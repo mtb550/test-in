@@ -23,7 +23,7 @@ public class TestCaseTableEditor extends UserDataHolderBase implements FileEdito
         TestCaseTableModel model = new TestCaseTableModel(feature.getTestCases());
         JBTable table = new JBTable(model);
 
-        // Add toolbar
+        // Toolbar
         JToolBar toolBar = new JToolBar();
         JTextField searchField = new JTextField(20);
         JButton searchButton = new JButton("Search");
@@ -54,7 +54,7 @@ public class TestCaseTableEditor extends UserDataHolderBase implements FileEdito
             table.clearSelection();
         });
 
-        // Double-click event
+        // Double-click to show details in TestCaseDetails tool window
         table.addMouseListener(new MouseInputAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -62,7 +62,7 @@ public class TestCaseTableEditor extends UserDataHolderBase implements FileEdito
                     int row = table.rowAtPoint(e.getPoint());
                     if (row >= 0) {
                         TestCase tc = model.getTestCaseAt(row);
-                        TestCaseToolWindow.show(tc);
+                        TestCaseToolWindow.show(tc); // This opens the side panel
                     }
                 }
             }
