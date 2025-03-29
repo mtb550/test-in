@@ -8,14 +8,14 @@ import com.intellij.openapi.wm.ToolWindowManager;
 public class TestCaseToolWindow {
     public static void show(TestCase testCase) {
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("TestCaseViewer");
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("TestCaseDetails");
 
         if (toolWindow != null) {
             if (!toolWindow.isVisible()) {
                 toolWindow.show();
             }
 
-            TestCaseToolWindowContent viewer = TestCaseToolWindowFactory.getInstance();
+            TestCaseDetailsPanel viewer = TestCaseDetailsToolWindowFactory.getInstance();
             if (viewer != null) {
                 viewer.update(testCase);
             }

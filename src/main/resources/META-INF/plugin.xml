@@ -1,41 +1,40 @@
 <idea-plugin>
     <id>com.example.demo</id>
-    <name>Demo</name>
+    <name>Test Case Manager</name>
     <vendor email="mtb550@gmail.com" url="https://mtb.com">initial</vendor>
 
     <description><![CDATA[
-        Plugin to browse test projects, view features, and manage test cases.
+        Plugin to browse test projects, view features, and manage test cases with details and bug tracking.
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
 
-    <!-- Register the tool window -->
     <extensions defaultExtensionNs="com.intellij">
+        <!-- Tool window: Test Case Explorer -->
         <toolWindow
-                id="TestCaseViewer"
-                factoryClass="com.example.demo.TestCaseToolWindowFactory"
+                id="TestCaseExplorer"
+                factoryClass="com.example.demo.TestCaseExplorerToolWindowFactory"
+                anchor="left"
+                icon="/icons/t1.png"
+                secondary="true" />
+
+        <!-- Tool window: Test Case Details -->
+        <toolWindow
+                id="TestCaseDetails"
+                factoryClass="com.example.demo.TestCaseDetailsToolWindowFactory"
                 anchor="right"
                 icon="/icons/t1.png"
                 secondary="true" />
     </extensions>
 
-    <!-- Register menu action -->
     <actions>
-<!--        <action-->
-<!--                id="com.example.demo.OpenTestTreeAction"-->
-<!--                class="com.example.demo.ShowTestTreeAction"-->
-<!--                text="Open Test Plan Tree"-->
-<!--                description="Open a tree of test projects and features">-->
-<!--            <add-to-group group-id="ToolsMenu" anchor="last"/>-->
-<!--        </action>-->
         <action
                 id="com.example.demo.OpenTestTreeAction"
                 class="com.example.demo.ShowTestTreeAction"
                 text="Open Test Plan Tree"
-                description="Open a tree of test projects and features"
-                icon="/icons/t2.png">
-            <add-to-group group-id="MainToolBar" anchor="last"/>
+                description="Show Test Case Explorer"
+                icon="/icons/t1.png">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
-
     </actions>
 </idea-plugin>
