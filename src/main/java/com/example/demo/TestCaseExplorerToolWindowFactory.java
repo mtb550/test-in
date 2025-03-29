@@ -16,4 +16,3 @@ public class TestCaseExplorerToolWindowFactory implements ToolWindowFactory {
         toolWindow.getContentManager().addContent(content);
     }
 }
-

@@ -10,21 +10,21 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <!-- Tool window: Test Case Explorer -->
         <toolWindow
                 id="TestCaseExplorer"
                 factoryClass="com.example.demo.TestCaseExplorerToolWindowFactory"
                 anchor="left"
                 icon="/icons/t1.png"
                 secondary="true" />
-
-        <!-- Tool window: Test Case Details -->
         <toolWindow
                 id="TestCaseDetails"
                 factoryClass="com.example.demo.TestCaseDetailsToolWindowFactory"
                 anchor="right"
                 icon="/icons/t1.png"
                 secondary="true" />
+
+        <fileEditorProvider implementation="com.example.demo.TestCaseEditorProvider"/>
+
     </extensions>
 
     <actions>

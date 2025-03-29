@@ -26,4 +26,3 @@ public class TestCaseDetailsToolWindowFactory implements ToolWindowFactory {
         toolWindow.getContentManager().addContent(bugsTab);
     }
 }
-

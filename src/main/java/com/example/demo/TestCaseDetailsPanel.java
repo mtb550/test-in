@@ -56,4 +56,3 @@ public class TestCaseDetailsPanel {
         return bugPanel;
     }
 }
-
