@@ -17,12 +17,16 @@ public class TestCaseDetailsToolWindowFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         instance = new TestCaseDetailsPanel();
-        Content content = ContentFactory.getInstance()
-                .createContent(instance.getPanel(), "Details", false);
-        toolWindow.getContentManager().addContent(content);
+        ContentFactory contentFactory = ContentFactory.getInstance();
 
-        Content bugsTab = ContentFactory.getInstance()
-                .createContent(instance.getBugPanel(), "Open Bugs", false);
+        Content detailsTab = contentFactory.createContent(instance.getDetailsPanel(), "Details", false);
+        Content historyTab = contentFactory.createContent(instance.getHistoryPanel(), "History", false);
+        Content bugsTab = contentFactory.createContent(instance.getBugPanel(), "Open Bugs", false);
+
+        toolWindow.getContentManager().addContent(detailsTab);
+        toolWindow.getContentManager().addContent(historyTab);
         toolWindow.getContentManager().addContent(bugsTab);
     }
+
+
 }
