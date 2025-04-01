@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.pojo.Feature;
 import com.intellij.testFramework.LightVirtualFile;
 
 import java.util.Objects;

@@ -16,7 +16,7 @@
         <!-- 🧭 Left-side tool window: Test Case Explorer -->
         <toolWindow
                 id="TestCaseExplorer"
-                factoryClass="com.example.demo.TestCaseExplorerToolWindowFactory"
+                factoryClass="com.example.explorer.TestCaseExplorerToolWindowFactory"
                 anchor="left"
                 icon="/icons/t1.png"
                 secondary="true" />
@@ -24,27 +24,28 @@
         <!-- 🔍 Right-side tool window: Test Case Details -->
         <toolWindow
                 id="TestCaseDetails"
-                factoryClass="com.example.demo.TestCaseDetailsToolWindowFactory"
+                factoryClass="com.example.viewer.TestCaseDetailsToolWindowFactory"
                 anchor="right"
                 icon="/icons/t1.png"
                 secondary="true" />
 
         <!-- 📝 File editor provider for table editor -->
-        <fileEditorProvider implementation="com.example.demo.TestCaseEditorProvider"/>
+        <fileEditorProvider implementation="com.example.editor.TestCaseEditorProvider"/>
     </extensions>
 
     <actions>
         <!-- 📂 Menu action to show tree view manually -->
         <action
                 id="com.example.demo.OpenTestTreeAction"
-                class="com.example.demo.ShowTestTreeAction"
+                class="com.example.pojo.ShowTestTreeAction"
                 text="Open Test Plan Tree"
                 description="Show Test Case Explorer"
                 icon="/icons/t1.png">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
+
         </action>
             <action id="TestTreeContextMenuGroup"
-                    class="com.example.demo.TestTreeContextMenuGroup"
+                    class="com.example.explorer.TestTreeContextMenuGroup"
                     text="Test Tree Context Menu"
                     popup="true"/>
     </actions>

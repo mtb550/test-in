@@ -1,4 +1,6 @@
-package com.example.demo;
+package com.example.editor;
+
+import com.example.pojo.TestCase;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;

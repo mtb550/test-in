@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.pojo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -7,12 +7,12 @@ import java.util.List;
 public class DB {
     public static List<Project> loadProjects() {
         List<TestCase> loginTests = Arrays.asList(
-                new TestCase("Login with valid credentials", "Dashboard shown", "Enter username and password", "High"),
-                new TestCase("Login with invalid password", "Error message displayed", "Enter wrong password", "Medium")
+                new TestCase("login-01","Login with valid credentials", "Dashboard shown", "Enter username and password", "High"),
+                new TestCase("login-02","Login with invalid password", "Error message displayed", "Enter wrong password", "Medium")
         );
 
         List<TestCase> logoutTests = Arrays.asList(
-                new TestCase("Logout from profile page", "Redirected to login", "Click logout", "Low")
+                new TestCase("logout-01","Logout from profile page", "Redirected to login", "Click logout", "Low")
         );
 
         Feature loginFeature = new Feature("Login", loginTests);
@@ -23,7 +23,7 @@ public class DB {
         return new ArrayList<>(List.of(project));
     }
 
-    public static List<TestCaseHistory> loadTestCaseHistory(int testCaseId) {
+    public static List<TestCaseHistory> loadTestCaseHistory() {
         List<TestCaseHistory> history = new ArrayList<>();
         history.add(new TestCaseHistory("2024-03-01", "Created test case"));
         history.add(new TestCaseHistory("2024-03-15", "Updated expected result"));

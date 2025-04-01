@@ -1,5 +1,9 @@
 package com.example.demo;
 
+import com.example.pojo.DB;
+import com.example.pojo.TestCase;
+import com.example.pojo.TestCaseHistory;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -32,7 +36,7 @@ public class TestCaseToolWindowContent {
         detailTab.add(new JLabel("Priority: " + testCase.getPriority()));
 
         DefaultListModel<String> model = new DefaultListModel<>();
-        for (TestCaseHistory history : DB.loadTestCaseHistory(testCase.getId())) {
+        for (TestCaseHistory history : DB.loadTestCaseHistory()) {
             model.addElement(history.getTimestamp() + " - " + history.getChangeSummary());
         }
         JList<String> historyList = new JList<>(model);

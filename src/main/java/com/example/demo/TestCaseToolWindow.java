@@ -1,5 +1,8 @@
 package com.example.demo;
 
+import com.example.pojo.TestCase;
+import com.example.viewer.TestCaseDetailsPanel;
+import com.example.viewer.TestCaseDetailsToolWindowFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.wm.ToolWindow;

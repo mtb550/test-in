@@ -1,5 +1,7 @@
-package com.example.demo;
+package com.example.editor;
 
+import com.example.demo.TestCaseToolWindow;
+import com.example.pojo.TestCase;
 import com.intellij.ui.table.JBTable;
 
 import javax.swing.*;

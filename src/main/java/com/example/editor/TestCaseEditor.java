@@ -1,5 +1,7 @@
-package com.example.demo;
+package com.example.editor;
 
+import com.example.demo.TestCaseVirtualFile;
+import com.example.pojo.Feature;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;

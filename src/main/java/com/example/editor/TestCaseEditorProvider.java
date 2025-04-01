@@ -1,5 +1,6 @@
-package com.example.demo;
+package com.example.editor;
 
+import com.example.demo.TestCaseVirtualFile;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorProvider;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;

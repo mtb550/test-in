@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.explorer;
 
 import com.intellij.openapi.actionSystem.*;
 import org.jetbrains.annotations.NotNull;
@@ -141,7 +141,7 @@ public class TestTreeContextMenuGroup extends DefaultActionGroup {
 
     public class ExportExcelAction extends AnAction {
         public ExportExcelAction() {
-            super("Export as HTML");
+            super("Export as Excel");
         }
 
         @Override

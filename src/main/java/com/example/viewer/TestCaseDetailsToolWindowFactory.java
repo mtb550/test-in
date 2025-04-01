@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.viewer;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;

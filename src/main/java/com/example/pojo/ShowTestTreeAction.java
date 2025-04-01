@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.pojo;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;

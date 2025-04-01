@@ -1,4 +1,12 @@
-package com.example.demo;
+package com.example.explorer;
+
+import com.example.editor.TestCaseEditor;
+import com.example.pojo.DB;
+import com.example.pojo.Feature;
+import com.example.pojo.Project;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.treeStructure.Tree;
 
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -6,11 +14,11 @@ import java.awt.*;
 import java.util.List;
 
 public class TestTreePanel {
-    private JPanel mainPanel;
-    private JTree tree;
+    private JBPanel mainPanel;
+    private Tree tree;
 
     public TestTreePanel() {
-        mainPanel = new JPanel(new BorderLayout());
+        mainPanel = new JBPanel(new BorderLayout());
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test Projects");
         List<Project> projects = DB.loadProjects();
@@ -22,8 +30,8 @@ public class TestTreePanel {
             root.add(projectNode);
         }
 
-        tree = new JTree(root);
-        JScrollPane scrollPane = new JScrollPane(tree);
+        tree = new Tree(root);
+        JBScrollPane scrollPane = new JBScrollPane(tree);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         tree.addTreeSelectionListener(e -> {
@@ -35,7 +43,7 @@ public class TestTreePanel {
         });
     }
 
-    public JPanel getMainPanel() {
+    public JBPanel getMainPanel() {
         return mainPanel;
     }
 

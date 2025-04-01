@@ -1,12 +1,17 @@
-package com.example.demo;
+package com.example.editor;
 
+import com.example.demo.TestCaseToolWindow;
+import com.example.pojo.Feature;
+import com.example.pojo.TestCase;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.ui.TableSpeedSearch;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.components.JBComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +26,7 @@ public class TestCaseTableEditor extends UserDataHolderBase implements FileEdito
     private final JPanel panel;
 
     public TestCaseTableEditor(Feature feature) {
-        panel = new JPanel(new BorderLayout());
+        panel = new JBPanel(new BorderLayout());
 
         TestCaseTableModel model = new TestCaseTableModel(feature.getTestCases());
         JBTable table = new JBTable(model);
@@ -38,7 +43,7 @@ public class TestCaseTableEditor extends UserDataHolderBase implements FileEdito
             table.getColumnModel().getColumn(i).setCellRenderer(wrapRenderer);
         }
 
-        JScrollPane scrollPane = new JBScrollPane(table);
+        JBScrollPane scrollPane = new JBScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
 
         // Double-click to show details in TestCaseDetails tool window
