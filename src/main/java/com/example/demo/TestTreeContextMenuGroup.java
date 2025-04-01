@@ -1,7 +1,6 @@
 package com.example.demo;
 
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 public class TestTreeContextMenuGroup extends DefaultActionGroup {

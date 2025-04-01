@@ -2,9 +2,6 @@ package com.example.demo;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.ui.ScrollPaneFactory;
-import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.TreeSpeedSearch;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.NonOpaquePanel;

@@ -4,6 +4,7 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.fileEditor.FileEditorStateLevel;
 import com.intellij.openapi.util.UserDataHolderBase;
+import com.intellij.ui.TableSpeedSearch;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
-import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeListener;
@@ -21,79 +22,24 @@ public class TestCaseTableEditor extends UserDataHolderBase implements FileEdito
 
     public TestCaseTableEditor(Feature feature) {
         panel = new JPanel(new BorderLayout());
+
         TestCaseTableModel model = new TestCaseTableModel(feature.getTestCases());
         JBTable table = new JBTable(model);
-
-        table.setFont(new Font("SansSerif", Font.PLAIN, 20));
+        table.setFillsViewportHeight(true);
         table.setRowHeight(28);
-        table.setIntercellSpacing(new Dimension(5, 5));
-        table.setShowGrid(false);
-        table.setRowHeight(100); // or calculate dynamically if needed
-        table.setRowMargin(10);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setAutoCreateRowSorter(true);
+        table.setShowGrid(true);
 
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value,
-                                                           boolean isSelected, boolean hasFocus,
-                                                           int row, int column) {
-                JTextArea area = new JTextArea(value == null ? "" : value.toString());
-                area.setWrapStyleWord(true);
-                area.setLineWrap(true);
-                area.setOpaque(true);
-                area.setFont(table.getFont());
-                area.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        new TestCaseTableContextMenu(table, model);
+        new TableSpeedSearch(table);
 
-                if (isSelected) {
-                    area.setBackground(table.getSelectionBackground());
-                    area.setForeground(table.getSelectionForeground());
-                }
-//                else {
-//                    area.setBackground(row % 2 == 0 ? Color.WHITE : new Color(245, 245, 245)); // zebra stripe
-//                    area.setForeground(table.getForeground());
-//                }
+        TableCellRenderer wrapRenderer = new WrapTextCellRenderer();
+        for (int i = 0; i < model.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(wrapRenderer);
+        }
 
-                return area;
-            }
-        });
-
-
-        JBScrollPane scrollPane = new JBScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        JScrollPane scrollPane = new JBScrollPane(table);
         panel.add(scrollPane, BorderLayout.CENTER);
-
-        scrollPane.setBorder(BorderFactory.createTitledBorder("Test Cases"));
-
-        // Toolbar
-        JToolBar toolBar = new JToolBar();
-        JTextField searchField = new JTextField(20);
-        JButton searchButton = new JButton("Search");
-        JButton clearButton = new JButton("Clear");
-
-        toolBar.add(new JLabel("Search: "));
-        toolBar.add(searchField);
-        toolBar.add(searchButton);
-        toolBar.add(clearButton);
-
-        panel.add(toolBar, BorderLayout.NORTH);
-        panel.add(new JBScrollPane(table), BorderLayout.CENTER);
-
-        // Search functionality
-        searchButton.addActionListener(e -> {
-            String query = searchField.getText().toLowerCase();
-            table.clearSelection();
-            for (int i = 0; i < model.getRowCount(); i++) {
-                boolean match = model.getValueAt(i, 0).toString().toLowerCase().contains(query);
-                if (match) {
-                    table.addRowSelectionInterval(i, i);
-                }
-            }
-        });
-
-        clearButton.addActionListener(e -> {
-            searchField.setText("");
-            table.clearSelection();
-        });
 
         // Double-click to show details in TestCaseDetails tool window
         table.addMouseListener(new MouseInputAdapter() {
@@ -108,47 +54,48 @@ public class TestCaseTableEditor extends UserDataHolderBase implements FileEdito
                 }
             }
         });
+
     }
 
-    @Override
-    public @NotNull JComponent getComponent() {
-        return panel;
+    static class WrapTextCellRenderer extends JTextArea implements TableCellRenderer {
+        public WrapTextCellRenderer() {
+            setLineWrap(true);
+            setWrapStyleWord(true);
+            setOpaque(true);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus,
+                                                       int row, int column) {
+            setText(value == null ? "" : value.toString());
+            setFont(table.getFont());
+
+            if (isSelected) {
+                setBackground(table.getSelectionBackground());
+                setForeground(table.getSelectionForeground());
+            } else {
+                setBackground(table.getBackground());
+                setForeground(table.getForeground());
+            }
+
+            setSize(table.getColumnModel().getColumn(column).getWidth(), getPreferredSize().height);
+            table.setRowHeight(row, getPreferredSize().height + 10);
+            return this;
+        }
     }
 
-    @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
-        return panel;
-    }
-
-    @Override
-    public @NotNull String getName() {
-        return "Test Case Table";
-    }
-
-    @Override
-    public void dispose() {}
-
-    @Override
-    public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {}
-
-    @Override
-    public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {}
-
-    @Override
-    public FileEditorState getState(@NotNull FileEditorStateLevel level) {
+    // FileEditor interface methods
+    @Override public @NotNull JComponent getComponent() { return panel; }
+    @Override public @Nullable JComponent getPreferredFocusedComponent() { return panel; }
+    @Override public @NotNull String getName() { return "Test Case Table"; }
+    @Override public void dispose() {}
+    @Override public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {}
+    @Override public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {}
+    @Override public FileEditorState getState(@NotNull FileEditorStateLevel level) {
         return FileEditorState.INSTANCE;
     }
-
-    @Override
-    public void setState(@NotNull FileEditorState state) {}
-
-    @Override
-    public boolean isModified() {
-        return false;
-    }
-
-    @Override
-    public boolean isValid() {
-        return true;
-    }
+    @Override public void setState(@NotNull FileEditorState state) {}
+    @Override public boolean isModified() { return false; }
+    @Override public boolean isValid() { return true; }
 }
