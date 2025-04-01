@@ -127,33 +127,39 @@ public class TestCaseExplorerPanel {
         return panel;
     }
 
+//    private void showContextMenu(MouseEvent e, DefaultMutableTreeNode node) {
+//        JPopupMenu menu = new JPopupMenu();
+//
+//        menu.add(new JMenuItem("➕ Add Suite"));
+//        menu.add(new JMenuItem("➕ Add Feature"));
+//        menu.addSeparator();
+//        menu.add(new JMenuItem("❌ Delete"));
+//        menu.add(new JMenuItem("✏️ Rename"));
+//        menu.addSeparator();
+//
+//        JMenuItem runItem = new JMenuItem("▶ Run Feature");
+//        runItem.setEnabled(node.getUserObject() instanceof NodeInfo info && info.type == NodeType.FEATURE);
+//        menu.add(runItem);
+//        menu.addSeparator();
+//
+//        JMenu export = new JMenu("📤 Export");
+//        export.add(new JMenuItem("CSV"));
+//        export.add(new JMenuItem("HTML"));
+//        export.add(new JMenuItem("Excel"));
+//        menu.add(export);
+//
+//        menu.add(new JMenuItem("📥 Import"));
+//        menu.addSeparator();
+//        menu.add(new JMenuItem("🕓 Open Old Versions"));
+//        menu.add(new JMenuItem("📌 View Pending Commits"));
+//
+//        menu.show(tree, e.getX(), e.getY());
+//    }
+
     private void showContextMenu(MouseEvent e, DefaultMutableTreeNode node) {
-        JPopupMenu menu = new JPopupMenu();
-
-        menu.add(new JMenuItem("➕ Add Suite"));
-        menu.add(new JMenuItem("➕ Add Feature"));
-        menu.addSeparator();
-        menu.add(new JMenuItem("❌ Delete"));
-        menu.add(new JMenuItem("✏️ Rename"));
-        menu.addSeparator();
-
-        JMenuItem runItem = new JMenuItem("▶ Run Feature");
-        runItem.setEnabled(node.getUserObject() instanceof NodeInfo info && info.type == NodeType.FEATURE);
-        menu.add(runItem);
-        menu.addSeparator();
-
-        JMenu export = new JMenu("📤 Export");
-        export.add(new JMenuItem("CSV"));
-        export.add(new JMenuItem("HTML"));
-        export.add(new JMenuItem("Excel"));
-        menu.add(export);
-
-        menu.add(new JMenuItem("📥 Import"));
-        menu.addSeparator();
-        menu.add(new JMenuItem("🕓 Open Old Versions"));
-        menu.add(new JMenuItem("📌 View Pending Commits"));
-
-        menu.show(tree, e.getX(), e.getY());
+        ActionGroup actionGroup = (ActionGroup) ActionManager.getInstance().getAction("TestTreeContextMenuGroup");
+        ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.PROJECT_VIEW_POPUP, actionGroup);
+        popupMenu.getComponent().show(tree, e.getX(), e.getY());
     }
 
     public JPanel getPanel() {
