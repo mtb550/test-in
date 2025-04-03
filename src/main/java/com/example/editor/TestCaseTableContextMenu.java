@@ -77,7 +77,7 @@ public class TestCaseTableContextMenu {
             System.out.println("🧪 Automation Ref: " + automationRef);
             if (automationRef != null && !automationRef.isBlank()) {
                 Project project = com.intellij.openapi.project.ProjectManager.getInstance().getOpenProjects()[0]; // You may want a better way to get project
-                TestNGRunner.runTestMethod(project, automationRef); // call your method
+                TestNGRunner.debugTestMethod(project, automationRef); // call your method
 
                 notify("Running TestNG class: " + automationRef, NotificationType.INFORMATION);
             } else {
