@@ -5,13 +5,15 @@ import com.example.pojo.DB;
 import com.example.pojo.Feature;
 import com.example.pojo.Project;
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.ui.treeStructure.SimpleTree;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -31,14 +33,10 @@ public class TestCaseExplorerPanel {
         toolWindowPanel = new NonOpaquePanel(new BorderLayout());
         tree = new SimpleTree();
 
-
         tree.setModel(buildTreeModel());
         tree.setRootVisible(true);
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new IntelliJRenderer());
-
-
-        //new TreeSpeedSearch(tree);
 
         tree.addMouseListener(new MouseAdapter() {
             @Override
@@ -72,12 +70,8 @@ public class TestCaseExplorerPanel {
         });
 
         JBScrollPane scrollPane = new JBScrollPane(tree);
-        //toolWindowPanel.setContent(scrollPane);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-
-        // Add IntelliJ-style toolbar
-        toolWindowPanel.add(buildToolbar(), BorderLayout.NORTH);
         toolWindowPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
@@ -95,49 +89,6 @@ public class TestCaseExplorerPanel {
         return new DefaultTreeModel(root);
     }
 
-    private JComponent buildToolbar() {
-        DefaultActionGroup group = new DefaultActionGroup();
-
-        group.add(new AnAction("Expand All", "Expand all nodes", AllIcons.Actions.Expandall) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
-            }
-        });
-
-        group.add(new AnAction("Collapse All", "Collapse all nodes", AllIcons.Actions.Collapseall) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                for (int i = tree.getRowCount() - 1; i >= 0; i--) tree.collapseRow(i);
-            }
-        });
-
-        group.addSeparator();
-
-        group.add(new AnAction("Refresh", "Reload", AllIcons.Actions.Refresh) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                tree.setModel(buildTreeModel());
-            }
-        });
-
-        group.add(new AnAction("Settings", "Configure Tree", AllIcons.General.Settings) {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                JOptionPane.showMessageDialog(tree, "Settings coming soon!");
-            }
-        });
-
-        ActionToolbar toolbar = ActionManager.getInstance().createActionToolbar("TestExplorerToolbar", group, true);
-        toolbar.setTargetComponent(tree);
-
-        NonOpaquePanel panel = new NonOpaquePanel(new BorderLayout());
-        panel.add(toolbar.getComponent(), BorderLayout.WEST);
-        panel.setBorder(null);
-
-        return panel;
-    }
-
     private void showContextMenu(MouseEvent e, DefaultMutableTreeNode node) {
         ActionGroup actionGroup = (ActionGroup) ActionManager.getInstance().getAction("TestTreeContextMenuGroup");
         ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.PROJECT_VIEW_POPUP, actionGroup);
@@ -146,6 +97,18 @@ public class TestCaseExplorerPanel {
 
     public JPanel getPanel() {
         return toolWindowPanel;
+    }
+
+    public void expandAll() {
+        for (int i = 0; i < tree.getRowCount(); i++) tree.expandRow(i);
+    }
+
+    public void collapseAll() {
+        for (int i = tree.getRowCount() - 1; i >= 0; i--) tree.collapseRow(i);
+    }
+
+    public void refresh() {
+        tree.setModel(buildTreeModel());
     }
 
     enum NodeType {PROJECT, FOLDER, FEATURE}
@@ -172,7 +135,9 @@ public class TestCaseExplorerPanel {
 
     static class IntelliJRenderer implements TreeCellRenderer {
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        public Component getTreeCellRendererComponent(JTree tree, Object value,
+                                                      boolean selected, boolean expanded,
+                                                      boolean leaf, int row, boolean hasFocus) {
             SimpleColoredComponent comp = new SimpleColoredComponent();
             comp.setOpaque(false);
             comp.setBorder(null);
@@ -190,7 +155,6 @@ public class TestCaseExplorerPanel {
             }
 
             comp.append(text, SimpleTextAttributes.REGULAR_ATTRIBUTES);
-
             return comp;
         }
     }
