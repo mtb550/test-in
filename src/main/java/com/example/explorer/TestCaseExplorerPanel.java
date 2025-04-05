@@ -6,8 +6,8 @@ import com.example.pojo.Feature;
 import com.example.pojo.Project;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.*;
-import com.intellij.openapi.ui.SimpleToolWindowPanel;
-import com.intellij.ui.TreeSpeedSearch;
+import com.intellij.ui.SimpleColoredComponent;
+import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -15,8 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -24,19 +24,21 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 public class TestCaseExplorerPanel {
-    private final SimpleToolWindowPanel toolWindowPanel;
+    private final NonOpaquePanel toolWindowPanel;
     private final SimpleTree tree;
 
     public TestCaseExplorerPanel() {
-        toolWindowPanel = new SimpleToolWindowPanel(true, true);
+        toolWindowPanel = new NonOpaquePanel(new BorderLayout());
         tree = new SimpleTree();
+
 
         tree.setModel(buildTreeModel());
         tree.setRootVisible(true);
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new IntelliJRenderer());
 
-        new TreeSpeedSearch(tree);
+
+        //new TreeSpeedSearch(tree);
 
         tree.addMouseListener(new MouseAdapter() {
             @Override
@@ -70,10 +72,13 @@ public class TestCaseExplorerPanel {
         });
 
         JBScrollPane scrollPane = new JBScrollPane(tree);
-        toolWindowPanel.setContent(scrollPane);
+        //toolWindowPanel.setContent(scrollPane);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+
 
         // Add IntelliJ-style toolbar
-        toolWindowPanel.setToolbar(buildToolbar());
+        toolWindowPanel.add(buildToolbar(), BorderLayout.NORTH);
+        toolWindowPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
     private DefaultTreeModel buildTreeModel() {
@@ -127,7 +132,9 @@ public class TestCaseExplorerPanel {
         toolbar.setTargetComponent(tree);
 
         NonOpaquePanel panel = new NonOpaquePanel(new BorderLayout());
-        panel.add(toolbar.getComponent(), BorderLayout.CENTER);
+        panel.add(toolbar.getComponent(), BorderLayout.WEST);
+        panel.setBorder(null);
+
         return panel;
     }
 
@@ -163,23 +170,28 @@ public class TestCaseExplorerPanel {
         }
     }
 
-    static class IntelliJRenderer extends DefaultTreeCellRenderer {
+    static class IntelliJRenderer implements TreeCellRenderer {
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value,
-                                                      boolean selected, boolean expanded,
-                                                      boolean leaf, int row, boolean hasFocus) {
-            JLabel label = (JLabel) super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            SimpleColoredComponent comp = new SimpleColoredComponent();
+            comp.setOpaque(false);
+            comp.setBorder(null);
 
             Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
+            String text = value.toString();
+
             if (userObject instanceof NodeInfo info) {
+                text = info.name;
                 switch (info.type) {
-                    case PROJECT -> label.setIcon(AllIcons.Nodes.Module);
-                    case FOLDER -> label.setIcon(AllIcons.Nodes.Folder);
-                    case FEATURE -> label.setIcon(AllIcons.Nodes.Class);
+                    case PROJECT -> comp.setIcon(AllIcons.Nodes.Module);
+                    case FOLDER -> comp.setIcon(AllIcons.Nodes.Folder);
+                    case FEATURE -> comp.setIcon(AllIcons.Nodes.Test);
                 }
             }
 
-            return label;
+            comp.append(text, SimpleTextAttributes.REGULAR_ATTRIBUTES);
+
+            return comp;
         }
     }
 }
