@@ -3,6 +3,7 @@ package com.example.editor;
 import com.example.Runner.TestNGRunner;
 import com.example.demo.TestCaseToolWindow;
 import com.example.pojo.TestCase;
+import com.example.util.Tools;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
@@ -77,6 +78,7 @@ public class TestCaseTableContextMenu {
             System.out.println("🧪 Automation Ref: " + automationRef);
             if (automationRef != null && !automationRef.isBlank()) {
                 Project project = com.intellij.openapi.project.ProjectManager.getInstance().getOpenProjects()[0]; // You may want a better way to get project
+                Tools.printTestSourceRoots(project);
                 TestNGRunner.debugTestMethod(project, automationRef); // call your method
 
                 notify("Running TestNG class: " + automationRef, NotificationType.INFORMATION);

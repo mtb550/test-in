@@ -7,7 +7,7 @@ import java.util.List;
 public class DB {
     public static List<Project> loadProjects() {
         List<TestCase> loginTests = Arrays.asList(
-                new TestCase("login-01", "Login with valid credentials", "Dashboard shown", "Enter username and password", "High", "test.LoginTest.test1"),
+                new TestCase("login-01", "Login with valid credentials", "Dashboard shown", "Enter username and password", "High", "AppActivationTest.verifyUserActivatesAppSuccessfully"),
                 new TestCase("login-02", "Login with invalid password", "Error message displayed", "Enter wrong password", "Medium", "test.LoginTest.test2")
         );
 
