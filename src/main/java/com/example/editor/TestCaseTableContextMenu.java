@@ -1,6 +1,7 @@
 package com.example.editor;
 
 import com.example.Runner.TestNGRunner;
+import com.example.Runner.TestNGRunnerByClassName;
 import com.example.Runner.TestNGRunnerByMethod;
 import com.example.demo.TestCaseToolWindow;
 import com.example.pojo.TestCase;
@@ -81,7 +82,8 @@ public class TestCaseTableContextMenu {
                 Project project = com.intellij.openapi.project.ProjectManager.getInstance().getOpenProjects()[0]; // You may want a better way to get project
                 Tools.printTestSourceRoots(project);
                 //TestNGRunner.debugTestMethod(project, automationRef); // call your method
-                TestNGRunnerByMethod.runTestMethod(project,automationRef,"test1");
+                //TestNGRunnerByMethod.runTestMethod(project,automationRef,"test1"); // works fine
+                TestNGRunnerByClassName.runTestClass(project,automationRef);
 
                 notify("Running TestNG class: " + automationRef, NotificationType.INFORMATION);
             } else {
