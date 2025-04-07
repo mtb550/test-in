@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
-public class TestCaseEditorProvider implements FileEditorProvider {
+public class EditorProvider implements FileEditorProvider {
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
         return file instanceof TestCaseVirtualFile;
@@ -16,7 +16,7 @@ public class TestCaseEditorProvider implements FileEditorProvider {
 
     @Override
     public @NotNull FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
-        return new TestCaseTableEditor(((TestCaseVirtualFile) file).getFeature());
+        return new TableEditor(((TestCaseVirtualFile) file).getFeature());
     }
 
     @Override

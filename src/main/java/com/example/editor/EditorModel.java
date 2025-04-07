@@ -5,11 +5,11 @@ import com.example.pojo.TestCase;
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
 
-public class TestCaseTableModel extends AbstractTableModel {
+public class EditorModel extends AbstractTableModel {
     private final String[] columnNames = {"#", "Title", "Expected Result", "Steps", "Priority", "Automation Ref"};
     private final List<TestCase> testCases;
 
-    public TestCaseTableModel(List<TestCase> testCases) {
+    public EditorModel(List<TestCase> testCases) {
         this.testCases = testCases;
     }
 

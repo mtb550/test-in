@@ -32,7 +32,7 @@
                 secondary="false"/>
 
         <!-- 📝 File editor provider for table editor -->
-        <fileEditorProvider implementation="com.example.editor.TestCaseEditorProvider"/>
+        <fileEditorProvider implementation="com.example.editor.EditorProvider"/>
 
         <notificationGroup id="Test Case Notifications"
                            displayType="BALLOON"

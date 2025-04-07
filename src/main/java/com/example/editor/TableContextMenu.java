@@ -3,7 +3,6 @@ package com.example.editor;
 import com.example.Runner.TestNGRunnerByClassName;
 import com.example.Runner.TestNGRunnerBySuite;
 import com.example.demo.TestCaseToolWindow;
-import com.example.pojo.GroupType;
 import com.example.pojo.TestCase;
 import com.example.util.Notifier;
 import com.example.util.Tools;
@@ -15,9 +14,9 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
-public class TestCaseTableContextMenu {
+public class TableContextMenu {
 
-    public TestCaseTableContextMenu(JPanel card, TestCase tc, List<TestCase> testCases) {
+    public TableContextMenu(JPanel card, TestCase tc, List<TestCase> testCases) {
         JPopupMenu menu = new JPopupMenu();
 
         JMenuItem copyItem = new JMenuItem("📋 Copy");
@@ -46,7 +45,7 @@ public class TestCaseTableContextMenu {
 
         JMenuItem duplicateItem = new JMenuItem("📄 Duplicate");
         duplicateItem.addActionListener(e -> {
-            testCases.add(new TestCase(tc.getId(), tc.getTitle() + " (Copy)", tc.getExpectedResult(), tc.getSteps(), tc.getPriority(), tc.getAutomationRef(), List.of(GroupType.Regression)));
+            //testCases.add(new TestCase(tc.getId(), tc.getTitle() + " (Copy)", tc.getExpectedResult(), tc.getSteps(), tc.getPriority(), tc.getAutomationRef(), List.of(GroupType.Regression)));
         });
 
         JMenuItem deleteItem = new JMenuItem("🗑 Delete");

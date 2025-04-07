@@ -13,19 +13,25 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class TestCaseTableEditor extends UserDataHolderBase implements FileEditor {
+public class TableEditor extends UserDataHolderBase implements FileEditor {
     private final JPanel panel;
     private final JPanel listPanel;
     private final List<TestCase> testCases;
 
-    public TestCaseTableEditor(@NotNull Feature feature) {
+    public TableEditor(@NotNull Feature feature) {
         panel = new JBPanel<>(new BorderLayout());
         listPanel = new JPanel();
         listPanel.setLayout(new BoxLayout(listPanel, BoxLayout.Y_AXIS));
         listPanel.setBackground(new Color(30, 30, 30));
-        testCases = feature.getTestCases();
+
+        testCases = feature.getTestCases()
+                .stream()
+                .sorted(Comparator.comparingInt(TestCase::getOrder))
+                .collect(Collectors.toList());
 
         refreshTestCases();
 
@@ -39,7 +45,7 @@ public class TestCaseTableEditor extends UserDataHolderBase implements FileEdito
         for (int i = 0; i < testCases.size(); i++) {
             TestCase tc = testCases.get(i);
             TestCaseCard card = new TestCaseCard(i, tc);
-            new TestCaseTableContextMenu(card, tc, testCases);
+            new TableContextMenu(card, tc, testCases);
             listPanel.add(card);
             listPanel.add(Box.createVerticalStrut(8));
         }
