@@ -1,6 +1,7 @@
 package com.example.explorer;
 
 import com.example.pojo.Tree;
+import com.example.util.ShortcutRegistry;
 import com.example.util.sql;
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.SimpleColoredComponent;
@@ -29,6 +30,7 @@ public class TestCaseExplorerPanel {
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new IntelliJRenderer());
         tree.addMouseListener(new TestCaseTreeMouseAdapter(tree));
+        ShortcutRegistry.Explorer(tree); // register all keyboard shortcuts
 
         JBScrollPane scrollPane = new JBScrollPane(tree);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());

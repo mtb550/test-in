@@ -13,6 +13,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.intellij.openapi.actionSystem.PlatformCoreDataKeys.CONTEXT_COMPONENT;
 
@@ -21,9 +24,12 @@ public class ExplorerContextMenu extends DefaultActionGroup {
     public ExplorerContextMenu() {
         super("Test Explorer Context Menu", true);
 
-        add(new AddProjectAction());
-        add(new AddSuiteAction());
-        add(new AddFeatureAction());
+        DefaultActionGroup addGroup = new DefaultActionGroup("➕ Add", true);
+        addGroup.add(new AddProjectAction());
+        addGroup.add(new AddSuiteAction());
+        addGroup.add(new AddFeatureAction());
+
+        add(addGroup); // instead of adding the three separately
         addSeparator();
         add(new DeleteNodeAction());
         add(new RenameNodeAction());
@@ -145,29 +151,45 @@ public class ExplorerContextMenu extends DefaultActionGroup {
             TreePath path = tree.getSelectionPath();
             if (path == null) return;
 
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-            Object userObject = node.getUserObject();
-            if (!(userObject instanceof TestCaseExplorerPanel.NodeInfo info)) return;
+            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+            if (!(selectedNode.getUserObject() instanceof TestCaseExplorerPanel.NodeInfo nodeInfo)) return;
 
-            int confirm = Messages.showYesNoDialog("Delete '" + info.name + "' and all its children?", "Confirm Delete", null);
+            int confirm = Messages.showYesNoDialog("Delete '" + nodeInfo.name + "' and all its children?", "Confirm Recursive Delete", null);
             if (confirm != Messages.YES) return;
 
             sql db = new sql();
+
             try {
-                db.execute("DELETE FROM tree WHERE id = ?", info.id);
-                // Optionally delete children in DB if cascade isn't set
+                // Collect all descendant IDs including this one
+                List<Integer> idsToDelete = new ArrayList<>();
+                collectIdsRecursively(nodeInfo.id, db, idsToDelete);
+
+                // Delete from DB
+                String inClause = idsToDelete.stream().map(id -> "?").collect(Collectors.joining(","));
+                db.execute("DELETE FROM tree WHERE id IN (" + inClause + ")", idsToDelete.toArray());
+
+                // Remove from UI
+                DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+                model.removeNodeFromParent(selectedNode);
+
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
+        }
 
-            ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(node);
+        private void collectIdsRecursively(int id, sql db, List<Integer> out) throws SQLException {
+            out.add(id);
+            Tree[] children = db.get("SELECT * FROM tree WHERE link = ?", id).as(Tree[].class);
+            for (Tree child : children) {
+                collectIdsRecursively(child.getId(), db, out);
+            }
         }
     }
 
 
     public static class AddFeatureAction extends AnAction {
         public AddFeatureAction() {
-            super("➕ Add Feature");
+            super("➕ New Feature");
         }
 
         @Override
@@ -204,7 +226,7 @@ public class ExplorerContextMenu extends DefaultActionGroup {
 
     public static class AddSuiteAction extends AnAction {
         public AddSuiteAction() {
-            super("➕ Add Suite");
+            super("➕ New Suite");
         }
 
         @Override
@@ -282,7 +304,7 @@ public class ExplorerContextMenu extends DefaultActionGroup {
 
     public static class AddProjectAction extends AnAction {
         public AddProjectAction() {
-            super("🆕 Add Project");
+            super("➕ New Project");
         }
 
         @Override
