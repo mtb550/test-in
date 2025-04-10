@@ -16,8 +16,8 @@ public class sql {
 
     @SneakyThrows
     public sql() {
-        //connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/mmoghyiri/Documents/Repo/iintellij-plugin-tc/autofy.db");
-        connection = DriverManager.getConnection("jdbc:sqlite:/home/mtb/IdeaProjects/demo/autofy.db");
+        connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/mmoghyiri/Documents/Repo/iintellij-plugin-tc/autofy.db");
+        //connection = DriverManager.getConnection("jdbc:sqlite:/home/mtb/IdeaProjects/demo/autofy.db");
     }
 
     public void close() {

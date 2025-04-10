@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,18 +23,18 @@ public class TestCaseFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getDescription() {
-        return "Test Case Table File";
+        return "Teat Cases table file";
     }
 
     @NotNull
     @Override
     public String getDefaultExtension() {
-        return "tctable";
+        return "tc table";
     }
 
     @Nullable
     @Override
     public Icon getIcon() {
-        return null;
+        return AllIcons.Nodes.DataTables;
     }
 }

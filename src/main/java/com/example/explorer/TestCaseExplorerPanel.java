@@ -30,7 +30,14 @@ public class TestCaseExplorerPanel {
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new IntelliJRenderer());
         tree.addMouseListener(new TestCaseTreeMouseAdapter(tree));
-        ShortcutRegistry.Explorer(tree); // register all keyboard shortcuts
+
+        // Enable drag and drop
+        tree.setDragEnabled(true);
+        tree.setDropMode(DropMode.ON_OR_INSERT);
+        tree.setTransferHandler(new TreeTransferHandler(tree));
+
+        // register all keyboard shortcuts
+        ShortcutRegistry.Explorer(tree);
 
         JBScrollPane scrollPane = new JBScrollPane(tree);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -84,8 +91,16 @@ public class TestCaseExplorerPanel {
 
     static class NodeInfo {
         String name;
-        int type;
-        int id;
+        Integer type;
+        Integer id;
+        Integer link;
+
+        NodeInfo(String name, int type, int id, int link) {
+            this.name = name;
+            this.type = type;
+            this.id = id;
+            this.link = link;
+        }
 
         NodeInfo(String name, int type, int id) {
             this.name = name;
