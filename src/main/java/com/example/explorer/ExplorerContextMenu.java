@@ -2,6 +2,7 @@ package com.example.explorer;
 
 import com.example.pojo.Tree;
 import com.example.util.sql;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -45,7 +46,11 @@ public class ExplorerContextMenu extends DefaultActionGroup {
         exportGroup.add(new ExportJsonAction());
         add(exportGroup);
 
-        add(new ImportAction()); // change it to group, add import from csv, json.
+        DefaultActionGroup importGroup = new DefaultActionGroup("📥 Import", true);
+        importGroup.add(new ImportCsvAction());
+        importGroup.add(new ImportExcelAction());
+        importGroup.add(new ImportJsonAction());
+        add(importGroup);
 
         DefaultActionGroup integrationGroup = new DefaultActionGroup("📥 Integrate", true);
         integrationGroup.add(new IntegrateTestRailAction());
@@ -81,17 +86,6 @@ public class ExplorerContextMenu extends DefaultActionGroup {
         }
     }
 
-    public static class ImportAction extends AnAction {
-        public ImportAction() {
-            super("📥 Import");
-        }
-
-        @Override
-        public void actionPerformed(@NotNull AnActionEvent e) {
-            // TODO: Import test cases
-        }
-    }
-
     public static class ExportCsvAction extends AnAction {
         public ExportCsvAction() {
             super("Export as CSV");
@@ -109,10 +103,34 @@ public class ExplorerContextMenu extends DefaultActionGroup {
         }
 
         @Override
+        public void update(@NotNull AnActionEvent e) {
+            JTree tree = e.getData(CONTEXT_COMPONENT) instanceof JTree jTree ? jTree : null;
+            if (tree == null) {
+                e.getPresentation().setEnabled(false);
+                return;
+            }
+
+            TreePath path = tree.getSelectionPath();
+            if (path == null) {
+                e.getPresentation().setEnabled(false);
+                return;
+            }
+
+            Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+            e.getPresentation().setEnabled(userObject instanceof TestCaseExplorerPanel.NodeInfo info && info.type == 2);
+        }
+
+        @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
             // TODO: Run the feature test automation
         }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
     }
+
 
     public static class RenameNodeAction extends AnAction {
         public RenameNodeAction() {
@@ -296,7 +314,7 @@ public class ExplorerContextMenu extends DefaultActionGroup {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            // TODO: Implement export logic to EXCEL
+            // TODO: Implement export logic to JSON
         }
     }
 
@@ -349,7 +367,7 @@ public class ExplorerContextMenu extends DefaultActionGroup {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            // TODO: Export test cases to CSV
+            // TODO: From Azure DevOps
         }
     }
 
@@ -360,7 +378,7 @@ public class ExplorerContextMenu extends DefaultActionGroup {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            // TODO: Export test cases to CSV
+            // TODO: From Test Rail
         }
     }
 
@@ -371,7 +389,40 @@ public class ExplorerContextMenu extends DefaultActionGroup {
 
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
-            // TODO: Export test cases to CSV
+            // TODO: From Jira
+        }
+    }
+
+    public static class ImportCsvAction extends AnAction {
+        public ImportCsvAction() {
+            super("From CSV");
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            // TODO: Import test cases From CSV
+        }
+    }
+
+    public static class ImportExcelAction extends AnAction {
+        public ImportExcelAction() {
+            super("From Excel");
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            // TODO: Import test cases From Excel
+        }
+    }
+
+    public static class ImportJsonAction extends AnAction {
+        public ImportJsonAction() {
+            super("From Json");
+        }
+
+        @Override
+        public void actionPerformed(@NotNull AnActionEvent e) {
+            // TODO: Import test cases From Json
         }
     }
 
