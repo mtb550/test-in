@@ -1,5 +1,6 @@
 package com.example.explorer;
 
+import com.example.pojo.Tree;
 import com.example.util.sql;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
@@ -66,15 +67,15 @@ public class TreeTransferHandler extends TransferHandler {
         DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) dropPath.getLastPathComponent();
         Object userObject = targetNode.getUserObject();
 
-        if (!(userObject instanceof TestCaseExplorerPanel.NodeInfo targetInfo)) return false;
+        if (!(userObject instanceof Tree targetInfo)) return false;
 
-        int targetType = targetInfo.type;
+        int targetType = targetInfo.getType();
         for (DefaultMutableTreeNode node : draggedNodes) {
             Object obj = node.getUserObject();
-            if (!(obj instanceof TestCaseExplorerPanel.NodeInfo draggedInfo)) return false;
+            if (!(obj instanceof Tree draggedInfo)) return false;
 
             // Block project moving or dropping into a feature
-            if (draggedInfo.type == 0 || targetType == 2) return false;
+            if (draggedInfo.getType() == 0 || targetType == 2) return false;
 
             // Block no-op
             if (node.getParent() == targetNode) return false;
@@ -95,25 +96,25 @@ public class TreeTransferHandler extends TransferHandler {
         DefaultMutableTreeNode newParent = (DefaultMutableTreeNode) dropPath.getLastPathComponent();
 
         Object parentObj = newParent.getUserObject();
-        if (!(parentObj instanceof TestCaseExplorerPanel.NodeInfo newParentInfo)) return false;
+        if (!(parentObj instanceof Tree newParentInfo)) return false;
 
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
         for (DefaultMutableTreeNode node : nodes) {
             Object userObj = node.getUserObject();
-            if (!(userObj instanceof TestCaseExplorerPanel.NodeInfo movingInfo)) continue;
+            if (!(userObj instanceof Tree movingInfo)) continue;
 
             // Remove from current parent
             model.removeNodeFromParent(node);
 
             // DB update
-            new sql().execute("UPDATE tree SET link = ? WHERE id = ?", newParentInfo.id, movingInfo.id);
+            new sql().execute("UPDATE tree SET link = ? WHERE id = ?", newParentInfo.getId(), movingInfo.getId());
 
             // Insert under new parent
             model.insertNodeInto(node, newParent, newParent.getChildCount());
 
             System.out.printf("[MOVED] '%s' (id=%d) -> '%s' (id=%d)%n",
-                    movingInfo.name, movingInfo.id, newParentInfo.name, newParentInfo.id);
+                    movingInfo.getName(), movingInfo.getId(), newParentInfo.getName(), newParentInfo.getId());
         }
 
         return true;

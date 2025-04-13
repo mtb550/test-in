@@ -62,7 +62,7 @@ public class TestCaseExplorerPanel {
 
     private DefaultMutableTreeNode buildSubTree(Tree treeItem) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-                new NodeInfo(treeItem.getName(), treeItem.getType(), treeItem.getId())
+                new Tree(treeItem.getId(), treeItem.getName(), treeItem.getType(), treeItem.getLink())
         );
 
         Tree[] children = db.get("SELECT * FROM tree WHERE link = ?", treeItem.getId()).as(Tree[].class);
@@ -91,35 +91,9 @@ public class TestCaseExplorerPanel {
         tree.setModel(buildTreeModel());
     }
 
-    static class NodeInfo {
-        String name;
-        Integer type;
-        Integer id;
-        Integer link;
-
-        NodeInfo(String name, int type, int id, int link) {
-            this.name = name;
-            this.type = type;
-            this.id = id;
-            this.link = link;
-        }
-
-        NodeInfo(String name, int type, int id) {
-            this.name = name;
-            this.type = type;
-            this.id = id;
-        }
-
-        public String toString() {
-            return name;
-        }
-    }
-
     static class IntelliJRenderer implements TreeCellRenderer {
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value,
-                                                      boolean selected, boolean expanded,
-                                                      boolean leaf, int row, boolean hasFocus) {
+        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             SimpleColoredComponent comp = new SimpleColoredComponent();
             comp.setOpaque(false);
             comp.setBorder(null);
@@ -127,16 +101,16 @@ public class TestCaseExplorerPanel {
             Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
             String text = value.toString();
 
-            if (userObject instanceof NodeInfo info) {
-                text = info.name;
-                switch (info.type) {
+            if (userObject instanceof Tree treeItem) {
+                text = treeItem.getName();
+                switch (treeItem.getType()) {
                     case 0 -> comp.setIcon(AllIcons.Nodes.Project);
                     case 1 -> comp.setIcon(AllIcons.Nodes.Folder);
                     case 2 -> comp.setIcon(AllIcons.Nodes.Class);
                 }
 
                 // Dim color for cut nodes
-                if (TestCaseTreeKeyAdapter.isCutNode(info.id)) {
+                if (TestCaseTreeKeyAdapter.isCutNode(treeItem.getId())) {
                     comp.append(text, SimpleTextAttributes.GRAYED_ATTRIBUTES);
                 } else {
                     comp.append(text, SimpleTextAttributes.REGULAR_ATTRIBUTES);

@@ -117,7 +117,7 @@ public class ExplorerContextMenu extends DefaultActionGroup {
             }
 
             Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-            e.getPresentation().setEnabled(userObject instanceof TestCaseExplorerPanel.NodeInfo info && info.type == 2);
+            e.getPresentation().setEnabled(userObject instanceof Tree treeItem && treeItem.getType() == 2);
         }
 
         @Override
@@ -147,15 +147,15 @@ public class ExplorerContextMenu extends DefaultActionGroup {
 
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
             Object userObject = node.getUserObject();
-            if (!(userObject instanceof TestCaseExplorerPanel.NodeInfo info)) return;
+            if (!(userObject instanceof Tree treeItem)) return;
 
-            String newName = Messages.showInputDialog("Rename node:", "Rename", null, info.name, null);
+            String newName = Messages.showInputDialog("Rename node:", "Rename", null, treeItem.getName(), null);
             if (newName == null || newName.isBlank()) return;
 
-            new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, info.id);
+            new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
 
 
-            info.name = newName;
+            treeItem.setName(newName);
             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
         }
     }
@@ -174,9 +174,9 @@ public class ExplorerContextMenu extends DefaultActionGroup {
             if (path == null) return;
 
             DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-            if (!(selectedNode.getUserObject() instanceof TestCaseExplorerPanel.NodeInfo nodeInfo)) return;
+            if (!(selectedNode.getUserObject() instanceof Tree treeItem)) return;
 
-            int confirm = Messages.showYesNoDialog("Delete '" + nodeInfo.name + "' and all its children?", "Confirm Recursive Delete", null);
+            int confirm = Messages.showYesNoDialog("Delete '" + treeItem.getName() + "' and all its children?", "Confirm Recursive Delete", null);
             if (confirm != Messages.YES) return;
 
             sql db = new sql();
@@ -184,7 +184,7 @@ public class ExplorerContextMenu extends DefaultActionGroup {
             try {
                 // Collect all descendant IDs including this one
                 List<Integer> idsToDelete = new ArrayList<>();
-                collectIdsRecursively(nodeInfo.id, db, idsToDelete);
+                collectIdsRecursively(treeItem.getId(), db, idsToDelete);
 
                 // Delete from DB
                 String inClause = idsToDelete.stream().map(id -> "?").collect(Collectors.joining(","));
@@ -224,18 +224,18 @@ public class ExplorerContextMenu extends DefaultActionGroup {
 
             DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
             Object userObject = parentNode.getUserObject();
-            if (!(userObject instanceof TestCaseExplorerPanel.NodeInfo parentInfo) || parentInfo.type == 2) return;
+            if (!(userObject instanceof Tree treeItem) || treeItem.getType() == 2) return;
 
             String name = Messages.showInputDialog("Enter feature name:", "Add Feature", null);
             if (name == null || name.isBlank()) return;
 
             sql db = new sql();
             db.execute("INSERT INTO tree (name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, datetime('now'))",
-                    name, 2, parentInfo.id, System.getProperty("user.name"));
+                    name, 2, treeItem.getId(), System.getProperty("user.name"));
 
 
             int newId = db.get("SELECT id from tree where name = ?", name).as(Tree.class).getId();
-            TestCaseExplorerPanel.NodeInfo newFeature = new TestCaseExplorerPanel.NodeInfo(name, 2, newId);
+            Tree newFeature = new Tree(name, 2, newId);
             DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFeature);
             ((DefaultTreeModel) tree.getModel()).insertNodeInto(newNode, parentNode, parentNode.getChildCount());
             tree.scrollPathToVisible(new TreePath(newNode.getPath()));
@@ -259,22 +259,22 @@ public class ExplorerContextMenu extends DefaultActionGroup {
             DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
             Object userObject = parentNode.getUserObject();
 
-            if (!(userObject instanceof TestCaseExplorerPanel.NodeInfo parentInfo) || parentInfo.type == 2) return;
+            if (!(userObject instanceof Tree treeItem) || treeItem.getType() == 2) return;
 
             String name = Messages.showInputDialog("Enter suite name:", "Add Suite", null);
             if (name == null || name.isBlank()) return;
 
             sql db = new sql();
-            db.execute("INSERT INTO tree (name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, datetime('now'))",
-                    name, 1, parentInfo.id, System.getProperty("user.name"));
+            db.execute("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?)",
+                    name, 1, treeItem.getId(), System.getProperty("user.name"));
 
 
             // Fetch new ID
-            int newId = db.get("SELECT id from tree where name = ?", name).as(Tree.class).getId();
+            Tree newInfo = db.get("SELECT TOP 1 * FROM tree WHERE name = ? ORDER BY created_at DESC", name).as(Tree.class);
 
             // Build new node and insert it
-            TestCaseExplorerPanel.NodeInfo newSuiteInfo = new TestCaseExplorerPanel.NodeInfo(name, 1, parentInfo.id);
-            newSuiteInfo.id = newId;
+            Tree newSuiteInfo = new Tree(name, 1, treeItem.getId());
+            newSuiteInfo.setId(newInfo.getId());
 
             DefaultMutableTreeNode newSuiteNode = new DefaultMutableTreeNode(newSuiteInfo);
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
@@ -332,12 +332,9 @@ public class ExplorerContextMenu extends DefaultActionGroup {
             if (name == null || name.isBlank()) return;
 
             sql db = new sql();
-            db.execute("INSERT INTO tree (name, type, created_by, created_at) VALUES (?, ?, ?, datetime('now'))",
-                    name, 0, System.getProperty("user.name"));
+            int newProjectId = db.get("INSERT INTO tree (name, type, created_by) VALUES (?, ?, ?) RETURNING id;", name, 0, System.getProperty("user.name")).asType(Integer.class);
 
-
-            int newId = db.get("SELECT id FROM tree WHERE name = ?", name).as(Tree.class).getId();
-            TestCaseExplorerPanel.NodeInfo newProject = new TestCaseExplorerPanel.NodeInfo(name, 0, newId);
+            Tree newProject = new Tree(name, 0, newProjectId);
             DefaultMutableTreeNode newProjectNode = new DefaultMutableTreeNode(newProject);
 
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();

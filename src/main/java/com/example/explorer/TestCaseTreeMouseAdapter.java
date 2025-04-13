@@ -1,6 +1,7 @@
 package com.example.explorer;
 
 import com.example.editor.TestCaseEditor;
+import com.example.pojo.Tree;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -26,18 +27,18 @@ public class TestCaseTreeMouseAdapter extends MouseAdapter {
 
         Object userObject = ((DefaultMutableTreeNode) selPath.getLastPathComponent()).getUserObject();
 
-        if (!(userObject instanceof TestCaseExplorerPanel.NodeInfo info)) return;
+        if (!(userObject instanceof Tree treeItem)) return;
 
         if (SwingUtilities.isRightMouseButton(e)) {
             ActionGroup group = (ActionGroup) ActionManager.getInstance().getAction("TestTreeContextMenuGroup");
             ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, group);
             popupMenu.getComponent().show(e.getComponent(), e.getX(), e.getY());
 
-        } else if (e.getClickCount() == 2 && info.type == 2) {
-            System.out.println(((TestCaseExplorerPanel.NodeInfo) userObject).name);
-            System.out.println(((TestCaseExplorerPanel.NodeInfo) userObject).type);
-            System.out.println(((TestCaseExplorerPanel.NodeInfo) userObject).id);
-            TestCaseEditor.open(((TestCaseExplorerPanel.NodeInfo) userObject).id);
+        } else if (e.getClickCount() == 2 && treeItem.getType() == 2) {
+            System.out.println(((Tree) userObject).getName());
+            System.out.println(((Tree) userObject).getType());
+            System.out.println(((Tree) userObject).getId());
+            TestCaseEditor.open(((Tree) userObject).getId());
         }
     }
 }

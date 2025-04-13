@@ -60,10 +60,10 @@ public class TestCaseTreeKeyAdapter {
                 if (path == null) return;
 
                 Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                if (userObject instanceof TestCaseExplorerPanel.NodeInfo info) {
-                    if (info.type == 2) {
-                        TestCaseEditor.open(info.id);
-                        System.out.printf("[ENTER] Opened test case: %s%n", info.name);
+                if (userObject instanceof Tree treeItem) {
+                    if (treeItem.getType() == 2) {
+                        TestCaseEditor.open(treeItem.getId());
+                        System.out.printf("[ENTER] Opened test case: %s%n", treeItem.getName());
                     }
                 }
             }
@@ -105,7 +105,7 @@ public class TestCaseTreeKeyAdapter {
                 for (TreePath path : paths) {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                     clipboard.add(node);
-                    cutNodeIds.add(((TestCaseExplorerPanel.NodeInfo) node.getUserObject()).id);
+                    cutNodeIds.add(((Tree) node.getUserObject()).getId());
                 }
 
                 isCut = true;
@@ -127,27 +127,27 @@ public class TestCaseTreeKeyAdapter {
 
                 DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) targetPath.getLastPathComponent();
                 Object userObject = targetNode.getUserObject();
-                if (!(userObject instanceof TestCaseExplorerPanel.NodeInfo targetInfo)) return;
+                if (!(userObject instanceof Tree targetTreeItem)) return;
 
                 DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
                 for (DefaultMutableTreeNode node : clipboard) {
-                    TestCaseExplorerPanel.NodeInfo originalInfo = (TestCaseExplorerPanel.NodeInfo) node.getUserObject();
+                    Tree sourceTreeItem = (Tree) node.getUserObject();
 
                     if (!isCut) {
                         new sql().execute("INSERT INTO tree (name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, datetime('now'))",
-                                originalInfo.name + " (Copy)", originalInfo.type, targetInfo.id, System.getProperty("user.name"));
+                                sourceTreeItem.getName() + " (Copy)", sourceTreeItem.getType(), targetTreeItem.getId(), System.getProperty("user.name"));
 
                         int newId = new sql().get("SELECT last_insert_rowid() AS id").as(Tree.class).getId();
 
-                        TestCaseExplorerPanel.NodeInfo newInfo = new TestCaseExplorerPanel.NodeInfo(
-                                originalInfo.name + " (Copy)", originalInfo.type, newId);
-                        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newInfo);
+                        Tree treeItem = new Tree(
+                                sourceTreeItem.getName() + " (Copy)", sourceTreeItem.getType(), newId);
+                        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(treeItem);
                         model.insertNodeInto(newNode, targetNode, targetNode.getChildCount());
 
                         ActionHistory.registerUndo(() -> {
                             model.removeNodeFromParent(newNode);
-                            new sql().execute("DELETE FROM tree WHERE id = ?", newInfo.id);
+                            new sql().execute("DELETE FROM tree WHERE id = ?", treeItem.getId());
                             tree.repaint();
                         });
 
@@ -156,13 +156,13 @@ public class TestCaseTreeKeyAdapter {
                         model.removeNodeFromParent(node);
                         model.insertNodeInto(node, targetNode, targetNode.getChildCount());
 
-                        new sql().execute("UPDATE tree SET link = ? WHERE id = ?", targetInfo.id, originalInfo.id);
+                        new sql().execute("UPDATE tree SET link = ? WHERE id = ?", targetTreeItem.getId(), sourceTreeItem.getId());
 
                         ActionHistory.registerUndo(() -> {
                             model.removeNodeFromParent(node);
                             model.insertNodeInto(node, oldParent, oldParent.getChildCount());
                             new sql().execute("UPDATE tree SET link = ? WHERE id = ?",
-                                    ((TestCaseExplorerPanel.NodeInfo) oldParent.getUserObject()).id, originalInfo.id);
+                                    ((Tree) oldParent.getUserObject()).getId(), sourceTreeItem.getId());
                             tree.repaint();
                         });
                     }
@@ -192,17 +192,17 @@ public class TestCaseTreeKeyAdapter {
                 for (TreePath path : paths) {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                     Object userObject = node.getUserObject();
-                    if (userObject instanceof TestCaseExplorerPanel.NodeInfo info) {
+                    if (userObject instanceof Tree treeItem) {
                         DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
                         int index = parent.getIndex(node);
 
                         model.removeNodeFromParent(node);
-                        new sql().execute("DELETE FROM tree WHERE id = ?", info.id);
+                        new sql().execute("DELETE FROM tree WHERE id = ?", treeItem.getId());
 
                         ActionHistory.registerUndo(() -> {
                             model.insertNodeInto(node, parent, index);
                             new sql().execute("INSERT INTO tree (id, name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))",
-                                    info.id, info.name, info.type, info.link, System.getProperty("user.name"));
+                                    treeItem.getId(), treeItem.getName(), treeItem.getType(), treeItem.getLink(), System.getProperty("user.name"));
                             tree.repaint();
                         });
                     }
@@ -244,28 +244,28 @@ public class TestCaseTreeKeyAdapter {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                 Object userObject = node.getUserObject();
 
-                if (!(userObject instanceof TestCaseExplorerPanel.NodeInfo info)) return;
+                if (!(userObject instanceof Tree treeItem)) return;
 
-                String newName = JOptionPane.showInputDialog(tree, "Rename node:", info.name);
-                if (newName == null || newName.isBlank() || newName.equals(info.name)) return;
+                String newName = JOptionPane.showInputDialog(tree, "Rename node:", treeItem.getName());
+                if (newName == null || newName.isBlank() || newName.equals(treeItem.getName())) return;
 
-                String oldName = info.name;
-                info.name = newName;
+                String oldName = treeItem.getName();
+                treeItem.setName(newName);
                 ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
-                new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, info.id);
+                new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
 
                 // Undo support
                 ActionHistory.registerUndo(() -> {
-                    info.name = oldName;
+                    treeItem.setName(oldName);
                     ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
-                    new sql().execute("UPDATE tree SET name = ? WHERE id = ?", oldName, info.id);
+                    new sql().execute("UPDATE tree SET name = ? WHERE id = ?", oldName, treeItem.getId());
                     tree.repaint();
                 });
 
                 ActionHistory.showStatus(project);
                 StatusUtil.showBalloon(project, "Renamed to: " + newName, MessageType.INFO);
-                System.out.printf("[RENAME] Node id=%d renamed '%s' -> '%s'%n", info.id, oldName, newName);
+                System.out.printf("[RENAME] Node id=%d renamed '%s' -> '%s'%n", treeItem.getId(), oldName, newName);
             }
         });
 
@@ -293,7 +293,7 @@ public class TestCaseTreeKeyAdapter {
             public void actionPerformed(ActionEvent e) {
                 TreePath path = tree.getSelectionPath();
                 DefaultMutableTreeNode selected = path != null ? (DefaultMutableTreeNode) path.getLastPathComponent() : null;
-                TestCaseExplorerPanel.NodeInfo selectedInfo = selected != null ? (TestCaseExplorerPanel.NodeInfo) selected.getUserObject() : null;
+                Tree selectedInfo = selected != null ? (Tree) selected.getUserObject() : null;
 
                 JBPanel<?> panel = new JBPanel<>(new BorderLayout(5, 5));
                 JBTextField nameField = new JBTextField();
@@ -337,26 +337,25 @@ public class TestCaseTreeKeyAdapter {
 
                 int parentId = 0;
 
-                if (newType == 1 && (selectedInfo == null || selectedInfo.type != 0)) {
+                if (newType == 1 && (selectedInfo == null || selectedInfo.getType() != 0)) {
                     JOptionPane.showMessageDialog(tree, "Please select a project to add a suite.");
                     return;
                 }
 
-                if (newType == 2 && (selectedInfo == null || selectedInfo.type != 1)) {
+                if (newType == 2 && (selectedInfo == null || selectedInfo.getType() != 1)) {
                     JOptionPane.showMessageDialog(tree, "Please select a suite to add a feature.");
                     return;
                 }
 
                 if (newType == 1 || newType == 2) {
-                    parentId = selectedInfo.id;
+                    parentId = selectedInfo.getId();
                 }
 
                 sql db = new sql();
-                db.execute("INSERT INTO tree (name, type, link, created_at, created_by) VALUES (?, ?, ?, datetime('now'), ?)",
+                db.execute("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?)",
                         name, newType, parentId, System.getProperty("user.name"));
 
-                int newId = db.get("SELECT last_insert_rowid() AS id").as(com.example.pojo.Tree.class).getId();
-                TestCaseExplorerPanel.NodeInfo newInfo = new TestCaseExplorerPanel.NodeInfo(name, newType, newId, parentId);
+                Tree newInfo = db.get("SELECT TOP 1 * FROM tree WHERE name = ? ORDER BY created_at DESC", name).as(Tree.class);
                 DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newInfo);
 
                 if (newType == 0) {

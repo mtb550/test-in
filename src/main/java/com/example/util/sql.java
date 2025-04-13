@@ -87,5 +87,13 @@ public class sql {
         String data = clazz.isArray() ? mapper.writeValueAsString(dbResult) : mapper.writeValueAsString(dbResult.get(0));
         return mapper.readValue(data, clazz);
     }
+
+    public <T> T asType(final Class<T> clazz) {
+        if (dbResult == null || dbResult.isEmpty() || dbResult.get(0).isEmpty())
+            return null;
+
+        Object data = dbResult.get(0).values().iterator().next();
+        return mapper.convertValue(data, clazz);
+    }
 }
 
