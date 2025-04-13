@@ -10,6 +10,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 import com.intellij.ui.treeStructure.SimpleTree;
+import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -19,6 +20,7 @@ import java.awt.*;
 
 public class TestCaseExplorerPanel {
     private final NonOpaquePanel toolWindowPanel;
+    @Getter
     private final SimpleTree tree;
     private sql db = new sql();
 
@@ -61,14 +63,12 @@ public class TestCaseExplorerPanel {
     }
 
     private DefaultMutableTreeNode buildSubTree(Tree treeItem) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-                new Tree(treeItem.getId(), treeItem.getName(), treeItem.getType(), treeItem.getLink())
-        );
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(treeItem);
 
         Tree[] children = db.get("SELECT * FROM tree WHERE link = ?", treeItem.getId()).as(Tree[].class);
 
-        for (Tree child : children) {
-            node.add(buildSubTree(child));
+        for (Tree childItem : children) {
+            node.add(buildSubTree(childItem));
         }
 
         return node;

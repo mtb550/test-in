@@ -22,11 +22,35 @@ import static com.intellij.openapi.actionSystem.PlatformCoreDataKeys.CONTEXT_COM
 
 public class ExplorerContextMenu extends DefaultActionGroup {
 
+    DefaultActionGroup addGroup = new DefaultActionGroup("➕ Add", true) {
+        @Override
+        public void update(@NotNull AnActionEvent e) {
+            JTree tree = e.getData(CONTEXT_COMPONENT) instanceof JTree jTree ? jTree : null;
+
+            boolean enabled = true;
+
+            if (tree != null) {
+                TreePath path = tree.getSelectionPath();
+                if (path != null) {
+                    Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+                    if (userObject instanceof Tree treeItem && treeItem.getType() == 2) {
+                        enabled = false;
+                    }
+                }
+            }
+
+            e.getPresentation().setEnabled(enabled);
+        }
+
+        @Override
+        public @NotNull ActionUpdateThread getActionUpdateThread() {
+            return ActionUpdateThread.EDT;
+        }
+    };
+
     public ExplorerContextMenu() {
         super("Test Explorer Context Menu", true);
 
-        DefaultActionGroup addGroup = new DefaultActionGroup("➕ Add", true);
-        addGroup.add(new AddProjectAction());
         addGroup.add(new AddSuiteAction());
         addGroup.add(new AddFeatureAction());
 
@@ -229,17 +253,21 @@ public class ExplorerContextMenu extends DefaultActionGroup {
             String name = Messages.showInputDialog("Enter feature name:", "Add Feature", null);
             if (name == null || name.isBlank()) return;
 
-            sql db = new sql();
-            db.execute("INSERT INTO tree (name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, datetime('now'))",
-                    name, 2, treeItem.getId(), System.getProperty("user.name"));
+            sql db = new sql(); // TODO:: to be removed
+            int newFeatureId = db.get("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?) RETURNING id;",
+                    name, 2, treeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
 
+            Tree newFeature = new Tree()
+                    .setName(name)
+                    .setType(2).
+                    setId(newFeatureId)
+                    .setLink(treeItem.getId());
 
-            int newId = db.get("SELECT id from tree where name = ?", name).as(Tree.class).getId();
-            Tree newFeature = new Tree(name, 2, newId);
             DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFeature);
             ((DefaultTreeModel) tree.getModel()).insertNodeInto(newNode, parentNode, parentNode.getChildCount());
             tree.scrollPathToVisible(new TreePath(newNode.getPath()));
         }
+
     }
 
 
@@ -265,18 +293,17 @@ public class ExplorerContextMenu extends DefaultActionGroup {
             if (name == null || name.isBlank()) return;
 
             sql db = new sql();
-            db.execute("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?)",
-                    name, 1, treeItem.getId(), System.getProperty("user.name"));
-
-
-            // Fetch new ID
-            Tree newInfo = db.get("SELECT TOP 1 * FROM tree WHERE name = ? ORDER BY created_at DESC", name).as(Tree.class);
+            int newNodeId = db.get("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?) RETURNING id;",
+                    name, 1, treeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
 
             // Build new node and insert it
-            Tree newSuiteInfo = new Tree(name, 1, treeItem.getId());
-            newSuiteInfo.setId(newInfo.getId());
+            Tree newSuite = new Tree()
+                    .setName(name)
+                    .setType(1).
+                    setLink(treeItem.getId())
+                    .setId(newNodeId);
 
-            DefaultMutableTreeNode newSuiteNode = new DefaultMutableTreeNode(newSuiteInfo);
+            DefaultMutableTreeNode newSuiteNode = new DefaultMutableTreeNode(newSuite);
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
             model.insertNodeInto(newSuiteNode, parentNode, parentNode.getChildCount());
 
@@ -315,33 +342,6 @@ public class ExplorerContextMenu extends DefaultActionGroup {
         @Override
         public void actionPerformed(@NotNull AnActionEvent e) {
             // TODO: Implement export logic to JSON
-        }
-    }
-
-    public static class AddProjectAction extends AnAction {
-        public AddProjectAction() {
-            super("➕ New Project");
-        }
-
-        @Override
-        public void actionPerformed(@NotNull AnActionEvent e) {
-            JTree tree = e.getData(CONTEXT_COMPONENT) instanceof JTree jTree ? jTree : null;
-            if (tree == null) return;
-
-            String name = Messages.showInputDialog("Enter project name:", "Add Project", null);
-            if (name == null || name.isBlank()) return;
-
-            sql db = new sql();
-            int newProjectId = db.get("INSERT INTO tree (name, type, created_by) VALUES (?, ?, ?) RETURNING id;", name, 0, System.getProperty("user.name")).asType(Integer.class);
-
-            Tree newProject = new Tree(name, 0, newProjectId);
-            DefaultMutableTreeNode newProjectNode = new DefaultMutableTreeNode(newProject);
-
-            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-            DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
-
-            model.insertNodeInto(newProjectNode, root, root.getChildCount());
-            tree.scrollPathToVisible(new TreePath(newProjectNode.getPath()));
         }
     }
 

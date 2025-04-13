@@ -135,13 +135,14 @@ public class TestCaseTreeKeyAdapter {
                     Tree sourceTreeItem = (Tree) node.getUserObject();
 
                     if (!isCut) {
-                        new sql().execute("INSERT INTO tree (name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, datetime('now'))",
-                                sourceTreeItem.getName() + " (Copy)", sourceTreeItem.getType(), targetTreeItem.getId(), System.getProperty("user.name"));
+                        sql db = new sql();
+                        int newNodeId = db.get("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?) RETURNING id;", sourceTreeItem.getName() + " (Copy)", sourceTreeItem.getType(), targetTreeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
 
-                        int newId = new sql().get("SELECT last_insert_rowid() AS id").as(Tree.class).getId();
+                        Tree treeItem = new Tree()
+                                .setName(sourceTreeItem.getName() + " (Copy)")
+                                .setType(sourceTreeItem.getType())
+                                .setId(newNodeId);
 
-                        Tree treeItem = new Tree(
-                                sourceTreeItem.getName() + " (Copy)", sourceTreeItem.getType(), newId);
                         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(treeItem);
                         model.insertNodeInto(newNode, targetNode, targetNode.getChildCount());
 
