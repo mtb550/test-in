@@ -17,7 +17,7 @@
 
         <!-- 🧭 Left-side tool window: Test Case Explorer -->
         <toolWindow
-                id="Explorer"
+                id="Test Bind"
                 factoryClass="com.example.explorer.ExplorerToolWindowFactory"
                 anchor="left"
                 icon="/icons/ant_dark.svg"

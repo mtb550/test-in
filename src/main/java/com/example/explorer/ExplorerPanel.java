@@ -2,6 +2,7 @@ package com.example.explorer;
 
 import com.example.pojo.Tree;
 import com.example.util.ShortcutRegistry;
+import com.example.util.sql;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.SimpleColoredComponent;
@@ -12,6 +13,7 @@ import lombok.Getter;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import java.awt.*;
 
@@ -41,10 +43,37 @@ public class ExplorerPanel {
         // register all keyboard shortcuts
         ShortcutRegistry.Explorer(tree);
 
+        // tree scroll view
         JBScrollPane scrollPane = new JBScrollPane(tree);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
+        // add a dropdown selector (below toolbar)
+        //JPanel topBar = new JPanel(new BorderLayout());
+        //topBar.add(new ComboBoxProjectSelector(this).getComponent(), BorderLayout.WEST);
+
+        //panel.add(topBar, BorderLayout.NORTH);
+        panel.add(new ComboBoxProjectSelector(this).getComponent(), BorderLayout.NORTH);
         panel.add(scrollPane, BorderLayout.CENTER);
+
+    }
+
+    public void loadAllProjects() {
+        ExplorerTree.build(); // Rebuild the whole tree
+        tree.setModel(ExplorerTree.getTreeModel());
+        tree.setRootVisible(true);
+        //tree.expandRow(0);
+    }
+
+    public void filterByProject(int projectId) {
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test Cases");
+        Tree selectedProject = new sql().get("SELECT * FROM tree WHERE id = ?", projectId).as(Tree.class);
+        DefaultMutableTreeNode node = ExplorerTree.buildSubTree(selectedProject);
+        root.add(node);
+
+        ExplorerTree.treeModel = new DefaultTreeModel(root);
+        tree.setModel(ExplorerTree.treeModel);
+        tree.setRootVisible(true);
+        //tree.expandRow(0);
     }
 
     static class IntelliJRenderer implements TreeCellRenderer {

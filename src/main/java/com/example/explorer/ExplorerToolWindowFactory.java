@@ -1,6 +1,7 @@
 package com.example.explorer;
 
 import com.example.explorer.actions.*;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -15,9 +16,16 @@ public class ExplorerToolWindowFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ExplorerPanel panel = new ExplorerPanel();
-        Content content = ContentFactory.getInstance().createContent(panel.getPanel(), "Display Name", false);
+        Content content = ContentFactory.getInstance().createContent(panel.getPanel(), null, false);
         toolWindow.getContentManager().addContent(content);
         toolWindow.setTitleActions(List.of(contextMenu(panel).getChildren(null)));
+
+        toolWindow.setAutoHide(false);
+        //toolWindow.setTitle("Test Bind");
+        toolWindow.setIcon(AllIcons.Debugger.Db_array);
+
+        //DefaultActionGroup group = new DefaultActionGroup();
+        //toolWindow.setTitleActions(List.of(group.getChildren(null)));
     }
 
     private DefaultActionGroup contextMenu(ExplorerPanel panel) {

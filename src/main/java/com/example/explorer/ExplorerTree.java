@@ -1,9 +1,12 @@
 package com.example.explorer;
 
 import com.example.pojo.Tree;
+import com.example.util.NodeType;
 import com.example.util.sql;
 import lombok.Getter;
 
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
@@ -15,7 +18,7 @@ public class ExplorerTree {
     public static void build() {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test Cases");
 
-        Tree[] rootNodes = new sql().get("SELECT * FROM tree WHERE type = 0").as(Tree[].class);
+        Tree[] rootNodes = new sql().get("SELECT * FROM tree WHERE type = ?", NodeType.PROJECT.getCode()).as(Tree[].class);
 
         for (Tree treeItem : rootNodes) {
             DefaultMutableTreeNode node = buildSubTree(treeItem);
@@ -23,9 +26,10 @@ public class ExplorerTree {
         }
 
         treeModel = new DefaultTreeModel(root);
+        treeModel.addTreeModelListener(new ReloadAllOnInsertListener());
     }
 
-    private static DefaultMutableTreeNode buildSubTree(Tree treeItem) {
+    static DefaultMutableTreeNode buildSubTree(Tree treeItem) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(treeItem);
 
         Tree[] children = new sql().get("SELECT * FROM tree WHERE link = ?", treeItem.getId()).as(Tree[].class);
@@ -35,5 +39,31 @@ public class ExplorerTree {
         }
 
         return node;
+    }
+
+    private static class ReloadAllOnInsertListener implements TreeModelListener {
+
+        @Override
+        public void treeNodesChanged(TreeModelEvent e) {
+            //treeModel.reload();
+        }
+
+        @Override
+        public void treeNodesInserted(TreeModelEvent e) {
+            //treeModel.reload();
+
+        }
+
+        @Override
+        public void treeNodesRemoved(TreeModelEvent e) {
+            //treeModel.reload();
+
+        }
+
+        @Override
+        public void treeStructureChanged(TreeModelEvent e) {
+            //treeModel.reload();
+
+        }
     }
 }

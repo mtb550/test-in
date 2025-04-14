@@ -20,7 +20,9 @@ public class RefreshAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ExplorerTree.build();
-        tree.setModel(ExplorerTree.getTreeModel());
+        //ExplorerTree.build();
+        //tree.setModel(ExplorerTree.getTreeModel());
+        ExplorerTree.getTreeModel().reload(); //TODO:: try this may it is better than code above
+        panel.loadAllProjects();
     }
 }
