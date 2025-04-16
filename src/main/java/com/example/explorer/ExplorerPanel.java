@@ -10,14 +10,15 @@ import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.panels.NonOpaquePanel;
+import com.intellij.ui.tabs.JBTabs;
+import com.intellij.ui.tabs.TabInfo;
+import com.intellij.ui.tabs.TabsListener;
+import com.intellij.ui.tabs.impl.JBTabsImpl;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.*;
 import java.awt.*;
 import java.util.prefs.Preferences;
 
@@ -70,67 +71,49 @@ public class ExplorerPanel {
         testPlanTree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode selected = (DefaultMutableTreeNode) testPlanTree.getLastSelectedPathComponent();
             if (selected != null && selected.getUserObject() instanceof TestPlan plan && plan.getType() == 1) {
-                //TestPlanEditor.open(plan.getId());
+                // TestPlanEditor.open(plan.getId());
             }
         });
         testPlanTree.addMouseListener(new TestCaseTreeMouseAdapter(testPlanTree));
         JBScrollPane testPlanScrollPane = new JBScrollPane(testPlanTree);
         testPlanScrollPane.setBorder(BorderFactory.createEmptyBorder());
 
-        // === Header ===
+        // === Project Selector + Tabs ===
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.add(new ComboBoxProjectSelector(this).getComponent(), BorderLayout.NORTH);
-
-        // Switcher buttons panel
-        JPanel switchers = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        ButtonGroup switcherGroup = new ButtonGroup();
-
-        JToggleButton btnTestCases = new JToggleButton("Test Cases");
-        JToggleButton btnTestPlans = new JToggleButton("Test Plans");
-        JToggleButton btnAutomation = new JToggleButton("Automation");
-
-        switcherGroup.add(btnTestCases);
-        switcherGroup.add(btnTestPlans);
-        switcherGroup.add(btnAutomation);
-
-        switchers.add(btnTestCases);
-        switchers.add(btnTestPlans);
-        switchers.add(btnAutomation);
-
-        topBar.add(switchers, BorderLayout.SOUTH);
         panel.add(topBar, BorderLayout.NORTH);
 
-        // === Main Content Panel ===
-        JPanel contentPanel = new JPanel(new CardLayout());
-        contentPanel.add(scrollPane, "Test Cases");
-        contentPanel.add(testPlanScrollPane, "Test Plans");
-        contentPanel.add(new JLabel("Automation content coming soon..."), "Automation");
+        // === IntelliJ-Style Tabbed Content ===
+        JBTabs tabs = new JBTabsImpl(ProjectManager.getInstance().getOpenProjects()[0]);
 
-        panel.add(contentPanel, BorderLayout.CENTER);
+        TabInfo testCaseTab = new TabInfo(scrollPane).setText("Test Cases").setIcon(AllIcons.Nodes.Folder);
+        TabInfo testPlanTab = new TabInfo(testPlanScrollPane).setText("Test Plans").setIcon(AllIcons.Nodes.Artifact);
+        TabInfo automationTab = new TabInfo(new JLabel("Automation content coming soon..."))
+                .setText("Automation").setIcon(AllIcons.Nodes.Plugin);
 
-        CardLayout cardLayout = (CardLayout) contentPanel.getLayout();
+        tabs.addTab(testCaseTab);
+        tabs.addTab(testPlanTab);
+        tabs.addTab(automationTab);
 
-        // === Remember last selected tab ===
+        // === Persist tab selection ===
         Preferences prefs = Preferences.userRoot().node("TestBind");
         String lastTab = prefs.get("activeTab", "Test Cases");
 
-        btnTestCases.setSelected("Test Cases".equals(lastTab));
-        btnTestPlans.setSelected("Test Plans".equals(lastTab));
-        btnAutomation.setSelected("Automation".equals(lastTab));
-        cardLayout.show(contentPanel, lastTab);
+        // Select previously selected tab
+        switch (lastTab) {
+            case "Test Plans" -> tabs.select(testPlanTab, true);
+            case "Automation" -> tabs.select(automationTab, true);
+            default -> tabs.select(testCaseTab, true);
+        }
 
-        btnTestCases.addActionListener(e -> {
-            cardLayout.show(contentPanel, "Test Cases");
-            prefs.put("activeTab", "Test Cases");
+        tabs.addListener(new TabsListener() {
+            @Override
+            public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
+                prefs.put("activeTab", newSelection.getText());
+            }
         });
-        btnTestPlans.addActionListener(e -> {
-            cardLayout.show(contentPanel, "Test Plans");
-            prefs.put("activeTab", "Test Plans");
-        });
-        btnAutomation.addActionListener(e -> {
-            cardLayout.show(contentPanel, "Automation");
-            prefs.put("activeTab", "Automation");
-        });
+
+        panel.add(tabs.getComponent(), BorderLayout.CENTER);
     }
 
     public void loadAllProjects() {
