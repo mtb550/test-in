@@ -2,6 +2,7 @@ package com.example.explorer;
 
 import com.example.pojo.TestPlan;
 import com.example.pojo.Tree;
+import com.example.pojo.TestCase;
 import com.example.util.NodeType;
 import com.example.util.sql;
 import com.intellij.openapi.ui.DialogWrapper;
@@ -37,14 +38,14 @@ public class TestPlanPopup {
                 JBPanel<?> panel = new JBPanel<>(new BorderLayout(10, 10));
                 panel.setPreferredSize(new Dimension(500, 550));
 
-                // === Build Number
+                // Build Number
                 JBPanel<?> buildPanel = new JBPanel<>(new BorderLayout(5, 5));
                 buildPanel.add(new JBLabel("🔢 Build Number:"), BorderLayout.NORTH);
                 buildField = new JTextField();
                 buildPanel.add(buildField, BorderLayout.CENTER);
                 panel.add(buildPanel, BorderLayout.NORTH);
 
-                // === Load Test Case Tree
+                // Load Test Case Tree
                 rootNode = new CheckedTreeNode("Test Cases");
                 Tree root = new sql().get("SELECT * FROM tree WHERE id = ?", plan.getProject_id()).as(Tree.class);
                 if (root != null) {
@@ -59,6 +60,8 @@ public class TestPlanPopup {
                             Object userObject = ctNode.getUserObject();
                             if (userObject instanceof Tree treeNode) {
                                 getTextRenderer().append(treeNode.getName());
+                            } else if (userObject instanceof TestCase testCase) {
+                                getTextRenderer().append("🧪 " + testCase.getTitle());
                             } else {
                                 getTextRenderer().append(value.toString());
                             }
@@ -70,7 +73,7 @@ public class TestPlanPopup {
                 scrollPane.setPreferredSize(new Dimension(480, 380));
                 panel.add(scrollPane, BorderLayout.CENTER);
 
-                // === Add Button
+                // Add Button
                 JButton addButton = new JButton("➕ Add");
                 addButton.addActionListener(e -> onAdd(plan));
                 JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -87,8 +90,8 @@ public class TestPlanPopup {
                     return;
                 }
 
-                List<Integer> selectedCaseIds = new ArrayList<>();
-                collectSelectedFeatures(rootNode, selectedCaseIds);
+                List<String> selectedCaseIds = new ArrayList<>();
+                collectSelectedTestCases(rootNode, selectedCaseIds);
 
                 if (selectedCaseIds.isEmpty()) {
                     Messages.showWarningDialog("Please select at least one test case.", "Validation");
@@ -111,36 +114,38 @@ public class TestPlanPopup {
                 CheckedTreeNode currentNode = new CheckedTreeNode(treeItem);
                 parentNode.add(currentNode);
 
+                if (treeItem.getType() == NodeType.FEATURE.getCode()) {
+                    // Load test cases from nafath_tc
+                    TestCase[] testCases = new sql().get(
+                            "SELECT * FROM nafath_tc WHERE module = ? ORDER BY sort", treeItem.getId()
+                    ).as(TestCase[].class);
+
+                    for (TestCase tc : testCases) {
+                        CheckedTreeNode testCaseNode = new CheckedTreeNode(tc);
+                        currentNode.add(testCaseNode);
+                    }
+
+                    return;
+                }
+
                 Tree[] children = new sql().get("SELECT * FROM tree WHERE link = ?", treeItem.getId()).as(Tree[].class);
                 for (Tree child : children) {
                     buildTreeRecursive(child, currentNode);
                 }
             }
 
-            private void collectSelectedFeatures(CheckedTreeNode node, List<Integer> output) {
+            private void collectSelectedTestCases(CheckedTreeNode node, List<String> output) {
                 Enumeration<?> enumeration = node.children();
                 while (enumeration.hasMoreElements()) {
                     Object child = enumeration.nextElement();
                     if (child instanceof CheckedTreeNode ctNode) {
                         Object userObject = ctNode.getUserObject();
-                        if (ctNode.isChecked() && userObject instanceof Tree treeNode && treeNode.getType() == NodeType.FEATURE.getCode()) {
-                            output.add(treeNode.getId());
+                        if (ctNode.isChecked() && userObject instanceof TestCase testCase) {
+                            output.add(testCase.getId());
                         }
-                        collectSelectedFeatures(ctNode, output);
+                        collectSelectedTestCases(ctNode, output);
                     }
                 }
-            }
-
-            private void setChildrenChecked(CheckedTreeNode parent, boolean checked) {
-                Enumeration<?> enumeration = parent.children();
-                while (enumeration.hasMoreElements()) {
-                    Object child = enumeration.nextElement();
-                    if (child instanceof CheckedTreeNode ctNode) {
-                        ctNode.setChecked(checked);
-                        setChildrenChecked(ctNode, checked);
-                    }
-                }
-                checkboxTree.repaint();
             }
         };
 
