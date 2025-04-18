@@ -18,10 +18,9 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -110,32 +109,56 @@ public class TestPlanPopup {
                 scrollPane.setPreferredSize(new Dimension(500, 380));
                 panel.add(scrollPane, BorderLayout.CENTER);
 
-                // === Configuration Panel
-                JBPanel<?> configPanel = new JBPanel<>(new GridLayout(4, 2, 10, 5));
+                // configuration
+                JBPanel<?> configPanel = new JBPanel<>(new GridBagLayout());
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.insets = JBUI.insets(4, 8);
+                //gbc.anchor = GridBagConstraints.WEST;           // ⬅️ Align left
+                gbc.fill = GridBagConstraints.HORIZONTAL;
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+                gbc.weightx = 1;
 
-                // 🧱 Platform
-                configPanel.add(new JBLabel("🧱 Platform:"));
-                ComboBox<String> platformCombo = new ComboBox<>(new String[]{"","api", "web", "mobile"});
-                configPanel.add(platformCombo);
+                // Platform
+                JBLabel platformLabel = new JBLabel("🧱 Platform:");
+                ComboBox<String> platformCombo = new ComboBox<>(new String[]{"", "api", "web", "mobile"});
+                configPanel.add(platformLabel, gbc);
+                gbc.gridx++;
+                configPanel.add(platformCombo, gbc);
 
-                // 🌍 Language
-                configPanel.add(new JBLabel("🌍 Language:"));
-                ComboBox<String> languageCombo = new ComboBox<>(new String[]{"","en", "ar"});
-                configPanel.add(languageCombo);
+                // Language
+                gbc.gridx = 0;
+                gbc.gridy++;
+                JBLabel languageLabel = new JBLabel("🌍 Language:");
+                ComboBox<String> languageCombo = new ComboBox<>(new String[]{"", "en", "ar"});
+                configPanel.add(languageLabel, gbc);
+                gbc.gridx++;
+                configPanel.add(languageCombo, gbc);
 
-                // 🌐 Browser
-                configPanel.add(new JBLabel("🌐 Browser:"));
-                ComboBox<String> browserCombo = new ComboBox<>(new String[]{"","chrome", "safari"});
-                configPanel.add(browserCombo);
+                // Browser
+                gbc.gridx = 0;
+                gbc.gridy++;
+                JBLabel browserLabel = new JBLabel("🌐 Browser:");
+                browserLabel.setToolTipText("Hidden when platform is API or Mobile");
+                ComboBox<String> browserCombo = new ComboBox<>(new String[]{"", "chrome", "safari", "edge", "firefox"});
+                configPanel.add(browserLabel, gbc);
+                gbc.gridx++;
+                configPanel.add(browserCombo, gbc);
 
-                // 📱 Device Type
-                configPanel.add(new JBLabel("📱 Device Type:"));
-                ComboBox<String> deviceCombo = new ComboBox<>(new String[]{"","iPhone", "Android", "Huawei"});
-                configPanel.add(deviceCombo);
+                // Device Type
+                gbc.gridx = 0;
+                gbc.gridy++;
+                JBLabel deviceLabel = new JBLabel("📱 Device Type:");
+                deviceLabel.setToolTipText("Hidden when platform is API or Web");
+                ComboBox<String> deviceCombo = new ComboBox<>(new String[]{"", "iPhone", "Android", "Huawei"});
+                configPanel.add(deviceLabel, gbc);
+                gbc.gridx++;
+                configPanel.add(deviceCombo, gbc);
+
 
                 panel.add(configPanel, BorderLayout.AFTER_LAST_LINE);
 
-// Behavior: Disable browser/device if platform = api
+                // Behavior: Disable browser/device if platform = api
                 platformCombo.addActionListener(e -> {
                     String selected = (String) platformCombo.getSelectedItem();
                     boolean isApi = "api".equalsIgnoreCase(selected);
@@ -143,8 +166,9 @@ public class TestPlanPopup {
                     boolean isMobile = "mobile".equalsIgnoreCase(selected);
 
                     browserCombo.setVisible(!isApi && !isMobile);
+                    browserLabel.setVisible(!isApi && !isMobile);
                     deviceCombo.setVisible(!isApi && !isWeb);
-
+                    deviceLabel.setVisible(!isApi && !isWeb);
                 });
 
 
