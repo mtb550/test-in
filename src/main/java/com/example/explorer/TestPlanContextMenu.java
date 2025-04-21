@@ -1,5 +1,6 @@
 package com.example.explorer;
 
+import com.example.explorer.actions.TestPlanInfoPopup;
 import com.example.pojo.TestPlan;
 import com.example.util.sql;
 
@@ -41,6 +42,16 @@ public class TestPlanContextMenu {
         });
         menu.add(delete);
 
+        // ℹ More Info
+        JMenuItem moreInfo = new JMenuItem("ℹ More Info");
+        moreInfo.addActionListener(e -> TestPlanInfoPopup.show(plan));
+        menu.add(moreInfo);
+
+
+
+
+        // add above
         return menu;
     }
+
 }
