@@ -26,35 +26,35 @@ import java.util.prefs.Preferences;
 @Getter
 public class ExplorerPanel {
     private final JPanel panel;
-    private final SimpleTree tree;
+    private final SimpleTree projectTree;
     private final SimpleTree testPlanTree;
 
     public ExplorerPanel() {
         panel = new JPanel(new BorderLayout());
-        tree = new SimpleTree();
+        projectTree = new SimpleTree();
         testPlanTree = new SimpleTree();
 
         // === Load Test Case Tree ===
         ExplorerTree.build();
 
-        tree.setModel(ExplorerTree.getTreeModel());
+        projectTree.setModel(ExplorerTree.getTreeModel());
 
-        tree.setRootVisible(true);
-        tree.setShowsRootHandles(true);
-        tree.setCellRenderer(new IntelliJRenderer());
-        tree.addMouseListener(new TestCaseTreeMouseAdapter(tree));
-        TestCaseTreeKeyAdapter.register(tree, ProjectManager.getInstance().getOpenProjects()[0]);
+        projectTree.setRootVisible(true);
+        projectTree.setShowsRootHandles(true);
+        projectTree.setCellRenderer(new IntelliJRenderer());
+        projectTree.addMouseListener(new TestCaseTreeMouseAdapter(projectTree));
+        TestCaseTreeKeyAdapter.register(projectTree, ProjectManager.getInstance().getOpenProjects()[0]);
 
         // enable drag and drop
-        tree.setDragEnabled(true);
-        tree.setDropMode(DropMode.ON_OR_INSERT);
-        tree.setTransferHandler(new TreeTransferHandler(tree));
+        projectTree.setDragEnabled(true);
+        projectTree.setDropMode(DropMode.ON_OR_INSERT);
+        projectTree.setTransferHandler(new TreeTransferHandler(projectTree));
 
         // register all keyboard shortcuts
-        ShortcutRegistry.Explorer(tree);
+        ShortcutRegistry.Explorer(projectTree);
 
         // tree scroll view
-        JBScrollPane scrollPane = new JBScrollPane(tree);
+        JBScrollPane scrollPane = new JBScrollPane(projectTree);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         // === Load Test Plans Tree ===
@@ -64,8 +64,8 @@ public class ExplorerPanel {
             DefaultMutableTreeNode node = new DefaultMutableTreeNode(plan);
             planRoot.add(node);
         }
-        DefaultTreeModel planModel = new DefaultTreeModel(planRoot);
-        testPlanTree.setModel(planModel);
+        DefaultTreeModel testPlanModel = new DefaultTreeModel(planRoot);
+        testPlanTree.setModel(testPlanModel);
         testPlanTree.setRootVisible(true);
         testPlanTree.setShowsRootHandles(true);
         testPlanTree.setCellRenderer(new IntelliJRenderer());
@@ -119,8 +119,8 @@ public class ExplorerPanel {
 
     public void loadAllProjects() {
         ExplorerTree.build(); // Rebuild the whole tree
-        tree.setModel(ExplorerTree.getTreeModel());
-        tree.setRootVisible(true);
+        projectTree.setModel(ExplorerTree.getTreeModel());
+        projectTree.setRootVisible(true);
         //tree.expandRow(0);
     }
 
@@ -131,8 +131,8 @@ public class ExplorerPanel {
         root.add(node);
 
         ExplorerTree.treeModel = new DefaultTreeModel(root);
-        tree.setModel(ExplorerTree.treeModel);
-        tree.setRootVisible(true);
+        projectTree.setModel(ExplorerTree.treeModel);
+        projectTree.setRootVisible(true);
         //tree.expandRow(0);
     }
 

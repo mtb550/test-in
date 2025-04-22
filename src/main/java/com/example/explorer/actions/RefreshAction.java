@@ -15,7 +15,7 @@ public class RefreshAction extends AnAction {
     public RefreshAction(ExplorerPanel panel) {
         super("Refresh", "Reload tree", AllIcons.Actions.Refresh);
         this.panel = panel;
-        this.tree = this.panel.getTree();
+        this.tree = this.panel.getProjectTree();
     }
 
     @Override

@@ -14,7 +14,7 @@ public class ExpandAllAction extends AnAction {
     public ExpandAllAction(ExplorerPanel panel) {
         super("Expand All", "Expand all nodes", AllIcons.Actions.Expandall);
         this.panel = panel;
-        this.tree = this.panel.getTree();
+        this.tree = this.panel.getProjectTree();
     }
 
     @Override

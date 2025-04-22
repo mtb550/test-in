@@ -22,7 +22,7 @@ public class AddProjectAction extends AnAction {
     public AddProjectAction(ExplorerPanel panel) {
         super("New Project", "Add new project", AllIcons.General.Add);
         this.panel = panel;
-        this.tree = this.panel.getTree();
+        this.tree = this.panel.getProjectTree();
     }
 
     @Override
