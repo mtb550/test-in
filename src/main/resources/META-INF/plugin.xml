@@ -31,14 +31,14 @@
                 icon="/icons/ant_dark.svg"
                 secondary="false"/>
 
-        <!-- 📝 File editor provider for table editor -->
+        <!-- 📝 File editor providers -->
         <fileEditorProvider implementation="com.example.editor.EditorProvider"/>
+        <fileEditorProvider implementation="com.example.explorer.testPlan.TestRunFileEditorProvider"/>
 
+        <!-- 🔔 Notification group -->
         <notificationGroup id="Test Case Notifications"
                            displayType="BALLOON"
                            isLogByDefault="true"/>
-
-
     </extensions>
 
     <actions>
@@ -50,8 +50,8 @@
                 description="Show Test Case Explorer"
                 icon="/icons/t1.png">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-
         </action>
+
         <action id="TestTreeContextMenuGroup"
                 class="com.example.explorer.ExplorerContext"
                 text="Test Tree Context Menu"

@@ -10,6 +10,7 @@ import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
+import com.intellij.openapi.project.Project;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -41,7 +42,9 @@ public class TestCaseTreeMouseAdapter extends MouseAdapter {
             }
 
             if (plan.getType() == 1 && SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-                TestRunEditor.open(plan.getId(), plan.getName());
+                Project project = com.intellij.openapi.project.ProjectManager.getInstance().getOpenProjects()[0]; // or however you obtain it
+                TestRunEditor.open(project, plan.getId(), plan.getName());
+
             }
 
             return;
