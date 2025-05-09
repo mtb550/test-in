@@ -25,7 +25,7 @@
 
         <!-- 🔍 Right-side tool window: Test Case Details -->
         <toolWindow
-                id="Details"
+                id="TestCaseDetails"
                 factoryClass="com.example.viewer.TestCaseDetailsToolWindowFactory"
                 anchor="bottom"
                 icon="/icons/ant_dark.svg"
