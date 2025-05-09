@@ -98,6 +98,33 @@ public class TableEditor extends UserDataHolderBase implements FileEditor {
         JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         panel.add(scrollPane, BorderLayout.CENTER);
+
+        // Ctrl + M → Prompt for title and add new test case
+        KeyStroke ctrlM = KeyStroke.getKeyStroke("control M");
+        InputMap inputMap = list.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap actionMap = list.getActionMap();
+
+        inputMap.put(ctrlM, "addTestCase");
+        actionMap.put("addTestCase", new AbstractAction() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                String title = JOptionPane.showInputDialog(list, "Enter title for new test case:", "New Test Case", JOptionPane.PLAIN_MESSAGE);
+                if (title != null && !title.trim().isEmpty()) {
+                    TestCase newCase = new TestCase();
+                    newCase.setTitle(title.trim());
+                    newCase.setSteps("Step 1: ...");
+                    newCase.setExpectedResult("Expected result...");
+                    newCase.setPriority("medium");
+                    newCase.setAutomationRef("");
+                    newCase.setSort(model.getSize() + 1);
+
+                    model.addElement(newCase);
+                    list.ensureIndexIsVisible(model.getSize() - 1);
+                    list.setSelectedIndex(model.getSize() - 1);
+                }
+            }
+        });
+
     }
 
     @Override
