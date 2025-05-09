@@ -89,12 +89,11 @@ public class ExplorerPanel {
 
         TabInfo testCaseTab = new TabInfo(scrollPane).setText("Test Cases").setIcon(AllIcons.Nodes.Folder);
         TabInfo testPlanTab = new TabInfo(testPlanScrollPane).setText("Test Plans").setIcon(AllIcons.Nodes.Artifact);
-        TabInfo automationTab = new TabInfo(new JLabel("Automation content coming soon..."))
-                .setText("Automation").setIcon(AllIcons.Nodes.Plugin);
+        //TabInfo automationTab = new TabInfo(new JLabel("Automation content coming soon...")).setText("Automation").setIcon(AllIcons.Nodes.Plugin);
 
         tabs.addTab(testCaseTab);
         tabs.addTab(testPlanTab);
-        tabs.addTab(automationTab);
+        //tabs.addTab(automationTab);
 
         // === Persist tab selection ===
         Preferences prefs = Preferences.userRoot().node("TestBind");
@@ -103,7 +102,7 @@ public class ExplorerPanel {
         // Select previously selected tab
         switch (lastTab) {
             case "Test Plans" -> tabs.select(testPlanTab, true);
-            case "Automation" -> tabs.select(automationTab, true);
+            //case "Automation" -> tabs.select(automationTab, true);
             default -> tabs.select(testCaseTab, true);
         }
 
