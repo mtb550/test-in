@@ -3,6 +3,9 @@ package com.example.viewer;
 import com.example.pojo.DB;
 import com.example.pojo.TestCase;
 import com.example.pojo.TestCaseHistory;
+import com.example.util.ActionHistory;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.components.*;
 import com.intellij.util.ui.JBUI;
 
@@ -13,16 +16,16 @@ import java.awt.event.ActionEvent;
 public class TestCaseDetailsPanel {
     private final JBPanel<?> mainPanel;
     private final JBTabbedPane tabbedPane;
-
     private final JBPanel<?> detailTab;
     private final JBPanel<?> historyTab;
     private final JBPanel<?> bugTab;
-
+    Project project = ProjectManager.getInstance().getOpenProjects()[0];
     private JBTextField titleField;
     private JBTextField expectedArea;
     private JBTextField stepsArea;
     private JBTextField priorityField;
 
+    private JBLabel idLabel;
     private JBLabel titleLabel;
     private JBLabel expectedLabel;
     private JBLabel stepsLabel;
@@ -57,6 +60,25 @@ public class TestCaseDetailsPanel {
                 }
             }
         });
+
+        mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), "undo");
+        mainPanel.getActionMap().put("undo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ActionHistory.undo();
+                System.out.println("[UNDO] Ctrl+Z triggered");
+            }
+        });
+
+        mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Y"), "redo");
+        mainPanel.getActionMap().put("redo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ActionHistory.redo();
+                System.out.println("[REDO] Ctrl+Y triggered");
+            }
+        });
+
     }
 
     public void update(TestCase testCase) {
@@ -87,6 +109,7 @@ public class TestCaseDetailsPanel {
             expectedArea.setFocusTraversalKeysEnabled(true);
             stepsArea.setFocusTraversalKeysEnabled(true);
 
+            addRow("📝 ID:", idLabel, detailTab, gbc, row++);
             addRow("📝 Title:", titleField, detailTab, gbc, row++);
             addRow("🎯 Expected Result:", expectedArea, detailTab, gbc, row++);
             addRow("🪜 Steps:", stepsArea, detailTab, gbc, row++);
@@ -115,11 +138,14 @@ public class TestCaseDetailsPanel {
 
         } else {
             // === Create and render label view ===
+            idLabel = createValueLabel(currentTestCase.getId());
+            titleLabel = createValueLabel(currentTestCase.getTitle());
             titleLabel = createValueLabel(currentTestCase.getTitle());
             expectedLabel = createValueLabel(currentTestCase.getExpectedResult());
             stepsLabel = createValueLabel(currentTestCase.getSteps());
             priorityLabel = createValueLabel(currentTestCase.getPriority());
 
+            addRow("📝 ID:", idLabel, detailTab, gbc, row++);
             addRow("📝 Title:", titleLabel, detailTab, gbc, row++);
             addRow("🎯 Expected Result:", expectedLabel, detailTab, gbc, row++);
             addRow("🪜 Steps:", stepsLabel, detailTab, gbc, row++);
@@ -136,10 +162,45 @@ public class TestCaseDetailsPanel {
     }
 
     private void onSave() {
-        currentTestCase.setTitle(titleField.getText().trim());
-        currentTestCase.setExpectedResult(expectedArea.getText().trim());
-        currentTestCase.setSteps(stepsArea.getText().trim());
-        currentTestCase.setPriority(priorityField.getText().trim());
+        // Capture previous values
+        String oldTitle = currentTestCase.getTitle();
+        String oldExpected = currentTestCase.getExpectedResult();
+        String oldSteps = currentTestCase.getSteps();
+        String oldPriority = currentTestCase.getPriority();
+
+        // Capture new values
+        String newTitle = titleField.getText().trim();
+        String newExpected = expectedArea.getText().trim();
+        String newSteps = stepsArea.getText().trim();
+        String newPriority = priorityField.getText().trim();
+
+        // Apply changes to model
+        currentTestCase.setTitle(newTitle);
+        currentTestCase.setExpectedResult(newExpected);
+        currentTestCase.setSteps(newSteps);
+        currentTestCase.setPriority(newPriority);
+
+        // Register single undo action (like in tree)
+        ActionHistory.register(
+                // Undo action: revert to previous values
+                () -> {
+                    currentTestCase.setTitle(oldTitle);
+                    currentTestCase.setExpectedResult(oldExpected);
+                    currentTestCase.setSteps(oldSteps);
+                    currentTestCase.setPriority(oldPriority);
+                    update(currentTestCase); // refresh UI
+                },
+
+                // Redo action: reapply the current changes
+                () -> {
+                    currentTestCase.setTitle(newTitle);
+                    currentTestCase.setExpectedResult(newExpected);
+                    currentTestCase.setSteps(newSteps);
+                    currentTestCase.setPriority(newPriority);
+                    update(currentTestCase); // refresh UI
+                }
+        );
+
 
         toggleEditMode(false);
         JOptionPane.showMessageDialog(mainPanel, "✅ Test case saved successfully.", "Saved", JOptionPane.INFORMATION_MESSAGE);

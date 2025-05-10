@@ -3,6 +3,7 @@ package com.example.editor;
 import com.example.Runner.TestNGRunnerByClassName;
 import com.example.demo.TestCaseToolWindow;
 import com.example.pojo.TestCase;
+import com.example.util.ActionHistory;
 import com.example.util.Notifier;
 import com.example.util.Tools;
 import com.intellij.notification.NotificationType;
@@ -16,6 +17,7 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
 public class TableContextMenu {
+
     public static JBPopupMenu create(JList<TestCase> list,
                                      DefaultListModel<TestCase> model,
                                      TestCase tc) {
@@ -26,7 +28,6 @@ public class TableContextMenu {
             String text = "Title: " + tc.getTitle() + "\nSteps: " + tc.getSteps() + "\nExpected: " + tc.getExpectedResult();
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
         });
-
         menu.add(copyItem);
 
         JBMenuItem runItem = new JBMenuItem("▶ Run Test");
@@ -36,7 +37,6 @@ public class TableContextMenu {
             if (ref != null && !ref.isBlank()) {
                 Tools.printTestSourceRoots(project);
                 TestNGRunnerByClassName.runTestClass(project, ref);
-                //TestNGRunnerBySuite.runTestSuite(project, "test.testng.xml");
                 Notifier.notify(project, "Test Case Notifications", "Running TestNG class: ", ref, NotificationType.INFORMATION);
             } else {
                 Notifier.notify(project,
@@ -60,6 +60,21 @@ public class TableContextMenu {
         });
         menu.add(deleteItem);
 
+        // === 📝 Add Undo button ===
+        JBMenuItem undoItem = new JBMenuItem("↩ Undo");
+        undoItem.addActionListener(e -> {
+            ActionHistory.undo();
+        });
+        menu.add(undoItem);
+
+        // === 🔁 Add Redo button ===
+        JBMenuItem redoItem = new JBMenuItem("↪ Redo");
+        redoItem.addActionListener(e -> {
+            ActionHistory.redo();
+        });
+        menu.add(redoItem);
+
         return menu;
     }
+
 }

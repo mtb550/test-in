@@ -7,27 +7,27 @@ import com.intellij.openapi.wm.WindowManager;
 import java.util.Stack;
 
 public class ActionHistory {
-    private static final Stack<Runnable> undoStack = new Stack<>();
-    private static final Stack<Runnable> redoStack = new Stack<>();
+    private static final Stack<ActionPair> undoStack = new Stack<>();
+    private static final Stack<ActionPair> redoStack = new Stack<>();
 
-    public static void registerUndo(Runnable undoAction) {
-        undoStack.push(undoAction);
+    public static void register(Runnable undo, Runnable redo) {
+        undoStack.push(new ActionPair(undo, redo));
         redoStack.clear();
     }
 
     public static void undo() {
         if (!undoStack.isEmpty()) {
-            Runnable action = undoStack.pop();
-            action.run();
-            redoStack.push(action);
+            ActionPair action = undoStack.pop();
+            action.undo.run();
+            redoStack.push(action); // correct: keep both undo/redo
         }
     }
 
     public static void redo() {
         if (!redoStack.isEmpty()) {
-            Runnable action = redoStack.pop();
-            action.run();
-            undoStack.push(action);
+            ActionPair action = redoStack.pop();
+            action.redo.run();
+            undoStack.push(action); // correct: re-push for further undos
         }
     }
 
@@ -39,6 +39,16 @@ public class ActionHistory {
 
         StatusUtil.showStatus(project, "Undo: " + undoStack.size() + " | Redo: " + redoStack.size());
 
+    }
+
+    private static class ActionPair {
+        public final Runnable undo;
+        public final Runnable redo;
+
+        public ActionPair(Runnable undo, Runnable redo) {
+            this.undo = undo;
+            this.redo = redo;
+        }
     }
 
 }

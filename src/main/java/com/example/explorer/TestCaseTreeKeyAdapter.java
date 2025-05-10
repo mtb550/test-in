@@ -147,11 +147,22 @@ public class TestCaseTreeKeyAdapter {
                         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(treeItem);
                         model.insertNodeInto(newNode, targetNode, targetNode.getChildCount());
 
-                        ActionHistory.registerUndo(() -> {
-                            model.removeNodeFromParent(newNode);
-                            new sql().execute("DELETE FROM tree WHERE id = ?", treeItem.getId());
-                            tree.repaint();
-                        });
+                        ActionHistory.register(
+                                // Undo: remove the newly inserted node from model and DB
+                                () -> {
+                                    model.removeNodeFromParent(newNode);
+                                    new sql().execute("DELETE FROM tree WHERE id = ?", treeItem.getId());
+                                    tree.repaint();
+                                },
+                                // Redo: re-insert the same node again into model and DB
+                                () -> {
+                                    model.insertNodeInto(newNode, targetNode, targetNode.getChildCount());
+                                    new sql().execute("INSERT INTO tree (id, name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))",
+                                            treeItem.getId(), treeItem.getName(), treeItem.getType(), targetTreeItem.getId(), System.getProperty("user.name"));
+                                    tree.repaint();
+                                }
+                        );
+
 
                     } else {
                         DefaultMutableTreeNode oldParent = (DefaultMutableTreeNode) node.getParent();
@@ -160,13 +171,25 @@ public class TestCaseTreeKeyAdapter {
 
                         new sql().execute("UPDATE tree SET link = ? WHERE id = ?", targetTreeItem.getId(), sourceTreeItem.getId());
 
-                        ActionHistory.registerUndo(() -> {
-                            model.removeNodeFromParent(node);
-                            model.insertNodeInto(node, oldParent, oldParent.getChildCount());
-                            new sql().execute("UPDATE tree SET link = ? WHERE id = ?",
-                                    ((Tree) oldParent.getUserObject()).getId(), sourceTreeItem.getId());
-                            tree.repaint();
-                        });
+                        ActionHistory.register(
+                                // Undo: move the node back to old parent
+                                () -> {
+                                    model.removeNodeFromParent(node);
+                                    model.insertNodeInto(node, oldParent, oldParent.getChildCount());
+                                    new sql().execute("UPDATE tree SET link = ? WHERE id = ?",
+                                            ((Tree) oldParent.getUserObject()).getId(), sourceTreeItem.getId());
+                                    tree.repaint();
+                                },
+                                // Redo: reapply move to target node
+                                () -> {
+                                    model.removeNodeFromParent(node);
+                                    model.insertNodeInto(node, targetNode, targetNode.getChildCount());
+                                    new sql().execute("UPDATE tree SET link = ? WHERE id = ?",
+                                            targetTreeItem.getId(), sourceTreeItem.getId());
+                                    tree.repaint();
+                                }
+                        );
+
                     }
                 }
 
@@ -201,12 +224,22 @@ public class TestCaseTreeKeyAdapter {
                         model.removeNodeFromParent(node);
                         new sql().execute("DELETE FROM tree WHERE id = ?", treeItem.getId());
 
-                        ActionHistory.registerUndo(() -> {
-                            model.insertNodeInto(node, parent, index);
-                            new sql().execute("INSERT INTO tree (id, name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))",
-                                    treeItem.getId(), treeItem.getName(), treeItem.getType(), treeItem.getLink(), System.getProperty("user.name"));
-                            tree.repaint();
-                        });
+                        ActionHistory.register(
+                                // Undo: restore the deleted node
+                                () -> {
+                                    model.insertNodeInto(node, parent, index);
+                                    new sql().execute("INSERT INTO tree (id, name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))",
+                                            treeItem.getId(), treeItem.getName(), treeItem.getType(), treeItem.getLink(), System.getProperty("user.name"));
+                                    tree.repaint();
+                                },
+                                // Redo: remove it again
+                                () -> {
+                                    model.removeNodeFromParent(node);
+                                    new sql().execute("DELETE FROM tree WHERE id = ?", treeItem.getId());
+                                    tree.repaint();
+                                }
+                        );
+
                     }
                 }
 
@@ -257,13 +290,23 @@ public class TestCaseTreeKeyAdapter {
 
                 new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
 
-                // Undo support
-                ActionHistory.registerUndo(() -> {
-                    treeItem.setName(oldName);
-                    ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
-                    new sql().execute("UPDATE tree SET name = ? WHERE id = ?", oldName, treeItem.getId());
-                    tree.repaint();
-                });
+                ActionHistory.register(
+                        // Undo: revert to old name
+                        () -> {
+                            treeItem.setName(oldName);
+                            ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+                            new sql().execute("UPDATE tree SET name = ? WHERE id = ?", oldName, treeItem.getId());
+                            tree.repaint();
+                        },
+                        // Redo: reapply new name
+                        () -> {
+                            treeItem.setName(newName);
+                            ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+                            new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
+                            tree.repaint();
+                        }
+                );
+
 
                 ActionHistory.showStatus(project);
                 StatusUtil.showBalloon(project, "Renamed to: " + newName, MessageType.INFO);
