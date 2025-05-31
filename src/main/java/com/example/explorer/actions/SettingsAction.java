@@ -21,6 +21,7 @@ import java.util.Map;
 
 public class SettingsAction extends AnAction {
     private final Map<Integer, ProjectRow> originalProjects = new LinkedHashMap<>();
+    private final Map<Integer, UserRow> originalUsers = new LinkedHashMap<>();
 
     public SettingsAction() {
         super("Settings", "Configure tree", AllIcons.General.Settings);
@@ -58,19 +59,24 @@ public class SettingsAction extends AnAction {
         tabbedPane.add("Projects", projectPanel);
 
         // --- Users Tab ---
-        JPanel userPanel = new JPanel(new BorderLayout());
-        JBTable userTable = new JBTable();
+        JBPanel<?> userPanel = new JBPanel<>(new BorderLayout());
+        DefaultTableModel userModel = new DefaultTableModel(new String[]{"ID", "Name", "Role", "Email", "Enabled"}, 0);
+        JBTable userTable = new JBTable(userModel) {
+            public boolean isCellEditable(int row, int column) {
+                return column != 0;
+            }
+        };
+
+        userTable.getColumnModel().getColumn(4).setCellRenderer(new ToggleRenderer());
+        userTable.getColumnModel().getColumn(4).setCellEditor(new ToggleEditor());
+
         JBScrollPane userScroll = new JBScrollPane(userTable);
         userPanel.add(userScroll, BorderLayout.CENTER);
 
-        JPanel userButtons = new JPanel();
-        JButton addUser = new JButton("Add");
-        JButton editUser = new JButton("Edit");
-        JButton deleteUser = new JButton("Delete");
-        userButtons.add(addUser);
-        userButtons.add(editUser);
-        userButtons.add(deleteUser);
-        userPanel.add(userButtons, BorderLayout.SOUTH);
+        JButton saveUsers = new JButton("Save");
+        JPanel saveUserPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        saveUserPanel.add(saveUsers);
+        userPanel.add(saveUserPanel, BorderLayout.SOUTH);
 
         tabbedPane.add("Users", userPanel);
 
@@ -81,6 +87,7 @@ public class SettingsAction extends AnAction {
         loadProjects(projectTable);
         loadUsers(userTable);
 
+        // Save changed projects
         saveProjects.addActionListener(evt -> {
             DefaultTableModel model = (DefaultTableModel) projectTable.getModel();
             for (int i = 0; i < model.getRowCount(); i++) {
@@ -101,28 +108,37 @@ public class SettingsAction extends AnAction {
                     }
                 }
             }
-            JOptionPane.showMessageDialog(null, "Changes saved.");
+            JOptionPane.showMessageDialog(null, "Projects saved.");
             loadProjects(projectTable);
         });
 
-        // Users
-        addUser.addActionListener(evt -> showUserDialog(null, userTable));
-        editUser.addActionListener(evt -> {
-            int row = userTable.getSelectedRow();
-            if (row != -1) showUserDialog(getRowId(userTable, row), userTable);
-        });
-        deleteUser.addActionListener(evt -> {
-            int row = userTable.getSelectedRow();
-            if (row != -1) {
-                int id = getRowId(userTable, row);
-                new sql().execute("DELETE FROM users WHERE id = ?", id);
-                loadUsers(userTable);
-            }
-        });
-    }
+        // Save changed users
+        saveUsers.addActionListener(evt -> {
+            DefaultTableModel model = (DefaultTableModel) userTable.getModel();
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Object idObj = model.getValueAt(i, 0);
+                String name = String.valueOf(model.getValueAt(i, 1));
+                String role = String.valueOf(model.getValueAt(i, 2));
+                String email = String.valueOf(model.getValueAt(i, 3));
+                int enabled = (boolean) model.getValueAt(i, 4) ? 1 : 0;
 
-    private int getRowId(JTable table, int row) {
-        return Integer.parseInt(table.getValueAt(row, 0).toString());
+                if (name.isBlank() || email.isBlank()) continue;
+
+                if (idObj == null || idObj.toString().isBlank()) {
+                    new sql().execute("INSERT INTO users (name, role, email, enabled) VALUES (?, ?, ?, ?)", name, role, email, enabled);
+                } else {
+                    int id = Integer.parseInt(idObj.toString());
+                    UserRow original = originalUsers.get(id);
+                    if (original != null && (!original.name.equals(name) || !original.role.equals(role)
+                            || !original.email.equals(email) || original.enabled != enabled)) {
+                        new sql().execute("UPDATE users SET name = ?, role = ?, email = ?, enabled = ? WHERE id = ?",
+                                name, role, email, enabled, id);
+                    }
+                }
+            }
+            JOptionPane.showMessageDialog(null, "Users saved.");
+            loadUsers(userTable);
+        });
     }
 
     private void loadProjects(JTable table) {
@@ -146,64 +162,23 @@ public class SettingsAction extends AnAction {
     }
 
     private void loadUsers(JTable table) {
-        DefaultTableModel model = new DefaultTableModel(new String[]{"ID", "Name", "Role", "Email", "Enabled"}, 0);
+        originalUsers.clear();
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        model.setRowCount(0);
+
         sql db = new sql().get("SELECT id, name, role, email, enabled FROM users");
 
         for (HashMap<String, Object> row : db.dbResult) {
-            model.addRow(new Object[]{
-                    row.get("id"),
-                    row.get("name"),
-                    row.get("role"),
-                    row.get("email"),
-                    row.get("enabled")
-            });
+            int id = (int) row.get("id");
+            String name = row.get("name").toString();
+            String role = row.get("role").toString();
+            String email = row.get("email").toString();
+            boolean enabled = Integer.parseInt(row.get("enabled").toString()) == 1;
+            model.addRow(new Object[]{id, name, role, email, enabled});
+            originalUsers.put(id, new UserRow(name, role, email, enabled ? 1 : 0));
         }
-
-        table.setModel(model);
+        model.addRow(new Object[]{null, "", "", "", Boolean.TRUE});
         table.setAutoCreateRowSorter(true);
-    }
-
-    private void showUserDialog(Integer id, JTable table) {
-        JTextField nameField = new JTextField();
-        JTextField roleField = new JTextField();
-        JTextField emailField = new JTextField();
-        JCheckBox enabledBox = new JCheckBox("Enabled");
-
-        if (id != null) {
-            sql db = new sql().get("SELECT name, role, email, enabled FROM users WHERE id = ?", id);
-            if (!db.dbResult.isEmpty()) {
-                HashMap<String, Object> row = db.dbResult.get(0);
-                nameField.setText(String.valueOf(row.get("name")));
-                roleField.setText(String.valueOf(row.get("role")));
-                emailField.setText(String.valueOf(row.get("email")));
-                enabledBox.setSelected(Integer.parseInt(row.get("enabled").toString()) == 1);
-            }
-        }
-
-        JPanel panel = new JPanel(new GridLayout(0, 1));
-        panel.add(new JLabel("Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Role (number):"));
-        panel.add(roleField);
-        panel.add(new JLabel("Email:"));
-        panel.add(emailField);
-        panel.add(enabledBox);
-
-        int result = JOptionPane.showConfirmDialog(null, panel,
-                id == null ? "Add User" : "Edit User", JOptionPane.OK_CANCEL_OPTION);
-        if (result == JOptionPane.OK_OPTION) {
-            try {
-                if (id == null)
-                    new sql().execute("INSERT INTO users (name, role, email, enabled) VALUES (?, ?, ?, ?)",
-                            nameField.getText(), Integer.parseInt(roleField.getText()), emailField.getText(), enabledBox.isSelected() ? 1 : 0);
-                else
-                    new sql().execute("UPDATE users SET name = ?, role = ?, email = ?, enabled = ? WHERE id = ?",
-                            nameField.getText(), Integer.parseInt(roleField.getText()), emailField.getText(), enabledBox.isSelected() ? 1 : 0, id);
-            } catch (Exception ex) {
-                ex.printStackTrace(System.err);
-            }
-            loadUsers(table);
-        }
     }
 
     private static class ProjectRow {
@@ -213,6 +188,17 @@ public class SettingsAction extends AnAction {
         ProjectRow(String name, int active) {
             this.name = name;
             this.active = active;
+        }
+    }
+
+    private static class UserRow {
+        String name, role, email;
+        int enabled;
+        UserRow(String name, String role, String email, int enabled) {
+            this.name = name;
+            this.role = role;
+            this.email = email;
+            this.enabled = enabled;
         }
     }
 
