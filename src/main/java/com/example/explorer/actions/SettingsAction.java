@@ -194,6 +194,7 @@ public class SettingsAction extends AnAction {
     private static class UserRow {
         String name, role, email;
         int enabled;
+
         UserRow(String name, String role, String email, int enabled) {
             this.name = name;
             this.role = role;

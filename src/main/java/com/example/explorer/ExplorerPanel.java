@@ -47,6 +47,7 @@ public class ExplorerPanel {
         // === Project Selector Bar ===
         JPanel topBar = new JPanel(new BorderLayout());
         topBar.add(new ComboBoxProjectSelector(this).getComponent(), BorderLayout.NORTH);
+        topBar.add(new ComboBoxVersionSelector(1).getComponent(), BorderLayout.SOUTH);
         panel.add(topBar, BorderLayout.NORTH);
 
         // === Tabs ===
