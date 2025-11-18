@@ -237,7 +237,7 @@ public class TestCaseDetailsPanel {
     }
 
     private JBLabel createValueLabel(String text) {
-        JBLabel label = new JBLabel(text);
+        JBLabel label = new JBLabel(text != null ? text : "3");  // Use "3" for null values
         label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         return label;
     }

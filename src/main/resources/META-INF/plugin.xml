@@ -20,23 +20,17 @@
                 id="Test Bind"
                 factoryClass="com.example.explorer.ExplorerToolWindowFactory"
                 anchor="left"
-                icon="/icons/ant_dark.svg"
+                icon="AllIcons.General.Information"
                 secondary="false"/>
+<!--        icon="/icons/ant_dark.svg"  OLD ICON -->
 
         <!-- 🔍 Right-side tool window: Test Case Details -->
         <toolWindow
                 id="TestCaseDetails"
                 factoryClass="com.example.viewer.TestCaseDetailsToolWindowFactory"
                 anchor="bottom"
-                icon="/icons/ant_dark.svg"
+                icon="AllIcons.General.Information"
                 secondary="false"/>
-
-        <!-- 🔍 Right-side tool window: Create Test Case -->
-        <toolWindow id="AddTestCase"
-                    secondary="false"
-                    icon="AllIcons.General.Add"
-                    anchor="bottom"
-                    factoryClass="com.example.viewer.AddTestCaseToolWindowFactory"/>
 
         <!-- 📝 File editor providers -->
         <fileEditorProvider implementation="com.example.editor.EditorProvider"/>

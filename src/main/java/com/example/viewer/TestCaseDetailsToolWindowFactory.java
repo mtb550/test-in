@@ -15,28 +15,38 @@ import java.awt.event.KeyEvent;
 
 public class TestCaseDetailsToolWindowFactory implements ToolWindowFactory {
     @Getter
-    private static TestCaseDetailsPanel instance;
+    private static TestCaseDetailsPanel detailsInstance;
+
+    @Getter
+    private static AddTestCasePanel addInstance;
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        instance = new TestCaseDetailsPanel();
+        detailsInstance = new TestCaseDetailsPanel();
+        addInstance = new AddTestCasePanel();
+
         ContentFactory contentFactory = ContentFactory.getInstance();
 
-        Content detailsTab = contentFactory.createContent(instance.getDetailsPanel(), "Details", false);
-        Content historyTab = contentFactory.createContent(instance.getHistoryPanel(), "History", false);
-        Content bugsTab = contentFactory.createContent(instance.getBugPanel(), "Open Bugs", false);
+        // Details tabs
+        Content detailsTab = contentFactory.createContent(detailsInstance.getDetailsPanel(), "Details", false);
+        Content historyTab = contentFactory.createContent(detailsInstance.getHistoryPanel(), "History", false);
+        Content bugsTab = contentFactory.createContent(detailsInstance.getBugPanel(), "Open Bugs", false);
+
+        // Add Test Case tab
+        Content addTestCaseTab = contentFactory.createContent(addInstance.getPanel(), "Create Test Case", false);
 
         toolWindow.getContentManager().addContent(detailsTab);
         toolWindow.getContentManager().addContent(historyTab);
         toolWindow.getContentManager().addContent(bugsTab);
+        toolWindow.getContentManager().addContent(addTestCaseTab);
 
         // === F2 Shortcut Binding ===
-        JComponent root = instance.getPanel();
+        JComponent root = detailsInstance.getPanel();
         KeyStroke f2 = KeyStroke.getKeyStroke("F2");
 
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(e -> {
             if (e.getID() == KeyEvent.KEY_PRESSED && e.getKeyCode() == KeyEvent.VK_F2) {
-                instance.toggleEditMode(true);
+                detailsInstance.toggleEditMode(true);
                 return true;
             }
             return false;
@@ -45,8 +55,16 @@ public class TestCaseDetailsToolWindowFactory implements ToolWindowFactory {
         root.getActionMap().put("editMode", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                instance.toggleEditMode(true); // enables editing
+                detailsInstance.toggleEditMode(true); // enables editing
             }
         });
+    }
+
+    public static TestCaseDetailsPanel getDetailsInstance() {
+        return detailsInstance;
+    }
+
+    public static AddTestCasePanel getAddInstance() {
+        return addInstance;
     }
 }
