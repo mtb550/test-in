@@ -37,6 +37,8 @@ dependencies {
     testImplementation("org.xerial:sqlite-jdbc:3.49.1.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3")
+    implementation("com.jayway.jsonpath:json-path:2.10.0")
+    implementation("commons-io:commons-io:2.21.0")
 }
 
 tasks {
