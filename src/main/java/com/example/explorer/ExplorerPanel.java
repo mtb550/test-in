@@ -108,7 +108,7 @@ public class ExplorerPanel {
     }
 
     private void setupTestCaseTree() {
-        ExplorerTree.build();
+        ExplorerTree.build_NEW();
         projectTree.setModel(ExplorerTree.getTreeModel());
         projectTree.setRootVisible(true);
         projectTree.setShowsRootHandles(true);
@@ -143,7 +143,7 @@ public class ExplorerPanel {
     }
 
     public void loadAllProjects() {
-        ExplorerTree.build();
+        ExplorerTree.build_NEW();
         projectTree.setModel(ExplorerTree.getTreeModel());
         projectTree.setRootVisible(true);
     }
@@ -154,7 +154,7 @@ public class ExplorerPanel {
             versionSelector.setProjectId(projectId);
         }
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test Cases");
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test CasesZ");
         String name = new sql().get("select name from projects where project_id = ?", projectId).asType(String.class);
         Tree selectedProject = new sql().get("SELECT * FROM " + name + "_tc_tree").as(Tree.class);
         DefaultMutableTreeNode node = ExplorerTree.buildSubTree(selectedProject);

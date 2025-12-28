@@ -51,15 +51,15 @@ public class TestCaseTreeMouseAdapter extends MouseAdapter {
         }
 
         // CASE: regular test case nodes
-        if (!(userObject instanceof Tree treeItem)) return;
+        //if (!(userObject instanceof Tree treeItem)) return;
 
         if (SwingUtilities.isRightMouseButton(e)) {
             ActionGroup group = (ActionGroup) ActionManager.getInstance().getAction("TestTreeContextMenuGroup");
             ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, group);
             popupMenu.getComponent().show(e.getComponent(), e.getX(), e.getY());
 
-        } else if (e.getClickCount() == NodeType.FEATURE.getCode() && treeItem.getType() == NodeType.FEATURE.getCode()) {
-            TestCaseEditor.open(treeItem.getId());
+//        } else if (e.getClickCount() == NodeType.FEATURE.getCode() && treeItem.getType() == NodeType.FEATURE.getCode()) {
+//            TestCaseEditor.open(treeItem.getId());
         }
     }
 

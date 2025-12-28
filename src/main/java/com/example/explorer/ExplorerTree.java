@@ -8,6 +8,7 @@ import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import java.io.File;
 
 public class ExplorerTree {
 
@@ -35,6 +36,52 @@ public class ExplorerTree {
 
         for (Tree childItem : children) {
             node.add(buildSubTree(childItem));
+        }
+
+        return node;
+    }
+
+    public static void build_NEW() {
+        // Absolute path from project root
+        String projectRoot = System.getProperty("user.dir");
+        File rootFolder = new File("/home/mtb/IdeaProjects/untitled/TestGit");
+
+        if (!rootFolder.exists()) {
+            System.out.println("❌ Folder not found!");
+            System.out.println(projectRoot);
+            System.out.println("Looking at: " + rootFolder.getAbsolutePath());
+            System.out.println("❌ Folder not found!");
+            return;
+        }
+
+        System.out.println("✓ Found Test Cases folder");
+        System.out.println("Path: " + rootFolder.getAbsolutePath());
+        System.out.println("rootFolder.getName(): "+rootFolder.getName());
+
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("TEST CASES A");
+
+        for (File child : rootFolder.listFiles()) {
+            if (child.isDirectory()) {
+                rootNode.add(buildSubTree2(child));
+            }
+        }
+
+        treeModel = new DefaultTreeModel(rootNode);
+        treeModel.addTreeModelListener(new ReloadAllOnInsertListener());
+    }
+
+    static DefaultMutableTreeNode buildSubTree2(File folder) {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder.getName());
+
+        System.out.println("#122 " + folder.getName());
+
+        File[] children = folder.listFiles();
+        if (children != null) {
+            for (File child : children) {
+                if (child.isDirectory()) {
+                    node.add(buildSubTree2(child));
+                }
+            }
         }
 
         return node;
