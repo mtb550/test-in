@@ -1,5 +1,6 @@
 package com.example.explorer;
 
+import com.example.pojo.Directory;
 import com.example.pojo.Version;
 import com.example.util.sql;
 import com.intellij.openapi.ui.ComboBox;
@@ -14,11 +15,11 @@ public class ComboBoxVersionSelector {
     private final DefaultComboBoxModel<String> model;
     private final Map<String, Double> nameToVersion = new HashMap<>();
 
-    public ComboBoxVersionSelector(int projectId) {
+    public ComboBoxVersionSelector(Directory tree) {
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
         comboBox.setFocusable(false);
-        loadVersions(projectId);
+        //loadVersions(project);
     }
 
     private void onSelection(ActionEvent e) {

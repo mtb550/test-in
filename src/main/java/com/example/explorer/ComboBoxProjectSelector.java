@@ -1,20 +1,19 @@
 package com.example.explorer;
 
-import com.example.pojo.Projects;
+import com.example.pojo.Directory;
+import com.example.pojo.Project;
 import com.intellij.openapi.ui.ComboBox;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ComboBoxProjectSelector {
-    private final ExplorerPanel panel;
-    private final ComboBox<String> comboBox;
-    private final DefaultComboBoxModel<String> model;
-    private final Map<String, Integer> nameToId = new HashMap<>();
+    private static ComboBox<Directory> comboBox = null;
+    private final DefaultComboBoxModel<Directory> model;
+    public ExplorerPanel panel;
 
     public ComboBoxProjectSelector(ExplorerPanel panel) {
         this.panel = panel;
@@ -25,24 +24,40 @@ public class ComboBoxProjectSelector {
         File testCasesFolder = new File("/home/mtb/IdeaProjects/untitled/TestGit");
         File[] dirs = testCasesFolder.listFiles(File::isDirectory);
 
-        Projects[] projects = (dirs == null) ? new Projects[0] : Arrays.stream(dirs)
+        // التغيير هنا: استخدم الواجهة Directory في مصفوفة البداية والنهاية
+        Directory[] projects = (dirs == null) ? new Directory[0] : Arrays.stream(dirs)
                 .map(dir -> {
-                    String[] parts = dir.getName().split("_");
+                    String fullName = dir.getName();
+                    String[] parts = fullName.split("_", 3);
 
-                    // Ensure the split has enough parts to prevent ArrayIndexOutOfBounds
-                    Integer id = Integer.parseInt(parts[0]);
-                    String name = parts[1];
-                    Integer active = Integer.parseInt(parts[2]);
+                    // استخدام كائن Project وتعبئته
+                    Project p = new Project();
+                    p.setFile(dir);
+                    p.setName(fullName); // اسم افتراضي
+                    p.setActive(1);      // نشط افتراضياً
 
-                    // Using your @Accessors(chain = true) logic
-                    return new Projects()
-                            .setId(id)
-                            .setName(name)
-                            .setActive(active);
+                    try {
+                        if (parts.length >= 2) {
+                            p.setId(Integer.parseInt(parts[0]));
+                            p.setName(parts[1]);
+                            if (parts.length > 2) {
+                                p.setActive(Integer.parseInt(parts[2]));
+                            }
+                        }
+                    } catch (NumberFormatException e) {
+                        // في حال فشل الأرقام، سيبقى الاسم هو fullName والنشاط 1
+                    }
+
+                    return (Directory) p; // تحويل صريح للواجهة لضمان توافق الـ Stream
                 })
-                // Optional: Filter for active only to match your old SQL WHERE active = 1
-                .filter(p -> p.getActive() != null && p.getActive() == 1)
-                .toArray(Projects[]::new);
+                .filter(p -> {
+                    // بما أن الفلتر يحتاج الوصول لـ active، نحتاج تحويله لـ Project مؤقتاً
+                    if (p instanceof Project) {
+                        return ((Project) p).getActive() == 1;
+                    }
+                    return true;
+                })
+                .toArray(Directory[]::new); // التخزين في مصفوفة Directory
 
         if (projects != null) {
             // Sort alphabetically
@@ -53,30 +68,41 @@ public class ComboBoxProjectSelector {
         }
 
         if (projects.length > 0) {
-            for (Projects project : projects) {
-                model.addElement(project.getName());
+            for (Directory project : projects) {
+                model.addElement(project);
             }
             comboBox.addActionListener(this::onSelection);
             comboBox.setSelectedIndex(0);
         } else {
-            comboBox.addItem("No projects found");
+            //comboBox.addItem("No projects found");
             comboBox.setEnabled(false);
         }
+
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Project) {
+                    setText(((Project) value).getName()); // هنا نخبره أن يعرض حقل الـ Name فقط
+                }
+                return this;
+            }
+        });
+    }
+
+    public static Directory getSelectedProject() {
+        return (Project) comboBox.getSelectedItem();
     }
 
     private void onSelection(ActionEvent e) {
-        String selected = (String) comboBox.getSelectedItem();
-        if (selected != null && nameToId.containsKey(selected)) {
-            panel.filterByProject(nameToId.get(selected));
-        }
+        Directory selected = (Project) comboBox.getSelectedItem();
+        panel.filterByProject(selected);
+
     }
 
     public JComponent getComponent() {
         return comboBox;
     }
 
-    public int getSelectedProjectId() {
-        String selected = (String) comboBox.getSelectedItem();
-        return nameToId.getOrDefault(selected, -1);
-    }
+
 }

@@ -40,10 +40,10 @@ public class AddFeatureAction extends AnAction {
                 name, NodeType.FEATURE.getCode(), treeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
 
         Tree newFeature = new Tree()
-                .setName(name)
                 .setType(NodeType.FEATURE.getCode()).
                 setId(newFeatureId)
                 .setLink(treeItem.getId());
+        newFeature.setName(name);
 
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFeature);
         ((DefaultTreeModel) tree.getModel()).insertNodeInto(newNode, parentNode, parentNode.getChildCount());

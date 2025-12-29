@@ -1,12 +1,11 @@
 package com.example.explorer;
 
+import com.example.pojo.Directory;
 import com.example.pojo.TestPlan;
 import com.example.pojo.Tree;
 import com.example.util.ShortcutRegistry;
 import com.example.util.sql;
 import com.intellij.icons.AllIcons;
-import com.intellij.notification.NotificationGroupManager;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.SimpleColoredComponent;
@@ -53,10 +52,10 @@ public class ExplorerPanel {
         ComboBoxProjectSelector projectSelector = new ComboBoxProjectSelector(this);
         topBar.add(projectSelector.getComponent(), BorderLayout.NORTH);
 
-        int selectedProjectId = projectSelector.getSelectedProjectId();
+        Directory selectedProject = ComboBoxProjectSelector.getSelectedProject();
 
         // ✅ Assign to field so we can refresh it on project change
-        versionSelector = new ComboBoxVersionSelector(selectedProjectId);
+        versionSelector = new ComboBoxVersionSelector(selectedProject);
         topBar.add(versionSelector.getComponent(), BorderLayout.SOUTH);
 
         panel.add(topBar, BorderLayout.NORTH);
@@ -150,15 +149,14 @@ public class ExplorerPanel {
         projectTree.setRootVisible(true);
     }
 
-    public void filterByProject(int projectId) {
+    public void filterByProject(Directory project) {
         // ✅ Refresh the version list dynamically
         if (versionSelector != null) {
-            versionSelector.setProjectId(projectId);
+            //versionSelector.setProjectId(projectId);
         }
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test CasesZ");
-        String name = new sql().get("select name from projects where project_id = ?", projectId).asType(String.class);
-        Tree selectedProject = new sql().get("SELECT * FROM " + name + "_tc_tree").as(Tree.class);
+        Directory selectedProject = ComboBoxProjectSelector.getSelectedProject();
         DefaultMutableTreeNode node = ExplorerTree.buildSubTree(selectedProject);
         root.add(node);
 

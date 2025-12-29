@@ -1,11 +1,8 @@
 package com.example.explorer;
 
-import com.example.editor.TestCaseEditor;
 import com.example.explorer.testPlan.TestPlanContextMenu;
 import com.example.explorer.testPlan.TestRunEditor;
 import com.example.pojo.TestPlan;
-import com.example.pojo.Tree;
-import com.example.util.NodeType;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;

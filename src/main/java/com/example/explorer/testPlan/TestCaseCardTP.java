@@ -63,10 +63,16 @@ public class TestCaseCardTP extends JPanel {
         JBLabel autoRef = createSubLabel("Automation Ref: " + tc.getAutomationRef(), true);
 
         // إضافة العناصر للـ GridBag
-        gbc.gridy = 0; content.add(titleLine, gbc);
-        gbc.gridy = 1; gbc.insets = JBUI.insetsTop(4); content.add(expected, gbc);
-        gbc.gridy = 2; content.add(steps, gbc);
-        gbc.gridy = 3; gbc.insets = JBUI.insetsTop(2); content.add(autoRef, gbc);
+        gbc.gridy = 0;
+        content.add(titleLine, gbc);
+        gbc.gridy = 1;
+        gbc.insets = JBUI.insetsTop(4);
+        content.add(expected, gbc);
+        gbc.gridy = 2;
+        content.add(steps, gbc);
+        gbc.gridy = 3;
+        gbc.insets = JBUI.insetsTop(2);
+        content.add(autoRef, gbc);
 
         return content;
     }

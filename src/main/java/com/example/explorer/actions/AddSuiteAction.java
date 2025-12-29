@@ -42,10 +42,10 @@ public class AddSuiteAction extends AnAction {
 
         // Build new node and insert it
         Tree newSuite = new Tree()
-                .setName(name)
                 .setType(NodeType.SUITE.getCode()).
                 setLink(treeItem.getId())
                 .setId(newNodeId);
+        newSuite.setName(name);
 
         DefaultMutableTreeNode newSuiteNode = new DefaultMutableTreeNode(newSuite);
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();

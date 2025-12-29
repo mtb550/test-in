@@ -1,8 +1,7 @@
 package com.example.explorer.testPlan;
 
 import com.example.pojo.TestCase;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBUI;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -73,7 +72,9 @@ public class TestCaseCardWrapper extends JLayeredPane {
         // نمنع الزر من "أكل" أحداث الماوس لكي لا تختفي اللوحة عند الوقوف عليه
         btn.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent e) { overlayPanel.setVisible(true); }
+            public void mouseEntered(MouseEvent e) {
+                overlayPanel.setVisible(true);
+            }
         });
 
         return btn;

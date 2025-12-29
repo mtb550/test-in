@@ -59,12 +59,4 @@ public class TestCaseDetailsToolWindowFactory implements ToolWindowFactory {
             }
         });
     }
-
-    public static TestCaseDetailsPanel getDetailsInstance() {
-        return detailsInstance;
-    }
-
-    public static AddTestCasePanel getAddInstance() {
-        return addInstance;
-    }
 }

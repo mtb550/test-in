@@ -16,8 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Tree {
-
+public class Tree implements Directory {
     private File file;
 
     private Integer id;
@@ -42,4 +41,23 @@ public class Tree {
     @JsonAlias("modified_by")
     private String modifiedBy;
 
+    @Override
+    public File getFile() {
+        return file;
+    }
+
+    @Override
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
 }

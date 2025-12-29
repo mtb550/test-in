@@ -36,9 +36,9 @@ public class AddProjectAction extends AnAction {
         ).asType(Integer.class);
 
         Tree newProject = new Tree()
-                .setName(name)
                 .setType(NodeType.PROJECT.getCode())
                 .setId(newProjectId);
+        newProject.setName(name);
 
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();

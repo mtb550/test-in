@@ -1,7 +1,7 @@
 package com.example.editor;
 
-import com.example.viewer.TestCaseToolWindow;
 import com.example.pojo.TestCase;
+import com.example.viewer.TestCaseToolWindow;
 import com.intellij.openapi.ui.JBPopupMenu;
 
 import javax.swing.*;

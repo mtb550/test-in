@@ -1,5 +1,6 @@
 package com.example.explorer;
 
+import com.example.pojo.Directory;
 import com.example.pojo.Tree;
 import lombok.Getter;
 
@@ -32,8 +33,8 @@ public class ExplorerTree {
         treeModel.addTreeModelListener(new ReloadAllOnInsertListener());
     }
 
-    public static DefaultMutableTreeNode buildSubTree(Tree folder) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder);
+    static DefaultMutableTreeNode buildSubTree(Directory folder) {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder.getName());
 
         File[] children = folder.getFile().listFiles();
 
