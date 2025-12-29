@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.io.File;
 import java.time.LocalDateTime;
 
 @Setter
@@ -16,6 +17,8 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Tree {
+
+    private File file;
 
     private Integer id;
 

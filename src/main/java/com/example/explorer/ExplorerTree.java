@@ -62,7 +62,14 @@ public class ExplorerTree {
 
         for (File child : rootFolder.listFiles()) {
             if (child.isDirectory()) {
-                rootNode.add(buildSubTree2(child));
+                String[] name = child.getName().split("_");
+                Tree tree = new Tree()
+                        .setFile(child)
+                        .setId(Integer.parseInt(name[0]))
+                        .setType(Integer.parseInt(name[2]))
+                        .setName(name[1]);
+
+                rootNode.add(buildSubTree2(tree));
             }
         }
 
@@ -70,21 +77,46 @@ public class ExplorerTree {
         treeModel.addTreeModelListener(new ReloadAllOnInsertListener());
     }
 
-    static DefaultMutableTreeNode buildSubTree2(File folder) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder.getName());
+    static DefaultMutableTreeNode buildSubTree2(Tree folder) {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder);
 
         System.out.println("#122 " + folder.getName());
 
-        File[] children = folder.listFiles();
+        File[] children = folder.getFile().listFiles();
         if (children != null) {
-            for (File child : children) {
-                if (child.isDirectory()) {
-                    node.add(buildSubTree2(child));
+            for (File childFile : children) {
+                if (childFile.isDirectory()) {
+                    Tree childTree = mapFolderToTree(childFile);
+                    node.add(buildSubTree2(childTree));
                 }
             }
         }
 
         return node;
+    }
+
+    // دالة مساعدة لتحويل File إلى Tree بناءً على الاسم (ID_Name_Type)
+    private static Tree mapFolderToTree(File file) {
+        String fullName = file.getName();
+        String[] parts = fullName.split("_", 3);
+
+        Tree t = new Tree();
+        t.setFile(file); // تخزين مرجع الملف الفعلي
+        t.setName(fullName); // اسم افتراضي في حال فشل التقسيم
+
+        try {
+            if (parts.length >= 2) {
+                t.setId(Integer.parseInt(parts[0]));
+                t.setName(parts[1]); // الاسم النظيف بدون أرقام
+                if (parts.length > 2) {
+                    t.setType(Integer.parseInt(parts[2]));
+                }
+            }
+        } catch (NumberFormatException e) {
+            // في حال فشل تحويل الرقم، يظل الاسم هو fullName
+        }
+
+        return t;
     }
 
     private static class ReloadAllOnInsertListener implements TreeModelListener {
