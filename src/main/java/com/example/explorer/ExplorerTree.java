@@ -1,7 +1,6 @@
 package com.example.explorer;
 
 import com.example.pojo.Directory;
-import com.example.pojo.Tree;
 import lombok.Getter;
 
 import javax.swing.event.TreeModelEvent;
@@ -24,7 +23,7 @@ public class ExplorerTree {
 
         for (File child : rootFolder.listFiles()) {
             if (child.isDirectory()) {
-                Tree tree = mapFolderToTree(child);
+                Directory tree = mapFolderToDirectory(child);
                 rootNode.add(buildSubTree(tree));
             }
         }
@@ -34,14 +33,14 @@ public class ExplorerTree {
     }
 
     static DefaultMutableTreeNode buildSubTree(Directory folder) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder.getName());
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder);
 
         File[] children = folder.getFile().listFiles();
 
         if (children != null) {
             for (File childFile : children) {
                 if (childFile.isDirectory()) {
-                    Tree childTree = mapFolderToTree(childFile);
+                    Directory childTree = mapFolderToDirectory(childFile);
                     node.add(buildSubTree(childTree));
                 }
             }
@@ -51,25 +50,16 @@ public class ExplorerTree {
     }
 
     // دالة مساعدة لتحويل File إلى Tree بناءً على الاسم (ID_Name_Type)
-    private static Tree mapFolderToTree(File file) {
+    private static Directory mapFolderToDirectory(File file) {
         String fullName = file.getName();
         String[] parts = fullName.split("_", 3);
 
-        Tree t = new Tree();
+        Directory t = new Directory();
         t.setFile(file); // تخزين مرجع الملف الفعلي
-        t.setName(fullName); // اسم افتراضي في حال فشل التقسيم
-
-        try {
-            if (parts.length >= 2) {
-                t.setId(Integer.parseInt(parts[0]));
-                t.setName(parts[1]); // الاسم النظيف بدون أرقام
-                if (parts.length > 2) {
-                    t.setType(Integer.parseInt(parts[2]));
-                }
-            }
-        } catch (NumberFormatException e) {
-            // في حال فشل تحويل الرقم، يظل الاسم هو fullName
-        }
+        //t.setName(fullName); // اسم افتراضي في حال فشل التقسيم
+        t.setId(Integer.parseInt(parts[0]));
+        t.setName(parts[1]); // الاسم النظيف بدون أرقام
+        t.setType(Integer.parseInt(parts[2]));
 
         return t;
     }
@@ -77,24 +67,24 @@ public class ExplorerTree {
     private static class ReloadAllOnInsertListener implements TreeModelListener {
         @Override
         public void treeNodesChanged(TreeModelEvent e) {
-            treeModel.reload();
+            //treeModel.reload();
         }
 
         @Override
         public void treeNodesInserted(TreeModelEvent e) {
-            treeModel.reload();
+            // treeModel.reload();
 
         }
 
         @Override
         public void treeNodesRemoved(TreeModelEvent e) {
-            treeModel.reload();
+            //  treeModel.reload();
 
         }
 
         @Override
         public void treeStructureChanged(TreeModelEvent e) {
-            treeModel.reload();
+            //   treeModel.reload();
         }
 
     }

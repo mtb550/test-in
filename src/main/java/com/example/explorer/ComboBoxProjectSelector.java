@@ -1,7 +1,6 @@
 package com.example.explorer;
 
 import com.example.pojo.Directory;
-import com.example.pojo.Project;
 import com.intellij.openapi.ui.ComboBox;
 
 import javax.swing.*;
@@ -12,13 +11,12 @@ import java.util.Arrays;
 
 public class ComboBoxProjectSelector {
     private static ComboBox<Directory> comboBox = null;
-    private final DefaultComboBoxModel<Directory> model;
     public ExplorerPanel panel;
 
     public ComboBoxProjectSelector(ExplorerPanel panel) {
         this.panel = panel;
-        this.model = new DefaultComboBoxModel<>();
-        this.comboBox = new ComboBox<>(model);
+        DefaultComboBoxModel<Directory> model = new DefaultComboBoxModel<>();
+        comboBox = new ComboBox<>(model);
         comboBox.setFocusable(false);
 
         File testCasesFolder = new File("/home/mtb/IdeaProjects/untitled/TestGit");
@@ -31,7 +29,7 @@ public class ComboBoxProjectSelector {
                     String[] parts = fullName.split("_", 3);
 
                     // استخدام كائن Project وتعبئته
-                    Project p = new Project();
+                    Directory p = new Directory();
                     p.setFile(dir);
                     p.setName(fullName); // اسم افتراضي
                     p.setActive(1);      // نشط افتراضياً
@@ -48,24 +46,19 @@ public class ComboBoxProjectSelector {
                         // في حال فشل الأرقام، سيبقى الاسم هو fullName والنشاط 1
                     }
 
-                    return (Directory) p; // تحويل صريح للواجهة لضمان توافق الـ Stream
+                    return p; // تحويل صريح للواجهة لضمان توافق الـ Stream
                 })
                 .filter(p -> {
                     // بما أن الفلتر يحتاج الوصول لـ active، نحتاج تحويله لـ Project مؤقتاً
-                    if (p instanceof Project) {
-                        return ((Project) p).getActive() == 1;
-                    }
-                    return true;
+                    return p.getActive() == 1;
                 })
                 .toArray(Directory[]::new); // التخزين في مصفوفة Directory
 
-        if (projects != null) {
-            // Sort alphabetically
-            //java.util.Arrays.sort(projects);
+        // Sort alphabetically
+        //java.util.Arrays.sort(projects);
 
-            // Now you have: ["ibram", "nafath", ...]
-            System.out.println("Found projects: " + Arrays.toString(projects));
-        }
+        // Now you have: ["ibram", "nafath", ...]
+        System.out.println("Found projects: " + Arrays.toString(projects));
 
         if (projects.length > 0) {
             for (Directory project : projects) {
@@ -82,20 +75,18 @@ public class ComboBoxProjectSelector {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Project) {
-                    setText(((Project) value).getName()); // هنا نخبره أن يعرض حقل الـ Name فقط
-                }
+                setText(((Directory) value).getName()); // هنا نخبره أن يعرض حقل الـ Name فقط
                 return this;
             }
         });
     }
 
     public static Directory getSelectedProject() {
-        return (Project) comboBox.getSelectedItem();
+        return (Directory) comboBox.getSelectedItem();
     }
 
     private void onSelection(ActionEvent e) {
-        Directory selected = (Project) comboBox.getSelectedItem();
+        Directory selected = (Directory) comboBox.getSelectedItem();
         panel.filterByProject(selected);
 
     }

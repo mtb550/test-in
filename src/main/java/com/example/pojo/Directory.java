@@ -1,13 +1,47 @@
 package com.example.pojo;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+
 import java.io.File;
+import java.time.LocalDateTime;
 
-public interface Directory {
-    File getFile();
+@Setter
+@Getter
+@NoArgsConstructor
+@Accessors(chain = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class Directory {
+    @JsonAlias("project_id")
+    private Integer id;
 
-    void setFile(File file);
+    private String name;
 
-    String getName();
+    private Integer active;
 
-    void setName(String name);
+    private File file;
+
+    private Integer type;
+
+    private Integer link;
+
+    @JsonAlias("created_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    @JsonAlias("created_by")
+    private String createdBy;
+
+    @JsonAlias("modified_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime modifiedAt;
+
+    @JsonAlias("modified_by")
+    private String modifiedBy;
+
 }

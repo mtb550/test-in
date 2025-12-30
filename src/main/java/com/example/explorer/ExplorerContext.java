@@ -1,7 +1,7 @@
 package com.example.explorer;
 
 import com.example.explorer.actions.*;
-import com.example.pojo.Tree;
+import com.example.pojo.Directory;
 import com.example.util.NodeType;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -27,7 +27,7 @@ public class ExplorerContext extends DefaultActionGroup {
                 TreePath path = tree.getSelectionPath();
                 if (path != null) {
                     Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                    if (userObject instanceof Tree treeItem && treeItem.getType() == NodeType.FEATURE.getCode()) {
+                    if (userObject instanceof Directory treeItem && treeItem.getType() == NodeType.FEATURE.getCode()) {
                         enabled = false;
                     }
                 }

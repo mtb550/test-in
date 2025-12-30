@@ -1,6 +1,6 @@
 package com.example.explorer.actions;
 
-import com.example.pojo.Tree;
+import com.example.pojo.Directory;
 import com.example.util.sql;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -29,7 +29,7 @@ public class RenameAction extends AnAction {
 
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = node.getUserObject();
-        if (!(userObject instanceof Tree treeItem)) return;
+        if (!(userObject instanceof Directory treeItem)) return;
 
         String newName = Messages.showInputDialog("Rename node:", "Rename", null, treeItem.getName(), null);
         if (newName == null || newName.isBlank()) return;

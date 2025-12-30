@@ -1,6 +1,6 @@
 package com.example.explorer.actions;
 
-import com.example.pojo.Tree;
+import com.example.pojo.Directory;
 import com.example.util.NodeType;
 import com.example.util.sql;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -30,7 +30,7 @@ public class AddFeatureAction extends AnAction {
 
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
-        if (!(userObject instanceof Tree treeItem) || treeItem.getType() == NodeType.FEATURE.getCode()) return;
+        if (!(userObject instanceof Directory treeItem) || treeItem.getType() == NodeType.FEATURE.getCode()) return;
 
         String name = Messages.showInputDialog("Enter feature name:", "Add Feature", null);
         if (name == null || name.isBlank()) return;
@@ -39,7 +39,7 @@ public class AddFeatureAction extends AnAction {
         int newFeatureId = db.get("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?) RETURNING id;",
                 name, NodeType.FEATURE.getCode(), treeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
 
-        Tree newFeature = new Tree()
+        Directory newFeature = new Directory()
                 .setType(NodeType.FEATURE.getCode()).
                 setId(newFeatureId)
                 .setLink(treeItem.getId());

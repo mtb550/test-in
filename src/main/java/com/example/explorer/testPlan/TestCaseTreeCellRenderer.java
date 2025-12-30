@@ -1,8 +1,8 @@
 package com.example.explorer.testPlan;
 
+import com.example.pojo.Directory;
 import com.example.pojo.GroupType;
 import com.example.pojo.TestCase;
-import com.example.pojo.Tree;
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.SimpleTextAttributes;
@@ -16,7 +16,7 @@ public class TestCaseTreeCellRenderer extends CheckboxTree.CheckboxTreeCellRende
                                   boolean leaf, int row, boolean hasFocus) {
         if (value instanceof CheckedTreeNode ctNode) {
             Object userObject = ctNode.getUserObject();
-            if (userObject instanceof Tree treeNode) {
+            if (userObject instanceof Directory treeNode) {
                 getTextRenderer().append(treeNode.getName());
             } else if (userObject instanceof TestCase testCase) {
                 renderTestCase(testCase);

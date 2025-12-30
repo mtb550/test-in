@@ -2,7 +2,6 @@ package com.example.explorer;
 
 import com.example.pojo.Directory;
 import com.example.pojo.TestPlan;
-import com.example.pojo.Tree;
 import com.example.util.ShortcutRegistry;
 import com.example.util.sql;
 import com.intellij.icons.AllIcons;
@@ -155,51 +154,66 @@ public class ExplorerPanel {
             //versionSelector.setProjectId(projectId);
         }
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test CasesZ");
-        Directory selectedProject = ComboBoxProjectSelector.getSelectedProject();
-        DefaultMutableTreeNode node = ExplorerTree.buildSubTree(selectedProject);
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test Cases");
+        DefaultMutableTreeNode node = ExplorerTree.buildSubTree(project);
         root.add(node);
 
         ExplorerTree.treeModel = new DefaultTreeModel(root);
         projectTree.setModel(ExplorerTree.treeModel);
         projectTree.setRootVisible(true);
+        //projectTree.setCellRenderer(new IntelliJRenderer());
     }
 
-    static class IntelliJRenderer implements TreeCellRenderer {
+    static class IntelliJRenderer extends SimpleColoredComponent implements TreeCellRenderer {
         @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value,
                                                       boolean selected, boolean expanded,
                                                       boolean leaf, int row, boolean hasFocus) {
-            SimpleColoredComponent comp = new SimpleColoredComponent();
-            comp.setOpaque(false);
+            this.clear(); // مسح الحالة السابقة (ضروري جداً)
 
-            Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
-            String text = value.toString();
-
-            if (userObject instanceof Tree projectNode) {
-                text = projectNode.getName();
-                switch (projectNode.getType()) {
-                    case 0 -> comp.setIcon(AllIcons.Nodes.Project);
-                    case 1 -> comp.setIcon(AllIcons.Nodes.Folder);
-                    case 2 -> comp.setIcon(AllIcons.Nodes.Class);
-                }
-                if (TestCaseTreeKeyAdapter.isCutNode(projectNode.getId())) {
-                    comp.append(text, SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                } else {
-                    comp.append(text, SimpleTextAttributes.REGULAR_ATTRIBUTES);
-                }
-            } else if (userObject instanceof TestPlan plan) {
-                text = plan.getName();
-                switch (plan.getType()) {
-                    case 0 -> comp.setIcon(AllIcons.Nodes.Folder);
-                    case 1 -> comp.setIcon(AllIcons.Nodes.Artifact);
-                }
-                comp.append(text, SimpleTextAttributes.REGULAR_ATTRIBUTES);
-            } else {
-                comp.append(text, SimpleTextAttributes.REGULAR_ATTRIBUTES);
+            Object userObject = null;
+            if (value instanceof DefaultMutableTreeNode node) {
+                userObject = node.getUserObject();
+                System.out.println(userObject + "%%%");
+                System.out.println(userObject.getClass() + "%%%");
             }
 
-            return comp;
+            // 1. حالة الـ Directory (المشاريع والمجلدات)
+            if (userObject instanceof Directory projectNode) {
+                // تعيين الأيقونة بناءً على النوع
+                Icon icon = AllIcons.Nodes.Folder; // افتراضي
+                if (projectNode.getType() != null) {
+                    icon = switch (projectNode.getType()) {
+                        case 0 -> AllIcons.Nodes.Project;
+                        case 1 -> AllIcons.Nodes.Folder;
+                        case 2 -> AllIcons.Nodes.Class;
+                        default -> AllIcons.Nodes.Folder;
+                    };
+                }
+                setIcon(icon); // ✅ تعيين الأيقونة
+
+                // تعيين النص والستايل
+                SimpleTextAttributes style = SimpleTextAttributes.REGULAR_ATTRIBUTES;
+                if (projectNode.getId() != null && TestCaseTreeKeyAdapter.isCutNode(projectNode.getId())) {
+                    style = SimpleTextAttributes.GRAYED_ATTRIBUTES;
+                }
+                append(projectNode.getName(), style); // ✅ إضافة النص
+            }
+
+            // 2. حالة الـ TestPlan
+            else if (userObject instanceof TestPlan plan) {
+                Icon planIcon = (plan.getType() == 1) ? AllIcons.Nodes.Artifact : AllIcons.Nodes.Folder;
+                setIcon(planIcon);
+                append(plan.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+            }
+
+            // 3. حالة النصوص العادية (مثل Root)
+            else {
+                setIcon(AllIcons.Nodes.Folder); // أيقونة اختيارية للـ Root
+                append(value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+            }
+
+            return this;
         }
     }
 }

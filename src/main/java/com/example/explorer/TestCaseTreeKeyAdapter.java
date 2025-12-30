@@ -1,7 +1,7 @@
 package com.example.explorer;
 
 import com.example.editor.TestCaseEditor;
-import com.example.pojo.Tree;
+import com.example.pojo.Directory;
 import com.example.util.*;
 import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -61,7 +61,7 @@ public class TestCaseTreeKeyAdapter {
                 if (path == null) return;
 
                 Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                if (userObject instanceof Tree treeItem) {
+                if (userObject instanceof Directory treeItem) {
                     if (treeItem.getType() == NodeType.FEATURE.getCode()) {
                         TestCaseEditor.open(treeItem.getId());
                         System.out.printf("[ENTER] Opened test case: %s%n", treeItem.getName());
@@ -106,7 +106,7 @@ public class TestCaseTreeKeyAdapter {
                 for (TreePath path : paths) {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                     clipboard.add(node);
-                    cutNodeIds.add(((Tree) node.getUserObject()).getId());
+                    cutNodeIds.add(((Directory) node.getUserObject()).getId());
                 }
 
                 isCut = true;
@@ -128,18 +128,18 @@ public class TestCaseTreeKeyAdapter {
 
                 DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) targetPath.getLastPathComponent();
                 Object userObject = targetNode.getUserObject();
-                if (!(userObject instanceof Tree targetTreeItem)) return;
+                if (!(userObject instanceof Directory targetTreeItem)) return;
 
                 DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
                 for (DefaultMutableTreeNode node : clipboard) {
-                    Tree sourceTreeItem = (Tree) node.getUserObject();
+                    Directory sourceTreeItem = (Directory) node.getUserObject();
 
                     if (!isCut) {
                         sql db = new sql();
                         int newNodeId = db.get("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?) RETURNING id;", sourceTreeItem.getName() + " (Copy)", sourceTreeItem.getType(), targetTreeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
 
-                        Tree treeItem = new Tree()
+                        Directory treeItem = new Directory()
                                 .setType(sourceTreeItem.getType())
                                 .setId(newNodeId);
                         treeItem.setName(sourceTreeItem.getName() + " (Copy)");
@@ -177,7 +177,7 @@ public class TestCaseTreeKeyAdapter {
                                     model.removeNodeFromParent(node);
                                     model.insertNodeInto(node, oldParent, oldParent.getChildCount());
                                     new sql().execute("UPDATE tree SET link = ? WHERE id = ?",
-                                            ((Tree) oldParent.getUserObject()).getId(), sourceTreeItem.getId());
+                                            ((Directory) oldParent.getUserObject()).getId(), sourceTreeItem.getId());
                                     tree.repaint();
                                 },
                                 // Redo: reapply move to target node
@@ -217,7 +217,7 @@ public class TestCaseTreeKeyAdapter {
                 for (TreePath path : paths) {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                     Object userObject = node.getUserObject();
-                    if (userObject instanceof Tree treeItem) {
+                    if (userObject instanceof Directory treeItem) {
                         DefaultMutableTreeNode parent = (DefaultMutableTreeNode) node.getParent();
                         int index = parent.getIndex(node);
 
@@ -279,7 +279,7 @@ public class TestCaseTreeKeyAdapter {
                 DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                 Object userObject = node.getUserObject();
 
-                if (!(userObject instanceof Tree treeItem)) return;
+                if (!(userObject instanceof Directory treeItem)) return;
 
                 String newName = JOptionPane.showInputDialog(tree, "Rename node:", treeItem.getName());
                 if (newName == null || newName.isBlank() || newName.equals(treeItem.getName())) return;
@@ -338,7 +338,7 @@ public class TestCaseTreeKeyAdapter {
             public void actionPerformed(ActionEvent e) {
                 TreePath path = tree.getSelectionPath();
                 DefaultMutableTreeNode selected = path != null ? (DefaultMutableTreeNode) path.getLastPathComponent() : null;
-                Tree selectedInfo = selected != null ? (Tree) selected.getUserObject() : null;
+                Directory selectedInfo = selected != null ? (Directory) selected.getUserObject() : null;
 
                 JBPanel<?> panel = new JBPanel<>(new BorderLayout(5, 5));
                 JBTextField nameField = new JBTextField();
@@ -400,7 +400,7 @@ public class TestCaseTreeKeyAdapter {
                 db.execute("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?)",
                         name, newType, parentId, System.getProperty("user.name"));
 
-                Tree newInfo = db.get("SELECT TOP 1 * FROM nafath_tc_tree WHERE name = ? ORDER BY created_at DESC", name).as(Tree.class);
+                Directory newInfo = db.get("SELECT TOP 1 * FROM nafath_tc_tree WHERE name = ? ORDER BY created_at DESC", name).as(Directory.class);
                 DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newInfo);
 
                 if (newType == 0) {

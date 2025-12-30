@@ -1,6 +1,6 @@
 package com.example.explorer;
 
-import com.example.pojo.Tree;
+import com.example.pojo.Directory;
 import com.example.util.NodeType;
 import com.example.util.sql;
 import lombok.SneakyThrows;
@@ -68,12 +68,12 @@ public class TreeTransferHandler extends TransferHandler {
         DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) dropPath.getLastPathComponent();
         Object userObject = targetNode.getUserObject();
 
-        if (!(userObject instanceof Tree targetInfo)) return false;
+        if (!(userObject instanceof Directory targetInfo)) return false;
 
         int targetType = targetInfo.getType();
         for (DefaultMutableTreeNode node : draggedNodes) {
             Object obj = node.getUserObject();
-            if (!(obj instanceof Tree draggedInfo)) return false;
+            if (!(obj instanceof Directory draggedInfo)) return false;
 
             // Block project moving or dropping into a feature
             if (draggedInfo.getType() == NodeType.PROJECT.getCode() || targetType == NodeType.FEATURE.getCode())
@@ -98,13 +98,13 @@ public class TreeTransferHandler extends TransferHandler {
         DefaultMutableTreeNode newParent = (DefaultMutableTreeNode) dropPath.getLastPathComponent();
 
         Object parentObj = newParent.getUserObject();
-        if (!(parentObj instanceof Tree newParentInfo)) return false;
+        if (!(parentObj instanceof Directory newParentInfo)) return false;
 
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
         for (DefaultMutableTreeNode node : nodes) {
             Object userObj = node.getUserObject();
-            if (!(userObj instanceof Tree movingInfo)) continue;
+            if (!(userObj instanceof Directory movingInfo)) continue;
 
             // Remove from current parent
             model.removeNodeFromParent(node);

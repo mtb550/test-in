@@ -1,7 +1,7 @@
 package com.example.explorer.actions;
 
 import com.example.explorer.ExplorerPanel;
-import com.example.pojo.Tree;
+import com.example.pojo.Directory;
 import com.example.util.NodeType;
 import com.example.util.sql;
 import com.intellij.icons.AllIcons;
@@ -35,7 +35,7 @@ public class AddProjectAction extends AnAction {
                 name, NodeType.PROJECT.getCode(), System.getProperty("user.name")
         ).asType(Integer.class);
 
-        Tree newProject = new Tree()
+        Directory newProject = new Directory()
                 .setType(NodeType.PROJECT.getCode())
                 .setId(newProjectId);
         newProject.setName(name);

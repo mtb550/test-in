@@ -1,6 +1,6 @@
 package com.example.explorer.actions;
 
-import com.example.pojo.Tree;
+import com.example.pojo.Directory;
 import com.example.util.NodeType;
 import com.example.util.sql;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -31,7 +31,7 @@ public class AddSuiteAction extends AnAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (!(userObject instanceof Tree treeItem) || treeItem.getType() == NodeType.FEATURE.getCode()) return;
+        if (!(userObject instanceof Directory treeItem) || treeItem.getType() == NodeType.FEATURE.getCode()) return;
 
         String name = Messages.showInputDialog("Enter suite name:", "Add Suite", null);
         if (name == null || name.isBlank()) return;
@@ -41,7 +41,7 @@ public class AddSuiteAction extends AnAction {
                 name, NodeType.SUITE.getCode(), treeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
 
         // Build new node and insert it
-        Tree newSuite = new Tree()
+        Directory newSuite = new Directory()
                 .setType(NodeType.SUITE.getCode()).
                 setLink(treeItem.getId())
                 .setId(newNodeId);

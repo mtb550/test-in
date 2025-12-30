@@ -1,6 +1,6 @@
 package com.example.explorer.actions;
 
-import com.example.pojo.Tree;
+import com.example.pojo.Directory;
 import com.example.util.sql;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -31,7 +31,7 @@ public class DeleteAction extends AnAction {
         if (path == null) return;
 
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        if (!(selectedNode.getUserObject() instanceof Tree treeItem)) return;
+        if (!(selectedNode.getUserObject() instanceof Directory treeItem)) return;
 
         int confirm = Messages.showYesNoDialog("Delete '" + treeItem.getName() + "' and all its children?", "Confirm Recursive Delete", null);
         if (confirm != Messages.YES) return;
@@ -58,8 +58,8 @@ public class DeleteAction extends AnAction {
 
     private void collectIdsRecursively(int id, sql db, List<Integer> out) throws SQLException {
         out.add(id);
-        Tree[] children = db.get("SELECT * FROM nafath_tc_tree WHERE link = ?", id).as(Tree[].class);
-        for (Tree child : children) {
+        Directory[] children = db.get("SELECT * FROM nafath_tc_tree WHERE link = ?", id).as(Directory[].class);
+        for (Directory child : children) {
             collectIdsRecursively(child.getId(), db, out);
         }
     }

@@ -1,8 +1,8 @@
 package com.example.explorer.testPlan;
 
+import com.example.pojo.Directory;
 import com.example.pojo.TestCase;
 import com.example.pojo.TestPlan;
-import com.example.pojo.Tree;
 import com.example.util.NodeType;
 import com.example.util.sql;
 import com.intellij.ui.CheckedTreeNode;
@@ -22,14 +22,14 @@ public class TestPlanTreeBuilder {
 
     public CheckedTreeNode buildTree() {
         CheckedTreeNode rootNode = new CheckedTreeNode("Test Cases");
-        Tree root = new sql().get("SELECT * FROM nafath_tc_tree WHERE id = ?", plan.getProject_id()).as(Tree.class);
+        Directory root = new sql().get("SELECT * FROM nafath_tc_tree WHERE id = ?", plan.getProject_id()).as(Directory.class);
         if (root != null) {
             buildTreeRecursive(root, rootNode);
         }
         return rootNode;
     }
 
-    private void buildTreeRecursive(Tree treeItem, CheckedTreeNode parentNode) {
+    private void buildTreeRecursive(Directory treeItem, CheckedTreeNode parentNode) {
         CheckedTreeNode currentNode = new CheckedTreeNode(treeItem);
         currentNode.setChecked(false);
         parentNode.add(currentNode);
@@ -45,8 +45,8 @@ public class TestPlanTreeBuilder {
             return;
         }
 
-        Tree[] children = new sql().get("SELECT * FROM nafath_tc_tree WHERE link = ?", treeItem.getId()).as(Tree[].class);
-        for (Tree child : children) {
+        Directory[] children = new sql().get("SELECT * FROM nafath_tc_tree WHERE link = ?", treeItem.getId()).as(Directory[].class);
+        for (Directory child : children) {
             buildTreeRecursive(child, currentNode);
         }
     }
