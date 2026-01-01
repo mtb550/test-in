@@ -30,7 +30,7 @@ import static com.example.util.Tools.refreshPath;
 @Getter
 public class ExplorerPanel {
     private final JPanel panel;
-    private final SimpleTree projectTree;
+    private final SimpleTree testCaseTree;
     private final SimpleTree testPlanTree;
 
     @Getter
@@ -40,14 +40,14 @@ public class ExplorerPanel {
     public ExplorerPanel() {
         panel = new JPanel(new BorderLayout());
 
-        projectTree = new SimpleTree();
+        testCaseTree = new SimpleTree();
         testPlanTree = new SimpleTree();
 
         setupTestCaseTree();
         setupTestPlanTree();
 
         // === Create Scroll Panes ===
-        JBScrollPane testCaseScrollPane = new JBScrollPane(projectTree);
+        JBScrollPane testCaseScrollPane = new JBScrollPane(testCaseTree);
         JBScrollPane testPlanScrollPane = new JBScrollPane(testPlanTree);
 
         // === Project Selector Bar ===
@@ -111,16 +111,16 @@ public class ExplorerPanel {
 
     private void setupTestCaseTree() {
         ExplorerTree.buildTree();
-        projectTree.setModel(ExplorerTree.getTreeModel());
-        projectTree.setRootVisible(false);
-        projectTree.setShowsRootHandles(true);
-        projectTree.setCellRenderer(new IntelliJRenderer());
-        projectTree.addMouseListener(new TestCaseTreeMouseAdapter(projectTree, this));
-        TestCaseTreeKeyAdapter.register(projectTree, ProjectManager.getInstance().getOpenProjects()[0]);
-        projectTree.setDragEnabled(true);
-        projectTree.setDropMode(DropMode.ON_OR_INSERT);
-        projectTree.setTransferHandler(new TreeTransferHandler(projectTree));
-        ShortcutRegistry.Explorer(projectTree, this);
+        testCaseTree.setModel(ExplorerTree.getTreeModel());
+        testCaseTree.setRootVisible(false);
+        testCaseTree.setShowsRootHandles(true);
+        testCaseTree.setCellRenderer(new IntelliJRenderer());
+        testCaseTree.addMouseListener(new TestCaseTreeMouseAdapter(testCaseTree, this));
+        TestCaseTreeKeyAdapter.register(testCaseTree, ProjectManager.getInstance().getOpenProjects()[0]);
+        testCaseTree.setDragEnabled(true);
+        testCaseTree.setDropMode(DropMode.ON_OR_INSERT);
+        testCaseTree.setTransferHandler(new TreeTransferHandler(testCaseTree));
+        ShortcutRegistry.Explorer(testCaseTree, this);
     }
 
     private void setupTestPlanTree() {
@@ -146,8 +146,8 @@ public class ExplorerPanel {
 
     public void loadAllProjects() {
         ExplorerTree.buildTree();
-        projectTree.setModel(ExplorerTree.getTreeModel());
-        projectTree.setRootVisible(false);
+        testCaseTree.setModel(ExplorerTree.getTreeModel());
+        testCaseTree.setRootVisible(false);
     }
 
     public void filterByProject(Directory project) {
@@ -163,8 +163,8 @@ public class ExplorerPanel {
         root.add(node);
 
         ExplorerTree.treeModel = new DefaultTreeModel(root);
-        projectTree.setModel(ExplorerTree.treeModel);
-        projectTree.setRootVisible(false);
+        testCaseTree.setModel(ExplorerTree.treeModel);
+        testCaseTree.setRootVisible(false);
     }
 
     static class IntelliJRenderer extends SimpleColoredComponent implements TreeCellRenderer {

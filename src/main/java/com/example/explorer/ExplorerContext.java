@@ -51,7 +51,7 @@ public class ExplorerContext extends DefaultActionGroup {
         add(addGroup); // instead of adding the three separately
         addSeparator();
         add(new DeleteAction(panel));
-        add(new RenameAction());
+        add(new RenameAction(panel));
         addSeparator();
         add(new RunAction());
 

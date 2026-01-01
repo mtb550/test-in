@@ -15,7 +15,7 @@ public class CollapseAllAction extends AnAction {
     public CollapseAllAction(ExplorerPanel panel) {
         super("Collapse All", "Collapse all nodes", AllIcons.Actions.Collapseall);
         this.panel = panel;
-        this.tree = this.panel.getProjectTree();
+        this.tree = this.panel.getTestCaseTree();
     }
 
     @Override
