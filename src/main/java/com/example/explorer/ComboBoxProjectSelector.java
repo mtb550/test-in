@@ -9,9 +9,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static com.example.explorer.ExplorerTree.mapProjectToDirectory;
-import static com.example.pojo.Config.rootFolder;
 
 public class ComboBoxProjectSelector {
     public static ComboBox<Directory> comboBox;
@@ -31,7 +31,7 @@ public class ComboBoxProjectSelector {
     }
 
     public void loadModel() {
-        File[] dirs = rootFolder.listFiles(File::isDirectory);
+        File[] dirs = Config.getRootFolder().listFiles(File::isDirectory);
 
         Directory[] projects = (dirs == null) ? new Directory[0] : Arrays.stream(dirs)
                 .map(dir -> {
@@ -41,7 +41,7 @@ public class ComboBoxProjectSelector {
                     return new Directory()
                             .setFile(dir)
                             .setFileName(fullName)
-                            .setFilePath(rootFolder.toPath().resolve(fullName))
+                            .setFilePath(Config.getRootFolder().toPath().resolve(fullName))
                             .setType(Integer.parseInt(parts[0]))
                             .setId(Integer.parseInt(parts[1]))
                             .setName(parts[2])
@@ -54,8 +54,7 @@ public class ComboBoxProjectSelector {
         // Sort alphabetically
         //java.util.Arrays.sort(projects);
 
-        // Now you have: ["ibram", "nafath", ...]
-        System.out.println("Found projects: " + Arrays.toString(projects));
+        System.out.println("Found projects: " + Arrays.stream(projects).map(Directory::getName).collect(Collectors.joining(", ", "[", "]")));
 
         if (projects.length > 0) {
             for (Directory project : projects) {
@@ -117,7 +116,7 @@ public class ComboBoxProjectSelector {
         // مسح العناصر القديمة من القائمة المنسدلة
         model.removeAllElements();
 
-        File[] dirs = Config.rootFolder.listFiles(File::isDirectory);
+        File[] dirs = Config.getRootFolder().listFiles(File::isDirectory);
         if (dirs != null) {
             for (File dir : dirs) { ///  make for parallel
                 Directory p = mapProjectToDirectory(dir); // الدالة التي تستخدمها لتحويل المجلد لكائن

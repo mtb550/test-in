@@ -2,13 +2,13 @@ package com.example.explorer.actions;
 
 import com.example.explorer.ComboBoxProjectSelector;
 import com.example.explorer.ExplorerPanel;
+import com.example.pojo.Config;
 import com.example.pojo.Directory;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 
-import static com.example.pojo.Config.rootFolder;
 import static com.example.util.Tools.refreshPath;
 
 public class RefreshAction extends AnAction {
@@ -21,7 +21,7 @@ public class RefreshAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        refreshPath(rootFolder.toPath());
+        refreshPath(Config.getRootFolder().toPath());
         Directory selectedProject = ComboBoxProjectSelector.getSelectedProject();
 
         if (selectedProject != null) {

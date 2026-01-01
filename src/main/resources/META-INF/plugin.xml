@@ -15,9 +15,11 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
+        <postStartupActivity implementation="com.example.settings.PluginPostStartupActivity"/>
+
         <!-- 🧭 Left-side tool window: Test Case Explorer -->
         <toolWindow
-                id="Test Bind"
+                id="TestGit"
                 factoryClass="com.example.explorer.ExplorerToolWindowFactory"
                 anchor="left"
                 icon="AllIcons.General.Information"
@@ -40,6 +42,15 @@
         <notificationGroup id="Test Case Notifications"
                            displayType="BALLOON"
                            isLogByDefault="true"/>
+
+        <applicationService serviceImplementation="com.example.settings.AppSettingsState"/>
+
+        <applicationConfigurable
+                instance="com.example.settings.AppSettingsConfigurable"
+                id="com.example.settings.AppSettingsConfigurable"
+                displayName="TestGit"
+                groupId="tools"/>
+
     </extensions>
 
     <actions>
@@ -48,7 +59,7 @@
                 id="com.example.demo.OpenTestTreeAction"
                 class="com.example.pojo.ShowTestTreeAction"
                 text="Open Test Plan Tree"
-                description="Show Test Case Explorer"
+                description="Show test case explorer"
                 icon="/icons/t1.png">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>

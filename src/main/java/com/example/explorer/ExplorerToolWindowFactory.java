@@ -24,7 +24,7 @@ public class ExplorerToolWindowFactory implements ToolWindowFactory {
         toolWindow.setTitleActions(List.of(contextMenu(panel).getChildren(null)));
 
         toolWindow.setAutoHide(false);
-        //toolWindow.setTitle("Test Bind");
+        //toolWindow.setTitle("TestGit");
         toolWindow.setIcon(AllIcons.Debugger.Db_array);
 
         //DefaultActionGroup group = new DefaultActionGroup();

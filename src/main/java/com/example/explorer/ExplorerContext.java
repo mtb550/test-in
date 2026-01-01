@@ -42,6 +42,9 @@ public class ExplorerContext extends DefaultActionGroup {
         }
     };
 
+    public ExplorerContext() {
+    }
+
     public ExplorerContext(ExplorerPanel panel) {
         super("Test Explorer Context Menu", true);
 

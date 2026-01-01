@@ -31,7 +31,7 @@ public class AddProjectAction extends AnAction {
 
         Directory newProject = new Directory().setType(NodeType.PROJECT.getCode()).setId(100).setName(name).setActive(1);
         newProject.setFileName(newProject.getType() + "_" + newProject.getId() + "_" + newProject.getName() + "_" + newProject.getActive());
-        newProject.setFilePath(Config.rootFolder.toPath().resolve(newProject.getFileName()));
+        newProject.setFilePath(Config.getRootFolder().toPath().resolve(newProject.getFileName()));
         newProject.setFile(new File(newProject.getFileName()));
 
         try {

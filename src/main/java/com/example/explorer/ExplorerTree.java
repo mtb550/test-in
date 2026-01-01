@@ -16,7 +16,7 @@ public class ExplorerTree {
 
     public static void buildTree() {
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("TEST CASES");
-        File[] children = Config.rootFolder.listFiles(File::isDirectory);
+        File[] children = Config.getRootFolder().listFiles(File::isDirectory);
 
         if (children != null) {
             for (File child : children) {
