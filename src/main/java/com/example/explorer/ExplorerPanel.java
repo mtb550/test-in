@@ -115,12 +115,12 @@ public class ExplorerPanel {
         projectTree.setRootVisible(false);
         projectTree.setShowsRootHandles(true);
         projectTree.setCellRenderer(new IntelliJRenderer());
-        projectTree.addMouseListener(new TestCaseTreeMouseAdapter(projectTree));
+        projectTree.addMouseListener(new TestCaseTreeMouseAdapter(projectTree, this));
         TestCaseTreeKeyAdapter.register(projectTree, ProjectManager.getInstance().getOpenProjects()[0]);
         projectTree.setDragEnabled(true);
         projectTree.setDropMode(DropMode.ON_OR_INSERT);
         projectTree.setTransferHandler(new TreeTransferHandler(projectTree));
-        ShortcutRegistry.Explorer(projectTree);
+        ShortcutRegistry.Explorer(projectTree, this);
     }
 
     private void setupTestPlanTree() {
@@ -138,10 +138,10 @@ public class ExplorerPanel {
         testPlanTree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode selected = (DefaultMutableTreeNode) testPlanTree.getLastSelectedPathComponent();
             //if (selected != null && selected.getUserObject() instanceof TestPlan plan && plan.getType() == 1) {
-                // TestPlanEditor.open(plan.getId());
+            // TestPlanEditor.open(plan.getId());
             //}
         });
-        testPlanTree.addMouseListener(new TestCaseTreeMouseAdapter(testPlanTree));
+        testPlanTree.addMouseListener(new TestCaseTreeMouseAdapter(testPlanTree, this));
     }
 
     public void loadAllProjects() {
@@ -155,7 +155,7 @@ public class ExplorerPanel {
 
         // ✅ Refresh the version list dynamically
         //if (versionSelector != null) {
-            //versionSelector.setProjectId(projectId);
+        //versionSelector.setProjectId(projectId);
         //}
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test Cases");

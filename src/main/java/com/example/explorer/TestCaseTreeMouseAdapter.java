@@ -3,7 +3,6 @@ package com.example.explorer;
 import com.example.explorer.testPlan.TestPlanContextMenu;
 import com.example.explorer.testPlan.TestRunEditor;
 import com.example.pojo.TestPlan;
-import com.intellij.openapi.actionSystem.ActionGroup;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
@@ -17,9 +16,11 @@ import java.awt.event.MouseEvent;
 
 public class TestCaseTreeMouseAdapter extends MouseAdapter {
     private final JTree tree;
+    private final ExplorerPanel panel;
 
-    public TestCaseTreeMouseAdapter(JTree tree) {
+    public TestCaseTreeMouseAdapter(JTree tree, ExplorerPanel panel) {
         this.tree = tree;
+        this.panel = panel;
     }
 
     @Override
@@ -51,8 +52,12 @@ public class TestCaseTreeMouseAdapter extends MouseAdapter {
         //if (!(userObject instanceof Tree treeItem)) return;
 
         if (SwingUtilities.isRightMouseButton(e)) {
-            ActionGroup group = (ActionGroup) ActionManager.getInstance().getAction("TestTreeContextMenuGroup");
-            ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, group);
+            ExplorerContext contextMenu = new ExplorerContext(panel);
+            ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(
+                    ActionPlaces.TOOLWINDOW_POPUP,
+                    contextMenu
+            );
+
             popupMenu.getComponent().show(e.getComponent(), e.getX(), e.getY());
 
 //        } else if (e.getClickCount() == NodeType.FEATURE.getCode() && treeItem.getType() == NodeType.FEATURE.getCode()) {

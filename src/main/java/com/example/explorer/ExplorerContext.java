@@ -42,7 +42,7 @@ public class ExplorerContext extends DefaultActionGroup {
         }
     };
 
-    public ExplorerContext() {
+    public ExplorerContext(ExplorerPanel panel) {
         super("Test Explorer Context Menu", true);
 
         addGroup.add(new AddSuiteAction());
@@ -50,7 +50,7 @@ public class ExplorerContext extends DefaultActionGroup {
 
         add(addGroup); // instead of adding the three separately
         addSeparator();
-        add(new DeleteAction());
+        add(new DeleteAction(panel));
         add(new RenameAction());
         addSeparator();
         add(new RunAction());

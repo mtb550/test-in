@@ -41,7 +41,7 @@ public class ExplorerTree {
         return node;
     }
 
-    private static Directory mapProjectToDirectory(File file) {
+    public static Directory mapProjectToDirectory(File file) {
         String fileName = file.getName();
         String[] parts = fileName.split("_", 4);
 

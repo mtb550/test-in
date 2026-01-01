@@ -1,5 +1,6 @@
 package com.example.explorer;
 
+import com.example.pojo.Config;
 import com.example.pojo.Directory;
 import com.intellij.openapi.ui.ComboBox;
 
@@ -9,10 +10,11 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
 
+import static com.example.explorer.ExplorerTree.mapProjectToDirectory;
 import static com.example.pojo.Config.rootFolder;
 
 public class ComboBoxProjectSelector {
-    private static ComboBox<Directory> comboBox;
+    public static ComboBox<Directory> comboBox;
     private final DefaultComboBoxModel<Directory> model;
     public ExplorerPanel panel;
 
@@ -62,19 +64,29 @@ public class ComboBoxProjectSelector {
 
             comboBox.addActionListener(this::onSelection);
             comboBox.setSelectedIndex(0);
+
         } else {
-            //comboBox.addItem("No projects found");
+            comboBox.addItem(new Directory().setName("No projects found"));
             comboBox.setEnabled(false);
+            comboBox.setVisible(true);
         }
 
         comboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                setText(((Directory) value).getName()); // هنا نخبره أن يعرض حقل الـ Name فقط
+                if (value instanceof Directory directory) {
+                    setText(directory.getName());
+                } else {
+                    setText("No projects found");
+                    comboBox.setVisible(true);
+                    comboBox.setEnabled(false);
+                }
                 return this;
             }
         });
+
+
     }
 
     public void addAndSelectProject(Directory project) {
@@ -83,18 +95,36 @@ public class ComboBoxProjectSelector {
         }
         model.addElement(project);
         comboBox.setSelectedItem(project); // This triggers focus/selection
+        panel.filterByProject(project);
+
     }
 
     private void onSelection(ActionEvent e) {
         Directory selected = (Directory) comboBox.getSelectedItem();
-        if (selected != null)
+        if (selected != null) {
             panel.filterByProject(selected);
-
+            System.out.println("select project: " + selected.getName());
+        } else {
+            System.out.println("selected is null");
+        }
     }
 
     public JComponent getComponent() {
         return comboBox;
     }
 
+    public void reloadProjects() {
+        // مسح العناصر القديمة من القائمة المنسدلة
+        model.removeAllElements();
 
+        File[] dirs = Config.rootFolder.listFiles(File::isDirectory);
+        if (dirs != null) {
+            for (File dir : dirs) { ///  make for parallel
+                Directory p = mapProjectToDirectory(dir); // الدالة التي تستخدمها لتحويل المجلد لكائن
+                if (p != null && p.getActive() == 1) {
+                    model.addElement(p);
+                }
+            }
+        }
+    }
 }

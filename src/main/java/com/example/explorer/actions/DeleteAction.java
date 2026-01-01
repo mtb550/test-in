@@ -1,5 +1,7 @@
 package com.example.explorer.actions;
 
+import com.example.explorer.ComboBoxProjectSelector;
+import com.example.explorer.ExplorerPanel;
 import com.example.pojo.Directory;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -17,8 +19,11 @@ import static com.example.util.Tools.refreshPath;
 import static com.intellij.openapi.actionSystem.PlatformCoreDataKeys.CONTEXT_COMPONENT;
 
 public class DeleteAction extends AnAction {
-    public DeleteAction() {
+    private final ExplorerPanel panel;
+
+    public DeleteAction(final ExplorerPanel panel) {
         super("❌ Delete");
+        this.panel = panel;
     }
 
     @Override
@@ -47,7 +52,7 @@ public class DeleteAction extends AnAction {
                 if (success) {
                     System.out.println("Success! Deleted: " + treeItem.getFilePath());
                     refreshPath(treeItem.getFilePath().getParent());
-                    
+
                 } else {
                     System.out.println("Could not delete folder. It might be in use. Delete Failed.");
                     return;
@@ -56,6 +61,13 @@ public class DeleteAction extends AnAction {
 
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
             model.removeNodeFromParent(selectedNode);
+
+            // بعد نجاح الحذف، حدث الـ ComboBox بسهولة
+            if (panel.getProjectSelector() != null) {
+                panel.getProjectSelector().reloadProjects();
+                panel.loadAllProjects();
+                panel.filterByProject(ComboBoxProjectSelector.comboBox.getItem());
+            }
 
         } catch (Exception ex) {
             //Messages.showErrorDialog("Error during delete: " + ex.getMessage(), "Error");
