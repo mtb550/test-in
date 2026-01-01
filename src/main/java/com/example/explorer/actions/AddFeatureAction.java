@@ -2,7 +2,6 @@ package com.example.explorer.actions;
 
 import com.example.pojo.Directory;
 import com.example.util.NodeType;
-import com.example.util.sql;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.Messages;
@@ -12,7 +11,11 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
+import static com.example.util.Tools.refreshPath;
 import static com.intellij.openapi.actionSystem.PlatformCoreDataKeys.CONTEXT_COMPONENT;
 
 public class AddFeatureAction extends AnAction {
@@ -30,23 +33,28 @@ public class AddFeatureAction extends AnAction {
 
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
+
         if (!(userObject instanceof Directory treeItem) || treeItem.getType() == NodeType.FEATURE.getCode()) return;
 
         String name = Messages.showInputDialog("Enter feature name:", "Add Feature", null);
         if (name == null || name.isBlank()) return;
 
-        sql db = new sql(); // TODO:: to be removed
-        int newFeatureId = db.get("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?) RETURNING id;",
-                name, NodeType.FEATURE.getCode(), treeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
+        Directory newFeature = new Directory().setType(NodeType.FEATURE.getCode()).setId(80).setName(name);
+        newFeature.setFileName(newFeature.getType() + "_" + newFeature.getId() + "_" + newFeature.getName());
+        newFeature.setFilePath(treeItem.getFilePath().resolve(newFeature.getFileName()));
+        newFeature.setFile(new File(newFeature.getFileName()));
 
-        Directory newFeature = new Directory()
-                .setType(NodeType.FEATURE.getCode()).
-                setId(newFeatureId)
-                .setLink(treeItem.getId());
-        newFeature.setName(name);
+        try {
+            Files.createDirectories(newFeature.getFilePath());
+            System.out.println("Success! feature created: " + newFeature.getFilePath());
+            refreshPath(newFeature.getFilePath());
+        } catch (IOException ee) {
+            System.err.println("Could not create feature: " + ee.getMessage());
+        }
 
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFeature);
-        ((DefaultTreeModel) tree.getModel()).insertNodeInto(newNode, parentNode, parentNode.getChildCount());
+        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+        model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
         tree.scrollPathToVisible(new TreePath(newNode.getPath()));
     }
 

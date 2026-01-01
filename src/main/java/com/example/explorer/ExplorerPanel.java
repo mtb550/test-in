@@ -137,9 +137,9 @@ public class ExplorerPanel {
         testPlanTree.setCellRenderer(new IntelliJRenderer());
         testPlanTree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode selected = (DefaultMutableTreeNode) testPlanTree.getLastSelectedPathComponent();
-            if (selected != null && selected.getUserObject() instanceof TestPlan plan && plan.getType() == 1) {
+            //if (selected != null && selected.getUserObject() instanceof TestPlan plan && plan.getType() == 1) {
                 // TestPlanEditor.open(plan.getId());
-            }
+            //}
         });
         testPlanTree.addMouseListener(new TestCaseTreeMouseAdapter(testPlanTree));
     }

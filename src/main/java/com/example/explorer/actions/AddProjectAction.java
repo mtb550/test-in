@@ -29,18 +29,14 @@ public class AddProjectAction extends AnAction {
         String name = Messages.showInputDialog("Enter project name:", "Add New Project", null);
         if (name == null || name.isBlank()) return;
 
-        Directory newProject = new Directory()
-                .setType(NodeType.PROJECT.getCode())
-                .setId(100)
-                .setName(name)
-                .setActive(1);
+        Directory newProject = new Directory().setType(NodeType.PROJECT.getCode()).setId(100).setName(name).setActive(1);
         newProject.setFileName(newProject.getType() + "_" + newProject.getId() + "_" + newProject.getName() + "_" + newProject.getActive());
         newProject.setFilePath(Config.rootFolder.toPath().resolve(newProject.getFileName()));
         newProject.setFile(new File(newProject.getFileName()));
 
         try {
             Files.createDirectories(newProject.getFilePath());
-            System.out.println("Success! Path created: " + newProject.getFilePath());
+            System.out.println("Success! project created: " + newProject.getFilePath());
             refreshPath(newProject.getFilePath());
 
             if (panel.getProjectSelector() != null) {
@@ -48,7 +44,7 @@ public class AddProjectAction extends AnAction {
             }
 
         } catch (IOException ex) {
-            System.err.println("Could not create folder: " + ex.getMessage());
+            System.err.println("Could not create project: " + ex.getMessage());
         }
     }
 }

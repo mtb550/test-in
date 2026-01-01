@@ -1,5 +1,8 @@
 package com.example.util;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.ModalityState;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -20,7 +23,18 @@ public class Tools {
     }
 
     // ✅ إجبار IntelliJ على قراءة محتويات المجلد من القرص الصلب قبل بناء الشجرة
-    public static void refreshPath(Path path) {
+    /*public static void refreshPath(Path path) {
         VfsUtil.markDirtyAndRefresh(false, true, true, path.toFile());
+    }*/
+
+    public static void refreshPath(Path path) {
+        if (path == null) return;
+
+        // استخدام ApplicationManager لضمان تشغيل الكود في سياق آمن
+        ApplicationManager.getApplication().invokeLater(() -> {
+            WriteAction.run(() -> {
+                VfsUtil.markDirtyAndRefresh(false, true, true, path.toFile());
+            });
+        }, ModalityState.defaultModalityState());
     }
 }

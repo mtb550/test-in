@@ -46,16 +46,15 @@ public class AddSuiteAction extends AnAction {
 
         try {
             Files.createDirectories(newSuite.getFilePath());
-            System.out.println("Success! Path created: " + newSuite.getFilePath());
+            System.out.println("Success! suite created: " + newSuite.getFilePath());
             refreshPath(newSuite.getFilePath());
         } catch (IOException ee) {
-            System.err.println("Could not create folder: " + ee.getMessage());
+            System.err.println("Could not create suite: " + ee.getMessage());
         }
 
-        DefaultMutableTreeNode newSuiteNode = new DefaultMutableTreeNode(newSuite);
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newSuite);
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-        model.insertNodeInto(newSuiteNode, parentNode, parentNode.getChildCount());
-
-        tree.scrollPathToVisible(new TreePath(newSuiteNode.getPath()));
+        model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
+        tree.scrollPathToVisible(new TreePath(newNode.getPath()));
     }
 }
