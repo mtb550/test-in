@@ -1,6 +1,5 @@
 package com.example.explorer;
 
-import com.example.editor.TestCaseEditor;
 import com.example.pojo.Directory;
 import com.example.util.*;
 import com.intellij.openapi.actionSystem.ActionGroup;
@@ -27,7 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class TestCaseTreeKeyAdapter {
+public class Shortcuts {
     private static final List<DefaultMutableTreeNode> clipboard = new ArrayList<>();
     private static final Set<Integer> cutNodeIds = new HashSet<>();
     private static boolean isCut = false;
@@ -37,40 +36,42 @@ public class TestCaseTreeKeyAdapter {
     }
 
     public static void register(JTree tree, Project project) {
-        InputMap im = tree.getInputMap(JComponent.WHEN_FOCUSED);
-        ActionMap am = tree.getActionMap();
+        System.out.println("Shortcuts.register()");
 
-        System.out.println("[KEY ADAPTER] Registering keyboard actions for TestCase Tree");
+        InputMap inputMap = tree.getInputMap(JComponent.WHEN_FOCUSED);
+        ActionMap actionMap = tree.getActionMap();
 
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "openTestCase");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copyNode");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK), "cutNode");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK), "pasteNode");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteNode");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "undoAction");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), "redoAction");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK), "renameNode");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "clearClipboard");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK), "addNewNode");
-        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0), "showContextMenu"); //TODO:: not working
+        //inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "openTestCase");
+        //actionMap.put("OpenFeatureAction", new OpenFeatureAction(tree));
 
-        am.put("openTestCase", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                TreePath path = tree.getSelectionPath();
-                if (path == null) return;
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK), "copyNode");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK), "cutNode");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK), "pasteNode");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteNode");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "undoAction");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), "redoAction");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK), "renameNode");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "clearClipboard");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK), "addNewNode");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0), "showContextMenu"); //TODO:: not working
 
-                Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                if (userObject instanceof Directory treeItem) {
-                    if (treeItem.getType() == NodeType.FEATURE.getCode()) {
-                        TestCaseEditor.open(treeItem.getFilePath());
-                        System.out.printf("[ENTER] Opened test case: %s%n", treeItem.getName());
-                    }
-                }
-            }
-        });
+//        actionMap.put("openTestCase", new AbstractAction() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                TreePath path = tree.getSelectionPath();
+//                if (path == null) return;
+//
+//                Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+//                if (userObject instanceof Directory treeItem) {
+//                    if (treeItem.getType() == NodeType.FEATURE.getCode()) {
+//                        TestCaseEditor.open(treeItem.getFilePath());
+//                        System.out.printf("[ENTER] Opened test case: %s%n", treeItem.getName());
+//                    }
+//                }
+//            }
+//        });
 
-        am.put("copyNode", new AbstractAction() {
+        actionMap.put("copyNode", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TreePath[] paths = tree.getSelectionPaths();
@@ -94,7 +95,7 @@ public class TestCaseTreeKeyAdapter {
 
         });
 
-        am.put("cutNode", new AbstractAction() {
+        actionMap.put("cutNode", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TreePath[] paths = tree.getSelectionPaths();
@@ -116,7 +117,7 @@ public class TestCaseTreeKeyAdapter {
             }
         });
 
-        am.put("pasteNode", new AbstractAction() {
+        actionMap.put("pasteNode", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (clipboard.isEmpty()) return;
@@ -204,7 +205,7 @@ public class TestCaseTreeKeyAdapter {
             }
         });
 
-        am.put("deleteNode", new AbstractAction() {
+        actionMap.put("deleteNode", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TreePath[] paths = tree.getSelectionPaths();
@@ -249,7 +250,7 @@ public class TestCaseTreeKeyAdapter {
             }
         });
 
-        am.put("undoAction", new AbstractAction() {
+        actionMap.put("undoAction", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ActionHistory.undo();
@@ -260,7 +261,7 @@ public class TestCaseTreeKeyAdapter {
 
         });
 
-        am.put("redoAction", new AbstractAction() {
+        actionMap.put("redoAction", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ActionHistory.redo();
@@ -270,7 +271,7 @@ public class TestCaseTreeKeyAdapter {
             }
         });
 
-        am.put("renameNode", new AbstractAction() {
+        actionMap.put("renameNode", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TreePath path = tree.getSelectionPath();
@@ -314,7 +315,7 @@ public class TestCaseTreeKeyAdapter {
             }
         });
 
-        am.put("clearClipboard", new AbstractAction() {
+        actionMap.put("clearClipboard", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (clipboard.isEmpty()) {
@@ -333,7 +334,7 @@ public class TestCaseTreeKeyAdapter {
             }
         });
 
-        am.put("addNewNode", new AbstractAction() {
+        actionMap.put("addNewNode", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TreePath path = tree.getSelectionPath();
@@ -416,7 +417,7 @@ public class TestCaseTreeKeyAdapter {
             }
         });
 
-        am.put("showContextMenu", new AbstractAction() {
+        actionMap.put("showContextMenu", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 TreePath path = tree.getSelectionPath();

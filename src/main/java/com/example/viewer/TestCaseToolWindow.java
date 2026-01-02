@@ -13,7 +13,7 @@ public class TestCaseToolWindow {
 
     public static void addTestCase(Consumer<TestCase> onSaveCallback) {
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("TestCaseDetails"); // in plugin.xml <toolWindow id="TestCaseDetails"
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Details"); // in plugin.xml <toolWindow id="TestCaseDetails"
 
         if (toolWindow != null) {
             if (!toolWindow.isVisible()) {
@@ -38,7 +38,7 @@ public class TestCaseToolWindow {
 
     public static void show(TestCase testCase) {
         Project project = ProjectManager.getInstance().getOpenProjects()[0];
-        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("TestCaseDetails"); // in plugin.xml <toolWindow id="TestCaseDetails"
+        ToolWindow toolWindow = ToolWindowManager.getInstance(project).getToolWindow("Details"); // in plugin.xml <toolWindow id="TestCaseDetails"
 
         if (toolWindow != null) {
             if (!toolWindow.isVisible()) {

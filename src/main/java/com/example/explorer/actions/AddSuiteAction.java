@@ -16,16 +16,17 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import static com.example.util.Tools.refreshPath;
-import static com.intellij.openapi.actionSystem.PlatformCoreDataKeys.CONTEXT_COMPONENT;
 
 public class AddSuiteAction extends AnAction {
-    public AddSuiteAction() {
+    private final JTree tree;
+
+    public AddSuiteAction(final JTree tree) {
         super("➕ New Suite");
+        this.tree = tree;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        JTree tree = e.getData(CONTEXT_COMPONENT) instanceof JTree jTree ? jTree : null;
         if (tree == null) return;
 
         TreePath path = tree.getSelectionPath();

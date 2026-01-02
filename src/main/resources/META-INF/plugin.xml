@@ -28,7 +28,7 @@
 
         <!-- 🔍 Right-side tool window: Test Case Details -->
         <toolWindow
-                id="TestCaseDetails"
+                id="Details"
                 factoryClass="com.example.viewer.TestCaseDetailsToolWindowFactory"
                 anchor="bottom"
                 icon="AllIcons.General.Information"
@@ -65,7 +65,7 @@
         </action>
 
         <group id="TestTreeContextMenuGroup"
-               class="com.example.explorer.ExplorerContext"
+               class="com.example.explorer.TestCaseContext"
                text="Test Tree Context Menu"
                popup="true">
         </group>

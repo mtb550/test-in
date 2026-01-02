@@ -33,7 +33,7 @@ public class TestCaseDetailsToolWindowFactory implements ToolWindowFactory {
         Content bugsTab = contentFactory.createContent(detailsInstance.getBugPanel(), "Open Bugs", false);
 
         // Add Test Case tab
-        Content addTestCaseTab = contentFactory.createContent(addInstance.getPanel(), "Create Test Case", false);
+        Content addTestCaseTab = contentFactory.createContent(addInstance.getMainPanel(), "Create Test Case", false);
 
         toolWindow.getContentManager().addContent(detailsTab);
         toolWindow.getContentManager().addContent(historyTab);

@@ -3,13 +3,13 @@ package com.example.explorer;
 import com.example.editor.TestCaseEditor;
 import com.example.explorer.testPlan.TestPlanContextMenu;
 import com.example.explorer.testPlan.TestRunEditor;
+import com.example.pojo.Config;
 import com.example.pojo.Directory;
 import com.example.pojo.TestPlan;
 import com.example.util.NodeType;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
-import com.intellij.openapi.project.Project;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -43,8 +43,7 @@ public class TestCaseTreeMouseAdapter extends MouseAdapter {
             }
 
             if (plan.getType() == 1 && SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-                Project project = com.intellij.openapi.project.ProjectManager.getInstance().getOpenProjects()[0]; // or however you obtain it
-                TestRunEditor.open(project, plan.getId(), plan.getName());
+                TestRunEditor.open(Config.getProject(), plan.getId(), plan.getName());
 
             }
 
@@ -57,7 +56,7 @@ public class TestCaseTreeMouseAdapter extends MouseAdapter {
 
 // 1. التعامل مع الزر الأيمن (القائمة المنبثقة)
         if (SwingUtilities.isRightMouseButton(e)) {
-            ExplorerContext contextMenu = new ExplorerContext(panel);
+            TestCaseContext contextMenu = new TestCaseContext(panel);
             ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(
                     ActionPlaces.TOOLWINDOW_POPUP,
                     contextMenu

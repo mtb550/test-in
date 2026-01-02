@@ -14,7 +14,7 @@ import javax.swing.tree.TreePath;
 
 import static com.intellij.openapi.actionSystem.PlatformCoreDataKeys.CONTEXT_COMPONENT;
 
-public class ExplorerContext extends DefaultActionGroup {
+public class TestCaseContext extends DefaultActionGroup {
 
     DefaultActionGroup addGroup = new DefaultActionGroup("➕ Add", true) {
         @Override
@@ -42,16 +42,16 @@ public class ExplorerContext extends DefaultActionGroup {
         }
     };
 
-    public ExplorerContext() {
+    public TestCaseContext() {
     }
 
-    public ExplorerContext(ExplorerPanel panel) {
-        super("Test Explorer Context Menu", true);
+    public TestCaseContext(ExplorerPanel panel) {
+        super("Test Case Context Menu", true);
 
-        addGroup.add(new AddSuiteAction());
+        add(new OpenFeatureActionContext(panel.getTestCaseTree()));
+        addGroup.add(new AddSuiteAction(panel.getTestCaseTree()));
         addGroup.add(new AddFeatureAction());
-
-        add(addGroup); // instead of adding the three separately
+        add(addGroup);
         addSeparator();
         add(new DeleteAction(panel));
         add(new RenameAction(panel));

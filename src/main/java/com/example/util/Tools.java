@@ -13,6 +13,8 @@ import java.nio.file.Path;
 
 public class Tools {
     public static void printTestSourceRoots(Project project) {
+        System.out.println("printTestSourceRoots.printTestSourceRoots()");
+
         ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
 
         for (VirtualFile root : ProjectRootManager.getInstance(project).getContentSourceRoots()) {
@@ -27,7 +29,8 @@ public class Tools {
         VfsUtil.markDirtyAndRefresh(false, true, true, path.toFile());
     }*/
 
-    public static void refreshPath(Path path) {
+    public static void refreshPath(final Path path) {
+        System.out.println("printTestSourceRoots.refreshPath()");
         if (path == null) return;
 
         // استخدام ApplicationManager لضمان تشغيل الكود في سياق آمن

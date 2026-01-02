@@ -3,10 +3,10 @@ package com.example.viewer;
 import com.example.pojo.GroupType;
 import com.example.pojo.TestCase;
 import com.example.util.ActionHistory;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.ui.components.*;
 import com.intellij.util.ui.JBUI;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,9 +18,9 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class AddTestCasePanel {
+    @Getter
     private final JBPanel<?> mainPanel;
     private final JBPanel<?> formPanel;
-    Project project = ProjectManager.getInstance().getOpenProjects()[0];
 
     private JBTextField titleField;
     private JBTextArea expectedArea;
@@ -33,6 +33,7 @@ public class AddTestCasePanel {
 
     private JButton saveButton;
     private JButton cancelButton;
+    @Setter
     private Consumer<TestCase> onSaveCallback;
 
     public AddTestCasePanel() {
@@ -271,11 +272,4 @@ public class AddTestCasePanel {
         panel.add(input, gbc);
     }
 
-    public JPanel getPanel() {
-        return mainPanel;
-    }
-
-    public void setOnSaveCallback(Consumer<TestCase> callback) {
-        this.onSaveCallback = callback;
-    }
 }

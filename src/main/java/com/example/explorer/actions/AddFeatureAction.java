@@ -25,6 +25,8 @@ public class AddFeatureAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        System.out.println("AddFeatureAction.actionPerformed()");
+
         JTree tree = e.getData(CONTEXT_COMPONENT) instanceof JTree jTree ? jTree : null;
         if (tree == null) return;
 

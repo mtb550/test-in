@@ -1,5 +1,7 @@
 package com.example.explorer;
 
+import com.example.explorer.actions.OpenFeatureAction;
+import com.example.pojo.Config;
 import com.example.pojo.Directory;
 import com.example.pojo.TestPlan;
 import com.example.util.ShortcutRegistry;
@@ -30,8 +32,8 @@ import static com.example.util.Tools.refreshPath;
 @Getter
 public class ExplorerPanel {
     private final JPanel panel;
-    private final SimpleTree testCaseTree;
-    private final SimpleTree testPlanTree;
+    private final JTree testCaseTree;
+    private final JTree testPlanTree;
 
     @Getter
     private final ComboBoxProjectSelector projectSelector;
@@ -116,7 +118,8 @@ public class ExplorerPanel {
         testCaseTree.setShowsRootHandles(true);
         testCaseTree.setCellRenderer(new IntelliJRenderer());
         testCaseTree.addMouseListener(new TestCaseTreeMouseAdapter(testCaseTree, this));
-        TestCaseTreeKeyAdapter.register(testCaseTree, ProjectManager.getInstance().getOpenProjects()[0]);
+        Shortcuts.register(testCaseTree, Config.getProject());
+        OpenFeatureAction.register(testCaseTree);
         testCaseTree.setDragEnabled(true);
         testCaseTree.setDropMode(DropMode.ON_OR_INSERT);
         testCaseTree.setTransferHandler(new TreeTransferHandler(testCaseTree));
@@ -195,7 +198,7 @@ public class ExplorerPanel {
 
                 // تعيين النص والستايل
                 SimpleTextAttributes style = SimpleTextAttributes.REGULAR_ATTRIBUTES;
-                if (projectNode.getId() != null && TestCaseTreeKeyAdapter.isCutNode(projectNode.getId())) {
+                if (projectNode.getId() != null && Shortcuts.isCutNode(projectNode.getId())) {
                     style = SimpleTextAttributes.GRAYED_ATTRIBUTES;
                 }
                 append(projectNode.getName(), style); // ✅ إضافة النص
