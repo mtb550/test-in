@@ -55,14 +55,14 @@ public class DirectoryMapper {
         System.out.println("DirectoryMapper.mapProject(): " + file.getName());
         String[] parts = file.getName().split("_", 4);
 
-            return new Directory()
-                    .setFile(file)
-                    .setFilePath(file.toPath())
-                    .setFileName(file.getName())
-                    .setType(Integer.parseInt(parts[0]))
-                    .setId(Integer.parseInt(parts[1]))
-                    .setName(parts[2])
-                    .setActive(Integer.parseInt(parts[3]));
+        return new Directory()
+                .setFile(file)
+                .setFilePath(file.toPath())
+                .setFileName(file.getName())
+                .setType(Integer.parseInt(parts[0]))
+                .setId(Integer.parseInt(parts[1]))
+                .setName(parts[2])
+                .setActive(Integer.parseInt(parts[3]));
     }
 
     /**
@@ -74,15 +74,15 @@ public class DirectoryMapper {
     public static Directory mapSuite(@NotNull final File file) {
         System.out.println("DirectoryMapper.mapSuite(): " + file.getName());
 
-            String[] parts = file.getName().split("_", 3);
+        String[] parts = file.getName().split("_", 3);
 
-            return new Directory()
-                    .setFile(file)
-                    .setFilePath(file.toPath())
-                    .setFileName(file.getName())
-                    .setType(Integer.parseInt(parts[0]))
-                    .setId(Integer.parseInt(parts[1]))
-                    .setName(parts[2]);
+        return new Directory()
+                .setFile(file)
+                .setFilePath(file.toPath())
+                .setFileName(file.getName())
+                .setType(Integer.parseInt(parts[0]))
+                .setId(Integer.parseInt(parts[1]))
+                .setName(parts[2]);
     }
 
 
