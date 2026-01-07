@@ -20,11 +20,11 @@ import java.awt.event.MouseEvent;
 
 public class TestCaseTreeMouseAdapter extends MouseAdapter {
     private final SimpleTree tree;
-    private final Panel panel;
+    private final ProjectPanel projectPanel;
 
-    public TestCaseTreeMouseAdapter(final Panel panel) {
-        this.panel = panel;
-        this.tree = panel.getTestCaseTree();
+    public TestCaseTreeMouseAdapter(final ProjectPanel projectPanel) {
+        this.projectPanel = projectPanel;
+        this.tree = projectPanel.getTestCaseTree();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class TestCaseTreeMouseAdapter extends MouseAdapter {
 
 // 1. التعامل مع الزر الأيمن (القائمة المنبثقة)
         if (SwingUtilities.isRightMouseButton(e)) {
-            TestCaseContext contextMenu = new TestCaseContext(panel);
+            TestCaseContext contextMenu = new TestCaseContext(projectPanel);
             ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(
                     ActionPlaces.TOOLWINDOW_POPUP,
                     contextMenu

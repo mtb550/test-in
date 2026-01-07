@@ -16,10 +16,10 @@ import static com.example.explorer.ExplorerTree.mapProjectToDirectory;
 public class ComboBoxProjectSelector {
     public static ComboBox<Directory> comboBox;
     private final DefaultComboBoxModel<Directory> model;
-    public Panel panel;
+    public ProjectPanel projectPanel;
 
-    public ComboBoxProjectSelector(final Panel panel) {
-        this.panel = panel;
+    public ComboBoxProjectSelector(final ProjectPanel projectPanel) {
+        this.projectPanel = projectPanel;
         model = new DefaultComboBoxModel<>();
         comboBox = new ComboBox<>(model);
         comboBox.setFocusable(false);
@@ -99,7 +99,7 @@ public class ComboBoxProjectSelector {
         }
         model.addElement(project);
         comboBox.setSelectedItem(project); // This triggers focus/selection
-        panel.filterByProject(project);
+        projectPanel.filterByProject(project);
 
     }
 
@@ -108,7 +108,7 @@ public class ComboBoxProjectSelector {
 
         Directory selected = (Directory) comboBox.getSelectedItem();
         if (selected != null) {
-            panel.filterByProject(selected);
+            projectPanel.filterByProject(selected);
             System.out.println("select project: " + selected.getName());
         } else {
             System.out.println("selected is null");

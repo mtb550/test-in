@@ -46,18 +46,18 @@ public class TestCaseContext extends DefaultActionGroup {
     public TestCaseContext() {
     }
 
-    public TestCaseContext(Panel panel) {
+    public TestCaseContext(ProjectPanel projectPanel) {
         super("Test Case Context Menu", true);
 
-        add(new OpenFeatureActionContext(panel.getTestCaseTree()));
-        addGroup.add(new AddSuiteAction(panel.getTestCaseTree()));
-        addGroup.add(new AddFeatureAction(panel.getTestCaseTree()));
+        add(new OpenFeatureActionContext(projectPanel.getTestCaseTree()));
+        addGroup.add(new AddSuiteAction(projectPanel.getTestCaseTree()));
+        addGroup.add(new AddFeatureAction(projectPanel.getTestCaseTree()));
         add(addGroup);
         addSeparator();
-        add(new DeleteAction(panel));
-        add(new RenameAction(panel));
+        add(new DeleteAction(projectPanel));
+        add(new RenameAction(projectPanel));
         addSeparator();
-        add(new RunAction(panel.getTestCaseTree()));
+        add(new RunAction(projectPanel.getTestCaseTree()));
 
         addSeparator();
 

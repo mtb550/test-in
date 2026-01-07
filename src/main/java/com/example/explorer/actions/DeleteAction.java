@@ -1,7 +1,7 @@
 package com.example.explorer.actions;
 
 import com.example.explorer.ComboBoxProjectSelector;
-import com.example.explorer.Panel;
+import com.example.explorer.ProjectPanel;
 import com.example.pojo.Directory;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -16,13 +16,13 @@ import javax.swing.tree.TreePath;
 import java.io.File;
 
 public class DeleteAction extends AnAction {
-    private final Panel panel;
+    private final ProjectPanel projectPanel;
     private final SimpleTree tree;
 
-    public DeleteAction(final Panel panel) {
+    public DeleteAction(final ProjectPanel projectPanel) {
         super("❌ Delete");
-        this.panel = panel;
-        this.tree = panel.getTestCaseTree();
+        this.projectPanel = projectPanel;
+        this.tree = projectPanel.getTestCaseTree();
     }
 
     @Override
@@ -61,10 +61,10 @@ public class DeleteAction extends AnAction {
             model.removeNodeFromParent(selectedNode);
 
             // بعد نجاح الحذف، حدث الـ ComboBox بسهولة
-            if (panel.getProjectSelector() != null) {
-                panel.getProjectSelector().reloadProjects();
+            if (projectPanel.getProjectSelector() != null) {
+                projectPanel.getProjectSelector().reloadProjects();
                 //panel.loadAllProjects();
-                panel.filterByProject(ComboBoxProjectSelector.comboBox.getItem());
+                projectPanel.filterByProject(ComboBoxProjectSelector.comboBox.getItem());
             }
 
         } catch (Exception ex) {

@@ -1,6 +1,6 @@
 package com.example.explorer.actions;
 
-import com.example.explorer.Panel;
+import com.example.explorer.ProjectPanel;
 import com.example.pojo.Directory;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -15,14 +15,14 @@ import java.io.File;
 import java.nio.file.Path;
 
 public class RenameAction extends AnAction {
-    private final Panel panel;
+    private final ProjectPanel projectPanel;
     private final SimpleTree tree;
 
     // استقبال الـ panel عبر الـ Constructor كما فعلنا في DeleteAction
-    public RenameAction(final Panel panel) {
+    public RenameAction(final ProjectPanel projectPanel) {
         super("✏️ Rename");
-        this.panel = panel;
-        this.tree = panel.getTestCaseTree();
+        this.projectPanel = projectPanel;
+        this.tree = projectPanel.getTestCaseTree();
     }
 
     @Override
@@ -57,8 +57,8 @@ public class RenameAction extends AnAction {
                 //refreshPath(newFilePath.getParent());
 
                 // 5. تحديث الـ ComboBox إذا كان العنصر "مشروع" (Type 0)
-                if (treeItem.getType() == 0 && panel.getProjectSelector() != null) {
-                    panel.getProjectSelector().reloadProjects();
+                if (treeItem.getType() == 0 && projectPanel.getProjectSelector() != null) {
+                    projectPanel.getProjectSelector().reloadProjects();
                 }
 
                 System.out.println("Success! Renamed to: " + newFileName);

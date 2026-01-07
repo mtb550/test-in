@@ -18,10 +18,10 @@ import java.util.List;
 public class ExplorerToolWindowFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        Panel panel = new Panel();
-        Content content = ContentFactory.getInstance().createContent(panel.getPanel(), null, false);
+        ProjectPanel projectPanel = new ProjectPanel();
+        Content content = ContentFactory.getInstance().createContent(projectPanel.getPanel(), null, false);
         toolWindow.getContentManager().addContent(content);
-        toolWindow.setTitleActions(List.of(contextMenu(panel).getChildren(null)));
+        toolWindow.setTitleActions(List.of(contextMenu(projectPanel).getChildren(null)));
 
         toolWindow.setAutoHide(false);
         //toolWindow.setTitle("TestGit");
@@ -31,15 +31,15 @@ public class ExplorerToolWindowFactory implements ToolWindowFactory {
         //toolWindow.setTitleActions(List.of(group.getChildren(null)));
     }
 
-    private DefaultActionGroup contextMenu(Panel panel) {
+    private DefaultActionGroup contextMenu(ProjectPanel projectPanel) {
         DefaultActionGroup group = new DefaultActionGroup();
 
-        group.add(new ExpandAllAction(panel.getTestCaseTree()));
-        group.add(new CollapseAllAction(panel.getTestCaseTree()));
+        group.add(new ExpandAllAction(projectPanel.getTestCaseTree()));
+        group.add(new CollapseAllAction(projectPanel.getTestCaseTree()));
         group.addSeparator();
-        group.add(new RefreshAction(panel));
+        group.add(new RefreshAction(projectPanel));
         ///group.add(new SettingsAction()); // no need anymore. to be removed with its class
-        group.add(new AddProjectAction(panel));
+        group.add(new AddProjectAction(projectPanel));
 
         return group;
     }

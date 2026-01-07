@@ -1,7 +1,7 @@
 package com.example.explorer.actions;
 
 import com.example.explorer.ComboBoxProjectSelector;
-import com.example.explorer.Panel;
+import com.example.explorer.ProjectPanel;
 import com.example.pojo.Directory;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
@@ -9,11 +9,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 
 public class RefreshAction extends AnAction {
-    private final Panel panel;
+    private final ProjectPanel projectPanel;
 
-    public RefreshAction(Panel panel) {
+    public RefreshAction(ProjectPanel projectPanel) {
         super("Refresh", "Reload tree", AllIcons.Actions.Refresh);
-        this.panel = panel;
+        this.projectPanel = projectPanel;
     }
 
     @Override
@@ -22,10 +22,10 @@ public class RefreshAction extends AnAction {
         Directory selectedProject = ComboBoxProjectSelector.getSelectedProject();
 
         if (selectedProject != null) {
-            panel.filterByProject(selectedProject);
+            projectPanel.filterByProject(selectedProject);
             System.out.println("refresh project: " + selectedProject.getName());
         } else {
-            panel.loadAllProjects();
+            projectPanel.loadAllProjects();
             System.out.println("refresh all projects");
         }
     }

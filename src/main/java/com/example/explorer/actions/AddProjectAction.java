@@ -1,6 +1,6 @@
 package com.example.explorer.actions;
 
-import com.example.explorer.Panel;
+import com.example.explorer.ProjectPanel;
 import com.example.pojo.Config;
 import com.example.pojo.Directory;
 import com.example.util.NodeType;
@@ -21,13 +21,13 @@ import java.io.File;
 import java.io.IOException;
 
 public class AddProjectAction extends AnAction {
-    public final Panel panel;
+    public final ProjectPanel projectPanel;
     public SimpleTree tree;
 
-    public AddProjectAction(Panel panel) {
+    public AddProjectAction(ProjectPanel projectPanel) {
         super("➕ New Project", "Add new project", AllIcons.General.Add);
-        this.panel = panel;
-        this.tree = panel.getTestCaseTree();
+        this.projectPanel = projectPanel;
+        this.tree = projectPanel.getTestCaseTree();
     }
 
     @Override
@@ -74,11 +74,11 @@ public class AddProjectAction extends AnAction {
                     // This triggers VFS events correctly and prevents the "watcher" clash
                     VirtualFile newDir = parentDir.createChildDirectory(this, newProject.getFileName());
 
-                    panel.getProjectSelector().addAndSelectProject(newProject);
+                    projectPanel.getProjectSelector().addAndSelectProject(newProject);
 
                     // 3. Update your Tree Model immediately inside the same WriteAction
                     DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newProject);
-                    DefaultTreeModel model = (DefaultTreeModel) panel.getTestCaseTree().getModel();
+                    DefaultTreeModel model = (DefaultTreeModel) projectPanel.getTestCaseTree().getModel();
                     model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
                     tree.scrollPathToVisible(new TreePath(newNode.getPath()));
 

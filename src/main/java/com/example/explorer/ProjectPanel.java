@@ -29,7 +29,7 @@ import java.util.prefs.Preferences;
 
 
 @Getter
-public class Panel {
+public class ProjectPanel {
     private final JPanel panel;
     private final SimpleTree testCaseTree;
     private final SimpleTree testPlanTree;
@@ -38,7 +38,7 @@ public class Panel {
     private final ComboBoxProjectSelector projectSelector;
     private final ComboBoxVersionSelector versionSelector;
 
-    public Panel() {
+    public ProjectPanel() {
         System.out.println("Panel.Panel()");
         panel = new JPanel(new BorderLayout());
 
