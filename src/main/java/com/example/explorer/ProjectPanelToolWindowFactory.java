@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public class ExplorerToolWindowFactory implements ToolWindowFactory {
+public class ProjectPanelToolWindowFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         ProjectPanel projectPanel = new ProjectPanel();
@@ -24,11 +24,8 @@ public class ExplorerToolWindowFactory implements ToolWindowFactory {
         toolWindow.setTitleActions(List.of(contextMenu(projectPanel).getChildren(null)));
 
         toolWindow.setAutoHide(false);
-        //toolWindow.setTitle("TestGit");
+        toolWindow.setTitle("TestGit");
         toolWindow.setIcon(AllIcons.Debugger.Db_array);
-
-        //DefaultActionGroup group = new DefaultActionGroup();
-        //toolWindow.setTitleActions(List.of(group.getChildren(null)));
     }
 
     private DefaultActionGroup contextMenu(ProjectPanel projectPanel) {

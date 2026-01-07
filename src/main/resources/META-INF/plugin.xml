@@ -20,7 +20,7 @@
         <!-- 🧭 Left-side tool window: Test Case Explorer -->
         <toolWindow
                 id="TestGit"
-                factoryClass="com.example.explorer.ExplorerToolWindowFactory"
+                factoryClass="com.example.explorer.ProjectPanelToolWindowFactory"
                 anchor="left"
                 icon="AllIcons.General.Information"
                 secondary="false"/>
