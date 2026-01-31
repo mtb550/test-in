@@ -1,7 +1,7 @@
 package com.example.util;
 
-import com.example.explorer.ProjectPanel;
-import com.example.explorer.actions.DeleteAction;
+import com.example.actions.DeleteAction;
+import com.example.projectPanel.ProjectPanel;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.ui.treeStructure.SimpleTree;

@@ -20,7 +20,7 @@
         <!-- 🧭 Left-side tool window: Test Case Explorer -->
         <toolWindow
                 id="TestGit"
-                factoryClass="com.example.explorer.ProjectPanelToolWindowFactory"
+                factoryClass="com.example.projectPanel.ProjectPanelToolWindowFactory"
                 anchor="left"
                 icon="AllIcons.General.Information"
                 secondary="false"/>
@@ -29,14 +29,14 @@
         <!-- 🔍 Right-side tool window: Test Case Details -->
         <toolWindow
                 id="Details"
-                factoryClass="com.example.viewer.TestCaseDetailsToolWindowFactory"
+                factoryClass="com.example.viewPanel.TestCaseDetailsToolWindowFactory"
                 anchor="bottom"
                 icon="AllIcons.General.Information"
                 secondary="false"/>
 
         <!-- 📝 File editor providers -->
-        <fileEditorProvider implementation="com.example.editor.EditorProvider"/>
-        <fileEditorProvider implementation="com.example.explorer.testPlan.TestRunFileEditorProvider"/>
+        <fileEditorProvider implementation="com.example.editorPanel.Provider"/>
+        <fileEditorProvider implementation="com.example.projectPanel.testPlan.TestRunFileEditorProvider"/>
 
         <!-- 🔔 Notification group -->
         <notificationGroup id="Test Case Notifications"
@@ -65,7 +65,7 @@
         </action>
 
         <group id="TestTreeContextMenuGroup"
-               class="com.example.explorer.TestCaseContext"
+               class="com.example.projectPanel.ProjectPanelContext"
                text="Test Tree Context Menu"
                popup="true">
         </group>
