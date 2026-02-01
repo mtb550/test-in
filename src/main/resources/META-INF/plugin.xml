@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.example.demo</id>
+    <id>testGit.demo</id>
     <name>Test Case Manager</name>
     <vendor email="mtb550@gmail.com" url="https://mtb.com">initial</vendor>
 
@@ -15,12 +15,12 @@
 
     <extensions defaultExtensionNs="com.intellij">
 
-        <postStartupActivity implementation="com.example.settings.PluginPostStartupActivity"/>
+        <postStartupActivity implementation="testGit.settings.PluginPostStartupActivity"/>
 
         <!-- 🧭 Left-side tool window: Test Case Explorer -->
         <toolWindow
                 id="TestGit"
-                factoryClass="com.example.projectPanel.ProjectPanelToolWindowFactory"
+                factoryClass="testGit.projectPanel.ProjectPanelToolWindowFactory"
                 anchor="left"
                 icon="AllIcons.General.Information"
                 secondary="false"/>
@@ -29,25 +29,25 @@
         <!-- 🔍 Right-side tool window: Test Case Details -->
         <toolWindow
                 id="Details"
-                factoryClass="com.example.viewPanel.TestCaseDetailsToolWindowFactory"
+                factoryClass="testGit.viewPanel.TestCaseDetailsToolWindowFactory"
                 anchor="bottom"
                 icon="AllIcons.General.Information"
                 secondary="false"/>
 
         <!-- 📝 File editor providers -->
-        <fileEditorProvider implementation="com.example.editorPanel.Provider"/>
-        <fileEditorProvider implementation="com.example.projectPanel.testPlan.TestRunFileEditorProvider"/>
+        <fileEditorProvider implementation="testGit.editorPanel.Provider"/>
+        <fileEditorProvider implementation="testGit.projectPanel.testPlan.TestRunFileEditorProvider"/>
 
         <!-- 🔔 Notification group -->
         <notificationGroup id="Test Case Notifications"
                            displayType="BALLOON"
                            isLogByDefault="true"/>
 
-        <applicationService serviceImplementation="com.example.settings.AppSettingsState"/>
+        <applicationService serviceImplementation="testGit.settings.AppSettingsState"/>
 
         <applicationConfigurable
-                instance="com.example.settings.AppSettingsConfigurable"
-                id="com.example.settings.AppSettingsConfigurable"
+                instance="testGit.settings.AppSettingsConfigurable"
+                id="testGit.settings.AppSettingsConfigurable"
                 displayName="TestGit"
                 groupId="tools"/>
 
@@ -56,8 +56,8 @@
     <actions>
         <!-- 📂 Menu action to show tree view manually -->
         <action
-                id="com.example.demo.OpenTestTreeAction"
-                class="com.example.pojo.ShowTestTreeAction"
+                id="testGit.demo.OpenTestTreeAction"
+                class="testGit.pojo.ShowTestTreeAction"
                 text="Open Test Plan Tree"
                 description="Show test case explorer"
                 icon="/icons/t1.png">
@@ -65,7 +65,7 @@
         </action>
 
         <group id="TestTreeContextMenuGroup"
-               class="com.example.projectPanel.ProjectPanelContext"
+               class="testGit.projectPanel.ProjectPanelContext"
                text="Test Tree Context Menu"
                popup="true">
         </group>
