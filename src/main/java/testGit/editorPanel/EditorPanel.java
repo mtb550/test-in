@@ -36,8 +36,8 @@ public class EditorPanel extends UserDataHolderBase implements FileEditor {
 
         // This is critical: it makes the list background clickable even when empty
         list.getEmptyText().setText("No test cases.");
-        list.getEmptyText().appendLine("Right-click to add your first test case.");
-        list.getEmptyText().appendLine("or click Ctrl+M");
+        list.getEmptyText().appendLine("Create your first test case.");
+        list.getEmptyText().appendLine("Ctrl + M");
 
         // Ensure the list component fills the viewport so it can catch mouse events
         list.setOpaque(true);

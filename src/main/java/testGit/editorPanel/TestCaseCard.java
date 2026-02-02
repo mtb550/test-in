@@ -7,10 +7,12 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import testGit.pojo.GroupType;
 import testGit.pojo.TestCase;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class TestCaseCard extends JPanel {
     public TestCaseCard(int index, TestCase tc) {
@@ -45,13 +47,24 @@ public class TestCaseCard extends JPanel {
         JBLabel automationRef = createDetailLabel("Automation Ref: " + tc.getAutomationRef(), true);
 
         JBLabel priorityBadge = getPriorityBadge(tc);
+        List<GroupType> groups = tc.getGroups();
 
         // Layout: Title and Badge
-        JBPanel<?> titleLine = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
+        JBPanel<?> titleLine = new JBPanel<>();
+        //titleLine.setLayout(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
+        titleLine.setLayout(new FlowLayout(FlowLayout.LEFT, JBUI.scale(8), 0)); // استخدام FlowLayout لترتيب العناصر أفقياً
         titleLine.setOpaque(false);
         titleLine.setAlignmentX(Component.LEFT_ALIGNMENT);
         titleLine.add(title);
         titleLine.add(priorityBadge);
+
+        // 3. إضافة ملصق لكل مجموعة
+        if (groups != null && !groups.isEmpty()) {
+            for (GroupType groupName : groups) {
+                JBLabel groupBadge = createGroupBadge(groupName.name());
+                titleLine.add(groupBadge);
+            }
+        }
 
         // Layout: Vertical Content Stack
         JBPanel<?> content = new JBPanel<>();
@@ -87,6 +100,20 @@ public class TestCaseCard extends JPanel {
         priorityBadge.setBorder(JBUI.Borders.empty(2, 8));
         priorityBadge.setHorizontalAlignment(SwingConstants.CENTER);
         return priorityBadge;
+    }
+
+    // 4. دالة مساعدة لإنشاء ملصق المجموعة (Group Badge)
+    private static @NotNull JBLabel createGroupBadge(String groupName) {
+        JBLabel badge = new JBLabel(groupName.toUpperCase());
+        badge.setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD));
+        badge.setOpaque(true);
+
+        // استخدام لون مميز للمجموعات (مثلاً أزرق سماوي متوافق مع IntelliJ)
+        badge.setForeground(JBColor.WHITE);
+        badge.setBackground(new JBColor(new Color(0, 120, 215), new Color(30, 80, 160)));
+
+        badge.setBorder(JBUI.Borders.empty(2, 8));
+        return badge;
     }
 
     private JBLabel createDetailLabel(String text, boolean italic) {
