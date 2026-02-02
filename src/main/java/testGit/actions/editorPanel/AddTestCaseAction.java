@@ -7,7 +7,7 @@ import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
@@ -15,7 +15,6 @@ import testGit.pojo.TestCase;
 import testGit.ui.AddNewTestCaseDialog;
 import testGit.util.Notifier;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -23,9 +22,9 @@ import java.util.UUID;
 public class AddTestCaseAction extends AnAction {
     private final JBList<TestCase> list;
     private final String featurePath;
-    private final DefaultListModel<TestCase> model;
+    private final CollectionListModel<TestCase> model;
 
-    public AddTestCaseAction(String featurePath, @NotNull VirtualFile file, JBList<TestCase> list, DefaultListModel<TestCase> model) {
+    public AddTestCaseAction(String featurePath, JBList<TestCase> list, CollectionListModel<TestCase> model) {
         super("➕ Add Test Case");
         this.list = list;
         this.featurePath = featurePath;
@@ -70,7 +69,7 @@ public class AddTestCaseAction extends AnAction {
             mapper.writeValue(targetFile, newCase);
 
             LocalFileSystem.getInstance().refreshAndFindFileByIoFile(targetFile);
-            model.addElement(newCase);
+            model.add(newCase);
             list.ensureIndexIsVisible(model.getSize() - 1);
 
         } catch (IOException ex) {

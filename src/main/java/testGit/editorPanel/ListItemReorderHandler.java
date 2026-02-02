@@ -1,5 +1,6 @@
 package testGit.editorPanel;
 
+import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.ImageUtil;
 import org.jetbrains.annotations.NotNull;
@@ -17,11 +18,11 @@ import java.util.List;
 public class ListItemReorderHandler extends TransferHandler {
     private static final DataFlavor TESTCASE_LIST_FLAVOR = new DataFlavor(List.class, "List of TestCase");
 
-    private final DefaultListModel<TestCase> model;
+    private final CollectionListModel<TestCase> model;
     private int[] draggedIndices;
     private List<TestCase> draggedItems;
 
-    public ListItemReorderHandler(DefaultListModel<TestCase> model) {
+    public ListItemReorderHandler(CollectionListModel<TestCase> model) {
         System.out.println("ListItemReorderHandler.ListItemReorderHandler()");
         this.model = model;
     }

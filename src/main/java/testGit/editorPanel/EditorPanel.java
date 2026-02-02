@@ -7,6 +7,7 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
@@ -39,12 +40,11 @@ public class EditorPanel extends UserDataHolderBase implements FileEditor {
         this.file = file;
 
         // 1) Build a sorted, mutable list model
-        DefaultListModel<TestCase> model = new DefaultListModel<>();
+        CollectionListModel<TestCase> model = new CollectionListModel<>();
         testCases
                 //.sorted(Comparator.comparingInt(TestCase::getSort))
-                .forEach(model::addElement);
+                .forEach(model::add);
 
-        // 2) JList with multi​-select and drag​-to​-reorder
         JBList<TestCase> list = new JBList<>(model);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setDragEnabled(true);
@@ -92,7 +92,7 @@ public class EditorPanel extends UserDataHolderBase implements FileEditor {
                 //JPopupMenu menu = EditorContext.create(featurePath, file, list, model, tc);
                 //menu.show(list, e.getX(), e.getY());
 
-                ContextMenu contextMenu = new ContextMenu(featurePath, file, list, model, tc);
+                ContextMenu contextMenu = new ContextMenu(featurePath, list, model, tc);
                 ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(
                         ActionPlaces.TOOLWINDOW_POPUP,
                         contextMenu
@@ -165,7 +165,7 @@ public class EditorPanel extends UserDataHolderBase implements FileEditor {
                     newCase.setSort(model.getSize() + 1);
 
                     // Add to the list model
-                    model.addElement(newCase);
+                    model.add(newCase);
 
                     // Scroll to and select the new test case
                     list.ensureIndexIsVisible(model.getSize() - 1);
