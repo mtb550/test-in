@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.TestCase;
@@ -20,11 +21,11 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class AddTestCaseAction extends AnAction {
-    private final JList<TestCase> list;
+    private final JBList<TestCase> list;
     private final String featurePath;
     private final DefaultListModel<TestCase> model;
 
-    public AddTestCaseAction(String featurePath, @NotNull VirtualFile file, JList<TestCase> list, DefaultListModel<TestCase> model) {
+    public AddTestCaseAction(String featurePath, @NotNull VirtualFile file, JBList<TestCase> list, DefaultListModel<TestCase> model) {
         super("➕ Add Test Case");
         this.list = list;
         this.featurePath = featurePath;
@@ -36,21 +37,24 @@ public class AddTestCaseAction extends AnAction {
         AddNewTestCaseDialog dialog = new AddNewTestCaseDialog();
 
         if (dialog.showAndGet()) {
-            saveTestCase(dialog.getInput());
+            saveNewTestCase(dialog);
         }
     }
 
-    private void saveTestCase(String title) {
+    private void saveNewTestCase(AddNewTestCaseDialog dialog) {
         TestCase newCase = new TestCase();
-        newCase.setTitle(title);
-        newCase.setPriority("LOW");
-        newCase.setNext(null);
         newCase.setId(UUID.randomUUID().toString());
+        newCase.setTitle(dialog.getTitle());
+        newCase.setPriority(dialog.getPriority());
+        newCase.setGroups(dialog.getSelectedGroups());
+        newCase.setNext(null);
 
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
                 .enable(SerializationFeature.INDENT_OUTPUT);
+
         try {
+            // Linked list chain logic
             if (model.isEmpty()) {
                 newCase.setIsHead(true);
             } else {
