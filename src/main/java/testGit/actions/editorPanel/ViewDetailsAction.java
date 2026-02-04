@@ -4,7 +4,7 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.TestCase;
-import testGit.viewPanel.TestCaseToolWindow;
+import testGit.viewPanel.ViewPanel;
 
 public class ViewDetailsAction extends AnAction {
     TestCase tc;
@@ -16,6 +16,6 @@ public class ViewDetailsAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        TestCaseToolWindow.show(tc);
+        ViewPanel.show(tc);
     }
 }

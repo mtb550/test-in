@@ -9,7 +9,7 @@ import testGit.pojo.TestCase;
 
 import java.util.function.Consumer;
 
-public class TestCaseToolWindow {
+public class ViewPanel {
 
     public static void addTestCase(Consumer<TestCase> onSaveCallback) {
         System.out.println("TestCaseToolWindow.addTestCase()");
