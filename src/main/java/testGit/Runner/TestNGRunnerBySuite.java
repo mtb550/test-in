@@ -10,7 +10,8 @@ import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
 
 public class TestNGRunnerBySuite {
-    public static void runTestSuite(Project project, String suiteFilePath) {
+    public static void runTestSuite(final Project project, final String suiteFilePath) {
+        // add notifier here
         if (suiteFilePath == null || suiteFilePath.trim().isEmpty()) {
             System.err.println("Suite file path is invalid.");
             return;

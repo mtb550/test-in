@@ -10,7 +10,8 @@ import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
 
 public class TestNGRunnerByMethod {
-    public static void runTestMethod(Project project, String fullyQualifiedClassName, String methodName) {
+    public static void runTestMethod(final Project project, final String fullyQualifiedClassName, final String methodName) {
+        // add notifier here
         TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
         RunManager runManager = RunManager.getInstance(project);
 
