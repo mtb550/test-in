@@ -19,6 +19,7 @@ public class ComboBoxProjectSelector {
     public ProjectPanel projectPanel;
 
     public ComboBoxProjectSelector(final ProjectPanel projectPanel) {
+        System.out.println("ComboBoxProjectSelector.ComboBoxProjectSelector()");
         this.projectPanel = projectPanel;
         model = new DefaultComboBoxModel<>();
         comboBox = new ComboBox<>(model);
@@ -27,17 +28,21 @@ public class ComboBoxProjectSelector {
     }
 
     public static Directory getSelectedProject() {
-        System.out.println("ComboBoxProjectSelector.getSelectedProject()");
-
+        System.out.println("ComboBoxProjectSelector.getSelectedProject(): ");
+        System.out.println("Selected Project: " + ((Directory) comboBox.getSelectedItem()).getName());
         return (Directory) comboBox.getSelectedItem();
     }
 
     public void loadProjects() {
         System.out.println("ComboBoxProjectSelector.loadProjects()");
+        System.out.println(Config.getRootFolderFile().getAbsolutePath());
+
         comboBox.removeAllItems();
-        File[] dirs = Config.getRootFolder().listFiles(File::isDirectory);
+        File[] dirs = Config.getRootFolderFile().listFiles(File::isDirectory);
+        Arrays.stream(dirs).forEach(System.out::println);
 
         Directory[] projects = (dirs == null) ? new Directory[0] : Arrays.stream(dirs)
+                .filter(dir -> !dir.getName().equals(".git"))
                 .map(dir -> {
                     String fullName = dir.getName();
                     String[] parts = fullName.split("_", 4);
@@ -45,7 +50,7 @@ public class ComboBoxProjectSelector {
                     return new Directory()
                             .setFile(dir)
                             .setFileName(fullName)
-                            .setFilePath(Config.getRootFolder().toPath().resolve(fullName))
+                            .setFilePath(Config.getRootFolderFile().toPath().resolve(fullName))
                             .setType(Integer.parseInt(parts[0]))
                             .setId(Integer.parseInt(parts[1]))
                             .setName(parts[2])
@@ -107,7 +112,7 @@ public class ComboBoxProjectSelector {
     private void onSelection(ActionEvent e) {
         System.out.println("ComboBoxProjectSelector.onSelection()");
 
-        Directory selected = (Directory) comboBox.getSelectedItem();
+        Directory selected = getSelectedProject();
         if (selected != null) {
             projectPanel.filterByProject(selected);
             System.out.println("select project: " + selected.getName());
@@ -128,7 +133,7 @@ public class ComboBoxProjectSelector {
         // مسح العناصر القديمة من القائمة المنسدلة
         model.removeAllElements();
 
-        File[] dirs = Config.getRootFolder().listFiles(File::isDirectory);
+        File[] dirs = Config.getRootFolderFile().listFiles(File::isDirectory);
         if (dirs != null) {
             for (File dir : dirs) { ///  make for parallel
                 Directory p = mapProject(dir); // الدالة التي تستخدمها لتحويل المجلد لكائن

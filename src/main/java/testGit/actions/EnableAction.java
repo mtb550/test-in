@@ -6,7 +6,6 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
-import testGit.util.sql;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -36,7 +35,7 @@ public class EnableAction extends AnAction {
         String newName = Messages.showInputDialog("Rename node:", "Rename", null, treeItem.getName(), null);
         if (newName == null || newName.isBlank()) return;
 
-        new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
+        //new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
 
 
         treeItem.setName(newName);

@@ -3,7 +3,6 @@ package testGit.projectPanel;
 import com.intellij.openapi.ui.ComboBox;
 import testGit.pojo.Directory;
 import testGit.pojo.Version;
-import testGit.util.sql;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -30,10 +29,7 @@ public class ComboBoxVersionSelector {
         model.removeAllElements();
         nameToVersion.clear();
 
-        Version[] versions = new sql().get(
-                "SELECT * FROM nafath_version WHERE project_id = ? ORDER BY version DESC",
-                projectId
-        ).as(Version[].class);
+        Version[] versions = null;
 
         if (versions.length > 0) {
             for (Version version : versions) {

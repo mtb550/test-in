@@ -5,7 +5,6 @@ import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
 import testGit.util.NodeType;
-import testGit.util.sql;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -111,7 +110,6 @@ public class TreeTransferHandler extends TransferHandler {
             model.removeNodeFromParent(node);
 
             // DB update
-            new sql().execute("UPDATE tree SET link = ? WHERE id = ?", newParentInfo.getId(), movingInfo.getId());
 
             // Insert under new parent
             model.insertNodeInto(node, newParent, newParent.getChildCount());

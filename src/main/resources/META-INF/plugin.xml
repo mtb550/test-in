@@ -10,8 +10,8 @@
     <!-- Required to access core IntelliJ APIs -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
+    <depends>com.intellij.modules.vcs</depends>
     <depends>TestNG-J</depends>
-    <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
 
@@ -65,7 +65,7 @@
         </action>
 
         <group id="TestTreeContextMenuGroup"
-               class="testGit.projectPanel.ProjectPanelContext"
+               class="testGit.projectPanel.testCase.TestCaseContext"
                text="Test Tree Context Menu"
                popup="true">
         </group>

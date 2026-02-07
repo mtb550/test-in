@@ -11,39 +11,84 @@ import javax.swing.event.TreeModelListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
+import java.nio.file.Path;
+import java.util.Arrays;
 
 public class DirectoryMapper {
     @Getter
-    public static DefaultTreeModel treeModel;
+    public static DefaultTreeModel testCasesTreeModel;
+    @Getter
+    public static DefaultTreeModel testPlansTreeModel;
 
-    public static void buildTree() {
-        System.out.println("ExplorerTree.buildTree()");
+    public static void buildTestCasesTree(Directory selectedProject) {
+        System.out.println("ExplorerTree.buildTestCasesTree()");
+        System.out.println("selectedProject" + selectedProject);
+
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("TEST CASES");
-        File[] children = Config.getRootFolder().listFiles(File::isDirectory);
+        File[] children = Config.getTestCasesRootFolder(selectedProject).listFiles(File::isDirectory);
 
         if (children != null) {
-            for (File child : children) {
-                Directory project = mapProject(child);
-                rootNode.add(buildSubTree(project));
-            }
+            Arrays.stream(children).forEach(file -> System.out.println(file.getName()));
+
+            Arrays.stream(children)
+                    .map(DirectoryMapper::mapSuite)
+                    .forEach(project -> rootNode.add(buildTestCasesSubTree(project)));
         }
-        treeModel = new DefaultTreeModel(rootNode);
+        testCasesTreeModel = new DefaultTreeModel(rootNode);
     }
 
-    public static DefaultMutableTreeNode buildSubTree(final Directory folder) {
-        System.out.println("ExplorerTree.buildSubTree()");
+    public static void buildTestPlansTree(Directory selectedProject) {
+        System.out.println("ExplorerTree.buildTestPlansTree()");
+        System.out.println("selectedProject: " + selectedProject.getName());
 
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(folder);
-        File[] children = folder.getFilePath().toFile().listFiles(File::isDirectory);
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode("TEST PLANS");
+        File[] children = Config.getTestPlansRootFolder(selectedProject).listFiles(File::isDirectory);
+
+        if (children != null) {
+            Arrays.stream(children).forEach(file -> System.out.println(file.getName()));
+
+            Arrays.stream(children)
+                    .map(DirectoryMapper::mapSuite)
+                    .forEach(project -> rootNode.add(buildTestPlansSubTree(project)));
+        }
+
+        testPlansTreeModel = new DefaultTreeModel(rootNode);
+    }
+
+    public static DefaultMutableTreeNode buildTestCasesSubTree(final Directory project) {
+        System.out.println("ExplorerTree.buildTestCasesSubTree()");
+
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(project);
+        Path p = project.getFilePath().resolve("testCases");
+        File[] children = p.toFile().listFiles(File::isDirectory);
 
         if (children != null) {
             for (File childFile : children) {
                 Directory childTree = mapSuite(childFile);
-                node.add(buildSubTree(childTree));
+                node.add(buildTestCasesSubTree(childTree));
             }
         }
         return node;
     }
+
+    public static DefaultMutableTreeNode buildTestPlansSubTree(final Directory project) {
+        System.out.println("ExplorerTree.buildTestPlansSubTree()");
+
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(project);
+        Path p = project.getFilePath().resolve("testPlans");
+        File[] children = p.toFile().listFiles(File::isDirectory);
+
+        if (children != null) {
+            Arrays.stream(children).forEach(file -> System.out.println(file.getName()));
+
+            for (File childFile : children) {
+                Directory childTree = mapSuite(childFile);
+                node.add(buildTestPlansSubTree(childTree));
+            }
+        }
+        return node;
+    }
+
 
     /**
      * Map file to Project Directory

@@ -7,7 +7,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.intellij.ui.components.JBScrollPane;
 import testGit.pojo.TestCase;
-import testGit.util.sql;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -31,12 +30,7 @@ public class TestRunEditor {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        TestCase[] testCases = new sql().get("""
-                    SELECT t.* FROM nafath_tc t
-                    JOIN nafath_tp map ON map.test_case_id = t.tc_id
-                    WHERE map.plan_id = ?
-                    ORDER BY map.run_order
-                """, testRunId).as(TestCase[].class);
+        TestCase[] testCases = null;
 
         for (int i = 0; i < testCases.length; i++) {
             //panel.add(new TestCaseCardTP(i, testCases[i]));

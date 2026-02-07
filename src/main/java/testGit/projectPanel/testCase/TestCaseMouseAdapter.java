@@ -1,15 +1,14 @@
-package testGit.projectPanel;
+package testGit.projectPanel.testCase;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.editorPanel.TestCaseEditor;
-import testGit.pojo.Config;
 import testGit.pojo.Directory;
 import testGit.pojo.TestPlan;
-import testGit.projectPanel.testPlan.TestPlanContextMenu;
-import testGit.projectPanel.testPlan.TestRunEditor;
+import testGit.projectPanel.ProjectPanel;
+import testGit.projectPanel.testPlan.TestPlanContext;
 import testGit.util.NodeType;
 
 import javax.swing.*;
@@ -18,17 +17,19 @@ import javax.swing.tree.TreePath;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class ProjectPanelMouseAdapter extends MouseAdapter {
+public class TestCaseMouseAdapter extends MouseAdapter {
     private final SimpleTree tree;
     private final ProjectPanel projectPanel;
 
-    public ProjectPanelMouseAdapter(final ProjectPanel projectPanel) {
+    public TestCaseMouseAdapter(final ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
         this.tree = projectPanel.getTestCaseTree();
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
+        System.out.println("ProjectPanelMouseAdapter.mouseClicked()");
+
         TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
         if (selPath == null) return;
 
@@ -38,15 +39,15 @@ public class ProjectPanelMouseAdapter extends MouseAdapter {
         // CASE: it's a TestPlan node (folder or test run)
         if (userObject instanceof TestPlan plan) {
             if (SwingUtilities.isRightMouseButton(e)) {
-                JPopupMenu popup = TestPlanContextMenu.create(tree, plan, node);
+                JPopupMenu popup = TestPlanContext.create(tree, plan, node);
                 popup.show(tree, e.getX(), e.getY());
                 return;
             }
 
-            if (plan.getType() == 1 && SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-                TestRunEditor.open(Config.getProject(), plan.getId(), plan.getName());
+            //if (plan.getType() == 1 && SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
+            //TestRunEditor.open(Config.getProject(), plan.getId(), plan.getName());
 
-            }
+            // }
 
             return;
         }
@@ -57,7 +58,7 @@ public class ProjectPanelMouseAdapter extends MouseAdapter {
 
 // 1. التعامل مع الزر الأيمن (القائمة المنبثقة)
         if (SwingUtilities.isRightMouseButton(e)) {
-            ProjectPanelContext contextMenu = new ProjectPanelContext(projectPanel);
+            TestCaseContext contextMenu = new TestCaseContext(projectPanel);
             ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(
                     ActionPlaces.TOOLWINDOW_POPUP,
                     contextMenu

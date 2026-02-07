@@ -57,14 +57,14 @@ public class AddProjectAction extends AnAction {
                 .setActive(1);
 
         newProject.setFileName(String.format("%d_%d_%s_%d", newProject.getType(), newProject.getId(), newProject.getName(), newProject.getActive()));
-        newProject.setFilePath(Config.getRootFolder().toPath().resolve(newProject.getFileName()));
+        newProject.setFilePath(Config.getRootFolderFile().toPath().resolve(newProject.getFileName()));
         newProject.setFile(new File(newProject.getFileName()));
 
 
         WriteAction.run(() -> {
             try {
                 // 1. Get the parent directory as a VirtualFile
-                File rootFolder = Config.getRootFolder();
+                File rootFolder = Config.getRootFolderFile();
                 System.out.println(rootFolder.getPath());
                 VirtualFile parentDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(rootFolder.toPath());
                 System.out.println("parentDir: " + parentDir);

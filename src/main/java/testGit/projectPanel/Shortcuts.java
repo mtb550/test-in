@@ -12,7 +12,10 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.pojo.Directory;
-import testGit.util.*;
+import testGit.util.ActionHistory;
+import testGit.util.NodeType;
+import testGit.util.StatusUtil;
+import testGit.util.UiDialogs;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -138,8 +141,8 @@ public class Shortcuts {
                     Directory sourceTreeItem = (Directory) node.getUserObject();
 
                     if (!isCut) {
-                        sql db = new sql();
-                        int newNodeId = db.get("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?) RETURNING id;", sourceTreeItem.getName() + " (Copy)", sourceTreeItem.getType(), targetTreeItem.getId(), System.getProperty("user.name")).asType(Integer.class);
+                        //sql db = new sql();
+                        Integer newNodeId = null;
 
                         Directory treeItem = new Directory()
                                 .setType(sourceTreeItem.getType())
@@ -153,15 +156,14 @@ public class Shortcuts {
                                 // Undo: remove the newly inserted node from model and DB
                                 () -> {
                                     model.removeNodeFromParent(newNode);
-                                    new sql().execute("DELETE FROM nafath_tc_tree WHERE id = ?", treeItem.getId());
                                     tree.repaint();
                                 },
                                 // Redo: re-insert the same node again into model and DB
                                 () -> {
                                     model.insertNodeInto(newNode, targetNode, targetNode.getChildCount());
-                                    new sql().execute("INSERT INTO tree (id, name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))",
-                                            treeItem.getId(), treeItem.getName(), treeItem.getType(), targetTreeItem.getId(), System.getProperty("user.name"));
-                                    tree.repaint();
+                                    //new sql().execute("INSERT INTO tree (id, name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))",
+                                    //treeItem.getId(), treeItem.getName(), treeItem.getType(), targetTreeItem.getId(), System.getProperty("user.name"));
+                                    //tree.repaint();
                                 }
                         );
 
@@ -171,23 +173,18 @@ public class Shortcuts {
                         model.removeNodeFromParent(node);
                         model.insertNodeInto(node, targetNode, targetNode.getChildCount());
 
-                        new sql().execute("UPDATE tree SET link = ? WHERE id = ?", targetTreeItem.getId(), sourceTreeItem.getId());
 
                         ActionHistory.register(
                                 // Undo: move the node back to old parent
                                 () -> {
                                     model.removeNodeFromParent(node);
                                     model.insertNodeInto(node, oldParent, oldParent.getChildCount());
-                                    new sql().execute("UPDATE tree SET link = ? WHERE id = ?",
-                                            ((Directory) oldParent.getUserObject()).getId(), sourceTreeItem.getId());
                                     tree.repaint();
                                 },
                                 // Redo: reapply move to target node
                                 () -> {
                                     model.removeNodeFromParent(node);
                                     model.insertNodeInto(node, targetNode, targetNode.getChildCount());
-                                    new sql().execute("UPDATE tree SET link = ? WHERE id = ?",
-                                            targetTreeItem.getId(), sourceTreeItem.getId());
                                     tree.repaint();
                                 }
                         );
@@ -224,20 +221,16 @@ public class Shortcuts {
                         int index = parent.getIndex(node);
 
                         model.removeNodeFromParent(node);
-                        new sql().execute("DELETE FROM nafath_tc_tree WHERE id = ?", treeItem.getId());
 
                         ActionHistory.register(
                                 // Undo: restore the deleted node
                                 () -> {
                                     model.insertNodeInto(node, parent, index);
-                                    new sql().execute("INSERT INTO tree (id, name, type, link, created_by, created_at) VALUES (?, ?, ?, ?, ?, datetime('now'))",
-                                            treeItem.getId(), treeItem.getName(), treeItem.getType(), treeItem.getLink(), System.getProperty("user.name"));
                                     tree.repaint();
                                 },
                                 // Redo: remove it again
                                 () -> {
                                     model.removeNodeFromParent(node);
-                                    new sql().execute("DELETE FROM nafath_tc_tree WHERE id = ?", treeItem.getId());
                                     tree.repaint();
                                 }
                         );
@@ -290,21 +283,18 @@ public class Shortcuts {
                 treeItem.setName(newName);
                 ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
-                new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
 
                 ActionHistory.register(
                         // Undo: revert to old name
                         () -> {
                             treeItem.setName(oldName);
                             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
-                            new sql().execute("UPDATE tree SET name = ? WHERE id = ?", oldName, treeItem.getId());
                             tree.repaint();
                         },
                         // Redo: reapply new name
                         () -> {
                             treeItem.setName(newName);
                             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
-                            new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
                             tree.repaint();
                         }
                 );
@@ -398,11 +388,9 @@ public class Shortcuts {
                     parentId = selectedInfo.getId();
                 }
 
-                sql db = new sql();
-                db.execute("INSERT INTO tree (name, type, link, created_by) VALUES (?, ?, ?, ?)",
-                        name, newType, parentId, System.getProperty("user.name"));
+                //sql db = new sql();
 
-                Directory newInfo = db.get("SELECT TOP 1 * FROM nafath_tc_tree WHERE name = ? ORDER BY created_at DESC", name).as(Directory.class);
+                Directory newInfo = null;
                 DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newInfo);
 
                 if (newType == 0) {

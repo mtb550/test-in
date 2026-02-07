@@ -16,6 +16,7 @@ public class PluginPostStartupActivity implements ProjectActivity {
 
         Config.setProject(project);
         Config.setProjectBasePath(project.getBasePath());
+        System.out.println("project.getBasePath(): " + project.getBasePath());
         Config.setRootFolder();
         return Unit.INSTANCE;
     }

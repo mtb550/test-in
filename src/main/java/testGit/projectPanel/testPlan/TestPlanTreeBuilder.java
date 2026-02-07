@@ -6,7 +6,6 @@ import testGit.pojo.Directory;
 import testGit.pojo.TestCase;
 import testGit.pojo.TestPlan;
 import testGit.util.NodeType;
-import testGit.util.sql;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ public class TestPlanTreeBuilder {
 
     public CheckedTreeNode buildTree() {
         CheckedTreeNode rootNode = new CheckedTreeNode("Test Cases");
-        Directory root = new sql().get("SELECT * FROM nafath_tc_tree WHERE id = ?", plan.getProject_id()).as(Directory.class);
+        Directory root = null;
         if (root != null) {
             buildTreeRecursive(root, rootNode);
         }
@@ -35,7 +34,7 @@ public class TestPlanTreeBuilder {
         parentNode.add(currentNode);
 
         if (treeItem.getType() == NodeType.FEATURE.getCode()) {
-            TestCase[] testCases = new sql().get("SELECT * FROM nafath_tc WHERE module = ? ORDER BY sort", treeItem.getId()).as(TestCase[].class);
+            TestCase[] testCases = null;
             for (TestCase tc : testCases) {
                 CheckedTreeNode testCaseNode = new CheckedTreeNode(tc);
                 testCaseNode.setChecked(false);
@@ -45,7 +44,7 @@ public class TestPlanTreeBuilder {
             return;
         }
 
-        Directory[] children = new sql().get("SELECT * FROM nafath_tc_tree WHERE link = ?", treeItem.getId()).as(Directory[].class);
+        Directory[] children = null;
         for (Directory child : children) {
             buildTreeRecursive(child, currentNode);
         }

@@ -3,13 +3,12 @@ package testGit.projectPanel.testPlan;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.actions.TestPlanInfoPopup;
 import testGit.pojo.TestPlan;
-import testGit.util.sql;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-public class TestPlanContextMenu {
+public class TestPlanContext {
 
     public static JPopupMenu create(SimpleTree tree, TestPlan plan, DefaultMutableTreeNode node) {
         JPopupMenu menu = new JPopupMenu();
@@ -24,7 +23,6 @@ public class TestPlanContextMenu {
         rename.addActionListener(e -> {
             String newName = JOptionPane.showInputDialog("Rename Test Plan:", plan.getName());
             if (newName != null && !newName.isBlank()) {
-                new sql().execute("UPDATE nafath_tp_tree SET name = ? WHERE id = ?", newName, plan.getId());
                 plan.setName(newName);
                 ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
             }
@@ -36,8 +34,6 @@ public class TestPlanContextMenu {
         delete.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(tree, "Delete this plan and its test cases?");
             if (confirm == JOptionPane.YES_OPTION) {
-                new sql().execute("DELETE FROM nafath_tp WHERE plan_id = ?", plan.getId());
-                new sql().execute("DELETE FROM nafath_tp_tree WHERE id = ?", plan.getId());
                 ((DefaultTreeModel) tree.getModel()).removeNodeFromParent(node);
             }
         });

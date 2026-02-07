@@ -8,14 +8,12 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
-import testGit.util.sql;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.util.EventObject;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -99,12 +97,12 @@ public class SettingsAction extends AnAction {
 
                 if (idObj == null || idObj.toString().isBlank()) {
                     // New record
-                    new sql().execute("INSERT INTO projects (name, active) VALUES (?, ?)", name, active);
+                    //new sql().execute("INSERT INTO projects (name, active) VALUES (?, ?)", name, active);
                 } else {
                     int id = Integer.parseInt(idObj.toString());
                     ProjectRow original = originalProjects.get(id);
                     if (original != null && (!original.name.equals(name) || original.active != active)) {
-                        new sql().execute("UPDATE projects SET name = ?, active = ? WHERE project_id = ?", name, active, id);
+                        //new sql().execute("UPDATE projects SET name = ?, active = ? WHERE project_id = ?", name, active, id);
                     }
                 }
             }
@@ -125,14 +123,13 @@ public class SettingsAction extends AnAction {
                 if (name.isBlank() || email.isBlank()) continue;
 
                 if (idObj == null || idObj.toString().isBlank()) {
-                    new sql().execute("INSERT INTO users (name, role, email, enabled) VALUES (?, ?, ?, ?)", name, role, email, enabled);
+                    //new sql().execute("INSERT INTO users (name, role, email, enabled) VALUES (?, ?, ?, ?)", name, role, email, enabled);
                 } else {
                     int id = Integer.parseInt(idObj.toString());
                     UserRow original = originalUsers.get(id);
                     if (original != null && (!original.name.equals(name) || !original.role.equals(role)
                             || !original.email.equals(email) || original.enabled != enabled)) {
-                        new sql().execute("UPDATE users SET name = ?, role = ?, email = ?, enabled = ? WHERE id = ?",
-                                name, role, email, enabled, id);
+                        //new sql().execute("UPDATE users SET name = ?, role = ?, email = ?, enabled = ? WHERE id = ?",name, role, email, enabled, id);
                     }
                 }
             }
@@ -146,14 +143,14 @@ public class SettingsAction extends AnAction {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
 
-        sql db = new sql().get("SELECT project_id, name, active FROM projects");
-        for (HashMap<String, Object> row : db.dbResult) {
-            int id = (int) row.get("project_id");
-            String name = row.get("name").toString();
-            boolean active = Integer.parseInt(row.get("active").toString()) == 1;
-            model.addRow(new Object[]{id, name, active});
-            originalProjects.put(id, new ProjectRow(name, active ? 1 : 0));
-        }
+        //sql db = new sql().get("SELECT project_id, name, active FROM projects");
+//        for (HashMap<String, Object> row : ) {
+//            int id = (int) row.get("project_id");
+//            String name = row.get("name").toString();
+//            boolean active = Integer.parseInt(row.get("active").toString()) == 1;
+//            model.addRow(new Object[]{id, name, active});
+//            originalProjects.put(id, new ProjectRow(name, active ? 1 : 0));
+//        }
 
         // Add empty row for new entry
         model.addRow(new Object[]{null, "", Boolean.TRUE});
@@ -166,17 +163,17 @@ public class SettingsAction extends AnAction {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         model.setRowCount(0);
 
-        sql db = new sql().get("SELECT id, name, role, email, enabled FROM users");
+        //sql db = new sql().get("SELECT id, name, role, email, enabled FROM users");
 
-        for (HashMap<String, Object> row : db.dbResult) {
-            int id = (int) row.get("id");
-            String name = row.get("name").toString();
-            String role = row.get("role").toString();
-            String email = row.get("email").toString();
-            boolean enabled = Integer.parseInt(row.get("enabled").toString()) == 1;
-            model.addRow(new Object[]{id, name, role, email, enabled});
-            originalUsers.put(id, new UserRow(name, role, email, enabled ? 1 : 0));
-        }
+//        for (HashMap<String, Object> row : db.dbResult) {
+//            int id = (int) row.get("id");
+//            String name = row.get("name").toString();
+//            String role = row.get("role").toString();
+//            String email = row.get("email").toString();
+//            boolean enabled = Integer.parseInt(row.get("enabled").toString()) == 1;
+//            model.addRow(new Object[]{id, name, role, email, enabled});
+//            originalUsers.put(id, new UserRow(name, role, email, enabled ? 1 : 0));
+//        }
         model.addRow(new Object[]{null, "", "", "", Boolean.TRUE});
         table.setAutoCreateRowSorter(true);
     }

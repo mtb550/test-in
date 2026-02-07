@@ -14,7 +14,8 @@ repositories {
 intellij {
     version.set("2024.1.7")
     type.set("IC") // Target IDE Platform
-    plugins.set(listOf("java", "TestNG-J"))
+    //plugins.set(listOf("java", "TestNG-J"))
+    plugins.set(listOf("java", "TestNG-J", "Git4Idea", "vcs-git"))
 }
 
 sourceSets {
@@ -35,7 +36,6 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok:1.18.30")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
     testImplementation("org.testng:testng:7.11.0")
-    testImplementation("org.xerial:sqlite-jdbc:3.49.1.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3")
     implementation("com.jayway.jsonpath:json-path:2.10.0")

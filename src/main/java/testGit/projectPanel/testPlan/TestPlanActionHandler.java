@@ -11,10 +11,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Setter;
 import testGit.pojo.TestCase;
 import testGit.pojo.TestPlan;
-import testGit.util.sql;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -87,14 +84,14 @@ public class TestPlanActionHandler {
     }
 
     private void createTestRun(List<String> selectedCaseIds, SimpleTree parent) {
-        sql db = new sql();
+        //sql db = new sql();
         try {
             String configJson = createConfigJson();
-            int testRunId = createTestRunRecord(db);
-            addTestCasesToRun(db, testRunId, selectedCaseIds, configJson);
+            //int testRunId = createTestRunRecord(db);
+            //addTestCasesToRun(db, testRunId, selectedCaseIds, configJson);
 
             Messages.showInfoMessage("Test Run created and test cases added.", "Success");
-            updateParentTree(parent);
+            //updateParentTree(parent);
         } catch (Exception ex) {
             ex.printStackTrace(System.out);
             Messages.showErrorDialog("Failed to create test run.", "Error");
@@ -110,28 +107,28 @@ public class TestPlanActionHandler {
         return new Gson().toJson(configMap);
     }
 
-    private int createTestRunRecord(sql db) throws Exception {
-        db.execute("INSERT INTO nafath_tp_tree (name, type, link, project_id, created_by, created_at) VALUES (?, 1, ?, ?, ?, datetime('now'))",
-                buildField.getText().trim(), plan.getId(), plan.getProject_id(), System.getProperty("user.name"));
-        return db.get("SELECT last_insert_rowid()").asType(Integer.class);
-    }
+//    private int createTestRunRecord(sql db) throws Exception {
+//        db.execute("INSERT INTO nafath_tp_tree (name, type, link, project_id, created_by, created_at) VALUES (?, 1, ?, ?, ?, datetime('now'))",
+//                buildField.getText().trim(), plan.getId(), plan.getProject_id(), System.getProperty("user.name"));
+//        return db.get("SELECT last_insert_rowid()").asType(Integer.class);
+//    }
 
-    private void addTestCasesToRun(sql db, int testRunId, List<String> selectedCaseIds, String configJson) throws Exception {
-        for (int i = 0; i < selectedCaseIds.size(); i++) {
-            db.execute("INSERT INTO nafath_tp (plan_id, test_case_id, config, run_order) VALUES (?, ?, ?, ?)",
-                    testRunId, selectedCaseIds.get(i), configJson, i + 1);
-        }
-    }
+//    private void addTestCasesToRun(sql db, int testRunId, List<String> selectedCaseIds, String configJson) throws Exception {
+//        for (int i = 0; i < selectedCaseIds.size(); i++) {
+//            db.execute("INSERT INTO nafath_tp (plan_id, test_case_id, config, run_order) VALUES (?, ?, ?, ?)",
+//                    testRunId, selectedCaseIds.get(i), configJson, i + 1);
+//        }
+//    }
 
-    private void updateParentTree(SimpleTree tree) {
-        DefaultMutableTreeNode newRoot = new DefaultMutableTreeNode("Test Plans");
-        TestPlan[] updatedPlans = new sql().get("SELECT * FROM nafath_tp_tree").as(TestPlan[].class);
-        for (TestPlan updatedPlan : updatedPlans) {
-            newRoot.add(new DefaultMutableTreeNode(updatedPlan));
-        }
-        DefaultTreeModel updatedModel = new DefaultTreeModel(newRoot);
-        tree.setModel(updatedModel);
-        tree.setRootVisible(true);
-
-    }
+//    private void updateParentTree(SimpleTree tree) {
+//        DefaultMutableTreeNode newRoot = new DefaultMutableTreeNode("Test Plans");
+//        TestPlan[] updatedPlans = new sql().get("SELECT * FROM nafath_tp_tree").as(TestPlan[].class);
+//        for (TestPlan updatedPlan : updatedPlans) {
+//            newRoot.add(new DefaultMutableTreeNode(updatedPlan));
+//        }
+//        DefaultTreeModel updatedModel = new DefaultTreeModel(newRoot);
+//        tree.setModel(updatedModel);
+//        tree.setRootVisible(true);
+//
+//    }
 }

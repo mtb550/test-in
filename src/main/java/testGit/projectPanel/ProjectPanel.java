@@ -16,8 +16,8 @@ import testGit.actions.OpenFeatureAction;
 import testGit.pojo.Config;
 import testGit.pojo.Directory;
 import testGit.pojo.TestPlan;
+import testGit.projectPanel.testCase.TestCaseMouseAdapter;
 import testGit.util.ShortcutRegistry;
-import testGit.util.sql;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -43,6 +43,8 @@ public class ProjectPanel {
         testCaseTree = new SimpleTree();
         testPlanTree = new SimpleTree();
 
+        projectSelector = new ComboBoxProjectSelector(this);
+
         setupTestCaseTree();
         setupTestPlanTree();
 
@@ -53,7 +55,7 @@ public class ProjectPanel {
         // === Project Selector Bar ===
         JPanel topBar = new JPanel(new BorderLayout());
 
-        projectSelector = new ComboBoxProjectSelector(this);
+
         topBar.add(projectSelector.selected(), BorderLayout.NORTH);
 
         Directory selectedProject = ComboBoxProjectSelector.getSelectedProject();
@@ -101,6 +103,7 @@ public class ProjectPanel {
         tabs.addListener(new TabsListener() {
             @Override
             public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
+                System.out.println("tabs.addListener.selectionChanged(): " + newSelection.getText());
                 prefs.put("activeTab", newSelection.getText());
             }
         });
@@ -111,12 +114,12 @@ public class ProjectPanel {
     public void setupTestCaseTree() {
         System.out.println("Panel.setupTestCaseTree()");
 
-        DirectoryMapper.buildTree();
-        testCaseTree.setModel(DirectoryMapper.getTreeModel());
+        DirectoryMapper.buildTestCasesTree(ComboBoxProjectSelector.getSelectedProject());
+        testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
         testCaseTree.setRootVisible(false);
         testCaseTree.setShowsRootHandles(true);
         testCaseTree.setCellRenderer(new IntelliJRenderer());
-        testCaseTree.addMouseListener(new ProjectPanelMouseAdapter(this));
+        testCaseTree.addMouseListener(new TestCaseMouseAdapter(this));
         Shortcuts.register(testCaseTree, Config.getProject());
         OpenFeatureAction.register(testCaseTree);
         testCaseTree.setDragEnabled(true);
@@ -128,14 +131,8 @@ public class ProjectPanel {
     private void setupTestPlanTree() {
         System.out.println("Panel.setupTestPlanTree()");
 
-        DefaultMutableTreeNode planRoot = new DefaultMutableTreeNode("Test Plans");
-        TestPlan[] plans = new sql().get("SELECT * FROM nafath_tp_tree").as(TestPlan[].class);
-        for (TestPlan plan : plans) {
-            planRoot.add(new DefaultMutableTreeNode(plan));
-        }
-
-        DefaultTreeModel testPlanModel = new DefaultTreeModel(planRoot);
-        testPlanTree.setModel(testPlanModel);
+        DirectoryMapper.buildTestPlansTree(ComboBoxProjectSelector.getSelectedProject());
+        testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
         testPlanTree.setRootVisible(false);
         testPlanTree.setShowsRootHandles(true);
         testPlanTree.setCellRenderer(new IntelliJRenderer());
@@ -145,14 +142,16 @@ public class ProjectPanel {
             // TestPlanEditor.open(plan.getId());
             //}
         });
-        testPlanTree.addMouseListener(new ProjectPanelMouseAdapter(this));
+        testPlanTree.addMouseListener(new TestCaseMouseAdapter(this));
     }
 
     public void refreshTestCaseTree() {
         System.out.println("Panel.refreshTestCaseTree()");
 
-        DirectoryMapper.buildTree();
-        testCaseTree.setModel(DirectoryMapper.getTreeModel());
+        DirectoryMapper.buildTestCasesTree(ComboBoxProjectSelector.getSelectedProject());
+        DirectoryMapper.buildTestPlansTree(ComboBoxProjectSelector.getSelectedProject());
+        testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
+        testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
     }
 
     public void refreshTestPlanTree() {
@@ -166,7 +165,7 @@ public class ProjectPanel {
     }
 
     public void filterByProject(final Directory project) {
-        System.out.println("Panel.filterByProject()");
+        System.out.println("Panel.filterByProject(): " + project.getName());
 
         //refreshPath(project.getFilePath());
 
@@ -175,13 +174,21 @@ public class ProjectPanel {
         //versionSelector.setProjectId(projectId);
         //}
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("Test Cases");
-        DefaultMutableTreeNode node = DirectoryMapper.buildSubTree(project);
-        root.add(node);
+        DefaultMutableTreeNode testCasesRoot = new DefaultMutableTreeNode("Test Cases");
+        DefaultMutableTreeNode testCasesNode = DirectoryMapper.buildTestCasesSubTree(project);
+        testCasesRoot.add(testCasesNode);
 
-        DirectoryMapper.treeModel = new DefaultTreeModel(root);
-        testCaseTree.setModel(DirectoryMapper.treeModel);
+        DirectoryMapper.testCasesTreeModel = new DefaultTreeModel(testCasesRoot);
+        testCaseTree.setModel(DirectoryMapper.testCasesTreeModel);
         testCaseTree.setRootVisible(false);
+
+        DefaultMutableTreeNode testPlansRoot = new DefaultMutableTreeNode("Test Plans");
+        DefaultMutableTreeNode testPlansNode = DirectoryMapper.buildTestPlansSubTree(project);
+        testPlansRoot.add(testPlansNode);
+
+        DirectoryMapper.testPlansTreeModel = new DefaultTreeModel(testPlansRoot);
+        testPlanTree.setModel(DirectoryMapper.testPlansTreeModel);
+        testPlanTree.setRootVisible(false);
     }
 
     static class IntelliJRenderer extends SimpleColoredComponent implements TreeCellRenderer {
@@ -219,7 +226,8 @@ public class ProjectPanel {
 
             // 2. حالة الـ TestPlan
             else if (userObject instanceof TestPlan plan) {
-                Icon planIcon = (plan.getType() == 1) ? AllIcons.Nodes.Artifact : AllIcons.Nodes.Folder;
+                //Icon planIcon = (plan.getType() == 1) ? AllIcons.Nodes.Artifact : AllIcons.Nodes.Folder;
+                Icon planIcon = AllIcons.Nodes.Artifact;
                 setIcon(planIcon);
                 append(plan.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
             }

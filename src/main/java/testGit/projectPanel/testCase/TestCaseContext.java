@@ -1,4 +1,4 @@
-package testGit.projectPanel;
+package testGit.projectPanel.testCase;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -7,6 +7,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.actions.*;
 import testGit.pojo.Directory;
+import testGit.projectPanel.ProjectPanel;
 import testGit.util.NodeType;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -14,7 +15,7 @@ import javax.swing.tree.TreePath;
 
 import static com.intellij.openapi.actionSystem.PlatformCoreDataKeys.CONTEXT_COMPONENT;
 
-public class ProjectPanelContext extends DefaultActionGroup {
+public class TestCaseContext extends DefaultActionGroup {
 
     DefaultActionGroup addGroup = new DefaultActionGroup("➕ Add", true) {
         @Override
@@ -43,10 +44,10 @@ public class ProjectPanelContext extends DefaultActionGroup {
         }
     };
 
-    public ProjectPanelContext() {
+    public TestCaseContext() {
     }
 
-    public ProjectPanelContext(ProjectPanel projectPanel) {
+    public TestCaseContext(ProjectPanel projectPanel) {
         super("Test Case Context Menu", true);
 
         add(new OpenFeatureActionContext(projectPanel.getTestCaseTree()));
