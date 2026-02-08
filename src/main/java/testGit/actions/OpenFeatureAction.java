@@ -3,7 +3,7 @@ package testGit.actions;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.editorPanel.TestCaseEditor;
 import testGit.pojo.Directory;
-import testGit.util.NodeType;
+import testGit.pojo.DirectoryType;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -33,7 +33,7 @@ public class OpenFeatureAction extends AbstractAction {
         if (node == null) return;
 
         // منطق فتح الـ Feature (ملفات JSON)
-        if (node.getUserObject() instanceof Directory dir && dir.getType() == NodeType.FEATURE.getCode()) {
+        if (node.getUserObject() instanceof Directory dir && dir.getType() == DirectoryType.F) {
             TestCaseEditor.open(dir.getFilePath());
         }
     }

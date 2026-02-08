@@ -12,8 +12,8 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryType;
 import testGit.util.ActionHistory;
-import testGit.util.NodeType;
 import testGit.util.StatusUtil;
 import testGit.util.UiDialogs;
 
@@ -25,6 +25,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,11 +33,11 @@ import java.util.Set;
 
 public class Shortcuts {
     private static final List<DefaultMutableTreeNode> clipboard = new ArrayList<>();
-    private static final Set<Integer> cutNodeIds = new HashSet<>();
+    private static final Set<Path> cutNodeIds = new HashSet<>();
     private static boolean isCut = false;
 
-    public static boolean isCutNode(int id) {
-        return cutNodeIds.contains(id);
+    public static boolean isCutNode(Path path) {
+        return cutNodeIds.contains(path);
     }
 
     public static void register(SimpleTree tree, Project project) {
@@ -111,7 +112,7 @@ public class Shortcuts {
                 for (TreePath path : paths) {
                     DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
                     clipboard.add(node);
-                    cutNodeIds.add(((Directory) node.getUserObject()).getId());
+                    cutNodeIds.add(((Directory) node.getUserObject()).getFilePath());
                 }
 
                 isCut = true;
@@ -142,11 +143,10 @@ public class Shortcuts {
 
                     if (!isCut) {
                         //sql db = new sql();
-                        Integer newNodeId = null;
+                        Path newNodeId = null;
 
                         Directory treeItem = new Directory()
-                                .setType(sourceTreeItem.getType())
-                                .setId(newNodeId);
+                                .setType(sourceTreeItem.getType());
                         treeItem.setName(sourceTreeItem.getName() + " (Copy)");
 
                         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(treeItem);
@@ -302,7 +302,7 @@ public class Shortcuts {
 
                 ActionHistory.showStatus(project);
                 StatusUtil.showBalloon(project, "Renamed to: " + newName, MessageType.INFO);
-                System.out.printf("[RENAME] Node id=%d renamed '%s' -> '%s'%n", treeItem.getId(), oldName, newName);
+                System.out.printf("[RENAME] Node id=%d renamed '%s' -> '%s'%n", oldName, newName);
             }
         });
 
@@ -365,27 +365,29 @@ public class Shortcuts {
                 if (name.isEmpty()) return;
 
                 String type = (String) typeCombo.getSelectedItem();
-                int newType = switch (type) {
-                    case "Project" -> 0;
-                    case "Suite" -> 1;
-                    case "Feature" -> 2;
-                    default -> -1;
+                DirectoryType newType = switch (type) {
+                    case "Project" -> DirectoryType.P;
+                    case "Suite" -> DirectoryType.S;
+                    case "Feature" -> DirectoryType.F;
+                    case "Test Plan" -> DirectoryType.TP;
+                    case "Test Run" -> DirectoryType.TR;
+                    default -> throw new Error("unknown type");
                 };
 
-                int parentId = 0;
+                Path parentId = null;
 
-                if (newType == NodeType.SUITE.getCode() && (selectedInfo == null || selectedInfo.getType() != NodeType.PROJECT.getCode())) {
+                if (newType == DirectoryType.S && (selectedInfo == null || selectedInfo.getType() != DirectoryType.P)) {
                     JOptionPane.showMessageDialog(tree, "Please select a project to add a suite.");
                     return;
                 }
 
-                if (newType == NodeType.FEATURE.getCode() && (selectedInfo == null || selectedInfo.getType() != NodeType.SUITE.getCode())) {
+                if (newType == DirectoryType.F && (selectedInfo == null || selectedInfo.getType() != DirectoryType.S)) {
                     JOptionPane.showMessageDialog(tree, "Please select a suite to add a feature.");
                     return;
                 }
 
-                if (newType == NodeType.SUITE.getCode() || newType == NodeType.FEATURE.getCode()) {
-                    parentId = selectedInfo.getId();
+                if (newType == DirectoryType.S || newType == DirectoryType.F) {
+                    parentId = selectedInfo.getFilePath();
                 }
 
                 //sql db = new sql();
@@ -393,7 +395,7 @@ public class Shortcuts {
                 Directory newInfo = null;
                 DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newInfo);
 
-                if (newType == 0) {
+                if (newType == DirectoryType.P) {
                     ((DefaultTreeModel) tree.getModel()).insertNodeInto(newNode, (DefaultMutableTreeNode) tree.getModel().getRoot(), tree.getModel().getChildCount(tree.getModel().getRoot()));
                 } else {
                     ((DefaultTreeModel) tree.getModel()).insertNodeInto(newNode, selected, selected.getChildCount());

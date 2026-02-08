@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
-import testGit.util.NodeType;
+import testGit.pojo.DirectoryType;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -34,7 +34,7 @@ public class RunAction extends AnAction {
         }
 
         Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-        e.getPresentation().setEnabled(userObject instanceof Directory treeItem && treeItem.getType() == NodeType.FEATURE.getCode());
+        e.getPresentation().setEnabled(userObject instanceof Directory treeItem && treeItem.getType() == DirectoryType.F);
     }
 
     @Override

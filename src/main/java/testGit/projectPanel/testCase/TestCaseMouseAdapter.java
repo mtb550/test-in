@@ -6,10 +6,10 @@ import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.editorPanel.TestCaseEditor;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryType;
 import testGit.pojo.TestPlan;
 import testGit.projectPanel.ProjectPanel;
 import testGit.projectPanel.testPlan.TestPlanContext;
-import testGit.util.NodeType;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -68,7 +68,7 @@ public class TestCaseMouseAdapter extends MouseAdapter {
 // 2. التعامل مع الضغط المزدوج بالزر الأيسر لفتح المحرر
         else if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
             // نتحقق هنا من أن نوع المجلد هو "Feature"
-            if (treeItem.getType() == NodeType.FEATURE.getCode()) {
+            if (treeItem.getType() == DirectoryType.F) {
                 TestCaseEditor.open(treeItem.getFilePath());
             }
         }

@@ -114,9 +114,9 @@ public class ProjectPanel {
     public void setupTestCaseTree() {
         System.out.println("Panel.setupTestCaseTree()");
 
-        DirectoryMapper.buildTestCasesTree(ComboBoxProjectSelector.getSelectedProject());
+        DirectoryMapper.buildTestCasesTree();
         testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
-        testCaseTree.setRootVisible(false);
+        //testCaseTree.setRootVisible(false);
         testCaseTree.setShowsRootHandles(true);
         testCaseTree.setCellRenderer(new IntelliJRenderer());
         testCaseTree.addMouseListener(new TestCaseMouseAdapter(this));
@@ -131,9 +131,9 @@ public class ProjectPanel {
     private void setupTestPlanTree() {
         System.out.println("Panel.setupTestPlanTree()");
 
-        DirectoryMapper.buildTestPlansTree(ComboBoxProjectSelector.getSelectedProject());
+        DirectoryMapper.buildTestPlansTree();
         testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
-        testPlanTree.setRootVisible(false);
+        //testPlanTree.setRootVisible(false);
         testPlanTree.setShowsRootHandles(true);
         testPlanTree.setCellRenderer(new IntelliJRenderer());
         testPlanTree.addTreeSelectionListener(e -> {
@@ -148,8 +148,8 @@ public class ProjectPanel {
     public void refreshTestCaseTree() {
         System.out.println("Panel.refreshTestCaseTree()");
 
-        DirectoryMapper.buildTestCasesTree(ComboBoxProjectSelector.getSelectedProject());
-        DirectoryMapper.buildTestPlansTree(ComboBoxProjectSelector.getSelectedProject());
+        DirectoryMapper.buildTestCasesTree();
+        DirectoryMapper.buildTestPlansTree();
         testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
         testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
     }
@@ -167,28 +167,44 @@ public class ProjectPanel {
     public void filterByProject(final Directory project) {
         System.out.println("Panel.filterByProject(): " + project.getName());
 
-        //refreshPath(project.getFilePath());
+        if (project.getName().equals("All Projects")) {
+            // 1. إعادة بناء البيانات الشاملة
+            DirectoryMapper.buildTestCasesTree();
+            DirectoryMapper.buildTestPlansTree();
 
-        // ✅ Refresh the version list dynamically
-        //if (versionSelector != null) {
-        //versionSelector.setProjectId(projectId);
-        //}
+            // 2. تحديث الموديل أولاً
+            testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
+            testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
 
-        DefaultMutableTreeNode testCasesRoot = new DefaultMutableTreeNode("Test Cases");
-        DefaultMutableTreeNode testCasesNode = DirectoryMapper.buildTestCasesSubTree(project);
-        testCasesRoot.add(testCasesNode);
+            // 3. إخفاء الجذر (كلمة TEST CASES)
+            testCaseTree.setRootVisible(false);
+            testPlanTree.setRootVisible(false);
 
-        DirectoryMapper.testCasesTreeModel = new DefaultTreeModel(testCasesRoot);
-        testCaseTree.setModel(DirectoryMapper.testCasesTreeModel);
-        testCaseTree.setRootVisible(false);
+        } else {
+            // 1. بناء العقد للمشروع المختار
+            DefaultMutableTreeNode casesRoot = DirectoryMapper.buildNodeRecursive(project, "testCases");
+            DefaultMutableTreeNode plansRoot = DirectoryMapper.buildNodeRecursive(project, "testPlans");
 
-        DefaultMutableTreeNode testPlansRoot = new DefaultMutableTreeNode("Test Plans");
-        DefaultMutableTreeNode testPlansNode = DirectoryMapper.buildTestPlansSubTree(project);
-        testPlansRoot.add(testPlansNode);
+            // 2. إنشاء الموديلات الجديدة وتحديثها
+            DirectoryMapper.setTestCasesTreeModel(new DefaultTreeModel(casesRoot));
+            DirectoryMapper.setTestPlansTreeModel(new DefaultTreeModel(plansRoot));
 
-        DirectoryMapper.testPlansTreeModel = new DefaultTreeModel(testPlansRoot);
-        testPlanTree.setModel(DirectoryMapper.testPlansTreeModel);
-        testPlanTree.setRootVisible(false);
+            testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
+            testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
+
+            // 3. إظهار الجذر (ليظهر اسم المشروع في القمة)
+            testCaseTree.setRootVisible(true);
+            testPlanTree.setRootVisible(true);
+        }
+
+        // 4. تحديث الواجهة وتوسيع العقد
+        testCaseTree.revalidate();
+        testPlanTree.revalidate();
+        testCaseTree.repaint();
+
+        // تأكد من تفعيل هذه السطور لضمان فتح المجلدات فوراً
+        //expandAllNodes(testCaseTree);
+        //expandAllNodes(testPlanTree);
     }
 
     static class IntelliJRenderer extends SimpleColoredComponent implements TreeCellRenderer {
@@ -203,25 +219,25 @@ public class ProjectPanel {
             }
 
             // 1. حالة الـ Directory (المشاريع والمجلدات)
-            if (userObject instanceof Directory projectNode) {
+            if (userObject instanceof Directory dir) {
                 // تعيين الأيقونة بناءً على النوع
                 Icon icon = AllIcons.Nodes.Folder; // افتراضي
-                if (projectNode.getType() != null) {
-                    icon = switch (projectNode.getType()) {
-                        case 0 -> AllIcons.Nodes.Project;
-                        case 1 -> AllIcons.Nodes.Folder;
-                        case 2 -> AllIcons.Nodes.Class;
-                        default -> AllIcons.Nodes.Folder;
+                if (dir.getType() != null) {
+                    icon = switch (dir.getType()) {
+                        case P -> AllIcons.Nodes.Project;
+                        case S -> AllIcons.Nodes.Folder;
+                        case F -> AllIcons.Nodes.Class;
+                        default -> AllIcons.Nodes.AbstractException;
                     };
                 }
                 setIcon(icon); // ✅ تعيين الأيقونة
 
                 // تعيين النص والستايل
                 SimpleTextAttributes style = SimpleTextAttributes.REGULAR_ATTRIBUTES;
-                if (projectNode.getId() != null && Shortcuts.isCutNode(projectNode.getId())) {
+                if (dir.getFilePath() != null && Shortcuts.isCutNode(dir.getFilePath())) {
                     style = SimpleTextAttributes.GRAYED_ATTRIBUTES;
                 }
-                append(projectNode.getName(), style); // ✅ إضافة النص
+                append(dir.getName(), style); // ✅ إضافة النص
             }
 
             // 2. حالة الـ TestPlan

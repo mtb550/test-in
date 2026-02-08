@@ -18,9 +18,6 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Directory {
-    @JsonAlias("project_id")
-    private Integer id;
-
     private String name;
 
     private Integer active;
@@ -31,7 +28,7 @@ public class Directory {
 
     private String fileName;
 
-    private Integer type;
+    private DirectoryType type;
 
     private Integer link;
 

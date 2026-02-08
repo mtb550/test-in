@@ -11,13 +11,12 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryType;
 import testGit.projectPanel.ProjectPanel;
-import testGit.util.NodeType;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import java.io.File;
 import java.io.IOException;
 
 public class AddProjectAction extends AnAction {
@@ -32,56 +31,52 @@ public class AddProjectAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        System.out.println("AddProjectAction.actionPerformed()");
         String name = Messages.showInputDialog("Enter project name:", "Add New Project", null);
         if (name == null || name.isBlank()) return;
 
-        if (tree == null) {
-            System.err.println("AddProjectAction.actionPerformed(): tree is null");
-            return;
-        }
-
-        TreePath path = tree.getSelectionPath();
-        DefaultMutableTreeNode parentNode;
-        if (path == null) {
-            System.out.println("AddProjectAction.actionPerformed(): path is null");
-            parentNode = (DefaultMutableTreeNode) tree.getModel().getRoot();
-        } else {
-            parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        }
-
+        // 1. إعداد بيانات المشروع الجديد
         Directory newProject = new Directory()
-                .setType(NodeType.PROJECT.getCode())
-                .setId(100)
+                .setType(DirectoryType.P)
                 .setName(name)
                 .setActive(1);
 
-        newProject.setFileName(String.format("%d_%d_%s_%d", newProject.getType(), newProject.getId(), newProject.getName(), newProject.getActive()));
-        newProject.setFilePath(Config.getRootFolderFile().toPath().resolve(newProject.getFileName()));
-        newProject.setFile(new File(newProject.getFileName()));
+        // استخدام name().toLowerCase() لضمان الاتساق
+        String folderName = String.format("%s_%s_%d", newProject.getType().name().toLowerCase(), newProject.getName(), newProject.getActive());
+        java.nio.file.Path projectPath = Config.getRootFolderFile().toPath().resolve(folderName);
 
+        newProject.setFileName(folderName)
+                .setFilePath(projectPath)
+                .setFile(projectPath.toFile());
 
         WriteAction.run(() -> {
             try {
-                // 1. Get the parent directory as a VirtualFile
-                File rootFolder = Config.getRootFolderFile();
-                System.out.println(rootFolder.getPath());
-                VirtualFile parentDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(rootFolder.toPath());
-                System.out.println("parentDir: " + parentDir);
+                VirtualFile rootVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Config.getRootFolderFile());
 
-                if (parentDir != null) {
-                    parentDir.createChildDirectory(this, newProject.getFileName());
+                if (rootVf != null) {
+                    // 2. إنشاء مجلد المشروع الرئيسي
+                    VirtualFile projectDir = rootVf.createChildDirectory(this, folderName);
+
+                    // 3. إنشاء المجلدات الفرعية الإلزامية داخل المشروع الجديد
+                    projectDir.createChildDirectory(this, "testCases");
+                    projectDir.createChildDirectory(this, "testPlans");
+
+                    // 4. تحديث الـ ComboBox واختيار المشروع الجديد
                     projectPanel.getProjectSelector().addAndSelectProject(newProject);
 
+                    // 5. تحديث الشجرة (Tree UI)
+                    DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+                    DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) model.getRoot();
                     DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newProject);
-                    DefaultTreeModel model = (DefaultTreeModel) projectPanel.getTestCaseTree().getModel();
-                    model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
-                    tree.scrollPathToVisible(new TreePath(newNode.getPath()));
 
-                    tree.scrollPathToVisible(new TreePath(newNode.getPath()));
+                    model.insertNodeInto(newNode, rootNode, rootNode.getChildCount());
+
+                    // التمرير للعنصر الجديد واختياره
+                    TreePath newPath = new TreePath(newNode.getPath());
+                    tree.scrollPathToVisible(newPath);
+                    tree.setSelectionPath(newPath);
                 }
             } catch (IOException ex) {
-                System.err.println("unable to create project: " + newProject);
+                Messages.showErrorDialog("Error creating project structure: " + ex.getMessage(), "IO Error");
             }
         });
     }

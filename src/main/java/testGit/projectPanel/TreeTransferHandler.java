@@ -4,7 +4,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
-import testGit.util.NodeType;
+import testGit.pojo.DirectoryType;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -70,13 +70,13 @@ public class TreeTransferHandler extends TransferHandler {
 
         if (!(userObject instanceof Directory targetInfo)) return false;
 
-        int targetType = targetInfo.getType();
+        DirectoryType targetType = targetInfo.getType();
         for (DefaultMutableTreeNode node : draggedNodes) {
             Object obj = node.getUserObject();
             if (!(obj instanceof Directory draggedInfo)) return false;
 
             // Block project moving or dropping into a feature
-            if (draggedInfo.getType() == NodeType.PROJECT.getCode() || targetType == NodeType.FEATURE.getCode())
+            if (draggedInfo.getType() == DirectoryType.P || targetType == DirectoryType.F)
                 return false;
 
             // Block no-op
@@ -115,7 +115,7 @@ public class TreeTransferHandler extends TransferHandler {
             model.insertNodeInto(node, newParent, newParent.getChildCount());
 
             System.out.printf("[MOVED] '%s' (id=%d) -> '%s' (id=%d)%n",
-                    movingInfo.getName(), movingInfo.getId(), newParentInfo.getName(), newParentInfo.getId());
+                    movingInfo.getName(), newParentInfo.getName());
         }
 
         return true;

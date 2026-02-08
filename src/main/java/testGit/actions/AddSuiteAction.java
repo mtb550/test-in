@@ -9,13 +9,13 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
-import testGit.util.NodeType;
+import testGit.pojo.DirectoryType;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class AddSuiteAction extends AnAction {
     private final SimpleTree tree;
@@ -27,46 +27,64 @@ public class AddSuiteAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        if (tree == null) return;
-
         TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+        if (path == null) {
+            System.out.println("path is null!!");
+            return;
+        }
 
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (!(userObject instanceof Directory treeItem) || treeItem.getType() == NodeType.FEATURE.getCode()) return;
+        // التحقق من أننا لا نضيف Suite داخل Feature
+        if (!(userObject instanceof Directory treeItem) || treeItem.getType() == DirectoryType.F) return;
 
         String name = Messages.showInputDialog("Enter suite name:", "Add Suite", null);
         if (name == null || name.isBlank()) return;
 
-        Directory newSuite = new Directory().setType(NodeType.SUITE.getCode()).setId(50).setName(name);
-        newSuite.setFileName(newSuite.getType() + "_" + newSuite.getId() + "_" + newSuite.getName());
-        newSuite.setFilePath(treeItem.getFilePath().resolve(newSuite.getFileName()));
-        newSuite.setFile(new File(newSuite.getFileName()));
+        // 1. تحديد مكان الإنشاء الفعلي على القرص
+        Path parentPath = (treeItem.getType() == DirectoryType.P)
+                ? treeItem.getFilePath().resolve("testCases")
+                : treeItem.getFilePath();
 
+        // 2. بناء بيانات الـ Suite الجديد
+        Directory newSuite = new Directory()
+                .setType(DirectoryType.S)
+                .setName(name)
+                .setActive(1);
+
+        // استخدام الدالة المحسنة لاسم الملف
+        String folderName = String.format("%s_%s_%d", newSuite.getType().name().toLowerCase(), newSuite.getName(), newSuite.getActive());
+        Path fullPath = parentPath.resolve(folderName);
+
+        newSuite.setFileName(folderName)
+                .setFilePath(fullPath)
+                .setFile(fullPath.toFile()); // ✅ مسار كامل Absolute Path
+
+        // 3. التنفيذ داخل WriteAction (مطلوب لتعديلات الملفات في IntelliJ)
         WriteAction.run(() -> {
             try {
-                // 1. Get the parent directory as a VirtualFile
-                VirtualFile parentDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(treeItem.getFilePath());
+                // تحديث نظام الملفات للعثور على المجلد الأب
+                VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
 
-                if (parentDir != null) {
-                    // 2. Create the directory using IntelliJ's API
-                    // This triggers VFS events correctly and prevents the "watcher" clash
-                    VirtualFile newDir = parentDir.createChildDirectory(this, newSuite.getFileName());
+                if (parentVf != null && parentVf.isDirectory()) {
+                    // إنشاء المجلد فعلياً
+                    parentVf.createChildDirectory(this, folderName);
 
-                    // 3. Update your Tree Model immediately inside the same WriteAction
+                    // تحديث الـ Tree Model
                     DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
                     DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newSuite);
+
+                    // إضافة النود وتنبيه المستمعين
                     model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
 
-                    // 4. Ensure UI visibility
-                    tree.scrollPathToVisible(new TreePath(newNode.getPath()));
+                    // توسيع الشجرة واختيار العنصر الجديد
+                    tree.makeVisible(new TreePath(newNode.getPath()));
+                    tree.setSelectionPath(new TreePath(newNode.getPath()));
                 }
             } catch (IOException ex) {
-                System.err.println("unable to create suite: " + newSuite);
+                Messages.showErrorDialog("Could not create directory: " + ex.getMessage(), "Error");
             }
         });
-
     }
 }

@@ -3,9 +3,9 @@ package testGit.projectPanel.testPlan;
 import com.intellij.ui.CheckedTreeNode;
 import lombok.Getter;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryType;
 import testGit.pojo.TestCase;
 import testGit.pojo.TestPlan;
-import testGit.util.NodeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class TestPlanTreeBuilder {
         currentNode.setChecked(false);
         parentNode.add(currentNode);
 
-        if (treeItem.getType() == NodeType.FEATURE.getCode()) {
+        if (treeItem.getType() == DirectoryType.F) {
             TestCase[] testCases = null;
             for (TestCase tc : testCases) {
                 CheckedTreeNode testCaseNode = new CheckedTreeNode(tc);

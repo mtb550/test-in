@@ -9,7 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
-import testGit.util.NodeType;
+import testGit.pojo.DirectoryType;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -37,29 +37,29 @@ public class AddFeatureAction extends AnAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (!(userObject instanceof Directory treeItem) || treeItem.getType() == NodeType.FEATURE.getCode()) return;
+        if (!(userObject instanceof Directory treeItem) || treeItem.getType() == DirectoryType.F) return;
 
         String name = Messages.showInputDialog("Enter feature name:", "Add Feature", null);
         if (name == null || name.isBlank()) return;
 
         Directory newFeature = new Directory()
-                .setType(NodeType.FEATURE.getCode())
-                .setId(80)
-                .setName(name);
+                .setType(DirectoryType.F)
+                .setName(name)
+                .setActive(1);
 
-        newFeature.setFileName(newFeature.getType() + "_" + newFeature.getId() + "_" + newFeature.getName());
+        newFeature.setFileName(String.format("%s_%s_%d", newFeature.getType().toString().toLowerCase(), newFeature.getName(), newFeature.getActive()));
         newFeature.setFilePath(treeItem.getFilePath().resolve(newFeature.getFileName()));
         newFeature.setFile(new File(newFeature.getFileName()));
 
         WriteAction.run(() -> {
             try {
                 // 1. Get the parent directory as a VirtualFile
-                VirtualFile parentDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(treeItem.getFilePath());
+                VirtualFile parentDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(treeItem.getType() == DirectoryType.P ? treeItem.getFilePath().resolve("testCases") : treeItem.getFilePath());
 
                 if (parentDir != null) {
                     // 2. Create the directory using IntelliJ's API
                     // This triggers VFS events correctly and prevents the "watcher" clash
-                    VirtualFile newDir = parentDir.createChildDirectory(this, newFeature.getFileName());
+                    parentDir.createChildDirectory(this, newFeature.getFileName());
 
                     // 3. Update your Tree Model immediately inside the same WriteAction
                     DefaultTreeModel model = (DefaultTreeModel) tree.getModel();

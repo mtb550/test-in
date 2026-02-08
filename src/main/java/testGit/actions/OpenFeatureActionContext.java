@@ -6,7 +6,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.TestCaseEditor;
 import testGit.pojo.Directory;
-import testGit.util.NodeType;
+import testGit.pojo.DirectoryType;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 
@@ -24,7 +24,7 @@ public class OpenFeatureActionContext extends AnAction {
         if (node == null) return;
 
         // منطق فتح الـ Feature (ملفات JSON)
-        if (node.getUserObject() instanceof Directory dir && dir.getType() == NodeType.FEATURE.getCode()) {
+        if (node.getUserObject() instanceof Directory dir && dir.getType() == DirectoryType.F) {
             TestCaseEditor.open(dir.getFilePath());
         }
     }
@@ -36,7 +36,7 @@ public class OpenFeatureActionContext extends AnAction {
         if (tree != null) {
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             isFeature = (node != null && node.getUserObject() instanceof Directory dir
-                    && dir.getType() == NodeType.FEATURE.getCode());
+                    && dir.getType() == DirectoryType.F);
         }
         //e.getPresentation().setEnabledAndVisible(isFeature);
         e.getPresentation().setEnabled(isFeature);

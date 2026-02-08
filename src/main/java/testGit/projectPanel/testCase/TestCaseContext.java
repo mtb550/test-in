@@ -7,8 +7,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.actions.*;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryType;
 import testGit.projectPanel.ProjectPanel;
-import testGit.util.NodeType;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -29,7 +29,7 @@ public class TestCaseContext extends DefaultActionGroup {
                 TreePath path = tree.getSelectionPath();
                 if (path != null) {
                     Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-                    if (userObject instanceof Directory treeItem && treeItem.getType() == NodeType.FEATURE.getCode()) {
+                    if (userObject instanceof Directory treeItem && treeItem.getType() == DirectoryType.F) {
                         enabled = false;
                     }
                 }

@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryType;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -41,7 +42,7 @@ public class RenameAction extends AnAction {
 
         try {
             File oldFile = treeItem.getFilePath().toFile();
-            String newFileName = treeItem.getType() + "_" + treeItem.getId() + "_" + newName;
+            String newFileName = treeItem.getType() + "_" + newName + "_" + treeItem.getActive();
             Path newFilePath = treeItem.getFilePath().getParent().resolve(newFileName);
             File newFile = newFilePath.toFile();
 
@@ -57,7 +58,7 @@ public class RenameAction extends AnAction {
                 //refreshPath(newFilePath.getParent());
 
                 // 5. تحديث الـ ComboBox إذا كان العنصر "مشروع" (Type 0)
-                if (treeItem.getType() == 0 && projectPanel.getProjectSelector() != null) {
+                if (treeItem.getType() == DirectoryType.P && projectPanel.getProjectSelector() != null) {
                     projectPanel.getProjectSelector().reloadProjects();
                 }
 
