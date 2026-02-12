@@ -1,5 +1,6 @@
 package testGit.actions;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ui.Messages;
@@ -7,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class TestPlansAction extends AnAction {
     public TestPlansAction() {
-        super("🧪 Test Plans");
+        super("Test Plans", "", AllIcons.Actions.ListFiles);
     }
 
     @Override

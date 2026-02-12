@@ -1,17 +1,16 @@
 package testGit.actions;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ExportJsonAction extends AnAction {
-    public ExportJsonAction() {
-        super("Export as Json", "", AllIcons.FileTypes.Json);
+public class IntegrateTestRail extends AnAction {
+    public IntegrateTestRail() {
+        super("From Test Rail");
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO: Implement export logic to JSON
+        // TODO: From Test Rail
     }
 }

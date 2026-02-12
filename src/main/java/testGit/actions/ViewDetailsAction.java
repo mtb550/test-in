@@ -1,17 +1,21 @@
 package testGit.actions;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
+import testGit.pojo.TestCase;
+import testGit.viewPanel.ViewPanel;
 
-public class ExportJsonAction extends AnAction {
-    public ExportJsonAction() {
-        super("Export as Json", "", AllIcons.FileTypes.Json);
+public class ViewDetailsAction extends AnAction {
+    TestCase tc;
+
+    public ViewDetailsAction(TestCase tc) {
+        super("🔍 View Details");
+        this.tc = tc;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO: Implement export logic to JSON
+        ViewPanel.show(tc);
     }
 }

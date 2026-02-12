@@ -5,13 +5,13 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ExportJsonAction extends AnAction {
-    public ExportJsonAction() {
-        super("Export as Json", "", AllIcons.FileTypes.Json);
+public class ExportCsv extends AnAction {
+    public ExportCsv() {
+        super("Export as CSV", "", AllIcons.FileTypes.Text);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO: Implement export logic to JSON
+        // TODO: Export test cases to CSV
     }
 }

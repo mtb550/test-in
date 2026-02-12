@@ -22,7 +22,7 @@ public class RenameAction extends AnAction {
 
     // استقبال الـ panel عبر الـ Constructor كما فعلنا في DeleteAction
     public RenameAction(final ProjectPanel projectPanel, final SimpleTree tree) {
-        super("Rename", "Description...", AllIcons.Actions.InlayRenameInComments);
+        super("Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.projectPanel = projectPanel;
         this.tree = tree;
     }

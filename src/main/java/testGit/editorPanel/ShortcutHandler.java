@@ -3,8 +3,8 @@ package testGit.editorPanel;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
-import testGit.actions.editorPanel.AddTestCaseAction;
-import testGit.actions.editorPanel.DeleteTestCaseAction;
+import testGit.actions.AddTestCaseAction;
+import testGit.actions.DeleteTestCaseAction;
 import testGit.pojo.TestCase;
 
 import javax.swing.*;

@@ -49,7 +49,7 @@ public class TestCaseEditor {
         // 1. Check if a tab for this path is already open
         for (VirtualFile openFile : editorManager.getOpenFiles()) {
             if (openFile instanceof TestCaseVirtualFile existing && existing.getFeaturePath().equals(featurePath.toString())) {
-                System.out.println("open feature: " + existing.getFeaturePath());
+                System.out.println("open test set: " + existing.getFeaturePath());
                 editorManager.openFile(existing, true);
                 return;
             }

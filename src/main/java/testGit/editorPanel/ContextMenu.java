@@ -3,7 +3,7 @@ package testGit.editorPanel;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
-import testGit.actions.editorPanel.*;
+import testGit.actions.*;
 import testGit.pojo.TestCase;
 
 public class ContextMenu extends DefaultActionGroup {

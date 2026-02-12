@@ -14,10 +14,10 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import testGit.actions.OpenFeatureAction;
 import testGit.pojo.Config;
-import testGit.pojo.Directory;
 import testGit.pojo.TestPlan;
-import testGit.projectPanel.testCase.TestCaseMouseAdapter;
-import testGit.projectPanel.testPlan.TestPlanMouseAdapter;
+import testGit.projectPanel.testCaseTab.MouseAdapter;
+import testGit.projectPanel.testPlanTab.TestPlanMouseAdapter;
+import testGit.util.Directory;
 import testGit.util.ShortcutRegistry;
 
 import javax.swing.*;
@@ -33,8 +33,8 @@ public class ProjectPanel {
     private final JPanel panel;
     private final SimpleTree testCaseTree;
     private final SimpleTree testPlanTree;
-    private final ComboBoxProjectSelector projectSelector;
-    private final ComboBoxVersionSelector versionSelector;
+    private final ProjectSelector projectSelector;
+    private final VersionSelector versionSelector;
     private final JBTabsImpl tabs;
 
     public ProjectPanel(final Project project) {
@@ -44,7 +44,7 @@ public class ProjectPanel {
         testCaseTree = new SimpleTree();
         testPlanTree = new SimpleTree();
 
-        projectSelector = new ComboBoxProjectSelector(this);
+        projectSelector = new ProjectSelector(this);
 
         setupTestCaseTree();
         setupTestPlanTree();
@@ -59,10 +59,10 @@ public class ProjectPanel {
 
         topBar.add(projectSelector.selected(), BorderLayout.NORTH);
 
-        Directory selectedProject = ComboBoxProjectSelector.getSelectedProject();
+        testGit.pojo.Directory selectedProject = ProjectSelector.getSelectedProject();
 
         // ✅ Assign to field so we can refresh it on project change
-        versionSelector = new ComboBoxVersionSelector(selectedProject);
+        versionSelector = new VersionSelector(selectedProject);
         topBar.add(versionSelector.getComponent(), BorderLayout.SOUTH);
 
         panel.add(topBar, BorderLayout.NORTH);
@@ -115,25 +115,25 @@ public class ProjectPanel {
     public void setupTestCaseTree() {
         System.out.println("Panel.setupTestCaseTree()");
 
-        DirectoryMapper.buildTestCasesTree();
-        testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
+        Directory.buildTestCasesTree();
+        testCaseTree.setModel(Directory.getTestCasesTreeModel());
         //testCaseTree.setRootVisible(false);
         testCaseTree.setShowsRootHandles(true);
         testCaseTree.setCellRenderer(new IntelliJRenderer());
-        testCaseTree.addMouseListener(new TestCaseMouseAdapter(this));
+        testCaseTree.addMouseListener(new MouseAdapter(this));
         Shortcuts.register(testCaseTree, Config.getProject());
         OpenFeatureAction.register(testCaseTree);
         testCaseTree.setDragEnabled(true);
         testCaseTree.setDropMode(DropMode.ON_OR_INSERT);
-        testCaseTree.setTransferHandler(new TreeTransferHandler(testCaseTree));
+        testCaseTree.setTransferHandler(new TransferHandler(testCaseTree));
         ShortcutRegistry.Explorer(testCaseTree, this);
     }
 
     private void setupTestPlanTree() {
         System.out.println("Panel.setupTestPlanTree()");
 
-        DirectoryMapper.buildTestPlansTree();
-        testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
+        Directory.buildTestPlansTree();
+        testPlanTree.setModel(Directory.getTestPlansTreeModel());
         //testPlanTree.setRootVisible(false);
         testPlanTree.addMouseListener(new TestPlanMouseAdapter(this));
         testPlanTree.setShowsRootHandles(true);
@@ -149,10 +149,10 @@ public class ProjectPanel {
     public void refreshTestCaseTree() {
         System.out.println("Panel.refreshTestCaseTree()");
 
-        DirectoryMapper.buildTestCasesTree();
-        DirectoryMapper.buildTestPlansTree();
-        testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
-        testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
+        Directory.buildTestCasesTree();
+        Directory.buildTestPlansTree();
+        testCaseTree.setModel(Directory.getTestCasesTreeModel());
+        testPlanTree.setModel(Directory.getTestPlansTreeModel());
     }
 
     public void refreshTestPlanTree() {
@@ -165,17 +165,17 @@ public class ProjectPanel {
 
     }
 
-    public void filterByProject(final Directory project) {
+    public void filterByProject(final testGit.pojo.Directory project) {
         System.out.println("Panel.filterByProject(): " + project.getName());
 
         if (project.getName().equals("All Projects")) {
             // 1. إعادة بناء البيانات الشاملة
-            DirectoryMapper.buildTestCasesTree();
-            DirectoryMapper.buildTestPlansTree();
+            Directory.buildTestCasesTree();
+            Directory.buildTestPlansTree();
 
             // 2. تحديث الموديل أولاً
-            testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
-            testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
+            testCaseTree.setModel(Directory.getTestCasesTreeModel());
+            testPlanTree.setModel(Directory.getTestPlansTreeModel());
 
             // 3. إخفاء الجذر (كلمة TEST CASES)
             testCaseTree.setRootVisible(false);
@@ -183,15 +183,15 @@ public class ProjectPanel {
 
         } else {
             // 1. بناء العقد للمشروع المختار
-            DefaultMutableTreeNode casesRoot = DirectoryMapper.buildNodeRecursive(project, "testCases");
-            DefaultMutableTreeNode plansRoot = DirectoryMapper.buildNodeRecursive(project, "testPlans");
+            DefaultMutableTreeNode casesRoot = Directory.buildNodeRecursive(project, "testCases");
+            DefaultMutableTreeNode plansRoot = Directory.buildNodeRecursive(project, "testPlans");
 
             // 2. إنشاء الموديلات الجديدة وتحديثها
-            DirectoryMapper.setTestCasesTreeModel(new DefaultTreeModel(casesRoot));
-            DirectoryMapper.setTestPlansTreeModel(new DefaultTreeModel(plansRoot));
+            Directory.setTestCasesTreeModel(new DefaultTreeModel(casesRoot));
+            Directory.setTestPlansTreeModel(new DefaultTreeModel(plansRoot));
 
-            testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
-            testPlanTree.setModel(DirectoryMapper.getTestPlansTreeModel());
+            testCaseTree.setModel(Directory.getTestCasesTreeModel());
+            testPlanTree.setModel(Directory.getTestPlansTreeModel());
 
             // 3. إظهار الجذر (ليظهر اسم المشروع في القمة)
             testCaseTree.setRootVisible(true);
@@ -220,7 +220,7 @@ public class ProjectPanel {
             }
 
             // 1. حالة الـ Directory (المشاريع والمجلدات)
-            if (userObject instanceof Directory dir) {
+            if (userObject instanceof testGit.pojo.Directory dir) {
                 // تعيين الأيقونة بناءً على النوع
                 Icon icon = AllIcons.Nodes.Folder; // افتراضي
                 if (dir.getType() != null) {

@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
-import testGit.actions.editorPanel.AddTestCaseAction;
+import testGit.actions.AddTestCaseAction;
 import testGit.pojo.TestCase;
 
 import java.awt.event.MouseEvent;

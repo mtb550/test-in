@@ -5,13 +5,13 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ExportJsonAction extends AnAction {
-    public ExportJsonAction() {
-        super("Export as Json", "", AllIcons.FileTypes.Json);
+public class ExportExcel extends AnAction {
+    public ExportExcel() {
+        super("Export as Excel", "", AllIcons.FileTypes.MicrosoftWindows);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO: Implement export logic to JSON
+        // TODO: Implement export logic to EXCEL
     }
 }

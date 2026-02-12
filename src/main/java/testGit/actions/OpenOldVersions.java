@@ -5,13 +5,13 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import org.jetbrains.annotations.NotNull;
 
-public class ExportJsonAction extends AnAction {
-    public ExportJsonAction() {
-        super("Export as Json", "", AllIcons.FileTypes.Json);
+public class OpenOldVersions extends AnAction {
+    public OpenOldVersions() {
+        super("Open Old Versions", "", AllIcons.Actions.SearchWithHistory);
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO: Implement export logic to JSON
+        // TODO: Load old test case versions
     }
 }

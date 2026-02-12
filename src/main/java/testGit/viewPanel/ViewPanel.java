@@ -31,7 +31,7 @@ public class ViewPanel {
                 }
             }
 
-            AddTestCasePanel add = TestCaseDetailsToolWindowFactory.getAddInstance();
+            AddTestCasePanel add = ToolWindowFactory.getAddInstance();
             if (add != null) {
                 add.setOnSaveCallback(onSaveCallback);
             }
@@ -57,7 +57,7 @@ public class ViewPanel {
                 }
             }
 
-            TestCaseDetailsPanel viewer = TestCaseDetailsToolWindowFactory.getDetailsInstance();
+            TestCaseDetailsPanel viewer = ToolWindowFactory.getDetailsInstance();
             if (viewer != null) {
                 viewer.update(testCase);
             }

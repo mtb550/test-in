@@ -1,5 +1,6 @@
 package testGit.actions;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -16,7 +17,7 @@ public class RunAction extends AnAction {
     private final SimpleTree tree;
 
     public RunAction(final SimpleTree tree) {
-        super("▶ Run Feature");
+        super("Run Test Set", "Run selected test set", AllIcons.RunConfigurations.TestState.Run);
         this.tree = tree;
     }
 
