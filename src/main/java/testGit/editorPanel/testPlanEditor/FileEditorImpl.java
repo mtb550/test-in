@@ -1,5 +1,6 @@
 package testGit.editorPanel.testPlanEditor;
 
+import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.util.UserDataHolderBase;
 import org.jetbrains.annotations.NotNull;
@@ -8,12 +9,12 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 
-public class FileEditor extends UserDataHolderBase implements com.intellij.openapi.fileEditor.FileEditor {
+public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final JComponent component;
 
-    public FileEditor(VirtualFile file) {
+    public FileEditorImpl(VirtualFileImpl virtualFileImpl) {
         TestPlanUI ui = new TestPlanUI();
-        this.component = ui.createEditorPanel(file.getTestCasesTreeModel(), file.getPlanPath());
+        this.component = ui.createEditorPanel(virtualFileImpl.getTestCasesTreeModel(), virtualFileImpl.getPlanPath());
     }
 
     @Override

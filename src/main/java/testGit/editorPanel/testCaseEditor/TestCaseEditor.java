@@ -3,11 +3,11 @@ package testGit.editorPanel.testCaseEditor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.vfs.VirtualFile;
 import testGit.pojo.Config;
 import testGit.pojo.TestCase;
 import testGit.util.TestCaseSorter;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +22,13 @@ public class TestCaseEditor {
         mapper.registerModule(new JavaTimeModule());
 
         List<TestCase> testCases = new ArrayList<>();
-        File folder = featurePath.toFile();
+        java.io.File folder = featurePath.toFile();
 
         if (folder.exists() && folder.isDirectory()) {
-            File[] jsonFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
+            java.io.File[] jsonFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".json"));
 
             if (jsonFiles != null) {
-                for (File file : jsonFiles) {
+                for (java.io.File file : jsonFiles) {
                     try {
                         TestCase tc = mapper.readValue(file, TestCase.class);
                         testCases.add(tc);
@@ -42,15 +42,15 @@ public class TestCaseEditor {
         testCases = TestCaseSorter.sortTestCases(testCases);
 
         // 1. Check if a tab for this path is already open
-        for (com.intellij.openapi.vfs.VirtualFile openFile : editorManager.getOpenFiles()) {
-            if (openFile instanceof VirtualFile existing && existing.getFeaturePath().equals(featurePath.toString())) {
+        for (VirtualFile openFile : editorManager.getOpenFiles()) {
+            if (openFile instanceof VirtualFileImpl existing && existing.getFeaturePath().equals(featurePath.toString())) {
                 System.out.println("open test set: " + existing.getFeaturePath());
                 editorManager.openFile(existing, true);
                 return;
             }
         }
 
-        com.intellij.openapi.vfs.VirtualFile virtualFile = new VirtualFile(featurePath.toString(), testCases);
+        VirtualFile virtualFile = new VirtualFileImpl(featurePath.toString(), testCases);
         editorManager.openFile(virtualFile, true);
     }
 }

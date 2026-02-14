@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Objects;
 
 @Getter
-public class VirtualFile extends LightVirtualFile {
+public class VirtualFileImpl extends LightVirtualFile {
     private final String featurePath; // المسار الكامل للمجلد المعني
     private final List<TestCase> testCases;
 
-    public VirtualFile(String featurePath, List<TestCase> testCases) {
+    public VirtualFileImpl(String featurePath, List<TestCase> testCases) {
         // نستخدم اسم المجلد فقط كعنوان للتبويب ليظهر بشكل جميل للمستخدم
         super(extractFolderName(featurePath), FileType.INSTANCE, "");
         this.featurePath = featurePath;
@@ -41,7 +41,7 @@ public class VirtualFile extends LightVirtualFile {
         // infinite sout
         //System.out.println("TestCaseVirtualFile.equals()");
         if (this == o) return true;
-        if (!(o instanceof VirtualFile that)) return false;
+        if (!(o instanceof VirtualFileImpl that)) return false;
         // المقارنة الآن تعتمد على المسار لضمان عدم تكرار فتح نفس المجلد
         return Objects.equals(featurePath, that.featurePath);
     }

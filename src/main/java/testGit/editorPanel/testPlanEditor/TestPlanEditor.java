@@ -14,14 +14,14 @@ public class TestPlanEditor {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
 
         for (com.intellij.openapi.vfs.VirtualFile openFile : editorManager.getOpenFiles()) {
-            if (openFile instanceof VirtualFile existing &&
+            if (openFile instanceof VirtualFileImpl existing &&
                     existing.getPlanPath().equals(planPath.toString())) {
                 editorManager.openFile(existing, true);
                 return;
             }
         }
 
-        VirtualFile virtualFile = new VirtualFile(
+        VirtualFileImpl virtualFile = new VirtualFileImpl(
                 planPath.toString(),
                 (DefaultTreeModel) projectPanel.getTestCaseTree().getModel()
         );

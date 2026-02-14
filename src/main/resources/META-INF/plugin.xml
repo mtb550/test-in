@@ -30,8 +30,8 @@
                 icon="AllIcons.General.Information"
                 secondary="false"/>
 
-        <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.Provider"/>
-        <fileEditorProvider implementation="testGit.editorPanel.testPlanEditor.Provider"/>
+        <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.ProviderImpl"/>
+        <fileEditorProvider implementation="testGit.editorPanel.testPlanEditor.ProviderImpl"/>
 
         <notificationGroup id="TestGit Notifications"
                            displayType="BALLOON"
