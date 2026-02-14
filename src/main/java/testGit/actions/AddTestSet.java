@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import testGit.editorPanel.testCaseEditor.TestCaseEditor;
 import testGit.pojo.Directory;
 import testGit.pojo.DirectoryType;
 
@@ -30,7 +31,7 @@ public class AddTestSet extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        System.out.println("AddFeatureAction.actionPerformed()");
+        System.out.println("AddTestSet.actionPerformed()");
         if (tree == null) return;
 
         TreePath path = tree.getSelectionPath();
@@ -56,24 +57,20 @@ public class AddTestSet extends AnAction {
 
         WriteAction.run(() -> {
             try {
-                // 1. Get the parent directory as a VirtualFile
                 VirtualFile parentDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(treeItem.getType() == DirectoryType.P ? treeItem.getFilePath().resolve("testCases") : treeItem.getFilePath());
 
                 if (parentDir != null) {
-                    // 2. Create the directory using IntelliJ's API
-                    // This triggers VFS events correctly and prevents the "watcher" clash
                     parentDir.createChildDirectory(this, newFeature.getFileName());
 
-                    // 3. Update your Tree Model immediately inside the same WriteAction
                     DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
                     DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newFeature);
                     model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
 
-                    // 4. Ensure UI visibility
                     tree.scrollPathToVisible(new TreePath(newNode.getPath()));
+                    TestCaseEditor.open(treeItem.getFilePath());
                 }
             } catch (IOException ex) {
-                System.err.println("unable to create suite: " + newFeature);
+                System.err.println("unable to create test set: " + newFeature);
             }
         });
     }

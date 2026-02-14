@@ -3,6 +3,7 @@ package testGit.actions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -23,7 +24,7 @@ public class AddTestCaseAction extends AnAction {
     private final CollectionListModel<TestCase> model;
 
     public AddTestCaseAction(String featurePath, JBList<TestCase> list, CollectionListModel<TestCase> model) {
-        super("➕ Add Test Case");
+        super("Add Test Case", "Add new test case", AllIcons.Actions.AddToDictionary);
         this.list = list;
         this.featurePath = featurePath;
         this.model = model;
@@ -31,6 +32,7 @@ public class AddTestCaseAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        System.out.println("AddTestCaseAction.actionPerformed(). featurePath: " + featurePath);
         AddNewTestCaseDialog dialog = new AddNewTestCaseDialog();
 
         if (dialog.showAndGet()) {
@@ -51,7 +53,6 @@ public class AddTestCaseAction extends AnAction {
                 .enable(SerializationFeature.INDENT_OUTPUT);
 
         try {
-            // Linked list chain logic
             if (model.isEmpty()) {
                 newCase.setIsHead(true);
             } else {
@@ -71,7 +72,9 @@ public class AddTestCaseAction extends AnAction {
             list.ensureIndexIsVisible(model.getSize() - 1);
 
         } catch (IOException ex) {
-            Notifier.error("Error", ex.getMessage());
+            Notifier.error("Error", "unable to add new test case. " + ex.getMessage());
+            System.err.println(ex.getMessage());
+            ex.printStackTrace(System.err);
         }
     }
 }

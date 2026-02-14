@@ -23,7 +23,6 @@ public class AddNewTestCaseDialog extends DialogWrapper {
     private final JBLabel charCounter = new JBLabel("0 / 100");
     private final ComboBox<String> priorityCombo = new ComboBox<>(new String[]{"LOW", "MEDIUM", "HIGH"});
 
-    // Using standard JBCheckBoxes in a panel for Groups to avoid 'CheckedComboBox' resolution issues
     private final JBCheckBox regressionBox = new JBCheckBox(GroupType.Regression.name());
     private final JBCheckBox sanityBox = new JBCheckBox(GroupType.Sanity.name());
     private final JBCheckBox smokeBox = new JBCheckBox(GroupType.Smoke.name());
@@ -42,7 +41,6 @@ public class AddNewTestCaseDialog extends DialogWrapper {
     @Override
     protected @Nullable JComponent createCenterPanel() {
         JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
-        // Set width to 600px (approx 30% of standard screen)
         panel.setPreferredSize(new Dimension(600, 200));
         panel.setBorder(JBUI.Borders.empty(12));
 
@@ -50,7 +48,6 @@ public class AddNewTestCaseDialog extends DialogWrapper {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = JBUI.insets(5);
 
-        // --- Row 0: Title Label and Counter ---
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 0;
@@ -62,7 +59,6 @@ public class AddNewTestCaseDialog extends DialogWrapper {
         charCounter.setForeground(UIUtil.getContextHelpForeground());
         panel.add(charCounter, gbc);
 
-        // --- Row 1: Title Field ---
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
@@ -70,7 +66,6 @@ public class AddNewTestCaseDialog extends DialogWrapper {
         titleField.getEmptyText().setText("Max 100 characters...");
         panel.add(titleField, gbc);
 
-        // --- Row 2: Priority ---
         gbc.gridy = 2;
         gbc.gridwidth = 1;
         gbc.weightx = 0;
@@ -79,7 +74,6 @@ public class AddNewTestCaseDialog extends DialogWrapper {
         gbc.weightx = 1.0;
         panel.add(priorityCombo, gbc);
 
-        // --- Row 3: Groups ---
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.weightx = 0;
@@ -97,7 +91,6 @@ public class AddNewTestCaseDialog extends DialogWrapper {
         gbc.weightx = 1.0;
         panel.add(groupsPanel, gbc);
 
-        // Live counter logic with theme-aware colors
         titleField.addCaretListener(e -> {
             int len = titleField.getText().length();
             charCounter.setText(len + " / 100");

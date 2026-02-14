@@ -54,29 +54,24 @@ public class AddTestProject extends AnAction {
                 VirtualFile rootVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Config.getRootFolderFile());
 
                 if (rootVf != null) {
-                    // 2. إنشاء مجلد المشروع الرئيسي
                     VirtualFile projectDir = rootVf.createChildDirectory(this, folderName);
 
-                    // 3. إنشاء المجلدات الفرعية الإلزامية داخل المشروع الجديد
                     projectDir.createChildDirectory(this, "testCases");
                     projectDir.createChildDirectory(this, "testPlans");
 
-                    // 4. تحديث الـ ComboBox واختيار المشروع الجديد
                     projectPanel.getProjectSelector().addAndSelectProject(newProject);
 
-                    // 5. تحديث الشجرة (Tree UI)
                     DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
                     DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) model.getRoot();
                     DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newProject);
 
                     model.insertNodeInto(newNode, rootNode, rootNode.getChildCount());
 
-                    // التمرير للعنصر الجديد واختياره
                     TreePath newPath = new TreePath(newNode.getPath());
                     tree.scrollPathToVisible(newPath);
                     tree.setSelectionPath(newPath);
 
-                    Notifier.information("New Test Project", String.format("Test Project %s has been approved", name));
+                    Notifier.information("New Test Project", String.format("Test Project %s has been added", name));
 
                 }
             } catch (IOException ex) {

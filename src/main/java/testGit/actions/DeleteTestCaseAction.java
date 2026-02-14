@@ -3,6 +3,7 @@ package testGit.actions;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -26,7 +27,7 @@ public class DeleteTestCaseAction extends AnAction {
     private final ObjectMapper mapper;
 
     public DeleteTestCaseAction(String featurePath, JBList<TestCase> list, CollectionListModel<TestCase> model) {
-        super("🗑 Delete");
+        super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
         this.featurePath = featurePath;
         this.list = list;
         this.model = model;
@@ -42,7 +43,6 @@ public class DeleteTestCaseAction extends AnAction {
 
         if (!DeleteTestCaseDialog.confirmDeleteAction(selectedItems)) return;
 
-        // Perform file operations in a background task or write action
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 performDeletion(selectedItems);
@@ -53,42 +53,33 @@ public class DeleteTestCaseAction extends AnAction {
     }
 
     private void performDeletion(List<TestCase> selectedItems) throws IOException {
-        // Find indices to identify context
         int firstIdx = model.getElementIndex(selectedItems.get(0));
         int lastIdx = model.getElementIndex(selectedItems.get(selectedItems.size() - 1));
 
-        // Get successor (the first item AFTER the entire selection)
         TestCase successor = (model.getSize() > lastIdx + 1) ? model.getElementAt(lastIdx + 1) : null;
 
-        // 1. Repair Chain
         if (firstIdx == 0) {
-            // Deleting the head: next remaining item becomes head
             if (successor != null) {
                 successor.setIsHead(true);
                 saveToFile(successor);
             }
         } else {
-            // Not deleting head: previous item points to successor
             TestCase predecessor = model.getElementAt(firstIdx - 1);
             predecessor.setNext(successor != null ? UUID.fromString(successor.getId()) : null);
             saveToFile(predecessor);
         }
 
-        // 2. Delete files and update UI model
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
             TestCase tc = selectedItems.get(i);
 
-            // Delete from Disk
             File file = new File(featurePath, tc.getId() + ".json");
             if (file.exists()) {
                 Files.delete(file.toPath());
             }
 
-            // Remove from UI
             model.remove(model.getElementIndex(tc));
         }
 
-        // 3. Batch Refresh VFS (Performance efficient)
         LocalFileSystem.getInstance().refreshIoFiles(List.of(new File(featurePath).listFiles()));
     }
 

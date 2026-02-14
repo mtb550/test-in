@@ -2,8 +2,6 @@ package testGit.projectPanel;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.SimpleColoredComponent;
-import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
@@ -13,15 +11,15 @@ import lombok.Getter;
 import testGit.actions.OpenFeatureAction;
 import testGit.pojo.Config;
 import testGit.pojo.Directory;
-import testGit.pojo.TestPlan;
+import testGit.projectPanel.projectSelector.ProjectSelector;
 import testGit.projectPanel.testPlanTab.MouseAdapter;
+import testGit.projectPanel.versionSelector.VersionSelector;
 import testGit.util.DirectoryMapper;
 import testGit.util.ShortcutRegistry;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeCellRenderer;
 import java.awt.*;
 import java.util.prefs.Preferences;
 
@@ -52,7 +50,6 @@ public class ProjectPanel {
 
         JPanel topBar = new JPanel(new BorderLayout());
 
-
         topBar.add(projectSelector.selected(), BorderLayout.NORTH);
 
         Directory selectedProject = ProjectSelector.getSelectedProject();
@@ -75,8 +72,7 @@ public class ProjectPanel {
         tabs.addTab(testCasesTab);
         tabs.addTab(testPlansTab);
 
-        // === Tab selection persistence ===
-        Preferences prefs = Preferences.userRoot().node("TestBind");
+        Preferences prefs = Preferences.userRoot().node("TestGit");
         String lastTab = prefs.get("activeTab", "Test Cases");
         if ("Test Plans".equals(lastTab)) {
             tabs.select(testPlansTab, true);
@@ -102,7 +98,7 @@ public class ProjectPanel {
         testCaseTree.setModel(DirectoryMapper.getTestCasesTreeModel());
         //testCaseTree.setRootVisible(false);
         testCaseTree.setShowsRootHandles(true);
-        testCaseTree.setCellRenderer(new IntelliJRenderer());
+        testCaseTree.setCellRenderer(new Renderer());
         testCaseTree.addMouseListener(new testGit.projectPanel.testCaseTab.MouseAdapter(this));
         Shortcuts.register(testCaseTree, Config.getProject());
         OpenFeatureAction.register(testCaseTree);
@@ -120,12 +116,8 @@ public class ProjectPanel {
         //testPlanTree.setRootVisible(false);
         testPlanTree.addMouseListener(new MouseAdapter(this));
         testPlanTree.setShowsRootHandles(true);
-        testPlanTree.setCellRenderer(new IntelliJRenderer());
+        testPlanTree.setCellRenderer(new Renderer());
         testPlanTree.addTreeSelectionListener(e -> {
-            DefaultMutableTreeNode selected = (DefaultMutableTreeNode) testPlanTree.getLastSelectedPathComponent();
-            //if (selected != null && selected.getUserObject() instanceof TestPlan plan && plan.getType() == 1) {
-            // TestPlanEditor.open(plan.getId());
-            //}
         });
     }
 
@@ -164,47 +156,4 @@ public class ProjectPanel {
         //expandAllNodes(testPlanTree);
     }
 
-    static class IntelliJRenderer extends SimpleColoredComponent implements TreeCellRenderer {
-        @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-            //System.out.println("Panel.getTreeCellRendererComponent()");
-            this.clear();
-
-            Object userObject = null;
-            if (value instanceof DefaultMutableTreeNode node) {
-                userObject = node.getUserObject();
-            }
-
-            if (userObject instanceof Directory dir) {
-                Icon icon = AllIcons.Nodes.Folder;
-                if (dir.getType() != null) {
-                    icon = switch (dir.getType()) {
-                        case P -> AllIcons.Nodes.Project;
-                        case S -> AllIcons.Nodes.Folder;
-                        case F -> AllIcons.Nodes.Class;
-                        case TP -> AllIcons.Nodes.WebFolder;
-                        case TR -> AllIcons.Nodes.AbstractMethod;
-                        default -> AllIcons.Nodes.AbstractException;
-                    };
-                }
-                setIcon(icon);
-
-                SimpleTextAttributes style = SimpleTextAttributes.REGULAR_ATTRIBUTES;
-                if (dir.getFilePath() != null && Shortcuts.isCutNode(dir.getFilePath())) {
-                    style = SimpleTextAttributes.GRAYED_ATTRIBUTES;
-                }
-                append(dir.getName(), style); // ✅ إضافة النص
-            } else if (userObject instanceof TestPlan plan) {
-                //Icon planIcon = (plan.getType() == 1) ? AllIcons.Nodes.Artifact : AllIcons.Nodes.Folder;
-                Icon planIcon = AllIcons.Nodes.Artifact;
-                setIcon(planIcon);
-                append(plan.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-            } else {
-                setIcon(AllIcons.Nodes.Folder); // أيقونة اختيارية للـ Root
-                append(value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-            }
-
-            return this;
-        }
-    }
 }

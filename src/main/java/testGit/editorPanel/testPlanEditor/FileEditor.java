@@ -1,6 +1,5 @@
 package testGit.editorPanel.testPlanEditor;
 
-import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.util.UserDataHolderBase;
 import org.jetbrains.annotations.NotNull;
@@ -9,12 +8,11 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 
-public class TestPlanFileEditor extends UserDataHolderBase implements FileEditor {
+public class FileEditor extends UserDataHolderBase implements com.intellij.openapi.fileEditor.FileEditor {
     private final JComponent component;
 
-    public TestPlanFileEditor(TestPlanVirtualFile file) {
+    public FileEditor(VirtualFile file) {
         TestPlanUI ui = new TestPlanUI();
-        // Pass the model directly from the file and the path where it should save
         this.component = ui.createEditorPanel(file.getTestCasesTreeModel(), file.getPlanPath());
     }
 
@@ -38,7 +36,6 @@ public class TestPlanFileEditor extends UserDataHolderBase implements FileEditor
 
     }
 
-    // ... rest of boilerplate remains same
     @Override
     public void dispose() {
     }

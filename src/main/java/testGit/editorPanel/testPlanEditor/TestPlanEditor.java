@@ -1,7 +1,6 @@
 package testGit.editorPanel.testPlanEditor;
 
 import com.intellij.openapi.fileEditor.FileEditorManager;
-import com.intellij.openapi.vfs.VirtualFile;
 import testGit.pojo.Config;
 import testGit.projectPanel.ProjectPanel;
 
@@ -14,17 +13,15 @@ public class TestPlanEditor {
     public static void open(final Path planPath, ProjectPanel projectPanel, DefaultMutableTreeNode selectedNode) {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
 
-        // Check if the file is already open to avoid duplicates
-        for (VirtualFile openFile : editorManager.getOpenFiles()) {
-            if (openFile instanceof TestPlanVirtualFile existing &&
+        for (com.intellij.openapi.vfs.VirtualFile openFile : editorManager.getOpenFiles()) {
+            if (openFile instanceof VirtualFile existing &&
                     existing.getPlanPath().equals(planPath.toString())) {
                 editorManager.openFile(existing, true);
                 return;
             }
         }
 
-        // Use the model directly from your projectPanel as requested
-        TestPlanVirtualFile virtualFile = new TestPlanVirtualFile(
+        VirtualFile virtualFile = new VirtualFile(
                 planPath.toString(),
                 (DefaultTreeModel) projectPanel.getTestCaseTree().getModel()
         );

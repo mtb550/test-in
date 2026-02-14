@@ -9,7 +9,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
 import testGit.projectPanel.ProjectPanel;
-import testGit.projectPanel.ProjectSelector;
+import testGit.projectPanel.projectSelector.ProjectSelector;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -50,7 +50,6 @@ public class Delete extends AnAction {
 
                 if (success) {
                     System.out.println("Success! Deleted: " + treeItem.getFilePath());
-                    //refreshPath(treeItem.getFilePath().getParent());
 
                 } else {
                     System.out.println("Could not delete folder. It might be in use. Delete Failed.");
@@ -61,7 +60,6 @@ public class Delete extends AnAction {
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
             model.removeNodeFromParent(selectedNode);
 
-            // بعد نجاح الحذف، حدث الـ ComboBox بسهولة
             if (projectPanel.getProjectSelector() != null) {
                 projectPanel.getProjectSelector().loadProjectList();
                 //panel.loadAllProjects();
@@ -69,7 +67,6 @@ public class Delete extends AnAction {
             }
 
         } catch (Exception ex) {
-            //Messages.showErrorDialog("Error during delete: " + ex.getMessage(), "Error");
             System.out.println("Error during delete: " + ex.getMessage());
         }
     }

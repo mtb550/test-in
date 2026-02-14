@@ -7,10 +7,10 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class TestCaseFileType extends LanguageFileType {
-    public static final TestCaseFileType INSTANCE = new TestCaseFileType();
+public class FileType extends LanguageFileType {
+    public static final FileType INSTANCE = new FileType();
 
-    private TestCaseFileType() {
+    private FileType() {
         super(TestCaseLanguage.INSTANCE);
         System.out.println("TestCaseFileType.TestCaseFileType()");
     }
@@ -19,7 +19,6 @@ public class TestCaseFileType extends LanguageFileType {
     @Override
     public String getName() {
         //System.out.println("TestCaseFileType.getName()");
-
         return "TestCaseFile";
     }
 
@@ -27,7 +26,6 @@ public class TestCaseFileType extends LanguageFileType {
     @Override
     public String getDescription() {
         System.out.println("TestCaseFileType.getDescription()");
-
         return "Teat Cases table file";
     }
 
@@ -35,7 +33,6 @@ public class TestCaseFileType extends LanguageFileType {
     @Override
     public String getDefaultExtension() {
         System.out.println("TestCaseFileType.getDefaultExtension()");
-
         return "tc table";
     }
 
@@ -43,7 +40,6 @@ public class TestCaseFileType extends LanguageFileType {
     @Override
     public Icon getIcon() {
         //System.out.println("TestCaseFileType.getIcon()");
-
         return AllIcons.Nodes.DataTables;
     }
 }

@@ -7,7 +7,6 @@
         Plugin to browse test projects, view features, and manage test cases with details and bug tracking.
     ]]></description>
 
-    <!-- Required to access core IntelliJ APIs -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.modules.vcs</depends>
@@ -17,16 +16,13 @@
 
         <postStartupActivity implementation="testGit.settings.PluginPostStartupActivity"/>
 
-        <!-- 🧭 Left-side tool window: Test Case Explorer -->
         <toolWindow
                 id="TestGit"
                 factoryClass="testGit.projectPanel.ToolWindowFactory"
                 anchor="left"
                 icon="AllIcons.General.Information"
                 secondary="false"/>
-        <!--        icon="/icons/ant_dark.svg"  OLD ICON -->
 
-        <!-- 🔍 Right-side tool window: Test Case Details -->
         <toolWindow
                 id="Details"
                 factoryClass="testGit.viewPanel.ToolWindowFactory"
@@ -34,11 +30,9 @@
                 icon="AllIcons.General.Information"
                 secondary="false"/>
 
-        <!-- 📝 File editor providers -->
         <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.Provider"/>
-        <fileEditorProvider implementation="testGit.projectPanel.testPlanTab.TestRunFileEditorProvider"/>
-        <fileEditorProvider implementation="testGit.editorPanel.testPlanEditor.TestPlanEditorProvider"/>
-        <!-- 🔔 Notification group -->
+        <fileEditorProvider implementation="testGit.editorPanel.testPlanEditor.Provider"/>
+
         <notificationGroup id="TestGit Notifications"
                            displayType="BALLOON"
                            isLogByDefault="true"/>
@@ -54,7 +48,6 @@
     </extensions>
 
     <actions>
-        <!-- 📂 Menu action to show tree view manually -->
         <action
                 id="testGit.demo.OpenTestTreeAction"
                 class="testGit.pojo.ShowTestTreeAction"

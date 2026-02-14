@@ -1,4 +1,4 @@
-package testGit.projectPanel;
+package testGit.projectPanel.versionSelector;
 
 import com.intellij.openapi.ui.ComboBox;
 import testGit.pojo.Directory;

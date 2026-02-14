@@ -1,12 +1,12 @@
-package testGit.projectPanel;
+package testGit.projectPanel.projectSelector;
 
 import com.intellij.openapi.ui.ComboBox;
 import testGit.pojo.Config;
 import testGit.pojo.Directory;
+import testGit.projectPanel.ProjectPanel;
 import testGit.util.DirectoryMapper;
 
 import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.util.Arrays;
 
@@ -21,41 +21,14 @@ public class ProjectSelector {
         comboBox = new ComboBox<>(model);
         comboBox.setFocusable(false);
 
-        // ✅ 1. الإعدادات الثابتة توضع هنا لمرة واحدة فقط
-        setupRenderer();
-        setupSelectionListener();
+        comboBox.setRenderer(new Renderer());
+        comboBox.addActionListener(new Listener(projectPanel));
 
-        // 2. تحميل البيانات
         loadProjectList();
     }
 
     public static Directory getSelectedProject() {
         return (Directory) comboBox.getSelectedItem();
-    }
-
-    private void setupRenderer() {
-        comboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Directory dir) {
-                    setText(dir.getName());
-                } else if (model.getSize() == 0) {
-                    setText("No projects found");
-                }
-                return this;
-            }
-        });
-    }
-
-    private void setupSelectionListener() {
-        comboBox.addActionListener(e -> {
-            Directory selected = (Directory) comboBox.getSelectedItem();
-            if (selected != null) {
-                System.out.println("Selection changed to: " + selected.getName());
-                projectPanel.filterByProject(selected);
-            }
-        });
     }
 
     public void loadProjectList() {
