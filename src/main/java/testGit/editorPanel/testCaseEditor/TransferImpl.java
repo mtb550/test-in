@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
+import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
 import testGit.pojo.TestCase;
 
@@ -19,11 +20,13 @@ public class TransferImpl extends TransferHandler {
     private static final DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
     private final CollectionListModel<TestCase> model;
     private final Directory dir;
+    private final Runnable onDragStart; // Triggered when the user starts dragging
     private int[] draggedIndices;
 
-    public TransferImpl(Directory dir, CollectionListModel<TestCase> model) {
+    public TransferImpl(Directory dir, CollectionListModel<TestCase> model, Runnable onDragStart) {
         this.model = model;
         this.dir = dir;
+        this.onDragStart = onDragStart;
     }
 
     @Override
@@ -33,9 +36,16 @@ public class TransferImpl extends TransferHandler {
 
     @Override
     protected Transferable createTransferable(JComponent c) {
+        // 1. Reset filters immediately when drag begins
+        if (onDragStart != null) {
+            onDragStart.run();
+        }
+
         JBList<TestCase> list = (JBList<TestCase>) c;
+        // 2. Now that the list is unfiltered, these indices are globally correct
         draggedIndices = list.getSelectedIndices();
         List<TestCase> items = list.getSelectedValuesList();
+
         return new Transferable() {
             @Override
             public DataFlavor[] getTransferDataFlavors() {
@@ -48,7 +58,7 @@ public class TransferImpl extends TransferHandler {
             }
 
             @Override
-            public Object getTransferData(DataFlavor flavor) {
+            public @NotNull Object getTransferData(DataFlavor flavor) {
                 return items;
             }
         };
@@ -64,13 +74,26 @@ public class TransferImpl extends TransferHandler {
         try {
             List<TestCase> items = (List<TestCase>) support.getTransferable().getTransferData(FLAVOR);
             JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
-            int index = dl.getIndex();
+            int insertAt = dl.getIndex();
 
+            // 1. Calculate how many dragged items are located BEFORE the drop index
+            // This is crucial for "down to up" or "up to down" logic
+            int shift = 0;
+            for (int draggedIndex : draggedIndices) {
+                if (draggedIndex < insertAt) {
+                    shift++;
+                }
+            }
+
+            // 2. Adjust the insertion point
+            insertAt -= shift;
+
+            // 3. Remove items using the saved indices (stored in createTransferable)
             for (int i = draggedIndices.length - 1; i >= 0; i--) {
                 model.remove(draggedIndices[i]);
             }
 
-            int insertAt = Math.min(index, model.getSize());
+            // 4. Insert items at the adjusted global index
             for (TestCase item : items) {
                 model.add(insertAt++, item);
             }
@@ -78,6 +101,7 @@ public class TransferImpl extends TransferHandler {
             updateSequenceAndSave();
             return true;
         } catch (Exception e) {
+            e.printStackTrace(System.err);
             return false;
         }
     }

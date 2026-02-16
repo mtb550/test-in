@@ -1,5 +1,6 @@
 package testGit.editorPanel.testCaseEditor;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -36,7 +37,7 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final CollectionListModel<TestCase> model;
     private final List<TestCase> allTestCases;
     private final Set<GroupType> selectedGroups = new HashSet<>();
-    private final JButton groupButton;
+    private final JButton groupButton; // Using a flat button style
     private final ModelSyncListener<TestCase> syncListener;
 
     public FileEditorImpl(@NotNull List<TestCase> testCases, @NotNull Directory dir, @NotNull VirtualFile file) {
@@ -44,31 +45,57 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         this.panel = new JBPanel<>(new BorderLayout());
         this.file = file;
 
-        JBPanel<?> filterBar = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(15), JBUI.scale(5)));
-        filterBar.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
+        // 1. Create a Professional Toolbar
+        // Removed the "Filter by Groups:" label for a cleaner look
+        JBPanel<?> toolbar = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(5), JBUI.scale(2)));
+        toolbar.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
+        toolbar.setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        filterBar.add(new JLabel("Filter by Groups:"));
-
-        groupButton = new JButton("Groups ▼");
+        // Use a flat style button that looks like a Toolbar Action
+        groupButton = new JButton("Groups", AllIcons.Actions.GroupBy);
+        groupButton.setFocusable(false);
+        groupButton.setBorderPainted(false);
+        groupButton.setContentAreaFilled(false);
+        groupButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        groupButton.setFont(JBUI.Fonts.label(12f));
         groupButton.addActionListener(e -> showGroupPopup(groupButton));
-        filterBar.add(groupButton);
 
+        // Hover effect for the button
+        groupButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                groupButton.setContentAreaFilled(true);
+                groupButton.setBackground(JBUI.CurrentTheme.ActionButton.hoverBackground());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                groupButton.setContentAreaFilled(false);
+            }
+        });
+
+        toolbar.add(groupButton);
+
+        // 2. Setup Model and Sync Listener
         this.model = new CollectionListModel<>(new ArrayList<>(allTestCases));
         this.syncListener = new ModelSyncListener<>(allTestCases, model);
+
+        // Auto-clear filter when adding new test case
         this.syncListener.setOnUpdate(() -> {
 
             if (!selectedGroups.isEmpty()) {
                 selectedGroups.clear();
                 applyFilters();
-                groupButton.setText("Groups ▼");
             }
         });
 
         this.model.addListDataListener(syncListener);
 
+        // 3. Setup List UI
         this.list = new JBList<>(model);
         list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
         list.setOpaque(true);
+        list.setBorder(JBUI.Borders.empty());
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
@@ -76,20 +103,33 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
         list.addListSelectionListener(new SelectionListenerImpl(list));
         list.addMouseListener(new MouseAdapterImpl(list, model, dir));
-        list.setTransferHandler(new TransferImpl(dir, model));
+
+        Runnable resetFilter = () -> {
+            if (!selectedGroups.isEmpty()) {
+                selectedGroups.clear();
+                applyFilters(); // applyFilters handles button text/color reset
+            }
+        };
+        list.setTransferHandler(new TransferImpl(dir, model, resetFilter));
         ShortcutHandler.register(dir, list, model);
 
-        panel.add(filterBar, BorderLayout.NORTH);
+        // 4. Assemble
+        panel.add(toolbar, BorderLayout.NORTH);
         panel.add(new JBScrollPane(list), BorderLayout.CENTER);
     }
 
     private void showGroupPopup(JButton anchor) {
         JBList<GroupType> groupList = new JBList<>(GroupType.values());
 
+        // FIX: Use JBColor.namedColor or ComboBox background for professional look
+        groupList.setBackground(JBColor.namedColor("Popup.background", new JBColor(0xffffff, 0x3c3f41)));
+
         groupList.setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            // Create a professional checkbox with proper padding
             JCheckBox checkBox = new JCheckBox(value.name(), selectedGroups.contains(value));
             checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
             checkBox.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
+            checkBox.setBorder(JBUI.Borders.empty(2, 8)); // Native-like horizontal padding
             checkBox.setOpaque(true);
             return checkBox;
         });
@@ -100,19 +140,23 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
                 int index = groupList.locationToIndex(e.getPoint());
                 if (index >= 0) {
                     GroupType group = groupList.getModel().getElementAt(index);
-                    if (selectedGroups.contains(group)) selectedGroups.remove(group);
-                    else selectedGroups.add(group);
-
+                    if (selectedGroups.contains(group)) {
+                        selectedGroups.remove(group);
+                    } else {
+                        selectedGroups.add(group);
+                    }
                     groupList.repaint();
                     applyFilters();
                 }
             }
         });
 
+        // Build the popup using a specialized builder for a "native" feel
         JBPopup popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(groupList), null)
-                .setTitle("Select Groups")
+                .setMovable(false)
                 .setRequestFocus(true)
+                .setResizable(false)
                 .setCancelOnClickOutside(true)
                 .createPopup();
 
@@ -125,14 +169,17 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         try {
             if (selectedGroups.isEmpty()) {
                 model.replaceAll(allTestCases);
-                groupButton.setText("Groups ▼");
+                groupButton.setText("Groups");
+                groupButton.setForeground(JBColor.foreground());
+
             } else {
                 List<TestCase> filtered = allTestCases.stream()
                         .filter(tc -> tc.getGroups() != null &&
                                 tc.getGroups().stream().anyMatch(selectedGroups::contains))
                         .collect(Collectors.toList());
                 model.replaceAll(filtered);
-                groupButton.setText("Groups (" + selectedGroups.size() + ") ▼");
+                groupButton.setText("Groups (" + selectedGroups.size() + ")");
+                groupButton.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
             }
         } finally {
             syncListener.resume();
