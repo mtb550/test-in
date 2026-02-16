@@ -11,9 +11,10 @@ import java.beans.PropertyChangeListener;
 
 public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final JComponent component;
+    private final TestRunUI ui;
 
     public FileEditorImpl(VirtualFileImpl virtualFileImpl) {
-        TestRunUI ui = new TestRunUI();
+        this.ui = new TestRunUI();
         this.component = ui.createEditorPanel(virtualFileImpl.getTestCasesTreeModel(), virtualFileImpl.getRunPath());
     }
 
@@ -24,7 +25,7 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
     @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
-        return null;
+        return ui.getChecklistTree();
     }
 
     @Override
@@ -33,8 +34,17 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     }
 
     @Override
-    public void setState(@NotNull FileEditorState state) {
+    public boolean isValid() {
+        return true;
+    }
 
+    @Override
+    public boolean isModified() {
+        return false;
+    }
+
+    @Override
+    public void setState(@NotNull FileEditorState state) {
     }
 
     @Override
@@ -42,22 +52,10 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     }
 
     @Override
-    public boolean isValid() {
-        return true;
+    public void addPropertyChangeListener(@NotNull PropertyChangeListener l) {
     }
 
     @Override
-    public void addPropertyChangeListener(@NotNull PropertyChangeListener listener) {
-
-    }
-
-    @Override
-    public void removePropertyChangeListener(@NotNull PropertyChangeListener listener) {
-
-    }
-
-    @Override
-    public boolean isModified() {
-        return false;
+    public void removePropertyChangeListener(@NotNull PropertyChangeListener l) {
     }
 }
