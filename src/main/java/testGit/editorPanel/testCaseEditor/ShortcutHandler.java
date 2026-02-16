@@ -13,10 +13,8 @@ import java.awt.event.KeyEvent;
 
 public class ShortcutHandler {
     public static void register(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
-        new CreateTestCase(dir, list, model)
-                .registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke("control M")), list);
+        new CreateTestCase(dir, list, model).registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke("control M")), list);
 
-        new DeleteTestCase(dir, list, model)
-                .registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)), list);
+        new DeleteTestCase(dir, list, model).registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)), list);
     }
 }

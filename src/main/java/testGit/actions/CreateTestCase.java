@@ -42,12 +42,12 @@ public class CreateTestCase extends AnAction {
     }
 
     private void saveNewTestCase(CreateNewTestCaseDialog dialog) {
-        TestCase newCase = new TestCase();
-        newCase.setId(UUID.randomUUID().toString());
-        newCase.setTitle(dialog.getTitle());
-        newCase.setPriority(dialog.getPriority());
-        newCase.setGroups(dialog.getSelectedGroups());
-        newCase.setNext(null);
+        TestCase newTestCase = new TestCase();
+        newTestCase.setId(UUID.randomUUID().toString());
+        newTestCase.setTitle(dialog.getTitle());
+        newTestCase.setPriority(dialog.getPriority());
+        newTestCase.setGroups(dialog.getSelectedGroups());
+        newTestCase.setNext(null);
 
         ObjectMapper mapper = new ObjectMapper()
                 .registerModule(new JavaTimeModule())
@@ -55,21 +55,21 @@ public class CreateTestCase extends AnAction {
 
         try {
             if (model.isEmpty()) {
-                newCase.setIsHead(true);
+                newTestCase.setIsHead(true);
             } else {
-                newCase.setIsHead(false);
+                newTestCase.setIsHead(false);
                 TestCase lastItem = model.getElementAt(model.getSize() - 1);
-                lastItem.setNext(UUID.fromString(newCase.getId()));
+                lastItem.setNext(UUID.fromString(newTestCase.getId()));
 
                 File lastItemFile = new File(dir.getFile(), lastItem.getId() + ".json");
                 mapper.writeValue(lastItemFile, lastItem);
             }
 
-            File targetFile = new File(dir.getFile(), newCase.getId() + ".json");
-            mapper.writeValue(targetFile, newCase);
+            File targetFile = new File(dir.getFile(), newTestCase.getId() + ".json");
+            mapper.writeValue(targetFile, newTestCase);
 
             LocalFileSystem.getInstance().refreshAndFindFileByIoFile(targetFile);
-            model.add(newCase);
+            model.add(newTestCase);
             list.ensureIndexIsVisible(model.getSize() - 1);
 
         } catch (IOException ex) {
