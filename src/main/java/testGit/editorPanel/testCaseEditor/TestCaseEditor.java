@@ -11,47 +11,39 @@ import testGit.util.TestCaseSorter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class TestCaseEditor {
+    private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     public static void open(final Directory dir) {
-        System.out.println("TestCaseEditor.open() , path: " + dir);
-
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-
         List<TestCase> testCases = new ArrayList<>();
         File folder = dir.getFile();
 
-        if (folder.exists() && folder.isDirectory()) {
-            File[] jsonFiles = folder.listFiles((dirType, name) -> name.toLowerCase().endsWith(".json"));
-
-            if (jsonFiles != null) {
-                for (File file : jsonFiles) {
-                    try {
-                        TestCase tc = mapper.readValue(file, TestCase.class);
-                        testCases.add(tc);
-                    } catch (Exception e) {
-                        System.err.println("Error parsing file: " + file.getName() + " -> " + e.getMessage());
-                    }
-                }
-            }
+        if (folder != null && folder.exists() && folder.isDirectory()) {
+            Optional.ofNullable(folder.listFiles((d, name) -> name.toLowerCase().endsWith(".json")))
+                    .ifPresent(files -> Arrays.stream(files).forEach(file -> {
+                        try {
+                            testCases.add(mapper.readValue(file, TestCase.class));
+                        } catch (Exception ignored) {
+                        }
+                    }));
         }
 
-        testCases = TestCaseSorter.sortTestCases(testCases);
+        List<TestCase> sortedCases = TestCaseSorter.sortTestCases(testCases);
 
-        // 1. Check if a tab for this path is already open
-        for (VirtualFile openFile : editorManager.getOpenFiles()) {
-            if (openFile instanceof VirtualFileImpl existing && existing.getDir().equals(dir.toString())) {
-                System.out.println("open test set: " + existing.getDir());
-                editorManager.openFile(existing, true);
-                return;
-            }
+        VirtualFile existing = Arrays.stream(editorManager.getOpenFiles())
+                .filter(f -> f instanceof VirtualFileImpl vf && vf.getDir().equals(dir))
+                .findFirst()
+                .orElse(null);
+
+        if (existing != null) {
+            editorManager.openFile(existing, true);
+        } else {
+            editorManager.openFile(new VirtualFileImpl(dir, sortedCases), true);
         }
-
-        VirtualFile virtualFile = new VirtualFileImpl(dir, testCases);
-        editorManager.openFile(virtualFile, true);
     }
 }

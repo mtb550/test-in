@@ -12,16 +12,11 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 
 public class ShortcutHandler {
-    public static void register(final Directory dir, final JBList<TestCase> list, final CollectionListModel<TestCase> model) {
+    public static void register(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
+        new CreateTestCase(dir, list, model)
+                .registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke("control M")), list);
 
-        // Add
-        KeyStroke ctrlM = KeyStroke.getKeyStroke("control M");
-        CreateTestCase addAction = new CreateTestCase(dir, list, model);
-        addAction.registerCustomShortcutSet(new CustomShortcutSet(ctrlM), list);
-
-        // Delete
-        KeyStroke deleteKey = KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0);
-        DeleteTestCase deleteAction = new DeleteTestCase(dir, list, model);
-        deleteAction.registerCustomShortcutSet(new CustomShortcutSet(deleteKey), list);
+        new DeleteTestCase(dir, list, model)
+                .registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)), list);
     }
 }

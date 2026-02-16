@@ -1,7 +1,9 @@
 package testGit.editorPanel.testCaseEditor;
 
+import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
 import testGit.pojo.TestCase;
 
@@ -13,28 +15,26 @@ public class VirtualFileImpl extends LightVirtualFile {
     private final Directory dir;
     private final List<TestCase> testCases;
 
-    public VirtualFileImpl(Directory dir, List<TestCase> testCases) {
-        super(dir.getName(), FileType.INSTANCE, "");
+    public VirtualFileImpl(@NotNull Directory dir, @NotNull List<TestCase> testCases) {
+        super(dir.getName(), FileTypes.UNKNOWN, "");
         this.dir = dir;
         this.testCases = testCases;
-        System.out.println("TestCaseVirtualFile.TestCaseVirtualFile()");
+    }
+
+    @Override
+    public boolean isValid() {
+        return true;
     }
 
     @Override
     public boolean equals(Object o) {
-        // infinite sout
-        //System.out.println("TestCaseVirtualFile.equals()");
         if (this == o) return true;
         if (!(o instanceof VirtualFileImpl that)) return false;
-        // المقارنة الآن تعتمد على المسار لضمان عدم تكرار فتح نفس المجلد
-        return Objects.equals(dir, that.dir);
+        return Objects.equals(dir.getFilePath(), that.dir.getFilePath());
     }
 
     @Override
     public int hashCode() {
-        // infinite sout
-        //System.out.println("TestCaseVirtualFile.hashCode()");
-        return Objects.hash(dir);
+        return Objects.hash(dir.getFilePath());
     }
-
 }

@@ -12,13 +12,14 @@ import testGit.projectPanel.ProjectPanel;
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MouseAdapter extends java.awt.event.MouseAdapter {
+public class MouseAdapterImpl extends MouseAdapter {
     private final SimpleTree tree;
     private final ProjectPanel projectPanel;
 
-    public MouseAdapter(final ProjectPanel projectPanel) {
+    public MouseAdapterImpl(final ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
         this.tree = projectPanel.getTestRunTree();
     }

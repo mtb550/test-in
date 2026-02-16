@@ -18,31 +18,28 @@ import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-public class EditorPanel extends UserDataHolderBase implements FileEditor {
+public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final JBPanel<?> panel;
     private final VirtualFile file;
-    private final JBList<TestCase> list; // Keep a reference to the list for focusing
+    private final JBList<TestCase> list;
 
-    public EditorPanel(@NotNull List<TestCase> testCases, @NotNull Directory dir, @NotNull VirtualFile file) {
+    public FileEditorImpl(@NotNull List<TestCase> testCases, @NotNull Directory dir, @NotNull VirtualFile file) {
         this.file = file;
         this.panel = new JBPanel<>(new BorderLayout());
 
         CollectionListModel<TestCase> model = new CollectionListModel<>(testCases);
         this.list = new JBList<>(model);
 
-        // UI Configuration
-        list.getEmptyText().setText("No test cases found")
-                .appendLine("Press Ctrl+M to add");
+        list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
         list.setOpaque(true);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
 
-        // Logic & Listeners
-        list.setCellRenderer(new CardCellRenderer());
-        list.addListSelectionListener(new CardSelectionListener(list));
-        list.addMouseListener(new MouseAdapter(list, model, dir));
-        list.setTransferHandler(new DragDropHandler(dir, model));
+        list.setCellRenderer(new RendererImpl());
+        list.addListSelectionListener(new SelectionListenerImpl(list));
+        list.addMouseListener(new MouseAdapterImpl(list, model, dir));
+        list.setTransferHandler(new TransferImpl(dir, model));
         ShortcutHandler.register(dir, list, model);
 
         panel.add(new JBScrollPane(list), BorderLayout.CENTER);
@@ -53,11 +50,6 @@ public class EditorPanel extends UserDataHolderBase implements FileEditor {
         return panel;
     }
 
-    /**
-     * This is the critical fix for focusing.
-     * By returning the list, IntelliJ knows to put the keyboard focus
-     * directly on your test cases when the tab opens.
-     */
     @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
         return list;

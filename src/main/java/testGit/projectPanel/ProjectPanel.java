@@ -12,7 +12,7 @@ import testGit.actions.OpenTestSet;
 import testGit.pojo.Config;
 import testGit.pojo.Directory;
 import testGit.projectPanel.projectSelector.ProjectSelector;
-import testGit.projectPanel.testRunTab.MouseAdapter;
+import testGit.projectPanel.testRunTab.MouseAdapterImpl;
 import testGit.projectPanel.versionSelector.VersionSelector;
 import testGit.util.DirectoryMapper;
 import testGit.util.ShortcutRegistry;
@@ -97,7 +97,7 @@ public class ProjectPanel {
         testCaseTree.setRootVisible(true);
         testCaseTree.setShowsRootHandles(true);
         testCaseTree.setCellRenderer(new Renderer());
-        testCaseTree.addMouseListener(new testGit.projectPanel.testCaseTab.MouseAdapter(this));
+        testCaseTree.addMouseListener(new testGit.projectPanel.testCaseTab.MouseAdapterImpl(this));
         Shortcuts.register(testCaseTree, Config.getProject());
         OpenTestSet.register(testCaseTree);
         testCaseTree.setDragEnabled(true);
@@ -112,7 +112,7 @@ public class ProjectPanel {
         DirectoryMapper.buildTestRunsTree();
         testRunTree.setModel(DirectoryMapper.getTestRunsTreeModel());
         testRunTree.setRootVisible(true);
-        testRunTree.addMouseListener(new MouseAdapter(this));
+        testRunTree.addMouseListener(new MouseAdapterImpl(this));
         testRunTree.setShowsRootHandles(true);
         testRunTree.setCellRenderer(new Renderer());
         testRunTree.addTreeSelectionListener(e -> {

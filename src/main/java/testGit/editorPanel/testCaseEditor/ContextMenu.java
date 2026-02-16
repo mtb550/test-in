@@ -8,8 +8,7 @@ import testGit.pojo.Directory;
 import testGit.pojo.TestCase;
 
 public class ContextMenu extends DefaultActionGroup {
-
-    public ContextMenu(final Directory dir, final JBList<TestCase> list, CollectionListModel<TestCase> model, TestCase tc) {
+    public ContextMenu(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model, TestCase tc) {
         super("Test Case Actions", false);
 
         add(new CopyTestCase(tc));
@@ -21,7 +20,5 @@ public class ContextMenu extends DefaultActionGroup {
 
         add(new DeleteTestCase(dir, list, model));
         add(new CreateTestCase(dir, list, model));
-
     }
-
 }
