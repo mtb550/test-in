@@ -3,6 +3,7 @@ package testGit.editorPanel.testRunEditor;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.util.UserDataHolderBase;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,10 +13,13 @@ import java.beans.PropertyChangeListener;
 public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final JComponent component;
     private final TestRunUI ui;
+    private final VirtualFileImpl virtualFile;
 
-    public FileEditorImpl(VirtualFileImpl virtualFileImpl) {
-        this.ui = new TestRunUI();
-        this.component = ui.createEditorPanel(virtualFileImpl.getTestCasesTreeModel(), virtualFileImpl.getRunPath());
+    public FileEditorImpl(VirtualFileImpl vf) {
+        this.virtualFile = vf;
+        // FIX: Pass the test cases from the virtual file, NOT a new empty list
+        this.ui = new TestRunUI(vf.getTestCases());
+        this.component = ui.createEditorPanel(vf.getTestCasesTreeModel(), vf.getRunPath());
     }
 
     @Override
@@ -24,13 +28,13 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     }
 
     @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
-        return ui.getChecklistTree();
+    public @NotNull String getName() {
+        return "Test Run Editor";
     }
 
     @Override
-    public @NotNull String getName() {
-        return "Test Run Editor";
+    public @NotNull VirtualFile getFile() {
+        return virtualFile;
     }
 
     @Override
@@ -39,16 +43,14 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     }
 
     @Override
+    public void dispose() {
+        com.intellij.openapi.util.Disposer.dispose(ui);
+    }
+
+    // Boilerplate
+    @Override
     public boolean isModified() {
         return false;
-    }
-
-    @Override
-    public void setState(@NotNull FileEditorState state) {
-    }
-
-    @Override
-    public void dispose() {
     }
 
     @Override
@@ -57,5 +59,15 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
     @Override
     public void removePropertyChangeListener(@NotNull PropertyChangeListener l) {
+    }
+
+    @Override
+    public void setState(@NotNull FileEditorState state) {
+    }
+
+    @Nullable
+    @Override
+    public JComponent getPreferredFocusedComponent() {
+        return component;
     }
 }

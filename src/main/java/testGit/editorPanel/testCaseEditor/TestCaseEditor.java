@@ -18,10 +18,10 @@ import java.util.Optional;
 public class TestCaseEditor {
     private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    public static void open(final Directory dir) {
+    public static void open(final Directory testSet) {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
         List<TestCase> testCases = new ArrayList<>();
-        File folder = dir.getFile();
+        File folder = testSet.getFile();
 
         if (folder != null && folder.exists() && folder.isDirectory()) {
             Optional.ofNullable(folder.listFiles((d, name) -> name.toLowerCase().endsWith(".json")))
@@ -36,14 +36,14 @@ public class TestCaseEditor {
         List<TestCase> sortedCases = TestCaseSorter.sortTestCases(testCases);
 
         VirtualFile existing = Arrays.stream(editorManager.getOpenFiles())
-                .filter(f -> f instanceof VirtualFileImpl vf && vf.getDir().equals(dir))
+                .filter(f -> f instanceof VirtualFileImpl vf && vf.getDir().equals(testSet))
                 .findFirst()
                 .orElse(null);
 
         if (existing != null) {
             editorManager.openFile(existing, true);
         } else {
-            editorManager.openFile(new VirtualFileImpl(dir, sortedCases), true);
+            editorManager.openFile(new VirtualFileImpl(testSet, sortedCases), true);
         }
     }
 }
