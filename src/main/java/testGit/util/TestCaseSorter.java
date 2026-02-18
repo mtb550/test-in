@@ -50,6 +50,15 @@ public class TestCaseSorter {
             }
         }
 
+        if (sortedList.size() < unsortedList.size()) {
+            for (TestCase tc : unsortedList) {
+                if (!visited.contains(tc.getId())) {
+                    // These are 'orphaned' test cases that aren't in the chain
+                    sortedList.add(tc);
+                }
+            }
+        }
+
         return sortedList;
     }
 }

@@ -1,21 +1,28 @@
 package testGit.pojo;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Getter
+@Setter
 public class TestRun {
-    private Integer id;
-    private String name;
+    private String runName;
+    private TestRunStatus status;
+    private LocalDateTime createdAt;
+    private List<TestRunItems> results;
 
-//    private String created_by;
-//    private String created_at;
-//
-//    private String modified_by;
-//    private String modified_at;
-//
-//    private String assigned_to;
-//    private String last_execution;
-//
-//    private Integer status;         // 0 = created, 1 = in progress, 2 = completed
+    @Getter
+    @Setter
+    public static class TestRunItems {
+        private UUID testCaseId;   // Pointer to the TestCase file name
+        private String status;       // "PASSED", "FAILED", "BLOCKED", "PENDING"
+        private Duration duration;     // Execution time
+        private String executedBy;
+        private LocalDateTime executedAt;
+    }
 }
-

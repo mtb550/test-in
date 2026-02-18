@@ -10,9 +10,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
-import testGit.pojo.Directory;
-import testGit.pojo.DirectoryType;
-import testGit.pojo.TestCase;
+import testGit.pojo.*;
 import testGit.util.TestCaseSorter;
 
 import javax.swing.*;
@@ -20,14 +18,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 public class TestRunUI implements Disposable {
     private static final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
     private final List<TestCase> initialTestCases;
     private CheckboxTree checklistTree;
+    private TestRun currentTestRun;
 
     public TestRunUI(List<TestCase> initialTestCases) {
         this.initialTestCases = TestCaseSorter.sortTestCases(initialTestCases);
@@ -54,9 +55,31 @@ public class TestRunUI implements Disposable {
                     if (userObj instanceof Directory dir) {
                         getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                     } else if (userObj instanceof TestCase tc) {
-                        // Display the Test Case title instead of the file path
-                        String title = tc.getTitle() != null ? tc.getTitle() : "Unnamed Test";
-                        getTextRenderer().append(title, SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                        // Find matching execution result from our TestRun object
+                        TestRun.TestRunItems result = findResultFor(tc.getId());
+
+                        SimpleTextAttributes mainStyle = SimpleTextAttributes.REGULAR_ATTRIBUTES;
+                        String statusText = " [Pending]";
+
+                        if (result != null) {
+                            switch (result.getStatus()) {
+                                case "PASSED" -> {
+                                    mainStyle = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, new Color(36, 138, 61));
+                                    statusText = " [Passed]";
+                                }
+                                case "FAILED" -> {
+                                    mainStyle = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, Color.RED);
+                                    statusText = " [Failed]";
+                                }
+                                case "BLOCKED" -> {
+                                    mainStyle = new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, Color.ORANGE);
+                                    statusText = " [Blocked]";
+                                }
+                            }
+                        }
+
+                        getTextRenderer().append(tc.getTitle(), mainStyle);
+                        getTextRenderer().append(statusText, SimpleTextAttributes.GRAYED_ATTRIBUTES);
                     }
                 }
             }
@@ -126,8 +149,70 @@ public class TestRunUI implements Disposable {
         return TestCaseSorter.sortTestCases(testCases);
     }
 
-    private void saveSelectedToJSON(CheckedTreeNode root, String savePath) {
-        // Logic to collect all checked TestCase nodes and save them to the run file
+    private void saveSelectedToJSON(CheckedTreeNode root, String baseProjectPath) {
+        // 1. Create the 'testRuns' directory path
+        File testRunsDir = new File(baseProjectPath, "testRuns");
+
+        // 2. Ensure the directory exists
+        if (!testRunsDir.exists()) {
+            testRunsDir.mkdirs();
+        }
+
+        // 3. Define the actual filename (e.g., using the run name or a timestamp)
+        // For now, we'll use a default name, but you should probably let the user name it
+        String fileName = "Run_" + System.currentTimeMillis() + ".json";
+        File finalOutputFile = new File(testRunsDir, fileName);
+
+        TestRun run = new TestRun();
+        run.setRunName(fileName);
+        run.setCreatedAt(LocalDateTime.now());
+        run.setStatus(TestRunStatus.CREATED);
+
+        List<TestRun.TestRunItems> items = new ArrayList<>();
+        collectCheckedItems(root, items);
+        run.setResults(items);
+
+        try {
+            // FIX: Write to the FILE object, not the DIRECTORY object
+            mapper.writerWithDefaultPrettyPrinter().writeValue(finalOutputFile, run);
+            System.out.println("Test Run saved successfully to: " + finalOutputFile.getAbsolutePath());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void collectCheckedItems(CheckedTreeNode node, List<TestRun.TestRunItems> items) {
+        if (node.getUserObject() instanceof TestCase tc && node.isChecked()) {
+            TestRun.TestRunItems item = new TestRun.TestRunItems();
+            // Assuming tc.getId() returns a string that can be converted to UUID
+            item.setTestCaseId(UUID.fromString(tc.getId()));
+            item.setStatus("PENDING"); // Default status for new run
+            items.add(item);
+        }
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            collectCheckedItems((CheckedTreeNode) node.getChildAt(i), items);
+        }
+    }
+
+    /**
+     * Finds the execution result for a specific test case by its ID.
+     */
+    private TestRun.TestRunItems findResultFor(String testCaseId) {
+        if (currentTestRun == null || currentTestRun.getResults() == null) {
+            return null;
+        }
+
+        // Convert the String ID to UUID for comparison
+        try {
+            UUID targetUuid = UUID.fromString(testCaseId);
+            return currentTestRun.getResults().stream()
+                    .filter(item -> item.getTestCaseId().equals(targetUuid))
+                    .findFirst()
+                    .orElse(null);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     @Override

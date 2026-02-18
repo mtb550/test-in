@@ -26,7 +26,7 @@ public class TestRunInfoPopup {
                 //int count = new sql().get("SELECT COUNT(*) FROM nafath_tp WHERE plan_id = ?", run.getId())
                 // .asType(Integer.class);
 
-                panel.add(new JBLabel("📁 Name: " + run.getName()));
+                panel.add(new JBLabel("📁 Name: " + run.getRunName()));
                 //panel.add(new JBLabel("🧪 Number of Test Cases: " + count));
                 //panel.add(new JBLabel("📌 Status: " + safe(TestRunStatus.labelFor(run.getStatus()))));
                 //panel.add(new JBLabel("⏱ Last Execution: " + safe(run.getLast_execution())));
