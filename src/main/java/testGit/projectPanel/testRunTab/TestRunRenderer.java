@@ -5,6 +5,8 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleColoredComponent;
 import com.intellij.ui.SimpleTextAttributes;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryType;
+import testGit.pojo.TestRunStatus;
 import testGit.projectPanel.Shortcuts;
 
 import javax.swing.*;
@@ -26,8 +28,9 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
 
         if (userObject instanceof Directory dir) {
             renderDirectory(dir);
+
         } else if (value != null) {
-            setIcon(AllIcons.Nodes.Folder);
+            setIcon(AllIcons.Nodes.Unknown);
             append(value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
         }
 
@@ -35,6 +38,8 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
     }
 
     private void renderDirectory(Directory dir) {
+        System.out.println("TestRunRenderer.renderDirectory()");
+
         setIcon(getIconForDirectory(dir));
         SimpleTextAttributes style = SimpleTextAttributes.REGULAR_ATTRIBUTES;
 
@@ -42,21 +47,13 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
             style = SimpleTextAttributes.GRAYED_ATTRIBUTES;
         }
 
-        // 1. Show the Name: "Cycle2 Sprint3"
         append(dir.getName() != null ? dir.getName() : "Unnamed", style);
 
-        // 2. Show the Status: " [Created]"
-        // Update renderDirectory style logic
-        if (dir.getType() == testGit.pojo.DirectoryType.TR) {
-            String statusLabel = testGit.pojo.TestRunStatus.labelFor(dir.getActive());
-            Color statusColor = switch (dir.getActive()) {
-                case 0 -> JBColor.RED;       // Created
-                case 1 -> JBColor.BLUE;       // In Progress
-                case 2 -> JBColor.YELLOW; // Completed (Green)
-                default -> JBColor.DARK_GRAY;
-            };
-            SimpleTextAttributes statusStyle = new SimpleTextAttributes(SimpleTextAttributes.STYLE_ITALIC, statusColor);
-            append(" [" + statusLabel + "]", statusStyle);
+        if (dir.getType() == DirectoryType.TR) {
+            String statusLabel = TestRunStatus.labelFor(dir.getActive());
+
+            SimpleTextAttributes statusStyle = new SimpleTextAttributes(SimpleTextAttributes.STYLE_ITALIC, JBColor.DARK_GRAY);
+            append(" " + statusLabel, statusStyle);
         }
     }
 
@@ -64,8 +61,8 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
         return switch (dir.getType()) {
             case PR -> AllIcons.Nodes.Project;
             case PA -> AllIcons.Nodes.WebFolder;
-            case TR -> AllIcons.Nodes.AbstractMethod;
-            default -> AllIcons.Nodes.Unknown;
+            case TR -> AllIcons.Nodes.Services;
+            default -> AllIcons.Nodes.Folder;
         };
     }
 }

@@ -16,7 +16,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class TestRunsDirectoryMapper {
-    // Aligned field name: testRunsTreeModel
     @Getter
     @Setter
     private static DefaultTreeModel treeModel;
@@ -26,19 +25,23 @@ public class TestRunsDirectoryMapper {
      * Matches the 'buildTree' naming in TestCasesDirectoryMapper.
      */
     public static void buildTree() {
-        treeModel = new DefaultTreeModel(buildRoot(ProjectSelector.getSelectedProject().getName(), "testRuns"));
+        String projectName = ProjectSelector.getSelectedProject().getName();
+        treeModel = new DefaultTreeModel(buildRoot(projectName, "testRuns"));
     }
 
     private static DefaultMutableTreeNode buildRoot(String rootName, String subFolderName) {
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(rootName);
-        File[] projects = Config.getRootFolderFile().listFiles(File::isDirectory);
+        File[] projects = Config.getRootFolderFile().listFiles();
 
         if (projects != null) {
             Arrays.stream(projects)
                     .filter(file -> !file.getName().startsWith("."))
                     .map(TestRunsDirectoryMapper::map)
                     .filter(Objects::nonNull)
-                    .forEach(dir -> rootNode.add(buildNodeRecursive(dir, subFolderName)));
+                    .forEach(dir -> {
+                        System.out.println("TestRunsDirectoryMapper.buildRoot: " + dir.getName());
+                        rootNode.add(buildNodeRecursive(dir, subFolderName));
+                    });
         }
         return rootNode;
     }
@@ -53,16 +56,18 @@ public class TestRunsDirectoryMapper {
                 ? dir.getFilePath().resolve(subFolder).toFile()
                 : dir.getFile();
 
-        if (folderToScan != null && folderToScan.exists() && folderToScan.isDirectory()) {
-            // Scan for .json files (Test Run files)
-            File[] runFiles = folderToScan.listFiles(f -> f.isFile() && f.getName().toLowerCase().endsWith(".json"));
+        System.out.println("TestRunsDirectoryMapper.buildNodeRecursive. folderToScan: " + folderToScan);
 
-            if (runFiles != null) {
-                Arrays.stream(runFiles)
-                        .map(TestRunsDirectoryMapper::map) // Using unified 'map' name
-                        .filter(Objects::nonNull)
-                        .forEach(runDir -> node.add(new DefaultMutableTreeNode(runDir)));
-            }
+        File[] runFiles = folderToScan.listFiles();
+
+        if (runFiles != null) {
+            Arrays.stream(runFiles)
+                    .map(TestRunsDirectoryMapper::map)
+                    .filter(Objects::nonNull)
+                    .forEach(runDir -> {
+                        System.out.println("TestRunsDirectoryMapper.buildNodeRecursive: " + runDir.getName());
+                        node.add(buildNodeRecursive(runDir, null));
+                    });
         }
         return node;
     }
@@ -75,7 +80,8 @@ public class TestRunsDirectoryMapper {
     public static Directory map(@NotNull final File file) {
         try {
             String fileName = file.getName();
-            // Handle extension for files, keep as is for directories
+            System.out.println("TestRunsDirectoryMapper.map(). fileName: " + fileName);
+
             String rawName = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf(".")) : fileName;
 
             String[] parts = rawName.split("_", 3);
@@ -85,7 +91,7 @@ public class TestRunsDirectoryMapper {
                     .setFile(file)
                     .setFilePath(file.toPath())
                     .setFileName(file.getName())
-                    .setType(DirectoryType.TR)
+                    .setType(DirectoryType.valueOf(parts[0].toUpperCase()))
                     .setName(parts[1])
                     .setActive(Integer.parseInt(parts[2]));
         } catch (Exception e) {

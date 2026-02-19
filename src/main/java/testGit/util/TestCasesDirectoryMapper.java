@@ -39,7 +39,10 @@ public class TestCasesDirectoryMapper {
                     .filter(file -> !file.getName().startsWith("."))
                     .map(TestCasesDirectoryMapper::map)
                     .filter(Objects::nonNull)
-                    .forEach(dir -> rootNode.add(buildNodeRecursive(dir, subFolderName)));
+                    .forEach(dir -> {
+                        System.out.println("TestCasesDirectoryMapper.buildRoot(). " + dir.getName());
+                        rootNode.add(buildNodeRecursive(dir, subFolderName));
+                    });
         }
         return rootNode;
     }

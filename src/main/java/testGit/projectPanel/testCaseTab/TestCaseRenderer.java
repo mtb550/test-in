@@ -25,8 +25,9 @@ public class TestCaseRenderer extends SimpleColoredComponent implements TreeCell
 
         if (userObject instanceof Directory dir) {
             renderDirectory(dir);
+
         } else if (value != null) {
-            setIcon(AllIcons.Nodes.Folder);
+            setIcon(AllIcons.Nodes.Unknown);
             append(value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
         }
 
@@ -35,7 +36,6 @@ public class TestCaseRenderer extends SimpleColoredComponent implements TreeCell
 
     private void renderDirectory(Directory dir) {
         setIcon(getIconForDirectory(dir));
-
         SimpleTextAttributes style = SimpleTextAttributes.REGULAR_ATTRIBUTES;
 
         if (dir.getFilePath() != null && Shortcuts.isCutNode(dir.getFilePath())) {

@@ -82,7 +82,7 @@ public class ProjectSelector {
 
         if (project.getName().equals("All Projects")) {
             TestCasesDirectoryMapper.buildTree();
-            TestCasesDirectoryMapper.buildTree();
+            TestRunsDirectoryMapper.buildTree();
 
             projectPanel.getTestCaseTree().setModel(TestCasesDirectoryMapper.getTreeModel());
             projectPanel.getTestRunTree().setModel(TestRunsDirectoryMapper.getTreeModel());
