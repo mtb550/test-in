@@ -6,21 +6,22 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ChangesUtil;
 import com.intellij.openapi.vcs.changes.LocalChangeList;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBList;
+import lombok.AllArgsConstructor;
 import testGit.pojo.Config;
 import testGit.pojo.TestCase;
 import testGit.util.ContentExtractor;
+import testGit.viewPanel.ViewPanel;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.util.List;
 
+@AllArgsConstructor
 public class SelectionListenerImpl implements ListSelectionListener {
     private final JBList<TestCase> list;
-
-    public SelectionListenerImpl(JBList<TestCase> list) {
-        this.list = list;
-    }
 
     public static void hideChangesSilently(Project project) {
         ChangeListManager manager = ChangeListManager.getInstance(project);
@@ -45,8 +46,17 @@ public class SelectionListenerImpl implements ListSelectionListener {
         if (!e.getValueIsAdjusting()) {
             TestCase selected = list.getSelectedValue();
             if (selected != null) {
-                //ViewPanel.show(selected);
-                ChangeListManager.getInstance(Config.getProject())
+                // Check if the "Details" ToolWindow is already open/active
+                ToolWindow toolWindow = ToolWindowManager.getInstance(Config.getProject())
+                        .getToolWindow("Details");
+
+                if (toolWindow != null && toolWindow.isVisible()) {
+                    // Update the details without forcing the window to 'pop' or grab focus
+                    ViewPanel.show(selected);
+                }
+
+                // Keep your existing change tracking logic
+                com.intellij.openapi.vcs.changes.ChangeListManager.getInstance(Config.getProject())
                         .getAllChanges()
                         .forEach(ContentExtractor::printJsonChanges);
             }

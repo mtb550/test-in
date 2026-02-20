@@ -35,7 +35,8 @@ public class ViewPanel {
     public static void show(TestCase testCase) {
         ToolWindow tw = getToolWindow();
         if (tw != null) {
-            if (!tw.isVisible()) tw.show();
+            if (!tw.isVisible())
+                tw.show();
 
             selectContent(tw, "Details");
 
@@ -50,6 +51,14 @@ public class ViewPanel {
         ToolWindow tw = getToolWindow();
         if (tw != null && tw.isVisible()) {
             tw.hide(null);
+        }
+    }
+
+    public static void reset() {
+        // Reset the Details Panel content
+        TestCaseDetailsPanel viewer = ToolWindowFactory.getDetailsInstance();
+        if (viewer != null) {
+            viewer.update(null); // Passing null to clear fields
         }
     }
 

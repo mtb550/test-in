@@ -32,5 +32,6 @@ public class CloseTestCaseDetails extends DumbAwareAction {
         // Assuming your ViewPanel has a hide/close method.
         // If it's a singleton or static manager:
         ViewPanel.hide();
+        ViewPanel.reset();
     }
 }
