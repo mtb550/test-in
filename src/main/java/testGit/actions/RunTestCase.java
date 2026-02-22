@@ -1,8 +1,8 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
@@ -11,7 +11,7 @@ import testGit.util.Notifier;
 import testGit.util.Runner.TestNGRunnerByClassName;
 import testGit.util.Tools;
 
-public class RunTestCase extends AnAction {
+public class RunTestCase extends DumbAwareAction {
     TestCase tc;
 
     public RunTestCase(TestCase tc) {

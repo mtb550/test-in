@@ -1,9 +1,9 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -18,7 +18,7 @@ import testGit.util.Notifier;
 
 import java.io.IOException;
 
-public class CreateTestProject extends AnAction {
+public class CreateTestProject extends DumbAwareAction {
     public final ProjectPanel projectPanel;
     public SimpleTree testCaseTree;
 

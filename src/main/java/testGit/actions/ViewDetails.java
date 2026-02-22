@@ -1,13 +1,13 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.TestCase;
 import testGit.viewPanel.ViewPanel;
 
-public class ViewDetails extends AnAction {
+public class ViewDetails extends DumbAwareAction {
     TestCase tc;
 
     public ViewDetails(TestCase tc) {

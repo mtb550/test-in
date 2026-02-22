@@ -1,10 +1,10 @@
 package testGit.actions;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
-public class IntegrateTestRail extends AnAction {
+public class IntegrateTestRail extends DumbAwareAction {
     public IntegrateTestRail() {
         super("From Test Rail");
     }

@@ -2,8 +2,8 @@ package testGit.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
@@ -13,7 +13,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 
-public class Run extends AnAction {
+public class Run extends DumbAwareAction {
     private final SimpleTree tree;
 
     public Run(final SimpleTree tree) {

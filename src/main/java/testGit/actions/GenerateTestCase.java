@@ -1,12 +1,12 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.TestCase;
 
-public class GenerateTestCase extends AnAction {
+public class GenerateTestCase extends DumbAwareAction {
     private final TestCase tc;
 
     public GenerateTestCase(TestCase tc) {

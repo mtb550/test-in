@@ -1,12 +1,12 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.TestCase;
 
-public class UndoDetails extends AnAction {
+public class UndoDetails extends DumbAwareAction {
     TestCase tc;
 
     public UndoDetails(TestCase tc) {

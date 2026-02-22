@@ -1,10 +1,10 @@
 package testGit.actions;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
-public class ImportJson extends AnAction {
+public class ImportJson extends DumbAwareAction {
     public ImportJson() {
         super("From Json");
     }

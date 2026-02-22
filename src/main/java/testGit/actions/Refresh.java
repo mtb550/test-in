@@ -1,12 +1,12 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import testGit.projectPanel.ProjectPanel;
 
-public class Refresh extends AnAction {
+public class Refresh extends DumbAwareAction {
     private final ProjectPanel projectPanel;
 
     public Refresh(final ProjectPanel projectPanel) {

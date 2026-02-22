@@ -1,8 +1,8 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ import javax.swing.tree.TreePath;
 import java.io.File;
 import java.nio.file.Path;
 
-public class Rename extends AnAction {
+public class Rename extends DumbAwareAction {
     private final ProjectPanel projectPanel;
     private final SimpleTree tree;
 

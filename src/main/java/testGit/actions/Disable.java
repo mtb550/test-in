@@ -1,7 +1,7 @@
 package testGit.actions;
 
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 
-public class Disable extends AnAction {
+public class Disable extends DumbAwareAction {
     private final SimpleTree tree;
 
     public Disable(final SimpleTree tree) {

@@ -1,11 +1,11 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 
-public class OpenOldVersions extends AnAction {
+public class OpenOldVersions extends DumbAwareAction {
     public OpenOldVersions() {
         super("Open Old Versions", "", AllIcons.Actions.SearchWithHistory);
     }

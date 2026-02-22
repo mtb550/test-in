@@ -2,9 +2,9 @@ package testGit.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -20,7 +20,7 @@ import javax.swing.tree.TreePath;
 import java.io.IOException;
 
 
-public class CreateTestSet extends AnAction {
+public class CreateTestSet extends DumbAwareAction {
     private final SimpleTree tree;
 
     public CreateTestSet(final SimpleTree tree) {

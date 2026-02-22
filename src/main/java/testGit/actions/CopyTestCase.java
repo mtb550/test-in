@@ -1,15 +1,15 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.TestCase;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
-public class CopyTestCase extends AnAction {
+public class CopyTestCase extends DumbAwareAction {
     TestCase tc;
 
     public CopyTestCase(TestCase tc) {

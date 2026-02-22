@@ -2,8 +2,8 @@ package testGit.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testRunEditor.NewTestRunDialog;
@@ -16,7 +16,7 @@ import testGit.projectPanel.ProjectPanel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-public class CreateTestRun extends AnAction {
+public class CreateTestRun extends DumbAwareAction {
     private final SimpleTree tree;
     private final ProjectPanel projectPanel;
 
