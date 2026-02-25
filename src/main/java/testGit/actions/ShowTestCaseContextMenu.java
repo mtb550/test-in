@@ -1,6 +1,9 @@
 package testGit.actions;
 
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
@@ -8,10 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testCaseEditor.ContextMenu;
 import testGit.pojo.Directory;
 import testGit.pojo.TestCase;
+import testGit.util.ShortcutSet;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 
 public class ShowTestCaseContextMenu extends DumbAwareAction {
     private final Directory dir;
@@ -24,19 +26,8 @@ public class ShowTestCaseContextMenu extends DumbAwareAction {
         this.dir = dir;
         this.list = list;
         this.model = model;
-    }
+        this.registerCustomShortcutSet(ShortcutSet.ContextMenu.get(), list);
 
-    /**
-     * Registers the action using the IntelliJ Shortcut System (Better than Swing InputMap)
-     */
-    public static void register(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
-        ShowTestCaseContextMenu action = new ShowTestCaseContextMenu(dir, list, model);
-
-        // Use the IntelliJ way to register the shortcut
-        action.registerCustomShortcutSet(
-                new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0)),
-                list
-        );
     }
 
     @Override

@@ -11,19 +11,19 @@ public class ShortcutHandler {
     public static void register(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
 
         // 1. Create (Ctrl + M)
-        CreateTestCase.register(dir, list, model);
+        new CreateTestCase(dir, list, model);
 
         // 2. Delete (Delete Key)
-        DeleteTestCase.register(dir, list, model);
+        new DeleteTestCase(dir, list, model);
 
         // 3. Open View Details (Enter Key)
-        OpenTestCaseDetails.register(list);
+        new OpenTestCaseDetails(list);
 
         // 4. Context Menu (Menu Key)
-        ShowTestCaseContextMenu.register(dir, list, model);
+        new ShowTestCaseContextMenu(dir, list, model);
 
         // 5. Close View Panel on ESCAPE
-        CloseTestCaseDetails.register(list);
+        new CloseTestCaseDetails(list);
 
     }
 

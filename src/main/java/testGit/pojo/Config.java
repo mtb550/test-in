@@ -1,5 +1,8 @@
 package testGit.pojo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
@@ -120,6 +123,12 @@ public class Config {
             setRootFolder();
         }
         return rootFolder;
+    }
+
+    public static ObjectMapper getMapper() {
+        return new ObjectMapper()
+                .registerModule(new JavaTimeModule())
+                .enable(SerializationFeature.INDENT_OUTPUT);
     }
 
 }

@@ -1,23 +1,19 @@
 package testGit.actions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import testGit.pojo.Config;
 import testGit.pojo.Directory;
 import testGit.pojo.TestCase;
 import testGit.ui.DeleteTestCaseDialog;
+import testGit.util.ShortcutSet;
 
-import javax.swing.*;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,24 +25,13 @@ public class DeleteTestCase extends DumbAwareAction {
     private final Directory dir;
     private final JBList<TestCase> list;
     private final CollectionListModel<TestCase> model;
-    private final ObjectMapper mapper;
 
     public DeleteTestCase(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
         super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
         this.dir = dir;
         this.list = list;
         this.model = model;
-        this.mapper = new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .enable(SerializationFeature.INDENT_OUTPUT);
-    }
-
-    /**
-     * Registers the action with the Delete key shortcut
-     */
-    public static void register(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
-        DeleteTestCase action = new DeleteTestCase(dir, list, model);
-        action.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)), list);
+        this.registerCustomShortcutSet(ShortcutSet.DeletePackage.get(), list);
     }
 
     @Override
@@ -96,6 +81,6 @@ public class DeleteTestCase extends DumbAwareAction {
 
     private void saveToFile(TestCase item) throws IOException {
         File file = new File(dir.getFile(), item.getId() + ".json");
-        mapper.writeValue(file, item);
+        Config.getMapper().writeValue(file, item);
     }
 }

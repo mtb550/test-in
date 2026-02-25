@@ -3,7 +3,6 @@ package testGit.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
@@ -13,11 +12,11 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
 
-import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
+
+import static testGit.util.ShortcutSet.DeletePackage;
 
 public class DeletePackage extends DumbAwareAction {
     private final SimpleTree tree;
@@ -25,9 +24,7 @@ public class DeletePackage extends DumbAwareAction {
     public DeletePackage(final SimpleTree tree) {
         super("Delete", "Delete selected node", AllIcons.Actions.GC);
         this.tree = tree;
-
-        this.registerCustomShortcutSet(new CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)), tree);
+        this.registerCustomShortcutSet(DeletePackage.get(), tree);
     }
 
     @Override

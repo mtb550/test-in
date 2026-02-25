@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.ui.CollectionListModel;
@@ -15,8 +14,8 @@ import testGit.pojo.Directory;
 import testGit.pojo.TestCase;
 import testGit.ui.CreateNewTestCaseDialog;
 import testGit.util.Notifier;
+import testGit.util.ShortcutSet;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -31,14 +30,8 @@ public class CreateTestCase extends DumbAwareAction {
         this.list = list;
         this.dir = dir;
         this.model = model;
-    }
+        this.registerCustomShortcutSet(ShortcutSet.CreateTestCase.get(), list);
 
-    /**
-     * Registers the action with Ctrl + M shortcut
-     */
-    public static void register(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
-        CreateTestCase action = new CreateTestCase(dir, list, model);
-        action.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke("control M")), list);
     }
 
     @Override

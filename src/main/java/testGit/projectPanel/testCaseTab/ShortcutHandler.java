@@ -2,7 +2,7 @@ package testGit.projectPanel.testCaseTab;
 
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.actions.DeletePackage;
-import testGit.actions.EscapeActions;
+import testGit.actions.Escape;
 import testGit.actions.OpenTestSet;
 import testGit.actions.Rename;
 import testGit.projectPanel.ProjectPanel;
@@ -18,13 +18,13 @@ public class ShortcutHandler {
         new DeletePackage(tree);
 
         // Open Test Set
-        OpenTestSet.register(tree);
+        new OpenTestSet(tree);
 
         // Rename
         new Rename(projectPanel, tree);
 
         // escape
-        EscapeActions.registerShortcuts(tree, transferHandler);
+        new Escape(tree, transferHandler);
 
         // 2. Map standard keystrokes to TransferHandler actions
         InputMap inputMap = tree.getInputMap(JComponent.WHEN_FOCUSED);
