@@ -21,7 +21,6 @@ import java.util.List;
 
 public class TestRunCard2 extends JBPanel<TestRunCard2> {
     private static final int CARD_HEIGHT = 160;
-    private static final int BADGE_RADIUS = 12;
     private static final int SELECTED_OPACITY = 220;
     private static final int BORDER_THICKNESS = 1; // Border thickness in pixels
     // Static field to track the currently selected card
@@ -38,7 +37,6 @@ public class TestRunCard2 extends JBPanel<TestRunCard2> {
     // Predefined borders to prevent layout shifts
     private final Border defaultBorder;
     private final Border selectedBorder;
-    private final Border emptyBorderReservation;
     // Track selection state
     private boolean isSelected = false;
 
@@ -56,19 +54,11 @@ public class TestRunCard2 extends JBPanel<TestRunCard2> {
         );
 
         // Create borders with consistent spacing
-        emptyBorderReservation = BorderFactory.createCompoundBorder(
-                JBUI.Borders.empty(BORDER_THICKNESS), // Reserve space for border
-                JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0) // Bottom line only
-        );
-
-        defaultBorder = emptyBorderReservation;
+        defaultBorder = JBUI.Borders.empty(BORDER_THICKNESS); // Empty border to reserve space
 
         selectedBorder = BorderFactory.createCompoundBorder(
-                JBUI.Borders.empty(0), // No extra space needed since we already reserved it
-                BorderFactory.createCompoundBorder(
-                        JBUI.Borders.customLine(new JBColor(new Color(0, 120, 215), new Color(75, 110, 175)), BORDER_THICKNESS),
-                        JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0) // Keep bottom line
-                )
+                JBUI.Borders.customLine(new JBColor(new Color(0, 120, 215), new Color(75, 110, 175)), BORDER_THICKNESS),
+                JBUI.Borders.empty() // No extra border inside
         );
 
         // Enhanced title styling with modern font
