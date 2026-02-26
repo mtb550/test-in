@@ -3,10 +3,7 @@ package testGit.editorPanel.testRunEditor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.SneakyThrows;
-import testGit.pojo.Config;
-import testGit.pojo.Directory;
-import testGit.pojo.TestCase;
-import testGit.pojo.TestRun;
+import testGit.pojo.*;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.TestCaseSorter;
 
@@ -62,7 +59,8 @@ public class TestRunEditor {
             VirtualFileImpl virtualFile = new VirtualFileImpl(
                     targetPath,
                     createFilteredModel(sortedCases), // Pass the restricted model
-                    sortedCases
+                    sortedCases,
+                    EditorType.TEST_RUN_OPENING
             );
 
             virtualFile.setMetadata(metadata);
@@ -124,7 +122,8 @@ public class TestRunEditor {
             VirtualFileImpl virtualFile = new VirtualFileImpl(
                     targetPath,
                     (DefaultTreeModel) ProjectPanel.testCaseTree.getModel(),
-                    sortedCases
+                    sortedCases,
+                    EditorType.TEST_RUN_CREATION
             );
 
             virtualFile.setMetadata(metadata);

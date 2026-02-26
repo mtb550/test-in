@@ -38,6 +38,7 @@ public class TestRunCreationUI implements Disposable {
     private VirtualFile currentFile;
 
     public TestRunCreationUI(List<TestCase> initialTestCases) {
+        System.out.println("TestRunCreationUI");
         this.initialTestCases = TestCaseSorter.sortTestCases(initialTestCases);
     }
 

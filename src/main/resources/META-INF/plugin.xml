@@ -31,9 +31,7 @@
                 secondary="false"/>
 
         <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.ProviderImpl"/>
-        <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.ProviderImpl"/>
-        <fileEditorProvider implementation="testGit.editorPanel.testRunEditor.ProviderCreationImpl"/>
-        <fileEditorProvider implementation="testGit.editorPanel.testRunEditor.ProviderOpeningImpl"/>
+        <fileEditorProvider implementation="testGit.util.FileEditorProviderImpl"/>
 
         <notificationGroup id="TestGit Notifications"
                            displayType="BALLOON"
