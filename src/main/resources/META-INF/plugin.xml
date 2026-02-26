@@ -31,7 +31,7 @@
                 secondary="false"/>
 
         <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.ProviderImpl"/>
-        <fileEditorProvider implementation="testGit.util.FileEditorProviderImpl"/>
+        <fileEditorProvider implementation="testGit.editorPanel.testRunEditor.FileEditorProviderImpl"/>
 
         <notificationGroup id="TestGit Notifications"
                            displayType="BALLOON"
