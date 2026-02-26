@@ -1,6 +1,7 @@
 package testGit.editorPanel.testCaseEditor;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -13,6 +14,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Directory;
@@ -37,13 +39,29 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final CollectionListModel<TestCase> model;
     private final List<TestCase> allTestCases;
     private final Set<GroupType> selectedGroups = new HashSet<>();
+    @Getter
+    private final Set<String> selectedDetails = new HashSet<>();
     private final JButton groupButton; // Using a flat button style
+    private final JButton detailsButton; // Using a flat button style
     private final ModelSyncListener<TestCase> syncListener;
+    @Getter
+    private boolean showGroups;
+    @Getter
+    private boolean showPriority;
 
     public FileEditorImpl(@NotNull List<TestCase> testCases, @NotNull Directory dir, @NotNull VirtualFile file) {
         this.allTestCases = new ArrayList<>(testCases);
         this.panel = new JBPanel<>(new BorderLayout());
         this.file = file;
+
+        // 1. LOAD SETTINGS FROM CACHE
+        PropertiesComponent props = PropertiesComponent.getInstance();
+        this.showGroups = props.getBoolean("testGit.showGroups", true);
+        this.showPriority = props.getBoolean("testGit.showPriority", true);
+        String savedDetails = props.getValue("testGit.selectedDetails", "ID,Module,Expected Result,Steps,Automation Ref,Business Ref");
+        if (!savedDetails.isEmpty()) {
+            selectedDetails.addAll(List.of(savedDetails.split(",")));
+        }
 
         JBPanel<?> toolbar = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(5), JBUI.scale(2)));
         toolbar.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
@@ -72,6 +90,30 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
         toolbar.add(groupButton);
 
+        detailsButton = new JButton("Details", AllIcons.Actions.PreviewDetailsVertically);
+        detailsButton.setFocusable(false);
+        detailsButton.setBorderPainted(false);
+        detailsButton.setContentAreaFilled(false);
+        detailsButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        detailsButton.setFont(JBUI.Fonts.label(12f));
+        detailsButton.addActionListener(e -> showDetailsPopup(detailsButton));
+
+        detailsButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                detailsButton.setContentAreaFilled(true);
+                detailsButton.setBackground(JBUI.CurrentTheme.ActionButton.hoverBackground());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                detailsButton.setContentAreaFilled(false);
+            }
+        });
+
+        toolbar.add(detailsButton);
+
+
         this.model = new CollectionListModel<>(new ArrayList<>(allTestCases));
         this.syncListener = new ModelSyncListener<>(allTestCases, model);
 
@@ -79,7 +121,12 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
             if (!selectedGroups.isEmpty()) {
                 selectedGroups.clear();
-                applyFilters();
+                applyGroupFilters();
+            }
+
+            if (!selectedDetails.isEmpty()) {
+                selectedDetails.clear();
+                updateDetailsButtonState();
             }
         });
 
@@ -91,22 +138,56 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
-        list.setCellRenderer(new RendererImpl());
 
         list.addListSelectionListener(new SelectionListenerImpl(list));
         list.addMouseListener(new MouseAdapterImpl(list, model, dir));
 
-        Runnable resetFilter = () -> {
+        Runnable resetGroupFilter = () -> {
             if (!selectedGroups.isEmpty()) {
                 selectedGroups.clear();
-                applyFilters();
+                applyGroupFilters();
             }
         };
-        list.setTransferHandler(new TransferImpl(dir, model, resetFilter));
+
+        Runnable resetDetailsFilter = () -> {
+            if (!selectedDetails.isEmpty()) {
+                selectedDetails.clear();
+                updateDetailsButtonState();
+            }
+        };
+        list.setTransferHandler(new TransferImpl(dir, model, resetGroupFilter));
+        list.setTransferHandler(new TransferImpl(dir, model, resetDetailsFilter));
         ShortcutHandler.register(dir, list, model);
 
         panel.add(toolbar, BorderLayout.NORTH);
         panel.add(new JBScrollPane(list), BorderLayout.CENTER);
+
+        // Create the checkbox
+        JCheckBox showGroupsCheck = new JCheckBox("Show Groups", showGroups);
+        showGroupsCheck.setOpaque(false);
+        showGroupsCheck.setFocusable(false);
+        showGroupsCheck.addActionListener(e -> {
+            showGroups = showGroupsCheck.isSelected();
+            // Trigger a repaint of the list to update the renderers
+            list.repaint();
+        });
+
+        // Add it to the toolbar (before or after the groupButton)
+        toolbar.add(showGroupsCheck);
+
+
+        // Priority Checkbox
+        JCheckBox showPriorityCheck = new JCheckBox("Show Priority", showPriority);
+        showPriorityCheck.setOpaque(false);
+        showPriorityCheck.addActionListener(e -> {
+            showPriority = showPriorityCheck.isSelected();
+            list.repaint();
+        });
+
+        toolbar.add(showPriorityCheck); // Added to toolbar
+
+        // Update the list renderer to accept the 'showGroups' state
+        this.list.setCellRenderer(new RendererImpl(this));
     }
 
     private void showGroupPopup(JButton anchor) {
@@ -135,7 +216,7 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
                         selectedGroups.add(group);
                     }
                     groupList.repaint();
-                    applyFilters();
+                    applyGroupFilters();
                 }
             }
         });
@@ -151,7 +232,55 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         popup.showUnderneathOf(anchor);
     }
 
-    private void applyFilters() {
+    private void showDetailsPopup(JButton anchor) {
+        JBList<String> detailsList = new JBList<>(List.of("ID", "Module", "Expected Result", "Steps", "Automation Ref", "Business Ref"));
+
+        detailsList.setBackground(JBColor.namedColor("Popup.background", new JBColor(0xffffff, 0x3c3f41)));
+
+        detailsList.setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
+            JCheckBox checkBox = new JCheckBox(value, selectedDetails.contains(value));
+            checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+            checkBox.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
+            checkBox.setBorder(JBUI.Borders.empty(2, 8)); // Native-like horizontal padding
+            checkBox.setOpaque(true);
+            return checkBox;
+        });
+
+        detailsList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int index = detailsList.locationToIndex(e.getPoint());
+                if (index >= 0) {
+                    String detailName = detailsList.getModel().getElementAt(index);
+
+                    // Toggle logic: update the set, not the UI component directly
+                    if (selectedDetails.contains(detailName)) {
+                        selectedDetails.remove(detailName);
+                    } else {
+                        selectedDetails.add(detailName);
+                    }
+
+                    detailsList.repaint();
+                    // Important: update the main list to show/hide the labels
+                    list.repaint();
+                    saveSettings();
+                    updateDetailsButtonState();
+                }
+            }
+        });
+
+        JBPopup popup = JBPopupFactory.getInstance()
+                .createComponentPopupBuilder(new JBScrollPane(detailsList), null)
+                .setMovable(false)
+                .setRequestFocus(true)
+                .setResizable(false)
+                .setCancelOnClickOutside(true)
+                .createPopup();
+
+        popup.showUnderneathOf(anchor);
+    }
+
+    private void applyGroupFilters() {
         syncListener.pause();
 
         try {
@@ -172,6 +301,27 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         } finally {
             syncListener.resume();
         }
+    }
+
+    private void updateDetailsButtonState() {
+        if (selectedDetails.isEmpty()) {
+            detailsButton.setText("Details");
+            detailsButton.setForeground(JBColor.foreground());
+        } else {
+            // Just update the button text, don't filter the model!
+            detailsButton.setText("Details (" + selectedDetails.size() + ")");
+            detailsButton.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
+        }
+        // Refresh the cards to show/hide labels
+        list.repaint();
+    }
+
+    private void saveSettings() {
+        PropertiesComponent props = PropertiesComponent.getInstance();
+        props.setValue("testGit.showGroups", showGroups, true);
+        props.setValue("testGit.showPriority", showPriority, true);
+        // Convert Set to a comma-separated string to save it
+        props.setValue("testGit.selectedDetails", String.join(",", selectedDetails));
     }
 
     @Override

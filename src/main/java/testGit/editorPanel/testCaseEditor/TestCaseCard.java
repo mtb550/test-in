@@ -14,6 +14,7 @@ import testGit.pojo.TestCase;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Set;
 
 public class TestCaseCard extends JBPanel<TestCaseCard> {
     private static final int CARD_HEIGHT = 130;
@@ -23,6 +24,9 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
     private final JBLabel expectedLabel = createDetailLabel();
     private final JBLabel stepsLabel = createDetailLabel();
     private final JBLabel automationRefLabel = createDetailLabel();
+    private final JBLabel businessRefLabel = createDetailLabel();
+    private final JBLabel moduleLabel = createDetailLabel();
+    private final JBLabel idLabel = createDetailLabel();
     private final BorderLayoutPanel wrapper = new BorderLayoutPanel();
 
     public TestCaseCard() {
@@ -48,6 +52,9 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         content.add(expectedLabel);
         content.add(stepsLabel);
         content.add(automationRefLabel);
+        content.add(businessRefLabel);
+        content.add(moduleLabel);
+        content.add(idLabel);
 
         wrapper.setOpaque(false);
         wrapper.setBorder(JBUI.Borders.empty(12, 16));
@@ -55,23 +62,47 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    public void updateData(int index, TestCase tc) {
+    public void updateData(int index, TestCase tc, boolean showGroups, boolean showPriority, Set<String> activeDetails) {
         titleLabel.setText((index + 1) + ". " + tc.getTitle());
         expectedLabel.setText("Expected Result: " + tc.getExpectedResult());
         stepsLabel.setText("Steps: " + tc.getSteps());
         automationRefLabel.setText("Automation Reference: " + tc.getAutomationRef());
+        businessRefLabel.setText("Business Reference: " + tc.getBusinessRef());
+        moduleLabel.setText("Module: " + tc.getModule());
+        idLabel.setText("ID: " + tc.getId());
 
         setBackground(index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45));
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
+
+        // 2. Control visibility based on the Set contents
+        // The strings here MUST match the strings in your showDetailsPopup list
+        expectedLabel.setVisible(activeDetails.contains("Expected Result"));
+        stepsLabel.setVisible(activeDetails.contains("Steps"));
+        automationRefLabel.setVisible(activeDetails.contains("Automation Ref"));
+        businessRefLabel.setVisible(activeDetails.contains("Business Ref"));
+        moduleLabel.setVisible(activeDetails.contains("Module"));
+        idLabel.setVisible(activeDetails.contains("ID"));
+
         badgePanel.removeAll();
-        badgePanel.add(createPriorityBadge(tc));
-        List<GroupType> groups = tc.getGroups();
-        if (groups != null) {
-            for (GroupType groupName : groups) {
-                badgePanel.add(createGroupBadge(groupName));
+
+        // Conditionally show Priority Badge
+        if (showPriority) {
+            badgePanel.add(createPriorityBadge(tc));
+        }
+
+        // Conditionally show Group Badges
+        if (showGroups) {
+            List<GroupType> groups = tc.getGroups();
+            if (groups != null) {
+                for (GroupType groupName : groups) {
+                    badgePanel.add(createGroupBadge(groupName));
+                }
             }
         }
+        // Crucial for dynamic changes in a renderer
+        badgePanel.revalidate();
+        badgePanel.repaint();
     }
 
     private JBLabel createPriorityBadge(TestCase tc) {
