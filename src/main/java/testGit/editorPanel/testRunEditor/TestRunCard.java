@@ -1,5 +1,8 @@
 package testGit.editorPanel.testRunEditor;
 
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -18,6 +21,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 public class TestRunCard extends JBPanel<TestRunCard> {
     private static final int CARD_HEIGHT = 130;
@@ -97,6 +101,47 @@ public class TestRunCard extends JBPanel<TestRunCard> {
         setBorder(defaultBorder);
         setupClickListener();
         updateData(index, tc);
+        addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    showContextMenu(e);
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    showContextMenu(e);
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+
+            }
+
+            private void showContextMenu(MouseEvent e) {
+                // Instantiate your custom ActionGroup
+                // Note: Assuming 'null' for list/model if not needed, or pass them if required
+                ContextMenu group = new ContextMenu(null, null, null, TestRunCard.this.tc);
+
+                ActionManager actionManager = ActionManager.getInstance();
+                ActionPopupMenu popupMenu = actionManager.createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, group);
+
+                popupMenu.getComponent().show(e.getComponent(), e.getX(), e.getY());
+            }
+        });
     }
 
     @Override
