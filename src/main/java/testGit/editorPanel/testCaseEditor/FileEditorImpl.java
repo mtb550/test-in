@@ -45,13 +45,10 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         this.panel = new JBPanel<>(new BorderLayout());
         this.file = file;
 
-        // 1. Create a Professional Toolbar
-        // Removed the "Filter by Groups:" label for a cleaner look
         JBPanel<?> toolbar = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(5), JBUI.scale(2)));
         toolbar.setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
         toolbar.setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        // Use a flat style button that looks like a Toolbar Action
         groupButton = new JButton("Groups", AllIcons.Actions.GroupBy);
         groupButton.setFocusable(false);
         groupButton.setBorderPainted(false);
@@ -60,7 +57,6 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         groupButton.setFont(JBUI.Fonts.label(12f));
         groupButton.addActionListener(e -> showGroupPopup(groupButton));
 
-        // Hover effect for the button
         groupButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -76,11 +72,9 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
         toolbar.add(groupButton);
 
-        // 2. Setup Model and Sync Listener
         this.model = new CollectionListModel<>(new ArrayList<>(allTestCases));
         this.syncListener = new ModelSyncListener<>(allTestCases, model);
 
-        // Auto-clear filter when adding new test case
         this.syncListener.setOnUpdate(() -> {
 
             if (!selectedGroups.isEmpty()) {
@@ -91,11 +85,9 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
         this.model.addListDataListener(syncListener);
 
-        // 3. Setup List UI
         this.list = new JBList<>(model);
         list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
         list.setOpaque(true);
-        list.setBorder(JBUI.Borders.empty());
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
@@ -107,13 +99,12 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         Runnable resetFilter = () -> {
             if (!selectedGroups.isEmpty()) {
                 selectedGroups.clear();
-                applyFilters(); // applyFilters handles button text/color reset
+                applyFilters();
             }
         };
         list.setTransferHandler(new TransferImpl(dir, model, resetFilter));
         ShortcutHandler.register(dir, list, model);
 
-        // 4. Assemble
         panel.add(toolbar, BorderLayout.NORTH);
         panel.add(new JBScrollPane(list), BorderLayout.CENTER);
     }
@@ -121,11 +112,9 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private void showGroupPopup(JButton anchor) {
         JBList<GroupType> groupList = new JBList<>(GroupType.values());
 
-        // FIX: Use JBColor.namedColor or ComboBox background for professional look
         groupList.setBackground(JBColor.namedColor("Popup.background", new JBColor(0xffffff, 0x3c3f41)));
 
         groupList.setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
-            // Create a professional checkbox with proper padding
             JCheckBox checkBox = new JCheckBox(value.name(), selectedGroups.contains(value));
             checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
             checkBox.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
@@ -151,7 +140,6 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
             }
         });
 
-        // Build the popup using a specialized builder for a "native" feel
         JBPopup popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(groupList), null)
                 .setMovable(false)

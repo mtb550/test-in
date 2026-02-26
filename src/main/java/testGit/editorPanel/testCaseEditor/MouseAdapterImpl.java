@@ -27,12 +27,10 @@ public class MouseAdapterImpl extends MouseAdapter {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        // 1. Handle Double Click (Left Button)
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
             handleDoubleClick(e);
         }
 
-        // 2. Handle Context Menu (Right Click)
         maybeShowPopup(e);
     }
 

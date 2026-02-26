@@ -11,6 +11,7 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import testGit.pojo.GroupType;
 import testGit.pojo.TestCase;
+import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -24,6 +25,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
     private static final int SELECTED_OPACITY = 220;
     private static final int BORDER_THICKNESS = 1;
     private static TestRunCard currentlySelectedCard = null;
+    final TestCase tc;
     private final JBLabel titleLabel = new JBLabel();
     private final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(6), 0));
     private final JBLabel expectedLabel = createDetailLabel();
@@ -38,6 +40,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
 
     public TestRunCard(int index, TestCase tc) {
         super(new BorderLayout());
+        this.tc = tc;
         setOpaque(true);
         setMaximumSize(new Dimension(Integer.MAX_VALUE, JBUI.scale(CARD_HEIGHT)));
 
@@ -84,13 +87,9 @@ public class TestRunCard extends JBPanel<TestRunCard> {
         wrapper.setBorder(JBUI.Borders.empty(12, 16));
         wrapper.addToCenter(content);
         wrapper.addToRight(actionButtonPanel);
-
         add(wrapper, BorderLayout.CENTER);
-
         setBorder(defaultBorder);
-
         setupClickListener();
-
         updateData(index, tc);
     }
 
@@ -141,10 +140,8 @@ public class TestRunCard extends JBPanel<TestRunCard> {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    // Double-click - open details panel
-                    openDetailsPanel();
+                    ViewPanel.show(TestRunCard.this.tc);
                 } else {
-                    // Single click - handle selection
                     if (currentlySelectedCard != null && currentlySelectedCard != TestRunCard.this) {
                         currentlySelectedCard.deselect();
                     }
@@ -161,27 +158,6 @@ public class TestRunCard extends JBPanel<TestRunCard> {
                 }
             }
         });
-    }
-
-    private void openDetailsPanel() {
-        // TODO: Implement your details panel logic here
-        // This could be:
-        // 1. Opening a tool window
-        // 2. Showing a dialog
-        // 3. Opening an editor tab
-        // 4. Emitting an event to be handled by the parent component
-
-        // Example: Show a simple message dialog
-        JOptionPane.showMessageDialog(
-                this,
-                "Details for: " + titleLabel.getText(),
-                "Test Case Details",
-                JOptionPane.INFORMATION_MESSAGE
-        );
-
-        // For more advanced integration with IntelliJ platform,
-        // you might want to use something like:
-        // Messages.showInfoMessage("Details for: " + titleLabel.getText(), "Test Case Details");
     }
 
     private void select() {
