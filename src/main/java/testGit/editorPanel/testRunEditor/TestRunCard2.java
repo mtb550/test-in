@@ -4,128 +4,210 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import com.intellij.util.ui.components.BorderLayoutPanel;
 import testGit.pojo.GroupType;
 import testGit.pojo.TestCase;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
 public class TestRunCard2 extends JBPanel<TestRunCard2> {
+    private static final int CARD_HEIGHT = 160;
+    private static final int BADGE_RADIUS = 12;
+    private static final int HOVER_OPACITY = 220;
+
     private final JBLabel titleLabel = new JBLabel();
-    private final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
+    private final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(6), 0));
     private final JBLabel expectedLabel = createDetailLabel();
     private final JBLabel stepsLabel = createDetailLabel();
     private final JBLabel automationRefLabel = createDetailLabel();
 
-    // Panel for the action buttons
-    private final JPanel actionButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, JBUI.scale(15), 10));
+    // Panel for the action buttons with modern styling
+    private final JPanel actionButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, JBUI.scale(8), 8));
+
+    private final Color defaultBackground;
+    private final Color hoverBackground;
 
     public TestRunCard2(int index, TestCase tc) {
-        setLayout(new BorderLayout());
+        super(new BorderLayout());
         setOpaque(true);
-        setMaximumSize(new Dimension(Integer.MAX_VALUE, JBUI.scale(160)));
+        setMaximumSize(new Dimension(Integer.MAX_VALUE, JBUI.scale(CARD_HEIGHT)));
 
-        Font titleFont = JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 6.0f);
+        // Initialize backgrounds
+        updateBackgrounds(index);
+        defaultBackground = getBackground();
+        hoverBackground = new JBColor(
+                new Color(defaultBackground.getRed(), defaultBackground.getGreen(), defaultBackground.getBlue(), HOVER_OPACITY),
+                new Color(defaultBackground.getRed(), defaultBackground.getGreen(), defaultBackground.getBlue(), HOVER_OPACITY)
+        );
+
+        // Enhanced title styling with modern font
+        Font titleFont = JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f);
         titleLabel.setFont(titleFont);
         titleLabel.setText(tc.getTitle());
-        titleLabel.setForeground(UIUtil.getLabelForeground());
+        titleLabel.setForeground(JBColor.namedColor("Label.foreground", UIUtil.getLabelForeground()));
+        titleLabel.setCopyable(true); // Allow copying of title text
+
         badgePanel.setOpaque(false);
 
-        JBPanel<?> titleLine = new JBPanel<>(new BorderLayout());
+        // Use BorderLayoutPanel for better component management
+        BorderLayoutPanel titleLine = new BorderLayoutPanel();
         titleLine.setOpaque(false);
-        titleLine.setAlignmentX(Component.LEFT_ALIGNMENT);
+        titleLine.addToLeft(titleLabel);
+        titleLine.addToCenter(badgePanel);
 
-        titleLine.add(titleLabel, BorderLayout.WEST);
-        titleLine.add(badgePanel, BorderLayout.CENTER);
-
-        // Main text content
-        JBPanel<?> content = new JBPanel<>();
+        // Main text content with improved spacing
+        JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
         content.setOpaque(false);
-        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         content.add(titleLine);
-        content.add(Box.createVerticalStrut(JBUI.scale(8)));
         content.add(expectedLabel);
         content.add(stepsLabel);
-        content.add(Box.createVerticalStrut(JBUI.scale(4)));
         content.add(automationRefLabel);
 
-        // --- Buttons Setup (Passed, Failed, Blocked) ---
-        actionButtonPanel.setOpaque(false);
-        actionButtonPanel.setVisible(false); // Invisible until hover
+        // Modern button styling
+        styleActionButtons();
 
-        actionButtonPanel.add(createStatusButton("PASSED", new JBColor(new Color(73, 156, 73), new Color(60, 120, 60))));
-        actionButtonPanel.add(createStatusButton("FAILED", new JBColor(new Color(188, 63, 60), new Color(140, 40, 40))));
-        actionButtonPanel.add(createStatusButton("BLOCKED", JBColor.ORANGE));
-
-        // Wrapper to hold everything (Same hierarchy as your request)
-        JBPanel<?> wrapper = new JBPanel<>(new BorderLayout());
+        // Enhanced wrapper with card-like appearance
+        BorderLayoutPanel wrapper = new BorderLayoutPanel();
         wrapper.setOpaque(false);
-        wrapper.setBorder(JBUI.Borders.empty(12));
-
-        wrapper.add(content, BorderLayout.CENTER);
-        wrapper.add(actionButtonPanel, BorderLayout.EAST); // Place buttons at the end
+        wrapper.setBorder(JBUI.Borders.empty(12, 16));
+        wrapper.addToCenter(content);
+        wrapper.addToRight(actionButtonPanel);
 
         add(wrapper, BorderLayout.CENTER);
 
-        // --- Hover Listener to show/hide buttons ---
+        // Enhanced hover listener with smooth transitions
+        setupHoverListener();
+
+        // Initialize data
+        updateData(index, tc);
+    }
+
+    private void styleActionButtons() {
+        actionButtonPanel.setOpaque(false);
+
+        // Create modern styled buttons
+        actionButtonPanel.add(createModernStatusButton("PASSED",
+                new JBColor(new Color(39, 174, 96), new Color(46, 125, 50))));
+        actionButtonPanel.add(createModernStatusButton("FAILED",
+                new JBColor(new Color(192, 57, 43), new Color(183, 28, 28))));
+        actionButtonPanel.add(createModernStatusButton("BLOCKED",
+                new JBColor(new Color(243, 156, 18), new Color(237, 108, 2))));
+    }
+
+    private JButton createModernStatusButton(String text, Color bg) {
+        JButton btn = new JButton(text);
+
+        // Use Darcula button UI for modern look
+        btn.putClientProperty("JButton.buttonType", "roundRect");
+        btn.putClientProperty("JButton.backgroundColor", bg);
+        btn.putClientProperty("JButton.selectedBackground", bg.darker());
+
+        btn.setBackground(bg);
+        btn.setForeground(JBColor.WHITE);
+        btn.setFont(JBFont.small().asBold());
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setFocusPainted(false);
+        btn.setBorder(JBUI.Borders.empty(6, 16));
+
+        // Add modern hover effect
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(bg.brighter());
+                btn.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(bg);
+                btn.repaint();
+            }
+        });
+
+        return btn;
+    }
+
+    private void setupHoverListener() {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 actionButtonPanel.setVisible(true);
+                setBackground(hoverBackground);
+                setBorder(createHoverBorder());
                 repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                // Check if mouse actually left the component area
-                if (!getBounds().contains(e.getPoint())) {
+                Point mousePosition = getMousePosition();
+                if (mousePosition == null || !contains(mousePosition)) {
                     actionButtonPanel.setVisible(false);
+                    setBackground(defaultBackground);
+                    setBorder(createDefaultBorder());
                     repaint();
                 }
             }
         });
-
-        // Call it right here!
-        updateData(index, tc);
     }
 
-    private JButton createStatusButton(String text, Color bg) {
-        JButton btn = new JButton(text);
-        btn.putClientProperty("JButton.buttonType", "roundRect"); // Professional IntelliJ style
-        btn.setBackground(bg);
-        btn.setForeground(Color.WHITE);
-        btn.setFont(JBFont.small().asBold());
-        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setFocusPainted(false);
-        return btn;
+    private Border createDefaultBorder() {
+        return JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0);
+    }
+
+    private Border createHoverBorder() {
+        return BorderFactory.createCompoundBorder(
+                JBUI.Borders.customLine(JBColor.namedColor("Component.borderColor", JBColor.border()), 0, 0, 1, 0),
+                JBUI.Borders.empty()
+        );
+    }
+
+    private void updateBackgrounds(int index) {
+        JBColor evenBg = new JBColor(Gray._245, Gray._60);
+        JBColor oddBg = new JBColor(Gray._230, Gray._45);
+        setBackground(index % 2 == 0 ? evenBg : oddBg);
     }
 
     public void updateData(int index, TestCase tc) {
-        titleLabel.setText((index + 1) + ". " + tc.getTitle());
+        titleLabel.setText(String.format("%d. %s", index + 1, tc.getTitle()));
+
         expectedLabel.setText("Expected Result: " + tc.getExpectedResult());
         stepsLabel.setText("Steps: " + tc.getSteps());
         automationRefLabel.setText("Automation Reference: " + tc.getAutomationRef());
 
-        setBackground(index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45));
-        // Use a bottom border line for a cleaner professional list look
-        setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
+        updateBackgrounds(index);
+        setBorder(createDefaultBorder());
 
+        // Update badges with modern styling
         badgePanel.removeAll();
         badgePanel.add(createPriorityBadge(tc));
+
         List<GroupType> groups = tc.getGroups();
+
         if (groups != null) {
             for (GroupType groupName : groups) {
                 badgePanel.add(createGroupBadge(groupName));
             }
         }
+    }
+
+    private String formatDetailText(String label, String text, int maxLength) {
+        if (text == null || text.trim().isEmpty()) {
+            return label + ": " + JBUI.CurrentTheme.ContextHelp.FOREGROUND;
+        }
+        String truncated = text.length() > maxLength ?
+                text.substring(0, maxLength) + "..." : text;
+        return String.format("%s: %s", label, truncated);
     }
 
     private JBLabel createPriorityBadge(TestCase tc) {

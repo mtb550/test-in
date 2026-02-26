@@ -27,7 +27,7 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         setOpaque(true);
         setMaximumSize(new Dimension(Integer.MAX_VALUE, JBUI.scale(160)));
 
-        Font titleFont = JBFont.label().deriveFont(Font.PLAIN, UIUtil.getLabelFont().getSize() + 6.0f);
+        Font titleFont = JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f);
         titleLabel.setFont(titleFont);
         titleLabel.setForeground(UIUtil.getLabelForeground());
         badgePanel.setOpaque(false);
