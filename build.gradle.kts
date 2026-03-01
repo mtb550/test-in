@@ -1,7 +1,6 @@
 plugins {
     id("java")
-    id("org.jetbrains.intellij") version "1.17.4"
-    //id("org.jetbrains.intellij.platform") version "2.1.0"
+    id("org.jetbrains.intellij.platform") version "2.11.0"
 }
 
 group = "testGit"
@@ -9,55 +8,58 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-}
-
-intellij {
-    version.set("2024.1.7")
-    type.set("IC") // Target IDE Platform
-    //plugins.set(listOf("java", "TestNG-J"))
-    plugins.set(listOf("java", "TestNG-J", "Git4Idea", "vcs-git"))
-}
-
-sourceSets {
-    main {
-        java.srcDirs("src/main/java")
-        resources.srcDirs("src/main/resources")
+    intellijPlatform {
+        defaultRepositories()
+        snapshots()
     }
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
 }
 
 dependencies {
-    compileOnly("org.projectlombok:lombok:1.18.30")
-    annotationProcessor("org.projectlombok:lombok:1.18.30")
-    testCompileOnly("org.projectlombok:lombok:1.18.30")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
-    testImplementation("org.testng:testng:7.11.0")
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.3")
-    implementation("com.jayway.jsonpath:json-path:2.10.0")
-    implementation("commons-io:commons-io:2.21.0")
-}
-
-tasks {
-    patchPluginXml {
-        sinceBuild.set("241")
-        untilBuild.set("243.*")
+    intellijPlatform {
+        intellijIdea("253.28294.334") {
+            useInstaller = false
+        }
+        bundledPlugins(listOf("com.intellij.java", "TestNG-J", "Git4Idea"))
+        jetbrainsRuntime()
+        pluginVerifier()
+        zipSigner()
     }
 
-    signPlugin {
+    compileOnly("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2")
+    implementation("com.jayway.jsonpath:json-path:2.9.0")
+    implementation("commons-io:commons-io:2.16.1")
+    testImplementation("org.testng:testng:7.10.2")
+}
+
+intellijPlatform {
+    pluginConfiguration {
+        id.set("testGit.demo")
+        name.set("Test Case Manager")
+        ideaVersion {
+            sinceBuild.set("253")
+            untilBuild.set("253.*")
+        }
+    }
+    signing {
         certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
         privateKey.set(System.getenv("PRIVATE_KEY"))
         password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
     }
-
-    publishPlugin {
+    publishing {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
+}
 
+tasks {
     processResources {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }

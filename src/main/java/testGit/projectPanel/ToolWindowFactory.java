@@ -1,6 +1,7 @@
 package testGit.projectPanel;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -17,7 +18,7 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
         ProjectPanel projectPanel = new ProjectPanel(project);
         Content content = ContentFactory.getInstance().createContent(projectPanel.getPanel(), null, false);
         toolWindow.getContentManager().addContent(content);
-        toolWindow.setTitleActions(List.of(contextMenu(projectPanel).getChildren(null)));
+        toolWindow.setTitleActions(List.of(contextMenu(projectPanel).getChildren(ActionManager.getInstance())));
 
         toolWindow.setAutoHide(false);
         //toolWindow.setTitle("TestGit");

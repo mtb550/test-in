@@ -8,8 +8,8 @@
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.java</depends>
-    <depends>com.intellij.modules.vcs</depends>
+    <depends>com.intellij.java</depends>
+    <depends>Git4Idea</depends>
     <depends>TestNG-J</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -53,7 +53,7 @@
                 class="testGit.pojo.ShowTestTreeAction"
                 text="Open Test Run Tree"
                 description="Show test case explorer"
-                icon="/icons/t1.png">
+                icon="AllIcons.Actions.ListFiles">
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
 
