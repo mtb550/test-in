@@ -285,8 +285,10 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
                         selectedDetails.add(detailName);
                     }
 
+                    list.setFixedCellHeight(-1);
+                    list.setCellRenderer(new RendererImpl(FileEditorImpl.this));
                     detailsList.repaint();
-                    // Important: update the main list to show/hide the labels
+                    list.revalidate();
                     list.repaint();
                     saveSettings();
                     updateDetailsButtonState();

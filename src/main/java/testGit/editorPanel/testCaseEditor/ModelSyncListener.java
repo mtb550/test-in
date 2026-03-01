@@ -47,7 +47,8 @@ public class ModelSyncListener<T> implements ListDataListener {
     @Override
     public void intervalRemoved(ListDataEvent e) {
         // If you want items deleted from UI to be deleted from data too:
-        if (!active) return;
+        if (!active) {
+        }
         // Logic for removal usually requires tracking what was removed,
         // as the model index is already gone here.
     }
