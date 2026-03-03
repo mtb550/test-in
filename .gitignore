@@ -1,5 +1,5 @@
-.gradle/
-.idea/
-.intellijPlatform/
+.gradle
+.idea
+.intellijPlatform
 build/
 out/
