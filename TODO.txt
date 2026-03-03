@@ -7,3 +7,7 @@ implement class debugger
 implement method debugger
 persist session for test case explorer and test plan explorer. once open intellij, explorer should show last opened hierarchy with focus in module.
 plan & implement delegation between leaders to leaders or leaders to members.
+
+fixes:
+add message that the loading tree in panel
+show buttons in test caseeditor tab like test run (run) and (view code)
