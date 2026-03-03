@@ -1,11 +1,6 @@
 package testGit.editorPanel.testCaseEditor;
 
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.FilePath;
-import com.intellij.openapi.vcs.changes.Change;
-import com.intellij.openapi.vcs.changes.ChangeListManager;
-import com.intellij.openapi.vcs.changes.ChangesUtil;
-import com.intellij.openapi.vcs.changes.LocalChangeList;
+
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBList;
@@ -17,29 +12,10 @@ import testGit.viewPanel.ViewPanel;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.util.List;
 
 @AllArgsConstructor
 public class SelectionListenerImpl implements ListSelectionListener {
     private final JBList<TestCase> list;
-
-    public static void hideChangesSilently(Project project) {
-        ChangeListManager manager = ChangeListManager.getInstance(project);
-        List<Change> toHide = manager.getAllChanges().stream()
-                .filter(c -> {
-                    FilePath path = ChangesUtil.getFilePath(c);
-                    return path.getPath().contains("/TestGit/");
-                })
-                .toList();
-
-        if (toHide.isEmpty()) return;
-
-        LocalChangeList testGitList = manager.findChangeList("TestGit Internal");
-        if (testGitList == null) {
-            testGitList = manager.addChangeList("TestGit Internal", "Auto-managed by plugin");
-        }
-        manager.moveChangesTo(testGitList, toHide.toArray(new Change[0]));
-    }
 
     @Override
     public void valueChanged(ListSelectionEvent e) {

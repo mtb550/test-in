@@ -16,6 +16,7 @@ import testGit.ui.AddNewTestProjectDialog;
 import testGit.util.Notifier;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class CreateTestProject extends DumbAwareAction {
     public final ProjectPanel projectPanel;
@@ -37,7 +38,7 @@ public class CreateTestProject extends DumbAwareAction {
                 .setActive(1);
 
         String folderName = String.format("%s_%s_%d", newProject.getType().name().toLowerCase(), newProject.getName(), newProject.getActive());
-        java.nio.file.Path projectPath = Config.getRootFolderFile().toPath().resolve(folderName);
+        Path projectPath = Config.getTestGitPath().resolve(folderName);
 
         newProject.setFileName(folderName)
                 .setFilePath(projectPath)
@@ -45,7 +46,7 @@ public class CreateTestProject extends DumbAwareAction {
 
         WriteAction.run(() -> {
             try {
-                VirtualFile rootVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Config.getRootFolderFile());
+                VirtualFile rootVf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Config.getTestGitPath().toFile());
 
                 if (rootVf != null) {
                     VirtualFile projectDir = rootVf.createChildDirectory(this, folderName);

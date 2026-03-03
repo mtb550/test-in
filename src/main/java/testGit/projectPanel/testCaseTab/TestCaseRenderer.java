@@ -18,17 +18,19 @@ public class TestCaseRenderer extends SimpleColoredComponent implements TreeCell
     public TestCaseRenderer(Set<DefaultMutableTreeNode> cutNodes) {
         this.cutNodes = cutNodes;
         setOpaque(true);
+        System.out.println("TestCaseRenderer.TestCaseRenderer");
+
     }
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         this.clear();
-
         Object userObject = (value instanceof DefaultMutableTreeNode node) ? node.getUserObject() : value;
 
         if (userObject instanceof Directory dir) {
             System.out.println("Rendering TC: " + dir.getName());
             renderDirectory((value instanceof DefaultMutableTreeNode n) ? n : null, dir);
+
         } else if (value != null) {
             setIcon(AllIcons.Nodes.Unknown);
             append(value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
@@ -37,6 +39,7 @@ public class TestCaseRenderer extends SimpleColoredComponent implements TreeCell
         if (selected) {
             setBackground(UIUtil.getTreeSelectionBackground(true));
             setForeground(UIUtil.getTreeSelectionForeground(true));
+
         } else {
             setBackground(UIUtil.getTreeBackground());
             setForeground(UIUtil.getTreeForeground());
@@ -48,15 +51,11 @@ public class TestCaseRenderer extends SimpleColoredComponent implements TreeCell
     private void renderDirectory(DefaultMutableTreeNode node, Directory dir) {
         setIcon(getIconForDirectory(dir));
 
-        SimpleTextAttributes style = (node != null && cutNodes.contains(node))
-                ? SimpleTextAttributes.GRAYED_ATTRIBUTES
-                : SimpleTextAttributes.REGULAR_ATTRIBUTES;
 
-        append(dir.getName() != null ? dir.getName() : "Unnamed", style);
+        append(dir.getName(), (cutNodes.contains(node)) ? SimpleTextAttributes.GRAYED_ATTRIBUTES : SimpleTextAttributes.REGULAR_ATTRIBUTES);
     }
 
     private Icon getIconForDirectory(Directory dir) {
-        if (dir.getType() == null) return AllIcons.Nodes.Unknown;
         return switch (dir.getType()) {
             case PR -> AllIcons.Nodes.Project;
             case PA -> AllIcons.Nodes.WebFolder;

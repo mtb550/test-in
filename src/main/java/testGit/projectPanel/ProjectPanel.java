@@ -6,7 +6,6 @@ import com.intellij.openapi.project.DumbService;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import lombok.Getter;
-import testGit.pojo.Config;
 import testGit.projectPanel.projectSelector.ProjectSelector;
 import testGit.projectPanel.testCaseTab.TestCaseTabController;
 import testGit.projectPanel.testRunTab.TestRunTabController;
@@ -48,13 +47,9 @@ public class ProjectPanel implements Disposable {
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
                     if (project.isDisposed()) return;
 
-                    // Heavy I/O Config
-                    Config.setProject(project);
-                    Config.setRootFolder();
-
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        testCaseTabController.setup(project);
-                        testRunTabController.setup(project);
+                        testCaseTabController.setup();
+                        testRunTabController.setup();
                         projectSelector.loadProjectList();
                     });
                 }));

@@ -1,11 +1,8 @@
 package testGit.util;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,19 +16,19 @@ import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 public class TestRunsDirectoryMapper {
 
-    public static void buildTreeAsync(@NotNull SimpleTree tree) {
-        Project project = DataManager.getInstance().getDataContext(tree).getData(CommonDataKeys.PROJECT);
-        if (project == null) project = Config.getProject();
+    public static void buildTreeAsync(SimpleTree tree) {
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Loading test runs", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Loading test runs", false) {
             private DefaultTreeModel newModel;
 
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 Directory selectedProject = ProjectSelector.getSelectedProject();
+
                 if (selectedProject == null) {
                     return;
                 }
@@ -46,66 +43,67 @@ public class TestRunsDirectoryMapper {
 
             @Override
             public void onSuccess() {
-                if (newModel != null) {
-                    tree.setModel(newModel);
-                    newModel.nodeStructureChanged((DefaultMutableTreeNode) newModel.getRoot());
-                    tree.updateUI();
-                    tree.expandRow(0);
-                }
+                tree.setModel(newModel);
+                newModel.nodeStructureChanged((DefaultMutableTreeNode) newModel.getRoot());
+                //tree.updateUI();
+                tree.expandRow(0);
+                System.out.println("TR Tree loaded successfully in background.");
             }
         });
     }
 
     private static DefaultMutableTreeNode buildRoot(String rootName) {
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(rootName);
-        File[] projects = Config.getRootFolderFile().listFiles();
+        File[] testProjects = Config.getTestGitPath().toFile().listFiles();
 
-        if (projects != null) {
-            Arrays.stream(projects)
-                    .filter(file -> !file.getName().startsWith("."))
+        if (testProjects != null) {
+            Arrays.stream(testProjects)
+                    .filter(item -> !item.getName().startsWith("."))
                     .map(TestRunsDirectoryMapper::map)
                     .filter(Objects::nonNull)
-                    .forEach(dir -> {
-                        System.out.println("TestRunsDirectoryMapper.buildRoot: " + dir.getName());
-                        rootNode.add(buildNodeRecursive(dir, "testRuns"));
+                    .forEach(item -> {
+                        System.out.println("TestRunsDirectoryMapper.buildRoot: " + item.getName());
+                        rootNode.add(buildNodeRecursive(item, "testRuns"));
                     });
         }
         return rootNode;
     }
 
-    public static DefaultMutableTreeNode buildNodeRecursive(@NotNull Directory dir, @Nullable String subFolder) {
+    public static DefaultMutableTreeNode buildNodeRecursive(Directory dir, String subFolder) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dir);
 
-        File folderToScan = (subFolder != null && dir.getFilePath() != null)
+        File folderToScan = (subFolder != null)
                 ? dir.getFilePath().resolve(subFolder).toFile()
                 : dir.getFile();
 
         System.out.println("TestRunsDirectoryMapper.buildNodeRecursive. folderToScan: " + folderToScan);
 
-        File[] runFiles = folderToScan.listFiles();
+        Optional.ofNullable(folderToScan.listFiles())
+                .stream()
+                .flatMap(Arrays::stream)
+                .map(TestRunsDirectoryMapper::map)
+                .parallel()
+                .filter(Objects::nonNull)
+                .forEachOrdered(runDir -> {
+                    System.out.println("TestRunsDirectoryMapper.buildNodeRecursive: " + runDir.getFileName());
+                    node.add(buildNodeRecursive(runDir, null));
+                });
 
-        if (runFiles != null) {
-            Arrays.stream(runFiles)
-                    .map(TestRunsDirectoryMapper::map)
-                    .filter(Objects::nonNull)
-                    .forEach(runDir -> {
-                        System.out.println("TestRunsDirectoryMapper.buildNodeRecursive: " + runDir.getName());
-                        node.add(buildNodeRecursive(runDir, null));
-                    });
-        }
         return node;
     }
 
     @Nullable
-    public static Directory map(@NotNull final File file) {
+    public static Directory map(final File file) {
         try {
             String fileName = file.getName();
             System.out.println("TestRunsDirectoryMapper.map(). fileName: " + fileName);
 
             String rawName = fileName.contains(".") ? fileName.substring(0, fileName.lastIndexOf(".")) : fileName;
+            System.out.println("TestRunsDirectoryMapper.map(). rawName: " + rawName);
 
             String[] parts = rawName.split("_", 3);
-            if (parts.length < 3) return null;
+            if (parts.length < 3)
+                Notifier.error("Test run Error", "invalid name: " + rawName);
 
             return new Directory()
                     .setFile(file)
@@ -115,6 +113,7 @@ public class TestRunsDirectoryMapper {
                     .setName(parts[1])
                     .setActive(Integer.parseInt(parts[2]));
         } catch (Exception e) {
+            Notifier.error("mapping Failed", e.getMessage());
             return null;
         }
     }

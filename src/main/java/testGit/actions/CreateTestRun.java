@@ -20,7 +20,7 @@ public class CreateTestRun extends DumbAwareAction {
     private final ProjectPanel projectPanel;
     private final SimpleTree testRunTree;
 
-    public CreateTestRun(final ProjectPanel projectPanel) {
+    public CreateTestRun(ProjectPanel projectPanel) {
         super("New Test Run", "Create a new test run", AllIcons.Actions.GroupBy);
         this.projectPanel = projectPanel;
         this.testRunTree = projectPanel.getTestRunTabController().getTree();

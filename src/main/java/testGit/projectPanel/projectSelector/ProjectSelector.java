@@ -6,6 +6,7 @@ import testGit.pojo.Config;
 import testGit.pojo.Directory;
 import testGit.projectPanel.ProjectPanel;
 import testGit.projectPanel.testCaseTab.TestCaseRenderer;
+import testGit.projectPanel.testRunTab.TestRunRenderer;
 import testGit.util.TestCasesDirectoryMapper;
 import testGit.util.TestRunsDirectoryMapper;
 
@@ -20,7 +21,7 @@ public class ProjectSelector {
     private final DefaultComboBoxModel<Directory> comboBoxModel;
     public ProjectPanel projectPanel;
 
-    public ProjectSelector(final ProjectPanel projectPanel) {
+    public ProjectSelector(ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
         this.comboBoxModel = new DefaultComboBoxModel<>();
         comboBox = new ComboBox<>(comboBoxModel);
@@ -44,7 +45,7 @@ public class ProjectSelector {
         Directory allProjects = new Directory().setName("All Projects");
         comboBoxModel.addElement(allProjects);
 
-        File root = Config.getRootFolderFile();
+        File root = Config.getTestGitPath().toFile();
 
         if (root == null || !root.exists()) {
             System.out.println("TestGit: Root folder not ready or doesn't exist. Showing default only.");
@@ -86,7 +87,7 @@ public class ProjectSelector {
         comboBoxModel.addElement(project);
     }
 
-    public void filterByProject(final Directory project, ProjectPanel projectPanel) {
+    public void filterByProject(Directory project, ProjectPanel projectPanel) {
         System.out.println("Panel.filterByProject(): " + project.getName());
 
         if (project.getName().equals("All Projects")) {
@@ -102,7 +103,12 @@ public class ProjectSelector {
 
         if (projectPanel.getTestCaseTabController().getTree().getCellRenderer() == null ||
                 !(projectPanel.getTestCaseTabController().getTree().getCellRenderer() instanceof TestCaseRenderer)) {
-            projectPanel.getTestCaseTabController().setup(Config.getProject());
+            projectPanel.getTestCaseTabController().setup();
+        }
+
+        if (projectPanel.getTestRunTabController().getTree().getCellRenderer() == null ||
+                !(projectPanel.getTestRunTabController().getTree().getCellRenderer() instanceof TestRunRenderer)) {
+            projectPanel.getTestRunTabController().setup();
         }
 
         projectPanel.getTestCaseTabController().getTree().setRootVisible(true);

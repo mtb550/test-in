@@ -68,8 +68,8 @@
         </group>
     </actions>
 
-    <projectListeners>
-        <listener class="testGit.settings.MyVfsListener"
-                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
-    </projectListeners>
+    <!--    <projectListeners>-->
+    <!--        <listener class="testGit.settings.MyVfsListener"-->
+    <!--                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>-->
+    <!--    </projectListeners>-->
 </idea-plugin>

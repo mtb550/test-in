@@ -1,9 +1,9 @@
 package testGit.projectPanel.testCaseTab;
 
 import com.intellij.openapi.project.DumbService;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
+import testGit.pojo.Config;
 import testGit.projectPanel.ProjectPanel;
 import testGit.projectPanel.TransferHandlerImpl;
 import testGit.projectPanel.projectSelector.ProjectSelector;
@@ -15,16 +15,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TestCaseTabController {
+    private final ProjectPanel projectPanel;
     @Getter
     private final SimpleTree tree;
-    private final ProjectPanel projectPanel;
 
     public TestCaseTabController(ProjectPanel projectPanel) {
-        this.tree = new SimpleTree();
         this.projectPanel = projectPanel;
+        this.tree = new SimpleTree();
     }
 
-    public void setup(Project project) {
+    public void setup() {
         if (ProjectSelector.getSelectedProject() == null) {
             tree.getEmptyText().setText("Select a project to view test cases.");
             return;
@@ -43,7 +43,7 @@ public class TestCaseTabController {
         ShortcutHandler.register(projectPanel, tree, transferHandler);
         tree.addMouseListener(new MouseAdapterImpl(projectPanel));
 
-        DumbService.getInstance(project).runWhenSmart(() ->
+        DumbService.getInstance(Config.getProject()).runWhenSmart(() ->
                 TestCasesDirectoryMapper.buildTreeAsync(tree)
         );
     }

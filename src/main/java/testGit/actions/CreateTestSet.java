@@ -19,7 +19,7 @@ import javax.swing.tree.TreePath;
 public class CreateTestSet extends DumbAwareAction {
     private final SimpleTree tree;
 
-    public CreateTestSet(final SimpleTree tree) {
+    public CreateTestSet(SimpleTree tree) {
         super("New Test Set", "Create a new test set", AllIcons.Nodes.Class);
         this.tree = tree;
     }

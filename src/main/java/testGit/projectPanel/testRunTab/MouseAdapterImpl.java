@@ -19,7 +19,7 @@ public class MouseAdapterImpl extends MouseAdapter {
     private final SimpleTree tree;
     private final ProjectPanel projectPanel;
 
-    public MouseAdapterImpl(final ProjectPanel projectPanel) {
+    public MouseAdapterImpl(ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
         this.tree = projectPanel.getTestRunTabController().getTree();
     }

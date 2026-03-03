@@ -9,7 +9,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
-import testGit.pojo.Config;
 
 import javax.swing.*;
 
@@ -55,7 +54,6 @@ public class AppSettingsConfigurable implements Configurable {
         System.out.println("AppSettingsConfigurable.apply()");
         AppSettingsState settings = AppSettingsState.getInstance();
         settings.rootFolderPath = rootPathField.getText();
-        Config.setRootFolder();
     }
 
     @Override

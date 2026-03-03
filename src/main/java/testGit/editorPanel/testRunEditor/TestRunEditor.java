@@ -28,7 +28,7 @@ public class TestRunEditor {
         return new DefaultTreeModel(root);
     }
 
-    public static void open(final Path runFilePath, ProjectPanel projectPanel) {
+    public static void open(Path runFilePath, ProjectPanel projectPanel) {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
         String targetPath = runFilePath.toAbsolutePath().toString();
 
@@ -55,7 +55,7 @@ public class TestRunEditor {
         openEditor(editorManager, targetPath, metadata, sortedCases, EditorType.TEST_RUN_OPENING, projectPanel);
     }
 
-    public static void create(final Path runPath, ProjectPanel projectPanel, DefaultMutableTreeNode selectedNode, TestRun metadata) {
+    public static void create(Path runPath, ProjectPanel projectPanel, DefaultMutableTreeNode selectedNode, TestRun metadata) {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
         String targetPath = runPath.toAbsolutePath().toString();
 
@@ -104,11 +104,11 @@ public class TestRunEditor {
     }
 
     public static TestCase findTestCaseRecursively(String projectName, String testCaseId) {
-        if (projectName == null || testCaseId == null || Config.getRootFolderFile() == null) {
+        if (projectName == null || testCaseId == null || Config.getTestGitPath() == null) {
             return null;
         }
 
-        Path searchRoot = Config.getRootFolderFile().toPath()
+        Path searchRoot = Config.getTestGitPath()
                 .resolve(projectName)
                 .resolve("testCases");
 

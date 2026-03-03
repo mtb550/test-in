@@ -18,18 +18,21 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
 
     public TestRunRenderer() {
         setOpaque(true);
+        System.out.println("TestRunRenderer.TestRunRenderer");
     }
 
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
         this.clear();
-
         Object userObject = (value instanceof DefaultMutableTreeNode node) ? node.getUserObject() : value;
+        System.out.println("getTreeCellRendererComponent. " + userObject.getClass());
 
         if (userObject instanceof Directory dir) {
             System.out.println("Rendering TR: " + dir.getName());
             renderDirectory(dir);
+
         } else if (value != null) {
+            System.out.println("TestRunRenderer.getTreeCellRendererComponent. else if: " + value.getClass());
             setIcon(AllIcons.Nodes.Unknown);
             append(value.toString(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
         }
@@ -37,6 +40,7 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
         if (selected) {
             setBackground(UIUtil.getTreeSelectionBackground(true));
             setForeground(UIUtil.getTreeSelectionForeground(true));
+
         } else {
             setBackground(UIUtil.getTreeBackground());
             setForeground(UIUtil.getTreeForeground());
@@ -47,7 +51,7 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
 
     private void renderDirectory(Directory dir) {
         setIcon(getIconForDirectory(dir));
-        append(dir.getName() != null ? dir.getName() : "Unnamed", SimpleTextAttributes.REGULAR_ATTRIBUTES);
+        append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
         if (dir.getType() == DirectoryType.TR) {
             String statusLabel = TestRunStatus.labelFor(dir.getActive());
@@ -56,7 +60,6 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
     }
 
     private Icon getIconForDirectory(Directory dir) {
-        if (dir.getType() == null) return AllIcons.Nodes.Folder;
         return switch (dir.getType()) {
             case PR -> AllIcons.Nodes.Project;
             case PA -> AllIcons.Nodes.WebFolder;

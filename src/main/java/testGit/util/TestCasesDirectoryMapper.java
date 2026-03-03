@@ -1,11 +1,8 @@
 package testGit.util;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,14 +16,13 @@ import javax.swing.tree.DefaultTreeModel;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 public class TestCasesDirectoryMapper {
 
     public static void buildTreeAsync(@NotNull SimpleTree tree) {
-        Project project = DataManager.getInstance().getDataContext(tree).getData(CommonDataKeys.PROJECT);
-        if (project == null) project = Config.getProject();
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Loading test cases", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Loading test cases", false) {
             private DefaultTreeModel newModel;
 
             @Override
@@ -38,7 +34,7 @@ public class TestCasesDirectoryMapper {
                 }
 
                 indicator.setIndeterminate(true);
-                indicator.setText("Scanning directories for test runs...");
+                indicator.setText("Scanning directories for test cases...");
 
                 String rootName = selectedProject.getName();
                 DefaultMutableTreeNode root = buildRoot(rootName);
@@ -50,26 +46,25 @@ public class TestCasesDirectoryMapper {
                 tree.setModel(newModel);
 
                 newModel.nodeStructureChanged((DefaultMutableTreeNode) newModel.getRoot());
-                tree.updateUI();
-
+                //tree.updateUI();
                 tree.expandRow(0);
-                System.out.println("Tree loaded successfully in background.");
+                System.out.println("TC Tree loaded successfully in background.");
             }
         });
     }
 
     private static DefaultMutableTreeNode buildRoot(String rootName) {
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(rootName);
-        File[] projects = Config.getRootFolderFile().listFiles(File::isDirectory);
+        File[] testProjects = Config.getTestGitPath().toFile().listFiles(File::isDirectory);
 
-        if (projects != null) {
-            Arrays.stream(projects)
+        if (testProjects != null) {
+            Arrays.stream(testProjects)
                     .filter(file -> !file.getName().startsWith("."))
                     .map(TestCasesDirectoryMapper::map)
                     .filter(Objects::nonNull)
-                    .forEach(dir -> {
-                        System.out.println("TestCasesDirectoryMapper.buildRoot(). " + dir.getName());
-                        rootNode.add(buildNodeRecursive(dir, "testCases"));
+                    .forEach(item -> {
+                        System.out.println("TestCasesDirectoryMapper.buildRoot(). " + item.getFileName());
+                        rootNode.add(buildNodeRecursive(item, "testCases"));
                     });
         }
         return rootNode;
@@ -78,20 +73,21 @@ public class TestCasesDirectoryMapper {
     public static DefaultMutableTreeNode buildNodeRecursive(@NotNull Directory dir, @Nullable String subFolder) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dir);
 
-        File folderToScan = (subFolder != null && dir.getFilePath() != null)
+        File folderToScan = (subFolder != null)
                 ? dir.getFilePath().resolve(subFolder).toFile()
                 : dir.getFile();
 
-        File[] children = folderToScan.listFiles(File::isDirectory);
+        Optional.ofNullable(folderToScan.listFiles(File::isDirectory)) // Handles the null check safely
+                .stream()
+                .flatMap(Arrays::stream)
+                .map(TestCasesDirectoryMapper::map)
+                .parallel()
+                .filter(Objects::nonNull)
+                .forEachOrdered(caseDir -> {
+                    System.out.println("TestCasesDirectoryMapper.buildNodeRecursive: " + caseDir.getName());
+                    node.add(buildNodeRecursive(caseDir, null));
+                });
 
-        if (children != null) {
-            for (File childFile : children) {
-                Directory childDir = map(childFile);
-                if (childDir != null) {
-                    node.add(buildNodeRecursive(childDir, null));
-                }
-            }
-        }
         return node;
     }
 

@@ -51,7 +51,6 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private boolean showGroups;
     @Getter
     private boolean showPriority;
-    private String currentSearchQuery = "";
 
     public FileEditorImpl(@NotNull List<TestCase> testCases, @NotNull Directory dir, @NotNull VirtualFile file) {
         this.allTestCases = new ArrayList<>(testCases);
@@ -334,7 +333,6 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     }
 
     public void applyFilters(String query) {
-        this.currentSearchQuery = query;
 
         if (syncListener != null) syncListener.pause();
 

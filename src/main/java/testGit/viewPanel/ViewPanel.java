@@ -1,6 +1,5 @@
 package testGit.viewPanel;
 
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
@@ -12,9 +11,7 @@ import java.util.function.Consumer;
 public class ViewPanel {
 
     private static ToolWindow getToolWindow() {
-        Project project = Config.getProject();
-        if (project == null) return null;
-        return ToolWindowManager.getInstance(project).getToolWindow("Details");
+        return ToolWindowManager.getInstance(Config.getProject()).getToolWindow("Details");
     }
 
     public static void addTestCase(Consumer<TestCase> onSaveCallback) {

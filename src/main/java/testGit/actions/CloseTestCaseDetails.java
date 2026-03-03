@@ -10,7 +10,7 @@ import javax.swing.*;
 
 public class CloseTestCaseDetails extends DumbAwareAction {
 
-    public CloseTestCaseDetails(final JComponent component) {
+    public CloseTestCaseDetails(JComponent component) {
         super("Close View Panel");
         this.registerCustomShortcutSet(KeyboardSet.Escape.get(), component);
     }

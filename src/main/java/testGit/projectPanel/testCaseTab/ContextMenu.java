@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import testGit.actions.*;
 import testGit.projectPanel.ProjectPanel;
 
+import javax.swing.*;
+
 @NoArgsConstructor
 public class ContextMenu extends DefaultActionGroup {
 
@@ -35,7 +37,7 @@ public class ContextMenu extends DefaultActionGroup {
         add(new TestRuns());
     }
 
-    private DefaultActionGroup createSubGroup(String title, javax.swing.Icon icon, com.intellij.openapi.actionSystem.AnAction... actions) {
+    private DefaultActionGroup createSubGroup(String title, Icon icon, AnAction... actions) {
         DefaultActionGroup group = new DefaultActionGroup(title, true);
         group.getTemplatePresentation().setIcon(icon);
         for (AnAction action : actions) {

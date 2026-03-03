@@ -3,6 +3,7 @@ package testGit.projectPanel;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
@@ -22,6 +23,7 @@ public class Main implements ToolWindowFactory, DumbAware {
         toolWindow.setTitleActions(TitleActions.create(projectPanel));
 
         Content content = ContentFactory.getInstance().createContent(projectPanel.getPanel(), null, false);
+        Disposer.register(content, projectPanel);
         toolWindow.getContentManager().addContent(content);
 
         projectPanel.init(project);
