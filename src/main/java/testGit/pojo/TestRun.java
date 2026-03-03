@@ -24,10 +24,10 @@ public class TestRun {
     @Getter
     @Setter
     public static class TestRunItems {
-        private UUID testCaseId;   // Pointer to the TestCase file name
-        private String project;   // Pointer to the TestCase file name
-        private String status;       // "PASSED", "FAILED", "BLOCKED", "PENDING"
-        private Duration duration;     // Execution time
+        private UUID testCaseId;
+        private String project;
+        private String status;
+        private Duration duration;
         private String executedBy;
         private LocalDateTime executedAt;
     }

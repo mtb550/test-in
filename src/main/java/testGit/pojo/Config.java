@@ -5,25 +5,28 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Getter;
 import lombok.Setter;
 import testGit.settings.AppSettingsState;
 
 import javax.swing.*;
 import java.io.File;
-import java.nio.file.Paths;
+import java.io.IOException;
 
 public class Config {
-    public static Icon porject = AllIcons.Nodes.Project;       // 📦 Project
-    public static Icon folder = AllIcons.Nodes.Folder;       // 📁 Folder
-    public static Icon clazz = AllIcons.Nodes.Class;     // 📄 Class
-    public static Icon java = AllIcons.FileTypes.Java;     // ☕ Java file
-    public static Icon json = AllIcons.FileTypes.Json;     // {} JSON
-    public static Icon xml = AllIcons.FileTypes.Xml;     // <> XML
-    public static Icon text = AllIcons.FileTypes.Text;     // 📝 Text
-    public static Icon branch = AllIcons.Vcs.Branch;     // 🌿 Branch
-    public static Icon add = AllIcons.General.Add;     // ➕ Add
-    public static Icon remove = AllIcons.General.Remove;     // ➖ Remove
+    public static Icon folder = AllIcons.Nodes.Folder;
+    public static Icon clazz = AllIcons.Nodes.Class;
+    public static Icon java = AllIcons.FileTypes.Java;
+    public static Icon json = AllIcons.FileTypes.Json;
+    public static Icon xml = AllIcons.FileTypes.Xml;
+    public static Icon text = AllIcons.FileTypes.Text;
+    public static Icon branch = AllIcons.Vcs.Branch;
+    public static Icon add = AllIcons.General.Add;
+    public static Icon remove = AllIcons.General.Remove;
+
     @Setter
     @Getter
     private static String projectBasePath;
@@ -31,98 +34,67 @@ public class Config {
     @Getter
     private static Project project;
     private static String rootFolder;
+    @Getter
     private static File rootFolderFile;
     private static File testCasesRootFolder;
     private static File testRunsRootFolder;
 
+    public static Icon getProjectIcon() {
+        return AllIcons.Nodes.Project;
+    }
+
     public static void setRootFolder() {
-        System.out.println("Config.setRootFolder()");
-
         String pathFromSettings = AppSettingsState.getInstance().rootFolderPath;
-        System.out.println("pathFromSettings: " + pathFromSettings);
-        System.out.println("projectBasePath: " + projectBasePath);
+        String targetPath = (pathFromSettings == null || pathFromSettings.isEmpty())
+                ? projectBasePath + "/TestGit"
+                : pathFromSettings;
 
-        if (pathFromSettings == null || pathFromSettings.isEmpty()) {
-            rootFolder = projectBasePath + "/TestGit";
-            rootFolderFile = Paths.get(rootFolder).toFile();
-            System.out.println("rootFolder: " + rootFolder);
-            System.out.println("rootFolder file: " + rootFolderFile.getAbsolutePath());
+        VirtualFile vFile = LocalFileSystem.getInstance().findFileByPath(targetPath);
+        if (vFile != null) {
+            rootFolder = vFile.getPath();
+            rootFolderFile = new File(vFile.getPath());
         } else {
-            rootFolder = pathFromSettings;
-            rootFolderFile = Paths.get(pathFromSettings).toFile();
-            System.out.println("rootFolder: " + rootFolder);
-            System.out.println("rootFolder file: " + rootFolderFile.getAbsolutePath());
+            rootFolder = targetPath;
+            rootFolderFile = new File(targetPath);
         }
     }
 
     public static void setTestCasesRootFolder(Directory selectedProject) {
-        System.out.println("Config.setTestCasesRootFolder()");
-
-        testCasesRootFolder = Paths.get(rootFolder, selectedProject.getFileName(), "testCases").toFile();
-        if (!testCasesRootFolder.exists()) {
-            boolean created = testCasesRootFolder.mkdirs();
-            if (created) {
-                System.out.println("Test Cases Root folder created at: " + testCasesRootFolder.getAbsolutePath());
-            }
-        } else {
-            System.out.println("Test Cases Root folder already exists at: " + testCasesRootFolder.getAbsolutePath());
-        }
+        testCasesRootFolder = createDirectorySafely(selectedProject.getFileName(), "testCases");
     }
 
     public static void setTestRunsRootFolder(Directory selectedProject) {
-        System.out.println("Config.setTestRunsRootFolder()");
+        testRunsRootFolder = createDirectorySafely(selectedProject.getFileName(), "testRuns");
+    }
 
-        testRunsRootFolder = Paths.get(rootFolder, selectedProject.getFileName(), "testRuns").toFile();
+    private static File createDirectorySafely(String projectName, String subFolder) {
+        if (rootFolder == null) setRootFolder();
 
-
-        if (!testRunsRootFolder.exists()) {
-            boolean created = testRunsRootFolder.mkdirs();
-            if (created) {
-                System.out.println("Test Runs Root folder created at: " + testRunsRootFolder.getAbsolutePath());
+        try {
+            VirtualFile base = LocalFileSystem.getInstance().refreshAndFindFileByPath(rootFolder);
+            if (base == null) {
+                File fallback = new File(rootFolder, projectName + "/" + subFolder);
+                fallback.mkdirs();
+                return fallback;
             }
-        } else {
-            System.out.println("Test Runs Root folder already exists at: " + testRunsRootFolder.getAbsolutePath());
+
+            VirtualFile result = VfsUtil.createDirectoryIfMissing(base, projectName + "/" + subFolder);
+            return result != null ? new File(result.getPath()) : null;
+
+        } catch (IOException e) {
+            System.err.println("TestGit: Failed to create directories: " + e.getMessage());
+            return new File(rootFolder, projectName + "/" + subFolder);
         }
     }
 
     public static File getTestCasesRootFolder(Directory selectedProject) {
-        System.out.println("Config.getTestCasesRootFolder()");
-
-        if (testCasesRootFolder == null) {
-            setTestCasesRootFolder(selectedProject);
-        }
-
-        System.out.println("Config.getTestCasesRootFolder(): " + testCasesRootFolder);
+        if (testCasesRootFolder == null) setTestCasesRootFolder(selectedProject);
         return testCasesRootFolder;
     }
 
     public static File getTestRunsRootFolder(Directory selectedProject) {
-        System.out.println("Config.getTestRunsRootFolder()");
-
-        if (testRunsRootFolder == null) {
-            setTestRunsRootFolder(selectedProject);
-        }
-
-        System.out.println("Config.getTestRunsRootFolder(): " + testRunsRootFolder);
+        if (testRunsRootFolder == null) setTestRunsRootFolder(selectedProject);
         return testRunsRootFolder;
-    }
-
-    public static File getRootFolderFile() {
-        System.out.println("Config.getRootFolderFile()");
-
-        if (rootFolderFile == null) {
-            setRootFolder();
-        }
-        return rootFolderFile;
-    }
-
-    public static String getRootFolder() {
-        System.out.println("Config.getRootFolder()");
-
-        if (rootFolder == null) {
-            setRootFolder();
-        }
-        return rootFolder;
     }
 
     public static ObjectMapper getMapper() {
@@ -130,5 +102,4 @@ public class Config {
                 .registerModule(new JavaTimeModule())
                 .enable(SerializationFeature.INDENT_OUTPUT);
     }
-
 }

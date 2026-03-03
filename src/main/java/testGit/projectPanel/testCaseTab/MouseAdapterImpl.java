@@ -21,7 +21,7 @@ public class MouseAdapterImpl extends MouseAdapter {
 
     public MouseAdapterImpl(final ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
-        this.tree = ProjectPanel.testCaseTree;
+        this.tree = projectPanel.getTestCaseTree();
     }
 
     @Override
@@ -43,8 +43,5 @@ public class MouseAdapterImpl extends MouseAdapter {
 
         } else if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && treeItem.getType() == DirectoryType.TS)
             TestCaseEditor.open(treeItem, node);
-
-
     }
-
 }

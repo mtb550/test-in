@@ -36,9 +36,6 @@ public class TestRunCard extends JBPanel<TestRunCard> {
     private final JBLabel automationRefLabel = createDetailLabel();
     private final JPanel actionButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, JBUI.scale(8), 8));
 
-    private final JLayeredPane layeredPane = new JLayeredPane();
-    private final BorderLayoutPanel wrapper = new BorderLayoutPanel();
-
     private final Color defaultBackground;
     private final Color selectedBackground;
     private final Border defaultBorder;
@@ -88,13 +85,15 @@ public class TestRunCard extends JBPanel<TestRunCard> {
 
         styleActionButtons();
 
+        BorderLayoutPanel wrapper = new BorderLayoutPanel();
         wrapper.setOpaque(false);
         wrapper.setBorder(JBUI.Borders.empty(12, 16));
         wrapper.addToCenter(content);
 
-        layeredPane.setLayout(null);
-        layeredPane.add(wrapper, JLayeredPane.DEFAULT_LAYER);
-        layeredPane.add(actionButtonPanel, JLayeredPane.PALETTE_LAYER);
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setLayout(new OverlayLayout(layeredPane));
+        layeredPane.add(wrapper, JLayeredPane.DRAG_LAYER);
+        layeredPane.add(actionButtonPanel);
 
         add(layeredPane, BorderLayout.CENTER);
 
@@ -132,8 +131,6 @@ public class TestRunCard extends JBPanel<TestRunCard> {
             }
 
             private void showContextMenu(MouseEvent e) {
-                // Instantiate your custom ActionGroup
-                // Note: Assuming 'null' for list/model if not needed, or pass them if required
                 ContextMenu group = new ContextMenu(null, null, null, TestRunCard.this.tc);
 
                 ActionManager actionManager = ActionManager.getInstance();
@@ -150,12 +147,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
 
         int w = getWidth();
         int h = getHeight();
-
-        layeredPane.setBounds(0, 0, w, h);
-        wrapper.setBounds(0, 0, w, h);
-
         Dimension btn = actionButtonPanel.getPreferredSize();
-
         actionButtonPanel.setBounds(
                 w - btn.width - JBUI.scale(8),
                 h - btn.height - JBUI.scale(8),
@@ -191,7 +183,6 @@ public class TestRunCard extends JBPanel<TestRunCard> {
         btn.setFocusPainted(false);
         btn.setBorder(JBUI.Borders.empty(6, 16));
 
-        // ADD ACTION HERE
         btn.addActionListener(e -> updateTestCaseStatus(status));
 
         btn.addMouseListener(new MouseAdapter() {
@@ -212,15 +203,10 @@ public class TestRunCard extends JBPanel<TestRunCard> {
     }
 
     private void updateTestCaseStatus(String status) {
-        // 1. Update your POJO
-        //this.tc.setStatus(status); // Assuming your TestCase has a setStatus method
 
-        // 2. Refresh UI if needed
         System.out.println("execution done.");
         System.out.println("Test Case " + tc.getTitle() + " updated to: " + status);
 
-        // 3. Optional: Trigger a save or refresh event
-        // e.g., ProjectManager.getInstance().getService(MyService.class).notifyChange(tc);
     }
 
     private void setupClickListener() {
@@ -290,11 +276,11 @@ public class TestRunCard extends JBPanel<TestRunCard> {
             case "medium" -> JBColor.magenta;
             default -> JBColor.lightGray;
         };
-        return new RoundedBadge(tc.getPriority(), bg, 20);
+        return new RoundedBadge(tc.getPriority(), bg);
     }
 
     private JBLabel createGroupBadge(GroupType groupName) {
-        return new RoundedBadge(groupName.name(), JBColor.darkGray, 20);
+        return new RoundedBadge(groupName.name(), JBColor.darkGray);
     }
 
     private JBLabel createDetailLabel() {
@@ -306,12 +292,9 @@ public class TestRunCard extends JBPanel<TestRunCard> {
     }
 
     private static class RoundedBadge extends JBLabel {
-        private final int radius;
 
-        RoundedBadge(String text, Color bg, int radius) {
+        RoundedBadge(String text, Color bg) {
             super(text.toUpperCase());
-            this.radius = radius;
-            setOpaque(false);
             setBackground(bg);
             setForeground(JBColor.WHITE);
             setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD));
@@ -320,11 +303,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
 
         @Override
         protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
-            g2.dispose();
+
             super.paintComponent(g);
         }
     }

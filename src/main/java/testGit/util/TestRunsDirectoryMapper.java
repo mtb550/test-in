@@ -1,11 +1,12 @@
 package testGit.util;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
@@ -20,47 +21,42 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class TestRunsDirectoryMapper {
-    @Getter
-    @Setter
-    private static DefaultTreeModel treeModel;
 
-    /**
-     * Builds the Test Runs tree.
-     * Matches the 'buildTree' naming in TestCasesDirectoryMapper.
-     */
-    /**
-     * The background-friendly way to load your tree.
-     */
     public static void buildTreeAsync(@NotNull SimpleTree tree) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Loading test runs", false) {
+        Project project = DataManager.getInstance().getDataContext(tree).getData(CommonDataKeys.PROJECT);
+        if (project == null) project = Config.getProject();
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Loading test runs", false) {
             private DefaultTreeModel newModel;
 
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                // This runs on a BACKGROUND thread
+                Directory selectedProject = ProjectSelector.getSelectedProject();
+                if (selectedProject == null) {
+                    return;
+                }
+
                 indicator.setIndeterminate(true);
                 indicator.setText("Scanning directories for test runs...");
 
-                // Do the heavy IO work here
-                String rootName = ProjectSelector.getSelectedProject().getName();
-                DefaultMutableTreeNode root = buildRoot(rootName, "testRuns");
+                String rootName = selectedProject.getName();
+                DefaultMutableTreeNode root = buildRoot(rootName);
                 newModel = new DefaultTreeModel(root);
             }
 
             @Override
             public void onSuccess() {
-                // This runs on the UI thread (EDT)
-                treeModel = newModel;
-                tree.setModel(treeModel);
-
-                // Optional: Expand the first level
-                tree.expandRow(0);
-                System.out.println("Tree loaded successfully in background.");
+                if (newModel != null) {
+                    tree.setModel(newModel);
+                    newModel.nodeStructureChanged((DefaultMutableTreeNode) newModel.getRoot());
+                    tree.updateUI();
+                    tree.expandRow(0);
+                }
             }
         });
     }
 
-    private static DefaultMutableTreeNode buildRoot(String rootName, String subFolderName) {
+    private static DefaultMutableTreeNode buildRoot(String rootName) {
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(rootName);
         File[] projects = Config.getRootFolderFile().listFiles();
 
@@ -71,15 +67,12 @@ public class TestRunsDirectoryMapper {
                     .filter(Objects::nonNull)
                     .forEach(dir -> {
                         System.out.println("TestRunsDirectoryMapper.buildRoot: " + dir.getName());
-                        rootNode.add(buildNodeRecursive(dir, subFolderName));
+                        rootNode.add(buildNodeRecursive(dir, "testRuns"));
                     });
         }
         return rootNode;
     }
 
-    /**
-     * Recursive-style node builder to match TestCasesDirectoryMapper structure.
-     */
     public static DefaultMutableTreeNode buildNodeRecursive(@NotNull Directory dir, @Nullable String subFolder) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dir);
 
@@ -103,10 +96,6 @@ public class TestRunsDirectoryMapper {
         return node;
     }
 
-    /**
-     * Maps a File to a Directory object.
-     * Renamed from 'mapToRun' to 'map' to match TestCasesDirectoryMapper.
-     */
     @Nullable
     public static Directory map(@NotNull final File file) {
         try {

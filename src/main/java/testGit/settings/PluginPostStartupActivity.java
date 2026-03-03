@@ -1,5 +1,6 @@
 package testGit.settings;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import kotlin.Unit;
@@ -13,11 +14,20 @@ public class PluginPostStartupActivity implements ProjectActivity {
     @Override
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         System.out.println("PluginPostStartupActivity.execute()");
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (project.isDisposed()) return;
 
-        Config.setProject(project);
-        Config.setProjectBasePath(project.getBasePath());
-        System.out.println("project.getBasePath(): " + project.getBasePath());
-        Config.setRootFolder();
+            Config.setProject(project);
+            Config.setProjectBasePath(project.getBasePath());
+
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                if (project.isDisposed()) return;
+                Config.setRootFolder();
+                System.out.println("TestGit: Initial configuration complete.");
+            });
+
+        });
+
         return Unit.INSTANCE;
     }
 }

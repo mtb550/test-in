@@ -1,11 +1,12 @@
 package testGit.util;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
@@ -20,46 +21,44 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class TestCasesDirectoryMapper {
-    @Getter
-    @Setter
-    private static DefaultTreeModel treeModel;
 
-    /**
-     * The background-friendly way to load your tree.
-     */
     public static void buildTreeAsync(@NotNull SimpleTree tree) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Loading test cases", false) {
+        Project project = DataManager.getInstance().getDataContext(tree).getData(CommonDataKeys.PROJECT);
+        if (project == null) project = Config.getProject();
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Loading test cases", false) {
             private DefaultTreeModel newModel;
 
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
-                // This runs on a BACKGROUND thread
-                indicator.setIndeterminate(true);
-                indicator.setText("Scanning directories for test cases...");
+                Directory selectedProject = ProjectSelector.getSelectedProject();
 
-                // Do the heavy IO work here
-                String rootName = ProjectSelector.getSelectedProject().getName();
-                DefaultMutableTreeNode root = buildRoot(rootName, "testCases");
+                if (selectedProject == null) {
+                    return;
+                }
+
+                indicator.setIndeterminate(true);
+                indicator.setText("Scanning directories for test runs...");
+
+                String rootName = selectedProject.getName();
+                DefaultMutableTreeNode root = buildRoot(rootName);
                 newModel = new DefaultTreeModel(root);
             }
 
             @Override
             public void onSuccess() {
-                // This runs on the UI thread (EDT)
-                treeModel = newModel;
-                tree.setModel(treeModel);
+                tree.setModel(newModel);
 
-                // Optional: Expand the first level
+                newModel.nodeStructureChanged((DefaultMutableTreeNode) newModel.getRoot());
+                tree.updateUI();
+
                 tree.expandRow(0);
                 System.out.println("Tree loaded successfully in background.");
             }
         });
     }
 
-    /**
-     * دالة عامة لبناء الجذر الأساسي لتجنب تكرار الكود
-     */
-    private static DefaultMutableTreeNode buildRoot(String rootName, String subFolderName) {
+    private static DefaultMutableTreeNode buildRoot(String rootName) {
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(rootName);
         File[] projects = Config.getRootFolderFile().listFiles(File::isDirectory);
 
@@ -70,15 +69,12 @@ public class TestCasesDirectoryMapper {
                     .filter(Objects::nonNull)
                     .forEach(dir -> {
                         System.out.println("TestCasesDirectoryMapper.buildRoot(). " + dir.getName());
-                        rootNode.add(buildNodeRecursive(dir, subFolderName));
+                        rootNode.add(buildNodeRecursive(dir, "testCases"));
                     });
         }
         return rootNode;
     }
 
-    /**
-     * دالة التكرار الذاتي (Recursion) الموحدة لكل أنواع الأشجار
-     */
     public static DefaultMutableTreeNode buildNodeRecursive(@NotNull Directory dir, @Nullable String subFolder) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dir);
 
@@ -99,9 +95,6 @@ public class TestCasesDirectoryMapper {
         return node;
     }
 
-    /**
-     * تحويل File إلى كائن Directory مع معالجة الأخطاء
-     */
     @Nullable
     public static Directory map(@NotNull final File file) {
         try {

@@ -1,5 +1,6 @@
 package testGit.actions;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
@@ -16,7 +17,7 @@ public class Enable extends DumbAwareAction {
     private final SimpleTree tree;
 
     public Enable(final SimpleTree tree) {
-        super("✏️ Rename");
+        super("Rename", "", AllIcons.Actions.Edit);
         this.tree = tree;
     }
 
@@ -34,9 +35,6 @@ public class Enable extends DumbAwareAction {
 
         String newName = Messages.showInputDialog("Rename node:", "Rename", null, treeItem.getName(), null);
         if (newName == null || newName.isBlank()) return;
-
-        //new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
-
 
         treeItem.setName(newName);
         ((DefaultTreeModel) tree.getModel()).nodeChanged(node);

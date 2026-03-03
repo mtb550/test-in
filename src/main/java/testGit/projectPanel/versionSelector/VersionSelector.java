@@ -22,7 +22,6 @@ public class VersionSelector {
     }
 
     private void onSelection(ActionEvent e) {
-        // Optional: notify panel on version change
     }
 
     private void loadVersions(int projectId) {

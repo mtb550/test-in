@@ -12,7 +12,7 @@ public class ProviderImpl implements FileEditorProvider, DumbAware {
 
     @Override
     public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
-        return file.getClass().getSimpleName().equals("VirtualFileImpl");
+        return file instanceof VirtualFileImpl;
     }
 
     @Override

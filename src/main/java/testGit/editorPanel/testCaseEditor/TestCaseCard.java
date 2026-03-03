@@ -75,8 +75,6 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
 
-        // 2. Control visibility based on the Set contents
-        // The strings here MUST match the strings in your showDetailsPopup list
         expectedLabel.setVisible(activeDetails.contains("Expected Result"));
         stepsLabel.setVisible(activeDetails.contains("Steps"));
         automationRefLabel.setVisible(activeDetails.contains("Automation Ref"));
@@ -86,12 +84,10 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
 
         badgePanel.removeAll();
 
-        // Conditionally show Priority Badge
         if (showPriority) {
             badgePanel.add(createPriorityBadge(tc));
         }
 
-        // Conditionally show Group Badges
         if (showGroups) {
             List<GroupType> groups = tc.getGroups();
             if (groups != null) {
@@ -100,7 +96,6 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
                 }
             }
         }
-        // Crucial for dynamic changes in a renderer
         badgePanel.revalidate();
         badgePanel.repaint();
     }

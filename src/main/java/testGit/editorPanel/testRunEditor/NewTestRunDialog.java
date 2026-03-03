@@ -20,7 +20,7 @@ public class NewTestRunDialog extends DialogWrapper {
     private final ComboBox<String> deviceCombo = new ComboBox<>(new String[]{"Desktop", "Mobile", "Tablet"});
 
     public NewTestRunDialog() {
-        super(true); // use current window as parent
+        super(true);
         setTitle("Create New Test Run");
         init();
     }

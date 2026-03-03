@@ -20,7 +20,6 @@ public class ModelSyncListener<T> implements ListDataListener {
         this.model = model;
     }
 
-    // Use this to temporarily pause syncing (like during filtering)
     public void pause() {
         this.active = false;
     }
@@ -46,15 +45,9 @@ public class ModelSyncListener<T> implements ListDataListener {
 
     @Override
     public void intervalRemoved(ListDataEvent e) {
-        // If you want items deleted from UI to be deleted from data too:
-        if (!active) {
-        }
-        // Logic for removal usually requires tracking what was removed,
-        // as the model index is already gone here.
     }
 
     @Override
     public void contentsChanged(ListDataEvent e) {
-        // Handle updates to existing items
     }
 }

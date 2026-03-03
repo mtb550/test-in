@@ -29,22 +29,22 @@ public class TestRunOpeningUI implements Disposable {
         JPanel cardList = new JPanel();
         cardList.setLayout(new BoxLayout(cardList, BoxLayout.Y_AXIS));
         cardList.setBackground(UIUtil.getTreeBackground());
+        cardList.setOpaque(true);
 
         for (int i = 0; i < initialTestCases.size(); i++) {
             TestCase tc = initialTestCases.get(i);
-
             TestRunCard card = new TestRunCard(i, tc);
-
             card.updateData(i, tc);
-
             cardList.add(card);
         }
 
         cardList.add(Box.createVerticalGlue());
 
         JBScrollPane scrollPane = new JBScrollPane(cardList);
+        scrollPane.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
+
         scrollPane.setBorder(JBUI.Borders.empty());
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(25); // Faster increment = fewer paint calls
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         return mainPanel;

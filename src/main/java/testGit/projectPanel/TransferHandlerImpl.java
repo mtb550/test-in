@@ -69,13 +69,11 @@ public class TransferHandlerImpl extends TransferHandler {
     @Override
     public boolean canImport(TransferSupport support) {
         System.out.println("TransferHandlerImpl.canImport()");
-        // Always check if we support the data flavor
         if (!support.isDataFlavorSupported(NODE_FLAVOR)) {
             System.out.println("TransferHandlerImpl.canImport(). not support");
             return false;
         }
 
-        // Logic for Mouse Drop
         if (support.isDrop()) {
             System.out.println("TransferHandlerImpl.canImport(). drop support");
 
@@ -85,16 +83,12 @@ public class TransferHandlerImpl extends TransferHandler {
             return isValidTarget(targetNode);
         }
 
-        // Logic for Keyboard Paste (Ctrl+V)
         return tree.getSelectionPath() != null;
     }
 
-    // Helper to encapsulate your business rules (DRY principle)
     private boolean isValidTarget(DefaultMutableTreeNode targetNode) {
         System.out.println("TransferHandlerImpl.isValidTarget()");
-
         return targetNode.getUserObject() instanceof Directory targetDir;
-        // Add your existing constraints here (e.g., TS/PR types)
     }
 
     @Override
@@ -104,10 +98,7 @@ public class TransferHandlerImpl extends TransferHandler {
         if (!canImport(support)) return false;
 
         try {
-            // 1. Get the nodes safely
             DefaultMutableTreeNode[] nodes = (DefaultMutableTreeNode[]) support.getTransferable().getTransferData(NODE_FLAVOR);
-
-            // 2. Determine target node
             DefaultMutableTreeNode targetNode;
 
             if (support.isDrop()) {
@@ -120,11 +111,9 @@ public class TransferHandlerImpl extends TransferHandler {
 
             if (targetNode.getUserObject() instanceof Directory targetDir) {
                 if (targetDir.getType() == DirectoryType.PR) {
-                    // Adjust the path to the 'testCases' folder
                     Path newPath = targetDir.getFilePath().resolve("testCases");
                     targetDir.setFilePath(newPath).setFile(newPath.toFile());
 
-                    // Update the model node to reflect the new directory object
                     targetNode.setUserObject(targetDir);
                 }
                 System.out.println("import data, target: " + targetDir.getFilePath());
@@ -139,22 +128,17 @@ public class TransferHandlerImpl extends TransferHandler {
                 for (DefaultMutableTreeNode node : nodes) {
                     if (action == MOVE) {
                         System.out.println("action is move");
-                        // 1. Move logic
                         model.removeNodeFromParent(node);
                         persistMove((Directory) node.getUserObject(), (Directory) targetNode.getUserObject());
-                        // Insert the ORIGINAL node
                         model.insertNodeInto(node, targetNode, targetNode.getChildCount());
                     } else {
                         System.out.println("action is copy");
-                        // 2. Copy logic
-                        // Use the CLONED node for insertion
                         DefaultMutableTreeNode clone = cloneNode(node);
                         persistCopy((Directory) node.getUserObject(), (Directory) targetNode.getUserObject());
                         model.insertNodeInto(clone, targetNode, targetNode.getChildCount());
                     }
                 }
 
-                // Clear the visual "cut" state after operation completes
                 cutNodes.clear();
                 tree.repaint();
             });
@@ -168,9 +152,8 @@ public class TransferHandlerImpl extends TransferHandler {
 
     private DefaultMutableTreeNode cloneNode(DefaultMutableTreeNode node) {
         Directory dir = (Directory) node.getUserObject();
-        // Assuming your Directory POJO has a copy constructor or similar setters
         Directory newDir = new Directory()
-                .setFile(dir.getFile()) // You may need to adjust this to the new path
+                .setFile(dir.getFile())
                 .setName(dir.getName())
                 .setType(dir.getType());
         return new DefaultMutableTreeNode(newDir);
@@ -215,7 +198,7 @@ public class TransferHandlerImpl extends TransferHandler {
                 cutNodes.clear();
                 cutNodes.addAll(Arrays.asList(nodes));
 
-                tree.repaint(); // Triggers the renderer to update colors
+                tree.repaint();
             } catch (Exception e) {
                 e.printStackTrace(System.err);
             }

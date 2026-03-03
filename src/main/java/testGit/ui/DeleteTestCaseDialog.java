@@ -28,7 +28,7 @@ public class DeleteTestCaseDialog {
         return MessageDialogBuilder.yesNo(title, message)
                 .yesText("Delete")
                 .noText("Cancel")
-                .asWarning() // Critical for theme-consistent warning icons
+                .asWarning()
                 .ask(Config.getProject());
     }
 }

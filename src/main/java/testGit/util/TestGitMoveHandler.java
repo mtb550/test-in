@@ -13,7 +13,6 @@ public class TestGitMoveHandler {
 
         if (automationList == null) return;
 
-        // Find all changes in the 'Default' list that should be in 'Automation'
         for (Change change : manager.getDefaultChangeList().getChanges()) {
             String path = ChangesUtil.getFilePath(change).getPath();
             if (path.contains("TestGit")) {

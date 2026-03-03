@@ -6,7 +6,6 @@ import com.intellij.openapi.vcs.changes.ContentRevision;
 
 public class ContentExtractor {
     public static void printJsonChanges(Change change) {
-        // 1. Get the file path from either the 'after' or 'before' revision
         ContentRevision revision = (change.getAfterRevision() != null)
                 ? change.getAfterRevision()
                 : change.getBeforeRevision();
@@ -15,13 +14,11 @@ public class ContentExtractor {
 
         String path = revision.getFile().getPath();
 
-        // 2. Bypass any file that does not end with .json
         if (!path.toLowerCase().endsWith(".json")) {
             return;
         }
 
         try {
-            // 3. Extract and Print
             String oldContent = (change.getBeforeRevision() != null)
                     ? change.getBeforeRevision().getContent()
                     : "[New File]";

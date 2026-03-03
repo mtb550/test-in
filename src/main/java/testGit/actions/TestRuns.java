@@ -14,6 +14,6 @@ public class TestRuns extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         Messages.showInfoMessage("Test Runs feature coming soon!", "Info");
-        // TODO: You can replace the above with real logic when ready.
+        /// TODO: You can replace the above with real logic when ready.
     }
 }

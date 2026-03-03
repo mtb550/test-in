@@ -19,8 +19,8 @@ public class FileEditorCreationImpl extends UserDataHolderBase implements FileEd
         this.virtualFile = vf;
         this.ui = new TestRunCreationUI(vf.getTestCases());
         this.ui.setMetadata(vf.getMetadata());
-        this.ui.setCurrentFile(vf); // Now the UI knows exactly which tab it belongs to
-        this.component = ui.createEditorPanel(vf.getTestCasesTreeModel(), vf.getRunPath());
+        this.ui.setCurrentFile(vf);
+        this.component = ui.createEditorPanel(vf.getTestCasesTreeModel(), vf.getRunPath(), vf.getProjectPanel());
     }
 
     @Override
@@ -48,11 +48,9 @@ public class FileEditorCreationImpl extends UserDataHolderBase implements FileEd
         com.intellij.openapi.util.Disposer.dispose(ui);
     }
 
-    // Boilerplate
     @Override
     public boolean isModified() {
-        //return ui.isModified(); // The IDE now knows when to show the '*'
-        return false;
+        return true;
     }
 
     @Override

@@ -51,7 +51,6 @@ public class CreateTestCase extends DumbAwareAction {
         newTestCase.setPriority(dialog.getPriority());
         newTestCase.setGroups(dialog.getSelectedGroups());
         newTestCase.setNext(null);
-        //newTestCase.setPath(getTreePathNames());
 
         try {
             if (model.isEmpty()) {
@@ -77,10 +76,9 @@ public class CreateTestCase extends DumbAwareAction {
         }
     }
 
-    // Helper to extract the list of names from the TreeNodes
     private List<String> getTreePathNames(DefaultMutableTreeNode node) {
         List<String> pathNames = new ArrayList<>();
-        TreeNode[] nodes = node.getPath(); // Gets nodes from root to this node
+        TreeNode[] nodes = node.getPath();
         for (TreeNode n : nodes) {
             if (n instanceof DefaultMutableTreeNode dmtn && dmtn.getUserObject() instanceof Directory dir) {
                 pathNames.add(dir.getName());

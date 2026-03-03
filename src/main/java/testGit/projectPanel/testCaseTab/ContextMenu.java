@@ -16,7 +16,7 @@ public class ContextMenu extends DefaultActionGroup {
     public ContextMenu(ProjectPanel projectPanel) {
         super("Test Case Context", true);
 
-        SimpleTree testCaseTree = ProjectPanel.testCaseTree;
+        SimpleTree testCaseTree = projectPanel.getTestCaseTree();
 
         add(new OpenTestSet2(testCaseTree));
         add(new AddGroup(testCaseTree));
@@ -35,9 +35,6 @@ public class ContextMenu extends DefaultActionGroup {
         add(new TestRuns());
     }
 
-    /**
-     * دالة مساعدة لإنشاء المجموعات الفرعية بأيقونات وبسطر واحد
-     */
     private DefaultActionGroup createSubGroup(String title, javax.swing.Icon icon, com.intellij.openapi.actionSystem.AnAction... actions) {
         DefaultActionGroup group = new DefaultActionGroup(title, true);
         group.getTemplatePresentation().setIcon(icon);
@@ -52,9 +49,6 @@ public class ContextMenu extends DefaultActionGroup {
         return ActionUpdateThread.EDT;
     }
 
-    /**
-     * كلاس داخلي لمجموعة "Add" للتحكم في الأيقونة وحالة الظهور (Validation)
-     */
     private static class AddGroup extends DefaultActionGroup {
 
         public AddGroup(SimpleTree tree) {

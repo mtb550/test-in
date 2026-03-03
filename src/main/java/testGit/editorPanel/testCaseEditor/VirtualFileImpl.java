@@ -19,5 +19,10 @@ public class VirtualFileImpl extends LightVirtualFile {
         this.testCases = testCases;
     }
 
+    @Override
+    public boolean isValid() {
+        return true;
+    }
+
 
 }

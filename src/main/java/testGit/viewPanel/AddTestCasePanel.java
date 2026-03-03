@@ -46,7 +46,6 @@ public class AddTestCasePanel {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-        // ESC to cancel/clear
         mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "cancelAdd");
         mainPanel.getActionMap().put("cancelAdd", new AbstractAction() {
             @Override
@@ -67,7 +66,6 @@ public class AddTestCasePanel {
 
         int row = 0;
 
-        // Initialize fields with empty values
         titleField = new JBTextField();
         titleField.setToolTipText("Enter test case title");
 
@@ -96,17 +94,15 @@ public class AddTestCasePanel {
         moduleField = new JBTextField();
         moduleField.setToolTipText("Enter module name");
 
-        // Add form rows
-        addRow("📝 Title: *", titleField, formPanel, gbc, row++);
-        addRow("🎯 Expected Result: *", new JBScrollPane(expectedArea), formPanel, gbc, row++);
-        addRow("🪜 Steps: *", new JBScrollPane(stepsArea), formPanel, gbc, row++);
-        addRow("🏷 Priority:", priorityField, formPanel, gbc, row++);
-        addRow("📁 Module:", moduleField, formPanel, gbc, row++);
-        addRow("🤖 Automation Ref:", autoRefField, formPanel, gbc, row++);
-        addRow("📊 Business Ref:", busiRefField, formPanel, gbc, row++);
-        addRow("🧪 Groups:", groupsField, formPanel, gbc, row++);
+        addRow("Title: *", titleField, formPanel, gbc, row++);
+        addRow("Expected Result: *", new JBScrollPane(expectedArea), formPanel, gbc, row++);
+        addRow("Steps: *", new JBScrollPane(stepsArea), formPanel, gbc, row++);
+        addRow("Priority:", priorityField, formPanel, gbc, row++);
+        addRow("Module:", moduleField, formPanel, gbc, row++);
+        addRow("Automation Ref:", autoRefField, formPanel, gbc, row++);
+        addRow("Business Ref:", busiRefField, formPanel, gbc, row++);
+        addRow("Groups:", groupsField, formPanel, gbc, row++);
 
-        // Button panel
         JBPanel<?> buttonPanel = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, 10, 5));
 
         saveButton = new JButton("Create Test Case");
@@ -134,7 +130,6 @@ public class AddTestCasePanel {
         gbc.fill = GridBagConstraints.NONE;
         formPanel.add(buttonPanel, gbc);
 
-        // Focus on title field
         SwingUtilities.invokeLater(() -> titleField.requestFocusInWindow());
 
         formPanel.revalidate();
@@ -142,7 +137,6 @@ public class AddTestCasePanel {
     }
 
     private void onSave() {
-        // Validate required fields
         String title = titleField.getText().trim();
         String expected = expectedArea.getText().trim();
         String steps = stepsArea.getText().trim();
@@ -150,14 +144,13 @@ public class AddTestCasePanel {
         if (title.isEmpty() || expected.isEmpty() || steps.isEmpty()) {
             JOptionPane.showMessageDialog(
                     mainPanel,
-                    "⚠️ Please fill in all required fields (Title, Expected Result, Steps).",
+                    "Please fill in all required fields (Title, Expected Result, Steps).",
                     "Validation Error",
                     JOptionPane.WARNING_MESSAGE
             );
             return;
         }
 
-        // Create new test case
         TestCase newTestCase = new TestCase();
         newTestCase.setTitle(title);
         newTestCase.setExpectedResult(expected);
@@ -167,7 +160,6 @@ public class AddTestCasePanel {
         newTestCase.setBusinessRef(busiRefField.getText().trim());
         newTestCase.setModule(moduleField.getText().trim());
 
-        // Parse groups - convert strings to GroupType enum values
         String groupsText = groupsField.getText().trim();
         if (!groupsText.isEmpty()) {
             List<GroupType> groupTypes = Arrays.stream(groupsText.split(","))
@@ -189,42 +181,27 @@ public class AddTestCasePanel {
             }
         }
 
-        // Set metadata
-        newTestCase.setCreateBy("current_user"); // Replace with actual user
+        newTestCase.setCreateBy("current_user");
         newTestCase.setUpdateBy("current_user");
         newTestCase.setCreateAt(LocalDateTime.now());
         newTestCase.setUpdateAt(LocalDateTime.now());
 
-        // Register undo/redo action
-//        ActionHistory.register(
-//                () -> {
-//                    System.out.println("[UNDO] Test case creation reverted");
-//                },
-//                () -> {
-//                    System.out.println("[REDO] Test case created again");
-//                }
-//        );
-
-        // Call the callback if provided
         if (onSaveCallback != null) {
             onSaveCallback.accept(newTestCase);
-            // Clear form after successful save when using callback
             clearForm();
         } else {
             JOptionPane.showMessageDialog(
                     mainPanel,
-                    "✅ Test case created successfully!\n\nTitle: " + title,
+                    "Test case created successfully!\n\nTitle: " + title,
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE
             );
-            // Clear form for next entry
             clearForm();
         }
     }
 
     private void onCancel() {
         if (onSaveCallback != null) {
-            // If using callback mode, just clear the form
             clearForm();
         } else {
             int result = JOptionPane.showConfirmDialog(

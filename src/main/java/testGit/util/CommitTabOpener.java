@@ -12,7 +12,6 @@ import java.util.Collection;
 public class CommitTabOpener {
 
     public static void openCommitTabAndListFiles(Project project) {
-        // 1. Get the list of files that have changes
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
         Collection<Change> allChanges = changeListManager.getAllChanges();
 
@@ -23,18 +22,14 @@ public class CommitTabOpener {
             }
         }
 
-        // 2. Open the "Commit" Tab using the direct ID string
-        // This avoids the 'internal' access error entirely.
         ApplicationManager.getApplication().invokeLater(() -> {
             ToolWindowManager manager = ToolWindowManager.getInstance(project);
 
-            // "Commit" is the hardcoded ID for the tab in your screenshot
             ToolWindow commitWindow = manager.getToolWindow("Commit");
 
             if (commitWindow != null) {
                 commitWindow.activate(null, true);
             } else {
-                // fallback for some versions where it is lowercase
                 ToolWindow fallback = manager.getToolWindow("commit");
                 if (fallback != null) fallback.activate(null, true);
             }

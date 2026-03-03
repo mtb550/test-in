@@ -35,9 +35,6 @@ public class Disable extends DumbAwareAction {
         String newName = Messages.showInputDialog("Rename node:", "Rename", null, treeItem.getName(), null);
         if (newName == null || newName.isBlank()) return;
 
-        //new sql().execute("UPDATE tree SET name = ? WHERE id = ?", newName, treeItem.getId());
-
-
         treeItem.setName(newName);
         ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
     }

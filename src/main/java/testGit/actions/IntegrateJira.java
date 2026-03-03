@@ -11,6 +11,6 @@ public class IntegrateJira extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO: From Jira
+        /// TODO: From Jira
     }
 }

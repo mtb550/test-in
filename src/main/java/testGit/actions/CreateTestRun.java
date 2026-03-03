@@ -23,7 +23,7 @@ public class CreateTestRun extends DumbAwareAction {
     public CreateTestRun(final ProjectPanel projectPanel) {
         super("New Test Run", "Create a new test run", AllIcons.Actions.GroupBy);
         this.projectPanel = projectPanel;
-        this.testRunTree = ProjectPanel.testRunTree;
+        this.testRunTree = projectPanel.getTestRunTree();
     }
 
     @Override
@@ -44,7 +44,7 @@ public class CreateTestRun extends DumbAwareAction {
 
         /*TestRunEditor.open(treeItem.getFilePath(), projectPanel, parentNode);*/
         NewTestRunDialog dialog = new NewTestRunDialog();
-        if (dialog.showAndGet()) { // Shows popup; returns true if user clicks OK
+        if (dialog.showAndGet()) {
             TestRun metadata = dialog.getMetadata();
             TestRunEditor.create(treeItem.getFilePath(), projectPanel, parentNode, metadata);
         }

@@ -9,15 +9,12 @@ import java.awt.event.KeyEvent;
 public class ShortcutHandler {
     public static void register(final SimpleTree tree) {
 
-        // Delete package (VK_DELETE)
         new DeletePackage(tree);
 
 
-        // 2. Map standard keystrokes to TransferHandler actions
         InputMap inputMap = tree.getInputMap(JComponent.WHEN_FOCUSED);
         ActionMap actionMap = tree.getActionMap();
 
-        // Simply map the keystrokes to the existing TransferHandler actions
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK), "cut");
         actionMap.put("cut", TransferHandler.getCutAction());
 

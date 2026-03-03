@@ -40,7 +40,7 @@ public class Run extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO: Run the feature test automation
+        /// TODO: Run the feature test automation
     }
 
     @Override

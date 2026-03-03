@@ -21,7 +21,7 @@ public class MouseAdapterImpl extends MouseAdapter {
 
     public MouseAdapterImpl(final ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
-        this.tree = ProjectPanel.testRunTree;
+        this.tree = projectPanel.getTestRunTree();
     }
 
     @Override
@@ -56,9 +56,7 @@ public class MouseAdapterImpl extends MouseAdapter {
 
         } else if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e) && treeItem.getType() == DirectoryType.TR) {
             System.out.println("double left click test run");
-            TestRunEditor.open(treeItem.getFilePath());
+            TestRunEditor.open(treeItem.getFilePath(), projectPanel);
         }
-
     }
-
 }

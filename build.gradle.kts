@@ -35,9 +35,9 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.30")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2")
-    implementation("com.jayway.jsonpath:json-path:2.9.0")
-    implementation("commons-io:commons-io:2.16.1")
-    testImplementation("org.testng:testng:7.10.2")
+    implementation("com.jayway.jsonpath:json-path:3.0.0")
+    implementation("commons-io:commons-io:2.21.0")
+    testImplementation("org.testng:testng:7.12.0")
 }
 
 intellijPlatform {
@@ -63,4 +63,9 @@ tasks {
     processResources {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     }
+
 }
+
+//tasks.withType<JavaCompile> {
+//    options.compilerArgs.add("-Xlint:deprecation")
+//}

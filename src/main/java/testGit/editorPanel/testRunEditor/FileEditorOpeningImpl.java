@@ -2,6 +2,7 @@ package testGit.editorPanel.testRunEditor;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -18,8 +19,6 @@ public class FileEditorOpeningImpl extends UserDataHolderBase implements FileEdi
     public FileEditorOpeningImpl(VirtualFileImpl vf) {
         this.virtualFile = vf;
         this.ui = new TestRunOpeningUI(vf);
-        //this.ui.setMetadata(vf.getMetadata());
-        //this.ui.setCurrentFile(vf); // Now the UI knows exactly which tab it belongs to
         this.component = ui.createEditorPanel();
     }
 
@@ -45,14 +44,12 @@ public class FileEditorOpeningImpl extends UserDataHolderBase implements FileEdi
 
     @Override
     public void dispose() {
-        com.intellij.openapi.util.Disposer.dispose(ui);
+        Disposer.dispose(ui);
     }
 
-    // Boilerplate
     @Override
     public boolean isModified() {
-        //return ui.isModified(); // The IDE now knows when to show the '*'
-        return false;
+        return true;
     }
 
     @Override

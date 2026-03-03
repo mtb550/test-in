@@ -15,7 +15,7 @@ public class ContextMenu extends DefaultActionGroup {
 
     public ContextMenu(ProjectPanel projectPanel) {
         super("Test Run Context", true);
-        SimpleTree tree = ProjectPanel.testRunTree;
+        SimpleTree tree = projectPanel.getTestRunTree();
 
         add(new createGroup(tree, projectPanel));
         addSeparator();
@@ -24,9 +24,6 @@ public class ContextMenu extends DefaultActionGroup {
 
     }
 
-    /**
-     * كلاس داخلي لفصل منطق "Add" والتحكم في حالته (Disabled vs Enabled)
-     */
     private static class createGroup extends DefaultActionGroup {
         public createGroup(SimpleTree tree, ProjectPanel projectPanel) {
             super("Create", "Create test run items", AllIcons.General.Add);
@@ -36,9 +33,6 @@ public class ContextMenu extends DefaultActionGroup {
         }
 
 
-        /**
-         * دالة مساعدة لإنشاء المجموعات الفرعية (في حال احتجت لإضافة Import/Export لاحقاً)
-         */
         private DefaultActionGroup createSubGroup(String title, javax.swing.Icon icon, AnAction... actions) {
             DefaultActionGroup group = new DefaultActionGroup(title, true);
             group.getTemplatePresentation().setIcon(icon);

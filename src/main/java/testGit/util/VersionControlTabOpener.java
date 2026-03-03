@@ -12,7 +12,6 @@ import java.util.Collection;
 public class VersionControlTabOpener {
 
     public static void openCommitTabAndListFiles(Project project) {
-        // 1. Get the list of files that have changes
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
         Collection<Change> allChanges = changeListManager.getAllChanges();
 
@@ -23,8 +22,6 @@ public class VersionControlTabOpener {
             }
         }
 
-        // 2. Open the Commit Tool Window
-        // Use "invokeAndWait" or "invokeLater" because UI changes must happen on the EDT thread
         ApplicationManager.getApplication().invokeLater(() -> {
             ToolWindow commitWindow = ToolWindowManager.getInstance(project).getToolWindow("commit");
 
@@ -33,7 +30,6 @@ public class VersionControlTabOpener {
                     System.out.println("Commit tab is now visible.");
                 }, true);
             } else {
-                // Fallback for older versions of IntelliJ where it was part of "Version Control"
                 ToolWindow vcsWindow = ToolWindowManager.getInstance(project).getToolWindow("Version Control");
                 if (vcsWindow != null) {
                     vcsWindow.activate(null);

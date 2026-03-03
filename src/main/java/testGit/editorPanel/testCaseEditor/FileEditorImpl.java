@@ -42,8 +42,8 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final Set<GroupType> selectedGroups = new HashSet<>();
     @Getter
     private final Set<String> selectedDetails = new HashSet<>();
-    private final JButton groupButton; // Using a flat button style
-    private final JButton detailsButton; // Using a flat button style
+    private final JButton groupButton;
+    private final JButton detailsButton;
     private final ModelSyncListener<TestCase> syncListener;
     private final SearchTextField searchField = new SearchTextField();
     private final Footer footer;
@@ -58,7 +58,6 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         this.panel = new JBPanel<>(new BorderLayout());
         this.file = file;
 
-        // 1. LOAD SETTINGS FROM CACHE
         PropertiesComponent props = PropertiesComponent.getInstance();
         this.showGroups = props.getBoolean("testGit.showGroups", true);
         this.showPriority = props.getBoolean("testGit.showPriority", true);
@@ -135,26 +134,19 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
         this.model.addListDataListener(syncListener);
 
-        // 1. Set the size (otherwise it might be tiny)
         searchField.getTextEditor().setColumns(30);
 
-        // 2. Add the listener to trigger filtering
         searchField.addDocumentListener(new com.intellij.ui.DocumentAdapter() {
             @Override
             protected void textChanged(@org.jetbrains.annotations.NotNull javax.swing.event.DocumentEvent e) {
-                // This calls the filtering method in your FileEditorImpl
                 applyFilters(searchField.getText().trim());
             }
         });
 
-        // 3. Add it to the UI
         header.add(searchField);
 
-        // 1. Initialize the footer
         this.footer = new Footer();
-        // 2. Add it to your main panel at the bottom
         this.panel.add(footer, BorderLayout.SOUTH);
-        // 3. Set the initial status
         this.footer.updateStatus(allTestCases.size(), allTestCases.size());
 
         this.list = new JBList<>(model);
@@ -187,21 +179,16 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         panel.add(header, BorderLayout.NORTH);
         panel.add(new JBScrollPane(list), BorderLayout.CENTER);
 
-        // Create the checkbox
         JCheckBox showGroupsCheck = new JCheckBox("Show Groups", showGroups);
         showGroupsCheck.setOpaque(false);
         showGroupsCheck.setFocusable(false);
         showGroupsCheck.addActionListener(e -> {
             showGroups = showGroupsCheck.isSelected();
-            // Trigger a repaint of the list to update the renderers
             list.repaint();
         });
 
-        // Add it to the header (before or after the groupButton)
         header.add(showGroupsCheck);
 
-
-        // Priority Checkbox
         JCheckBox showPriorityCheck = new JCheckBox("Show Priority", showPriority);
         showPriorityCheck.setOpaque(false);
         showPriorityCheck.addActionListener(e -> {
@@ -209,9 +196,8 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
             list.repaint();
         });
 
-        header.add(showPriorityCheck); // Added to header
+        header.add(showPriorityCheck);
 
-        // Update the list renderer to accept the 'showGroups' state
         this.list.setCellRenderer(new RendererImpl(this));
     }
 
@@ -278,7 +264,6 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
                 if (index >= 0) {
                     String detailName = detailsList.getModel().getElementAt(index);
 
-                    // Toggle logic: update the set, not the UI component directly
                     if (selectedDetails.contains(detailName)) {
                         selectedDetails.remove(detailName);
                     } else {
@@ -335,11 +320,9 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
             detailsButton.setText("Details");
             detailsButton.setForeground(JBColor.foreground());
         } else {
-            // Just update the button text, don't filter the model!
             detailsButton.setText("Details (" + selectedDetails.size() + ")");
             detailsButton.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
         }
-        // Refresh the cards to show/hide labels
         list.repaint();
     }
 
@@ -347,25 +330,20 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         PropertiesComponent props = PropertiesComponent.getInstance();
         props.setValue("testGit.showGroups", showGroups, true);
         props.setValue("testGit.showPriority", showPriority, true);
-        // Convert Set to a comma-separated string to save it
         props.setValue("testGit.selectedDetails", String.join(",", selectedDetails));
     }
 
     public void applyFilters(String query) {
         this.currentSearchQuery = query;
 
-        // We pause the syncListener so that updating the UI model
-        // doesn't accidentally try to "sync" back to the original file.
         if (syncListener != null) syncListener.pause();
 
         try {
             List<TestCase> filtered = allTestCases.stream()
                     .filter(tc -> {
-                        // Filter by Search Query
                         boolean matchesSearch = query.isEmpty() ||
                                 (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query.toLowerCase()));
 
-                        // Filter by Selected Groups (Keep your existing logic here)
                         boolean matchesGroup = selectedGroups.isEmpty() ||
                                 (tc.getGroups() != null && tc.getGroups().stream().anyMatch(selectedGroups::contains));
 
@@ -373,10 +351,8 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
                     })
                     .collect(java.util.stream.Collectors.toList());
 
-            // Update the JBList model with the new filtered results
             model.replaceAll(filtered);
 
-            // Update the footer counts
             if (footer != null) {
                 footer.updateStatus(model.getSize(), allTestCases.size());
             }

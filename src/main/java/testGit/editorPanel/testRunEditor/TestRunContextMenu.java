@@ -12,7 +12,6 @@ public class TestRunContextMenu extends DefaultActionGroup {
         add(new AnAction("Run This Test", "Execute single test", AllIcons.Actions.Execute) {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                // Execution logic
             }
         });
         addSeparator();

@@ -12,6 +12,6 @@ public class ViewCommits extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // TODO: Open commit log UI
+        /// TODO: Open commit log UI
     }
 }

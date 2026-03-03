@@ -109,13 +109,13 @@ public class TestCaseDetailsPanel {
             busiRefField = new JBTextField(currentTestCase.getBusinessRef());
             groupsField = new JBTextField(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "");
 
-            addRow("📝 Title:", titleField, detailTab, gbc, row++);
-            addRow("🎯 Expected Result:", expectedArea, detailTab, gbc, row++);
-            addRow("🪜 Steps:", stepsArea, detailTab, gbc, row++);
-            addRow("🏷 Priority:", priorityField, detailTab, gbc, row++);
-            addRow("🤖 Automation Ref:", autoRefField, detailTab, gbc, row++);
-            addRow("📊 Business Ref:", busiRefField, detailTab, gbc, row++);
-            addRow("🧪 Groups:", groupsField, detailTab, gbc, row++);
+            addRow("Title:", titleField, detailTab, gbc, row++);
+            addRow("Expected Result:", expectedArea, detailTab, gbc, row++);
+            addRow("Steps:", stepsArea, detailTab, gbc, row++);
+            addRow("Priority:", priorityField, detailTab, gbc, row++);
+            addRow("Automation Ref:", autoRefField, detailTab, gbc, row++);
+            addRow("Business Ref:", busiRefField, detailTab, gbc, row++);
+            addRow("Groups:", groupsField, detailTab, gbc, row++);
         } else {
             idLabel = createValueLabel(currentTestCase.getId());
             titleLabel = createValueLabel(currentTestCase.getTitle());
@@ -126,14 +126,14 @@ public class TestCaseDetailsPanel {
             busiRefLabel = createValueLabel(currentTestCase.getBusinessRef());
             groupsLabel = createValueLabel(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "");
 
-            addRow("📝 ID:", idLabel, detailTab, gbc, row++);
-            addRow("📝 Title:", titleLabel, detailTab, gbc, row++);
-            addRow("🎯 Expected Result:", expectedLabel, detailTab, gbc, row++);
-            addRow("🪜 Steps:", stepsLabel, detailTab, gbc, row++);
-            addRow("🏷 Priority:", priorityLabel, detailTab, gbc, row++);
-            addRow("🤖 Automation Ref:", autoRefLabel, detailTab, gbc, row++);
-            addRow("📊 Business Ref:", busiRefLabel, detailTab, gbc, row++);
-            addRow("🧪 Groups:", groupsLabel, detailTab, gbc, row++);
+            addRow("ID:", idLabel, detailTab, gbc, row++);
+            addRow("Title:", titleLabel, detailTab, gbc, row++);
+            addRow("Expected Result:", expectedLabel, detailTab, gbc, row++);
+            addRow("Steps:", stepsLabel, detailTab, gbc, row++);
+            addRow("Priority:", priorityLabel, detailTab, gbc, row++);
+            addRow("Automation Ref:", autoRefLabel, detailTab, gbc, row++);
+            addRow("Business Ref:", busiRefLabel, detailTab, gbc, row++);
+            addRow("Groups:", groupsLabel, detailTab, gbc, row++);
         }
 
         uidLabel = createValueLabel(String.valueOf(currentTestCase.getUid()));
@@ -143,12 +143,12 @@ public class TestCaseDetailsPanel {
         createdAtLabel = createValueLabel(currentTestCase.getCreateAt() != null ? currentTestCase.getCreateAt().toString() : "-");
         updatedAtLabel = createValueLabel(currentTestCase.getUpdateAt() != null ? currentTestCase.getUpdateAt().toString() : "-");
 
-        addRow("🆔 UID:", uidLabel, detailTab, gbc, row++);
-        addRow("📁 Module:", moduleLabel, detailTab, gbc, row++);
-        addRow("👤 Created By:", createdByLabel, detailTab, gbc, row++);
-        addRow("✍️ Updated By:", updatedByLabel, detailTab, gbc, row++);
-        addRow("🕒 Created At:", createdAtLabel, detailTab, gbc, row++);
-        addRow("🕓 Updated At:", updatedAtLabel, detailTab, gbc, row++);
+        addRow("UID:", uidLabel, detailTab, gbc, row++);
+        addRow("Module:", moduleLabel, detailTab, gbc, row++);
+        addRow("Created By:", createdByLabel, detailTab, gbc, row++);
+        addRow("Updated By:", updatedByLabel, detailTab, gbc, row++);
+        addRow("Created At:", createdAtLabel, detailTab, gbc, row++);
+        addRow("Updated At:", updatedAtLabel, detailTab, gbc, row++);
 
         if (editable) {
             saveButton = new JButton("Save");
@@ -190,23 +190,6 @@ public class TestCaseDetailsPanel {
         currentTestCase.setExpectedResult(newExpected);
         currentTestCase.setSteps(newSteps);
         currentTestCase.setPriority(newPriority);
-
-//        ActionHistory.register(
-//                () -> {
-//                    currentTestCase.setTitle(oldTitle);
-//                    currentTestCase.setExpectedResult(oldExpected);
-//                    currentTestCase.setSteps(oldSteps);
-//                    currentTestCase.setPriority(oldPriority);
-//                    update(currentTestCase);
-//                },
-//                () -> {
-//                    currentTestCase.setTitle(newTitle);
-//                    currentTestCase.setExpectedResult(newExpected);
-//                    currentTestCase.setSteps(newSteps);
-//                    currentTestCase.setPriority(newPriority);
-//                    update(currentTestCase);
-//                }
-//        );
 
         toggleEditMode(false);
         JOptionPane.showMessageDialog(mainPanel, "✅ Test case saved successfully.", "Saved", JOptionPane.INFORMATION_MESSAGE);

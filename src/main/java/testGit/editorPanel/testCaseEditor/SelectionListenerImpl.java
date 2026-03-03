@@ -46,16 +46,13 @@ public class SelectionListenerImpl implements ListSelectionListener {
         if (!e.getValueIsAdjusting()) {
             TestCase selected = list.getSelectedValue();
             if (selected != null) {
-                // Check if the "Details" ToolWindow is already open/active
                 ToolWindow toolWindow = ToolWindowManager.getInstance(Config.getProject())
                         .getToolWindow("Details");
 
                 if (toolWindow != null && toolWindow.isVisible()) {
-                    // Update the details without forcing the window to 'pop' or grab focus
                     ViewPanel.show(selected);
                 }
 
-                // Keep your existing change tracking logic
                 com.intellij.openapi.vcs.changes.ChangeListManager.getInstance(Config.getProject())
                         .getAllChanges()
                         .forEach(ContentExtractor::printJsonChanges);

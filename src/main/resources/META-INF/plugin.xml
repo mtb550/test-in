@@ -21,14 +21,18 @@
                 factoryClass="testGit.projectPanel.ToolWindowFactory"
                 anchor="left"
                 icon="AllIcons.General.Information"
-                secondary="false"/>
+                secondary="false"
+                doNotActivateOnStart="true"
+        />
 
         <toolWindow
                 id="Details"
-                factoryClass="testGit.viewPanel.ToolWindowFactory"
+                factoryClass="testGit.viewPanel.ToolWindowFactoryImpl"
                 anchor="bottom"
                 icon="AllIcons.General.Information"
-                secondary="false"/>
+                secondary="false"
+                doNotActivateOnStart="true"
+        />
 
         <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.ProviderImpl"/>
         <fileEditorProvider implementation="testGit.editorPanel.testRunEditor.FileEditorProviderImpl"/>
@@ -63,4 +67,9 @@
                popup="true">
         </group>
     </actions>
+
+    <projectListeners>
+        <listener class="testGit.settings.MyVfsListener"
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </projectListeners>
 </idea-plugin>

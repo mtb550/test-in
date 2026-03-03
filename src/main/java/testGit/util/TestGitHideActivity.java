@@ -15,7 +15,6 @@ public class TestGitHideActivity implements ProjectActivity {
     public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
         ChangeListManager manager = ChangeListManager.getInstance(project);
 
-        // Create the list if it doesn't exist
         LocalChangeList list = manager.findChangeList("TestGit Automation");
         if (list == null) {
             manager.addChangeList("TestGit Automation", "Files managed by automation - do not commit");

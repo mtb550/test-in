@@ -2,6 +2,7 @@ package testGit.settings;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -28,9 +29,13 @@ public class AppSettingsConfigurable implements Configurable {
     public JComponent createComponent() {
         System.out.println("AppSettingsConfigurable.createComponent()");
 
-        // إضافة زر تصفح المجلدات (Browse) للحقل
-        rootPathField.addBrowseFolderListener("Select Root Folder", null, null,
-                FileChooserDescriptorFactory.createSingleFolderDescriptor());
+        rootPathField.addBrowseFolderListener(
+                null,
+                FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                        .withTitle("Select Root Folder")
+                        .withDescription("Choose the directory where your test projects are stored"),
+                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+        );
 
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("Root projects folder: "), rootPathField, 1, false)

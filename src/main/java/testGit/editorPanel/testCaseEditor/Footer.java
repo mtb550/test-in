@@ -16,7 +16,6 @@ public class Footer extends JBPanel<Footer> {
 
     public Footer() {
         super(new BorderLayout());
-        // Add a line at the top to separate it from the list
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0));
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
         setPreferredSize(new Dimension(-1, JBUI.scale(28)));

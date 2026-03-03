@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 
 public class ViewPanel {
 
-    // Helper to get the ToolWindow safely and avoid static state issues
     private static ToolWindow getToolWindow() {
         Project project = Config.getProject();
         if (project == null) return null;
@@ -25,7 +24,7 @@ public class ViewPanel {
 
             selectContent(tw, "Create Test Case");
 
-            AddTestCasePanel add = ToolWindowFactory.getAddInstance();
+            AddTestCasePanel add = ToolWindowFactoryImpl.getAddInstance();
             if (add != null) {
                 add.setOnSaveCallback(onSaveCallback);
             }
@@ -40,7 +39,7 @@ public class ViewPanel {
 
             selectContent(tw, "Details");
 
-            TestCaseDetailsPanel viewer = ToolWindowFactory.getDetailsInstance();
+            TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
             if (viewer != null) {
                 viewer.update(testCase);
             }
@@ -55,14 +54,12 @@ public class ViewPanel {
     }
 
     public static void reset() {
-        // Reset the Details Panel content
-        TestCaseDetailsPanel viewer = ToolWindowFactory.getDetailsInstance();
+        TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
         if (viewer != null) {
-            viewer.update(null); // Passing null to clear fields
+            viewer.update(null);
         }
     }
 
-    // Extracted logic to keep code DRY
     private static void selectContent(ToolWindow tw, String displayName) {
         Content[] contents = tw.getContentManager().getContents();
         for (Content content : contents) {

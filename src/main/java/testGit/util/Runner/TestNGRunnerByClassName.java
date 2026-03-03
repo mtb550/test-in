@@ -11,7 +11,7 @@ import com.theoryinpractice.testng.model.TestType;
 
 public class TestNGRunnerByClassName {
     public static void runTestClass(final Project project, final String fullyQualifiedClassName) {
-        // add notifier here
+        /// add notifier here
         TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
         RunManager runManager = RunManager.getInstance(project);
 
