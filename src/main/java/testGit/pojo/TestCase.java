@@ -32,7 +32,7 @@ public class TestCase {
 
     private String steps;
 
-    private String priority;
+    private Priority priority;
 
     private String automationRef;
 

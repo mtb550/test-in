@@ -75,6 +75,8 @@ intellijPlatform {
     publishing {
         token.set(System.getenv("PUBLISH_TOKEN"))
     }
+
+    sandboxContainer.set(layout.projectDirectory.dir(".sandbox"))
 }
 
 tasks {
@@ -88,5 +90,11 @@ tasks {
         testLogging {
             events("passed", "skipped", "failed")
         }
+    }
+}
+
+intellijPlatformTesting {
+    runIde {
+        parallelStream()
     }
 }

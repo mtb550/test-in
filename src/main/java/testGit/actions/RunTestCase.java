@@ -29,10 +29,10 @@ public class RunTestCase extends DumbAwareAction {
         if (ref != null && !ref.isBlank()) {
             Tools.printTestSourceRoots(project);
             TestNGRunnerByClassName.runTestClass(project, ref);
-            Notifier.information("Running TestNG class: ", ref);
+            Notifier.info("Running TestNG class: ", ref);
         } else {
             System.out.println("No automation reference found for this test case.");
-            Notifier.warning("Note", "No automation reference found for this test case.");
+            Notifier.warn("Note", "No automation reference found for this test case.");
         }
     }
 }

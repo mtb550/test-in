@@ -54,7 +54,7 @@ public class TestRunRenderer extends SimpleColoredComponent implements TreeCellR
         append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
         if (dir.getType() == DirectoryType.TR) {
-            String statusLabel = TestRunStatus.labelFor(dir.getActive());
+            String statusLabel = TestRunStatus.labelFor(1);
             append(" " + statusLabel, new SimpleTextAttributes(SimpleTextAttributes.STYLE_ITALIC, JBColor.DARK_GRAY));
         }
     }

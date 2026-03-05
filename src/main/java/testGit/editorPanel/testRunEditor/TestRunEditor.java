@@ -64,7 +64,7 @@ public class TestRunEditor {
         File folder = testSet.getFile();
 
         if (folder != null && folder.exists() && folder.isDirectory()) {
-            File[] files = folder.listFiles((d, name) -> name.toLowerCase().endsWith(".json"));
+            File[] files = folder.listFiles((d, name) -> name.endsWith(".json"));
             if (files != null) {
                 for (File file : files) {
                     try {

@@ -9,6 +9,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testCaseEditor.TestCaseEditor;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryStatus;
 import testGit.pojo.DirectoryType;
 import testGit.util.TreeUtilImpl;
 
@@ -45,9 +46,9 @@ public class CreateTestSet extends DumbAwareAction {
         Directory newTestSet = new Directory()
                 .setType(DirectoryType.TS)
                 .setName(name)
-                .setActive(1);
+                .setStatus(DirectoryStatus.AC);
 
-        newTestSet.setFileName(String.format("%s_%s_%d", newTestSet.getType().toString().toLowerCase(), newTestSet.getName(), newTestSet.getActive()));
+        newTestSet.setFileName(String.format("%s_%s_%s", newTestSet.getType().toString(), newTestSet.getName(), newTestSet.getStatus()));
 
         Path parentPath;
         if (treeItem.getType() == DirectoryType.PR) {

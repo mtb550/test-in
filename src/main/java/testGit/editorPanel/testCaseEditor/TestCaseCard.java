@@ -101,12 +101,12 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
     }
 
     private JBLabel createPriorityBadge(TestCase tc) {
-        Color bg = switch (tc.getPriority().toLowerCase()) {
-            case "high" -> JBColor.CYAN;
-            case "medium" -> JBColor.magenta;
-            default -> JBColor.lightGray;
+        Color bg = switch (tc.getPriority()) {
+            case HIGH -> JBColor.CYAN;
+            case MEDIUM -> JBColor.magenta;
+            case LOW -> JBColor.GRAY;
         };
-        return new RoundedBadge(tc.getPriority(), bg, 20);
+        return new RoundedBadge(tc.getPriority().getDescription(), bg, 20);
     }
 
     private JBLabel createGroupBadge(GroupType groupName) {
@@ -127,7 +127,7 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         private final int radius;
 
         RoundedBadge(String text, Color bg, int radius) {
-            super(text.toUpperCase());
+            super(text);
             this.radius = radius;
             setOpaque(false);
             setBackground(bg);

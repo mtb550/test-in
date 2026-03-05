@@ -3,7 +3,7 @@ package testGit.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import testGit.projectPanel.ProjectPanel;
 
 public class Refresh extends DumbAwareAction {
@@ -15,7 +15,7 @@ public class Refresh extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(@Nullable AnActionEvent e) {
         System.out.println("RefreshAction.actionPerformed()");
         //projectPanel.getTestProjectSelector().loadTestProjectList();
         projectPanel.setupMainLayout();

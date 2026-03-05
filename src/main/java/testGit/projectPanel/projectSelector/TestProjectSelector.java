@@ -6,8 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import testGit.pojo.Config;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryStatus;
 import testGit.projectPanel.ProjectPanel;
-import testGit.projectPanel.testCaseTab.TestCaseTabController;
+import testGit.util.DirectoryMapper;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -58,9 +59,9 @@ public class TestProjectSelector {
                 .filter(item -> !item.getName().equals(".git") && item.getName().contains("_"))
                 .peek(System.out::println)
                 //.parallel()
-                .map(TestCaseTabController::map)
+                .map(DirectoryMapper::map)
                 .filter(Objects::nonNull)
-                .filter(p -> p.getActive() == 1)
+                .filter(p -> p.getStatus() == DirectoryStatus.AC)
                 .forEach(testProjectList::addElement);
 
         if (!root.exists() || testProjectList.getSize() == 0) {

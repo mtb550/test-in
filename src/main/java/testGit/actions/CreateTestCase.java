@@ -9,6 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.Directory;
+import testGit.pojo.Priority;
 import testGit.pojo.TestCase;
 import testGit.ui.CreateNewTestCaseDialog;
 import testGit.util.KeyboardSet;
@@ -48,7 +49,7 @@ public class CreateTestCase extends DumbAwareAction {
         TestCase newTestCase = new TestCase();
         newTestCase.setId(UUID.randomUUID().toString());
         newTestCase.setTitle(dialog.getTitle());
-        newTestCase.setPriority(dialog.getPriority());
+        newTestCase.setPriority(Priority.valueOf(dialog.getPriority()));
         newTestCase.setGroups(dialog.getSelectedGroups());
         newTestCase.setNext(null);
 

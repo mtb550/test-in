@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryStatus;
 import testGit.pojo.DirectoryType;
 import testGit.util.TreeUtilImpl;
 
@@ -49,9 +50,9 @@ public class CreateTestRunPackage extends DumbAwareAction {
         Directory newPackage = new Directory()
                 .setType(DirectoryType.PA)
                 .setName(name)
-                .setActive(1);
+                .setStatus(DirectoryStatus.AC);
 
-        String folderName = String.format("%s_%s_%d", newPackage.getType().name().toLowerCase(), newPackage.getName(), newPackage.getActive());
+        String folderName = String.format("%s_%s_%s", newPackage.getType().name(), newPackage.getName(), newPackage.getStatus());
         Path fullPath = parentPath.resolve(folderName);
 
         newPackage.setFileName(folderName)

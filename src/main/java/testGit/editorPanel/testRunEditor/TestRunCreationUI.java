@@ -128,7 +128,7 @@ public class TestRunCreationUI implements Disposable {
         List<TestCase> testCases = new ArrayList<>();
         File folder = dir.getFile();
         if (folder != null && folder.exists() && folder.isDirectory()) {
-            File[] files = folder.listFiles((d, name) -> name.toLowerCase().endsWith(".json"));
+            File[] files = folder.listFiles((d, name) -> name.endsWith(".json"));
             if (files != null) {
                 for (File file : files) {
                     try {

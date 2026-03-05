@@ -21,7 +21,7 @@ public class ContextMenu extends DefaultActionGroup {
         SimpleTree testCaseTree = projectPanel.getTestCaseTabController().getTree();
 
         add(new OpenTestSet2(testCaseTree));
-        add(new AddGroup(testCaseTree));
+        add(new AddGroup(projectPanel, testCaseTree));
         addSeparator();
         add(new DeletePackage(projectPanel, testCaseTree));
         add(new Rename(projectPanel, testCaseTree));
@@ -53,11 +53,11 @@ public class ContextMenu extends DefaultActionGroup {
 
     private static class AddGroup extends DefaultActionGroup {
 
-        public AddGroup(SimpleTree tree) {
+        public AddGroup(ProjectPanel projectPanel, SimpleTree tree) {
             super("Create", "Create new items", AllIcons.General.Add);
             setPopup(true);
 
-            add(new CreateTestCasePackage(tree));
+            add(new CreateTestCasePackage(projectPanel, tree));
             add(new CreateTestSet(tree));
         }
 

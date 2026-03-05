@@ -10,6 +10,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import testGit.settings.StartupActivity;
+import testGit.settings.service.ProjectPanelService;
 
 public class Main implements ToolWindowFactory, DumbAware {
 
@@ -19,9 +20,12 @@ public class Main implements ToolWindowFactory, DumbAware {
 
         StartupActivity.execute(project);
 
-        toolWindow.setIcon(AllIcons.Debugger.Db_array);
         ProjectPanel projectPanel = new ProjectPanel(project);
+
+        toolWindow.setIcon(AllIcons.Debugger.Db_array);
         toolWindow.setTitleActions(TitleActions.create(projectPanel));
+
+        ProjectPanelService.getInstance(project).setPanel(projectPanel);
 
         Content content = ContentFactory.getInstance().createContent(projectPanel.getPanel(), null, false);
         Disposer.register(content, projectPanel);

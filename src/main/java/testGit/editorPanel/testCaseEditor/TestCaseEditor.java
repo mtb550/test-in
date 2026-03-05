@@ -27,7 +27,7 @@ public class TestCaseEditor {
     private static VirtualFile createVirtualFile(Directory testSet) {
         List<TestCase> testCases = Optional.ofNullable(testSet.getFile())
                 .filter(f -> f.exists() && f.isDirectory())
-                .map(f -> f.listFiles((d, name) -> name.toLowerCase().endsWith(".json")))
+                .map(f -> f.listFiles((d, name) -> name.endsWith(".json")))
                 .stream()
                 .flatMap(Arrays::stream)
                 //.parallel()

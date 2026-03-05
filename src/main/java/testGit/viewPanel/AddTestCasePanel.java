@@ -5,6 +5,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import lombok.Setter;
 import testGit.pojo.GroupType;
+import testGit.pojo.Priority;
 import testGit.pojo.TestCase;
 
 import javax.swing.*;
@@ -155,7 +156,7 @@ public class AddTestCasePanel {
         newTestCase.setTitle(title);
         newTestCase.setExpectedResult(expected);
         newTestCase.setSteps(steps);
-        newTestCase.setPriority(priorityField.getText().trim());
+        newTestCase.setPriority(Priority.valueOf(priorityField.getText().trim()));
         newTestCase.setAutomationRef(autoRefField.getText().trim());
         newTestCase.setBusinessRef(busiRefField.getText().trim());
         newTestCase.setModule(moduleField.getText().trim());

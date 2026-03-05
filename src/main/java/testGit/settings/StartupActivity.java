@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 public class StartupActivity {
-
     public static void execute(@NotNull Project project) {
         System.out.println("StartupActivity.execute()");
 

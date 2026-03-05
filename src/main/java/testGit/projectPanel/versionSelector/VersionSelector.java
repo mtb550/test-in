@@ -18,6 +18,7 @@ public class VersionSelector {
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
         comboBox.setFocusable(false);
+        comboBox.setEnabled(true);
         //loadVersions(project);
     }
 

@@ -3,6 +3,7 @@ package testGit.viewPanel;
 import com.intellij.ui.components.*;
 import com.intellij.util.ui.JBUI;
 import testGit.pojo.DB;
+import testGit.pojo.Priority;
 import testGit.pojo.TestCase;
 import testGit.pojo.TestCaseHistory;
 
@@ -104,7 +105,7 @@ public class TestCaseDetailsPanel {
             titleField = new JBTextField(currentTestCase.getTitle());
             expectedArea = new JBTextField(currentTestCase.getExpectedResult());
             stepsArea = new JBTextField(currentTestCase.getSteps());
-            priorityField = new JBTextField(currentTestCase.getPriority());
+            priorityField = new JBTextField(currentTestCase.getPriority().getDescription());
             autoRefField = new JBTextField(currentTestCase.getAutomationRef());
             busiRefField = new JBTextField(currentTestCase.getBusinessRef());
             groupsField = new JBTextField(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "");
@@ -121,7 +122,7 @@ public class TestCaseDetailsPanel {
             titleLabel = createValueLabel(currentTestCase.getTitle());
             expectedLabel = createValueLabel(currentTestCase.getExpectedResult());
             stepsLabel = createValueLabel(currentTestCase.getSteps());
-            priorityLabel = createValueLabel(currentTestCase.getPriority());
+            priorityLabel = createValueLabel(currentTestCase.getPriority().getDescription());
             autoRefLabel = createValueLabel(currentTestCase.getAutomationRef());
             busiRefLabel = createValueLabel(currentTestCase.getBusinessRef());
             groupsLabel = createValueLabel(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "");
@@ -179,7 +180,7 @@ public class TestCaseDetailsPanel {
         String oldTitle = currentTestCase.getTitle();
         String oldExpected = currentTestCase.getExpectedResult();
         String oldSteps = currentTestCase.getSteps();
-        String oldPriority = currentTestCase.getPriority();
+        Priority oldPriority = currentTestCase.getPriority();
 
         String newTitle = titleField.getText().trim();
         String newExpected = expectedArea.getText().trim();
@@ -189,7 +190,7 @@ public class TestCaseDetailsPanel {
         currentTestCase.setTitle(newTitle);
         currentTestCase.setExpectedResult(newExpected);
         currentTestCase.setSteps(newSteps);
-        currentTestCase.setPriority(newPriority);
+        currentTestCase.setPriority(Priority.valueOf(newPriority));
 
         toggleEditMode(false);
         JOptionPane.showMessageDialog(mainPanel, "✅ Test case saved successfully.", "Saved", JOptionPane.INFORMATION_MESSAGE);

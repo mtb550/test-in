@@ -5,14 +5,14 @@ import com.intellij.notification.NotificationType;
 import testGit.pojo.Config;
 
 public class Notifier {
-    public static void information(String title, String content) {
+    public static void info(String title, String content) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("TestGit Notifications")
                 .createNotification(title, content, NotificationType.INFORMATION)
                 .notify(Config.getProject());
     }
 
-    public static void warning(String title, String content) {
+    public static void warn(String title, String content) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup("TestGit Notifications")
                 .createNotification(title, content, NotificationType.WARNING)

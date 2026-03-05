@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class Directory {
     private String name;
 
-    private Integer active;
+    private DirectoryStatus status;
 
     private Path filePath;
 

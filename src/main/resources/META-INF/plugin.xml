@@ -11,7 +11,6 @@
     <depends>Git4Idea</depends>
     <depends>TestNG-J</depends>
     <extensions defaultExtensionNs="com.intellij">
-        <projectService serviceImplementation="testGit.projectPanel.ProjectPanel"/>
         <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.ProviderImpl"/>
         <fileEditorProvider implementation="testGit.editorPanel.testRunEditor.FileEditorProviderImpl"/>
         <applicationService serviceImplementation="testGit.settings.AppSettingsState"/>

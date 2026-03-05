@@ -10,11 +10,12 @@ import org.jetbrains.annotations.Nullable;
 
 @State(
         name = "testGit.settings.AppSettingsState",
-        storages = @Storage("TestCaseManagerSettings.xml")
+        storages = @Storage("TestGitSettings.xml")
 )
 public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
 
-    public String rootFolderPath;
+    public String rootFolderPath = "";
+    public boolean readMode = false;
 
     public static AppSettingsState getInstance() {
         System.out.println("AppSettingsState.getInstance()");

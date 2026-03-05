@@ -43,7 +43,7 @@ public class Rename extends DumbAwareAction {
 
         try {
             File oldFile = treeItem.getFilePath().toFile();
-            String newFileName = treeItem.getType() + "_" + newName + "_" + treeItem.getActive();
+            String newFileName = treeItem.getType() + "_" + newName + "_" + treeItem.getStatus();
             Path newFilePath = treeItem.getFilePath().getParent().resolve(newFileName);
             File newFile = newFilePath.toFile();
 

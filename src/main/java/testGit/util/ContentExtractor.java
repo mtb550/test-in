@@ -14,7 +14,7 @@ public class ContentExtractor {
 
         String path = revision.getFile().getPath();
 
-        if (!path.toLowerCase().endsWith(".json")) {
+        if (!path.endsWith(".json")) {
             return;
         }
 

@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryStatus;
 import testGit.pojo.DirectoryType;
 import testGit.projectPanel.ProjectPanel;
 import testGit.ui.AddNewTestProjectDialog;
@@ -35,9 +36,9 @@ public class CreateTestProject extends DumbAwareAction {
         Directory newTestProject = new Directory()
                 .setType(DirectoryType.PR)
                 .setName(name)
-                .setActive(1);
+                .setStatus(DirectoryStatus.AC);
 
-        String folderName = String.format("%s_%s_%d", newTestProject.getType().name().toLowerCase(), newTestProject.getName(), newTestProject.getActive());
+        String folderName = String.format("%s_%s_%s", newTestProject.getType().name(), newTestProject.getName(), newTestProject.getStatus());
         Path projectPath = Config.getTestGitPath().resolve(folderName);
 
         newTestProject.setFileName(folderName)
@@ -57,7 +58,7 @@ public class CreateTestProject extends DumbAwareAction {
 
                     projectPanel.getTestProjectSelector().addTestProject(newTestProject);
 
-                    Notifier.information("New Test Project", String.format("Test Project %s has been added", name));
+                    Notifier.info("New Test Project", String.format("Test Project %s has been added", name));
 
                 }
             } catch (IOException ex) {
