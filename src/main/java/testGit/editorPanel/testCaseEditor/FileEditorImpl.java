@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
-import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -38,7 +37,6 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final VirtualFile file;
     private final JBList<TestCase> list;
     private final CollectionListModel<TestCase> model;
-    private final List<TestCase> allTestCases;
     private final Set<GroupType> selectedGroups = new HashSet<>();
     @Getter
     private final Set<String> selectedDetails = new HashSet<>();
@@ -46,11 +44,17 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
     private final JButton detailsButton;
     private final ModelSyncListener<TestCase> syncListener;
     private final SearchTextField searchField = new SearchTextField();
-    private final Footer footer;
+    private final StatusBar statusBar;
+    private List<TestCase> allTestCases;
     @Getter
     private boolean showGroups;
     @Getter
     private boolean showPriority;
+
+    @Getter
+    private int currentPage = 1;
+    @Getter
+    private int pageSize = 10;
 
     public FileEditorImpl(@NotNull List<TestCase> testCases, @NotNull Directory dir, @NotNull VirtualFile file) {
         this.allTestCases = new ArrayList<>(testCases);
@@ -115,20 +119,20 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
 
         header.add(detailsButton);
 
-        this.model = new CollectionListModel<>(new ArrayList<>(allTestCases));
+        this.model = new CollectionListModel<>(new ArrayList<>());
         this.syncListener = new ModelSyncListener<>(allTestCases, model);
 
         this.syncListener.setOnUpdate(() -> {
 
             if (!selectedGroups.isEmpty()) {
                 selectedGroups.clear();
-                applyGroupFilters();
             }
 
             if (!selectedDetails.isEmpty()) {
                 selectedDetails.clear();
-                updateDetailsButtonState();
             }
+            updateDetailsButtonState();
+            refreshView();
         });
 
         this.model.addListDataListener(syncListener);
@@ -138,15 +142,15 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         searchField.addDocumentListener(new com.intellij.ui.DocumentAdapter() {
             @Override
             protected void textChanged(@org.jetbrains.annotations.NotNull javax.swing.event.DocumentEvent e) {
-                applyFilters(searchField.getText().trim());
+                applyFilters();
             }
         });
 
         header.add(searchField);
 
-        this.footer = new Footer();
-        this.panel.add(footer, BorderLayout.SOUTH);
-        this.footer.updateStatus(allTestCases.size(), allTestCases.size());
+        this.statusBar = new StatusBar();
+        this.panel.add(statusBar, BorderLayout.SOUTH);
+        attachListeners();
 
         this.list = new JBList<>(model);
         list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
@@ -158,19 +162,12 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         list.addListSelectionListener(new SelectionListenerImpl(list));
         list.addMouseListener(new MouseAdapterImpl(list, model, dir));
 
-        Runnable resetGroupFilter = () -> {
-            if (!selectedGroups.isEmpty()) {
-                selectedGroups.clear();
-                applyGroupFilters();
-            }
+        Runnable resetGroupFilter = this::applyGroupFilters;
+        Runnable resetDetailsFilter = () -> {
+            selectedDetails.clear();
+            updateDetailsButtonState();
         };
 
-        Runnable resetDetailsFilter = () -> {
-            if (!selectedDetails.isEmpty()) {
-                selectedDetails.clear();
-                updateDetailsButtonState();
-            }
-        };
         list.setTransferHandler(new TransferImpl(dir, model, resetGroupFilter));
         list.setTransferHandler(new TransferImpl(dir, model, resetDetailsFilter));
         ShortcutHandler.register(dir, list, model);
@@ -198,6 +195,111 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         header.add(showPriorityCheck);
 
         this.list.setCellRenderer(new RendererImpl(this));
+        refreshView();
+    }
+
+    private void attachListeners() {
+        statusBar.getNextButton().addActionListener(e -> {
+            if (currentPage < getTotalPages(getFilteredList())) {
+                currentPage++;
+                refreshView();
+            }
+        });
+
+        statusBar.getPrevButton().addActionListener(e -> {
+            if (currentPage > 1) {
+                currentPage--;
+                refreshView();
+            }
+        });
+
+        statusBar.getFirstButton().addActionListener(e -> {
+            currentPage = 1;
+            refreshView();
+        });
+
+        statusBar.getLastButton().addActionListener(e -> {
+            currentPage = getTotalPages(getFilteredList());
+            refreshView();
+        });
+
+        statusBar.getPageSizeField().addActionListener(e -> {
+            try {
+                int newSize = Integer.parseInt(statusBar.getPageSizeField().getText().trim());
+                if (newSize > 0) {
+                    pageSize = newSize;
+                    currentPage = 1;
+                    refreshView();
+                }
+            } catch (NumberFormatException ex) {
+                statusBar.getPageSizeField().setText(String.valueOf(pageSize));
+            }
+        });
+    }
+
+    private int getTotalPages(List<TestCase> filtered) {
+        if (filtered.isEmpty()) return 1;
+        return (int) Math.ceil((double) filtered.size() / pageSize);
+    }
+
+    private List<TestCase> getFilteredList() {
+        String query = searchField.getText().trim().toLowerCase();
+        return allTestCases.stream()
+                .filter(tc -> {
+                    boolean matchesSearch = query.isEmpty() ||
+                            (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query));
+                    boolean matchesGroup = selectedGroups.isEmpty() ||
+                            (tc.getGroups() != null && tc.getGroups().stream().anyMatch(selectedGroups::contains));
+                    return matchesSearch && matchesGroup;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public void refreshView() {
+        List<TestCase> filtered = getFilteredList();
+        int totalItems = filtered.size();
+        int totalPages = getTotalPages(filtered);
+
+        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+
+        int startIndex = (currentPage - 1) * pageSize;
+        int endIndex = Math.min(startIndex + pageSize, totalItems);
+
+        List<TestCase> pageItems = new ArrayList<>();
+        if (startIndex < totalItems) {
+            pageItems = new ArrayList<>(filtered.subList(startIndex, endIndex));
+        }
+
+        if (syncListener != null) syncListener.pause();
+        model.replaceAll(pageItems);
+        if (syncListener != null) syncListener.resume();
+
+        if (statusBar != null) {
+            statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), totalItems);
+        }
+    }
+
+    public void applyFilters() {
+        currentPage = 1;
+        refreshView();
+    }
+
+    private void applyGroupFilters() {
+        currentPage = 1;
+        refreshView();
+        if (selectedGroups.isEmpty()) {
+            groupButton.setText("Groups");
+            groupButton.setForeground(JBColor.foreground());
+        } else {
+            groupButton.setText("Groups (" + selectedGroups.size() + ")");
+            groupButton.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
+        }
+    }
+
+    public void loadData(List<TestCase> loadedData) {
+        this.allTestCases = loadedData;
+        this.currentPage = 1;
+        refreshView();
     }
 
     private void showGroupPopup(JButton anchor) {
@@ -209,7 +311,7 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
             JCheckBox checkBox = new JCheckBox(value.name(), selectedGroups.contains(value));
             checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
             checkBox.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
-            checkBox.setBorder(JBUI.Borders.empty(2, 8)); // Native-like horizontal padding
+            checkBox.setBorder(JBUI.Borders.empty(2, 8));
             checkBox.setOpaque(true);
             return checkBox;
         });
@@ -220,26 +322,20 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
                 int index = groupList.locationToIndex(e.getPoint());
                 if (index >= 0) {
                     GroupType group = groupList.getModel().getElementAt(index);
-                    if (selectedGroups.contains(group)) {
-                        selectedGroups.remove(group);
-                    } else {
-                        selectedGroups.add(group);
-                    }
+                    if (selectedGroups.contains(group)) selectedGroups.remove(group);
+                    else selectedGroups.add(group);
                     groupList.repaint();
                     applyGroupFilters();
                 }
             }
         });
 
-        JBPopup popup = JBPopupFactory.getInstance()
+        JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(groupList), null)
-                .setMovable(false)
                 .setRequestFocus(true)
-                .setResizable(false)
                 .setCancelOnClickOutside(true)
-                .createPopup();
-
-        popup.showUnderneathOf(anchor);
+                .createPopup()
+                .showUnderneathOf(anchor);
     }
 
     private void showDetailsPopup(JButton anchor) {
@@ -251,7 +347,7 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
             JCheckBox checkBox = new JCheckBox(value, selectedDetails.contains(value));
             checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
             checkBox.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
-            checkBox.setBorder(JBUI.Borders.empty(2, 8)); // Native-like horizontal padding
+            checkBox.setBorder(JBUI.Borders.empty(2, 8));
             checkBox.setOpaque(true);
             return checkBox;
         });
@@ -262,13 +358,8 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
                 int index = detailsList.locationToIndex(e.getPoint());
                 if (index >= 0) {
                     String detailName = detailsList.getModel().getElementAt(index);
-
-                    if (selectedDetails.contains(detailName)) {
-                        selectedDetails.remove(detailName);
-                    } else {
-                        selectedDetails.add(detailName);
-                    }
-
+                    if (selectedDetails.contains(detailName)) selectedDetails.remove(detailName);
+                    else selectedDetails.add(detailName);
                     list.setFixedCellHeight(-1);
                     list.setCellRenderer(new RendererImpl(FileEditorImpl.this));
                     detailsList.repaint();
@@ -280,38 +371,12 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
             }
         });
 
-        JBPopup popup = JBPopupFactory.getInstance()
+        JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(detailsList), null)
-                .setMovable(false)
                 .setRequestFocus(true)
-                .setResizable(false)
                 .setCancelOnClickOutside(true)
-                .createPopup();
-
-        popup.showUnderneathOf(anchor);
-    }
-
-    private void applyGroupFilters() {
-        syncListener.pause();
-
-        try {
-            if (selectedGroups.isEmpty()) {
-                model.replaceAll(allTestCases);
-                groupButton.setText("Groups");
-                groupButton.setForeground(JBColor.foreground());
-
-            } else {
-                List<TestCase> filtered = allTestCases.stream()
-                        .filter(tc -> tc.getGroups() != null &&
-                                tc.getGroups().stream().anyMatch(selectedGroups::contains))
-                        .collect(Collectors.toList());
-                model.replaceAll(filtered);
-                groupButton.setText("Groups (" + selectedGroups.size() + ")");
-                groupButton.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
-            }
-        } finally {
-            syncListener.resume();
-        }
+                .createPopup()
+                .showUnderneathOf(anchor);
     }
 
     private void updateDetailsButtonState() {
@@ -330,33 +395,6 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor {
         props.setValue("testGit.showGroups", showGroups, true);
         props.setValue("testGit.showPriority", showPriority, true);
         props.setValue("testGit.selectedDetails", String.join(",", selectedDetails));
-    }
-
-    public void applyFilters(String query) {
-
-        if (syncListener != null) syncListener.pause();
-
-        try {
-            List<TestCase> filtered = allTestCases.stream()
-                    .filter(tc -> {
-                        boolean matchesSearch = query.isEmpty() ||
-                                (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query.toLowerCase()));
-
-                        boolean matchesGroup = selectedGroups.isEmpty() ||
-                                (tc.getGroups() != null && tc.getGroups().stream().anyMatch(selectedGroups::contains));
-
-                        return matchesSearch && matchesGroup;
-                    })
-                    .collect(java.util.stream.Collectors.toList());
-
-            model.replaceAll(filtered);
-
-            if (footer != null) {
-                footer.updateStatus(model.getSize(), allTestCases.size());
-            }
-        } finally {
-            if (syncListener != null) syncListener.resume();
-        }
     }
 
     @Override

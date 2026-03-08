@@ -17,11 +17,14 @@ public class RendererImpl implements ListCellRenderer<TestCase> {
 
     @Override
     public Component getListCellRendererComponent(JList<? extends TestCase> list, TestCase tc, int index, boolean isSelected, boolean cellHasFocus) {
-        rendererCard.updateData(index, tc, editor.isShowGroups(), editor.isShowPriority(), editor.getSelectedDetails());
+        int globalIndex = ((editor.getCurrentPage() - 1) * editor.getPageSize()) + index;
+
+        rendererCard.updateData(globalIndex, tc, editor.isShowGroups(), editor.isShowPriority(), editor.getSelectedDetails());
 
         rendererCard.setBorder(isSelected ?
                 JBUI.Borders.customLine(JBColor.blue, 1) :
                 JBUI.Borders.empty(1));
+
         return rendererCard;
     }
 }
