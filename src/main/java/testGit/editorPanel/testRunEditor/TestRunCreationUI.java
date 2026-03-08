@@ -96,6 +96,7 @@ public class TestRunCreationUI implements Disposable {
     }
 
     private CheckedTreeNode convertToCheckedNodes(DefaultMutableTreeNode node) {
+        System.out.println("TestRunCreationUI.convertToCheckedNodes()");
         Object userObj = node.getUserObject();
         CheckedTreeNode newNode = new CheckedTreeNode(userObj);
 
@@ -125,6 +126,7 @@ public class TestRunCreationUI implements Disposable {
     }
 
     private List<TestCase> loadTestCasesFromDir(Directory dir) {
+        System.out.println("looking for the test cases for directory " + dir.getName());
         List<TestCase> testCases = new ArrayList<>();
         File folder = dir.getFile();
         if (folder != null && folder.exists() && folder.isDirectory()) {
@@ -138,6 +140,8 @@ public class TestRunCreationUI implements Disposable {
                 }
             }
         }
+
+        testCases.forEach(System.out::println);
         return TestCaseSorter.sortTestCases(testCases);
     }
 

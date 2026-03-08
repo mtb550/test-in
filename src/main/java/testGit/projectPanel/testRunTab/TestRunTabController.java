@@ -7,6 +7,7 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.actions.CreateTestRun;
+import testGit.actions.CreateTestRunItems;
 import testGit.actions.CreateTestRunPackage;
 import testGit.pojo.Directory;
 import testGit.projectPanel.ProjectPanel;
@@ -46,11 +47,14 @@ public class TestRunTabController {
     private void showEmptyState() {
         tree.getEmptyText().clear();
 
-        tree.getEmptyText().appendLine("Create new package", SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> new CreateTestRunPackage(tree).actionPerformed(null));
+        tree.getEmptyText().appendLine("Create new item", SimpleTextAttributes.LINK_ATTRIBUTES,
+                e -> new CreateTestRunItems(projectPanel,tree).actionPerformed(null));
 
-        tree.getEmptyText().appendLine("Create new test run", SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> new CreateTestRun(projectPanel).actionPerformed(null));
+//        tree.getEmptyText().appendLine("Create new package", SimpleTextAttributes.LINK_ATTRIBUTES,
+//                e -> new CreateTestRunPackage(tree).actionPerformed(null));
+
+//        tree.getEmptyText().appendLine("Create new test run", SimpleTextAttributes.LINK_ATTRIBUTES,
+//                e -> new CreateTestRun(projectPanel).actionPerformed(null));
     }
 
     public void buildTreeAsync(Directory selectedProject) {

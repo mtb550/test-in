@@ -29,6 +29,7 @@ public class TestRunEditor {
     }
 
     public static void open(Path runFilePath, ProjectPanel projectPanel) {
+        System.out.println("TestRunEditor.open()");
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
         String targetPath = runFilePath.toAbsolutePath().toString();
 
@@ -56,18 +57,23 @@ public class TestRunEditor {
     }
 
     public static void create(Path runPath, ProjectPanel projectPanel, DefaultMutableTreeNode selectedNode, TestRun metadata) {
+        System.out.println("TestRunEditor.create()");
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
-        String targetPath = runPath.toAbsolutePath().toString();
 
+        String targetPath = runPath.toAbsolutePath().toString();
+        System.out.println("targetPath: " + targetPath);
         Directory testSet = (Directory) selectedNode.getUserObject();
+        System.out.println("testset: " + testSet.getFileName());
         List<TestCase> testCases = new ArrayList<>();
         File folder = testSet.getFile();
+        //System.out.println("folder: " + folder.getAbsolutePath());
 
         if (folder != null && folder.exists() && folder.isDirectory()) {
             File[] files = folder.listFiles((d, name) -> name.endsWith(".json"));
             if (files != null) {
                 for (File file : files) {
                     try {
+                        System.out.println(file.getName());
                         TestCase tc = Config.getMapper().readValue(file, TestCase.class);
                         testCases.add(tc);
                     } catch (Exception ignored) {
@@ -75,14 +81,14 @@ public class TestRunEditor {
                 }
             }
         }
-
+        testCases.forEach(System.out::println);
         List<TestCase> sortedCases = TestCaseSorter.sortTestCases(testCases);
         openEditor(editorManager, targetPath, metadata, sortedCases, EditorType.TEST_RUN_CREATION, projectPanel);
     }
 
     private static void openEditor(FileEditorManager editorManager, String targetPath, TestRun metadata,
                                    List<TestCase> sortedCases, EditorType type, ProjectPanel projectPanel) {
-
+        System.out.println("TestRunEditor.openEditor()");
         VirtualFile existingFile = Arrays.stream(editorManager.getOpenFiles())
                 .filter(f -> f instanceof VirtualFileImpl && ((VirtualFileImpl) f).getRunPath().equals(targetPath))
                 .findFirst()
@@ -105,6 +111,7 @@ public class TestRunEditor {
 
     public static TestCase findTestCaseRecursively(String projectName, String testCaseId) {
         if (projectName == null || testCaseId == null || Config.getTestGitPath() == null) {
+            System.out.println("findTestCaseRecursively. projectName == null || testCaseId == null || Config.getTestGitPath() == null");
             return null;
         }
 
@@ -112,6 +119,7 @@ public class TestRunEditor {
                 .resolve(projectName)
                 .resolve("testCases");
 
+        System.out.println("searchRoot: " + searchRoot);
         if (!Files.exists(searchRoot)) {
             return null;
         }
