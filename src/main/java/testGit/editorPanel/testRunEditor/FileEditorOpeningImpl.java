@@ -17,6 +17,7 @@ public class FileEditorOpeningImpl extends UserDataHolderBase implements FileEdi
     private final VirtualFileImpl virtualFile;
 
     public FileEditorOpeningImpl(VirtualFileImpl vf) {
+        System.out.println("FileEditorOpeningImpl.FileEditorOpeningImpl()");
         this.virtualFile = vf;
         this.ui = new TestRunOpeningUI(vf);
         this.component = ui.createEditorPanel();

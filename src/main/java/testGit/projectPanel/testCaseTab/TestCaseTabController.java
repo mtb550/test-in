@@ -96,7 +96,7 @@ public class TestCaseTabController {
         Optional.ofNullable(dir.getFile().listFiles(File::isDirectory))
                 .stream()
                 .flatMap(Arrays::stream)
-                .parallel()
+                //.parallel()
                 .map(DirectoryMapper::map)
                 .filter(Objects::nonNull)
                 .forEachOrdered(caseDir -> node.add(buildNodeRecursive(caseDir)));

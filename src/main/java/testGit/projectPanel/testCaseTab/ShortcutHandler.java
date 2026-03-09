@@ -1,9 +1,9 @@
 package testGit.projectPanel.testCaseTab;
 
 import com.intellij.ui.treeStructure.SimpleTree;
-import testGit.actions.RemovePackage;
 import testGit.actions.Escape;
 import testGit.actions.OpenTestSet;
+import testGit.actions.RemovePackage;
 import testGit.actions.Rename;
 import testGit.projectPanel.ProjectPanel;
 import testGit.projectPanel.TransferHandlerImpl;

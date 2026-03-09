@@ -2,6 +2,7 @@ package testGit.editorPanel.testRunEditor;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +17,7 @@ public class FileEditorCreationImpl extends UserDataHolderBase implements FileEd
     private final VirtualFileImpl virtualFile;
 
     public FileEditorCreationImpl(VirtualFileImpl vf) {
+        System.out.println("FileEditorCreationImpl.FileEditorCreationImpl()");
         this.virtualFile = vf;
         this.ui = new TestRunCreationUI(vf.getTestCases());
         this.ui.setMetadata(vf.getMetadata());
@@ -45,7 +47,7 @@ public class FileEditorCreationImpl extends UserDataHolderBase implements FileEd
 
     @Override
     public void dispose() {
-        com.intellij.openapi.util.Disposer.dispose(ui);
+        Disposer.dispose(ui);
     }
 
     @Override

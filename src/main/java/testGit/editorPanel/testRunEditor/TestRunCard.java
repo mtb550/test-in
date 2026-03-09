@@ -44,6 +44,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
 
     public TestRunCard(int index, TestCase tc) {
         super(new BorderLayout());
+        System.out.println("TestRunCard.TestRunCard()");
         this.tc = tc;
         setOpaque(true);
         setMaximumSize(new Dimension(Integer.MAX_VALUE, JBUI.scale(CARD_HEIGHT)));

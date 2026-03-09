@@ -16,6 +16,8 @@ public class FileEditorProviderImpl implements FileEditorProvider, DumbAware {
 
     @Override
     public @NotNull FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
+        System.out.println("FileEditorProviderImpl.createEditor()");
+
         VirtualFileImpl vf = (VirtualFileImpl) file;
 
         return switch (vf.getEditorType()) {

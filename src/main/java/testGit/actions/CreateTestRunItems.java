@@ -12,7 +12,6 @@ import testGit.pojo.Directory;
 import testGit.pojo.DirectoryStatus;
 import testGit.pojo.DirectoryType;
 import testGit.projectPanel.ProjectPanel;
-import testGit.ui.InputDialogList;
 import testGit.ui.InputDialogList_TestRun;
 import testGit.util.Notifier;
 import testGit.util.TreeUtilImpl;
@@ -45,7 +44,7 @@ public class CreateTestRunItems extends DumbAwareAction {
             InputDialogList_TestRun.show("Test Project Name", (enteredName, selectedItem) -> {
                 System.out.println("Processing: " + enteredName + " | Selected Type: " + selectedItem.name());
                 if (enteredName != null && !enteredName.isEmpty()) {
-                    add_new(selectedTestProject, enteredName ,selectedItem);
+                    add_new(selectedTestProject, enteredName, selectedItem);
                 }
             });
 

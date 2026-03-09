@@ -6,9 +6,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import testGit.actions.CreateTestRun;
 import testGit.actions.CreateTestRunItems;
-import testGit.actions.CreateTestRunPackage;
 import testGit.pojo.Directory;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.DirectoryMapper;
@@ -36,7 +34,6 @@ public class TestRunTabController {
     public void init() {
         System.out.println("TestRunTabController.init()");
 
-        tree.setRootVisible(false);
         tree.setCellRenderer(new TestRunRenderer());
         tree.addMouseListener(new MouseAdapterImpl(projectPanel));
         ShortcutHandler.register(projectPanel, tree);
@@ -48,7 +45,7 @@ public class TestRunTabController {
         tree.getEmptyText().clear();
 
         tree.getEmptyText().appendLine("Create new item", SimpleTextAttributes.LINK_ATTRIBUTES,
-                e -> new CreateTestRunItems(projectPanel,tree).actionPerformed(null));
+                e -> new CreateTestRunItems(projectPanel, tree).actionPerformed(null));
 
 //        tree.getEmptyText().appendLine("Create new package", SimpleTextAttributes.LINK_ATTRIBUTES,
 //                e -> new CreateTestRunPackage(tree).actionPerformed(null));
@@ -77,9 +74,7 @@ public class TestRunTabController {
             ApplicationManager.getApplication().invokeLater(() -> {
                 DefaultTreeModel newModel = new DefaultTreeModel(rootNode);
 
-                if (rootNode.getChildCount() > 0)
-                    tree.setRootVisible(true);
-
+                tree.setRootVisible(rootNode.getChildCount() > 0);
                 tree.setShowsRootHandles(true);
                 tree.setDragEnabled(true);
                 tree.setDropMode(DropMode.ON_OR_INSERT);

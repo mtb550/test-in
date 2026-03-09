@@ -189,8 +189,8 @@ public class InputDialogList_TestRun {
 
     // 1. Added 'disabled' boolean to the model. Created a secondary constructor for convenience.
     public record TemplateItem(String name, Icon icon, boolean disabled, DirectoryType type) {
-        public TemplateItem(String name, Icon icon , DirectoryType type) {
-            this(name, icon, false,type);
+        public TemplateItem(String name, Icon icon, DirectoryType type) {
+            this(name, icon, false, type);
         }
     }
 }
