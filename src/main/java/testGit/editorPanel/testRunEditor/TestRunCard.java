@@ -45,6 +45,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
     private boolean isSelected = false;
     @Setter
     private SelectionListener selectionListener;
+
     public TestRunCard(int index, TestCase tc) {
         super(new BorderLayout());
         this.tc = tc;
@@ -103,9 +104,6 @@ public class TestRunCard extends JBPanel<TestRunCard> {
         updateData(index, tc);
     }
 
-    /**
-     * Called externally by the parent to deselect this card when another is selected.
-     */
     public void deselect() {
         isSelected = false;
         actionButtonPanel.setVisible(false);
@@ -257,9 +255,6 @@ public class TestRunCard extends JBPanel<TestRunCard> {
         return label;
     }
 
-    /**
-     * Callback interface so the parent (TestRunOpeningUI) manages selection state, not a static field.
-     */
     public interface SelectionListener {
         void onSelected(TestRunCard card);
     }

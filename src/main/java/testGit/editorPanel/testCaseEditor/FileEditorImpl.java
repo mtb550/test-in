@@ -17,6 +17,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import testGit.editorPanel.StatusBar;
 import testGit.pojo.Directory;
 import testGit.pojo.GroupType;
 import testGit.pojo.TestCase;

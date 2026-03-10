@@ -6,6 +6,8 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,27 +28,83 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class TestRunCreationUI implements Disposable {
+public class TestRunEditorUI implements Disposable {
 
+    // --- Creation-mode state ---
     private final List<TestCase> initialTestCases;
     private final Set<Integer> initialTestCaseUids;
-
+    // --- Shared ---
+    private final VirtualFileImpl vf;
     private CheckboxTree checklistTree;
     private TestRun metadata;
     private VirtualFile currentFile;
     private Map<UUID, TestRun.TestRunItems> resultsMap;
     private TestRunMetadataHeader metadataHeader;
-
+    // --- Opening-mode state ---
+    private TestRunCard selectedCard = null;
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
 
-    public TestRunCreationUI(List<TestCase> initialTestCases) {
-        this.initialTestCases = TestCaseSorter.sortTestCases(initialTestCases);
+    public TestRunEditorUI(VirtualFileImpl vf) {
+        this.vf = vf;
+        this.metadata = vf.getMetadata();
+        this.currentFile = vf;
+
+        List<TestCase> cases = vf.getTestCases() != null ? vf.getTestCases() : Collections.emptyList();
+        this.initialTestCases = TestCaseSorter.sortTestCases(cases);
         this.initialTestCaseUids = this.initialTestCases.stream()
                 .map(TestCase::getUid)
                 .collect(Collectors.toSet());
     }
 
-    public JComponent createEditorPanel(DefaultTreeModel testCaseModel, String savePath, ProjectPanel projectPanel) {
+    public JComponent createEditorPanel() {
+        return switch (vf.getEditorType()) {
+            case TEST_RUN_OPENING -> buildOpeningPanel();
+            case TEST_RUN_CREATION ->
+                    buildCreationPanel(vf.getTestCasesTreeModel(), vf.getRunPath(), vf.getProjectPanel());
+            default -> throw new IllegalArgumentException("Unsupported editor type: " + vf.getEditorType());
+        };
+    }
+
+    // -------------------------------------------------------------------------
+    // Opening mode
+    // -------------------------------------------------------------------------
+
+    private JComponent buildOpeningPanel() {
+        JPanel cardList = new JPanel();
+        cardList.setLayout(new BoxLayout(cardList, BoxLayout.Y_AXIS));
+        cardList.setBackground(UIUtil.getTreeBackground());
+        cardList.setOpaque(true);
+
+        for (int i = 0; i < initialTestCases.size(); i++) {
+            TestRunCard card = new TestRunCard(i, initialTestCases.get(i));
+            card.setSelectionListener(this::handleCardSelected);
+            cardList.add(card);
+        }
+
+        cardList.add(Box.createVerticalGlue());
+
+        JBScrollPane scrollPane = new JBScrollPane(cardList);
+        scrollPane.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
+        scrollPane.setBorder(JBUI.Borders.empty());
+        scrollPane.getVerticalScrollBar().setUnitIncrement(25);
+
+        mainPanel = new JBPanel<>(new BorderLayout());
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+        return mainPanel;
+    }
+
+    private void handleCardSelected(TestRunCard newlySelected) {
+        if (selectedCard != null && selectedCard != newlySelected) {
+            selectedCard.deselect();
+        }
+        selectedCard = newlySelected;
+    }
+
+    // -------------------------------------------------------------------------
+    // Creation mode
+    // -------------------------------------------------------------------------
+
+    private JComponent buildCreationPanel(DefaultTreeModel testCaseModel, String savePath, ProjectPanel projectPanel) {
         CheckedTreeNode root = convertToCheckedNodes((DefaultMutableTreeNode) testCaseModel.getRoot());
 
         mainPanel = new JBPanel<>(new BorderLayout());
@@ -54,7 +112,7 @@ public class TestRunCreationUI implements Disposable {
         metadataHeader = new TestRunMetadataHeader();
         mainPanel.add(metadataHeader.getPanel(), BorderLayout.NORTH);
 
-        checklistTree = new CheckboxTree(createRenderer(), root,
+        checklistTree = new CheckboxTree(createTreeRenderer(), root,
                 new CheckboxTreeBase.CheckPolicy(true, true, true, true));
         TreeUtil.expandAll(checklistTree);
 
@@ -64,7 +122,7 @@ public class TestRunCreationUI implements Disposable {
         return mainPanel;
     }
 
-    private CheckboxTree.CheckboxTreeCellRenderer createRenderer() {
+    private CheckboxTree.CheckboxTreeCellRenderer createTreeRenderer() {
         return new CheckboxTree.CheckboxTreeCellRenderer() {
             @Override
             public void customizeRenderer(@NotNull JTree tree, @NotNull Object value, boolean selected,
@@ -75,13 +133,13 @@ public class TestRunCreationUI implements Disposable {
                 if (userObj instanceof Directory dir) {
                     getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                 } else if (userObj instanceof TestCase tc) {
-                    renderTestCase(tc);
+                    renderTestCaseNode(tc);
                 } else if (userObj instanceof String str) {
                     getTextRenderer().append(str, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
                 }
             }
 
-            private void renderTestCase(TestCase tc) {
+            private void renderTestCaseNode(TestCase tc) {
                 TestRun.TestRunItems result = findResultFor(tc.getId());
                 SimpleTextAttributes style = SimpleTextAttributes.REGULAR_ATTRIBUTES;
                 String statusText = " [Pending]";
@@ -125,7 +183,7 @@ public class TestRunCreationUI implements Disposable {
         Object userObj = node.getUserObject();
         CheckedTreeNode newNode = new CheckedTreeNode(userObj);
 
-        if (userObj instanceof TestCase tc && isAlreadyInRun(tc)) {
+        if (userObj instanceof TestCase tc && initialTestCaseUids.contains(tc.getUid())) {
             newNode.setChecked(true);
         }
 
@@ -135,24 +193,17 @@ public class TestRunCreationUI implements Disposable {
         return newNode;
     }
 
-    private boolean isAlreadyInRun(TestCase tc) {
-        return initialTestCaseUids != null && initialTestCaseUids.contains(tc.getUid());
-    }
-
     private void saveSelectedToJSON(CheckedTreeNode root, String savePath, ProjectPanel projectPanel) {
-        TestRun run = Optional.ofNullable(this.metadata).map(m -> {
-            TestRun r = new TestRun();
-            r.setBuildNumber(m.getBuildNumber());
-            r.setPlatform(m.getPlatform());
-            r.setLanguage(m.getLanguage());
-            r.setBrowser(m.getBrowser());
-            r.setDeviceType(m.getDeviceType());
-            return r;
-        }).orElseGet(TestRun::new);
+        TestRun run = new TestRun();
+        if (metadata != null) {
+            run.setBuildNumber(metadata.getBuildNumber());
+            run.setPlatform(metadata.getPlatform());
+            run.setLanguage(metadata.getLanguage());
+            run.setBrowser(metadata.getBrowser());
+            run.setDeviceType(metadata.getDeviceType());
+        }
 
         String fileName = DirectoryType.TR.name() + "_" + metadata.getBuildNumber() + "_" + DirectoryStatus.AC.name() + ".json";
-        File outputFile = new File(savePath, fileName);
-
         run.setRunName(fileName);
         run.setCreatedAt(LocalDateTime.now());
         run.setStatus(TestRunStatus.CREATED);
@@ -162,7 +213,7 @@ public class TestRunCreationUI implements Disposable {
         run.setResults(items);
 
         try {
-            Config.getMapper().writerWithDefaultPrettyPrinter().writeValue(outputFile, run);
+            Config.getMapper().writerWithDefaultPrettyPrinter().writeValue(new File(savePath, fileName), run);
         } catch (Exception e) {
             System.err.println("Failed to save Test Run: " + e.getMessage());
             e.printStackTrace(System.err);
