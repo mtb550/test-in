@@ -9,6 +9,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import testGit.editorPanel.Shared;
 import testGit.pojo.GroupType;
 import testGit.pojo.TestCase;
 
@@ -18,7 +19,6 @@ import java.util.Set;
 
 public class TestCaseCard extends JBPanel<TestCaseCard> {
     private static final int CARD_HEIGHT = 130;
-    private static final int BORDER_THICKNESS = 1;
     private final JBLabel titleLabel = new JBLabel();
     private final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
     private final JBLabel expectedLabel = createDetailLabel();
@@ -33,8 +33,7 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         setOpaque(true);
         setMaximumSize(new Dimension(Integer.MAX_VALUE, JBUI.scale(CARD_HEIGHT)));
 
-        Font titleFont = JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f);
-        titleLabel.setFont(titleFont);
+        titleLabel.setFont(JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f));
         titleLabel.setForeground(UIUtil.getLabelForeground());
         badgePanel.setOpaque(false);
 
@@ -74,7 +73,6 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         setBackground(index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45));
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
-
         expectedLabel.setVisible(activeDetails.contains("Expected Result"));
         stepsLabel.setVisible(activeDetails.contains("Steps"));
         automationRefLabel.setVisible(activeDetails.contains("Automation Ref"));
@@ -83,67 +81,22 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         idLabel.setVisible(activeDetails.contains("ID"));
 
         badgePanel.removeAll();
-
-        if (showPriority) {
-            badgePanel.add(createPriorityBadge(tc));
-        }
-
+        if (showPriority) badgePanel.add(Shared.createPriorityBadge(tc));
         if (showGroups) {
             List<GroupType> groups = tc.getGroups();
-            if (groups != null) {
-                for (GroupType groupName : groups) {
-                    badgePanel.add(createGroupBadge(groupName));
-                }
-            }
+            if (groups != null)
+                for (GroupType groupName : groups)
+                    badgePanel.add(Shared.createGroupBadge(groupName));
         }
         badgePanel.revalidate();
         badgePanel.repaint();
-    }
-
-    private JBLabel createPriorityBadge(TestCase tc) {
-        Color bg = switch (tc.getPriority()) {
-            case HIGH -> JBColor.CYAN;
-            case MEDIUM -> JBColor.magenta;
-            case LOW -> JBColor.GRAY;
-        };
-        return new RoundedBadge(tc.getPriority().getDescription(), bg, 20);
-    }
-
-    private JBLabel createGroupBadge(GroupType groupName) {
-        return new RoundedBadge(groupName.name(), JBColor.darkGray, 20);
     }
 
     private JBLabel createDetailLabel() {
         JBLabel label = new JBLabel();
         label.setFont(UIUtil.getLabelFont(UIUtil.FontSize.NORMAL));
         label.setForeground(UIUtil.getContextHelpForeground());
-
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         return label;
-    }
-
-    private static class RoundedBadge extends JBLabel {
-        private final int radius;
-
-        RoundedBadge(String text, Color bg, int radius) {
-            super(text);
-            this.radius = radius;
-            setOpaque(false);
-            setBackground(bg);
-            setForeground(JBColor.WHITE);
-            setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD));
-            setBorder(JBUI.Borders.empty(2, 10));
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
-            g2.dispose();
-            super.paintComponent(g);
-        }
     }
 }

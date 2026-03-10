@@ -15,6 +15,7 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.Setter;
 import testGit.actions.RunTestCase;
 import testGit.actions.ViewDetails;
+import testGit.editorPanel.Shared;
 import testGit.pojo.GroupType;
 import testGit.pojo.TestCase;
 import testGit.viewPanel.ViewPanel;
@@ -133,10 +134,10 @@ public class TestRunCard extends JBPanel<TestRunCard> {
         automationRefLabel.setVisible(activeDetails.contains("Automation Ref"));
 
         badgePanel.removeAll();
-        if (showPriority) badgePanel.add(createPriorityBadge(tc));
+        if (showPriority) badgePanel.add(Shared.createPriorityBadge(tc));
         if (showGroups && tc.getGroups() != null)
             for (GroupType group : tc.getGroups())
-                badgePanel.add(createGroupBadge(group));
+                badgePanel.add(Shared.createGroupBadge(group));
         badgePanel.revalidate();
         badgePanel.repaint();
 
@@ -251,19 +252,6 @@ public class TestRunCard extends JBPanel<TestRunCard> {
         setBackground(index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45));
     }
 
-    private JBLabel createPriorityBadge(TestCase tc) {
-        Color bg = switch (tc.getPriority()) {
-            case HIGH -> JBColor.CYAN;
-            case MEDIUM -> JBColor.magenta;
-            case LOW -> JBColor.GRAY;
-        };
-        return new RoundedBadge(tc.getPriority().getDescription(), bg);
-    }
-
-    private JBLabel createGroupBadge(GroupType groupName) {
-        return new RoundedBadge(groupName.name(), JBColor.darkGray);
-    }
-
     private JBLabel createDetailLabel() {
         JBLabel label = new JBLabel();
         label.setFont(UIUtil.getLabelFont(UIUtil.FontSize.NORMAL));
@@ -274,15 +262,5 @@ public class TestRunCard extends JBPanel<TestRunCard> {
 
     public interface SelectionListener {
         void onSelected(TestRunCard card);
-    }
-
-    private static class RoundedBadge extends JBLabel {
-        RoundedBadge(String text, Color bg) {
-            super(text);
-            setBackground(bg);
-            setForeground(JBColor.WHITE);
-            setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD));
-            setBorder(JBUI.Borders.empty(2, 10));
-        }
     }
 }
