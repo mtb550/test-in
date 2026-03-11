@@ -1,6 +1,5 @@
 package testGit.projectPanel;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;

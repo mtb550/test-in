@@ -1,24 +1,58 @@
 <idea-plugin>
+
+    <!-- ================================================================== -->
+    <!-- Identity                                                           -->
+    <!-- ================================================================== -->
     <id>testGit</id>
-    <resource-bundle>messages.bundle</resource-bundle>
     <name>Test Git</name>
-    <vendor email="mtb550@gmail.com" url="https://mtb.com">initial</vendor>
+    <version>1.1</version>
+    <vendor email="mtb550@gmail.com" url="https://mtb.com">Muteb Almughyiri</vendor>
+    <resource-bundle>messages.bundle</resource-bundle>
     <description><![CDATA[
-        Plugin to browse test projects, view features, and manage test cases with details and bug tracking.
+        <b>Test Git</b> — a QC management plugin for IntelliJ-based IDEs.<br/><br/>
+        Browse test projects, manage test cases, track test runs, and integrate
+        with Git version control — all from within your IDE.
     ]]></description>
+    <change-notes><![CDATA[
+        <b>1.0.0</b>
+        <ul>
+            <li>Initial release</li>
+            <li>Test case editor with filtering, search, and pagination</li>
+            <li>Test run creation and opening editor</li>
+            <li>Settings page for global configuration</li>
+        </ul>
+    ]]></change-notes>
+
+    <!-- ================================================================== -->
+    <!-- Compatibility                                                        -->
+    <!-- ================================================================== -->
+    <idea-version since-build="233" until-build="251.*"/>
+
+    <!-- ================================================================== -->
+    <!-- Dependencies                                                         -->
+    <!-- ================================================================== -->
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
     <depends>Git4Idea</depends>
     <depends>TestNG-J</depends>
+
+    <!-- ================================================================== -->
+    <!-- Extensions                                                           -->
+    <!-- ================================================================== -->
     <extensions defaultExtensionNs="com.intellij">
+        <!-- File editors -->
         <fileEditorProvider implementation="testGit.editorPanel.testCaseEditor.ProviderImpl"/>
         <fileEditorProvider implementation="testGit.editorPanel.testRunEditor.FileEditorProviderImpl"/>
+
+        <!-- Services -->
         <applicationService serviceImplementation="testGit.settings.AppSettingsState"/>
+
+        <!-- Tool windows -->
         <toolWindow
                 id="TestGit"
                 factoryClass="testGit.projectPanel.Main"
                 anchor="left"
-                icon="META-INF/pluginIcon.svg"
+                icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -26,16 +60,19 @@
                 id="Details"
                 factoryClass="testGit.viewPanel.ToolWindowFactoryImpl"
                 anchor="bottom"
-                icon="META-INF/pluginIcon.svg"
+                icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
-                canCloseContents="true"
         />
+
+        <!-- Notifications -->
         <notificationGroup id="TestGit Notifications"
                            displayType="BALLOON"
                            isLogByDefault="true"
                            key="notification.group.testgit"
         />
+
+        <!-- Settings -->
         <applicationConfigurable
                 instance="testGit.settings.AppSettingsConfigurable"
                 id="testGit.settings.AppSettingsConfigurable"
@@ -44,16 +81,5 @@
                 groupId="tools"
         />
     </extensions>
-    <actions>
-        <action id="testGit.demo.OpenTestTreeAction"
-                class="testGit.pojo.ShowTestTreeAction"
-                icon="META-INF/pluginIcon.svg">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-        <group id="TestTreeContextMenuGroup"
-               class="testGit.projectPanel.testCaseTab.ContextMenu"
-               popup="true">
-            <reference ref="testGit.demo.OpenTestTreeAction"/>
-        </group>
-    </actions>
+
 </idea-plugin>
