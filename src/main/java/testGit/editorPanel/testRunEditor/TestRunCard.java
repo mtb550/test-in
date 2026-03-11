@@ -2,7 +2,6 @@ package testGit.editorPanel.testRunEditor;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -13,8 +12,6 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.Setter;
-import testGit.actions.RunTestCase;
-import testGit.actions.ViewDetails;
 import testGit.editorPanel.Shared;
 import testGit.pojo.GroupType;
 import testGit.pojo.TestCase;
@@ -191,10 +188,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
             }
 
             private void showContextMenu(MouseEvent e) {
-                DefaultActionGroup group = new DefaultActionGroup("Test Run Actions", false);
-                group.add(new ViewDetails(tc));
-                group.addSeparator();
-                group.add(new RunTestCase(tc, null));
+                ContextMenu group = new ContextMenu(null, null, null, TestRunCard.this.tc);
                 ActionManager.getInstance()
                         .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, group)
                         .getComponent().show(e.getComponent(), e.getX(), e.getY());

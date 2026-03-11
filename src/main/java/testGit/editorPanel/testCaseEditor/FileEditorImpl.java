@@ -2,6 +2,8 @@ package testGit.editorPanel.testCaseEditor;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.fileEditor.FileEditor;
+import com.intellij.openapi.fileEditor.FileEditorManagerEvent;
+import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -12,10 +14,13 @@ import com.intellij.ui.components.JBScrollPane;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import testGit.editorPanel.EditorFocusSyncListener;
 import testGit.editorPanel.StatusBar;
 import testGit.editorPanel.ToolBar;
+import testGit.pojo.Config;
 import testGit.pojo.Directory;
 import testGit.pojo.TestCase;
+import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -82,6 +87,19 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor, To
         attachPaginationListeners();
 
         refreshView();
+        EditorFocusSyncListener syncListener = new EditorFocusSyncListener(this.list);
+
+        Config.getProject()
+                .getMessageBus()
+                .connect(this)
+                .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+                    @Override
+                    public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+                        if (event.getNewFile() != null && event.getNewFile().equals(file)) {
+                            syncListener.selectionChanged(event);
+                        }
+                    }
+                });
     }
 
     // -------------------------------------------------------------------------
@@ -252,5 +270,8 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor, To
 
     @Override
     public void dispose() {
+        TestCase selectedInThisFile = list.getSelectedValue();
+        ViewPanel.hideIfShowing(selectedInThisFile);
+        model.removeListDataListener(syncListener);
     }
 }

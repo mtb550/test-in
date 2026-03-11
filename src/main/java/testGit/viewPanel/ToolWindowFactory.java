@@ -27,9 +27,9 @@ public class ToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFact
         ContentFactory contentFactory = ContentFactory.getInstance();
 
         // Details tabs
-        Content detailsTab = contentFactory.createContent(detailsInstance.getDetailsPanel(), "Details", false);
-        Content historyTab = contentFactory.createContent(detailsInstance.getHistoryPanel(), "History", false);
-        Content bugsTab = contentFactory.createContent(detailsInstance.getBugPanel(), "Open Bugs", false);
+        Content detailsTab = contentFactory.createContent(detailsInstance.getDetailsTab(), "Details", false);
+        Content historyTab = contentFactory.createContent(detailsInstance.getHistoryTab(), "History", false);
+        Content bugsTab = contentFactory.createContent(detailsInstance.getBugTab(), "Open Bugs", false);
 
         // Add Test Case tab
         Content addTestCaseTab = contentFactory.createContent(addInstance.getMainPanel(), "Create Test Case", false);

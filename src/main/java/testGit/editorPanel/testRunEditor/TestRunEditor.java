@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 
 public class TestRunEditor {
 
-    private TestRunEditor() {
-    }
-
     public static void open(Path runFilePath, ProjectPanel projectPanel) {
         try {
             TestRun metadata = Config.getMapper().readValue(runFilePath.toFile(), TestRun.class);

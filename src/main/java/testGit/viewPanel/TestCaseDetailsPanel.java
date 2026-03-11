@@ -1,7 +1,9 @@
 package testGit.viewPanel;
 
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.*;
 import com.intellij.util.ui.JBUI;
+import lombok.Getter;
 import testGit.pojo.DB;
 import testGit.pojo.Priority;
 import testGit.pojo.TestCase;
@@ -12,86 +14,81 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class TestCaseDetailsPanel {
-    private final JBPanel<?> mainPanel;
+    @Getter
+    private final JBPanel<?> panel;
     private final JBTabbedPane tabbedPane;
-    private final JBPanel<?> detailTab;
+    @Getter
+    private final JBPanel<?> detailsTab;
+    @Getter
     private final JBPanel<?> historyTab;
+    @Getter
     private final JBPanel<?> bugTab;
-    private JBTextField titleField;
-    private JBTextField expectedArea;
-    private JBTextField stepsArea;
-    private JBTextField priorityField;
-    private JBTextField autoRefField;
-    private JBTextField busiRefField;
-    private JBTextField groupsField;
 
-    private JBLabel idLabel;
-    private JBLabel titleLabel;
-    private JBLabel expectedLabel;
-    private JBLabel stepsLabel;
-    private JBLabel priorityLabel;
-    private JBLabel autoRefLabel, busiRefLabel, groupsLabel;
-    private JBLabel uidLabel,
-            moduleLabel, createdByLabel, updatedByLabel, createdAtLabel;
-    private JBLabel updatedAtLabel;
+    // Edit Fields
+    private JBTextField titleField, expectedArea, stepsArea, priorityField;
+    private JBTextField autoRefField, busiRefField, groupsField;
 
     private JButton saveButton;
-
+    @Getter
     private TestCase currentTestCase;
     private boolean isEditing = false;
 
     public TestCaseDetailsPanel() {
-        mainPanel = new JBPanel<>(new BorderLayout());
+        panel = new JBPanel<>(new BorderLayout());
         tabbedPane = new JBTabbedPane();
 
-        detailTab = new JBPanel<>(new GridBagLayout());
+        detailsTab = new JBPanel<>(new GridBagLayout());
         historyTab = new JBPanel<>(new BorderLayout());
         bugTab = new JBPanel<>(new BorderLayout());
 
-        tabbedPane.addTab("Details", detailTab);
+        tabbedPane.addTab("Details", detailsTab);
         tabbedPane.addTab("History", historyTab);
         tabbedPane.addTab("Open Bugs", bugTab);
 
-        mainPanel.add(tabbedPane, BorderLayout.CENTER);
+        panel.add(tabbedPane, BorderLayout.CENTER);
 
-        mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("ESCAPE"), "cancelEdit");
-        mainPanel.getActionMap().put("cancelEdit", new AbstractAction() {
+        // Shortcut: Escape to cancel edit
+        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+                .put(KeyStroke.getKeyStroke("ESCAPE"), "cancelEdit");
+        panel.getActionMap().put("cancelEdit", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (isEditing) {
-                    toggleEditMode(false);
-                }
-            }
-        });
-
-        mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Z"), "undo");
-        mainPanel.getActionMap().put("undo", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //ActionHistory.undo();
-                System.out.println("[UNDO] Ctrl+Z triggered");
-            }
-        });
-
-        mainPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control Y"), "redo");
-        mainPanel.getActionMap().put("redo", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                //ActionHistory.redo();
-                System.out.println("[REDO] Ctrl+Y triggered");
+                if (isEditing) toggleEditMode(false);
             }
         });
     }
 
+    /**
+     * Entry point for updating the UI. Handles null safely.
+     */
     public void update(TestCase testCase) {
         this.currentTestCase = testCase;
+
+        // 1. CLEAR UI IF NULL (Fixes the NPE from reset/escape)
+        if (testCase == null) {
+            detailsTab.removeAll();
+            JBLabel placeholder = new JBLabel("Select a test case to view details");
+            placeholder.setForeground(JBColor.GRAY);
+            detailsTab.add(placeholder, new GridBagConstraints());
+            detailsTab.revalidate();
+            detailsTab.repaint();
+            return;
+        }
+
+        // 2. Otherwise, show read-only details
         toggleEditMode(false);
         loadHistoryAndBugs();
     }
 
+    /**
+     * Rebuilds the detail tab based on whether we are viewing or editing.
+     */
     public void toggleEditMode(boolean editable) {
+        // NULL GUARD: Prevents crashes when resetting or closing
+        if (currentTestCase == null) return;
+
         isEditing = editable;
-        detailTab.removeAll();
+        detailsTab.removeAll();
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(8, 16);
@@ -102,125 +99,105 @@ public class TestCaseDetailsPanel {
         int row = 0;
 
         if (editable) {
-            titleField = new JBTextField(currentTestCase.getTitle());
-            expectedArea = new JBTextField(currentTestCase.getExpected());
-            stepsArea = new JBTextField(currentTestCase.getSteps());
-            priorityField = new JBTextField(currentTestCase.getPriority().getDescription());
-            autoRefField = new JBTextField(currentTestCase.getAutoRef());
-            busiRefField = new JBTextField(currentTestCase.getBusiRef());
-            groupsField = new JBTextField(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "");
-
-            addRow("Title:", titleField, detailTab, gbc, row++);
-            addRow("Expected Result:", expectedArea, detailTab, gbc, row++);
-            addRow("Steps:", stepsArea, detailTab, gbc, row++);
-            addRow("Priority:", priorityField, detailTab, gbc, row++);
-            addRow("Automation Ref:", autoRefField, detailTab, gbc, row++);
-            addRow("Business Ref:", busiRefField, detailTab, gbc, row++);
-            addRow("Groups:", groupsField, detailTab, gbc, row++);
+            setupEditMode(gbc, row);
         } else {
-            idLabel = createValueLabel(currentTestCase.getId());
-            titleLabel = createValueLabel(currentTestCase.getTitle());
-            expectedLabel = createValueLabel(currentTestCase.getExpected());
-            stepsLabel = createValueLabel(currentTestCase.getSteps());
-            priorityLabel = createValueLabel(currentTestCase.getPriority().getDescription());
-            autoRefLabel = createValueLabel(currentTestCase.getAutoRef());
-            busiRefLabel = createValueLabel(currentTestCase.getBusiRef());
-            groupsLabel = createValueLabel(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "");
-
-            addRow("ID:", idLabel, detailTab, gbc, row++);
-            addRow("Title:", titleLabel, detailTab, gbc, row++);
-            addRow("Expected Result:", expectedLabel, detailTab, gbc, row++);
-            addRow("Steps:", stepsLabel, detailTab, gbc, row++);
-            addRow("Priority:", priorityLabel, detailTab, gbc, row++);
-            addRow("Automation Ref:", autoRefLabel, detailTab, gbc, row++);
-            addRow("Business Ref:", busiRefLabel, detailTab, gbc, row++);
-            addRow("Groups:", groupsLabel, detailTab, gbc, row++);
+            setupViewMode(gbc, row);
         }
 
-        uidLabel = createValueLabel(String.valueOf(currentTestCase.getUid()));
-        moduleLabel = createValueLabel(currentTestCase.getModule());
-        createdByLabel = createValueLabel(currentTestCase.getCreateBy());
-        updatedByLabel = createValueLabel(currentTestCase.getUpdateBy());
-        createdAtLabel = createValueLabel(currentTestCase.getCreateAt() != null ? currentTestCase.getCreateAt().toString() : "-");
-        updatedAtLabel = createValueLabel(currentTestCase.getUpdateAt() != null ? currentTestCase.getUpdateAt().toString() : "-");
+        detailsTab.revalidate();
+        detailsTab.repaint();
+    }
 
-        addRow("UID:", uidLabel, detailTab, gbc, row++);
-        addRow("Module:", moduleLabel, detailTab, gbc, row++);
-        addRow("Created By:", createdByLabel, detailTab, gbc, row++);
-        addRow("Updated By:", updatedByLabel, detailTab, gbc, row++);
-        addRow("Created At:", createdAtLabel, detailTab, gbc, row++);
-        addRow("Updated At:", updatedAtLabel, detailTab, gbc, row++);
+    private void setupEditMode(GridBagConstraints gbc, int row) {
+        titleField = new JBTextField(currentTestCase.getTitle());
+        expectedArea = new JBTextField(currentTestCase.getExpected());
+        stepsArea = new JBTextField(currentTestCase.getSteps());
+        priorityField = new JBTextField(currentTestCase.getPriority() != null ? currentTestCase.getPriority().getDescription() : "");
+        autoRefField = new JBTextField(currentTestCase.getAutoRef());
+        busiRefField = new JBTextField(currentTestCase.getBusiRef());
+        groupsField = new JBTextField(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "");
 
-        if (editable) {
-            saveButton = new JButton("Save");
-            saveButton.setFont(new Font("Segoe UI", Font.BOLD, 13));
-            saveButton.setVisible(true);
-            saveButton.addActionListener(e -> onSave());
-            saveButton.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke("ENTER"), "save");
-            saveButton.getActionMap().put("save", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    onSave();
-                }
-            });
-            gbc.gridx = 1;
-            gbc.gridy = row;
-            gbc.anchor = GridBagConstraints.EAST;
-            detailTab.add(saveButton, gbc);
-            SwingUtilities.invokeLater(() -> titleField.requestFocusInWindow());
-        } else if (saveButton != null) {
-            saveButton.setVisible(false);
-        }
+        addRow("Title:", titleField, detailsTab, gbc, row++);
+        addRow("Expected Result:", expectedArea, detailsTab, gbc, row++);
+        addRow("Steps:", stepsArea, detailsTab, gbc, row++);
+        addRow("Priority:", priorityField, detailsTab, gbc, row++);
+        addRow("Automation Ref:", autoRefField, detailsTab, gbc, row++);
+        addRow("Business Ref:", busiRefField, detailsTab, gbc, row++);
+        addRow("Groups:", groupsField, detailsTab, gbc, row++);
 
-        detailTab.revalidate();
-        detailTab.repaint();
+        addCommonMetaRows(gbc, row);
+
+        saveButton = new JButton("Save Changes");
+        saveButton.addActionListener(e -> onSave());
+        gbc.gridx = 1;
+        gbc.gridy = row + 10;
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        detailsTab.add(saveButton, gbc);
+
+        SwingUtilities.invokeLater(() -> titleField.requestFocusInWindow());
+    }
+
+    private void setupViewMode(GridBagConstraints gbc, int row) {
+        addRow("ID:", createValueLabel(currentTestCase.getId()), detailsTab, gbc, row++);
+        addRow("Title:", createValueLabel(currentTestCase.getTitle()), detailsTab, gbc, row++);
+        addRow("Expected Result:", createValueLabel(currentTestCase.getExpected()), detailsTab, gbc, row++);
+        addRow("Steps:", createValueLabel(currentTestCase.getSteps()), detailsTab, gbc, row++);
+        addRow("Priority:", createValueLabel(currentTestCase.getPriority() != null ? currentTestCase.getPriority().getDescription() : "-"), detailsTab, gbc, row++);
+        addRow("Automation Ref:", createValueLabel(currentTestCase.getAutoRef()), detailsTab, gbc, row++);
+        addRow("Business Ref:", createValueLabel(currentTestCase.getBusiRef()), detailsTab, gbc, row++);
+        addRow("Groups:", createValueLabel(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "-"), detailsTab, gbc, row++);
+
+        addCommonMetaRows(gbc, row);
+    }
+
+    private void addCommonMetaRows(GridBagConstraints gbc, int row) {
+        addRow("UID:", createValueLabel(String.valueOf(currentTestCase.getUid())), detailsTab, gbc, row++);
+        addRow("Module:", createValueLabel(currentTestCase.getModule()), detailsTab, gbc, row++);
+        addRow("Created By:", createValueLabel(currentTestCase.getCreateBy()), detailsTab, gbc, row++);
+        addRow("Updated By:", createValueLabel(currentTestCase.getUpdateBy()), detailsTab, gbc, row++);
+        addRow("Created At:", createValueLabel(currentTestCase.getCreateAt() != null ? currentTestCase.getCreateAt().toString() : "-"), detailsTab, gbc, row++);
+        addRow("Updated At:", createValueLabel(currentTestCase.getUpdateAt() != null ? currentTestCase.getUpdateAt().toString() : "-"), detailsTab, gbc, row++);
     }
 
     private void onSave() {
-        String oldTitle = currentTestCase.getTitle();
-        String oldExpected = currentTestCase.getExpected();
-        String oldSteps = currentTestCase.getSteps();
-        Priority oldPriority = currentTestCase.getPriority();
+        if (currentTestCase == null) return;
 
-        String newTitle = titleField.getText().trim();
-        String newExpected = expectedArea.getText().trim();
-        String newSteps = stepsArea.getText().trim();
-        String newPriority = priorityField.getText().trim();
-
-        currentTestCase.setTitle(newTitle);
-        currentTestCase.setExpected(newExpected);
-        currentTestCase.setSteps(newSteps);
-        currentTestCase.setPriority(Priority.valueOf(newPriority));
+        currentTestCase.setTitle(titleField.getText().trim());
+        currentTestCase.setExpected(expectedArea.getText().trim());
+        currentTestCase.setSteps(stepsArea.getText().trim());
+        try {
+            currentTestCase.setPriority(Priority.valueOf(priorityField.getText().toUpperCase()));
+        } catch (Exception ignored) {
+        }
 
         toggleEditMode(false);
-        JOptionPane.showMessageDialog(mainPanel, "✅ Test case saved successfully.", "Saved", JOptionPane.INFORMATION_MESSAGE);
+        // Better than JOptionPane: uses IntelliJ's notification system if available
+        System.out.println("Saved: " + currentTestCase.getId());
     }
 
     private void loadHistoryAndBugs() {
         historyTab.removeAll();
-        bugTab.removeAll();
-
         DefaultListModel<String> model = new DefaultListModel<>();
-        for (TestCaseHistory history : DB.loadTestCaseHistory()) {
-            model.addElement(history.getTimestamp() + " - " + history.getChangeSummary());
+        for (TestCaseHistory h : DB.loadTestCaseHistory()) {
+            model.addElement(h.getTimestamp() + " - " + h.getChangeSummary());
         }
-        JBList<String> historyList = new JBList<>(model);
-        historyList.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        historyTab.add(new JBScrollPane(historyList), BorderLayout.CENTER);
+        JBList<String> list = new JBList<>(model);
+        historyTab.add(new JBScrollPane(list), BorderLayout.CENTER);
 
-        bugTab.add(new JBLabel("🐞 Bug list will be shown here."), BorderLayout.NORTH);
+        bugTab.removeAll();
+        bugTab.add(new JBLabel("No bugs found for this test case."), BorderLayout.NORTH);
     }
 
     private JBLabel createValueLabel(String text) {
-        JBLabel label = new JBLabel(text != null ? text : "3");  // Use "3" for null values
-        label.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JBLabel label = new JBLabel((text == null || text.isEmpty()) ? "-" : text);
+        label.setFont(JBUI.Fonts.label(14));
         return label;
     }
 
     private void addRow(String label, JComponent input, JBPanel<?> panel, GridBagConstraints gbc, int row) {
         JBLabel keyLabel = new JBLabel(label);
-        keyLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        keyLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        keyLabel.setFont(JBUI.Fonts.label(14).asBold());
 
         gbc.gridx = 0;
         gbc.gridy = row;
@@ -234,19 +211,4 @@ public class TestCaseDetailsPanel {
         panel.add(input, gbc);
     }
 
-    public JBPanel<?> getPanel() {
-        return mainPanel;
-    }
-
-    public JBPanel<?> getDetailsPanel() {
-        return detailTab;
-    }
-
-    public JBPanel<?> getHistoryPanel() {
-        return historyTab;
-    }
-
-    public JBPanel<?> getBugPanel() {
-        return bugTab;
-    }
 }

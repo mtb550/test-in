@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class ViewPanel {
 
-    private static ToolWindow getToolWindow() {
+    public static ToolWindow getToolWindow() {
         return ToolWindowManager.getInstance(Config.getProject()).getToolWindow("Details");
     }
 
@@ -66,4 +66,21 @@ public class ViewPanel {
             }
         }
     }
+
+    public static void hideIfShowing(TestCase testCaseToMatch) {
+        ToolWindow tw = getToolWindow();
+        if (tw == null || !tw.isVisible()) return;
+
+        TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
+        if (viewer != null) {
+            TestCase currentlyShown = viewer.getCurrentTestCase();
+
+            if (currentlyShown != null && testCaseToMatch != null &&
+                    currentlyShown.getId().equals(testCaseToMatch.getId())) {
+                reset();
+                hide();
+            }
+        }
+    }
+
 }
