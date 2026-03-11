@@ -20,6 +20,7 @@ public class ContextMenu extends DefaultActionGroup {
         addSeparator();
         add(new GenerateTestCase(tc, list));
         add(new RunTestCase(tc, list));
+        add(new NavigateToCode(tc, list));
 
 
     }

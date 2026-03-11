@@ -12,7 +12,7 @@ public class GenerateTestCase extends DumbAwareAction {
     private final TestCase tc;
 
     public GenerateTestCase(TestCase tc, final JBList<TestCase> list) {
-        super("Generate Test", "", AllIcons.RunConfigurations.TestState.Run);
+        super("Generate Test", "", AllIcons.Actions.IntentionBulb);
         this.tc = tc;
         this.registerCustomShortcutSet(KeyboardSet.GenerateTestCase.get(), list);
     }

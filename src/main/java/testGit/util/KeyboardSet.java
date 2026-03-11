@@ -15,6 +15,7 @@ public enum KeyboardSet {
     ContextMenu(KeyEvent.VK_CONTEXT_MENU, 0),
     UpdateTestCase(KeyEvent.VK_F2, 0),
     RunTestCase(KeyEvent.VK_F5, 0),
+    NavigateToCode(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK),
     GenerateTestCase(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK);
 
     private final int keyCode;

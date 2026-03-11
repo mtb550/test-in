@@ -26,7 +26,7 @@ public class ContextMenu extends DefaultActionGroup {
         add(new RemovePackage(projectPanel, testCaseTree));
         add(new Rename(projectPanel, testCaseTree));
         addSeparator();
-        add(new Run(testCaseTree));
+        add(new RunTestSet(testCaseTree));
         addSeparator();
         add(createSubGroup("Export", AllIcons.ToolbarDecorator.Export, new ExportCsv(), new ExportHtml(), new ExportExcel(), new ExportJson()));
         add(createSubGroup("Import", AllIcons.ToolbarDecorator.Import, new ImportCsv(), new ImportExcel(projectPanel), new ImportJson()));

@@ -13,10 +13,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 
-public class Run extends DumbAwareAction {
+public class RunTestSet extends DumbAwareAction {
     private final SimpleTree tree;
 
-    public Run(final SimpleTree tree) {
+    public RunTestSet(final SimpleTree tree) {
         super("Run Test Set", "Run selected test set", AllIcons.RunConfigurations.TestState.Run);
         this.tree = tree;
     }
