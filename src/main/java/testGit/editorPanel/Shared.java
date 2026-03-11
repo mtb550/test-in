@@ -63,7 +63,7 @@ public class Shared {
         public RoundedBadge(String text, Color bg) {
             super(text);
             this.radius = BADGE_RADIUS;
-            setOpaque(radius == 0); // flat badges can use the default opaque fill
+            setOpaque(false); // flat badges can use the default opaque fill
             setBackground(bg);
             setForeground(JBColor.WHITE);
             setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD));

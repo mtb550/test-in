@@ -41,12 +41,13 @@ public class TestCaseCard extends JBPanel<TestCaseCard> {
         titleLine.setOpaque(false);
         titleLine.setAlignmentX(Component.LEFT_ALIGNMENT);
         titleLine.add(titleLabel, BorderLayout.WEST);
-        titleLine.add(badgePanel, BorderLayout.CENTER);
+        badgePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
         content.setOpaque(false);
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.add(titleLine);
+        content.add(badgePanel);
         content.add(expectedLabel);
         content.add(stepsLabel);
         content.add(automationRefLabel);
