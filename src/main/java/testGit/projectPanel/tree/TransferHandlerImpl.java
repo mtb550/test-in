@@ -15,9 +15,9 @@ import javax.swing.tree.TreePath;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Set;
 
 public class TransferHandlerImpl extends TransferHandler {
@@ -37,25 +37,18 @@ public class TransferHandlerImpl extends TransferHandler {
     private Integer lastAction;
 
     public TransferHandlerImpl(SimpleTree tree, Set<DefaultMutableTreeNode> cutNodes) {
-        System.out.println("TransferHandlerImpl.TransferHandlerImpl()");
         this.tree = tree;
         this.cutNodes = cutNodes;
     }
 
-
     @Override
     public int getSourceActions(JComponent c) {
-        System.out.println("TransferHandlerImpl.getSourceActions " + c.getName());
         return COPY_OR_MOVE;
     }
 
     @Override
     protected Transferable createTransferable(JComponent c) {
-        System.out.println("TransferHandlerImpl.createTransferable. path: " + Arrays.toString(tree.getSelectionPaths()));
-
         TreePath[] paths = tree.getSelectionPaths();
-        Arrays.stream(Objects.requireNonNull(tree.getSelectionPaths())).forEach(treePath -> System.out.println(treePath.getLastPathComponent()));
-
         if (paths == null) return null;
 
         DefaultMutableTreeNode[] nodes = Arrays.stream(paths)
@@ -67,73 +60,47 @@ public class TransferHandlerImpl extends TransferHandler {
 
     @Override
     public boolean canImport(TransferSupport support) {
-        System.out.println("TransferHandlerImpl.canImport()");
-        if (!support.isDataFlavorSupported(NODE_FLAVOR)) {
-            System.out.println("TransferHandlerImpl.canImport(). not support");
-            return false;
-        }
+        if (!support.isDataFlavorSupported(NODE_FLAVOR)) return false;
 
         if (support.isDrop()) {
-            System.out.println("TransferHandlerImpl.canImport(). drop support");
-
             TreePath dropPath = ((SimpleTree.DropLocation) support.getDropLocation()).getPath();
-            if (dropPath == null) return false;
-            DefaultMutableTreeNode targetNode = (DefaultMutableTreeNode) dropPath.getLastPathComponent();
-            return isValidTarget(targetNode);
+            return dropPath != null && ((DefaultMutableTreeNode) dropPath.getLastPathComponent()).getUserObject() instanceof TestPackage;
         }
-
         return tree.getSelectionPath() != null;
-    }
-
-    private boolean isValidTarget(DefaultMutableTreeNode targetNode) {
-        System.out.println("TransferHandlerImpl.isValidTarget()");
-        return targetNode.getUserObject() instanceof TestPackage targetDir;
     }
 
     @Override
     public boolean importData(TransferSupport support) {
-        System.out.println("TransferHandlerImpl.importData()");
-
         if (!canImport(support)) return false;
 
         try {
             DefaultMutableTreeNode[] nodes = (DefaultMutableTreeNode[]) support.getTransferable().getTransferData(NODE_FLAVOR);
-            DefaultMutableTreeNode targetNode;
-
-            if (support.isDrop()) {
-                targetNode = (DefaultMutableTreeNode) ((SimpleTree.DropLocation) support.getDropLocation()).getPath().getLastPathComponent();
-            } else {
-                targetNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-            }
+            DefaultMutableTreeNode targetNode = support.isDrop()
+                    ? (DefaultMutableTreeNode) ((SimpleTree.DropLocation) support.getDropLocation()).getPath().getLastPathComponent()
+                    : (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
             if (targetNode == null) return false;
 
-            if (this.lastAction == null) return false;
-            int action = support.isDrop() ? support.getDropAction() : this.lastAction;
+            int action = support.isDrop() ? support.getDropAction() : (this.lastAction != null ? this.lastAction : COPY);
 
             WriteAction.run(() -> {
                 DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
                 for (DefaultMutableTreeNode node : nodes) {
                     if (action == MOVE) {
-                        System.out.println("action is move");
+                        if (node.equals(targetNode) || node.isNodeDescendant(targetNode)) continue;
                         model.removeNodeFromParent(node);
                         persistMove((TestPackage) node.getUserObject(), (TestPackage) targetNode.getUserObject());
                         model.insertNodeInto(node, targetNode, targetNode.getChildCount());
                     } else {
-                        System.out.println("action is copy");
                         DefaultMutableTreeNode clone = cloneNode(node);
                         persistCopy((TestPackage) node.getUserObject(), (TestPackage) targetNode.getUserObject(), (TestPackage) clone.getUserObject());
                         model.insertNodeInto(clone, targetNode, targetNode.getChildCount());
                     }
                 }
-
-                cutNodes.clear();
-                tree.repaint();
+                resetLastAction();
             });
-
             return true;
         } catch (Exception e) {
-            e.printStackTrace(System.err);
             return false;
         }
     }
@@ -147,89 +114,78 @@ public class TransferHandlerImpl extends TransferHandler {
                 .setFilePath(dir.getFilePath())
                 .setType(dir.getType())
                 .setIcon(dir.getIcon());
-
         return new DefaultMutableTreeNode(newDir);
     }
 
     private void persistMove(TestPackage source, TestPackage target) {
-        System.out.println("Persisting MOVE to disk: " + source.getFileName());
+        VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(source.getFile());
+        VirtualFile targetDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(target.getFile());
 
-        VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(source.getFile());
-        VirtualFile targetDir = LocalFileSystem.getInstance().findFileByIoFile(target.getFile());
-
-        System.out.println("source:: " + source.getFilePath());
-        System.out.println("target:: " + target.getFilePath());
         try {
             if (vFile != null && targetDir != null) {
                 vFile.move(this, targetDir);
-
                 Path newPath = target.getFilePath().resolve(source.getFileName());
                 source.setFilePath(newPath).setFile(newPath.toFile());
             }
-        } catch (java.io.IOException e) {
-            e.printStackTrace(System.err);
+        } catch (IOException ignored) {
         }
     }
 
     private void persistCopy(TestPackage source, TestPackage target, TestPackage cloned) {
-        System.out.println("Persisting COPY to disk: " + source.getFileName());
-
-        VirtualFile vFile = LocalFileSystem.getInstance().findFileByIoFile(source.getFile());
-        VirtualFile targetDir = LocalFileSystem.getInstance().findFileByIoFile(target.getFile());
+        VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(source.getFile());
+        VirtualFile targetDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(target.getFile());
 
         try {
             if (vFile != null && targetDir != null) {
                 vFile.copy(this, targetDir, vFile.getName());
-
                 Path newPath = target.getFilePath().resolve(source.getFileName());
-
                 cloned.setFilePath(newPath).setFile(newPath.toFile());
             }
-        } catch (java.io.IOException e) {
-            e.printStackTrace(System.err);
+        } catch (IOException ignored) {
         }
     }
 
     @Override
     protected void exportDone(JComponent source, Transferable data, int action) {
-        System.out.println("TransferHandlerImpl.exportDone()");
-        this.lastAction = action;
-
-        if (action == MOVE) {
-            System.out.println("MMMMMMove action");
-            try {
-                DefaultMutableTreeNode[] nodes = (DefaultMutableTreeNode[]) data.getTransferData(NODE_FLAVOR);
-                cutNodes.clear();
-                cutNodes.addAll(Arrays.asList(nodes));
-
-                tree.repaint();
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
-            }
-            System.out.println("Nodes cut successfully, cleaning up source...");
-        }
+        resetLastAction();
     }
 
     public void resetLastAction() {
         this.lastAction = null;
+        cutNodes.clear();
+        tree.repaint();
+    }
+
+    @Override
+    public void exportToClipboard(JComponent comp, java.awt.datatransfer.Clipboard clip, int action) throws IllegalStateException {
+        super.exportToClipboard(comp, clip, action);
+        this.lastAction = action;
+
+        cutNodes.clear();
+        if (action == MOVE) {
+            TreePath[] paths = tree.getSelectionPaths();
+            if (paths != null) {
+                for (TreePath path : paths) {
+                    cutNodes.add((DefaultMutableTreeNode) path.getLastPathComponent());
+                }
+            }
+        }
+        tree.repaint();
     }
 
     private record NodesTransferable(DefaultMutableTreeNode[] nodes) implements Transferable {
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            System.out.println("TransferHandlerImpl.getTransferDataFlavors()");
             return new DataFlavor[]{NODE_FLAVOR};
         }
 
         @Override
         public boolean isDataFlavorSupported(DataFlavor flavor) {
-            System.out.println("TransferHandlerImpl.isDataFlavorSupported()");
             return NODE_FLAVOR.equals(flavor);
         }
 
         @Override
         public @NotNull Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-            System.out.println("TransferHandlerImpl.getTransferData()");
             if (!isDataFlavorSupported(flavor)) throw new UnsupportedFlavorException(flavor);
             return nodes;
         }

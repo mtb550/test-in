@@ -13,4 +13,27 @@ add message that the loading tree in panel
 show buttons in test caseeditor tab like test run (run) and (view code)
 
 support mult removal for project panel nodes
+
 create action: RemoveTestProject
+
+no need for pr, pa, tc, tr..etc you can know folder type without write the type. to be implemented.
+
+zoom in, out by mouse and scroll. to allow user to control the size. in editor only.
+
+project panel tree shows the message (nothing to show) once startup on first run. try to change it
+to (loading)
+
+implement this in control panel tree:
+/*
+inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK), "undoAction");
+inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), "redoAction");
+inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK), "addNewNode");
+inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0), "showContextMenu");
+*/
+
+unify add items in project panel to the new ui you created. and update the context menu
+to show add button without sub group.
+
+update copy action to prevent copy same file twice in same folder. in project panel
+
+change color to gray once cut. in project panel

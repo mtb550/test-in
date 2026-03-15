@@ -20,21 +20,17 @@ public class RendererImpl extends ColoredTreeCellRenderer {
 
     @Override
     public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof TestPackage pkg) {
 
-        Object userObject = (value instanceof DefaultMutableTreeNode node) ? node.getUserObject() : value;
+            setIcon((pkg.getIcon() != null && pkg.getIcon().getValue() != null) ? pkg.getIcon().getValue() : AllIcons.Nodes.Folder);
 
-        if (userObject instanceof TestPackage pkg) {
+            boolean isHeader = (pkg.getType() == DirectoryType.TCP || pkg.getType() == DirectoryType.TRP);
+            boolean isCut = (!isHeader && cutNodes != null && cutNodes.contains(node));
 
-            setIcon(pkg.getIcon().getValue());
+            SimpleTextAttributes attrs = isHeader ? SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES :
+                    (isCut ? SimpleTextAttributes.GRAYED_ATTRIBUTES : SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
-            if (pkg.getType() == DirectoryType.TCP || pkg.getType() == DirectoryType.TRP) {
-                append(pkg.getName(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
-
-            } else {
-                boolean isCut = (cutNodes != null && value instanceof DefaultMutableTreeNode && cutNodes.contains(value));
-                append(pkg.getName(), isCut ? SimpleTextAttributes.GRAYED_ATTRIBUTES : SimpleTextAttributes.REGULAR_ATTRIBUTES);
-            }
-
+            append(pkg.getName(), attrs);
             return;
         }
 

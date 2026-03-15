@@ -143,6 +143,7 @@ public class Tools {
 
         for (VirtualFile file : openFiles) {
             if (editorName.equals(file.getName())) {
+                editorManager.openFile(file, true);
                 return true;
             }
         }

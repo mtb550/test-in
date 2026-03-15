@@ -12,6 +12,7 @@ import testGit.pojo.DirectoryType;
 import testGit.pojo.TestPackage;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.KeyboardSet;
+import testGit.util.Tools;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -28,12 +29,16 @@ public class Open extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.Enter.get(), tree);
     }
 
-    @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public static void execute(ProjectPanel projectPanel, SimpleTree tree) {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node == null) return;
 
         if (node.getUserObject() instanceof TestPackage pkg) {
+            if (Tools.isEditorOpen(pkg.getName())) {
+                System.out.println("Editor already open, focusing: " + pkg.getFileName());
+                return;
+            }
+
             System.out.println("Opening Test Set: " + pkg.getFilePath());
             if (pkg.getType() == DirectoryType.TS)
                 TestCaseEditor.open(pkg);
@@ -44,14 +49,18 @@ public class Open extends DumbAwareAction {
     }
 
     @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        execute(projectPanel, tree);
+    }
+
+    @Override
     public void update(@NotNull AnActionEvent e) {
         TreePath path = tree.getSelectionPath();
 
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
                 node.getUserObject() instanceof TestPackage pkg &&
-                (pkg.getType() == DirectoryType.TS ||
-                        pkg.getType() == DirectoryType.TR)
+                (pkg.getType() == DirectoryType.TS || pkg.getType() == DirectoryType.TR)
         );
 
         e.getPresentation().setVisible(true);

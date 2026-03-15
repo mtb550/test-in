@@ -15,13 +15,8 @@ public class TestCaseEditor {
     public static void open(final TestPackage testSet) {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
 
-        editorManager.openFile(
-                Arrays.stream(editorManager.getOpenFiles())
-                        .filter(f -> f instanceof VirtualFileImpl vf && vf.getPkg().equals(testSet))
-                        .findFirst()
-                        .orElseGet(() -> createVirtualFile(testSet)),
-                true
-        );
+        VirtualFile newVirtualFile = createVirtualFile(testSet);
+        editorManager.openFile(newVirtualFile, true);
     }
 
     private static VirtualFile createVirtualFile(TestPackage testSet) {
@@ -44,6 +39,7 @@ public class TestCaseEditor {
             return Config.getMapper().readValue(file, TestCase.class);
         } catch (Exception e) {
             Notifier.error("Read Test Case failed", e.getMessage());
+            e.printStackTrace(System.err);
             return null;
         }
     }

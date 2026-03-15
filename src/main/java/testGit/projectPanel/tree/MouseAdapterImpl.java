@@ -4,9 +4,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.treeStructure.SimpleTree;
-import testGit.editorPanel.testCaseEditor.TestCaseEditor;
-import testGit.editorPanel.testRunEditor.TestRunEditor;
-import testGit.pojo.DirectoryType;
+import testGit.actions.Open;
 import testGit.pojo.TestPackage;
 import testGit.projectPanel.ProjectPanel;
 
@@ -27,39 +25,19 @@ public class MouseAdapterImpl extends MouseAdapter {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        System.out.println("ProjectPanelMouseAdapter.mouseClicked()");
-
         TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
-        if (selPath == null) return;
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) selPath.getLastPathComponent();
-        Object userObject = node.getUserObject();
-
-        if (!(userObject instanceof TestPackage pkg)) return;
+        if (selPath == null || !(selPath.getLastPathComponent() instanceof DefaultMutableTreeNode node) || !(node.getUserObject() instanceof TestPackage pkg))
+            return;
 
         if (SwingUtilities.isRightMouseButton(e)) {
             ContextMenu contextMenu = new ContextMenu(projectPanel);
             ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, contextMenu);
             popupMenu.getComponent().show(e.getComponent(), e.getX(), e.getY());
-            return;
 
+        } else if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+            Open.execute(projectPanel, tree);
+            e.consume();
         }
-
-        if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-
-            if (pkg.getType() == DirectoryType.TS) {
-                System.out.println("double left click test set");
-                TestCaseEditor.open(pkg);
-                return;
-            }
-
-            if (pkg.getType() == DirectoryType.TR) {
-                System.out.println("double left click test run");
-                TestRunEditor.open(pkg, projectPanel);
-            }
-
-        }
-
     }
-
 }

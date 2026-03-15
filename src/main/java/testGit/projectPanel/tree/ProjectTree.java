@@ -37,6 +37,8 @@ public class ProjectTree {
 
         mainTree.setRootVisible(false);
         mainTree.setShowsRootHandles(true);
+        mainTree.setDragEnabled(true);
+        mainTree.setDropMode(DropMode.ON_OR_INSERT);
 
         Set<DefaultMutableTreeNode> sharedCutNodes = new HashSet<>();
 

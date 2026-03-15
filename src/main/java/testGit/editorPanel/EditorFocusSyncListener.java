@@ -20,6 +20,7 @@ public class EditorFocusSyncListener implements FileEditorManagerListener {
 
     @Override
     public void selectionChanged(@NotNull FileEditorManagerEvent event) {
+
         if (event.getNewFile() instanceof VirtualFileImpl) {
             System.out.println(this.getClass() + " slection changed");
             ToolWindow viewPanel = ViewPanel.getToolWindow();

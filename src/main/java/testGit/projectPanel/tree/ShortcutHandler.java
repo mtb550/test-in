@@ -11,8 +11,8 @@ import javax.swing.*;
 import java.awt.event.KeyEvent;
 
 public class ShortcutHandler {
-    public static void register(final ProjectPanel projectPanel, final SimpleTree tree, TransferHandlerImpl transferHandler) {
 
+    public static void register(final ProjectPanel projectPanel, final SimpleTree tree, TransferHandlerImpl transferHandler) {
         new Remove(tree);
         new Open(projectPanel, tree);
         new Rename(projectPanel, tree);
@@ -30,12 +30,10 @@ public class ShortcutHandler {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK), "redoAction");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK), "addNewNode");
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0), "showContextMenu"); //TODO:: not working
-*/
+        */
 
         actionMap.put("cut", TransferHandler.getCutAction());
         actionMap.put("copy", TransferHandler.getCopyAction());
         actionMap.put("paste", TransferHandler.getPasteAction());
-
-
     }
 }
