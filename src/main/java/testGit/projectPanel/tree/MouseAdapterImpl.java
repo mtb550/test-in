@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.editorPanel.testCaseEditor.TestCaseEditor;
 import testGit.editorPanel.testRunEditor.TestRunEditor;
-import testGit.pojo.PackageType;
+import testGit.pojo.DirectoryType;
 import testGit.pojo.TestPackage;
 import testGit.projectPanel.ProjectPanel;
 
@@ -47,13 +47,13 @@ public class MouseAdapterImpl extends MouseAdapter {
 
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
 
-            if (pkg.getPackageType() == PackageType.TS) {
+            if (pkg.getType() == DirectoryType.TS) {
                 System.out.println("double left click test set");
                 TestCaseEditor.open(pkg);
                 return;
             }
 
-            if (pkg.getPackageType() == PackageType.TR) {
+            if (pkg.getType() == DirectoryType.TR) {
                 System.out.println("double left click test run");
                 TestRunEditor.open(pkg, projectPanel);
             }

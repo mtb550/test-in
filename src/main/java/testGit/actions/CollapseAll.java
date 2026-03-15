@@ -7,17 +7,22 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
+import testGit.projectPanel.ProjectPanel;
 
 public class CollapseAll extends DumbAwareAction {
-    private final SimpleTree tree;
+    ProjectPanel projectPanel;
 
-    public CollapseAll(SimpleTree tree) {
+    public CollapseAll(ProjectPanel projectPanel) {
         super("Collapse All", "Collapse all nodes", AllIcons.Actions.Collapseall);
-        this.tree = tree;
+        this.projectPanel = projectPanel;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        if (projectPanel.getProjectTree() == null) return;
+
+        SimpleTree tree = projectPanel.getProjectTree().getMainTree();
+
         if (tree != null) {
             TreeUtil.collapseAll(tree, 0);
         }
@@ -25,11 +30,12 @@ public class CollapseAll extends DumbAwareAction {
 
     @Override
     public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(tree != null);
+        boolean hasTree = projectPanel.getProjectTree() != null && projectPanel.getProjectTree().getMainTree() != null;
+        e.getPresentation().setEnabled(hasTree);
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        return ActionUpdateThread.EDT;
     }
 }

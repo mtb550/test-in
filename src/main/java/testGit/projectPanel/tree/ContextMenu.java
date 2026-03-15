@@ -48,7 +48,7 @@ public class ContextMenu extends DefaultActionGroup {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        return ActionUpdateThread.EDT;
     }
 
     private static class AddGroup extends DefaultActionGroup {

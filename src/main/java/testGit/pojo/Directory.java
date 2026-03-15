@@ -18,27 +18,29 @@ import java.time.LocalDateTime;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class Directory {
-    protected String name;
+    private String name;
 
-    protected Path filePath;
+    private Path filePath;
 
-    protected File file;
+    private File file;
 
-    protected String fileName;
+    private String fileName;
 
-    protected DirectoryIcon icon;
+    private DirectoryIcon icon;
+
+    private DirectoryType type;
 
     @JsonAlias("created_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    protected LocalDateTime createdAt;
+    private LocalDateTime createdAt;
 
     @JsonAlias("created_by")
-    protected String createdBy;
+    private String createdBy;
 
     @JsonAlias("modified_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    protected LocalDateTime modifiedAt;
+    private LocalDateTime modifiedAt;
 
     @JsonAlias("modified_by")
-    protected String modifiedBy;
+    private String modifiedBy;
 }

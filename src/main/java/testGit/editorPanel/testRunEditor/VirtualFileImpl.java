@@ -3,7 +3,7 @@ package testGit.editorPanel.testRunEditor;
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
+import testGit.editorPanel.FileType;
 import testGit.pojo.EditorType;
 import testGit.pojo.TestCase;
 import testGit.pojo.TestPackage;
@@ -23,13 +23,14 @@ public class VirtualFileImpl extends LightVirtualFile {
     private TestRun metadata;
     private EditorType editorType;
 
-    public VirtualFileImpl(@NotNull TestPackage pkg, @NotNull DefaultTreeModel treeModel, List<TestCase> testCases, EditorType editorType, ProjectPanel projectPanel) {
+    public VirtualFileImpl(TestPackage pkg, DefaultTreeModel treeModel, List<TestCase> testCases, EditorType editorType, ProjectPanel projectPanel) {
         super(pkg.getName());
         this.pkg = pkg;
-        this.testCasesTreeModel = treeModel;
         this.testCases = testCases;
+        this.testCasesTreeModel = treeModel;
         this.editorType = editorType;
         this.projectPanel = projectPanel;
+        this.setFileType(FileType.TEST_RUN);
     }
 
     @Override

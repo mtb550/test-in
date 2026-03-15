@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.PackageType;
+import testGit.pojo.DirectoryType;
 import testGit.pojo.TestPackage;
 import testGit.util.Tools;
 import testGit.util.TreeUtilImpl;
@@ -31,9 +31,9 @@ public class Remove extends DumbAwareAction {
 
         if (node != null && node.getUserObject() instanceof TestPackage pkg) {
 
-            if (pkg.getPackageType() == PackageType.PR ||
-                    pkg.getPackageType() == PackageType.TCP ||
-                    pkg.getPackageType() == PackageType.TRP) {
+            if (pkg.getType() == DirectoryType.PR ||
+                    pkg.getType() == DirectoryType.TCP ||
+                    pkg.getType() == DirectoryType.TRP) {
                 return;
             }
 
@@ -46,7 +46,7 @@ public class Remove extends DumbAwareAction {
             if (confirm == Messages.YES) {
                 System.out.println("Removing node: " + pkg.getName());
 
-                if (pkg.getPackageType() == PackageType.TS || pkg.getPackageType() == PackageType.TR)
+                if (pkg.getType() == DirectoryType.TS || pkg.getType() == DirectoryType.TR)
                     Tools.closeEditor(pkg.getName());
 
                 TreeUtilImpl.removeVf(this, pkg.getFile());
@@ -61,9 +61,9 @@ public class Remove extends DumbAwareAction {
 
         boolean shouldEnable = (node != null &&
                 node.getUserObject() instanceof TestPackage pkg &&
-                pkg.getPackageType() != PackageType.PR &&
-                pkg.getPackageType() != PackageType.TCP &&
-                pkg.getPackageType() != PackageType.TRP
+                pkg.getType() != DirectoryType.PR &&
+                pkg.getType() != DirectoryType.TCP &&
+                pkg.getType() != DirectoryType.TRP
         );
 
         e.getPresentation().setEnabled(shouldEnable);

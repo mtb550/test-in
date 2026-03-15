@@ -13,7 +13,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
-import testGit.pojo.PackageType;
+import testGit.pojo.DirectoryType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,8 +27,8 @@ public class InputDialogList_TestRun {
 
     public static void show(String title, BiConsumer<String, TemplateItem> onSelected) {
         TemplateItem[] items = {
-                new TemplateItem("Package", AllIcons.Nodes.Package, false, PackageType.PA),
-                new TemplateItem("Test Run", AllIcons.Actions.GroupBy, false, PackageType.TR),
+                new TemplateItem("Package", AllIcons.Nodes.Package, false, DirectoryType.PA),
+                new TemplateItem("Test Run", AllIcons.Actions.GroupBy, false, DirectoryType.TR),
         };
 
         ExtendableTextField textField = new ExtendableTextField();
@@ -188,9 +188,9 @@ public class InputDialogList_TestRun {
     }
 
     // 1. Added 'disabled' boolean to the model. Created a secondary constructor for convenience.
-    public record TemplateItem(String name, Icon icon, boolean disabled, PackageType packageType) {
-        public TemplateItem(String name, Icon icon, PackageType packageType) {
-            this(name, icon, false, packageType);
+    public record TemplateItem(String name, Icon icon, boolean disabled, DirectoryType directoryType) {
+        public TemplateItem(String name, Icon icon, DirectoryType directoryType) {
+            this(name, icon, false, directoryType);
         }
     }
 }

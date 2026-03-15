@@ -8,7 +8,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testCaseEditor.TestCaseEditor;
 import testGit.editorPanel.testRunEditor.TestRunEditor;
-import testGit.pojo.PackageType;
+import testGit.pojo.DirectoryType;
 import testGit.pojo.TestPackage;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.KeyboardSet;
@@ -35,10 +35,10 @@ public class Open extends DumbAwareAction {
 
         if (node.getUserObject() instanceof TestPackage pkg) {
             System.out.println("Opening Test Set: " + pkg.getFilePath());
-            if (pkg.getPackageType() == PackageType.TS)
+            if (pkg.getType() == DirectoryType.TS)
                 TestCaseEditor.open(pkg);
 
-            if (pkg.getPackageType() == PackageType.TR)
+            if (pkg.getType() == DirectoryType.TR)
                 TestRunEditor.open(pkg, projectPanel);
         }
     }
@@ -50,8 +50,8 @@ public class Open extends DumbAwareAction {
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
                 node.getUserObject() instanceof TestPackage pkg &&
-                (pkg.getPackageType() == PackageType.TS ||
-                        pkg.getPackageType() == PackageType.TR)
+                (pkg.getType() == DirectoryType.TS ||
+                        pkg.getType() == DirectoryType.TR)
         );
 
         e.getPresentation().setVisible(true);

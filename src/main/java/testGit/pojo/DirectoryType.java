@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum PackageType {
+public enum DirectoryType {
     PR("Project"),
     /// to be removed
     PA("Package"),

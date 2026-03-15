@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.editorPanel.testCaseEditor.TestCaseEditor;
 import testGit.pojo.DirectoryIcon;
-import testGit.pojo.PackageType;
+import testGit.pojo.DirectoryType;
 import testGit.pojo.TestPackage;
 import testGit.util.TreeUtilImpl;
 
@@ -36,7 +36,7 @@ public class CreateTestSet extends DumbAwareAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (!(userObject instanceof TestPackage treeItem) || treeItem.getPackageType() == PackageType.TS || treeItem.getPackageType() == PackageType.TR)
+        if (!(userObject instanceof TestPackage treeItem) || treeItem.getType() == DirectoryType.TS || treeItem.getType() == DirectoryType.TR)
             return;
 
         String name = Messages.showInputDialog("Enter feature name:", "Add Feature", null);
@@ -44,11 +44,11 @@ public class CreateTestSet extends DumbAwareAction {
         name = name.replace("_", " ");
 
         TestPackage newTestSet = new TestPackage()
-                .setPackageType(PackageType.TS)
+                .setType(DirectoryType.TS)
                 .setName(name)
                 .setIcon(DirectoryIcon.TS);
 
-        newTestSet.setFileName(String.format("%s_%s", newTestSet.getPackageType().toString(), newTestSet.getName()));
+        newTestSet.setFileName(String.format("%s_%s", newTestSet.getType().toString(), newTestSet.getName()));
 
         newTestSet.setFilePath(treeItem.getFilePath().resolve(newTestSet.getFileName()));
 
@@ -68,8 +68,8 @@ public class CreateTestSet extends DumbAwareAction {
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
                 node.getUserObject() instanceof TestPackage item &&
-                item.getPackageType() != PackageType.TS &&
-                item.getPackageType() != PackageType.TR &&
+                item.getType() != DirectoryType.TS &&
+                item.getType() != DirectoryType.TR &&
                 !item.getFilePath().toString().contains("TRP_testRuns")
         );
 

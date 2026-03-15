@@ -1,32 +1,32 @@
 package testGit.editorPanel;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.ex.FakeFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import testGit.pojo.DirectoryIcon;
 
 import javax.swing.*;
 
 public class FileType extends FakeFileType {
 
     public static final FileType TEST_RUN = new FileType(
-            "TestRun",
+            "Test Run",
             "Test Run Editor",
-            AllIcons.RunConfigurations.TestState.Run
+            DirectoryIcon.TR
     );
 
     public static final FileType TEST_CASE = new FileType(
-            "TestCase",
+            "Test Case",
             "Test Case Editor",
-            AllIcons.Nodes.Test
+            DirectoryIcon.TS
     );
 
     private final String name;
     private final String description;
-    private final Icon icon;
+    private final DirectoryIcon icon;
 
-    private FileType(String name, String description, Icon icon) {
+    private FileType(String name, String description, DirectoryIcon icon) {
         this.name = name;
         this.description = description;
         this.icon = icon;
@@ -49,6 +49,6 @@ public class FileType extends FakeFileType {
 
     @Override
     public @Nullable Icon getIcon() {
-        return icon;
+        return icon.getValue();
     }
 }

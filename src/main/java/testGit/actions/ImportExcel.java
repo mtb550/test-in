@@ -52,7 +52,7 @@ public class ImportExcel extends DumbAwareAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (!(userObject instanceof TestPackage treeItem) || treeItem.getPackageType() != PackageType.TS) {
+        if (!(userObject instanceof TestPackage treeItem) || treeItem.getType() != DirectoryType.TS) {
             Notifier.error("Import Error", "Please select a valid TS Directory.");
             return;
         }

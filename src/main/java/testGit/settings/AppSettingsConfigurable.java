@@ -42,7 +42,8 @@ public class AppSettingsConfigurable implements Configurable {
 
     private final JButton activateBtn = new JButton("Activate");
     private final JButton deactivateBtn = new JButton("Deactivate");
-    private final JButton archivBtn = new JButton("Archive");
+    private final JButton archiveBtn = new JButton("Archive");
+    private final JButton renameBtn = new JButton("Rename");
 
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
@@ -72,7 +73,8 @@ public class AppSettingsConfigurable implements Configurable {
         // 3. Setup Management Button Listeners
         activateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.AC));
         deactivateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.IN));
-        archivBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.AR));
+        archiveBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.AR));
+        //renameBtn.addActionListener(e -> new Rename().actionPerformed(ProjectStatus.AR));
 
         // 4. Initialize Data
         refreshProjectList();
@@ -83,7 +85,9 @@ public class AppSettingsConfigurable implements Configurable {
         buttonPanel.add(new Box.Filler(new Dimension(5, 0), new Dimension(5, 0), new Dimension(5, 0)));
         buttonPanel.add(deactivateBtn);
         buttonPanel.add(new Box.Filler(new Dimension(5, 0), new Dimension(5, 0), new Dimension(5, 0)));
-        buttonPanel.add(archivBtn);
+        buttonPanel.add(archiveBtn);
+        buttonPanel.add(new Box.Filler(new Dimension(5, 0), new Dimension(5, 0), new Dimension(5, 0)));
+        buttonPanel.add(renameBtn);
 
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("Root TestGit folder: "), rootTestGitPathField, 1, false)

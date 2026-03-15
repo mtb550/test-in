@@ -15,8 +15,6 @@ import java.nio.file.Path;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestPackage extends Directory {
-    private PackageType packageType;
-
     @Override
     public TestPackage setFilePath(Path filePath) {
         super.setFilePath(filePath);
@@ -43,12 +41,23 @@ public class TestPackage extends Directory {
 
     @Override
     public DirectoryIcon getIcon() {
-        return icon;
+        return super.getIcon();
     }
 
     @Override
     public TestPackage setIcon(DirectoryIcon directoryIcon) {
         super.setIcon(directoryIcon);
+        return this;
+    }
+
+    @Override
+    public DirectoryType getType() {
+        return super.getType();
+    }
+
+    @Override
+    public TestPackage setType(DirectoryType type) {
+        super.setType(type);
         return this;
     }
 

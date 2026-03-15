@@ -49,12 +49,23 @@ public class TestProject extends Directory {
 
     @Override
     public DirectoryIcon getIcon() {
-        return icon;
+        return super.getIcon();
     }
 
     @Override
     public TestProject setIcon(DirectoryIcon directoryIcon) {
         super.setIcon(directoryIcon);
+        return this;
+    }
+
+    @Override
+    public DirectoryType getType() {
+        return super.getType();
+    }
+
+    @Override
+    public TestProject setType(DirectoryType type) {
+        super.setType(type);
         return this;
     }
 }

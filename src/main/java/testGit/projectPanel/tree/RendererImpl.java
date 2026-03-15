@@ -4,7 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.PackageType;
+import testGit.pojo.DirectoryType;
 import testGit.pojo.TestPackage;
 
 import javax.swing.*;
@@ -27,7 +27,7 @@ public class RendererImpl extends ColoredTreeCellRenderer {
 
             setIcon(pkg.getIcon().getValue());
 
-            if (pkg.getPackageType() == PackageType.TCP || pkg.getPackageType() == PackageType.TRP) {
+            if (pkg.getType() == DirectoryType.TCP || pkg.getType() == DirectoryType.TRP) {
                 append(pkg.getName(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
 
             } else {

@@ -17,7 +17,7 @@ public class TestCaseEditor {
 
         editorManager.openFile(
                 Arrays.stream(editorManager.getOpenFiles())
-                        .filter(f -> f instanceof VirtualFileImpl vf && vf.getDir().equals(testSet))
+                        .filter(f -> f instanceof VirtualFileImpl vf && vf.getPkg().equals(testSet))
                         .findFirst()
                         .orElseGet(() -> createVirtualFile(testSet)),
                 true

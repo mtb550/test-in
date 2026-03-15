@@ -11,7 +11,8 @@ public enum DirectoryIcon {
     TCP(AllIcons.Nodes.Bookmark),
     TRP(AllIcons.Nodes.Bookmark),
     PA(AllIcons.Nodes.WebFolder),
-    TS(AllIcons.Nodes.Class),
+    //TS(AllIcons.Nodes.Class),
+    TS(AllIcons.FileTypes.Text),
     TR(AllIcons.Nodes.Services),
     DEFAULT(AllIcons.Nodes.Folder);
 
