@@ -18,7 +18,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CreateNewTestCaseDialog extends DialogWrapper {
+public class CreateTestCaseDialog extends DialogWrapper {
     private final JBTextField titleField = new JBTextField();
     private final JBLabel charCounter = new JBLabel("0 / 100");
     private final ComboBox<String> priorityCombo = new ComboBox<>(new String[]{"LOW", "MEDIUM", "HIGH"});
@@ -31,7 +31,7 @@ public class CreateNewTestCaseDialog extends DialogWrapper {
     private final JBCheckBox validationBox = new JBCheckBox(GroupType.Validation.name());
     private final JBCheckBox uiBox = new JBCheckBox(GroupType.UI.name());
 
-    public CreateNewTestCaseDialog() {
+    public CreateTestCaseDialog() {
         super(true);
         setTitle("New Test Case");
         setOKButtonText("Create");

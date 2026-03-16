@@ -11,7 +11,7 @@ import testGit.pojo.Config;
 import testGit.pojo.Priority;
 import testGit.pojo.TestCase;
 import testGit.pojo.TestPackage;
-import testGit.ui.CreateNewTestCaseDialog;
+import testGit.ui.CreateTestCaseDialog;
 import testGit.util.KeyboardSet;
 import testGit.util.Notifier;
 
@@ -39,13 +39,13 @@ public class CreateTestCase extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        CreateNewTestCaseDialog dialog = new CreateNewTestCaseDialog();
+        CreateTestCaseDialog dialog = new CreateTestCaseDialog();
         if (dialog.showAndGet()) {
             saveNewTestCase(dialog);
         }
     }
 
-    private void saveNewTestCase(CreateNewTestCaseDialog dialog) {
+    private void saveNewTestCase(CreateTestCaseDialog dialog) {
         TestCase newTestCase = new TestCase();
         newTestCase.setId(UUID.randomUUID().toString());
         newTestCase.setTitle(dialog.getTitle());

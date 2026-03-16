@@ -6,7 +6,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class MenuOptions {
+public class DirectoryOptions {
     private final DirectoryType[] availableItems = {
             DirectoryType.PA,
             DirectoryType.TS,
@@ -16,7 +16,7 @@ public class MenuOptions {
 
     private final Map<DirectoryType, Boolean> activeStates = new EnumMap<>(DirectoryType.class);
 
-    public MenuOptions() {
+    public DirectoryOptions() {
         for (DirectoryType item : availableItems) {
             activeStates.put(item, true);
         }
@@ -41,19 +41,19 @@ public class MenuOptions {
             this.currentType = currentType;
         }
 
-        public MenuOptions setActive() {
+        public DirectoryOptions setActive() {
             activeStates.put(currentType, true);
-            return MenuOptions.this;
+            return DirectoryOptions.this;
         }
 
-        public MenuOptions setInactive() {
+        public DirectoryOptions setInactive() {
             activeStates.put(currentType, false);
-            return MenuOptions.this;
+            return DirectoryOptions.this;
         }
 
-        public MenuOptions setStatus(boolean status) {
+        public DirectoryOptions setStatus(boolean status) {
             activeStates.put(currentType, status);
-            return MenuOptions.this;
+            return DirectoryOptions.this;
         }
     }
 }

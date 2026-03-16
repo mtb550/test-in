@@ -10,8 +10,8 @@ import testGit.editorPanel.testCaseEditor.TestCaseEditor;
 import testGit.editorPanel.testRunEditor.TestRunEditor;
 import testGit.pojo.*;
 import testGit.projectPanel.ProjectPanel;
-import testGit.ui.InputDialogList;
-import testGit.ui.MenuOptions;
+import testGit.ui.CreateNodesDialog;
+import testGit.ui.DirectoryOptions;
 import testGit.util.KeyboardSet;
 import testGit.util.TreeUtilImpl;
 
@@ -22,7 +22,7 @@ import java.nio.file.Path;
 public class CreateNode extends DumbAwareAction {
     private final ProjectPanel projectPanel;
     private final SimpleTree tree;
-    MenuOptions option;
+    DirectoryOptions option;
 
     public CreateNode(ProjectPanel projectPanel, SimpleTree tree) {
         super("Create Node", "Create new node", AllIcons.General.Add);
@@ -30,7 +30,7 @@ public class CreateNode extends DumbAwareAction {
         this.tree = tree;
         this.registerCustomShortcutSet(KeyboardSet.CreateNode.getShortcut(), tree);
 
-        option = new MenuOptions()
+        option = new DirectoryOptions()
                 .type(DirectoryType.PR).setActive()
                 .type(DirectoryType.PA).setActive()
                 .type(DirectoryType.TS).setActive()
@@ -41,7 +41,7 @@ public class CreateNode extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         System.out.println("Add new node triggered via AddNewNodeAction");
 
-        InputDialogList.show("Test Project Name", option.getItems(), option.getDisabledPredicate(), (enteredName, selectedItem) -> {
+        CreateNodesDialog.show("Test Project Name", option.getItems(), option.getDisabledPredicate(), (enteredName, selectedItem) -> {
             if (enteredName == null || enteredName.isEmpty()) return;
 
             /// use switch instead of if-statements

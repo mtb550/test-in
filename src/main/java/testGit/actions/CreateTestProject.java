@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.*;
 import testGit.projectPanel.ProjectPanel;
-import testGit.ui.CreateNewTestProjectDialog;
+import testGit.ui.CreateTestProjectDialog;
 import testGit.util.Notifier;
 import testGit.util.TreeUtilImpl;
 
@@ -25,7 +25,7 @@ public class CreateTestProject extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@Nullable AnActionEvent e) {
-        String name = CreateNewTestProjectDialog.show();
+        String name = CreateTestProjectDialog.show();
 
         if (name == null || name.trim().isEmpty()) return;
 

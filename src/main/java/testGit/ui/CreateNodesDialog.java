@@ -23,7 +23,7 @@ import java.awt.event.MouseEvent;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-public class InputDialogList {
+public class CreateNodesDialog {
 
     public static void show(String title, DirectoryType[] items, Predicate<DirectoryType> isDisabled, BiConsumer<String, DirectoryType> onSelected) {
 
