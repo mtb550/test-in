@@ -18,9 +18,11 @@ import java.util.Objects;
 
 public class TestProjectSelector {
     private final ProjectPanel projectPanel;
+
     @Getter
     @Setter
     private DefaultComboBoxModel<TestProject> testProjectList;
+
     @Getter
     @Setter
     private ComboBox<TestProject> selectedTestProject;
@@ -37,10 +39,7 @@ public class TestProjectSelector {
 
     public boolean init() {
         System.out.println("TestProjectSelector.init()");
-        boolean status = loadTestProjectList();
-        System.out.println("status = " + status);
-
-        return status;
+        return loadTestProjectList();
     }
 
     public boolean loadTestProjectList() {

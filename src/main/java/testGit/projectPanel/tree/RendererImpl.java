@@ -25,13 +25,13 @@ public class RendererImpl extends ColoredTreeCellRenderer {
         if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof Directory dir) {
 
             DirectoryType type = DirectoryType.fromClass(dir.getClass());
-            System.out.println(dir.getClass());
             setIcon(type.getIcon());
 
             boolean isHeader = (dir instanceof TestCasesDirectory || dir instanceof TestRunsDirectory);
             boolean isCut = (!isHeader && cutNodes != null && cutNodes.contains(node));
 
-            SimpleTextAttributes attrs = isHeader ? SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES :
+            SimpleTextAttributes attrs = isHeader ?
+                    SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES :
                     (isCut ? SimpleTextAttributes.GRAYED_ATTRIBUTES : SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
             append(dir.getName(), attrs);

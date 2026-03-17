@@ -8,17 +8,18 @@ import testGit.pojo.TestRun;
 import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.pojo.mappers.TestRunJsonMapper;
 import testGit.pojo.mappers.TestSetMapper;
+import testGit.pojo.mappers.TestSetPackageMapper;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.TestCaseSorter;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TestRunEditor {
 
@@ -43,12 +44,15 @@ public class TestRunEditor {
         }
     }
 
-    public static void create(TestRun pkg, ProjectPanel projectPanel, TestProject testProjectName, TestRunJsonMapper metadata) {
-        Path testCasesPath = Config.getTestGitPath().resolve(testProjectName.getPathName()).resolve("testCases");
-        DefaultTreeModel fullModel = new DefaultTreeModel(buildDirectoryTree(testCasesPath.toFile(), true));
+    public static void create(TestRun tr, ProjectPanel projectPanel, TestProject tp, TestRunJsonMapper metadata) {
+        // 🌟 1. جلب مسار TestCases مباشرة من الـ POJO (أنظف وأكثر أماناً)
+        Path testCasesPath = tp.getTestCasesDirectory().getPath();
+
+        // 🌟 2. تمرير Path مباشرة بدلاً من .toFile()
+        DefaultTreeModel fullModel = new DefaultTreeModel(buildDirectoryTree(testCasesPath, true));
 
         VirtualFileImpl virtualFile = new VirtualFileImpl(
-                pkg,
+                tr,
                 fullModel,
                 new ArrayList<>(),
                 EditorType.TEST_RUN_CREATION,
@@ -61,20 +65,22 @@ public class TestRunEditor {
 
     // --- Private helpers ---
 
-    private static List<TestCaseJsonMapper> loadTestCasesForRun(TestRunJsonMapper metadata, ProjectPanel projectPanel) throws IOException {
+    private static List<TestCaseJsonMapper> loadTestCasesForRun(TestRunJsonMapper metadata, ProjectPanel projectPanel) {
         if (metadata.getResults() == null) return Collections.emptyList();
 
         Set<String> targetIds = metadata.getResults().stream()
                 .map(item -> item.getTestCaseId().toString())
                 .collect(Collectors.toSet());
 
-        String projectName = projectPanel.getTestProjectSelector().getSelectedTestProject().getItem().getPathName();
-        Path testCasesRoot = Config.getTestGitPath().resolve(projectName).resolve("testCases");
+        // 🌟 3. تحديث جلب المسار ليعتمد على كائن المشروع المحمل في الذاكرة بدلاً من إعادة تركيبه
+        Path testCasesRoot = projectPanel.getTestProjectSelector().getSelectedTestProject().getItem().getTestCasesDirectory().getPath();
 
         if (!Files.exists(testCasesRoot)) return Collections.emptyList();
 
         List<TestCaseJsonMapper> cases = new ArrayList<>();
-        try (var paths = Files.walk(testCasesRoot)) {
+
+        // استخدام try-with-resources لضمان إغلاق الـ Stream
+        try (Stream<Path> paths = Files.walk(testCasesRoot)) {
             paths.filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".json"))
                     .forEach(p -> {
@@ -84,9 +90,13 @@ public class TestRunEditor {
                                 cases.add(tc);
                             }
                         } catch (Exception ignored) {
+                            // تجاهل الملفات غير الصالحة بصمت
                         }
                     });
+        } catch (IOException e) {
+            System.err.println("Failed to load test cases for run: " + e.getMessage());
         }
+
         return cases;
     }
 
@@ -96,32 +106,49 @@ public class TestRunEditor {
         return new DefaultTreeModel(root);
     }
 
-    private static DefaultMutableTreeNode buildDirectoryTree(File folder, boolean isRoot) {
+    // 🌟 4. ترقية دالة بناء الشجرة لتعمل بنظام الـ Path بالكامل
+    private static DefaultMutableTreeNode buildDirectoryTree(Path folder, boolean isRoot) {
         Object label = isRoot
-                ? "Test Cases (" + folder.getParentFile().getName() + ")"
-                : Optional.ofNullable((Object) TestSetMapper.map(folder.toPath())).orElse(folder.getName()); // to be updated
+                ? "Test Cases (" + folder.getParent().getFileName().toString() + ")"
+                : resolveDirectoryObject(folder); // 🌟 استخدام دالة مساعدة ذكية للمابرز
 
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
 
-        File[] children = folder.listFiles();
-        if (children == null) return node;
+        if (!Files.exists(folder) || !Files.isDirectory(folder)) return node;
 
-        Arrays.sort(children, Comparator
-                .comparing((File f) -> !f.isDirectory())
-                .thenComparing(f -> f.getName().toLowerCase()));
+        try (Stream<Path> paths = Files.list(folder)) {
+            // 🌟 5. ترتيب الـ Stream (المجلدات أولاً، ثم ترتيب أبجدي)
+            List<Path> sortedPaths = paths.sorted(Comparator
+                            .comparing((Path p) -> !Files.isDirectory(p))
+                            .thenComparing(p -> p.getFileName().toString().toLowerCase()))
+                    .toList();
 
-        for (File child : children) {
-            if (child.isDirectory()) {
-                node.add(buildDirectoryTree(child, false));
-            } else if (child.isFile() && child.getName().endsWith(".json")) {
-                try {
-                    TestCaseJsonMapper tc = Config.getMapper().readValue(child, TestCaseJsonMapper.class);
-                    node.add(new DefaultMutableTreeNode(tc));
-                } catch (Exception e) {
-                    System.err.println("Failed to parse test case: " + child.getName());
+            for (Path child : sortedPaths) {
+                if (Files.isDirectory(child)) {
+                    node.add(buildDirectoryTree(child, false));
+                } else if (child.toString().endsWith(".json")) {
+                    try {
+                        TestCaseJsonMapper tc = Config.getMapper().readValue(child.toFile(), TestCaseJsonMapper.class);
+                        node.add(new DefaultMutableTreeNode(tc));
+                    } catch (Exception e) {
+                        System.err.println("Failed to parse test case: " + child.getFileName());
+                    }
                 }
             }
+        } catch (IOException e) {
+            System.err.println("Failed to read directory tree: " + folder);
+            e.printStackTrace(System.err);
         }
+
         return node;
+    }
+
+    // 🌟 6. دالة مساعدة لتحديد نوع المجلد (تعويضاً عن TestSetMapper.map القديمة)
+    private static Object resolveDirectoryObject(Path folder) {
+        if (Files.exists(folder.resolve(".tcp"))) return TestSetPackageMapper.map(folder);
+        if (Files.exists(folder.resolve(".ts"))) return TestSetMapper.map(folder);
+
+        // إرجاع الاسم كنص في حال لم يكن المجلد معروفاً (Fallback)
+        return folder.getFileName().toString();
     }
 }

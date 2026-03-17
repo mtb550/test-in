@@ -74,7 +74,7 @@ public class TestCaseTabController {
     }
 
     private Directory mapPathToDirectory(Path path) {
-        if (Files.exists(path.resolve(".tcp"))) return TestSetPackageMapper.map(path);
+        if (Files.exists(path.resolve(".tsp"))) return TestSetPackageMapper.map(path);
         if (Files.exists(path.resolve(".ts"))) return TestSetMapper.map(path);
         return null;
     }

@@ -75,6 +75,22 @@ public class TreeUtilImpl {
         });
     }
 
+    public static void createDataVf(final Object requester, final Path parentPath, final String fileName) {
+        WriteAction.run(() -> {
+            try {
+                VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
+
+                if (parentVf != null && parentVf.isDirectory()) {
+                    if (parentVf.findChild(fileName) == null) {
+                        parentVf.createChildData(requester, fileName);
+                    }
+                }
+            } catch (IOException ex) {
+                Messages.showErrorDialog("Could not create marker file: " + ex.getMessage(), "Error");
+            }
+        });
+    }
+
     public static void removeVf(final Object requester, final Path path) {
         WriteAction.run(() -> {
             try {

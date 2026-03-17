@@ -18,6 +18,7 @@ import testGit.util.TreeUtilImpl;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.nio.file.Path;
 
 public class CreateNode extends DumbAwareAction {
     private final ProjectPanel projectPanel;
@@ -34,115 +35,87 @@ public class CreateNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        System.out.println("Add new node triggered via AddNewNodeAction");
+        TreePath path = tree.getSelectionPath();
+        if (path == null) return;
+
+        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+
+        if (!(parentNode.getUserObject() instanceof Directory parentDir)) {
+            return;
+        }
 
         CreateNodesDialog.show("Node Name", option.getItems(), option.getDisabledPredicate(), (enteredName, selectedClass) -> {
             if (enteredName == null || enteredName.isEmpty()) return;
 
+            Path newDirPath = parentDir.getPath().resolve(enteredName);
+
             switch (selectedClass) {
-                case Class<?> c when c == TestSetPackage.class -> createTestCasePackage(enteredName);
-
-                case Class<?> c when c == TestRunPackage.class -> createTestRunPackage(enteredName);
-
-                case Class<?> c when c == TestSet.class -> createTestSet(enteredName);
-
-                case Class<?> c when c == TestRun.class -> createTestRun(enteredName);
-
+                case Class<?> c when c == TestSetPackage.class ->
+                        createTestSetPackage(enteredName, parentNode, parentDir, newDirPath);
+                case Class<?> c when c == TestRunPackage.class ->
+                        createTestRunPackage(enteredName, parentNode, parentDir, newDirPath);
+                case Class<?> c when c == TestSet.class ->
+                        createTestSet(enteredName, parentNode, parentDir, newDirPath);
+                case Class<?> c when c == TestRun.class -> createTestRun(enteredName, parentDir, newDirPath);
                 case Class<?> c when c == TestProject.class ->
                         System.out.println("create project from here to be implemented");
-
                 default -> System.out.println("Unknown or null class selected: " + selectedClass);
             }
 
         });
     }
 
-    private void createTestRun(String name) {
-        /// to be removed and used once not in all creation methods
-        TreePath path = tree.getSelectionPath();
-
-        if (path == null) return;
-
-        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = parentNode.getUserObject();
-        /// removing to here
-
-        if (!(userObject instanceof TestRun tr)) return;
-
+    private void createTestRun(String name, Directory parentDir, Path newDirPath) {
         TestRunJsonMapper metadata = new TestRunJsonMapper();
         metadata.setStatus(TestRunStatus.CREATED);
 
+        TestRun newTestRun = new TestRun()
+                .setName(name)
+                .setPath(newDirPath);
+
         TestRunEditor.create(
                 // attribute name not used!! to be use it and pass it here.
-                tr,
+                newTestRun,
                 projectPanel,
                 projectPanel.getTestProjectSelector().getSelectedTestProject().getItem(),
                 metadata
         );
+        TreeUtilImpl.createDataVf(this, newDirPath, ".tr");
     }
 
-    private void createTestSet(String name) {
-        /// to be removed and used once not in all creation methods
-        TreePath path = tree.getSelectionPath();
-
-        if (path == null) return;
-
-        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = parentNode.getUserObject();
-        /// removing to here
-
-        if (!(userObject instanceof TestSet ts)) return;
-
+    private void createTestSet(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
         TestSet newTestSet = new TestSet()
                 .setName(name)
-                .setPath(ts.getPath().resolve(name));
+                .setPath(parentDir.getPath().resolve(name));
 
         System.out.println("AddTestSet.actionPerformed(): newTestSet = " + newTestSet.getPath());
 
-        TreeUtilImpl.insertVf(this, ts.getPath(), newTestSet.getName());
-
+        TreeUtilImpl.insertVf(this, parentDir.getPath(), newTestSet.getName());
+        TreeUtilImpl.createDataVf(this, newDirPath, ".ts");
         TreeUtilImpl.insertNode(tree, parentNode, newTestSet);
         TestCaseEditor.open(newTestSet);
     }
 
-    private void createTestCasePackage(String name) {
-        /// to be removed and used once not in all creation methods
-        TreePath path = tree.getSelectionPath();
-
-        if (path == null) return;
-
-        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = parentNode.getUserObject();
-        /// removing to here
-
-        if (!(userObject instanceof TestSetPackage tsp)) return;
-
+    private void createTestSetPackage(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
         TestSetPackage newTestSetPackage = new TestSetPackage()
                 .setName(name)
-                .setPath(tsp.getPath().resolve(name));
+                .setPath(parentDir.getPath().resolve(name));
 
-        TreeUtilImpl.insertVf(this, tsp.getPath(), name);
+        TreeUtilImpl.insertVf(this, parentDir.getPath(), name);
         TreeUtilImpl.insertNode(tree, parentNode, newTestSetPackage);
+        TreeUtilImpl.createDataVf(this, newDirPath, ".tsp");
     }
 
-    private void createTestRunPackage(String name) {
-        /// to be removed and used once not in all creation methods
-        TreePath path = tree.getSelectionPath();
+    private void createTestRunPackage(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
 
-        if (path == null) return;
-
-        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = parentNode.getUserObject();
-        /// removing to here
-
-        if (!(userObject instanceof TestRunPackage trp)) return;
 
         TestRunPackage newTestRunPackage = new TestRunPackage()
                 .setName(name)
-                .setPath(trp.getPath().resolve(name));
+                .setPath(parentDir.getPath().resolve(name));
 
-        TreeUtilImpl.insertVf(this, trp.getPath(), name);
+        TreeUtilImpl.insertVf(this, parentDir.getPath(), name);
         TreeUtilImpl.insertNode(tree, parentNode, newTestRunPackage);
+        TreeUtilImpl.createDataVf(this, newDirPath, ".trp");
     }
 
     @Override
@@ -177,7 +150,7 @@ public class CreateNode extends DumbAwareAction {
         }
 
         if (userObject instanceof TestCasesDirectory) {
-            option.type(DirectoryType.TP).setInactive()
+            option.type(DirectoryType.TP).setActive()
                     .type(DirectoryType.TSP).setActive()
                     .type(DirectoryType.TRP).setInactive()
                     .type(DirectoryType.TS).setActive()
@@ -186,7 +159,7 @@ public class CreateNode extends DumbAwareAction {
         }
 
         if (userObject instanceof TestRunsDirectory) {
-            option.type(DirectoryType.TP).setInactive()
+            option.type(DirectoryType.TP).setActive()
                     .type(DirectoryType.TSP).setInactive()
                     .type(DirectoryType.TRP).setActive()
                     .type(DirectoryType.TS).setInactive()
