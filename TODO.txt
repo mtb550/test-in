@@ -64,3 +64,9 @@ enhance view panel. easy thing you can do it next step.
 make automation referrence automatic & create class and packages in project root automatic
 
 change test case and test run editor size by mouse wheel. or make the font control in testGit setting
+
+cusomize test packages to: module, epic, feature
+
+fix disappear expected, id..etc once drag and drop. and make sure tool bar checks are saved once colse then open again
+
+add badge (un-sorted) if the test case not linked to to the before one
