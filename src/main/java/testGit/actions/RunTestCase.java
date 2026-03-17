@@ -5,16 +5,16 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.TestCase;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.util.KeyboardSet;
 import testGit.util.Notifier;
 import testGit.util.Runner.TestNGRunnerByMethod;
 import testGit.util.Tools;
 
 public class RunTestCase extends DumbAwareAction {
-    TestCase tc;
+    TestCaseJsonMapper tc;
 
-    public RunTestCase(TestCase tc, JBList<TestCase> list) {
+    public RunTestCase(TestCaseJsonMapper tc, JBList<TestCaseJsonMapper> list) {
         super("Run Test", "", AllIcons.RunConfigurations.TestState.Run);
         this.tc = tc;
         this.registerCustomShortcutSet(KeyboardSet.RunTestCase.getShortcut(), list);

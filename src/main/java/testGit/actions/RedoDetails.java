@@ -3,12 +3,12 @@ package testGit.actions;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.TestCase;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 
 public class RedoDetails extends DumbAwareAction {
-    TestCase tc;
+    TestCaseJsonMapper tc;
 
-    public RedoDetails(TestCase tc) {
+    public RedoDetails(TestCaseJsonMapper tc) {
         super("↪ Redo");
         this.tc = tc;
     }

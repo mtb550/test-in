@@ -8,7 +8,7 @@ import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
-import testGit.pojo.TestRun;
+import testGit.pojo.mappers.TestRunJsonMapper;
 
 import javax.swing.*;
 
@@ -42,7 +42,7 @@ public class TestRunMetadataHeader {
     /**
      * Updates the provided TestRun object with the current values from the UI fields.
      */
-    public void applyToMetadata(TestRun metadata) {
+    public void applyToMetadata(TestRunJsonMapper metadata) {
         if (metadata == null) return;
         metadata.setBuildNumber(buildNumberField.getText().trim());
         metadata.setPlatform((String) platformCombo.getSelectedItem());

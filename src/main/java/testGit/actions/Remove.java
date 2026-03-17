@@ -7,14 +7,13 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.DirectoryType;
-import testGit.pojo.TestPackage;
+import testGit.pojo.*;
 import testGit.util.Tools;
 import testGit.util.TreeUtilImpl;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static testGit.util.KeyboardSet.DeletePackage;
@@ -28,30 +27,30 @@ public class Remove extends DumbAwareAction {
         this.registerCustomShortcutSet(DeletePackage.getShortcut(), tree);
     }
 
+    private boolean isRemovable(Object dir) {
+        return dir instanceof Directory &&
+                !(dir instanceof TestProject) &&
+                !(dir instanceof TestCasesDirectory) &&
+                !(dir instanceof TestRunsDirectory);
+    }
+
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         TreePath[] paths = tree.getSelectionPaths();
-
         if (paths == null || paths.length == 0) return;
 
-        List<DefaultMutableTreeNode> nodesToRemove = new ArrayList<>();
-
-        for (TreePath path : paths) {
-            if (path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
-                    node.getUserObject() instanceof TestPackage pkg) {
-
-                if (pkg.getType() != DirectoryType.PR &&
-                        pkg.getType() != DirectoryType.TCP &&
-                        pkg.getType() != DirectoryType.TRP) {
-                    nodesToRemove.add(node);
-                }
-            }
-        }
+        // 🌟 1. تجميع العقد القابلة للحذف باستخدام Stream API بشكل نظيف وأنيق
+        List<DefaultMutableTreeNode> nodesToRemove = Arrays.stream(paths)
+                .map(TreePath::getLastPathComponent)
+                .filter(DefaultMutableTreeNode.class::isInstance)
+                .map(DefaultMutableTreeNode.class::cast)
+                .filter(node -> isRemovable(node.getUserObject()))
+                .toList();
 
         if (nodesToRemove.isEmpty()) return;
 
         String message = nodesToRemove.size() == 1
-                ? "Are you sure you want to remove '" + ((TestPackage) nodesToRemove.getFirst().getUserObject()).getName() + "'?"
+                ? "Are you sure you want to remove '" + ((Directory) nodesToRemove.getFirst().getUserObject()).getName() + "'?"
                 : "Are you sure you want to remove these " + nodesToRemove.size() + " items?";
 
         int confirm = Messages.showYesNoDialog(message, "Confirm Removing", Messages.getQuestionIcon());
@@ -59,12 +58,12 @@ public class Remove extends DumbAwareAction {
         if (confirm == Messages.YES) {
 
             for (DefaultMutableTreeNode node : nodesToRemove) {
-                TestPackage pkg = (TestPackage) node.getUserObject();
+                Directory pkg = (Directory) node.getUserObject();
 
-                if (pkg.getType() == DirectoryType.TS || pkg.getType() == DirectoryType.TR)
+                if (pkg instanceof TestSet || pkg instanceof TestRun)
                     Tools.closeEditor(pkg.getName());
 
-                TreeUtilImpl.removeVf(this, pkg.getFile());
+                TreeUtilImpl.removeVf(this, pkg.getPath());
                 TreeUtilImpl.removeNode(node, tree);
             }
             System.out.println("Removed " + nodesToRemove.size() + " nodes.");
@@ -74,22 +73,12 @@ public class Remove extends DumbAwareAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         TreePath[] paths = tree.getSelectionPaths();
-        boolean canRemove = false;
 
-        if (paths != null) {
-            for (TreePath path : paths) {
-                if (path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
-                        node.getUserObject() instanceof TestPackage pkg) {
-
-                    if (pkg.getType() != DirectoryType.PR &&
-                            pkg.getType() != DirectoryType.TCP &&
-                            pkg.getType() != DirectoryType.TRP) {
-                        canRemove = true;
-                        break;
-                    }
-                }
-            }
-        }
+        boolean canRemove = paths != null && Arrays.stream(paths)
+                .map(TreePath::getLastPathComponent)
+                .filter(DefaultMutableTreeNode.class::isInstance)
+                .map(node -> ((DefaultMutableTreeNode) node).getUserObject())
+                .anyMatch(this::isRemovable);
 
         e.getPresentation().setEnabled(canRemove);
     }

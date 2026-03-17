@@ -18,7 +18,10 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.*;
+import testGit.pojo.Config;
+import testGit.pojo.Priority;
+import testGit.pojo.TestSet;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.Notifier;
 
@@ -52,12 +55,12 @@ public class ImportExcel extends DumbAwareAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (!(userObject instanceof TestPackage treeItem) || treeItem.getType() != DirectoryType.TS) {
+        if (!(userObject instanceof TestSet ts)) {
             Notifier.error("Import Error", "Please select a valid TS Directory.");
             return;
         }
 
-        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(treeItem.getFilePath().toString());
+        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(ts.getPath().toString());
 
         if (targetDirectory != null && !targetDirectory.isDirectory()) {
             targetDirectory = targetDirectory.getParent();
@@ -116,22 +119,22 @@ public class ImportExcel extends DumbAwareAction {
                     break;
                 }
 
-                TestCase testCase = new TestCase();
+                TestCaseJsonMapper testCaseJsonMapper = new TestCaseJsonMapper();
                 String generatedUuid = UUID.randomUUID().toString();
 
-                testCase.setId(generatedUuid);
-                testCase.setTitle(title);
-                testCase.setExpected(getFieldSafe(recordset, "expected"));
-                testCase.setSteps(getFieldSafe(recordset, "steps"));
+                testCaseJsonMapper.setId(generatedUuid);
+                testCaseJsonMapper.setTitle(title);
+                testCaseJsonMapper.setExpected(getFieldSafe(recordset, "expected"));
+                testCaseJsonMapper.setSteps(getFieldSafe(recordset, "steps"));
 
-                testCase.setPriority(parsePrioritySafe(getFieldSafe(recordset, "priority")));
+                testCaseJsonMapper.setPriority(parsePrioritySafe(getFieldSafe(recordset, "priority")));
 
-                testCase.setGroups(new ArrayList<>());
-                testCase.setCreateBy(getFieldSafe(recordset, "createBy"));
+                testCaseJsonMapper.setGroups(new ArrayList<>());
+                testCaseJsonMapper.setCreateBy(getFieldSafe(recordset, "createBy"));
 
-                testCase.setCreateAt(parseDateSafe(getFieldSafe(recordset, "createAt")));
+                testCaseJsonMapper.setCreateAt(parseDateSafe(getFieldSafe(recordset, "createAt")));
 
-                String jsonContent = gson.toJson(testCase);
+                String jsonContent = gson.toJson(testCaseJsonMapper);
                 String fileName = generatedUuid + ".json";
 
                 ApplicationManager.getApplication().runWriteAction(() -> {

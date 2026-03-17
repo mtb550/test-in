@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.actions.Open;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.*;
@@ -27,7 +27,7 @@ public class MouseAdapterImpl extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {
         TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
 
-        if (selPath == null || !(selPath.getLastPathComponent() instanceof DefaultMutableTreeNode node) || !(node.getUserObject() instanceof TestPackage pkg))
+        if (selPath == null || !(selPath.getLastPathComponent() instanceof DefaultMutableTreeNode node) || !(node.getUserObject() instanceof Directory))
             return;
 
         if (SwingUtilities.isRightMouseButton(e)) {

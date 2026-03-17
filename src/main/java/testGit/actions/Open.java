@@ -8,8 +8,9 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testCaseEditor.TestCaseEditor;
 import testGit.editorPanel.testRunEditor.TestRunEditor;
-import testGit.pojo.DirectoryType;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
+import testGit.pojo.TestRun;
+import testGit.pojo.TestSet;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.KeyboardSet;
 import testGit.util.Tools;
@@ -33,18 +34,18 @@ public class Open extends DumbAwareAction {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node == null) return;
 
-        if (node.getUserObject() instanceof TestPackage pkg) {
+        if (node.getUserObject() instanceof Directory pkg) {
             if (Tools.isEditorOpen(pkg.getName())) {
-                System.out.println("Editor already open, focusing: " + pkg.getFileName());
+                System.out.println("Editor already open, focusing: " + pkg.getName());
                 return;
             }
 
-            System.out.println("Opening Test Set: " + pkg.getFilePath());
-            if (pkg.getType() == DirectoryType.TS)
-                TestCaseEditor.open(pkg);
+            System.out.println("Opening Test Set: " + pkg.getPath());
+            if (pkg instanceof TestSet ts)
+                TestCaseEditor.open(ts);
 
-            if (pkg.getType() == DirectoryType.TR)
-                TestRunEditor.open(pkg, projectPanel);
+            if (pkg instanceof TestRun tr)
+                TestRunEditor.open(tr, projectPanel);
         }
     }
 
@@ -59,9 +60,8 @@ public class Open extends DumbAwareAction {
 
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
-                node.getUserObject() instanceof TestPackage pkg &&
-                (pkg.getType() == DirectoryType.TS || pkg.getType() == DirectoryType.TR)
-        );
+                (node.getUserObject() instanceof TestSet ||
+                        node.getUserObject() instanceof TestRun));
 
         e.getPresentation().setVisible(true);
         e.getPresentation().setEnabled(shouldEnable);

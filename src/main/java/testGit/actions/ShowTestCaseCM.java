@@ -9,18 +9,18 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testCaseEditor.ContextMenu;
-import testGit.pojo.TestCase;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.util.KeyboardSet;
 
 import java.awt.*;
 
 public class ShowTestCaseCM extends DumbAwareAction {
-    private final TestPackage dir;
-    private final JBList<TestCase> list;
-    private final CollectionListModel<TestCase> model;
+    private final Directory dir;
+    private final JBList<TestCaseJsonMapper> list;
+    private final CollectionListModel<TestCaseJsonMapper> model;
 
-    public ShowTestCaseCM(TestPackage dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
+    public ShowTestCaseCM(Directory dir, JBList<TestCaseJsonMapper> list, CollectionListModel<TestCaseJsonMapper> model) {
         super("Show Context Menu");
         this.dir = dir;
         this.list = list;

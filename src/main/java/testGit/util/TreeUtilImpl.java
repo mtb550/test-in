@@ -6,11 +6,9 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
-import testGit.pojo.TestPackage;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -47,7 +45,7 @@ public class TreeUtilImpl {
         });
     }
 
-    public static DefaultMutableTreeNode insertNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final TestPackage newTestPackage) {
+    public static DefaultMutableTreeNode insertNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object newTestPackage) {
 
         DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newTestPackage);
@@ -77,10 +75,10 @@ public class TreeUtilImpl {
         });
     }
 
-    public static void removeVf(final Object requester, final File path) {
+    public static void removeVf(final Object requester, final Path path) {
         WriteAction.run(() -> {
             try {
-                VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path);
+                VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
                 if (vf != null) {
                     vf.delete(requester);
                 }

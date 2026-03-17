@@ -61,3 +61,5 @@ remove DirectoryIcon and use refactor code to use DirectoryType instead
 
 create the new ui same creation for delete tree node
 
+project activity status to be removed from folder name and use separate xml that has rules
+

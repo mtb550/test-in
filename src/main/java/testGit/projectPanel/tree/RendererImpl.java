@@ -4,8 +4,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
+import testGit.pojo.Directory;
 import testGit.pojo.DirectoryType;
-import testGit.pojo.TestPackage;
+import testGit.pojo.TestCasesDirectory;
+import testGit.pojo.TestRunsDirectory;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -20,17 +22,19 @@ public class RendererImpl extends ColoredTreeCellRenderer {
 
     @Override
     public void customizeCellRenderer(@NotNull JTree tree, Object value, boolean selected, boolean expanded, boolean leaf, int row, boolean hasFocus) {
-        if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof TestPackage pkg) {
+        if (value instanceof DefaultMutableTreeNode node && node.getUserObject() instanceof Directory dir) {
 
-            setIcon((pkg.getIcon() != null && pkg.getIcon().getValue() != null) ? pkg.getIcon().getValue() : AllIcons.Nodes.Folder);
+            DirectoryType type = DirectoryType.fromClass(dir.getClass());
+            System.out.println(dir.getClass());
+            setIcon(type.getIcon());
 
-            boolean isHeader = (pkg.getType() == DirectoryType.TCP || pkg.getType() == DirectoryType.TRP);
+            boolean isHeader = (dir instanceof TestCasesDirectory || dir instanceof TestRunsDirectory);
             boolean isCut = (!isHeader && cutNodes != null && cutNodes.contains(node));
 
             SimpleTextAttributes attrs = isHeader ? SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES :
                     (isCut ? SimpleTextAttributes.GRAYED_ATTRIBUTES : SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
-            append(pkg.getName(), attrs);
+            append(dir.getName(), attrs);
             return;
         }
 

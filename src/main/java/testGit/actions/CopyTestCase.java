@@ -4,15 +4,15 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.TestCase;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
 public class CopyTestCase extends DumbAwareAction {
-    TestCase tc;
+    TestCaseJsonMapper tc;
 
-    public CopyTestCase(TestCase tc) {
+    public CopyTestCase(TestCaseJsonMapper tc) {
         super("Copy", "Copy test case", AllIcons.Actions.Copy);
         this.tc = tc;
     }

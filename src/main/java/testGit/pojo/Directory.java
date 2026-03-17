@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 
@@ -20,15 +19,7 @@ import java.time.LocalDateTime;
 public abstract class Directory {
     private String name;
 
-    private Path filePath;
-
-    private File file;
-
-    private String fileName;
-
-    private DirectoryIcon icon;
-
-    private DirectoryType type;
+    private Path path;
 
     @JsonAlias("created_at")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

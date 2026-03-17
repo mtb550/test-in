@@ -4,11 +4,11 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import testGit.actions.*;
-import testGit.pojo.TestCase;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 
 public class ContextMenu extends DefaultActionGroup {
-    public ContextMenu(TestPackage dir, JBList<TestCase> list, CollectionListModel<TestCase> model, TestCase tc) {
+    public ContextMenu(Directory dir, JBList<TestCaseJsonMapper> list, CollectionListModel<TestCaseJsonMapper> model, TestCaseJsonMapper tc) {
         super("Test Case Actions", false);
 
         add(new CreateTestCase(dir, list, model));

@@ -13,16 +13,17 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TestRun extends Directory {
+public class TestSet extends Directory {
     @Override
-    public TestRun setPath(Path path) {
+    public TestSet setPath(Path path) {
         super.setPath(path);
         return this;
     }
 
     @Override
-    public TestRun setName(String name) {
+    public TestSet setName(String name) {
         super.setName(name);
         return this;
     }
+
 }

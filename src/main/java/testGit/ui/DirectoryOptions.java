@@ -1,43 +1,44 @@
 package testGit.ui;
 
-import testGit.pojo.DirectoryType;
+import testGit.pojo.*;
 
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
 public class DirectoryOptions {
-    private final DirectoryType[] availableItems = {
-            DirectoryType.PA,
-            DirectoryType.TS,
-            DirectoryType.TR,
-            DirectoryType.PR
+    private final Class<?>[] availableItems = {
+            TestSetPackage.class,
+            TestRunPackage.class,
+            TestSet.class,
+            TestRun.class,
+            TestProject.class
     };
 
-    private final Map<DirectoryType, Boolean> activeStates = new EnumMap<>(DirectoryType.class);
+    private final Map<Class<?>, Boolean> activeStates = new HashMap<>();
 
     public DirectoryOptions() {
-        for (DirectoryType item : availableItems) {
+        for (Class<?> item : availableItems) {
             activeStates.put(item, true);
         }
     }
 
     public TypeConfigurator type(DirectoryType type) {
-        return new TypeConfigurator(type);
+        return new TypeConfigurator(type.getClazz());
     }
 
-    public DirectoryType[] getItems() {
+    public Class<?>[] getItems() {
         return availableItems;
     }
 
-    public Predicate<DirectoryType> getDisabledPredicate() {
+    public Predicate<Class<?>> getDisabledPredicate() {
         return type -> !activeStates.getOrDefault(type, true);
     }
 
     public class TypeConfigurator {
-        private final DirectoryType currentType;
+        private final Class<?> currentType;
 
-        public TypeConfigurator(DirectoryType currentType) {
+        public TypeConfigurator(Class<?> currentType) {
             this.currentType = currentType;
         }
 

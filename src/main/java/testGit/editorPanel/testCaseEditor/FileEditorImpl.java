@@ -18,8 +18,8 @@ import testGit.editorPanel.EditorFocusSyncListener;
 import testGit.editorPanel.StatusBar;
 import testGit.editorPanel.ToolBar;
 import testGit.pojo.Config;
-import testGit.pojo.TestCase;
-import testGit.pojo.TestPackage;
+import testGit.pojo.TestSet;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
@@ -34,21 +34,21 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor, To
 
     private final JBPanel<?> panel;
     private final VirtualFile file;
-    private final JBList<TestCase> list;
-    private final CollectionListModel<TestCase> model;
-    private final ModelSyncListener<TestCase> syncListener;
+    private final JBList<TestCaseJsonMapper> list;
+    private final CollectionListModel<TestCaseJsonMapper> model;
+    private final ModelSyncListener<TestCaseJsonMapper> syncListener;
     private final ToolBar toolBar;
     private final StatusBar statusBar;
 
-    private List<TestCase> allTestCases;
+    private List<TestCaseJsonMapper> allTestCaseJsonMappers;
 
     @Getter
     private int currentPage = 1;
     @Getter
     private int pageSize = 10;
 
-    public FileEditorImpl(@NotNull List<TestCase> testCases, @NotNull TestPackage dir, @NotNull VirtualFile file) {
-        this.allTestCases = new ArrayList<>(testCases);
+    public FileEditorImpl(@NotNull List<TestCaseJsonMapper> testCaseJsonMappers, @NotNull TestSet dir, @NotNull VirtualFile file) {
+        this.allTestCaseJsonMappers = new ArrayList<>(testCaseJsonMappers);
         this.panel = new JBPanel<>(new BorderLayout());
         this.file = file;
 
@@ -60,7 +60,7 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor, To
 
         // Model + sync listener
         this.model = new CollectionListModel<>(new ArrayList<>());
-        this.syncListener = new ModelSyncListener<>(allTestCases, model);
+        this.syncListener = new ModelSyncListener<>(allTestCaseJsonMappers, model);
         this.syncListener.setOnUpdate(() -> {
             toolBar.resetFilters();
             refreshView();
@@ -146,14 +146,14 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor, To
     }
 
     public void refreshView() {
-        List<TestCase> filtered = getFilteredList();
+        List<TestCaseJsonMapper> filtered = getFilteredList();
         int totalItems = filtered.size();
         int totalPages = getTotalPages(filtered);
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
 
         int startIndex = (currentPage - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalItems);
-        List<TestCase> pageItems = startIndex < totalItems
+        List<TestCaseJsonMapper> pageItems = startIndex < totalItems
                 ? new ArrayList<>(filtered.subList(startIndex, endIndex))
                 : new ArrayList<>();
 
@@ -164,15 +164,15 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor, To
         statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), totalItems);
     }
 
-    public void loadData(List<TestCase> loadedData) {
-        this.allTestCases = loadedData;
+    public void loadData(List<TestCaseJsonMapper> loadedData) {
+        this.allTestCaseJsonMappers = loadedData;
         this.currentPage = 1;
         refreshView();
     }
 
-    private List<TestCase> getFilteredList() {
+    private List<TestCaseJsonMapper> getFilteredList() {
         String query = toolBar.getSearchQuery();
-        return allTestCases.stream()
+        return allTestCaseJsonMappers.stream()
                 .filter(tc -> {
                     boolean matchesSearch = query.isEmpty() ||
                             (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query));
@@ -183,7 +183,7 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor, To
                 .collect(Collectors.toList());
     }
 
-    private int getTotalPages(List<TestCase> filtered) {
+    private int getTotalPages(List<TestCaseJsonMapper> filtered) {
         return filtered.isEmpty() ? 1 : (int) Math.ceil((double) filtered.size() / pageSize);
     }
 
@@ -272,7 +272,7 @@ public class FileEditorImpl extends UserDataHolderBase implements FileEditor, To
     public void dispose() {
         System.out.println("Disposing TestCase FileEditorImpl...");
 
-        TestCase selectedInThisFile = list.getSelectedValue();
+        TestCaseJsonMapper selectedInThisFile = list.getSelectedValue();
         ViewPanel.hideIfShowing(selectedInThisFile);
 
         if (model != null && syncListener != null) {

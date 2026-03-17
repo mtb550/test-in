@@ -6,7 +6,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
 import testGit.pojo.Config;
-import testGit.pojo.TestCase;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.util.ContentExtractor;
 import testGit.viewPanel.ViewPanel;
 
@@ -15,12 +15,12 @@ import javax.swing.event.ListSelectionListener;
 
 @AllArgsConstructor
 public class SelectionListenerImpl implements ListSelectionListener {
-    private final JBList<TestCase> list;
+    private final JBList<TestCaseJsonMapper> list;
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            TestCase selected = list.getSelectedValue();
+            TestCaseJsonMapper selected = list.getSelectedValue();
             if (selected != null) {
                 ToolWindow toolWindow = ToolWindowManager.getInstance(Config.getProject())
                         .getToolWindow("Details");

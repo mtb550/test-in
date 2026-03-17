@@ -8,9 +8,9 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
+import testGit.pojo.Directory;
 import testGit.pojo.Priority;
-import testGit.pojo.TestCase;
-import testGit.pojo.TestPackage;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.ui.CreateTestCaseDialog;
 import testGit.util.KeyboardSet;
 import testGit.util.Notifier;
@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class CreateTestCase extends DumbAwareAction {
-    private final JBList<TestCase> list;
-    private final TestPackage dir;
-    private final CollectionListModel<TestCase> model;
+    private final JBList<TestCaseJsonMapper> list;
+    private final Directory dir;
+    private final CollectionListModel<TestCaseJsonMapper> model;
 
-    public CreateTestCase(TestPackage dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
+    public CreateTestCase(Directory dir, JBList<TestCaseJsonMapper> list, CollectionListModel<TestCaseJsonMapper> model) {
         super("Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
         this.list = list;
         this.dir = dir;
@@ -46,30 +46,30 @@ public class CreateTestCase extends DumbAwareAction {
     }
 
     private void saveNewTestCase(CreateTestCaseDialog dialog) {
-        TestCase newTestCase = new TestCase();
-        newTestCase.setId(UUID.randomUUID().toString());
-        newTestCase.setTitle(dialog.getTitle());
-        newTestCase.setPriority(Priority.valueOf(dialog.getPriority()));
-        newTestCase.setGroups(dialog.getSelectedGroups());
-        newTestCase.setNext(null);
+        TestCaseJsonMapper newTestCaseJsonMapper = new TestCaseJsonMapper();
+        newTestCaseJsonMapper.setId(UUID.randomUUID().toString());
+        newTestCaseJsonMapper.setTitle(dialog.getTitle());
+        newTestCaseJsonMapper.setPriority(Priority.valueOf(dialog.getPriority()));
+        newTestCaseJsonMapper.setGroups(dialog.getSelectedGroups());
+        newTestCaseJsonMapper.setNext(null);
 
         try {
             if (model.isEmpty()) {
-                newTestCase.setIsHead(true);
+                newTestCaseJsonMapper.setIsHead(true);
             } else {
-                newTestCase.setIsHead(false);
-                TestCase lastItem = model.getElementAt(model.getSize() - 1);
-                lastItem.setNext(UUID.fromString(newTestCase.getId()));
+                newTestCaseJsonMapper.setIsHead(false);
+                TestCaseJsonMapper lastItem = model.getElementAt(model.getSize() - 1);
+                lastItem.setNext(UUID.fromString(newTestCaseJsonMapper.getId()));
 
-                File lastItemFile = new File(dir.getFile(), lastItem.getId() + ".json");
+                File lastItemFile = new File(dir.getPath().toFile(), lastItem.getId() + ".json");
                 Config.getMapper().writeValue(lastItemFile, lastItem);
             }
 
-            File targetFile = new File(dir.getFile(), newTestCase.getId() + ".json");
-            Config.getMapper().writeValue(targetFile, newTestCase);
+            File targetFile = new File(dir.getPath().toFile(), newTestCaseJsonMapper.getId() + ".json");
+            Config.getMapper().writeValue(targetFile, newTestCaseJsonMapper);
 
             LocalFileSystem.getInstance().refreshAndFindFileByIoFile(targetFile);
-            model.add(newTestCase);
+            model.add(newTestCaseJsonMapper);
             list.ensureIndexIsVisible(model.getSize() - 1);
 
         } catch (IOException ex) {
@@ -81,7 +81,7 @@ public class CreateTestCase extends DumbAwareAction {
         List<String> pathNames = new ArrayList<>();
         TreeNode[] nodes = node.getPath();
         for (TreeNode n : nodes) {
-            if (n instanceof DefaultMutableTreeNode dmtn && dmtn.getUserObject() instanceof TestPackage dir) {
+            if (n instanceof DefaultMutableTreeNode dmtn && dmtn.getUserObject() instanceof Directory dir) {
                 pathNames.add(dir.getName());
             }
         }

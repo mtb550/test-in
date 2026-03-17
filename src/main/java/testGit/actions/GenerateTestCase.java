@@ -5,13 +5,13 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.TestCase;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.util.KeyboardSet;
 
 public class GenerateTestCase extends DumbAwareAction {
-    private final TestCase tc;
+    private final TestCaseJsonMapper tc;
 
-    public GenerateTestCase(TestCase tc, final JBList<TestCase> list) {
+    public GenerateTestCase(TestCaseJsonMapper tc, final JBList<TestCaseJsonMapper> list) {
         super("Generate Test", "", AllIcons.Actions.IntentionBulb);
         this.tc = tc;
         this.registerCustomShortcutSet(KeyboardSet.GenerateTestCase.getShortcut(), list);

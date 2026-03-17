@@ -9,13 +9,28 @@ import javax.swing.*;
 @Getter
 @AllArgsConstructor
 public enum DirectoryType {
-    PR("Project", AllIcons.Nodes.Project),
-    PA("Package", AllIcons.Nodes.WebFolder),
-    TS("Test Set", AllIcons.FileTypes.Text),
-    TR("Test Run", AllIcons.Nodes.Services),
-    TCP("Test Cases Directory", AllIcons.Nodes.Bookmark),
-    TRP("Test Runs Directory", AllIcons.Nodes.Bookmark);
+    TP("Test Project", AllIcons.Nodes.Project, TestProject.class),
+
+    TCD("Test Cases Directory", AllIcons.Nodes.Bookmark, TestCasesDirectory.class),
+    TRD("Test Runs Directory", AllIcons.Nodes.Bookmark, TestRunsDirectory.class),
+
+    TSP("Test Set Package", AllIcons.Nodes.WebFolder, TestSetPackage.class),
+    TRP("Test Run Package", AllIcons.Nodes.WebFolder, TestRunPackage.class),
+
+    TS("Test Set", AllIcons.FileTypes.Text, TestSet.class),
+    TR("Test Run", AllIcons.Nodes.Services, TestRun.class);
+
 
     private final String description;
     private final Icon icon;
+    private final Class<? extends Directory> clazz;
+
+    public static DirectoryType fromClass(Class<?> clazz) {
+        for (DirectoryType type : values()) {
+            if (type.getClazz() == clazz) {
+                return type;
+            }
+        }
+        return null;
+    }
 }

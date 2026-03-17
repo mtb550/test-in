@@ -9,7 +9,9 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Directory;
-import testGit.pojo.DirectoryType;
+import testGit.pojo.TestCasesDirectory;
+import testGit.pojo.TestProject;
+import testGit.pojo.TestRunsDirectory;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.KeyboardSet;
 import testGit.util.Tools;
@@ -42,29 +44,28 @@ public class Rename extends DumbAwareAction {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 
         if (!(node.getUserObject() instanceof Directory dir)) return;
-        if (dir.getType() == DirectoryType.TCP || dir.getType() == DirectoryType.TRP) return;
+        if (dir instanceof TestCasesDirectory || dir instanceof TestRunsDirectory) return;
 
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
         if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
 
         Tools.closeEditor(dir.getName());
 
-        String newFileName = dir.getFileName().replace(dir.getName(), newName);
+        String newFileName = dir.getName().replace(dir.getName(), newName);
 
-        TreeUtilImpl.executeVfsAction(dir.getFilePath(), "Rename Failed", vf -> {
+        TreeUtilImpl.executeVfsAction(dir.getPath(), "Rename Failed", vf -> {
             vf.rename(this, newFileName);
 
-            Path newFilePath = dir.getFilePath().getParent().resolve(newFileName);
+            Path newFilePath = dir.getPath().getParent().resolve(newFileName);
             dir.setName(newName)
-                    .setFileName(newFileName)
-                    .setFilePath(newFilePath)
-                    .setFile(newFilePath.toFile())
+                    .setName(newFileName)
+                    .setPath(newFilePath)
                     .setModifiedAt(LocalDateTime.now())
                     .setModifiedBy("Muteb almughyiri");
 
             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
-            if (dir.getType() == DirectoryType.PR && projectPanel.getTestProjectSelector() != null) {
+            if (dir instanceof TestProject && projectPanel.getTestProjectSelector() != null) {
                 projectPanel.getTestProjectSelector().loadTestProjectList();
             }
 
@@ -79,8 +80,8 @@ public class Rename extends DumbAwareAction {
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
                 node.getUserObject() instanceof Directory dir &&
-                dir.getType() != DirectoryType.TCP &&
-                dir.getType() != DirectoryType.TRP
+                !(dir instanceof TestCasesDirectory) &&
+                !(dir instanceof TestRunsDirectory)
         );
 
         e.getPresentation().setEnabled(shouldEnable);

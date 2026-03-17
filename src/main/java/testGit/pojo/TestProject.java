@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import java.io.File;
 import java.nio.file.Path;
 
 @Setter
@@ -19,9 +18,11 @@ import java.nio.file.Path;
 public class TestProject extends Directory {
     private ProjectStatus projectStatus;
 
-    private TestPackage testCase;
+    private TestCasesDirectory testCasesDirectory;
 
-    private TestPackage testRun;
+    private TestRunsDirectory testRunsDirectory;
+
+    private String pathName;
 
     @Override
     public TestProject setName(String name) {
@@ -30,42 +31,9 @@ public class TestProject extends Directory {
     }
 
     @Override
-    public TestProject setFilePath(Path filePath) {
-        super.setFilePath(filePath);
+    public TestProject setPath(Path path) {
+        super.setPath(path);
         return this;
     }
 
-    @Override
-    public TestProject setFile(File file) {
-        super.setFile(file);
-        return this;
-    }
-
-    @Override
-    public TestProject setFileName(String fileName) {
-        super.setFileName(fileName);
-        return this;
-    }
-
-    @Override
-    public DirectoryIcon getIcon() {
-        return super.getIcon();
-    }
-
-    @Override
-    public TestProject setIcon(DirectoryIcon directoryIcon) {
-        super.setIcon(directoryIcon);
-        return this;
-    }
-
-    @Override
-    public DirectoryType getType() {
-        return super.getType();
-    }
-
-    @Override
-    public TestProject setType(DirectoryType type) {
-        super.setType(type);
-        return this;
-    }
 }

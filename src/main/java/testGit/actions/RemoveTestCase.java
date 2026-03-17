@@ -9,8 +9,8 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
-import testGit.pojo.TestCase;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.ui.RemoveTestCaseDialog;
 import testGit.util.KeyboardSet;
 
@@ -22,11 +22,11 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class RemoveTestCase extends DumbAwareAction {
-    private final TestPackage dir;
-    private final JBList<TestCase> list;
-    private final CollectionListModel<TestCase> model;
+    private final Directory dir;
+    private final JBList<TestCaseJsonMapper> list;
+    private final CollectionListModel<TestCaseJsonMapper> model;
 
-    public RemoveTestCase(TestPackage dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
+    public RemoveTestCase(Directory dir, JBList<TestCaseJsonMapper> list, CollectionListModel<TestCaseJsonMapper> model) {
         super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
         this.dir = dir;
         this.list = list;
@@ -36,7 +36,7 @@ public class RemoveTestCase extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        List<TestCase> selectedItems = list.getSelectedValuesList();
+        List<TestCaseJsonMapper> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         if (!RemoveTestCaseDialog.confirmDeleteAction(selectedItems)) return;
@@ -50,11 +50,11 @@ public class RemoveTestCase extends DumbAwareAction {
         });
     }
 
-    private void performDeletion(List<TestCase> selectedItems) throws IOException {
+    private void performDeletion(List<TestCaseJsonMapper> selectedItems) throws IOException {
         int firstIdx = model.getElementIndex(selectedItems.get(0));
         int lastIdx = model.getElementIndex(selectedItems.get(selectedItems.size() - 1));
 
-        TestCase successor = (model.getSize() > lastIdx + 1) ? model.getElementAt(lastIdx + 1) : null;
+        TestCaseJsonMapper successor = (model.getSize() > lastIdx + 1) ? model.getElementAt(lastIdx + 1) : null;
 
         if (firstIdx == 0) {
             if (successor != null) {
@@ -62,25 +62,25 @@ public class RemoveTestCase extends DumbAwareAction {
                 saveToFile(successor);
             }
         } else {
-            TestCase predecessor = model.getElementAt(firstIdx - 1);
+            TestCaseJsonMapper predecessor = model.getElementAt(firstIdx - 1);
             predecessor.setNext(successor != null ? UUID.fromString(successor.getId()) : null);
             saveToFile(predecessor);
         }
 
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
-            TestCase tc = selectedItems.get(i);
-            File file = new File(dir.getFile(), tc.getId() + ".json");
+            TestCaseJsonMapper tc = selectedItems.get(i);
+            File file = new File(dir.getPath().toFile(), tc.getId() + ".json");
             if (file.exists()) {
                 Files.delete(file.toPath());
             }
             model.remove(model.getElementIndex(tc));
         }
 
-        LocalFileSystem.getInstance().refreshIoFiles(List.of(Objects.requireNonNull(dir.getFile().listFiles())));
+        LocalFileSystem.getInstance().refreshIoFiles(List.of(Objects.requireNonNull(dir.getPath().toFile().listFiles())));
     }
 
-    private void saveToFile(TestCase item) throws IOException {
-        File file = new File(dir.getFile(), item.getId() + ".json");
+    private void saveToFile(TestCaseJsonMapper item) throws IOException {
+        File file = new File(dir.getPath().toFile(), item.getId() + ".json");
         Config.getMapper().writeValue(file, item);
     }
 }

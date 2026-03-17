@@ -6,8 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.DirectoryType;
-import testGit.pojo.TestPackage;
+import testGit.pojo.TestSet;
 import testGit.util.Notifier;
 import testGit.util.Runner.TestNGRunnerByClass;
 import testGit.util.Tools;
@@ -38,7 +37,7 @@ public class RunTestSet extends DumbAwareAction {
         }
 
         Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
-        e.getPresentation().setEnabled(userObject instanceof TestPackage treeItem && treeItem.getType() == DirectoryType.TS);
+        e.getPresentation().setEnabled(userObject instanceof TestSet);
     }
 
     @Override
@@ -50,10 +49,10 @@ public class RunTestSet extends DumbAwareAction {
         // Extract the selected Directory object
         Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
 
-        if (userObject instanceof TestPackage treeItem && treeItem.getType() == DirectoryType.TS) {
+        if (userObject instanceof TestSet ts) {
             // 1. Convert the physical File path into a Java FQCN
-            System.out.println(this.getClass() + "directory file: " + treeItem.getFile());
-            String fqcn = Tools.fileToFqcn(treeItem.getFile());
+            System.out.println(this.getClass() + "directory file: " + ts.getPath().toFile());
+            String fqcn = Tools.fileToFqcn(ts.getPath().toFile());
             System.out.println(this.getClass() + "fqcn path: " + fqcn);
 
             // 2. Trigger the high-performance background runner!
@@ -61,7 +60,7 @@ public class RunTestSet extends DumbAwareAction {
                 System.out.println("fqcn: " + fqcn);
                 TestNGRunnerByClass.runTestClass(fqcn);
             } else {
-                Notifier.error("Run Failed", "Could not parse class name from file path: " + treeItem.getFile().getName());
+                Notifier.error("Run Failed", "Could not parse class name from file path: " + ts.getPath().toFile().getName());
             }
         }
     }

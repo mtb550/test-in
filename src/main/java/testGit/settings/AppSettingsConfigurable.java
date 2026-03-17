@@ -15,19 +15,21 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import testGit.actions.Refresh;
 import testGit.pojo.Config;
+import testGit.pojo.Directory;
 import testGit.pojo.ProjectStatus;
-import testGit.pojo.TestPackage;
 import testGit.pojo.TestProject;
+import testGit.pojo.mappers.TestProjectMapper;
 import testGit.projectPanel.ProjectPanel;
 import testGit.projectPanel.projectSelector.RendererImpl;
 import testGit.settings.service.ProjectPanelService;
-import testGit.util.DirectoryMapper;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class AppSettingsConfigurable implements Configurable {
 
@@ -103,11 +105,11 @@ public class AppSettingsConfigurable implements Configurable {
     }
 
     private void updateProjectStatus(ProjectStatus newProjectStatus) {
-        TestPackage selected = (TestPackage) projectComboBox.getSelectedItem();
+        Directory selected = (Directory) projectComboBox.getSelectedItem();
         if (selected == null) return;
 
-        File oldDir = selected.getFile();
-        String currentFileName = selected.getFileName();
+        File oldDir = selected.getPath().toFile();
+        String currentFileName = selected.getName();
 
         if (oldDir.exists() && currentFileName.contains("_")) {
             // Extract the base (PR_Name) and append the new Status (AC/IN/AR)
@@ -120,7 +122,7 @@ public class AppSettingsConfigurable implements Configurable {
 
                 // Re-select the renamed project in the new list
                 for (int i = 0; i < testProjectList.getSize(); i++) {
-                    if (testProjectList.getElementAt(i).getFileName().equals(newName)) {
+                    if (testProjectList.getElementAt(i).getPathName().equals(newName)) {
                         projectComboBox.setSelectedIndex(i);
                         break;
                     }
@@ -139,15 +141,23 @@ public class AppSettingsConfigurable implements Configurable {
 
     private void refreshProjectList() {
         testProjectList.removeAllElements();
-        File root = new File(rootTestGitPathField.getText());
 
-        if (root.exists() && root.isDirectory()) {
-            File[] projects = root.listFiles(f -> f.isDirectory() && f.getName().startsWith("PR_"));
-            if (projects != null) {
-                Arrays.stream(projects)
-                        .map(DirectoryMapper::mapProject) // Maps File to Directory object
+        // 🌟 1. تحويل النص مباشرة إلى Path
+        Path rootPath = Path.of(rootTestGitPathField.getText());
+
+        if (Files.exists(rootPath) && Files.isDirectory(rootPath)) {
+
+            // 🌟 2. استخدام try-with-resources لإغلاق الـ Stream تلقائياً
+            try (Stream<Path> paths = Files.list(rootPath)) {
+                paths.filter(Files::isDirectory)
+                        .filter(path -> path.getFileName().toString().startsWith("PR_"))
+                        .map(TestProjectMapper::map) // 🌟 3. نستخدم المابر الجديد الذي يستقبل Path
                         .filter(Objects::nonNull)
                         .forEach(testProjectList::addElement);
+
+            } catch (Exception e) {
+                System.err.println("Failed to refresh project list: " + e.getMessage());
+                e.printStackTrace(System.err);
             }
         }
     }

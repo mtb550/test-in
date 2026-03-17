@@ -1,10 +1,12 @@
-package testGit.pojo;
+package testGit.pojo.mappers;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import testGit.pojo.GroupType;
+import testGit.pojo.Priority;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,7 +16,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestCase {
+public class TestCaseJsonMapper {
 
     private int uid;
 

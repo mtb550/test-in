@@ -1,5 +1,6 @@
 package testGit.ui;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.IconLoader;
@@ -25,7 +26,7 @@ import java.util.function.Predicate;
 
 public class CreateNodesDialog {
 
-    public static void show(String title, DirectoryType[] items, Predicate<DirectoryType> isDisabled, BiConsumer<String, DirectoryType> onSelected) {
+    public static void show(String title, Class<?>[] items, Predicate<Class<?>> isDisabled, BiConsumer<String, Class<?>> onSelected) {
 
         ExtendableTextField textField = new ExtendableTextField();
         textField.getEmptyText().setText("Name");
@@ -33,7 +34,7 @@ public class CreateNodesDialog {
         textField.setBorder(JBUI.Borders.empty(6, 10));
         textField.putClientProperty("JTextField.Search.noBorderRing", Boolean.TRUE);
 
-        JBList<DirectoryType> list = new JBList<>(items);
+        JBList<Class<?>> list = new JBList<>(items);
         list.setBorder(JBUI.Borders.empty());
 
         list.setSelectionModel(new DefaultListSelectionModel() {
@@ -45,34 +46,44 @@ public class CreateNodesDialog {
             }
         });
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
         int firstAvailableIndex = getNextEnabledIndex(items, isDisabled, -1, 1);
         if (firstAvailableIndex != -1) {
             list.setSelectedIndex(firstAvailableIndex);
+
         } else {
             list.clearSelection();
         }
 
         list.setCellRenderer(new ColoredListCellRenderer<>() {
             @Override
-            protected void customizeCellRenderer(@NotNull JList<? extends DirectoryType> list, DirectoryType value, int index, boolean selected, boolean hasFocus) {
+            protected void customizeCellRenderer(@NotNull JList<? extends Class<?>> list, Class<?> value, int index, boolean selected, boolean hasFocus) {
+                DirectoryType dirType = DirectoryType.fromClass(value);
+                Icon icon = dirType != null ? dirType.getIcon() : AllIcons.Nodes.Unknown;
+                String description = dirType != null ? dirType.getDescription() : value.getSimpleName();
+
                 if (isDisabled.test(value)) {
-                    setIcon(IconLoader.getDisabledIcon(value.getIcon()));
-                    append(value.getDescription(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
+                    setIcon(IconLoader.getDisabledIcon(icon));
+                    append(description, SimpleTextAttributes.GRAYED_ATTRIBUTES);
+
                 } else {
-                    setIcon(value.getIcon());
-                    append(value.getDescription());
+                    setIcon(icon);
+                    append(description);
                 }
                 setBorder(JBUI.Borders.empty(4, 12));
             }
         });
 
         Runnable updateIcon = () -> {
-            DirectoryType selected = list.getSelectedValue();
+            Class<?> selected = list.getSelectedValue();
             if (selected != null && !isDisabled.test(selected)) {
                 textField.setExtensions(new ExtendableTextComponent.Extension() {
+
                     @Override
                     public Icon getIcon(boolean hovered) {
-                        return selected.getIcon();
+                        // 🌟 سطر واحد هنا أيضاً!
+                        DirectoryType dirType = DirectoryType.fromClass(selected);
+                        return dirType != null ? dirType.getIcon() : AllIcons.Nodes.Unknown;
                     }
 
                     @Override
@@ -122,13 +133,16 @@ public class CreateNodesDialog {
                     list.setSelectedIndex(newIdx);
                     list.ensureIndexIsVisible(newIdx);
                     e.consume();
+
                 } else if (e.getKeyCode() == KeyEvent.VK_UP) {
                     int newIdx = getNextEnabledIndex(items, isDisabled, list.getSelectedIndex(), -1);
                     list.setSelectedIndex(newIdx);
                     list.ensureIndexIsVisible(newIdx);
                     e.consume();
+
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     submit(textField, list, popup, onSelected);
+
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     popup.cancel();
                 }
@@ -155,7 +169,7 @@ public class CreateNodesDialog {
         });
     }
 
-    private static int getNextEnabledIndex(DirectoryType[] items, Predicate<DirectoryType> isDisabled, int currentIdx, int direction) {
+    private static int getNextEnabledIndex(Class<?>[] items, Predicate<Class<?>> isDisabled, int currentIdx, int direction) {
         int idx = currentIdx + direction;
         while (idx >= 0 && idx < items.length) {
             if (!isDisabled.test(items[idx])) {
@@ -166,7 +180,7 @@ public class CreateNodesDialog {
         return currentIdx;
     }
 
-    private static void submit(ExtendableTextField textField, JBList<DirectoryType> list, JBPopup popup, BiConsumer<String, DirectoryType> onSelected) {
+    private static void submit(ExtendableTextField textField, JBList<Class<?>> list, JBPopup popup, BiConsumer<String, Class<?>> onSelected) {
         String text = textField.getText().trim();
         if (!text.isEmpty() && list.getSelectedValue() != null) {
             onSelected.accept(text, list.getSelectedValue());

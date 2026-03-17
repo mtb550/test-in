@@ -5,7 +5,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import testGit.pojo.GroupType;
-import testGit.pojo.TestCase;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 
 import java.awt.*;
 
@@ -30,7 +30,7 @@ public class Shared {
      *
      * @param tc the test case whose priority is displayed
      */
-    public static JBLabel createPriorityBadge(TestCase tc) {
+    public static JBLabel createPriorityBadge(TestCaseJsonMapper tc) {
         Color bg = switch (tc.getPriority()) {
             case HIGH -> JBColor.CYAN;
             case MEDIUM -> JBColor.magenta;

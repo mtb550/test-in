@@ -36,39 +36,34 @@ public class CreateTestProject extends DumbAwareAction {
         String folderName = String.format("%s_%s", newTestProject.getName(), newTestProject.getProjectStatus());
         Path projectPath = Config.getTestGitPath().resolve(folderName);
 
-        newTestProject.setFileName(folderName)
-                .setFilePath(projectPath)
-                .setFile(projectPath.toFile());
+        newTestProject.setPathName(folderName)
+                .setPath(projectPath);
 
-        newTestProject.setIcon(DirectoryIcon.PR);
-        newTestProject.setTestCase(
-                        new TestPackage()
-                                .setIcon(DirectoryIcon.TCP)
-                                .setFileName("TCP_testCases")
-                                .setType(DirectoryType.TCP)
-                                .setFile(newTestProject.getFile().toPath().resolve("TCP_testCases").toFile())
-                                .setFilePath(newTestProject.getFile().toPath().resolve("TCP_testCases"))
+        newTestProject.setTestCasesDirectory(
+                        new TestCasesDirectory()
+                                .setPath(newTestProject.getPath().resolve("testCases"))
                                 .setName("Test Cases")
                 )
-                .setTestRun(
-                        new TestPackage()
-                                .setIcon(DirectoryIcon.TRP)
-                                .setFileName("TRP_testRuns")
-                                .setType(DirectoryType.TRP)
-                                .setFile(newTestProject.getFile().toPath().resolve("TRP_testRuns").toFile())
-                                .setFilePath(newTestProject.getFile().toPath().resolve("TRP_testRuns"))
+                .setTestRunsDirectory(
+                        new TestRunsDirectory()
+                                .setPath(newTestProject.getPath().resolve("testRuns"))
                                 .setName("Test Runs")
                 );
 
         TreeUtilImpl.executeVfsAction(Config.getTestGitPath(), "IO Error", vf -> {
             VirtualFile projectDir = vf.createChildDirectory(this, folderName);
+            projectDir.createChildData(this, ".pr");
 
-            projectDir.createChildDirectory(this, "TCP_testCases");
-            projectDir.createChildDirectory(this, "TRP_testRuns");
+            String tcdName = newTestProject.getTestCasesDirectory().getPath().getFileName().toString();
+            VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);
+            tcdDir.createChildData(this, ".tcd");
+
+            String trdName = newTestProject.getTestRunsDirectory().getPath().getFileName().toString();
+            VirtualFile trdDir = projectDir.createChildDirectory(this, trdName);
+            trdDir.createChildData(this, ".trd");
+
             projectDir.refresh(false, true);
-
             projectPanel.getTestProjectSelector().addTestProject(newTestProject);
-
             Notifier.info("New Test Project", String.format("Test Project %s has been added", name));
         });
     }

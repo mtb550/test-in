@@ -5,7 +5,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -30,7 +30,7 @@ public class Disable extends DumbAwareAction {
 
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = node.getUserObject();
-        if (!(userObject instanceof TestPackage treeItem)) return;
+        if (!(userObject instanceof Directory treeItem)) return;
 
         String newName = Messages.showInputDialog("Rename node:", "Rename", null, treeItem.getName(), null);
         if (newName == null || newName.isBlank()) return;

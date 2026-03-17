@@ -3,7 +3,7 @@ package testGit.projectPanel.tree;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
 import testGit.util.TreeUtilImpl;
 
 import javax.swing.*;
@@ -61,7 +61,7 @@ public class TransferHandlerImpl extends TransferHandler {
 
         if (support.isDrop()) {
             TreePath dropPath = ((SimpleTree.DropLocation) support.getDropLocation()).getPath();
-            return dropPath != null && ((DefaultMutableTreeNode) dropPath.getLastPathComponent()).getUserObject() instanceof TestPackage;
+            return dropPath != null && ((DefaultMutableTreeNode) dropPath.getLastPathComponent()).getUserObject() instanceof Directory;
         }
         return tree.getSelectionPath() != null;
     }
@@ -86,12 +86,12 @@ public class TransferHandlerImpl extends TransferHandler {
 
                     if (node.equals(targetNode) || node.isNodeDescendant(targetNode)) continue;
                     model.removeNodeFromParent(node);
-                    persistMove((TestPackage) node.getUserObject(), (TestPackage) targetNode.getUserObject());
+                    persistMove((Directory) node.getUserObject(), (Directory) targetNode.getUserObject());
                     model.insertNodeInto(node, targetNode, targetNode.getChildCount());
 
                 } else {
                     DefaultMutableTreeNode clone = cloneNode(node);
-                    persistCopy((TestPackage) node.getUserObject(), (TestPackage) targetNode.getUserObject(), (TestPackage) clone.getUserObject());
+                    persistCopy((Directory) node.getUserObject(), (Directory) targetNode.getUserObject(), (Directory) clone.getUserObject());
                     model.insertNodeInto(clone, targetNode, targetNode.getChildCount());
                 }
             }
@@ -105,30 +105,45 @@ public class TransferHandlerImpl extends TransferHandler {
     }
 
     private DefaultMutableTreeNode cloneNode(DefaultMutableTreeNode node) {
-        TestPackage dir = (TestPackage) node.getUserObject();
-        TestPackage newDir = new TestPackage()
-                .setName(dir.getName())
-                .setFileName(dir.getFileName())
-                .setFile(dir.getFile())
-                .setFilePath(dir.getFilePath())
-                .setType(dir.getType())
-                .setIcon(dir.getIcon());
-        return new DefaultMutableTreeNode(newDir);
+        Object userObject = node.getUserObject();
+
+        if (userObject instanceof Directory dir) {
+            try {
+                Directory newDir = dir.getClass().getDeclaredConstructor().newInstance();
+
+                newDir.setName(dir.getName());
+                newDir.setPath(dir.getPath());
+
+                return new DefaultMutableTreeNode(newDir);
+
+            } catch (Exception e) {
+                System.err.println("Failed to clone node: " + e.getMessage());
+                e.printStackTrace(System.err);
+            }
+        }
+
+        return new DefaultMutableTreeNode(userObject);
     }
 
-    private void persistMove(TestPackage source, TestPackage target) {
-        TreeUtilImpl.executeVfsAction(source.getFilePath(), target.getFilePath(), "Move Failed", (sourceVf, targetVf) -> {
+    private void persistMove(Directory source, Directory target) {
+        TreeUtilImpl.executeVfsAction(source.getPath(), target.getPath(), "Move Failed", (sourceVf, targetVf) -> {
+
             sourceVf.move(this, targetVf);
-            Path newPath = target.getFilePath().resolve(source.getFileName());
-            source.setFilePath(newPath).setFile(newPath.toFile());
+
+            String actualFileName = source.getPath().getFileName().toString();
+
+            Path newPath = target.getPath().resolve(actualFileName);
+            source.setPath(newPath);
+
+            System.out.println("Moved successfully to: " + newPath);
         });
     }
 
-    private void persistCopy(TestPackage source, TestPackage target, TestPackage cloned) {
-        TreeUtilImpl.executeVfsAction(source.getFilePath(), target.getFilePath(), "Copy Failed", (sourceVf, targetVf) -> {
+    private void persistCopy(Directory source, Directory target, Directory cloned) {
+        TreeUtilImpl.executeVfsAction(source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
             sourceVf.copy(this, targetVf, sourceVf.getName());
-            Path newPath = target.getFilePath().resolve(source.getFileName());
-            cloned.setFilePath(newPath).setFile(newPath.toFile());
+            Path newPath = target.getPath().resolve(source.getName());
+            cloned.setPath(newPath);
         });
     }
 

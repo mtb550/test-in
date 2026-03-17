@@ -14,7 +14,7 @@ import com.intellij.util.ui.components.BorderLayoutPanel;
 import lombok.Setter;
 import testGit.editorPanel.Shared;
 import testGit.pojo.GroupType;
-import testGit.pojo.TestCase;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
 
     private static final int CARD_HEIGHT = 130;
     private static final int BORDER_THICKNESS = 1;
-    final TestCase tc;
+    final TestCaseJsonMapper tc;
     private final JBLabel titleLabel = new JBLabel();
     private final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(6), 0));
     private final JBLabel expectedLabel = createDetailLabel();
@@ -44,7 +44,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
     @Setter
     private SelectionListener selectionListener;
 
-    public TestRunCard(int index, TestCase tc) {
+    public TestRunCard(int index, TestCaseJsonMapper tc) {
         super(new BorderLayout());
         this.tc = tc;
 
@@ -117,7 +117,7 @@ public class TestRunCard extends JBPanel<TestRunCard> {
      * @param showPriority  whether the priority badge should be visible
      * @param activeDetails which detail rows are visible ("Expected Result", "Steps", "Automation Ref")
      */
-    public void updateData(int index, TestCase tc,
+    public void updateData(int index, TestCaseJsonMapper tc,
                            boolean showGroups, boolean showPriority,
                            Set<String> activeDetails) {
         titleLabel.setText(String.format("%d. %s", index + 1, tc.getTitle()));

@@ -5,14 +5,14 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.Nullable;
-import testGit.pojo.TestCase;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.util.CodeNavigator;
 import testGit.util.KeyboardSet;
 
 public class NavigateToCode extends DumbAwareAction {
-    private final TestCase tc;
+    private final TestCaseJsonMapper tc;
 
-    public NavigateToCode(TestCase tc, JBList<TestCase> list) {
+    public NavigateToCode(TestCaseJsonMapper tc, JBList<TestCaseJsonMapper> list) {
         super("Navigate to Code", "Jump to the automated test case", AllIcons.General.ArrowRight);
         this.tc = tc;
         this.registerCustomShortcutSet(KeyboardSet.NavigateToCode.getShortcut(), list);

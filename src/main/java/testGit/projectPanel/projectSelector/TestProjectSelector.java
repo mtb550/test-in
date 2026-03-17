@@ -7,15 +7,14 @@ import lombok.Setter;
 import testGit.pojo.Config;
 import testGit.pojo.ProjectStatus;
 import testGit.pojo.TestProject;
+import testGit.pojo.mappers.TestProjectMapper;
 import testGit.projectPanel.ProjectPanel;
-import testGit.util.DirectoryMapper;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.Arrays;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
-import java.util.Optional;
 
 public class TestProjectSelector {
     private final ProjectPanel projectPanel;
@@ -49,22 +48,31 @@ public class TestProjectSelector {
 
         testProjectList.removeAllElements();
 
-        File root = Config.getTestGitPath().toFile();
+        Path root = Config.getTestGitPath();
 
-        File[] dirs = root.listFiles(File::isDirectory);
+        if (Files.exists(root) && Files.isDirectory(root)) {
 
-        Optional.ofNullable(dirs)
-                .stream()
-                .flatMap(Arrays::stream)
-                .filter(item -> !item.getName().equals(".git") && item.getName().contains("_"))
-                .peek(System.out::println)
-                .map(DirectoryMapper::mapProject)
-                .filter(Objects::nonNull)
-                .filter(p -> p.getProjectStatus() == ProjectStatus.AC)
-                .forEach(testProjectList::addElement);
+            try (java.util.stream.Stream<Path> paths = java.nio.file.Files.list(root)) {
 
-        if (!root.exists() || testProjectList.getSize() == 0) {
-            System.out.println("not projects. " + root.exists() + " , " + testProjectList.getSize());
+                paths.filter(java.nio.file.Files::isDirectory)
+                        .filter(path -> {
+                            String name = path.getFileName().toString();
+                            return !name.startsWith(".") && name.contains("_");
+                        })
+                        .peek(System.out::println)
+                        .map(TestProjectMapper::map)
+                        .filter(Objects::nonNull)
+                        .filter(p -> p.getProjectStatus() == ProjectStatus.AC)
+                        .forEach(testProjectList::addElement);
+
+            } catch (Exception e) {
+                System.err.println("Error reading directory: " + e.getMessage());
+                e.printStackTrace(System.err);
+            }
+        }
+
+        if (!Files.exists(root) || testProjectList.getSize() == 0) {
+            System.out.println("no projects. " + Files.exists(root) + " , " + testProjectList.getSize());
             projectPanel.showEmptyState();
             selectedTestProject.setEnabled(false);
             return false;

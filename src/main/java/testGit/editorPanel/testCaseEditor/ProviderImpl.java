@@ -18,7 +18,7 @@ public class ProviderImpl implements FileEditorProvider, DumbAware {
     @Override
     public @NotNull FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
         if (file instanceof VirtualFileImpl vf) {
-            return new FileEditorImpl(vf.getTestCases(), vf.getPkg(), file);
+            return new FileEditorImpl(vf.getTestCaseJsonMappers(), vf.getPkg(), file);
         }
         throw new IllegalArgumentException("Expected VirtualFileImpl, got: " + file.getClass().getName());
     }

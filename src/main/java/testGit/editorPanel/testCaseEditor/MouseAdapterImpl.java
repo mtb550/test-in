@@ -6,8 +6,8 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import testGit.actions.CreateTestCase;
-import testGit.pojo.TestCase;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
@@ -15,11 +15,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MouseAdapterImpl extends MouseAdapter {
-    private final JBList<TestCase> list;
-    private final CollectionListModel<TestCase> model;
-    private final TestPackage dir;
+    private final JBList<TestCaseJsonMapper> list;
+    private final CollectionListModel<TestCaseJsonMapper> model;
+    private final Directory dir;
 
-    public MouseAdapterImpl(JBList<TestCase> list, CollectionListModel<TestCase> model, TestPackage dir) {
+    public MouseAdapterImpl(JBList<TestCaseJsonMapper> list, CollectionListModel<TestCaseJsonMapper> model, Directory dir) {
         this.list = list;
         this.model = model;
         this.dir = dir;
@@ -42,7 +42,7 @@ public class MouseAdapterImpl extends MouseAdapter {
     private void handleDoubleClick(MouseEvent e) {
         int index = list.locationToIndex(e.getPoint());
         if (index >= 0 && list.getCellBounds(index, index).contains(e.getPoint())) {
-            TestCase selected = model.getElementAt(index);
+            TestCaseJsonMapper selected = model.getElementAt(index);
             if (selected != null) {
                 ViewPanel.show(selected);
             }

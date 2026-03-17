@@ -3,12 +3,12 @@ package testGit.editorPanel.testCaseEditor;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import testGit.actions.*;
-import testGit.pojo.TestCase;
-import testGit.pojo.TestPackage;
+import testGit.pojo.Directory;
+import testGit.pojo.mappers.TestCaseJsonMapper;
 
 
 public class ShortcutHandler {
-    public static void register(TestPackage dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
+    public static void register(Directory dir, JBList<TestCaseJsonMapper> list, CollectionListModel<TestCaseJsonMapper> model) {
 
         new CreateTestCase(dir, list, model);
         new RemoveTestCase(dir, list, model);
