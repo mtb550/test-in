@@ -8,7 +8,9 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import testGit.pojo.Config;
+import testGit.pojo.Directory;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
 import java.nio.file.Path;
 
@@ -159,6 +161,21 @@ public class Tools {
             if (editorName.equals(file.getName())) {
                 editorManager.closeFile(file);
                 break;
+            }
+        }
+    }
+
+    public static void updateChildrenPathsRecursive(DefaultMutableTreeNode parentNode, Path oldParentPath, Path newParentPath) {
+        for (int i = 0; i < parentNode.getChildCount(); i++) {
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parentNode.getChildAt(i);
+
+            if (childNode.getUserObject() instanceof Directory childDir) {
+
+                Path relativePath = oldParentPath.relativize(childDir.getPath());
+                Path newChildPath = newParentPath.resolve(relativePath);
+
+                childDir.setPath(newChildPath);
+                updateChildrenPathsRecursive(childNode, oldParentPath, newParentPath);
             }
         }
     }

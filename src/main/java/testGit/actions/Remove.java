@@ -39,7 +39,6 @@ public class Remove extends DumbAwareAction {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null || paths.length == 0) return;
 
-        // 🌟 1. تجميع العقد القابلة للحذف باستخدام Stream API بشكل نظيف وأنيق
         List<DefaultMutableTreeNode> nodesToRemove = Arrays.stream(paths)
                 .map(TreePath::getLastPathComponent)
                 .filter(DefaultMutableTreeNode.class::isInstance)

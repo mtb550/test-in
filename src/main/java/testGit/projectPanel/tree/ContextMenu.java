@@ -15,13 +15,13 @@ import javax.swing.*;
 @NoArgsConstructor
 public class ContextMenu extends DefaultActionGroup {
 
-    public ContextMenu(ProjectPanel projectPanel) {
+    public ContextMenu(ProjectPanel projectPanel, SimpleTree tree) {
         super("Tree Context Menu", true);
-        SimpleTree tree = projectPanel.getProjectTree().getMainTree();
 
         add(new Open(projectPanel, tree));
         add(new CreateNode(projectPanel, tree));
         addSeparator();
+
         add(createSubGroup("Actions", AllIcons.Actions.Edit,
                 new UndoNode(tree),
                 new RedoNode(tree),
@@ -31,23 +31,40 @@ public class ContextMenu extends DefaultActionGroup {
                 new CutNode(tree),
                 new PasteNode(tree)
         ));
+
         addSeparator();
         add(new RunTestSet(tree));
         addSeparator();
 
-        ///  update below to be same above createSubGroup
-        add(createSubGroup("Export", AllIcons.ToolbarDecorator.Export, new ExportCsv(), new ExportHtml(), new ExportExcel(), new ExportJson()));
-        add(createSubGroup("Import", AllIcons.ToolbarDecorator.Import, new ImportCsv(), new ImportExcel(projectPanel), new ImportJson()));
-        add(createSubGroup("Integrate", AllIcons.Nodes.Related, new IntegrateTestRail(), new IntegrateJira(), new IntegrateAzure()));
+        add(createSubGroup("Export", AllIcons.ToolbarDecorator.Export,
+                new ExportCsv(),
+                new ExportHtml(),
+                new ExportExcel(),
+                new ExportJson()
+        ));
+
+        add(createSubGroup("Import", AllIcons.ToolbarDecorator.Import,
+                new ImportCsv(),
+                new ImportExcel(projectPanel, tree),
+                new ImportJson()
+        ));
+
+        add(createSubGroup("Integrate", AllIcons.Nodes.Related,
+                new IntegrateTestRail(),
+                new IntegrateJira(),
+                new IntegrateAzure()
+        ));
+
         addSeparator();
+
         add(new OpenOldVersions());
         add(new ViewCommits());
         add(new TestRuns());
     }
 
-    public static void registerShortcuts(final ProjectPanel projectPanel, final SimpleTree tree, TransferHandlerImpl transferHandler) {
+    public static void registerShortcuts(final SimpleTree tree, TransferHandlerImpl transferHandler, ContextMenu contextMenu) {
         new Escape(tree, transferHandler);
-        new OpenNodeCM(projectPanel, tree);
+        new OpenNodeCM(tree, contextMenu);
 
     }
 

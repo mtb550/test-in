@@ -51,18 +51,19 @@ public class Rename extends DumbAwareAction {
 
         Tools.closeEditor(dir.getName());
 
-        String newFileName = dir.getName().replace(dir.getName(), newName);
+        Path oldPath = dir.getPath();
+        Path newPath = oldPath.getParent().resolve(newName);
 
-        TreeUtilImpl.executeVfsAction(dir.getPath(), "Rename Failed", vf -> {
-            vf.rename(this, newFileName);
+        TreeUtilImpl.executeVfsAction(oldPath, "Rename Failed", vf -> {
+            vf.rename(this, newName);
 
-            Path newFilePath = dir.getPath().getParent().resolve(newFileName);
             dir.setName(newName)
-                    .setName(newFileName)
-                    .setPath(newFilePath)
+                    .setName(newName)
+                    .setPath(newPath)
                     .setModifiedAt(LocalDateTime.now())
                     .setModifiedBy("Muteb almughyiri");
 
+            Tools.updateChildrenPathsRecursive(node, oldPath, newPath);
             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
             if (dir instanceof TestProject && projectPanel.getTestProjectSelector() != null) {
@@ -91,4 +92,6 @@ public class Rename extends DumbAwareAction {
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
     }
+
+
 }

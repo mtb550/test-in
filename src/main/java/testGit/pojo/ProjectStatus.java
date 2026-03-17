@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum ProjectStatus {
     AC("Active"),
     IN("Inactive"),
+    RE("Removed"),
     AR("Archived");
 
     private final String description;

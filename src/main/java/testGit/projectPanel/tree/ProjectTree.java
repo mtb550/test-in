@@ -22,6 +22,7 @@ public class ProjectTree {
     private final DefaultTreeModel treeModel;
     private final SimpleTree mainTree;
     private final TransferHandlerImpl transferHandler;
+    private final ContextMenu contextMenu;
 
     public ProjectTree(ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
@@ -46,10 +47,11 @@ public class ProjectTree {
         updateNodes();
 
         mainTree.setCellRenderer(new RendererImpl(sharedCutNodes));
-        mainTree.addMouseListener(new MouseAdapterImpl(projectPanel, mainTree));
         this.transferHandler = new TransferHandlerImpl(mainTree, sharedCutNodes);
         mainTree.setTransferHandler(transferHandler);
-        ContextMenu.registerShortcuts(projectPanel, mainTree, transferHandler);
+        contextMenu = new ContextMenu(projectPanel, mainTree);
+        mainTree.addMouseListener(new MouseAdapterImpl(projectPanel, mainTree, contextMenu));
+        ContextMenu.registerShortcuts(mainTree, transferHandler, contextMenu);
     }
 
     public void updateNodes() {

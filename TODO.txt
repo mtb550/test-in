@@ -63,3 +63,4 @@ create the new ui same creation for delete tree node
 
 project activity status to be removed from folder name and use separate xml that has rules
 
+implement details in marker file like created time date by modified, number of test cases , open bugss

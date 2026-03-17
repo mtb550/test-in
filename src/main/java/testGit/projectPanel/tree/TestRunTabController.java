@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Directory;
+import testGit.pojo.DirectoryType;
 import testGit.pojo.TestProject;
 import testGit.pojo.TestRunsDirectory;
 import testGit.pojo.mappers.TestRunMapper;
@@ -74,8 +75,8 @@ public class TestRunTabController {
     }
 
     private Directory mapPathToDirectory(Path path) {
-        if (Files.exists(path.resolve(".trp"))) return TestRunPackageMapper.map(path);
-        if (Files.exists(path.resolve(".tr"))) return TestRunMapper.map(path);
+        if (Files.exists(path.resolve(DirectoryType.TRP.getMarker()))) return TestRunPackageMapper.map(path);
+        if (Files.exists(path.resolve(DirectoryType.TR.getMarker()))) return TestRunMapper.map(path);
         return null;
     }
 }

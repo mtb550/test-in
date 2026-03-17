@@ -37,16 +37,16 @@ import java.util.UUID;
 
 public class ImportExcel extends DumbAwareAction {
 
-    private final SimpleTree testCasesTree;
+    private final SimpleTree tree;
 
-    public ImportExcel(ProjectPanel projectPanel) {
+    public ImportExcel(ProjectPanel projectPanel, SimpleTree tree) {
         super("From Excel", "Import test cases from excel", AllIcons.Providers.Microsoft);
-        this.testCasesTree = projectPanel.getProjectTree().getMainTree();
+        this.tree = tree;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        TreePath path = testCasesTree.getSelectionPath();
+        TreePath path = tree.getSelectionPath();
         if (path == null) {
             Notifier.error("Import Error", "Please select a directory in the Project Panel tree.");
             return;

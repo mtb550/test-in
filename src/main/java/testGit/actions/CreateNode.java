@@ -52,13 +52,18 @@ public class CreateNode extends DumbAwareAction {
             switch (selectedClass) {
                 case Class<?> c when c == TestSetPackage.class ->
                         createTestSetPackage(enteredName, parentNode, parentDir, newDirPath);
+
                 case Class<?> c when c == TestRunPackage.class ->
                         createTestRunPackage(enteredName, parentNode, parentDir, newDirPath);
+
                 case Class<?> c when c == TestSet.class ->
                         createTestSet(enteredName, parentNode, parentDir, newDirPath);
+
                 case Class<?> c when c == TestRun.class -> createTestRun(enteredName, parentDir, newDirPath);
+
                 case Class<?> c when c == TestProject.class ->
                         System.out.println("create project from here to be implemented");
+
                 default -> System.out.println("Unknown or null class selected: " + selectedClass);
             }
 
@@ -66,6 +71,7 @@ public class CreateNode extends DumbAwareAction {
     }
 
     private void createTestRun(String name, Directory parentDir, Path newDirPath) {
+        ///  use name that you recieve
         TestRunJsonMapper metadata = new TestRunJsonMapper();
         metadata.setStatus(TestRunStatus.CREATED);
 
@@ -80,7 +86,7 @@ public class CreateNode extends DumbAwareAction {
                 projectPanel.getTestProjectSelector().getSelectedTestProject().getItem(),
                 metadata
         );
-        TreeUtilImpl.createDataVf(this, newDirPath, ".tr");
+        TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TR.getMarker());
     }
 
     private void createTestSet(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
@@ -88,10 +94,8 @@ public class CreateNode extends DumbAwareAction {
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
 
-        System.out.println("AddTestSet.actionPerformed(): newTestSet = " + newTestSet.getPath());
-
         TreeUtilImpl.insertVf(this, parentDir.getPath(), newTestSet.getName());
-        TreeUtilImpl.createDataVf(this, newDirPath, ".ts");
+        TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TS.getMarker());
         TreeUtilImpl.insertNode(tree, parentNode, newTestSet);
         TestCaseEditor.open(newTestSet);
     }
@@ -103,19 +107,17 @@ public class CreateNode extends DumbAwareAction {
 
         TreeUtilImpl.insertVf(this, parentDir.getPath(), name);
         TreeUtilImpl.insertNode(tree, parentNode, newTestSetPackage);
-        TreeUtilImpl.createDataVf(this, newDirPath, ".tsp");
+        TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TSP.getMarker());
     }
 
     private void createTestRunPackage(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
-
-
         TestRunPackage newTestRunPackage = new TestRunPackage()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
 
         TreeUtilImpl.insertVf(this, parentDir.getPath(), name);
         TreeUtilImpl.insertNode(tree, parentNode, newTestRunPackage);
-        TreeUtilImpl.createDataVf(this, newDirPath, ".trp");
+        TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TRP.getMarker());
     }
 
     @Override
@@ -127,51 +129,43 @@ public class CreateNode extends DumbAwareAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (userObject instanceof TestSetPackage) {
-            option.type(DirectoryType.TP).setInactive()
-                    .type(DirectoryType.TSP).setActive()
-                    .type(DirectoryType.TRP).setInactive()
-                    .type(DirectoryType.TS).setActive()
-                    .type(DirectoryType.TR).setInactive();
-        }
+        switch (userObject) {
+            case TestSetPackage ignored ->
+                    option.type(DirectoryType.TP).setInactive().type(DirectoryType.TSP).setActive()
+                            .type(DirectoryType.TRP).setInactive().type(DirectoryType.TS).setActive()
+                            .type(DirectoryType.TR).setInactive();
 
-        if (userObject instanceof TestRunPackage) {
-            option.type(DirectoryType.TP).setInactive()
-                    .type(DirectoryType.TSP).setInactive()
-                    .type(DirectoryType.TRP).setActive()
-                    .type(DirectoryType.TS).setInactive()
-                    .type(DirectoryType.TR).setActive();
-        }
+            case TestRunPackage ignored ->
+                    option.type(DirectoryType.TP).setInactive().type(DirectoryType.TSP).setInactive()
+                            .type(DirectoryType.TRP).setActive().type(DirectoryType.TS).setInactive()
+                            .type(DirectoryType.TR).setActive();
 
-        if (userObject instanceof TestSet) {
-            e.getPresentation().setVisible(true);
-            e.getPresentation().setEnabled(false);
-            return;
-        }
+            case TestCasesDirectory ignored ->
+                    option.type(DirectoryType.TP).setActive().type(DirectoryType.TSP).setActive()
+                            .type(DirectoryType.TRP).setInactive().type(DirectoryType.TS).setActive()
+                            .type(DirectoryType.TR).setInactive();
 
-        if (userObject instanceof TestCasesDirectory) {
-            option.type(DirectoryType.TP).setActive()
-                    .type(DirectoryType.TSP).setActive()
-                    .type(DirectoryType.TRP).setInactive()
-                    .type(DirectoryType.TS).setActive()
-                    .type(DirectoryType.TR).setInactive();
-            return;
-        }
+            case TestRunsDirectory ignored ->
+                    option.type(DirectoryType.TP).setActive().type(DirectoryType.TSP).setInactive()
+                            .type(DirectoryType.TRP).setActive().type(DirectoryType.TS).setInactive()
+                            .type(DirectoryType.TR).setActive();
 
-        if (userObject instanceof TestRunsDirectory) {
-            option.type(DirectoryType.TP).setActive()
-                    .type(DirectoryType.TSP).setInactive()
-                    .type(DirectoryType.TRP).setActive()
-                    .type(DirectoryType.TS).setInactive()
-                    .type(DirectoryType.TR).setActive();
-            return;
-        }
+            case TestSet ignored -> {
+                e.getPresentation().setVisible(true);
+                e.getPresentation().setEnabled(false);
+            }
 
-        if (userObject instanceof TestRun) {
-            e.getPresentation().setVisible(true);
-            e.getPresentation().setEnabled(false);
-        }
+            case TestRun ignored -> {
+                e.getPresentation().setVisible(true);
+                e.getPresentation().setEnabled(false);
+            }
 
+            default -> {
+                e.getPresentation().setVisible(true);
+                e.getPresentation().setEnabled(false);
+            }
+
+        }
     }
 
     @Override
