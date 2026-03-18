@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import testGit.pojo.GroupType;
 import testGit.pojo.Priority;
-import testGit.pojo.mappers.TestCase;
+import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,7 @@ public class AddTestCasePanel {
     private JButton saveButton;
     private JButton cancelButton;
     @Setter
-    private Consumer<TestCase> onSaveCallback;
+    private Consumer<TestCaseDto> onSaveCallback;
 
     public AddTestCasePanel() {
         mainPanel = new JBPanel<>(new BorderLayout());
@@ -152,14 +152,14 @@ public class AddTestCasePanel {
             return;
         }
 
-        TestCase newTestCase = new TestCase();
-        newTestCase.setTitle(title);
-        newTestCase.setExpected(expected);
-        newTestCase.setSteps(steps);
-        newTestCase.setPriority(Priority.valueOf(priorityField.getText().trim()));
-        newTestCase.setAutoRef(autoRefField.getText().trim());
-        newTestCase.setBusiRef(busiRefField.getText().trim());
-        newTestCase.setModule(moduleField.getText().trim());
+        TestCaseDto newTestCaseDto = new TestCaseDto();
+        newTestCaseDto.setTitle(title);
+        newTestCaseDto.setExpected(expected);
+        newTestCaseDto.setSteps(steps);
+        newTestCaseDto.setPriority(Priority.valueOf(priorityField.getText().trim()));
+        newTestCaseDto.setAutoRef(autoRefField.getText().trim());
+        newTestCaseDto.setBusiRef(busiRefField.getText().trim());
+        newTestCaseDto.setModule(moduleField.getText().trim());
 
         String groupsText = groupsField.getText().trim();
         if (!groupsText.isEmpty()) {
@@ -178,17 +178,17 @@ public class AddTestCasePanel {
                     .collect(Collectors.toList());
 
             if (!groupTypes.isEmpty()) {
-                newTestCase.setGroups(groupTypes);
+                newTestCaseDto.setGroups(groupTypes);
             }
         }
 
-        newTestCase.setCreateBy("current_user");
-        newTestCase.setUpdateBy("current_user");
-        newTestCase.setCreateAt(LocalDateTime.now());
-        newTestCase.setUpdateAt(LocalDateTime.now());
+        newTestCaseDto.setCreateBy("current_user");
+        newTestCaseDto.setUpdateBy("current_user");
+        newTestCaseDto.setCreateAt(LocalDateTime.now());
+        newTestCaseDto.setUpdateAt(LocalDateTime.now());
 
         if (onSaveCallback != null) {
-            onSaveCallback.accept(newTestCase);
+            onSaveCallback.accept(newTestCaseDto);
             clearForm();
         } else {
             JOptionPane.showMessageDialog(

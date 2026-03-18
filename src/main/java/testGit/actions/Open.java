@@ -8,9 +8,9 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testCaseEditor.TestEditor;
 import testGit.editorPanel.testRunEditor.RunEditor;
-import testGit.pojo.tree.dirs.Directory;
-import testGit.pojo.tree.dirs.TestRunDirectory;
-import testGit.pojo.tree.dirs.TestSetDirectory;
+import testGit.pojo.dto.dirs.DirectoryDto;
+import testGit.pojo.dto.dirs.TestRunDirectoryDto;
+import testGit.pojo.dto.dirs.TestSetDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.KeyboardSet;
 import testGit.util.Tools;
@@ -34,17 +34,17 @@ public class Open extends DumbAwareAction {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (node == null) return;
 
-        if (node.getUserObject() instanceof Directory pkg) {
+        if (node.getUserObject() instanceof DirectoryDto pkg) {
             if (Tools.isEditorOpen(pkg.getName())) {
                 System.out.println("Editor already open, focusing: " + pkg.getName());
                 return;
             }
 
             System.out.println("Opening Test Set: " + pkg.getPath());
-            if (pkg instanceof TestSetDirectory ts)
+            if (pkg instanceof TestSetDirectoryDto ts)
                 TestEditor.open(ts);
 
-            if (pkg instanceof TestRunDirectory tr)
+            if (pkg instanceof TestRunDirectoryDto tr)
                 RunEditor.open(tr, projectPanel);
         }
     }
@@ -60,8 +60,8 @@ public class Open extends DumbAwareAction {
 
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
-                (node.getUserObject() instanceof TestSetDirectory ||
-                        node.getUserObject() instanceof TestRunDirectory));
+                (node.getUserObject() instanceof TestSetDirectoryDto ||
+                        node.getUserObject() instanceof TestRunDirectoryDto));
 
         e.getPresentation().setVisible(true);
         e.getPresentation().setEnabled(shouldEnable);

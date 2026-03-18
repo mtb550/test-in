@@ -18,9 +18,9 @@ import testGit.editorPanel.StatusBar;
 import testGit.editorPanel.ToolBar;
 import testGit.editorPanel.UnifiedVirtualFile;
 import testGit.pojo.*;
-import testGit.pojo.mappers.TestCase;
-import testGit.pojo.mappers.TestRun;
-import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.pojo.dto.TestRunDto;
+import testGit.pojo.dto.dirs.DirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.TestCaseSorter;
 
@@ -41,7 +41,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     // --- Shared ---
     private final UnifiedVirtualFile vf;
-    private final List<TestCase> initialTestCases;
+    private final List<TestCaseDto> initialTestCaseDtos;
     private final Set<Integer> initialTestCaseUids;
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
 
@@ -55,9 +55,9 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     // --- Creation-mode state ---
     private CheckboxTree checklistTree;
-    private TestRun metadata;
+    private TestRunDto metadata;
     private VirtualFile currentFile;
-    private Map<UUID, TestRun.TestRunItems> resultsMap;
+    private Map<UUID, TestRunDto.TestRunItems> resultsMap;
     private TestRunMetadataHeader metadataHeader;
 
     public RunEditorUI(UnifiedVirtualFile vf) {
@@ -65,10 +65,10 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         this.metadata = vf.getMetadata();
         this.currentFile = vf;
 
-        List<TestCase> cases = vf.getTestCases() != null ? vf.getTestCases() : Collections.emptyList();
-        this.initialTestCases = TestCaseSorter.sortTestCases(cases);
-        this.initialTestCaseUids = this.initialTestCases.stream()
-                .map(TestCase::getUid)
+        List<TestCaseDto> cases = vf.getTestCaseDtos() != null ? vf.getTestCaseDtos() : Collections.emptyList();
+        this.initialTestCaseDtos = TestCaseSorter.sortTestCases(cases);
+        this.initialTestCaseUids = this.initialTestCaseDtos.stream()
+                .map(TestCaseDto::getUid)
                 .collect(Collectors.toSet());
 
         createEditorPanel();
@@ -78,7 +78,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         switch (vf.getEditorType()) {
             case TEST_RUN_OPENING -> buildOpeningPanel();
             case TEST_RUN_CREATION ->
-                    buildCreationPanel(vf.getTestCasesTreeModel(), vf.getDirectory().getPath(), vf.getProjectPanel());
+                    buildCreationPanel(vf.getTestCasesTreeModel(), vf.getDirectoryDto().getPath(), vf.getProjectPanel());
             default -> throw new IllegalArgumentException("Unsupported editor type: " + vf.getEditorType());
         }
     }
@@ -136,14 +136,14 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         } catch (NumberFormatException ignored) {
         }
 
-        List<TestCase> filtered = getFilteredList();
+        List<TestCaseDto> filtered = getFilteredList();
         int total = filtered.size();
         int totalPages = Math.max(1, (int) Math.ceil((double) total / pageSize));
         currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
         int fromIndex = (currentPage - 1) * pageSize;
         int toIndex = Math.min(fromIndex + pageSize, total);
-        List<TestCase> pageItems = filtered.subList(fromIndex, toIndex);
+        List<TestCaseDto> pageItems = filtered.subList(fromIndex, toIndex);
 
         cardListPanel.removeAll();
         for (int i = 0; i < pageItems.size(); i++) {
@@ -177,11 +177,11 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
      * Returns the subset of initialTestCases that match the current search query
      * and group filter from the header.
      */
-    private List<TestCase> getFilteredList() {
+    private List<TestCaseDto> getFilteredList() {
         String query = toolBar != null ? toolBar.getSearchQuery() : "";
         Set<GroupType> groups = toolBar != null ? toolBar.getSelectedGroups() : Collections.emptySet();
 
-        return initialTestCases.stream()
+        return initialTestCaseDtos.stream()
                 .filter(tc -> {
                     boolean matchesSearch = query.isEmpty() ||
                             (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query));
@@ -231,7 +231,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         mainPanel = new JBPanel<>(new BorderLayout());
 
         metadataHeader = new TestRunMetadataHeader();
-        metadataHeader.setRunNameDisabled(vf.getDirectory().getName());
+        metadataHeader.setRunNameDisabled(vf.getDirectoryDto().getName());
         mainPanel.add(metadataHeader.getPanel(), BorderLayout.NORTH);
 
         checklistTree = new CheckboxTree(createTreeRenderer(), root,
@@ -251,17 +251,17 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
                 if (!(value instanceof CheckedTreeNode node)) return;
                 Object userObj = node.getUserObject();
 
-                if (userObj instanceof Directory dir) {
+                if (userObj instanceof DirectoryDto dir) {
                     getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-                } else if (userObj instanceof TestCase tc) {
+                } else if (userObj instanceof TestCaseDto tc) {
                     renderTestCaseNode(tc);
                 } else if (userObj instanceof String str) {
                     getTextRenderer().append(str, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
                 }
             }
 
-            private void renderTestCaseNode(TestCase tc) {
-                TestRun.TestRunItems result = findResultFor(tc.getId());
+            private void renderTestCaseNode(TestCaseDto tc) {
+                TestRunDto.TestRunItems result = findResultFor(tc.getId());
                 SimpleTextAttributes style = SimpleTextAttributes.REGULAR_ATTRIBUTES;
                 String statusText = " [Pending]";
 
@@ -304,7 +304,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         Object userObj = node.getUserObject();
         CheckedTreeNode newNode = new CheckedTreeNode(userObj);
 
-        if (userObj instanceof TestCase tc && initialTestCaseUids.contains(tc.getUid())) {
+        if (userObj instanceof TestCaseDto tc && initialTestCaseUids.contains(tc.getUid())) {
             newNode.setChecked(true);
         }
         for (int i = 0; i < node.getChildCount(); i++) {
@@ -314,7 +314,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
     }
 
     private void saveSelectedToJSON(CheckedTreeNode root, Path savePath, ProjectPanel projectPanel) {
-        TestRun run = new TestRun();
+        TestRunDto run = new TestRunDto();
         if (metadata != null) {
             run.setBuildNumber(metadata.getBuildNumber());
             run.setPlatform(metadata.getPlatform());
@@ -323,12 +323,12 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
             run.setDeviceType(metadata.getDeviceType());
         }
 
-        String fileName = DirectoryType.TR.name() + "_" + vf.getDirectory().getName() + "_" + ProjectStatus.AC.name() + ".json";
+        String fileName = DirectoryType.TR.name() + "_" + vf.getDirectoryDto().getName() + "_" + ProjectStatus.AC.name() + ".json";
         run.setRunName(fileName);
         run.setCreatedAt(LocalDateTime.now());
         run.setStatus(TestRunStatus.CREATED);
 
-        List<TestRun.TestRunItems> items = new ArrayList<>();
+        List<TestRunDto.TestRunItems> items = new ArrayList<>();
         collectCheckedItems(root, items);
         run.setResults(items);
 
@@ -344,13 +344,13 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         FileEditorManager.getInstance(Config.getProject()).closeFile(currentFile);
     }
 
-    private void collectCheckedItems(CheckedTreeNode node, List<TestRun.TestRunItems> items) {
-        if (node.getUserObject() instanceof TestCase tc && node.isChecked()) {
-            TestRun.TestRunItems item = new TestRun.TestRunItems();
+    private void collectCheckedItems(CheckedTreeNode node, List<TestRunDto.TestRunItems> items) {
+        if (node.getUserObject() instanceof TestCaseDto tc && node.isChecked()) {
+            TestRunDto.TestRunItems item = new TestRunDto.TestRunItems();
             item.setTestCaseId(UUID.fromString(tc.getId()));
             item.setStatus("PENDING");
             Object rootObj = ((DefaultMutableTreeNode) node.getRoot()).getUserObject();
-            item.setProject(rootObj instanceof Directory d ? d.getName() : String.valueOf(rootObj));
+            item.setProject(rootObj instanceof DirectoryDto d ? d.getName() : String.valueOf(rootObj));
             items.add(item);
         }
         for (int i = 0; i < node.getChildCount(); i++) {
@@ -358,7 +358,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         }
     }
 
-    private TestRun.TestRunItems findResultFor(String testCaseId) {
+    private TestRunDto.TestRunItems findResultFor(String testCaseId) {
         if (resultsMap == null) return null;
         try {
             return resultsMap.get(UUID.fromString(testCaseId));
@@ -371,7 +371,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
     public void dispose() {
         System.out.println("Disposing TestRunEditorUI to free memory...");
 
-        if (initialTestCases != null) initialTestCases.clear();
+        if (initialTestCaseDtos != null) initialTestCaseDtos.clear();
         if (initialTestCaseUids != null) initialTestCaseUids.clear();
         if (resultsMap != null) resultsMap.clear();
 

@@ -1,4 +1,4 @@
-package testGit.pojo.mappers;
+package testGit.pojo.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestCase {
+public class TestCaseDto {
 
     private int uid;
 

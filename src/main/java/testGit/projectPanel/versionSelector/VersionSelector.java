@@ -1,8 +1,8 @@
 package testGit.projectPanel.versionSelector;
 
 import com.intellij.openapi.ui.ComboBox;
-import testGit.pojo.Version;
-import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.dto.VersionDto;
+import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,7 +14,7 @@ public class VersionSelector {
     private final DefaultComboBoxModel<String> model;
     private final Map<String, Double> nameToVersion = new HashMap<>();
 
-    public VersionSelector(TestProjectDirectory testProjectDirectory) {
+    public VersionSelector(TestProjectDirectoryDto testProjectDirectory) {
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
         comboBox.setFocusable(false);
@@ -29,13 +29,13 @@ public class VersionSelector {
         model.removeAllElements();
         nameToVersion.clear();
 
-        Version[] versions = null;
+        VersionDto[] versionDtos = null;
 
-        if (versions.length > 0) {
-            for (Version version : versions) {
-                String versionStr = String.valueOf(version.getVersion());
+        if (versionDtos.length > 0) {
+            for (VersionDto versionDto : versionDtos) {
+                String versionStr = String.valueOf(versionDto.getVersion());
                 model.addElement(versionStr);
-                nameToVersion.put(versionStr, version.getVersion());
+                nameToVersion.put(versionStr, versionDto.getVersion());
             }
             comboBox.setEnabled(true);
             comboBox.addActionListener(this::onSelection);

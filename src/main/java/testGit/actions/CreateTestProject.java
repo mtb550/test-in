@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
 import testGit.pojo.ProjectStatus;
-import testGit.pojo.tree.dirs.TestCasesDirectory;
-import testGit.pojo.tree.dirs.TestProjectDirectory;
-import testGit.pojo.tree.dirs.TestRunsDirectory;
+import testGit.pojo.dto.dirs.TestCasesDirectoryDto;
+import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
+import testGit.pojo.dto.dirs.TestRunsDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 import testGit.ui.CreateTestProjectDialog;
 import testGit.util.Notifier;
@@ -33,7 +33,7 @@ public class CreateTestProject extends DumbAwareAction {
 
         if (name == null || name.trim().isEmpty()) return;
 
-        TestProjectDirectory newTestProjectDirectory = new TestProjectDirectory()
+        TestProjectDirectoryDto newTestProjectDirectory = new TestProjectDirectoryDto()
                 .setProjectStatus(ProjectStatus.AC)
                 .setName(name);
 
@@ -44,12 +44,12 @@ public class CreateTestProject extends DumbAwareAction {
                 .setPath(projectPath);
 
         newTestProjectDirectory.setTestCasesDirectory(
-                        new TestCasesDirectory()
+                        new TestCasesDirectoryDto()
                                 .setPath(newTestProjectDirectory.getPath().resolve("testCases"))
                                 .setName("Test Cases")
                 )
                 .setTestRunsDirectory(
-                        new TestRunsDirectory()
+                        new TestRunsDirectoryDto()
                                 .setPath(newTestProjectDirectory.getPath().resolve("testRuns"))
                                 .setName("Test Runs")
                 );

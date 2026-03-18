@@ -15,10 +15,10 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import testGit.actions.Refresh;
 import testGit.pojo.Config;
+import testGit.pojo.DirectoryMapper;
 import testGit.pojo.ProjectStatus;
-import testGit.pojo.tree.dirs.Directory;
-import testGit.pojo.tree.dirs.TestProjectDirectory;
-import testGit.pojo.tree.mappers.TestProjectMapper;
+import testGit.pojo.dto.dirs.DirectoryDto;
+import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 import testGit.projectPanel.projectSelector.RendererImpl;
 import testGit.settings.service.ProjectPanelService;
@@ -37,8 +37,8 @@ public class AppSettingsConfigurable implements Configurable {
     private final JBTextField rootAutomationPathField = new JBTextField();
 
     // Store projects as Directory objects in a Model
-    private final DefaultComboBoxModel<TestProjectDirectory> testProjectList = new DefaultComboBoxModel<>();
-    private final ComboBox<TestProjectDirectory> projectComboBox = new ComboBox<>(testProjectList);
+    private final DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList = new DefaultComboBoxModel<>();
+    private final ComboBox<TestProjectDirectoryDto> projectComboBox = new ComboBox<>(testProjectList);
 
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
 
@@ -105,7 +105,7 @@ public class AppSettingsConfigurable implements Configurable {
     }
 
     private void updateProjectStatus(ProjectStatus newProjectStatus) {
-        Directory selected = (Directory) projectComboBox.getSelectedItem();
+        DirectoryDto selected = (DirectoryDto) projectComboBox.getSelectedItem();
         if (selected == null) return;
 
         File oldDir = selected.getPath().toFile();
@@ -151,7 +151,7 @@ public class AppSettingsConfigurable implements Configurable {
             try (Stream<Path> paths = Files.list(rootPath)) {
                 paths.filter(Files::isDirectory)
                         .filter(path -> path.getFileName().toString().startsWith("PR_"))
-                        .map(TestProjectMapper::map) // 🌟 3. نستخدم المابر الجديد الذي يستقبل Path
+                        .map(DirectoryMapper::testProjectNode) // 🌟 3. نستخدم المابر الجديد الذي يستقبل Path
                         .filter(Objects::nonNull)
                         .forEach(testProjectList::addElement);
 

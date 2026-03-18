@@ -4,11 +4,11 @@ import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
 import lombok.Setter;
 import testGit.pojo.EditorType;
-import testGit.pojo.mappers.TestCase;
-import testGit.pojo.mappers.TestRun;
-import testGit.pojo.tree.dirs.Directory;
-import testGit.pojo.tree.dirs.TestRunDirectory;
-import testGit.pojo.tree.dirs.TestSetDirectory;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.pojo.dto.TestRunDto;
+import testGit.pojo.dto.dirs.DirectoryDto;
+import testGit.pojo.dto.dirs.TestRunDirectoryDto;
+import testGit.pojo.dto.dirs.TestSetDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.tree.DefaultTreeModel;
@@ -19,28 +19,28 @@ import java.util.List;
 public class UnifiedVirtualFile extends LightVirtualFile {
 
     // --- خصائص مشتركة (Shared Properties) ---
-    private final Directory directory; // يمكن أن يكون TestSet أو TestRun
-    private final List<TestCase> testCases;
+    private final DirectoryDto directoryDto; // يمكن أن يكون TestSet أو TestRun
+    private final List<TestCaseDto> testCaseDtos;
 
     // --- خصائص خاصة بـ Test Run (ستكون null في حالة Test Case) ---
     private ProjectPanel projectPanel;
     private DefaultTreeModel testCasesTreeModel;
-    private TestRun metadata;
+    private TestRunDto metadata;
     private EditorType editorType;
 
     // 🌟 1. المُنشئ الخاص بـ Test Case
-    public UnifiedVirtualFile(TestSetDirectory directory, List<TestCase> testCases) {
+    public UnifiedVirtualFile(TestSetDirectoryDto directory, List<TestCaseDto> testCaseDtos) {
         super(directory.getName());
-        this.directory = directory;
-        this.testCases = testCases;
+        this.directoryDto = directory;
+        this.testCaseDtos = testCaseDtos;
         this.setFileType(FileType.TEST_CASE);
     }
 
     // 🌟 2. المُنشئ الخاص بـ Test Run
-    public UnifiedVirtualFile(TestRunDirectory directory, DefaultTreeModel treeModel, List<TestCase> testCases, EditorType editorType, ProjectPanel projectPanel) {
+    public UnifiedVirtualFile(TestRunDirectoryDto directory, DefaultTreeModel treeModel, List<TestCaseDto> testCaseDtos, EditorType editorType, ProjectPanel projectPanel) {
         super(directory.getName());
-        this.directory = directory;
-        this.testCases = testCases;
+        this.directoryDto = directory;
+        this.testCaseDtos = testCaseDtos;
         this.testCasesTreeModel = treeModel;
         this.editorType = editorType;
         this.projectPanel = projectPanel;
@@ -54,11 +54,11 @@ public class UnifiedVirtualFile extends LightVirtualFile {
 
     // --- دوال مساعدة لجلب الكائن بالنوع الصحيح بسهولة ---
 
-    public TestSetDirectory getTestSet() {
-        return directory instanceof TestSetDirectory ? (TestSetDirectory) directory : null;
+    public TestSetDirectoryDto getTestSet() {
+        return directoryDto instanceof TestSetDirectoryDto ? (TestSetDirectoryDto) directoryDto : null;
     }
 
-    public TestRunDirectory getTestRunPkg() {
-        return directory instanceof TestRunDirectory ? (TestRunDirectory) directory : null;
+    public TestRunDirectoryDto getTestRunPkg() {
+        return directoryDto instanceof TestRunDirectoryDto ? (TestRunDirectoryDto) directoryDto : null;
     }
 }

@@ -1,4 +1,4 @@
-package testGit.editorPanel.testCaseEditor;
+package testGit.editorPanel.listeners;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
@@ -7,8 +7,8 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import testGit.actions.CreateTestCase;
 import testGit.editorPanel.EditorContextMenu;
-import testGit.pojo.mappers.TestCase;
-import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.pojo.dto.dirs.DirectoryDto;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
@@ -16,12 +16,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class TestMouseListener extends MouseAdapter {
-    private final JBList<TestCase> list;
-    private final CollectionListModel<TestCase> model;
+    private final JBList<TestCaseDto> list;
+    private final CollectionListModel<TestCaseDto> model;
     private final EditorContextMenu editorContextMenu;
     private final DefaultActionGroup emptyMenu;
 
-    public TestMouseListener(final JBList<TestCase> list, final CollectionListModel<TestCase> model, final Directory dir, final EditorContextMenu editorContextMenu) {
+    public TestMouseListener(final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorContextMenu editorContextMenu) {
         this.list = list;
         this.model = model;
         this.editorContextMenu = editorContextMenu;
@@ -37,7 +37,7 @@ public class TestMouseListener extends MouseAdapter {
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
 
             if (isClickOnItem) {
-                TestCase selected = model.getElementAt(index);
+                TestCaseDto selected = model.getElementAt(index);
 
                 if (selected != null) {
                     ViewPanel.show(selected);

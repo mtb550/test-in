@@ -5,22 +5,22 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.mappers.TestCase;
+import testGit.pojo.dto.TestCaseDto;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
 public class CopyTestCase extends DumbAwareAction {
-    private final JBList<TestCase> list;
+    private final JBList<TestCaseDto> list;
 
-    public CopyTestCase(final JBList<TestCase> list) {
+    public CopyTestCase(final JBList<TestCaseDto> list) {
         super("Copy", "Copy test case", AllIcons.Actions.Copy);
         this.list = list;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        TestCase tc = list.getSelectedValue();
+        TestCaseDto tc = list.getSelectedValue();
         String text = "Title: " + tc.getTitle() + "\nSteps: " + tc.getSteps() + "\nExpected: " + tc.getExpected();
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
     }

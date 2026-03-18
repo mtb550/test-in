@@ -2,26 +2,27 @@ package testGit.editorPanel.testCaseEditor;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
-import testGit.pojo.mappers.TestCase;
+import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class TestListRenderer implements ListCellRenderer<TestCase> {
+public class TestListRenderer implements ListCellRenderer<TestCaseDto> {
     private final TestCard rendererCard = new TestCard();
-
     private final TestEditorUI ui;
 
-    public TestListRenderer(TestEditorUI ui) {
+    public TestListRenderer(final TestEditorUI ui) {
         this.ui = ui;
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends TestCase> list, TestCase tc, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
 
         int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
 
-        rendererCard.updateData(globalIndex, tc, ui.isShowGroups(), ui.isShowPriority(), ui.getSelectedDetails());
+        boolean isUnsorted = ui.getUnsortedIds().contains(tc.getId());
+
+        rendererCard.updateData(globalIndex, tc, ui.isShowGroups(), ui.isShowPriority(), ui.getSelectedDetails(), isUnsorted);
 
         rendererCard.setBorder(isSelected ?
                 JBUI.Borders.customLine(JBColor.blue, 1) :

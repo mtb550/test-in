@@ -12,13 +12,17 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.editorPanel.*;
+import testGit.editorPanel.listeners.ModelSyncListener;
+import testGit.editorPanel.listeners.SelectionListener;
+import testGit.editorPanel.listeners.TestMouseListener;
 import testGit.pojo.Config;
-import testGit.pojo.mappers.TestCase;
+import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -26,13 +30,15 @@ import java.util.stream.Collectors;
 public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI {
 
     private final JBPanel<?> mainPanel;
-    private final JBList<TestCase> list;
-    private final CollectionListModel<TestCase> model;
-    private final ModelSyncListener<TestCase> syncListener;
+    private final JBList<TestCaseDto> list;
+    private final CollectionListModel<TestCaseDto> model;
+    private final ModelSyncListener<TestCaseDto> syncListener;
     private final ToolBar toolBar;
     private final StatusBar statusBar;
+    private List<TestCaseDto> allTestCaseDtos;
 
-    private List<TestCase> allTestCases;
+    @Getter
+    private Set<String> unsortedIds = new HashSet<>();
 
     @Getter
     private int currentPage = 1;
@@ -40,7 +46,9 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     private int pageSize = 10;
 
     public TestEditorUI(@NotNull UnifiedVirtualFile vf) {
-        this.allTestCases = new ArrayList<>(vf.getTestCases());
+        this.allTestCaseDtos = new ArrayList<>(vf.getTestCaseDtos());
+        sortAndIdentifyUnsorted();
+
         this.mainPanel = new JBPanel<>(new BorderLayout());
 
         pageSize = PropertiesComponent.getInstance().getInt("testGit.pageSize", 10);
@@ -51,9 +59,10 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
         // Model + sync listener
         this.model = new CollectionListModel<>(new ArrayList<>());
-        this.syncListener = new ModelSyncListener<>(allTestCases, model);
+        this.syncListener = new ModelSyncListener<>(allTestCaseDtos, model);
         this.syncListener.setOnUpdate(() -> {
             toolBar.resetFilters();
+            sortAndIdentifyUnsorted();
             refreshView();
         });
         this.model.addListDataListener(syncListener);
@@ -83,6 +92,17 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         attachPaginationListeners();
+        list.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                // نمرر التحديد الحالي، ورقم الصفحة، وإجمالي عدد الاختبارات
+                statusBar.updateSelectionState(
+                        list.getSelectedIndices(),
+                        currentPage,
+                        pageSize,
+                        allTestCaseDtos.size()
+                );
+            }
+        });
 
         refreshView();
         EditorFocusSyncListener focusSyncListener = new EditorFocusSyncListener(this.list);
@@ -152,14 +172,14 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     }
 
     public void refreshView() {
-        List<TestCase> filtered = getFilteredList();
+        List<TestCaseDto> filtered = getFilteredList();
         int totalItems = filtered.size();
         int totalPages = getTotalPages(filtered);
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
 
         int startIndex = (currentPage - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalItems);
-        List<TestCase> pageItems = startIndex < totalItems
+        List<TestCaseDto> pageItems = startIndex < totalItems
                 ? new ArrayList<>(filtered.subList(startIndex, endIndex))
                 : new ArrayList<>();
 
@@ -170,15 +190,17 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), totalItems);
     }
 
-    public void loadData(List<TestCase> loadedData) {
-        this.allTestCases = loadedData;
+    /// used with refresh button that will be added to tool bar later
+    public void loadData(List<TestCaseDto> loadedData) {
+        this.allTestCaseDtos = loadedData;
+        sortAndIdentifyUnsorted();
         this.currentPage = 1;
         refreshView();
     }
 
-    private List<TestCase> getFilteredList() {
+    private List<TestCaseDto> getFilteredList() {
         String query = toolBar.getSearchQuery();
-        return allTestCases.stream()
+        return allTestCaseDtos.stream()
                 .filter(tc -> {
                     boolean matchesSearch = query.isEmpty() ||
                             (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query));
@@ -189,7 +211,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
                 .collect(Collectors.toList());
     }
 
-    private int getTotalPages(List<TestCase> filtered) {
+    private int getTotalPages(List<TestCaseDto> filtered) {
         return filtered.isEmpty() ? 1 : (int) Math.ceil((double) filtered.size() / pageSize);
     }
 
@@ -228,6 +250,50 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         });
     }
 
+    private void sortAndIdentifyUnsorted() {
+        if (allTestCaseDtos == null || allTestCaseDtos.isEmpty()) return;
+
+        // 1. خريطة للبحث السريع
+        java.util.Map<String, TestCaseDto> map = allTestCaseDtos.stream()
+                .collect(Collectors.toMap(TestCaseDto::getId, tc -> tc));
+
+        // 2. إيجاد نقطة البداية (isHead)
+        TestCaseDto head = allTestCaseDtos.stream()
+                .filter(tc -> Boolean.TRUE.equals(tc.getIsHead()))
+                .findFirst()
+                .orElse(null);
+
+        List<TestCaseDto> sortedList = new ArrayList<>();
+        Set<String> sortedIds = new HashSet<>(); // 🌟 جديد: قائمة التتبع السريع والآمن
+        unsortedIds.clear();
+
+        // 3. تتبع السلسلة السليمة
+        TestCaseDto current = head;
+        while (current != null && !sortedIds.contains(current.getId())) {
+            sortedList.add(current);
+            sortedIds.add(current.getId()); // 🌟 نضيفه هنا لنتذكره
+
+            if (current.getNext() != null) {
+                current = map.get(current.getNext().toString());
+            } else {
+                current = null;
+            }
+        }
+
+        // 4. وضع ما تبقى (غير المرتب) في النهاية
+        for (TestCaseDto tc : allTestCaseDtos) {
+            if (!sortedIds.contains(tc.getId())) { // 🌟 الفحص أصبح O(1) سريع جداً
+                sortedList.add(tc);
+                unsortedIds.add(tc.getId());
+            }
+        }
+
+        // 🌟 5. الإصلاح الحاسم: نقوم بتفريغ القائمة الأصلية وتعبئتها بدلاً من إنشاء واحدة جديدة
+        // هذا يحافظ على الاتصال السليم مع (ModelSyncListener)
+        this.allTestCaseDtos.clear();
+        this.allTestCaseDtos.addAll(sortedList);
+    }
+
     // -------------------------------------------------------------------------
     // Disposal & memory management
     // -------------------------------------------------------------------------
@@ -235,7 +301,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     public void dispose() {
         System.out.println("Disposing TestCaseEditorUI...");
 
-        TestCase selectedInThisFile = list.getSelectedValue();
+        TestCaseDto selectedInThisFile = list.getSelectedValue();
         ViewPanel.hideIfShowing(selectedInThisFile);
 
         if (model != null && syncListener != null) {

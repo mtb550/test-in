@@ -8,10 +8,10 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import testGit.pojo.tree.dirs.Directory;
-import testGit.pojo.tree.dirs.TestCasesDirectory;
-import testGit.pojo.tree.dirs.TestProjectDirectory;
-import testGit.pojo.tree.dirs.TestRunsDirectory;
+import testGit.pojo.dto.dirs.DirectoryDto;
+import testGit.pojo.dto.dirs.TestCasesDirectoryDto;
+import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
+import testGit.pojo.dto.dirs.TestRunsDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.KeyboardSet;
 import testGit.util.Tools;
@@ -43,8 +43,8 @@ public class Rename extends DumbAwareAction {
 
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        if (!(node.getUserObject() instanceof Directory dir)) return;
-        if (dir instanceof TestCasesDirectory || dir instanceof TestRunsDirectory) return;
+        if (!(node.getUserObject() instanceof DirectoryDto dir)) return;
+        if (dir instanceof TestCasesDirectoryDto || dir instanceof TestRunsDirectoryDto) return;
 
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
         if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
@@ -66,7 +66,7 @@ public class Rename extends DumbAwareAction {
             Tools.updateChildrenPathsRecursive(node, oldPath, newPath);
             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
-            if (dir instanceof TestProjectDirectory && projectPanel.getTestProjectSelector() != null) {
+            if (dir instanceof TestProjectDirectoryDto && projectPanel.getTestProjectSelector() != null) {
                 projectPanel.getTestProjectSelector().loadTestProjectList();
             }
 
@@ -80,9 +80,9 @@ public class Rename extends DumbAwareAction {
 
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
-                node.getUserObject() instanceof Directory dir &&
-                !(dir instanceof TestCasesDirectory) &&
-                !(dir instanceof TestRunsDirectory)
+                node.getUserObject() instanceof DirectoryDto dir &&
+                !(dir instanceof TestCasesDirectoryDto) &&
+                !(dir instanceof TestRunsDirectoryDto)
         );
 
         e.getPresentation().setEnabled(shouldEnable);

@@ -1,4 +1,4 @@
-package testGit.pojo.tree.dirs;
+package testGit.pojo.dto.dirs;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public abstract class Directory {
+public abstract class DirectoryDto {
     private String name;
 
     private Path path;

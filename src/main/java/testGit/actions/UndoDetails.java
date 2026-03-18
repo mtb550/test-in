@@ -4,12 +4,12 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.mappers.TestCase;
+import testGit.pojo.dto.TestCaseDto;
 
 public class UndoDetails extends DumbAwareAction {
-    TestCase tc;
+    TestCaseDto tc;
 
-    public UndoDetails(TestCase tc) {
+    public UndoDetails(TestCaseDto tc) {
         super("Undo", "", AllIcons.Actions.Undo);
         this.tc = tc;
     }

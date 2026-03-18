@@ -1,4 +1,4 @@
-package testGit.pojo.mappers;
+package testGit.pojo.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class TestRun {
+public class TestRunDto {
     private String runName;
     private String buildNumber;
     private String platform;

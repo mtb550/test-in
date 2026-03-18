@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.actions.Open;
-import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.dto.dirs.DirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class TreeMouseListener extends MouseAdapter {
     public void mouseClicked(MouseEvent e) {
         TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
 
-        if (selPath == null || !(selPath.getLastPathComponent() instanceof DefaultMutableTreeNode node) || !(node.getUserObject() instanceof Directory))
+        if (selPath == null || !(selPath.getLastPathComponent() instanceof DefaultMutableTreeNode node) || !(node.getUserObject() instanceof DirectoryDto))
             return;
 
         if (SwingUtilities.isRightMouseButton(e)) {

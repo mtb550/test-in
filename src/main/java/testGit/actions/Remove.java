@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.tree.dirs.*;
+import testGit.pojo.dto.dirs.*;
 import testGit.util.Tools;
 import testGit.util.TreeUtilImpl;
 
@@ -28,10 +28,10 @@ public class Remove extends DumbAwareAction {
     }
 
     private boolean isRemovable(Object dir) {
-        return dir instanceof Directory &&
-                !(dir instanceof TestProjectDirectory) &&
-                !(dir instanceof TestCasesDirectory) &&
-                !(dir instanceof TestRunsDirectory);
+        return dir instanceof DirectoryDto &&
+                !(dir instanceof TestProjectDirectoryDto) &&
+                !(dir instanceof TestCasesDirectoryDto) &&
+                !(dir instanceof TestRunsDirectoryDto);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Remove extends DumbAwareAction {
         if (nodesToRemove.isEmpty()) return;
 
         String message = nodesToRemove.size() == 1
-                ? "Are you sure you want to remove '" + ((Directory) nodesToRemove.getFirst().getUserObject()).getName() + "'?"
+                ? "Are you sure you want to remove '" + ((DirectoryDto) nodesToRemove.getFirst().getUserObject()).getName() + "'?"
                 : "Are you sure you want to remove these " + nodesToRemove.size() + " items?";
 
         int confirm = Messages.showYesNoDialog(message, "Confirm Removing", Messages.getQuestionIcon());
@@ -57,9 +57,9 @@ public class Remove extends DumbAwareAction {
         if (confirm == Messages.YES) {
 
             for (DefaultMutableTreeNode node : nodesToRemove) {
-                Directory pkg = (Directory) node.getUserObject();
+                DirectoryDto pkg = (DirectoryDto) node.getUserObject();
 
-                if (pkg instanceof TestSetDirectory || pkg instanceof TestRunDirectory)
+                if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
                     Tools.closeEditor(pkg.getName());
 
                 TreeUtilImpl.removeVf(this, pkg.getPath());

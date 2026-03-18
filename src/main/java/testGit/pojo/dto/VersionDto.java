@@ -1,9 +1,9 @@
-package testGit.pojo;
+package testGit.pojo.dto;
 
 import lombok.Data;
 
 @Data
-public class Version {
+public class VersionDto {
     private int id;
 
     private double version;

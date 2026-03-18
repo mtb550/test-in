@@ -5,7 +5,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
-import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.*;
@@ -27,9 +27,9 @@ public class ProjectTree {
     public ProjectTree(ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
 
-        TestProjectDirectory testProjectDirectory = null;
+        TestProjectDirectoryDto testProjectDirectory = null;
         if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
-            testProjectDirectory = (TestProjectDirectory) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+            testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
         }
 
         this.mainRoot = new DefaultMutableTreeNode(testProjectDirectory != null ? testProjectDirectory : "Project");
@@ -61,9 +61,9 @@ public class ProjectTree {
         ApplicationManager.getApplication().invokeLater(() -> {
             mainRoot.removeAllChildren();
 
-            TestProjectDirectory testProjectDirectory = null;
+            TestProjectDirectoryDto testProjectDirectory = null;
             if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
-                testProjectDirectory = (TestProjectDirectory) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+                testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
             }
             if (testProjectDirectory != null) {
                 mainRoot.setUserObject(testProjectDirectory);

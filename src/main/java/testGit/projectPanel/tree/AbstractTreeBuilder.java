@@ -3,7 +3,7 @@ package testGit.projectPanel.tree;
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.dto.dirs.DirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -23,11 +23,11 @@ public abstract class AbstractTreeBuilder {
         this.rootNode = new DefaultMutableTreeNode("loading..");
     }
 
-    public void buildTree(Directory rootDirectory) {
-        DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(rootDirectory);
+    public void buildTree(DirectoryDto rootDirectoryDto) {
+        DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(rootDirectoryDto);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            Path rootPath = rootDirectory.getPath();
+            Path rootPath = rootDirectoryDto.getPath();
 
             if (Files.exists(rootPath) && Files.isDirectory(rootPath)) {
                 try (Stream<Path> paths = Files.list(rootPath)) {
@@ -50,7 +50,7 @@ public abstract class AbstractTreeBuilder {
         });
     }
 
-    private DefaultMutableTreeNode buildNodeRecursive(@NotNull Directory dir) {
+    private DefaultMutableTreeNode buildNodeRecursive(@NotNull DirectoryDto dir) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dir);
         Path currentPath = dir.getPath();
 
@@ -68,5 +68,5 @@ public abstract class AbstractTreeBuilder {
         return node;
     }
 
-    protected abstract Directory mapPathToDirectory(Path path);
+    protected abstract DirectoryDto mapPathToDirectory(Path path);
 }

@@ -1,10 +1,9 @@
 package testGit.projectPanel.tree;
 
+import testGit.pojo.DirectoryMapper;
 import testGit.pojo.DirectoryType;
-import testGit.pojo.tree.dirs.Directory;
-import testGit.pojo.tree.dirs.TestProjectDirectory;
-import testGit.pojo.tree.mappers.TestRunMapper;
-import testGit.pojo.tree.mappers.TestRunPackageMapper;
+import testGit.pojo.dto.dirs.DirectoryDto;
+import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 
 import java.nio.file.Files;
@@ -16,14 +15,14 @@ public class TestRunTreeBuilder extends AbstractTreeBuilder {
         super(projectPanel);
     }
 
-    public void buildTree(TestProjectDirectory selectedTestProjectDirectory) {
+    public void buildTree(TestProjectDirectoryDto selectedTestProjectDirectory) {
         super.buildTree(selectedTestProjectDirectory.getTestRunsDirectory());
     }
 
     @Override
-    protected Directory mapPathToDirectory(Path path) {
-        if (Files.exists(path.resolve(DirectoryType.TRP.getMarker()))) return TestRunPackageMapper.map(path);
-        if (Files.exists(path.resolve(DirectoryType.TR.getMarker()))) return TestRunMapper.map(path);
+    protected DirectoryDto mapPathToDirectory(Path path) {
+        if (Files.exists(path.resolve(DirectoryType.TRP.getMarker()))) return DirectoryMapper.testRunPackageNode(path);
+        if (Files.exists(path.resolve(DirectoryType.TR.getMarker()))) return DirectoryMapper.testRunNode(path);
         return null;
     }
 }

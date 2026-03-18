@@ -4,14 +4,14 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.mappers.TestRun;
+import testGit.pojo.dto.TestRunDto;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class TestRunInfoPopup {
 
-    public static void show(TestRun run) {
+    public static void show(TestRunDto run) {
         DialogWrapper dialog = new DialogWrapper(true) {
             {
                 init();

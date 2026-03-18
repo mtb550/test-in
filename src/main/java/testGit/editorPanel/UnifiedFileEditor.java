@@ -32,7 +32,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
 
     @Override
     public @NotNull String getName() {
-        return vf.getDirectory().getName();
+        return vf.getDirectoryDto().getName();
     }
 
     @Override

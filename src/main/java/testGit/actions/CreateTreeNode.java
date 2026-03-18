@@ -10,8 +10,8 @@ import testGit.editorPanel.testCaseEditor.TestEditor;
 import testGit.editorPanel.testRunEditor.RunEditor;
 import testGit.pojo.DirectoryType;
 import testGit.pojo.TestRunStatus;
-import testGit.pojo.mappers.TestRun;
-import testGit.pojo.tree.dirs.*;
+import testGit.pojo.dto.TestRunDto;
+import testGit.pojo.dto.dirs.*;
 import testGit.projectPanel.ProjectPanel;
 import testGit.ui.CreateNodesDialog;
 import testGit.ui.DirectoryOptions;
@@ -42,7 +42,7 @@ public class CreateTreeNode extends DumbAwareAction {
 
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        if (!(parentNode.getUserObject() instanceof Directory parentDir)) {
+        if (!(parentNode.getUserObject() instanceof DirectoryDto parentDir)) {
             return;
         }
 
@@ -52,18 +52,19 @@ public class CreateTreeNode extends DumbAwareAction {
             Path newDirPath = parentDir.getPath().resolve(enteredName);
 
             switch (selectedClass) {
-                case Class<?> c when c == TestSetPackageDirectory.class ->
+                case Class<?> c when c == TestSetPackageDirectoryDto.class ->
                         createTestSetPackage(enteredName, parentNode, parentDir, newDirPath);
 
-                case Class<?> c when c == TestRunPackageDirectory.class ->
+                case Class<?> c when c == TestRunPackageDirectoryDto.class ->
                         createTestRunPackage(enteredName, parentNode, parentDir, newDirPath);
 
-                case Class<?> c when c == TestSetDirectory.class ->
+                case Class<?> c when c == TestSetDirectoryDto.class ->
                         createTestSet(enteredName, parentNode, parentDir, newDirPath);
 
-                case Class<?> c when c == TestRunDirectory.class -> createTestRun(enteredName, parentDir, newDirPath);
+                case Class<?> c when c == TestRunDirectoryDto.class ->
+                        createTestRun(enteredName, parentDir, newDirPath);
 
-                case Class<?> c when c == TestProjectDirectory.class ->
+                case Class<?> c when c == TestProjectDirectoryDto.class ->
                         System.out.println("create project from here to be implemented");
 
                 default -> System.out.println("Unknown or null class selected: " + selectedClass);
@@ -72,12 +73,12 @@ public class CreateTreeNode extends DumbAwareAction {
         });
     }
 
-    private void createTestRun(String name, Directory parentDir, Path newDirPath) {
+    private void createTestRun(String name, DirectoryDto parentDir, Path newDirPath) {
         ///  use name that you recieve
-        TestRun metadata = new TestRun();
+        TestRunDto metadata = new TestRunDto();
         metadata.setStatus(TestRunStatus.CREATED);
 
-        TestRunDirectory newTestRunDirectory = new TestRunDirectory()
+        TestRunDirectoryDto newTestRunDirectory = new TestRunDirectoryDto()
                 .setName(name)
                 .setPath(newDirPath);
 
@@ -91,8 +92,8 @@ public class CreateTreeNode extends DumbAwareAction {
         TreeUtilImpl.createDataVf(this, parentDir.getPath(), DirectoryType.TR.getMarker());
     }
 
-    private void createTestSet(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
-        TestSetDirectory newTestSetDirectory = new TestSetDirectory()
+    private void createTestSet(String name, DefaultMutableTreeNode parentNode, DirectoryDto parentDir, Path newDirPath) {
+        TestSetDirectoryDto newTestSetDirectory = new TestSetDirectoryDto()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
 
@@ -102,8 +103,8 @@ public class CreateTreeNode extends DumbAwareAction {
         TestEditor.open(newTestSetDirectory);
     }
 
-    private void createTestSetPackage(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
-        TestSetPackageDirectory newTestSetPackageDirectory = new TestSetPackageDirectory()
+    private void createTestSetPackage(String name, DefaultMutableTreeNode parentNode, DirectoryDto parentDir, Path newDirPath) {
+        TestSetPackageDirectoryDto newTestSetPackageDirectory = new TestSetPackageDirectoryDto()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
 
@@ -112,8 +113,8 @@ public class CreateTreeNode extends DumbAwareAction {
         TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TSP.getMarker());
     }
 
-    private void createTestRunPackage(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
-        TestRunPackageDirectory newTestRunPackageDirectory = new TestRunPackageDirectory()
+    private void createTestRunPackage(String name, DefaultMutableTreeNode parentNode, DirectoryDto parentDir, Path newDirPath) {
+        TestRunPackageDirectoryDto newTestRunPackageDirectory = new TestRunPackageDirectoryDto()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
 
@@ -132,22 +133,22 @@ public class CreateTreeNode extends DumbAwareAction {
         Object userObject = parentNode.getUserObject();
 
         switch (userObject) {
-            case TestSetPackageDirectory ignored ->
+            case TestSetPackageDirectoryDto ignored ->
                     option.type(DirectoryType.TP).setInactive().type(DirectoryType.TSP).setActive()
                             .type(DirectoryType.TRP).setInactive().type(DirectoryType.TS).setActive()
                             .type(DirectoryType.TR).setInactive();
 
-            case TestRunPackageDirectory ignored ->
+            case TestRunPackageDirectoryDto ignored ->
                     option.type(DirectoryType.TP).setInactive().type(DirectoryType.TSP).setInactive()
                             .type(DirectoryType.TRP).setActive().type(DirectoryType.TS).setInactive()
                             .type(DirectoryType.TR).setActive();
 
-            case TestCasesDirectory ignored ->
+            case TestCasesDirectoryDto ignored ->
                     option.type(DirectoryType.TP).setActive().type(DirectoryType.TSP).setActive()
                             .type(DirectoryType.TRP).setInactive().type(DirectoryType.TS).setActive()
                             .type(DirectoryType.TR).setInactive();
 
-            case TestRunsDirectory ignored ->
+            case TestRunsDirectoryDto ignored ->
                     option.type(DirectoryType.TP).setActive().type(DirectoryType.TSP).setInactive()
                             .type(DirectoryType.TRP).setActive().type(DirectoryType.TS).setInactive()
                             .type(DirectoryType.TR).setActive();

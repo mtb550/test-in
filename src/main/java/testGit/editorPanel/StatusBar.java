@@ -49,18 +49,18 @@ public class StatusBar extends JBPanel<StatusBar> {
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
         pageSizeField.setToolTipText("Test cases per page");
 
-        makeCompact(firstButton);
+        //makeCompact(firstButton);
         makeCompact(prevButton);
         makeCompact(nextButton);
-        makeCompact(lastButton);
+        //makeCompact(lastButton);
 
-        paginationPanel.add(firstButton);
+        //paginationPanel.add(firstButton);
         paginationPanel.add(prevButton);
         paginationPanel.add(currentPageLabel);
-        paginationPanel.add(new JBLabel(" | Per page:"));
+        //paginationPanel.add(new JBLabel(" | Per page:"));
         paginationPanel.add(pageSizeField);
         paginationPanel.add(nextButton);
-        paginationPanel.add(lastButton);
+        //paginationPanel.add(lastButton);
 
         add(statusLabel, BorderLayout.WEST);
         add(paginationPanel, BorderLayout.CENTER);
@@ -75,14 +75,30 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     public void updatePaginationState(int currentPage, int totalPages, int visibleCount, int totalCount) {
-        statusLabel.setText(String.format("Showing %d of %d test cases", visibleCount, totalCount));
+        //statusLabel.setText(String.format("Showing %d of %d test cases", visibleCount, totalCount));
+        statusLabel.setText(String.format("0 of %d test cases", totalCount));
         syncLabel.setText("Last updated: " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        currentPageLabel.setText("Page " + currentPage + " of " + Math.max(1, totalPages));
+        currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
 
         firstButton.setEnabled(currentPage > 1);
         prevButton.setEnabled(currentPage > 1);
         nextButton.setEnabled(currentPage < totalPages);
         lastButton.setEnabled(currentPage < totalPages);
+    }
+
+    public void updateSelectionState(int[] selectedIndices, int currentPage, int pageSize, int totalCount) {
+        int selectedCount = selectedIndices.length;
+
+        if (selectedCount > 1) {
+            statusLabel.setText(String.format("%d selected of %d test cases", selectedCount, totalCount));
+
+        } else if (selectedCount == 1) {
+            int globalIndex = ((currentPage - 1) * pageSize) + selectedIndices[0];
+            statusLabel.setText(String.format("%d of %d test cases", globalIndex + 1, totalCount));
+
+        } else {
+            statusLabel.setText(String.format("0 of %d test cases", totalCount));
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-package testGit.pojo.tree.dirs;
+package testGit.pojo.dto.dirs;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
@@ -13,15 +13,15 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TestSetPackageDirectory extends Directory {
+public class TestCasesDirectoryDto extends DirectoryDto {
     @Override
-    public TestSetPackageDirectory setPath(Path path) {
+    public TestCasesDirectoryDto setPath(Path path) {
         super.setPath(path);
         return this;
     }
 
     @Override
-    public TestSetPackageDirectory setName(String name) {
+    public TestCasesDirectoryDto setName(String name) {
         super.setName(name);
         return this;
     }

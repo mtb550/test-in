@@ -20,8 +20,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.Priority;
-import testGit.pojo.mappers.TestCase;
-import testGit.pojo.tree.dirs.TestSetDirectory;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.pojo.dto.dirs.TestSetDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.Notifier;
 
@@ -55,7 +55,7 @@ public class ImportExcel extends DumbAwareAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (!(userObject instanceof TestSetDirectory ts)) {
+        if (!(userObject instanceof TestSetDirectoryDto ts)) {
             Notifier.error("Import Error", "Please select a valid TS Directory.");
             return;
         }
@@ -119,22 +119,22 @@ public class ImportExcel extends DumbAwareAction {
                     break;
                 }
 
-                TestCase testCase = new TestCase();
+                TestCaseDto testCaseDto = new TestCaseDto();
                 String generatedUuid = UUID.randomUUID().toString();
 
-                testCase.setId(generatedUuid);
-                testCase.setTitle(title);
-                testCase.setExpected(getFieldSafe(recordset, "expected"));
-                testCase.setSteps(getFieldSafe(recordset, "steps"));
+                testCaseDto.setId(generatedUuid);
+                testCaseDto.setTitle(title);
+                testCaseDto.setExpected(getFieldSafe(recordset, "expected"));
+                testCaseDto.setSteps(getFieldSafe(recordset, "steps"));
 
-                testCase.setPriority(parsePrioritySafe(getFieldSafe(recordset, "priority")));
+                testCaseDto.setPriority(parsePrioritySafe(getFieldSafe(recordset, "priority")));
 
-                testCase.setGroups(new ArrayList<>());
-                testCase.setCreateBy(getFieldSafe(recordset, "createBy"));
+                testCaseDto.setGroups(new ArrayList<>());
+                testCaseDto.setCreateBy(getFieldSafe(recordset, "createBy"));
 
-                testCase.setCreateAt(parseDateSafe(getFieldSafe(recordset, "createAt")));
+                testCaseDto.setCreateAt(parseDateSafe(getFieldSafe(recordset, "createAt")));
 
-                String jsonContent = gson.toJson(testCase);
+                String jsonContent = gson.toJson(testCaseDto);
                 String fileName = generatedUuid + ".json";
 
                 ApplicationManager.getApplication().runWriteAction(() -> {

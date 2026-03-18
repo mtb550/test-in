@@ -5,15 +5,15 @@ import com.intellij.openapi.fileEditor.FileEditorManagerListener;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.mappers.TestCase;
+import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
 
 public class EditorFocusSyncListener implements FileEditorManagerListener {
-    private final JBList<TestCase> list;
+    private final JBList<TestCaseDto> list;
 
-    public EditorFocusSyncListener(JBList<TestCase> list) {
+    public EditorFocusSyncListener(JBList<TestCaseDto> list) {
         this.list = list;
     }
 
@@ -25,7 +25,7 @@ public class EditorFocusSyncListener implements FileEditorManagerListener {
             ToolWindow viewPanel = ViewPanel.getToolWindow();
 
             if (viewPanel != null && viewPanel.isVisible()) {
-                TestCase selected = list.getSelectedValue();
+                TestCaseDto selected = list.getSelectedValue();
                 if (selected != null) {
                     SwingUtilities.invokeLater(() -> ViewPanel.show(selected));
                 }

@@ -1,10 +1,9 @@
 package testGit.projectPanel.tree;
 
+import testGit.pojo.DirectoryMapper;
 import testGit.pojo.DirectoryType;
-import testGit.pojo.tree.dirs.Directory;
-import testGit.pojo.tree.dirs.TestProjectDirectory;
-import testGit.pojo.tree.mappers.TestSetMapper;
-import testGit.pojo.tree.mappers.TestSetPackageMapper;
+import testGit.pojo.dto.dirs.DirectoryDto;
+import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 
 import java.nio.file.Files;
@@ -16,14 +15,14 @@ public class TestCaseTreeBuilder extends AbstractTreeBuilder {
         super(projectPanel);
     }
 
-    public void buildTree(final TestProjectDirectory selectedTestProjectDirectory) {
+    public void buildTree(final TestProjectDirectoryDto selectedTestProjectDirectory) {
         super.buildTree(selectedTestProjectDirectory.getTestCasesDirectory());
     }
 
     @Override
-    protected Directory mapPathToDirectory(final Path path) {
-        if (Files.exists(path.resolve(DirectoryType.TSP.getMarker()))) return TestSetPackageMapper.map(path);
-        if (Files.exists(path.resolve(DirectoryType.TS.getMarker()))) return TestSetMapper.map(path);
+    protected DirectoryDto mapPathToDirectory(final Path path) {
+        if (Files.exists(path.resolve(DirectoryType.TSP.getMarker()))) return DirectoryMapper.testSetPackageNode(path);
+        if (Files.exists(path.resolve(DirectoryType.TS.getMarker()))) return DirectoryMapper.testSetNode(path);
         return null;
     }
 }

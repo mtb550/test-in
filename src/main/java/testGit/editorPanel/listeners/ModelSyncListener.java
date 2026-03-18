@@ -1,4 +1,4 @@
-package testGit.editorPanel.testCaseEditor;
+package testGit.editorPanel.listeners;
 
 import com.intellij.ui.CollectionListModel;
 import lombok.Setter;

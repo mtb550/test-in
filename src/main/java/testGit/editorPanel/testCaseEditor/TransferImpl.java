@@ -2,9 +2,10 @@ package testGit.editorPanel.testCaseEditor;
 
 import com.intellij.ui.CollectionListModel;
 import org.jetbrains.annotations.NotNull;
+import testGit.editorPanel.listeners.ModelSyncListener;
 import testGit.pojo.Config;
-import testGit.pojo.mappers.TestCase;
-import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.pojo.dto.dirs.DirectoryDto;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -18,12 +19,12 @@ import java.util.stream.Collectors;
 
 public class TransferImpl extends TransferHandler {
     private static final DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
-    private final CollectionListModel<TestCase> model;
-    private final Directory dir;
-    private final ModelSyncListener<TestCase> syncListener; // 🌟 إضافة المستمع للتحكم به
+    private final CollectionListModel<TestCaseDto> model;
+    private final DirectoryDto dir;
+    private final ModelSyncListener<TestCaseDto> syncListener; // 🌟 إضافة المستمع للتحكم به
     private int[] draggedIndices;
 
-    public TransferImpl(Directory dir, CollectionListModel<TestCase> model, ModelSyncListener<TestCase> syncListener) {
+    public TransferImpl(DirectoryDto dir, CollectionListModel<TestCaseDto> model, ModelSyncListener<TestCaseDto> syncListener) {
         this.model = model;
         this.dir = dir;
         this.syncListener = syncListener;
@@ -40,9 +41,9 @@ public class TransferImpl extends TransferHandler {
 
         draggedIndices = rawList.getSelectedIndices();
 
-        List<TestCase> items = rawList.getSelectedValuesList().stream()
-                .filter(TestCase.class::isInstance)
-                .map(TestCase.class::cast)
+        List<TestCaseDto> items = rawList.getSelectedValuesList().stream()
+                .filter(TestCaseDto.class::isInstance)
+                .map(TestCaseDto.class::cast)
                 .collect(Collectors.toList());
 
         return new Transferable() {
@@ -74,9 +75,9 @@ public class TransferImpl extends TransferHandler {
             Object data = support.getTransferable().getTransferData(FLAVOR);
             if (!(data instanceof List<?> rawList)) return false;
 
-            List<TestCase> items = rawList.stream()
-                    .filter(TestCase.class::isInstance)
-                    .map(TestCase.class::cast)
+            List<TestCaseDto> items = rawList.stream()
+                    .filter(TestCaseDto.class::isInstance)
+                    .map(TestCaseDto.class::cast)
                     .toList();
 
             if (items.isEmpty()) return false;
@@ -96,7 +97,7 @@ public class TransferImpl extends TransferHandler {
                 model.remove(draggedIndices[i]);
             }
 
-            for (TestCase item : items) {
+            for (TestCaseDto item : items) {
                 model.add(insertAt++, item);
             }
 
@@ -113,11 +114,11 @@ public class TransferImpl extends TransferHandler {
     }
 
     private void updateSequenceAndSave() {
-        List<TestCase> snapshot = new ArrayList<>(model.getItems());
+        List<TestCaseDto> snapshot = new ArrayList<>(model.getItems());
 
         SwingUtilities.invokeLater(() -> {
             for (int i = 0; i < snapshot.size(); i++) {
-                TestCase current = snapshot.get(i);
+                TestCaseDto current = snapshot.get(i);
                 current.setIsHead(i == 0);
                 current.setNext(i < snapshot.size() - 1 ? UUID.fromString(snapshot.get(i + 1).getId()) : null);
 

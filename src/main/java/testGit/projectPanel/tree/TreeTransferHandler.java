@@ -3,7 +3,7 @@ package testGit.projectPanel.tree;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.dto.dirs.DirectoryDto;
 import testGit.util.Tools;
 import testGit.util.TreeUtilImpl;
 
@@ -62,7 +62,7 @@ public class TreeTransferHandler extends TransferHandler {
 
         if (support.isDrop()) {
             TreePath dropPath = ((SimpleTree.DropLocation) support.getDropLocation()).getPath();
-            return dropPath != null && ((DefaultMutableTreeNode) dropPath.getLastPathComponent()).getUserObject() instanceof Directory;
+            return dropPath != null && ((DefaultMutableTreeNode) dropPath.getLastPathComponent()).getUserObject() instanceof DirectoryDto;
         }
         return tree.getSelectionPath() != null;
     }
@@ -77,7 +77,7 @@ public class TreeTransferHandler extends TransferHandler {
                     ? (DefaultMutableTreeNode) ((SimpleTree.DropLocation) support.getDropLocation()).getPath().getLastPathComponent()
                     : (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
-            if (targetNode == null || !(targetNode.getUserObject() instanceof Directory targetDir)) return false;
+            if (targetNode == null || !(targetNode.getUserObject() instanceof DirectoryDto targetDir)) return false;
 
             int action = support.isDrop() ? support.getDropAction() : (this.lastAction != null ? this.lastAction : COPY);
 
@@ -91,7 +91,7 @@ public class TreeTransferHandler extends TransferHandler {
                     model.insertNodeInto(node, targetNode, targetNode.getChildCount());
                 } else {
                     DefaultMutableTreeNode clone = deepCloneNode(node, targetDir.getPath());
-                    persistCopy((Directory) node.getUserObject(), targetDir);
+                    persistCopy((DirectoryDto) node.getUserObject(), targetDir);
                     model.insertNodeInto(clone, targetNode, targetNode.getChildCount());
                 }
             }
@@ -107,13 +107,13 @@ public class TreeTransferHandler extends TransferHandler {
     private DefaultMutableTreeNode deepCloneNode(DefaultMutableTreeNode node, Path newParentPath) {
         Object userObject = node.getUserObject();
 
-        if (!(userObject instanceof Directory dir)) {
+        if (!(userObject instanceof DirectoryDto dir)) {
             return new DefaultMutableTreeNode(userObject);
         }
 
         try {
             // استنساخ الكائن
-            Directory clonedDir = dir.getClass().getDeclaredConstructor().newInstance();
+            DirectoryDto clonedDir = dir.getClass().getDeclaredConstructor().newInstance();
             clonedDir.setName(dir.getName());
 
             // 🌟 حساب المسار الجديد لهذه النسخة وتعيينه
@@ -136,8 +136,8 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    private void persistMove(DefaultMutableTreeNode movedNode, Directory targetDir) {
-        Directory sourceDir = (Directory) movedNode.getUserObject();
+    private void persistMove(DefaultMutableTreeNode movedNode, DirectoryDto targetDir) {
+        DirectoryDto sourceDir = (DirectoryDto) movedNode.getUserObject();
 
         TreeUtilImpl.executeVfsAction(sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
             sourceVf.move(this, targetVf);
@@ -153,7 +153,7 @@ public class TreeTransferHandler extends TransferHandler {
         });
     }
 
-    private void persistCopy(Directory source, Directory target) {
+    private void persistCopy(DirectoryDto source, DirectoryDto target) {
         TreeUtilImpl.executeVfsAction(source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
             sourceVf.copy(this, targetVf, sourceVf.getName());
             System.out.println("Copied successfully to: " + target.getPath().resolve(source.getName()));

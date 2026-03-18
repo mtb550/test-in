@@ -6,8 +6,8 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import testGit.pojo.DB;
 import testGit.pojo.Priority;
-import testGit.pojo.TestCaseHistory;
-import testGit.pojo.mappers.TestCase;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.pojo.dto.TestCaseHistoryDto;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +30,7 @@ public class TestCaseDetailsPanel {
 
     private JButton saveButton;
     @Getter
-    private TestCase currentTestCase;
+    private TestCaseDto currentTestCaseDto;
     private boolean isEditing = false;
 
     public TestCaseDetailsPanel() {
@@ -61,11 +61,11 @@ public class TestCaseDetailsPanel {
     /**
      * Entry point for updating the UI. Handles null safely.
      */
-    public void update(TestCase testCase) {
-        this.currentTestCase = testCase;
+    public void update(TestCaseDto testCaseDto) {
+        this.currentTestCaseDto = testCaseDto;
 
         // 1. CLEAR UI IF NULL (Fixes the NPE from reset/escape)
-        if (testCase == null) {
+        if (testCaseDto == null) {
             detailsTab.removeAll();
             JBLabel placeholder = new JBLabel("Select a test case to view details");
             placeholder.setForeground(JBColor.GRAY);
@@ -85,7 +85,7 @@ public class TestCaseDetailsPanel {
      */
     public void toggleEditMode(boolean editable) {
         // NULL GUARD: Prevents crashes when resetting or closing
-        if (currentTestCase == null) return;
+        if (currentTestCaseDto == null) return;
 
         isEditing = editable;
         detailsTab.removeAll();
@@ -109,13 +109,13 @@ public class TestCaseDetailsPanel {
     }
 
     private void setupEditMode(GridBagConstraints gbc, int row) {
-        titleField = new JBTextField(currentTestCase.getTitle());
-        expectedArea = new JBTextField(currentTestCase.getExpected());
-        stepsArea = new JBTextField(currentTestCase.getSteps());
-        priorityField = new JBTextField(currentTestCase.getPriority() != null ? currentTestCase.getPriority().getDescription() : "");
-        autoRefField = new JBTextField(currentTestCase.getAutoRef());
-        busiRefField = new JBTextField(currentTestCase.getBusiRef());
-        groupsField = new JBTextField(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "");
+        titleField = new JBTextField(currentTestCaseDto.getTitle());
+        expectedArea = new JBTextField(currentTestCaseDto.getExpected());
+        stepsArea = new JBTextField(currentTestCaseDto.getSteps());
+        priorityField = new JBTextField(currentTestCaseDto.getPriority() != null ? currentTestCaseDto.getPriority().getDescription() : "");
+        autoRefField = new JBTextField(currentTestCaseDto.getAutoRef());
+        busiRefField = new JBTextField(currentTestCaseDto.getBusiRef());
+        groupsField = new JBTextField(currentTestCaseDto.getGroups() != null ? currentTestCaseDto.getGroups().toString() : "");
 
         addRow("Title:", titleField, detailsTab, gbc, row++);
         addRow("Expected Result:", expectedArea, detailsTab, gbc, row++);
@@ -139,22 +139,22 @@ public class TestCaseDetailsPanel {
     }
 
     private void setupViewMode(GridBagConstraints gbc, int row) {
-        addRow("ID:", createValueLabel(currentTestCase.getId()), detailsTab, gbc, row++);
-        addRow("Title:", createValueLabel(currentTestCase.getTitle()), detailsTab, gbc, row++);
-        addRow("Expected Result:", createValueLabel(currentTestCase.getExpected()), detailsTab, gbc, row++);
-        addRow("Steps:", createValueLabel(currentTestCase.getSteps()), detailsTab, gbc, row++);
-        addRow("Priority:", createValueLabel(currentTestCase.getPriority() != null ? currentTestCase.getPriority().getDescription() : "-"), detailsTab, gbc, row++);
-        addRow("Automation Ref:", createValueLabel(currentTestCase.getAutoRef()), detailsTab, gbc, row++);
-        addRow("Business Ref:", createValueLabel(currentTestCase.getBusiRef()), detailsTab, gbc, row++);
-        addRow("Groups:", createValueLabel(currentTestCase.getGroups() != null ? currentTestCase.getGroups().toString() : "-"), detailsTab, gbc, row++);
-        addRow("UID:", createValueLabel(String.valueOf(currentTestCase.getUid())), detailsTab, gbc, row++);
-        addRow("Module:", createValueLabel(currentTestCase.getModule()), detailsTab, gbc, row++);
-        addRow("Created By:", createValueLabel(currentTestCase.getCreateBy()), detailsTab, gbc, row++);
-        addRow("Updated By:", createValueLabel(currentTestCase.getUpdateBy()), detailsTab, gbc, row++);
-        addRow("Created At:", createValueLabel(currentTestCase.getCreateAt() != null ? currentTestCase.getCreateAt().toString() : "-"), detailsTab, gbc, row++);
-        addRow("Updated At:", createValueLabel(currentTestCase.getUpdateAt() != null ? currentTestCase.getUpdateAt().toString() : "-"), detailsTab, gbc, row++);
-        addRow("Is Head:", createValueLabel(currentTestCase.getIsHead() != null ? currentTestCase.getIsHead().toString() : "-"), detailsTab, gbc, row++);
-        addRow("Next:", createValueLabel(currentTestCase.getNext() != null ? currentTestCase.getNext().toString() : "-"), detailsTab, gbc, row++);
+        addRow("ID:", createValueLabel(currentTestCaseDto.getId()), detailsTab, gbc, row++);
+        addRow("Title:", createValueLabel(currentTestCaseDto.getTitle()), detailsTab, gbc, row++);
+        addRow("Expected Result:", createValueLabel(currentTestCaseDto.getExpected()), detailsTab, gbc, row++);
+        addRow("Steps:", createValueLabel(currentTestCaseDto.getSteps()), detailsTab, gbc, row++);
+        addRow("Priority:", createValueLabel(currentTestCaseDto.getPriority() != null ? currentTestCaseDto.getPriority().getDescription() : "-"), detailsTab, gbc, row++);
+        addRow("Automation Ref:", createValueLabel(currentTestCaseDto.getAutoRef()), detailsTab, gbc, row++);
+        addRow("Business Ref:", createValueLabel(currentTestCaseDto.getBusiRef()), detailsTab, gbc, row++);
+        addRow("Groups:", createValueLabel(currentTestCaseDto.getGroups() != null ? currentTestCaseDto.getGroups().toString() : "-"), detailsTab, gbc, row++);
+        addRow("UID:", createValueLabel(String.valueOf(currentTestCaseDto.getUid())), detailsTab, gbc, row++);
+        addRow("Module:", createValueLabel(currentTestCaseDto.getModule()), detailsTab, gbc, row++);
+        addRow("Created By:", createValueLabel(currentTestCaseDto.getCreateBy()), detailsTab, gbc, row++);
+        addRow("Updated By:", createValueLabel(currentTestCaseDto.getUpdateBy()), detailsTab, gbc, row++);
+        addRow("Created At:", createValueLabel(currentTestCaseDto.getCreateAt() != null ? currentTestCaseDto.getCreateAt().toString() : "-"), detailsTab, gbc, row++);
+        addRow("Updated At:", createValueLabel(currentTestCaseDto.getUpdateAt() != null ? currentTestCaseDto.getUpdateAt().toString() : "-"), detailsTab, gbc, row++);
+        addRow("Is Head:", createValueLabel(currentTestCaseDto.getIsHead() != null ? currentTestCaseDto.getIsHead().toString() : "-"), detailsTab, gbc, row++);
+        addRow("Next:", createValueLabel(currentTestCaseDto.getNext() != null ? currentTestCaseDto.getNext().toString() : "-"), detailsTab, gbc, row++);
 
         addCommonMetaRows(gbc, row);
     }
@@ -164,25 +164,25 @@ public class TestCaseDetailsPanel {
     }
 
     private void onSave() {
-        if (currentTestCase == null) return;
+        if (currentTestCaseDto == null) return;
 
-        currentTestCase.setTitle(titleField.getText().trim());
-        currentTestCase.setExpected(expectedArea.getText().trim());
-        currentTestCase.setSteps(stepsArea.getText().trim());
+        currentTestCaseDto.setTitle(titleField.getText().trim());
+        currentTestCaseDto.setExpected(expectedArea.getText().trim());
+        currentTestCaseDto.setSteps(stepsArea.getText().trim());
         try {
-            currentTestCase.setPriority(Priority.valueOf(priorityField.getText().toUpperCase()));
+            currentTestCaseDto.setPriority(Priority.valueOf(priorityField.getText().toUpperCase()));
         } catch (Exception ignored) {
         }
 
         toggleEditMode(false);
         // Better than JOptionPane: uses IntelliJ's notification system if available
-        System.out.println("Saved: " + currentTestCase.getId());
+        System.out.println("Saved: " + currentTestCaseDto.getId());
     }
 
     private void loadHistoryAndBugs() {
         historyTab.removeAll();
         DefaultListModel<String> model = new DefaultListModel<>();
-        for (TestCaseHistory h : DB.loadTestCaseHistory()) {
+        for (TestCaseHistoryDto h : DB.loadTestCaseHistory()) {
             model.addElement(h.getTimestamp() + " - " + h.getChangeSummary());
         }
         JBList<String> list = new JBList<>(model);

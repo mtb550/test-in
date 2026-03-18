@@ -8,7 +8,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import testGit.pojo.Config;
-import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.dto.dirs.DirectoryDto;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
@@ -169,7 +169,7 @@ public class Tools {
         for (int i = 0; i < parentNode.getChildCount(); i++) {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parentNode.getChildAt(i);
 
-            if (childNode.getUserObject() instanceof Directory childDir) {
+            if (childNode.getUserObject() instanceof DirectoryDto childDir) {
 
                 Path relativePath = oldParentPath.relativize(childDir.getPath());
                 Path newChildPath = newParentPath.resolve(relativePath);

@@ -11,7 +11,7 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import testGit.editorPanel.Shared;
 import testGit.pojo.GroupType;
-import testGit.pojo.mappers.TestCase;
+import testGit.pojo.dto.TestCaseDto;
 
 import java.awt.*;
 import java.util.List;
@@ -62,7 +62,7 @@ public class TestCard extends JBPanel<TestCard> {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    public void updateData(int index, TestCase tc, boolean showGroups, boolean showPriority, Set<String> activeDetails) {
+    public void updateData(final int index, final TestCaseDto tc, final boolean showGroups, final boolean showPriority, final Set<String> activeDetails, final boolean isUnsorted) {
         titleLabel.setText((index + 1) + ". " + tc.getTitle());
         expectedLabel.setText("Expected Result: " + tc.getExpected());
         stepsLabel.setText("Steps: " + tc.getSteps());
@@ -82,6 +82,17 @@ public class TestCard extends JBPanel<TestCard> {
         idLabel.setVisible(activeDetails.contains("ID"));
 
         badgePanel.removeAll();
+
+        // 🌟 2. كود رسم الشارة الحمراء للاختبارات غير المرتبة
+        if (isUnsorted) {
+            JBLabel unsortedBadge = new JBLabel("Unsorted");
+            unsortedBadge.setOpaque(true);
+            unsortedBadge.setBackground(new JBColor(new Color(255, 200, 200), new Color(130, 50, 50)));
+            unsortedBadge.setForeground(JBColor.RED);
+            unsortedBadge.setFont(JBUI.Fonts.smallFont().asBold());
+            badgePanel.add(unsortedBadge);
+        }
+
         if (showPriority) badgePanel.add(Shared.createPriorityBadge(tc));
         if (showGroups) {
             List<GroupType> groups = tc.getGroups();

@@ -7,13 +7,13 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.actions.*;
-import testGit.pojo.mappers.TestCase;
-import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.pojo.dto.dirs.DirectoryDto;
 
 import javax.swing.*;
 
 public class EditorContextMenu extends DefaultActionGroup {
-    public EditorContextMenu(final Directory dir, final JBList<TestCase> list, final CollectionListModel<TestCase> model) {
+    public EditorContextMenu(final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
 
         add(new CreateTestCase(dir, list, model));
@@ -28,7 +28,7 @@ public class EditorContextMenu extends DefaultActionGroup {
         add(new NavigateToCode(list));
     }
 
-    public static void registerShortcuts(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
+    public static void registerShortcuts(DirectoryDto dir, JBList<TestCaseDto> list, CollectionListModel<TestCaseDto> model) {
         //new Escape(tree, transferHandler);
         //new OpenNodeCM(tree, treeContextMenu);
         new CreateTestCase(dir, list, model);

@@ -5,9 +5,9 @@ import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.DirectoryType;
-import testGit.pojo.tree.dirs.Directory;
-import testGit.pojo.tree.dirs.TestCasesDirectory;
-import testGit.pojo.tree.dirs.TestRunsDirectory;
+import testGit.pojo.dto.dirs.DirectoryDto;
+import testGit.pojo.dto.dirs.TestCasesDirectoryDto;
+import testGit.pojo.dto.dirs.TestRunsDirectoryDto;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -24,7 +24,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
     public void customizeCellRenderer(@NotNull final JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {
             switch (value) {
-                case DefaultMutableTreeNode node when node.getUserObject() instanceof Directory dir -> {
+                case DefaultMutableTreeNode node when node.getUserObject() instanceof DirectoryDto dir -> {
                     DirectoryType type = DirectoryType.fromClass(dir.getClass());
                     setIcon(type != null ? type.getIcon() : AllIcons.Nodes.Folder);
                     append(dir.getName(), getSimpleTextAttributes(node, dir));
@@ -49,11 +49,11 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
         }
     }
 
-    private @NotNull SimpleTextAttributes getSimpleTextAttributes(final DefaultMutableTreeNode node, final Directory dir) {
+    private @NotNull SimpleTextAttributes getSimpleTextAttributes(final DefaultMutableTreeNode node, final DirectoryDto dir) {
         return switch (dir) {
-            case TestCasesDirectory ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
+            case TestCasesDirectoryDto ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
 
-            case TestRunsDirectory ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
+            case TestRunsDirectoryDto ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
 
             default -> (selectedNodes != null && selectedNodes.contains(node))
                     ? SimpleTextAttributes.GRAYED_ATTRIBUTES
