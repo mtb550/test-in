@@ -72,3 +72,5 @@ fix disappear expected, id..etc once drag and drop. and make sure tool bar check
 add badge (un-sorted) if the test case not linked to to the before one
 
 faild create test runs, error in path
+
+move editor ui classes to the util, ui package

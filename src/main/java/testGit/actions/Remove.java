@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.*;
+import testGit.pojo.tree.dirs.*;
 import testGit.util.Tools;
 import testGit.util.TreeUtilImpl;
 
@@ -29,7 +29,7 @@ public class Remove extends DumbAwareAction {
 
     private boolean isRemovable(Object dir) {
         return dir instanceof Directory &&
-                !(dir instanceof TestProject) &&
+                !(dir instanceof TestProjectDirectory) &&
                 !(dir instanceof TestCasesDirectory) &&
                 !(dir instanceof TestRunsDirectory);
     }
@@ -59,7 +59,7 @@ public class Remove extends DumbAwareAction {
             for (DefaultMutableTreeNode node : nodesToRemove) {
                 Directory pkg = (Directory) node.getUserObject();
 
-                if (pkg instanceof TestSet || pkg instanceof TestRun)
+                if (pkg instanceof TestSetDirectory || pkg instanceof TestRunDirectory)
                     Tools.closeEditor(pkg.getName());
 
                 TreeUtilImpl.removeVf(this, pkg.getPath());

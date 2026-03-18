@@ -2,12 +2,12 @@ package testGit.editorPanel.testCaseEditor;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class TestListRenderer implements ListCellRenderer<TestCaseJsonMapper> {
+public class TestListRenderer implements ListCellRenderer<TestCase> {
     private final TestCard rendererCard = new TestCard();
 
     private final TestEditorUI ui;
@@ -17,7 +17,7 @@ public class TestListRenderer implements ListCellRenderer<TestCaseJsonMapper> {
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends TestCaseJsonMapper> list, TestCaseJsonMapper tc, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(JList<? extends TestCase> list, TestCase tc, int index, boolean isSelected, boolean cellHasFocus) {
 
         int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
 

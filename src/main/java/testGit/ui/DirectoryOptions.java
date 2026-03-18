@@ -1,6 +1,7 @@
 package testGit.ui;
 
-import testGit.pojo.*;
+import testGit.pojo.DirectoryType;
+import testGit.pojo.tree.dirs.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,11 +9,11 @@ import java.util.function.Predicate;
 
 public class DirectoryOptions {
     private final Class<?>[] availableItems = {
-            TestSetPackage.class,
-            TestRunPackage.class,
-            TestSet.class,
-            TestRun.class,
-            TestProject.class
+            TestSetPackageDirectory.class,
+            TestRunPackageDirectory.class,
+            TestSetDirectory.class,
+            TestRunDirectory.class,
+            TestProjectDirectory.class
     };
 
     private final Map<Class<?>, Boolean> activeStates = new HashMap<>();

@@ -11,7 +11,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class TestRunJsonMapper {
+public class TestRun {
     private String runName;
     private String buildNumber;
     private String platform;

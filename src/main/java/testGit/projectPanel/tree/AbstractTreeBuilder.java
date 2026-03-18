@@ -3,7 +3,7 @@ package testGit.projectPanel.tree;
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.Directory;
+import testGit.pojo.tree.dirs.Directory;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.tree.DefaultMutableTreeNode;

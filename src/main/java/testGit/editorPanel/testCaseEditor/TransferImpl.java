@@ -3,8 +3,8 @@ package testGit.editorPanel.testCaseEditor;
 import com.intellij.ui.CollectionListModel;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
-import testGit.pojo.Directory;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
+import testGit.pojo.tree.dirs.Directory;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 
 public class TransferImpl extends TransferHandler {
     private static final DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
-    private final CollectionListModel<TestCaseJsonMapper> model;
+    private final CollectionListModel<TestCase> model;
     private final Directory dir;
     private final Runnable onDragStart;
     private int[] draggedIndices;
 
-    public TransferImpl(Directory dir, CollectionListModel<TestCaseJsonMapper> model, Runnable onDragStart) {
+    public TransferImpl(Directory dir, CollectionListModel<TestCase> model, Runnable onDragStart) {
         this.model = model;
         this.dir = dir;
         this.onDragStart = onDragStart;
@@ -43,9 +43,9 @@ public class TransferImpl extends TransferHandler {
 
         draggedIndices = rawList.getSelectedIndices();
 
-        List<TestCaseJsonMapper> items = rawList.getSelectedValuesList().stream()
-                .filter(TestCaseJsonMapper.class::isInstance)
-                .map(TestCaseJsonMapper.class::cast)
+        List<TestCase> items = rawList.getSelectedValuesList().stream()
+                .filter(TestCase.class::isInstance)
+                .map(TestCase.class::cast)
                 .collect(Collectors.toList());
 
         return new Transferable() {
@@ -80,9 +80,9 @@ public class TransferImpl extends TransferHandler {
                 return false;
             }
 
-            List<TestCaseJsonMapper> items = rawList.stream()
-                    .filter(TestCaseJsonMapper.class::isInstance)
-                    .map(TestCaseJsonMapper.class::cast)
+            List<TestCase> items = rawList.stream()
+                    .filter(TestCase.class::isInstance)
+                    .map(TestCase.class::cast)
                     .toList();
 
             if (items.isEmpty()) return false;
@@ -103,7 +103,7 @@ public class TransferImpl extends TransferHandler {
                 model.remove(draggedIndices[i]);
             }
 
-            for (TestCaseJsonMapper item : items) {
+            for (TestCase item : items) {
                 model.add(insertAt++, item);
             }
 
@@ -117,7 +117,7 @@ public class TransferImpl extends TransferHandler {
 
     private void updateSequenceAndSave() {
         for (int i = 0; i < model.getSize(); i++) {
-            TestCaseJsonMapper current = model.getElementAt(i);
+            TestCase current = model.getElementAt(i);
             current.setIsHead(i == 0);
             current.setNext(i < model.getSize() - 1 ? UUID.fromString(model.getElementAt(i + 1).getId()) : null);
 

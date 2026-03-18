@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import testGit.pojo.GroupType;
 import testGit.pojo.Priority;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,7 +35,7 @@ public class AddTestCasePanel {
     private JButton saveButton;
     private JButton cancelButton;
     @Setter
-    private Consumer<TestCaseJsonMapper> onSaveCallback;
+    private Consumer<TestCase> onSaveCallback;
 
     public AddTestCasePanel() {
         mainPanel = new JBPanel<>(new BorderLayout());
@@ -152,14 +152,14 @@ public class AddTestCasePanel {
             return;
         }
 
-        TestCaseJsonMapper newTestCaseJsonMapper = new TestCaseJsonMapper();
-        newTestCaseJsonMapper.setTitle(title);
-        newTestCaseJsonMapper.setExpected(expected);
-        newTestCaseJsonMapper.setSteps(steps);
-        newTestCaseJsonMapper.setPriority(Priority.valueOf(priorityField.getText().trim()));
-        newTestCaseJsonMapper.setAutoRef(autoRefField.getText().trim());
-        newTestCaseJsonMapper.setBusiRef(busiRefField.getText().trim());
-        newTestCaseJsonMapper.setModule(moduleField.getText().trim());
+        TestCase newTestCase = new TestCase();
+        newTestCase.setTitle(title);
+        newTestCase.setExpected(expected);
+        newTestCase.setSteps(steps);
+        newTestCase.setPriority(Priority.valueOf(priorityField.getText().trim()));
+        newTestCase.setAutoRef(autoRefField.getText().trim());
+        newTestCase.setBusiRef(busiRefField.getText().trim());
+        newTestCase.setModule(moduleField.getText().trim());
 
         String groupsText = groupsField.getText().trim();
         if (!groupsText.isEmpty()) {
@@ -178,17 +178,17 @@ public class AddTestCasePanel {
                     .collect(Collectors.toList());
 
             if (!groupTypes.isEmpty()) {
-                newTestCaseJsonMapper.setGroups(groupTypes);
+                newTestCase.setGroups(groupTypes);
             }
         }
 
-        newTestCaseJsonMapper.setCreateBy("current_user");
-        newTestCaseJsonMapper.setUpdateBy("current_user");
-        newTestCaseJsonMapper.setCreateAt(LocalDateTime.now());
-        newTestCaseJsonMapper.setUpdateAt(LocalDateTime.now());
+        newTestCase.setCreateBy("current_user");
+        newTestCase.setUpdateBy("current_user");
+        newTestCase.setCreateAt(LocalDateTime.now());
+        newTestCase.setUpdateAt(LocalDateTime.now());
 
         if (onSaveCallback != null) {
-            onSaveCallback.accept(newTestCaseJsonMapper);
+            onSaveCallback.accept(newTestCase);
             clearForm();
         } else {
             JOptionPane.showMessageDialog(

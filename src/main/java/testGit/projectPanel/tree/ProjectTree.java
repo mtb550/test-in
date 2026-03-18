@@ -5,7 +5,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
-import testGit.pojo.TestProject;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.*;
@@ -27,12 +27,12 @@ public class ProjectTree {
     public ProjectTree(ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
 
-        TestProject testProject = null;
+        TestProjectDirectory testProjectDirectory = null;
         if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
-            testProject = (TestProject) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+            testProjectDirectory = (TestProjectDirectory) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
         }
 
-        this.mainRoot = new DefaultMutableTreeNode(testProject != null ? testProject : "Project");
+        this.mainRoot = new DefaultMutableTreeNode(testProjectDirectory != null ? testProjectDirectory : "Project");
         this.treeModel = new DefaultTreeModel(mainRoot);
         this.mainTree = new SimpleTree(treeModel);
         this.scrollPane = new JBScrollPane(mainTree);
@@ -61,12 +61,12 @@ public class ProjectTree {
         ApplicationManager.getApplication().invokeLater(() -> {
             mainRoot.removeAllChildren();
 
-            TestProject testProject = null;
+            TestProjectDirectory testProjectDirectory = null;
             if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
-                testProject = (TestProject) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+                testProjectDirectory = (TestProjectDirectory) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
             }
-            if (testProject != null) {
-                mainRoot.setUserObject(testProject);
+            if (testProjectDirectory != null) {
+                mainRoot.setUserObject(testProjectDirectory);
             }
 
             DefaultMutableTreeNode tcNode = projectPanel.getTestCaseTreeBuilder().getRootNode();

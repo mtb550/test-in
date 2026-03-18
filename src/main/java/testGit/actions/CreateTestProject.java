@@ -7,7 +7,11 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import testGit.pojo.*;
+import testGit.pojo.Config;
+import testGit.pojo.ProjectStatus;
+import testGit.pojo.tree.dirs.TestCasesDirectory;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.tree.dirs.TestRunsDirectory;
 import testGit.projectPanel.ProjectPanel;
 import testGit.ui.CreateTestProjectDialog;
 import testGit.util.Notifier;
@@ -29,24 +33,24 @@ public class CreateTestProject extends DumbAwareAction {
 
         if (name == null || name.trim().isEmpty()) return;
 
-        TestProject newTestProject = new TestProject()
+        TestProjectDirectory newTestProjectDirectory = new TestProjectDirectory()
                 .setProjectStatus(ProjectStatus.AC)
                 .setName(name);
 
-        String folderName = String.format("%s_%s", newTestProject.getName(), newTestProject.getProjectStatus());
+        String folderName = String.format("%s_%s", newTestProjectDirectory.getName(), newTestProjectDirectory.getProjectStatus());
         Path projectPath = Config.getTestGitPath().resolve(folderName);
 
-        newTestProject.setPathName(folderName)
+        newTestProjectDirectory.setPathName(folderName)
                 .setPath(projectPath);
 
-        newTestProject.setTestCasesDirectory(
+        newTestProjectDirectory.setTestCasesDirectory(
                         new TestCasesDirectory()
-                                .setPath(newTestProject.getPath().resolve("testCases"))
+                                .setPath(newTestProjectDirectory.getPath().resolve("testCases"))
                                 .setName("Test Cases")
                 )
                 .setTestRunsDirectory(
                         new TestRunsDirectory()
-                                .setPath(newTestProject.getPath().resolve("testRuns"))
+                                .setPath(newTestProjectDirectory.getPath().resolve("testRuns"))
                                 .setName("Test Runs")
                 );
 
@@ -54,16 +58,16 @@ public class CreateTestProject extends DumbAwareAction {
             VirtualFile projectDir = vf.createChildDirectory(this, folderName);
             projectDir.createChildData(this, ".pr");
 
-            String tcdName = newTestProject.getTestCasesDirectory().getPath().getFileName().toString();
+            String tcdName = newTestProjectDirectory.getTestCasesDirectory().getPath().getFileName().toString();
             VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);
             tcdDir.createChildData(this, ".tcd");
 
-            String trdName = newTestProject.getTestRunsDirectory().getPath().getFileName().toString();
+            String trdName = newTestProjectDirectory.getTestRunsDirectory().getPath().getFileName().toString();
             VirtualFile trdDir = projectDir.createChildDirectory(this, trdName);
             trdDir.createChildData(this, ".trd");
 
             projectDir.refresh(false, true);
-            projectPanel.getTestProjectSelector().addTestProject(newTestProject);
+            projectPanel.getTestProjectSelector().addTestProject(newTestProjectDirectory);
             Notifier.info("New Test Project", String.format("Test Project %s has been added", name));
         });
     }

@@ -1,16 +1,16 @@
-package testGit.pojo.mappers;
+package testGit.pojo.tree.mappers;
 
 import testGit.pojo.ProjectStatus;
-import testGit.pojo.TestCasesDirectory;
-import testGit.pojo.TestProject;
-import testGit.pojo.TestRunsDirectory;
+import testGit.pojo.tree.dirs.TestCasesDirectory;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.tree.dirs.TestRunsDirectory;
 import testGit.util.Notifier;
 
 import java.nio.file.Path;
 
 public class TestProjectMapper {
 
-    public static TestProject map(Path path) {
+    public static TestProjectDirectory map(Path path) {
         try {
             String[] parts = path.getFileName().toString().split("_", 2);
 
@@ -22,7 +22,7 @@ public class TestProjectMapper {
                     .setPath(path.resolve("testRuns"))
                     .setName("Test Runs");
 
-            return new TestProject()
+            return new TestProjectDirectory()
                     .setTestCasesDirectory(tcd)
                     .setTestRunsDirectory(trd)
                     .setName(parts[0])

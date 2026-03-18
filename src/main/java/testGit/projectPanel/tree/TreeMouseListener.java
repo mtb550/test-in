@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.treeStructure.SimpleTree;
 import testGit.actions.Open;
-import testGit.pojo.Directory;
+import testGit.pojo.tree.dirs.Directory;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.*;

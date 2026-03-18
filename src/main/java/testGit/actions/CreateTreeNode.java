@@ -8,8 +8,10 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testCaseEditor.TestEditor;
 import testGit.editorPanel.testRunEditor.RunEditor;
-import testGit.pojo.*;
-import testGit.pojo.mappers.TestRunJsonMapper;
+import testGit.pojo.DirectoryType;
+import testGit.pojo.TestRunStatus;
+import testGit.pojo.mappers.TestRun;
+import testGit.pojo.tree.dirs.*;
 import testGit.projectPanel.ProjectPanel;
 import testGit.ui.CreateNodesDialog;
 import testGit.ui.DirectoryOptions;
@@ -50,18 +52,18 @@ public class CreateTreeNode extends DumbAwareAction {
             Path newDirPath = parentDir.getPath().resolve(enteredName);
 
             switch (selectedClass) {
-                case Class<?> c when c == TestSetPackage.class ->
+                case Class<?> c when c == TestSetPackageDirectory.class ->
                         createTestSetPackage(enteredName, parentNode, parentDir, newDirPath);
 
-                case Class<?> c when c == TestRunPackage.class ->
+                case Class<?> c when c == TestRunPackageDirectory.class ->
                         createTestRunPackage(enteredName, parentNode, parentDir, newDirPath);
 
-                case Class<?> c when c == TestSet.class ->
+                case Class<?> c when c == TestSetDirectory.class ->
                         createTestSet(enteredName, parentNode, parentDir, newDirPath);
 
-                case Class<?> c when c == TestRun.class -> createTestRun(enteredName, parentDir, newDirPath);
+                case Class<?> c when c == TestRunDirectory.class -> createTestRun(enteredName, parentDir, newDirPath);
 
-                case Class<?> c when c == TestProject.class ->
+                case Class<?> c when c == TestProjectDirectory.class ->
                         System.out.println("create project from here to be implemented");
 
                 default -> System.out.println("Unknown or null class selected: " + selectedClass);
@@ -72,16 +74,16 @@ public class CreateTreeNode extends DumbAwareAction {
 
     private void createTestRun(String name, Directory parentDir, Path newDirPath) {
         ///  use name that you recieve
-        TestRunJsonMapper metadata = new TestRunJsonMapper();
+        TestRun metadata = new TestRun();
         metadata.setStatus(TestRunStatus.CREATED);
 
-        TestRun newTestRun = new TestRun()
+        TestRunDirectory newTestRunDirectory = new TestRunDirectory()
                 .setName(name)
                 .setPath(newDirPath);
 
         RunEditor.create(
                 // attribute name not used!! to be use it and pass it here.
-                newTestRun,
+                newTestRunDirectory,
                 projectPanel,
                 projectPanel.getTestProjectSelector().getSelectedTestProject().getItem(),
                 metadata
@@ -90,33 +92,33 @@ public class CreateTreeNode extends DumbAwareAction {
     }
 
     private void createTestSet(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
-        TestSet newTestSet = new TestSet()
+        TestSetDirectory newTestSetDirectory = new TestSetDirectory()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
 
-        TreeUtilImpl.insertVf(this, parentDir.getPath(), newTestSet.getName());
+        TreeUtilImpl.insertVf(this, parentDir.getPath(), newTestSetDirectory.getName());
         TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TS.getMarker());
-        TreeUtilImpl.insertNode(tree, parentNode, newTestSet);
-        TestEditor.open(newTestSet);
+        TreeUtilImpl.insertNode(tree, parentNode, newTestSetDirectory);
+        TestEditor.open(newTestSetDirectory);
     }
 
     private void createTestSetPackage(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
-        TestSetPackage newTestSetPackage = new TestSetPackage()
+        TestSetPackageDirectory newTestSetPackageDirectory = new TestSetPackageDirectory()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
 
         TreeUtilImpl.insertVf(this, parentDir.getPath(), name);
-        TreeUtilImpl.insertNode(tree, parentNode, newTestSetPackage);
+        TreeUtilImpl.insertNode(tree, parentNode, newTestSetPackageDirectory);
         TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TSP.getMarker());
     }
 
     private void createTestRunPackage(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
-        TestRunPackage newTestRunPackage = new TestRunPackage()
+        TestRunPackageDirectory newTestRunPackageDirectory = new TestRunPackageDirectory()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
 
         TreeUtilImpl.insertVf(this, parentDir.getPath(), name);
-        TreeUtilImpl.insertNode(tree, parentNode, newTestRunPackage);
+        TreeUtilImpl.insertNode(tree, parentNode, newTestRunPackageDirectory);
         TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TRP.getMarker());
     }
 
@@ -130,12 +132,12 @@ public class CreateTreeNode extends DumbAwareAction {
         Object userObject = parentNode.getUserObject();
 
         switch (userObject) {
-            case TestSetPackage ignored ->
+            case TestSetPackageDirectory ignored ->
                     option.type(DirectoryType.TP).setInactive().type(DirectoryType.TSP).setActive()
                             .type(DirectoryType.TRP).setInactive().type(DirectoryType.TS).setActive()
                             .type(DirectoryType.TR).setInactive();
 
-            case TestRunPackage ignored ->
+            case TestRunPackageDirectory ignored ->
                     option.type(DirectoryType.TP).setInactive().type(DirectoryType.TSP).setInactive()
                             .type(DirectoryType.TRP).setActive().type(DirectoryType.TS).setInactive()
                             .type(DirectoryType.TR).setActive();

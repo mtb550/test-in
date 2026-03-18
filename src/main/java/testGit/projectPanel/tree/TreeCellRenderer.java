@@ -4,10 +4,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.Directory;
 import testGit.pojo.DirectoryType;
-import testGit.pojo.TestCasesDirectory;
-import testGit.pojo.TestRunsDirectory;
+import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.tree.dirs.TestCasesDirectory;
+import testGit.pojo.tree.dirs.TestRunsDirectory;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;

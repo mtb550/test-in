@@ -1,6 +1,6 @@
 package testGit.projectPanel.projectSelector;
 
-import testGit.pojo.TestProject;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.*;
@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 
 public class Listener implements ActionListener {
     private final ProjectPanel projectPanel;
-    private TestProject lastSelected = null;
+    private TestProjectDirectory lastSelected = null;
 
     public Listener(ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
@@ -18,7 +18,7 @@ public class Listener implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof JComboBox<?> comboBox) {
-            if (comboBox.getSelectedItem() instanceof TestProject selected) {
+            if (comboBox.getSelectedItem() instanceof TestProjectDirectory selected) {
                 if (selected.equals(lastSelected)) {
                     return;
                 }

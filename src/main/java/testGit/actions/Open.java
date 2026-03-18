@@ -8,9 +8,9 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.editorPanel.testCaseEditor.TestEditor;
 import testGit.editorPanel.testRunEditor.RunEditor;
-import testGit.pojo.Directory;
-import testGit.pojo.TestRun;
-import testGit.pojo.TestSet;
+import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.tree.dirs.TestRunDirectory;
+import testGit.pojo.tree.dirs.TestSetDirectory;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.KeyboardSet;
 import testGit.util.Tools;
@@ -41,10 +41,10 @@ public class Open extends DumbAwareAction {
             }
 
             System.out.println("Opening Test Set: " + pkg.getPath());
-            if (pkg instanceof TestSet ts)
+            if (pkg instanceof TestSetDirectory ts)
                 TestEditor.open(ts);
 
-            if (pkg instanceof TestRun tr)
+            if (pkg instanceof TestRunDirectory tr)
                 RunEditor.open(tr, projectPanel);
         }
     }
@@ -60,8 +60,8 @@ public class Open extends DumbAwareAction {
 
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
-                (node.getUserObject() instanceof TestSet ||
-                        node.getUserObject() instanceof TestRun));
+                (node.getUserObject() instanceof TestSetDirectory ||
+                        node.getUserObject() instanceof TestRunDirectory));
 
         e.getPresentation().setVisible(true);
         e.getPresentation().setEnabled(shouldEnable);

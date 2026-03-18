@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.editorPanel.*;
 import testGit.pojo.Config;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI {
 
     private final JBPanel<?> mainPanel;
-    private final JBList<TestCaseJsonMapper> list;
-    private final CollectionListModel<TestCaseJsonMapper> model;
-    private final ModelSyncListener<TestCaseJsonMapper> syncListener;
+    private final JBList<TestCase> list;
+    private final CollectionListModel<TestCase> model;
+    private final ModelSyncListener<TestCase> syncListener;
     private final ToolBar toolBar;
     private final StatusBar statusBar;
 
-    private List<TestCaseJsonMapper> allTestCaseJsonMappers;
+    private List<TestCase> allTestCases;
 
     @Getter
     private int currentPage = 1;
@@ -40,7 +40,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     private int pageSize = 10;
 
     public TestEditorUI(@NotNull UnifiedVirtualFile vf) {
-        this.allTestCaseJsonMappers = new ArrayList<>(vf.getTestCaseJsonMappers());
+        this.allTestCases = new ArrayList<>(vf.getTestCases());
         this.mainPanel = new JBPanel<>(new BorderLayout());
 
         pageSize = PropertiesComponent.getInstance().getInt("testGit.pageSize", 10);
@@ -51,7 +51,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
         // Model + sync listener
         this.model = new CollectionListModel<>(new ArrayList<>());
-        this.syncListener = new ModelSyncListener<>(allTestCaseJsonMappers, model);
+        this.syncListener = new ModelSyncListener<>(allTestCases, model);
         this.syncListener.setOnUpdate(() -> {
             toolBar.resetFilters();
             refreshView();
@@ -65,7 +65,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
-        list.addListSelectionListener(new SelectionListenerImpl(list));
+        list.addListSelectionListener(new SelectionListener(list));
 
         EditorContextMenu editorContextMenu = new EditorContextMenu(vf.getTestSet(), list, model);
         TestMouseListener testMouseListener = new TestMouseListener(list, model, vf.getTestSet(), editorContextMenu);
@@ -76,7 +76,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         // 🌟 تمرير this إلى الريندرر (بما أن هذا الكلاس يملك دوال isShowGroups وغيرها)
         list.setCellRenderer(new TestListRenderer(this));
 
-        ShortcutHandler.register(vf.getTestSet(), list, model);
+        EditorContextMenu.registerShortcuts(vf.getTestSet(), list, model);
         mainPanel.add(new JBScrollPane(list), BorderLayout.CENTER);
 
         // Status bar
@@ -152,14 +152,14 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     }
 
     public void refreshView() {
-        List<TestCaseJsonMapper> filtered = getFilteredList();
+        List<TestCase> filtered = getFilteredList();
         int totalItems = filtered.size();
         int totalPages = getTotalPages(filtered);
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
 
         int startIndex = (currentPage - 1) * pageSize;
         int endIndex = Math.min(startIndex + pageSize, totalItems);
-        List<TestCaseJsonMapper> pageItems = startIndex < totalItems
+        List<TestCase> pageItems = startIndex < totalItems
                 ? new ArrayList<>(filtered.subList(startIndex, endIndex))
                 : new ArrayList<>();
 
@@ -170,15 +170,15 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), totalItems);
     }
 
-    public void loadData(List<TestCaseJsonMapper> loadedData) {
-        this.allTestCaseJsonMappers = loadedData;
+    public void loadData(List<TestCase> loadedData) {
+        this.allTestCases = loadedData;
         this.currentPage = 1;
         refreshView();
     }
 
-    private List<TestCaseJsonMapper> getFilteredList() {
+    private List<TestCase> getFilteredList() {
         String query = toolBar.getSearchQuery();
-        return allTestCaseJsonMappers.stream()
+        return allTestCases.stream()
                 .filter(tc -> {
                     boolean matchesSearch = query.isEmpty() ||
                             (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query));
@@ -189,7 +189,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
                 .collect(Collectors.toList());
     }
 
-    private int getTotalPages(List<TestCaseJsonMapper> filtered) {
+    private int getTotalPages(List<TestCase> filtered) {
         return filtered.isEmpty() ? 1 : (int) Math.ceil((double) filtered.size() / pageSize);
     }
 
@@ -235,7 +235,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     public void dispose() {
         System.out.println("Disposing TestCaseEditorUI...");
 
-        TestCaseJsonMapper selectedInThisFile = list.getSelectedValue();
+        TestCase selectedInThisFile = list.getSelectedValue();
         ViewPanel.hideIfShowing(selectedInThisFile);
 
         if (model != null && syncListener != null) {

@@ -1,6 +1,6 @@
-package testGit.pojo.mappers;
+package testGit.pojo.tree.mappers;
 
-import testGit.pojo.TestRunsDirectory;
+import testGit.pojo.tree.dirs.TestRunsDirectory;
 import testGit.util.Notifier;
 
 import java.nio.file.Path;

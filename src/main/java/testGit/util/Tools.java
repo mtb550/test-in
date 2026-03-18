@@ -8,7 +8,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import testGit.pojo.Config;
-import testGit.pojo.Directory;
+import testGit.pojo.tree.dirs.Directory;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;

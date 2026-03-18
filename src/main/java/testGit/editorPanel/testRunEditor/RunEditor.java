@@ -4,12 +4,12 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import testGit.editorPanel.UnifiedVirtualFile;
 import testGit.pojo.Config;
 import testGit.pojo.EditorType;
-import testGit.pojo.TestProject;
-import testGit.pojo.TestRun;
-import testGit.pojo.mappers.TestCaseJsonMapper;
-import testGit.pojo.mappers.TestRunJsonMapper;
-import testGit.pojo.mappers.TestSetMapper;
-import testGit.pojo.mappers.TestSetPackageMapper;
+import testGit.pojo.mappers.TestCase;
+import testGit.pojo.mappers.TestRun;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.tree.dirs.TestRunDirectory;
+import testGit.pojo.tree.mappers.TestSetMapper;
+import testGit.pojo.tree.mappers.TestSetPackageMapper;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.TestCaseSorter;
 
@@ -24,11 +24,11 @@ import java.util.stream.Stream;
 
 public class RunEditor {
 
-    public static void open(TestRun tr, ProjectPanel projectPanel) {
+    public static void open(TestRunDirectory tr, ProjectPanel projectPanel) {
         try {
-            TestRunJsonMapper metadata = Config.getMapper().readValue(tr.getPath().toFile(), TestRunJsonMapper.class);
-            List<TestCaseJsonMapper> testCaseJsonMappers = loadTestCasesForRun(metadata, projectPanel);
-            List<TestCaseJsonMapper> sorted = TestCaseSorter.sortTestCases(testCaseJsonMappers);
+            TestRun metadata = Config.getMapper().readValue(tr.getPath().toFile(), TestRun.class);
+            List<TestCase> testCases = loadTestCasesForRun(metadata, projectPanel);
+            List<TestCase> sorted = TestCaseSorter.sortTestCases(testCases);
 
             UnifiedVirtualFile virtualFile = new UnifiedVirtualFile(
                     tr,
@@ -45,7 +45,7 @@ public class RunEditor {
         }
     }
 
-    public static void create(TestRun tr, ProjectPanel projectPanel, TestProject tp, TestRunJsonMapper metadata) {
+    public static void create(TestRunDirectory tr, ProjectPanel projectPanel, TestProjectDirectory tp, TestRun metadata) {
         Path testCasesPath = tp.getTestCasesDirectory().getPath();
 
         DefaultTreeModel fullModel = new DefaultTreeModel(buildDirectoryTree(testCasesPath, true));
@@ -64,7 +64,7 @@ public class RunEditor {
 
     // --- Private helpers ---
 
-    private static List<TestCaseJsonMapper> loadTestCasesForRun(TestRunJsonMapper metadata, ProjectPanel projectPanel) {
+    private static List<TestCase> loadTestCasesForRun(TestRun metadata, ProjectPanel projectPanel) {
         if (metadata.getResults() == null) return Collections.emptyList();
 
         Set<String> targetIds = metadata.getResults().stream()
@@ -75,14 +75,14 @@ public class RunEditor {
 
         if (!Files.exists(testCasesRoot)) return Collections.emptyList();
 
-        List<TestCaseJsonMapper> cases = new ArrayList<>();
+        List<TestCase> cases = new ArrayList<>();
 
         try (Stream<Path> paths = Files.walk(testCasesRoot)) {
             paths.filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".json"))
                     .forEach(p -> {
                         try {
-                            TestCaseJsonMapper tc = Config.getMapper().readValue(p.toFile(), TestCaseJsonMapper.class);
+                            TestCase tc = Config.getMapper().readValue(p.toFile(), TestCase.class);
                             if (tc.getId() != null && targetIds.contains(tc.getId())) {
                                 cases.add(tc);
                             }
@@ -97,7 +97,7 @@ public class RunEditor {
         return cases;
     }
 
-    private static DefaultTreeModel buildFilteredModel(List<TestCaseJsonMapper> cases) {
+    private static DefaultTreeModel buildFilteredModel(List<TestCase> cases) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Selected Test Cases");
         cases.forEach(tc -> root.add(new DefaultMutableTreeNode(tc)));
         return new DefaultTreeModel(root);
@@ -123,7 +123,7 @@ public class RunEditor {
                     node.add(buildDirectoryTree(child, false));
                 } else if (child.toString().endsWith(".json")) {
                     try {
-                        TestCaseJsonMapper tc = Config.getMapper().readValue(child.toFile(), TestCaseJsonMapper.class);
+                        TestCase tc = Config.getMapper().readValue(child.toFile(), TestCase.class);
                         node.add(new DefaultMutableTreeNode(tc));
                     } catch (Exception e) {
                         System.err.println("Failed to parse test case: " + child.getFileName());

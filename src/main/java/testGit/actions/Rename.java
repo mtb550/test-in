@@ -8,10 +8,10 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import testGit.pojo.Directory;
-import testGit.pojo.TestCasesDirectory;
-import testGit.pojo.TestProject;
-import testGit.pojo.TestRunsDirectory;
+import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.tree.dirs.TestCasesDirectory;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.tree.dirs.TestRunsDirectory;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.KeyboardSet;
 import testGit.util.Tools;
@@ -66,7 +66,7 @@ public class Rename extends DumbAwareAction {
             Tools.updateChildrenPathsRecursive(node, oldPath, newPath);
             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
-            if (dir instanceof TestProject && projectPanel.getTestProjectSelector() != null) {
+            if (dir instanceof TestProjectDirectory && projectPanel.getTestProjectSelector() != null) {
                 projectPanel.getTestProjectSelector().loadTestProjectList();
             }
 

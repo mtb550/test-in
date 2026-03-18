@@ -1,14 +1,14 @@
-package testGit.pojo.mappers;
+package testGit.pojo.tree.mappers;
 
-import testGit.pojo.TestSet;
+import testGit.pojo.tree.dirs.TestSetDirectory;
 import testGit.util.Notifier;
 
 import java.nio.file.Path;
 
 public class TestSetMapper {
-    public static TestSet map(Path path) {
+    public static TestSetDirectory map(Path path) {
         try {
-            return new TestSet()
+            return new TestSetDirectory()
                     .setName(path.getFileName().toString())
                     .setPath(path);
 

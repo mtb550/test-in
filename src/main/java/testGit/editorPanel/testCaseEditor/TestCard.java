@@ -11,7 +11,7 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
 import testGit.editorPanel.Shared;
 import testGit.pojo.GroupType;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
 
 import java.awt.*;
 import java.util.List;
@@ -62,7 +62,7 @@ public class TestCard extends JBPanel<TestCard> {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    public void updateData(int index, TestCaseJsonMapper tc, boolean showGroups, boolean showPriority, Set<String> activeDetails) {
+    public void updateData(int index, TestCase tc, boolean showGroups, boolean showPriority, Set<String> activeDetails) {
         titleLabel.setText((index + 1) + ". " + tc.getTitle());
         expectedLabel.setText("Expected Result: " + tc.getExpected());
         stepsLabel.setText("Steps: " + tc.getSteps());

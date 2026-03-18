@@ -8,7 +8,7 @@ import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
-import testGit.pojo.mappers.TestRunJsonMapper;
+import testGit.pojo.mappers.TestRun;
 
 import javax.swing.*;
 
@@ -38,7 +38,7 @@ public class TestRunMetadataHeader {
         ));
     }
 
-    public void applyToMetadata(TestRunJsonMapper metadata) {
+    public void applyToMetadata(TestRun metadata) {
         if (metadata == null) return;
         metadata.setBuildNumber(buildNumberField.getText().trim());
         metadata.setPlatform((String) platformCombo.getSelectedItem());

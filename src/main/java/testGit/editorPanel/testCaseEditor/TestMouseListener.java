@@ -7,8 +7,8 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import testGit.actions.CreateTestCase;
 import testGit.editorPanel.EditorContextMenu;
-import testGit.pojo.Directory;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
+import testGit.pojo.tree.dirs.Directory;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
@@ -16,12 +16,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class TestMouseListener extends MouseAdapter {
-    private final JBList<TestCaseJsonMapper> list;
-    private final CollectionListModel<TestCaseJsonMapper> model;
+    private final JBList<TestCase> list;
+    private final CollectionListModel<TestCase> model;
     private final EditorContextMenu editorContextMenu;
     private final DefaultActionGroup emptyMenu;
 
-    public TestMouseListener(final JBList<TestCaseJsonMapper> list, final CollectionListModel<TestCaseJsonMapper> model, final Directory dir, final EditorContextMenu editorContextMenu) {
+    public TestMouseListener(final JBList<TestCase> list, final CollectionListModel<TestCase> model, final Directory dir, final EditorContextMenu editorContextMenu) {
         this.list = list;
         this.model = model;
         this.editorContextMenu = editorContextMenu;
@@ -37,7 +37,7 @@ public class TestMouseListener extends MouseAdapter {
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
 
             if (isClickOnItem) {
-                TestCaseJsonMapper selected = model.getElementAt(index);
+                TestCase selected = model.getElementAt(index);
 
                 if (selected != null) {
                     ViewPanel.show(selected);

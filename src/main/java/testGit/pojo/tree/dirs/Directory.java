@@ -1,4 +1,4 @@
-package testGit.pojo;
+package testGit.pojo.tree.dirs;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonFormat;

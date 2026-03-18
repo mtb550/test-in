@@ -1,14 +1,14 @@
-package testGit.pojo.mappers;
+package testGit.pojo.tree.mappers;
 
-import testGit.pojo.TestRunPackage;
+import testGit.pojo.tree.dirs.TestRunPackageDirectory;
 import testGit.util.Notifier;
 
 import java.nio.file.Path;
 
 public class TestRunPackageMapper {
-    public static TestRunPackage map(Path path) {
+    public static TestRunPackageDirectory map(Path path) {
         try {
-            return new TestRunPackage()
+            return new TestRunPackageDirectory()
                     .setName(path.getFileName().toString())
                     .setPath(path);
 

@@ -3,7 +3,7 @@ package testGit.projectPanel.tree;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.Directory;
+import testGit.pojo.tree.dirs.Directory;
 import testGit.util.Tools;
 import testGit.util.TreeUtilImpl;
 

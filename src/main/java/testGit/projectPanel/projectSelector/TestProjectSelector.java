@@ -6,8 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import testGit.pojo.Config;
 import testGit.pojo.ProjectStatus;
-import testGit.pojo.TestProject;
-import testGit.pojo.mappers.TestProjectMapper;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.tree.mappers.TestProjectMapper;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.*;
@@ -21,11 +21,11 @@ public class TestProjectSelector {
 
     @Getter
     @Setter
-    private DefaultComboBoxModel<TestProject> testProjectList;
+    private DefaultComboBoxModel<TestProjectDirectory> testProjectList;
 
     @Getter
     @Setter
-    private ComboBox<TestProject> selectedTestProject;
+    private ComboBox<TestProjectDirectory> selectedTestProject;
 
     public TestProjectSelector(ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
@@ -78,30 +78,30 @@ public class TestProjectSelector {
         }
 
         selectedTestProject.setEnabled(true);
-        TestProject firstTestTestProject = testProjectList.getElementAt(0);
-        selectedTestProject.setSelectedItem(firstTestTestProject);
+        TestProjectDirectory firstTestTestProjectDirectory = testProjectList.getElementAt(0);
+        selectedTestProject.setSelectedItem(firstTestTestProjectDirectory);
         //filterByTestProject(firstTestProject);
         return true;
     }
 
-    public void addTestProject(TestProject newTestTestProject) {
+    public void addTestProject(TestProjectDirectory newTestTestProjectDirectory) {
         System.out.println("TestProjectSelector.addTestProject()");
         if (!selectedTestProject.isEnabled()) {
             projectPanel.showEmptyState();
         }
 
-        testProjectList.addElement(newTestTestProject);
-        selectedTestProject.setSelectedItem(newTestTestProject);
+        testProjectList.addElement(newTestTestProjectDirectory);
+        selectedTestProject.setSelectedItem(newTestTestProjectDirectory);
         if (testProjectList.getSize() == 1) {
             selectedTestProject.setEnabled(true);
             projectPanel.setupMainLayout();
         }
     }
 
-    public void removeTestProject(SimpleTree tree, TestProject testProject) {
+    public void removeTestProject(SimpleTree tree, TestProjectDirectory testProjectDirectory) {
         int indexToRemove = -1;
         for (int i = 0; i < testProjectList.getSize(); i++) {
-            if (testProjectList.getElementAt(i).getName().equals(testProject.getName())) {
+            if (testProjectList.getElementAt(i).getName().equals(testProjectDirectory.getName())) {
                 indexToRemove = i;
                 break;
             }
@@ -130,8 +130,8 @@ public class TestProjectSelector {
         tree.repaint();
     }
 
-    public void filterByTestProject(TestProject testProject) {
-        System.out.println("Panel.filterByProject(): " + testProject.getName());
+    public void filterByTestProject(TestProjectDirectory testProjectDirectory) {
+        System.out.println("Panel.filterByProject(): " + testProjectDirectory.getName());
 
         projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
         projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());

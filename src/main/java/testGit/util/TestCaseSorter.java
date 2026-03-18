@@ -1,21 +1,21 @@
 package testGit.util;
 
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
 
 import java.util.*;
 
 public class TestCaseSorter {
 
-    public static List<TestCaseJsonMapper> sortTestCases(List<TestCaseJsonMapper> unsortedList) {
+    public static List<TestCase> sortTestCases(List<TestCase> unsortedList) {
         if (unsortedList == null || unsortedList.isEmpty()) {
             System.out.println("no test cases");
             return new ArrayList<>();
         }
 
-        Map<String, TestCaseJsonMapper> idMap = new HashMap<>();
-        TestCaseJsonMapper head = null;
+        Map<String, TestCase> idMap = new HashMap<>();
+        TestCase head = null;
 
-        for (TestCaseJsonMapper tc : unsortedList) {
+        for (TestCase tc : unsortedList) {
             idMap.put(tc.getId(), tc);
             if (tc.getIsHead() != null && tc.getIsHead()) {
                 head = tc;
@@ -27,8 +27,8 @@ public class TestCaseSorter {
             return unsortedList;
         }
 
-        List<TestCaseJsonMapper> sortedList = new ArrayList<>();
-        TestCaseJsonMapper current = head;
+        List<TestCase> sortedList = new ArrayList<>();
+        TestCase current = head;
 
         Set<String> visited = new HashSet<>();
 
@@ -45,7 +45,7 @@ public class TestCaseSorter {
         }
 
         if (sortedList.size() < unsortedList.size()) {
-            for (TestCaseJsonMapper tc : unsortedList) {
+            for (TestCase tc : unsortedList) {
                 if (!visited.contains(tc.getId())) {
                     sortedList.add(tc);
                 }

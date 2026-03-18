@@ -15,10 +15,10 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import testGit.actions.Refresh;
 import testGit.pojo.Config;
-import testGit.pojo.Directory;
 import testGit.pojo.ProjectStatus;
-import testGit.pojo.TestProject;
-import testGit.pojo.mappers.TestProjectMapper;
+import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.tree.mappers.TestProjectMapper;
 import testGit.projectPanel.ProjectPanel;
 import testGit.projectPanel.projectSelector.RendererImpl;
 import testGit.settings.service.ProjectPanelService;
@@ -37,8 +37,8 @@ public class AppSettingsConfigurable implements Configurable {
     private final JBTextField rootAutomationPathField = new JBTextField();
 
     // Store projects as Directory objects in a Model
-    private final DefaultComboBoxModel<TestProject> testProjectList = new DefaultComboBoxModel<>();
-    private final ComboBox<TestProject> projectComboBox = new ComboBox<>(testProjectList);
+    private final DefaultComboBoxModel<TestProjectDirectory> testProjectList = new DefaultComboBoxModel<>();
+    private final ComboBox<TestProjectDirectory> projectComboBox = new ComboBox<>(testProjectList);
 
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
 

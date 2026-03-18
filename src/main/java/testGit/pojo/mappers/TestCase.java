@@ -16,7 +16,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TestCaseJsonMapper {
+public class TestCase {
 
     private int uid;
 

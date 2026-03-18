@@ -20,8 +20,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.Priority;
-import testGit.pojo.TestSet;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
+import testGit.pojo.tree.dirs.TestSetDirectory;
 import testGit.projectPanel.ProjectPanel;
 import testGit.util.Notifier;
 
@@ -55,7 +55,7 @@ public class ImportExcel extends DumbAwareAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        if (!(userObject instanceof TestSet ts)) {
+        if (!(userObject instanceof TestSetDirectory ts)) {
             Notifier.error("Import Error", "Please select a valid TS Directory.");
             return;
         }
@@ -119,22 +119,22 @@ public class ImportExcel extends DumbAwareAction {
                     break;
                 }
 
-                TestCaseJsonMapper testCaseJsonMapper = new TestCaseJsonMapper();
+                TestCase testCase = new TestCase();
                 String generatedUuid = UUID.randomUUID().toString();
 
-                testCaseJsonMapper.setId(generatedUuid);
-                testCaseJsonMapper.setTitle(title);
-                testCaseJsonMapper.setExpected(getFieldSafe(recordset, "expected"));
-                testCaseJsonMapper.setSteps(getFieldSafe(recordset, "steps"));
+                testCase.setId(generatedUuid);
+                testCase.setTitle(title);
+                testCase.setExpected(getFieldSafe(recordset, "expected"));
+                testCase.setSteps(getFieldSafe(recordset, "steps"));
 
-                testCaseJsonMapper.setPriority(parsePrioritySafe(getFieldSafe(recordset, "priority")));
+                testCase.setPriority(parsePrioritySafe(getFieldSafe(recordset, "priority")));
 
-                testCaseJsonMapper.setGroups(new ArrayList<>());
-                testCaseJsonMapper.setCreateBy(getFieldSafe(recordset, "createBy"));
+                testCase.setGroups(new ArrayList<>());
+                testCase.setCreateBy(getFieldSafe(recordset, "createBy"));
 
-                testCaseJsonMapper.setCreateAt(parseDateSafe(getFieldSafe(recordset, "createAt")));
+                testCase.setCreateAt(parseDateSafe(getFieldSafe(recordset, "createAt")));
 
-                String jsonContent = gson.toJson(testCaseJsonMapper);
+                String jsonContent = gson.toJson(testCase);
                 String fileName = generatedUuid + ".json";
 
                 ApplicationManager.getApplication().runWriteAction(() -> {

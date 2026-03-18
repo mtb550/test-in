@@ -4,7 +4,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import testGit.pojo.Config;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
 
 import java.util.function.Consumer;
 
@@ -14,7 +14,7 @@ public class ViewPanel {
         return ToolWindowManager.getInstance(Config.getProject()).getToolWindow("Details");
     }
 
-    public static void addTestCase(Consumer<TestCaseJsonMapper> onSaveCallback) {
+    public static void addTestCase(Consumer<TestCase> onSaveCallback) {
         ToolWindow tw = getToolWindow();
         if (tw != null) {
             if (!tw.isVisible()) tw.show();
@@ -28,7 +28,7 @@ public class ViewPanel {
         }
     }
 
-    public static void show(TestCaseJsonMapper testCaseJsonMapper) {
+    public static void show(TestCase testCase) {
         ToolWindow tw = getToolWindow();
         if (tw != null) {
             if (!tw.isVisible())
@@ -38,7 +38,7 @@ public class ViewPanel {
 
             TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
             if (viewer != null) {
-                viewer.update(testCaseJsonMapper);
+                viewer.update(testCase);
             }
         }
     }
@@ -67,16 +67,16 @@ public class ViewPanel {
         }
     }
 
-    public static void hideIfShowing(TestCaseJsonMapper testCaseJsonMapperToMatch) {
+    public static void hideIfShowing(TestCase testCaseToMatch) {
         ToolWindow tw = getToolWindow();
         if (tw == null || !tw.isVisible()) return;
 
         TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
         if (viewer != null) {
-            TestCaseJsonMapper currentlyShown = viewer.getCurrentTestCaseJsonMapper();
+            TestCase currentlyShown = viewer.getCurrentTestCase();
 
-            if (currentlyShown != null && testCaseJsonMapperToMatch != null &&
-                    currentlyShown.getId().equals(testCaseJsonMapperToMatch.getId())) {
+            if (currentlyShown != null && testCaseToMatch != null &&
+                    currentlyShown.getId().equals(testCaseToMatch.getId())) {
                 reset();
                 hide();
             }

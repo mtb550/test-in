@@ -4,8 +4,8 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import testGit.editorPanel.UnifiedVirtualFile;
 import testGit.pojo.Config;
-import testGit.pojo.TestSet;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
+import testGit.pojo.tree.dirs.TestSetDirectory;
 import testGit.util.Notifier;
 
 import java.io.File;
@@ -13,30 +13,30 @@ import java.util.*;
 
 public class TestEditor {
 
-    public static void open(final TestSet ts) {
+    public static void open(final TestSetDirectory ts) {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
 
         VirtualFile newVirtualFile = createVirtualFile(ts);
         editorManager.openFile(newVirtualFile, true);
     }
 
-    private static VirtualFile createVirtualFile(TestSet testSet) {
-        List<TestCaseJsonMapper> testCaseJsonMappers = Optional.of(testSet.getPath().toFile())
+    private static VirtualFile createVirtualFile(TestSetDirectory testSetDirectory) {
+        List<TestCase> testCases = Optional.of(testSetDirectory.getPath().toFile())
                 .filter(f -> f.exists() && f.isDirectory())
                 .map(f -> f.listFiles((d, name) -> name.endsWith(".json")))
                 .stream()
                 .flatMap(Arrays::stream)
                 .map(TestEditor::addTestCase)
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(TestCaseJsonMapper::getTitle))
+                .sorted(Comparator.comparing(TestCase::getTitle))
                 .toList();
 
-        return new UnifiedVirtualFile(testSet, testCaseJsonMappers);
+        return new UnifiedVirtualFile(testSetDirectory, testCases);
     }
 
-    private static TestCaseJsonMapper addTestCase(File file) {
+    private static TestCase addTestCase(File file) {
         try {
-            return Config.getMapper().readValue(file, TestCaseJsonMapper.class);
+            return Config.getMapper().readValue(file, TestCase.class);
         } catch (Exception e) {
             Notifier.error("Read Test Case failed", e.getMessage());
             e.printStackTrace(System.err);

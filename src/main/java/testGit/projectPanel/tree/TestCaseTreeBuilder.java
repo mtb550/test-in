@@ -1,10 +1,10 @@
 package testGit.projectPanel.tree;
 
-import testGit.pojo.Directory;
 import testGit.pojo.DirectoryType;
-import testGit.pojo.TestProject;
-import testGit.pojo.mappers.TestSetMapper;
-import testGit.pojo.mappers.TestSetPackageMapper;
+import testGit.pojo.tree.dirs.Directory;
+import testGit.pojo.tree.dirs.TestProjectDirectory;
+import testGit.pojo.tree.mappers.TestSetMapper;
+import testGit.pojo.tree.mappers.TestSetPackageMapper;
 import testGit.projectPanel.ProjectPanel;
 
 import java.nio.file.Files;
@@ -16,8 +16,8 @@ public class TestCaseTreeBuilder extends AbstractTreeBuilder {
         super(projectPanel);
     }
 
-    public void buildTree(final TestProject selectedTestProject) {
-        super.buildTree(selectedTestProject.getTestCasesDirectory());
+    public void buildTree(final TestProjectDirectory selectedTestProjectDirectory) {
+        super.buildTree(selectedTestProjectDirectory.getTestCasesDirectory());
     }
 
     @Override

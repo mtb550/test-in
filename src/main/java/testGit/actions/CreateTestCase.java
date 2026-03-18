@@ -8,9 +8,9 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
-import testGit.pojo.Directory;
 import testGit.pojo.Priority;
-import testGit.pojo.mappers.TestCaseJsonMapper;
+import testGit.pojo.mappers.TestCase;
+import testGit.pojo.tree.dirs.Directory;
 import testGit.ui.CreateTestCaseDialog;
 import testGit.util.KeyboardSet;
 import testGit.util.Notifier;
@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class CreateTestCase extends DumbAwareAction {
-    private final JBList<TestCaseJsonMapper> list;
+    private final JBList<TestCase> list;
     private final Directory dir;
-    private final CollectionListModel<TestCaseJsonMapper> model;
+    private final CollectionListModel<TestCase> model;
 
-    public CreateTestCase(Directory dir, JBList<TestCaseJsonMapper> list, CollectionListModel<TestCaseJsonMapper> model) {
+    public CreateTestCase(Directory dir, JBList<TestCase> list, CollectionListModel<TestCase> model) {
         super("Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
         this.list = list;
         this.dir = dir;
@@ -46,30 +46,30 @@ public class CreateTestCase extends DumbAwareAction {
     }
 
     private void saveNewTestCase(CreateTestCaseDialog dialog) {
-        TestCaseJsonMapper newTestCaseJsonMapper = new TestCaseJsonMapper();
-        newTestCaseJsonMapper.setId(UUID.randomUUID().toString());
-        newTestCaseJsonMapper.setTitle(dialog.getTitle());
-        newTestCaseJsonMapper.setPriority(Priority.valueOf(dialog.getPriority()));
-        newTestCaseJsonMapper.setGroups(dialog.getSelectedGroups());
-        newTestCaseJsonMapper.setNext(null);
+        TestCase newTestCase = new TestCase();
+        newTestCase.setId(UUID.randomUUID().toString());
+        newTestCase.setTitle(dialog.getTitle());
+        newTestCase.setPriority(Priority.valueOf(dialog.getPriority()));
+        newTestCase.setGroups(dialog.getSelectedGroups());
+        newTestCase.setNext(null);
 
         try {
             if (model.isEmpty()) {
-                newTestCaseJsonMapper.setIsHead(true);
+                newTestCase.setIsHead(true);
             } else {
-                newTestCaseJsonMapper.setIsHead(false);
-                TestCaseJsonMapper lastItem = model.getElementAt(model.getSize() - 1);
-                lastItem.setNext(UUID.fromString(newTestCaseJsonMapper.getId()));
+                newTestCase.setIsHead(false);
+                TestCase lastItem = model.getElementAt(model.getSize() - 1);
+                lastItem.setNext(UUID.fromString(newTestCase.getId()));
 
                 File lastItemFile = new File(dir.getPath().toFile(), lastItem.getId() + ".json");
                 Config.getMapper().writeValue(lastItemFile, lastItem);
             }
 
-            File targetFile = new File(dir.getPath().toFile(), newTestCaseJsonMapper.getId() + ".json");
-            Config.getMapper().writeValue(targetFile, newTestCaseJsonMapper);
+            File targetFile = new File(dir.getPath().toFile(), newTestCase.getId() + ".json");
+            Config.getMapper().writeValue(targetFile, newTestCase);
 
             LocalFileSystem.getInstance().refreshAndFindFileByIoFile(targetFile);
-            model.add(newTestCaseJsonMapper);
+            model.add(newTestCase);
             list.ensureIndexIsVisible(model.getSize() - 1);
 
         } catch (IOException ex) {
