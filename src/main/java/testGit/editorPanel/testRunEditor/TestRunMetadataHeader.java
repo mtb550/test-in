@@ -32,16 +32,12 @@ public class TestRunMetadataHeader {
                 .addLabeledComponent(new JBLabel("Device type:", AllIcons.Nodes.Include, SwingConstants.LEFT), deviceCombo)
                 .getPanel();
 
-        // Add padding and a bottom border to separate it from the checklist
         this.panel.setBorder(JBUI.Borders.compound(
                 JBUI.Borders.customLine(UIUtil.getBoundsColor(), 0, 0, 1, 0),
                 JBUI.Borders.empty(10)
         ));
     }
 
-    /**
-     * Updates the provided TestRun object with the current values from the UI fields.
-     */
     public void applyToMetadata(TestRunJsonMapper metadata) {
         if (metadata == null) return;
         metadata.setBuildNumber(buildNumberField.getText().trim());
@@ -57,5 +53,11 @@ public class TestRunMetadataHeader {
 
     public JComponent getPreferredFocusedComponent() {
         return buildNumberField;
+    }
+
+    public void setRunNameDisabled(String name) {
+        buildNumberField.setText(name);
+        buildNumberField.setEditable(false); // يمنع الكتابة
+        buildNumberField.setEnabled(false);  // يجعله باهتاً (Grayed out)
     }
 }

@@ -20,12 +20,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
-public class CreateNode extends DumbAwareAction {
+public class CreateTreeNode extends DumbAwareAction {
     private final ProjectPanel projectPanel;
     private final SimpleTree tree;
     private final DirectoryOptions option;
 
-    public CreateNode(ProjectPanel projectPanel, SimpleTree tree) {
+    public CreateTreeNode(ProjectPanel projectPanel, SimpleTree tree) {
         super("Create Node", "Create new node", AllIcons.General.Add);
         this.projectPanel = projectPanel;
         this.tree = tree;
@@ -86,7 +86,7 @@ public class CreateNode extends DumbAwareAction {
                 projectPanel.getTestProjectSelector().getSelectedTestProject().getItem(),
                 metadata
         );
-        TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TR.getMarker());
+        TreeUtilImpl.createDataVf(this, parentDir.getPath(), DirectoryType.TR.getMarker());
     }
 
     private void createTestSet(String name, DefaultMutableTreeNode parentNode, Directory parentDir, Path newDirPath) {
@@ -149,16 +149,6 @@ public class CreateNode extends DumbAwareAction {
                     option.type(DirectoryType.TP).setActive().type(DirectoryType.TSP).setInactive()
                             .type(DirectoryType.TRP).setActive().type(DirectoryType.TS).setInactive()
                             .type(DirectoryType.TR).setActive();
-
-            case TestSet ignored -> {
-                e.getPresentation().setVisible(true);
-                e.getPresentation().setEnabled(false);
-            }
-
-            case TestRun ignored -> {
-                e.getPresentation().setVisible(true);
-                e.getPresentation().setEnabled(false);
-            }
 
             default -> {
                 e.getPresentation().setVisible(true);

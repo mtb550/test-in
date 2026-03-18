@@ -6,19 +6,19 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.projectPanel.tree.ContextMenu;
+import testGit.projectPanel.tree.TreeContextMenu;
 import testGit.util.KeyboardSet;
 
 import java.awt.*;
 
 public class OpenNodeCM extends DumbAwareAction {
     private final SimpleTree tree;
-    private final ContextMenu contextMenu;
+    private final TreeContextMenu treeContextMenu;
 
-    public OpenNodeCM(SimpleTree tree, ContextMenu contextMenu) {
+    public OpenNodeCM(SimpleTree tree, TreeContextMenu treeContextMenu) {
         super("Show Context Menu");
         this.tree = tree;
-        this.contextMenu = contextMenu;
+        this.treeContextMenu = treeContextMenu;
         this.registerCustomShortcutSet(KeyboardSet.ContextMenu.getShortcut(), tree);
     }
 
@@ -29,7 +29,7 @@ public class OpenNodeCM extends DumbAwareAction {
             Rectangle rect = tree.getRowBounds(selectedRows[0]);
             if (rect != null) {
                 ActionManager.getInstance()
-                        .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, contextMenu)
+                        .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu)
                         .getComponent()
                         .show(tree, rect.x + (rect.width / 2), rect.y + (rect.height / 2));
             }

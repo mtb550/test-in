@@ -21,8 +21,8 @@ public class ProjectTree {
     private final DefaultMutableTreeNode mainRoot;
     private final DefaultTreeModel treeModel;
     private final SimpleTree mainTree;
-    private final TransferHandlerImpl transferHandler;
-    private final ContextMenu contextMenu;
+    private final TreeTransferHandler transferHandler;
+    private final TreeContextMenu treeContextMenu;
 
     public ProjectTree(ProjectPanel projectPanel) {
         this.projectPanel = projectPanel;
@@ -46,12 +46,15 @@ public class ProjectTree {
 
         updateNodes();
 
-        mainTree.setCellRenderer(new RendererImpl(sharedCutNodes));
-        this.transferHandler = new TransferHandlerImpl(mainTree, sharedCutNodes);
+        mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
+
+        this.transferHandler = new TreeTransferHandler(mainTree, sharedCutNodes);
         mainTree.setTransferHandler(transferHandler);
-        contextMenu = new ContextMenu(projectPanel, mainTree);
-        mainTree.addMouseListener(new MouseAdapterImpl(projectPanel, mainTree, contextMenu));
-        ContextMenu.registerShortcuts(mainTree, transferHandler, contextMenu);
+
+        treeContextMenu = new TreeContextMenu(projectPanel, mainTree);
+        mainTree.addMouseListener(new TreeMouseListener(projectPanel, mainTree, treeContextMenu));
+
+        TreeContextMenu.registerShortcuts(mainTree, transferHandler, treeContextMenu);
     }
 
     public void updateNodes() {
@@ -66,8 +69,8 @@ public class ProjectTree {
                 mainRoot.setUserObject(testProject);
             }
 
-            DefaultMutableTreeNode tcNode = projectPanel.getTestCaseTabController().getRootNode();
-            DefaultMutableTreeNode trNode = projectPanel.getTestRunTabController().getRootNode();
+            DefaultMutableTreeNode tcNode = projectPanel.getTestCaseTreeBuilder().getRootNode();
+            DefaultMutableTreeNode trNode = projectPanel.getTestRunTreeBuilder().getRootNode();
 
             if (tcNode != null) mainRoot.add(tcNode);
             if (trNode != null) mainRoot.add(trNode);

@@ -133,8 +133,8 @@ public class TestProjectSelector {
     public void filterByTestProject(TestProject testProject) {
         System.out.println("Panel.filterByProject(): " + testProject.getName());
 
-        projectPanel.getTestCaseTabController().buildTreeAsync(selectedTestProject.getItem());
-        projectPanel.getTestRunTabController().buildTreeAsync(selectedTestProject.getItem());
+        projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
+        projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
 
     }
 

@@ -13,13 +13,13 @@ import testGit.projectPanel.ProjectPanel;
 import javax.swing.*;
 
 @NoArgsConstructor
-public class ContextMenu extends DefaultActionGroup {
+public class TreeContextMenu extends DefaultActionGroup {
 
-    public ContextMenu(ProjectPanel projectPanel, SimpleTree tree) {
+    public TreeContextMenu(ProjectPanel projectPanel, SimpleTree tree) {
         super("Tree Context Menu", true);
 
         add(new Open(projectPanel, tree));
-        add(new CreateNode(projectPanel, tree));
+        add(new CreateTreeNode(projectPanel, tree));
         addSeparator();
 
         add(createSubGroup("Actions", AllIcons.Actions.Edit,
@@ -62,9 +62,9 @@ public class ContextMenu extends DefaultActionGroup {
         add(new TestRuns());
     }
 
-    public static void registerShortcuts(final SimpleTree tree, TransferHandlerImpl transferHandler, ContextMenu contextMenu) {
+    public static void registerShortcuts(final SimpleTree tree, TreeTransferHandler transferHandler, TreeContextMenu treeContextMenu) {
         new Escape(tree, transferHandler);
-        new OpenNodeCM(tree, contextMenu);
+        new OpenNodeCM(tree, treeContextMenu);
 
     }
 

@@ -45,10 +45,8 @@ public class TestRunEditor {
     }
 
     public static void create(TestRun tr, ProjectPanel projectPanel, TestProject tp, TestRunJsonMapper metadata) {
-        // 🌟 1. جلب مسار TestCases مباشرة من الـ POJO (أنظف وأكثر أماناً)
         Path testCasesPath = tp.getTestCasesDirectory().getPath();
 
-        // 🌟 2. تمرير Path مباشرة بدلاً من .toFile()
         DefaultTreeModel fullModel = new DefaultTreeModel(buildDirectoryTree(testCasesPath, true));
 
         VirtualFileImpl virtualFile = new VirtualFileImpl(
@@ -72,14 +70,12 @@ public class TestRunEditor {
                 .map(item -> item.getTestCaseId().toString())
                 .collect(Collectors.toSet());
 
-        // 🌟 3. تحديث جلب المسار ليعتمد على كائن المشروع المحمل في الذاكرة بدلاً من إعادة تركيبه
         Path testCasesRoot = projectPanel.getTestProjectSelector().getSelectedTestProject().getItem().getTestCasesDirectory().getPath();
 
         if (!Files.exists(testCasesRoot)) return Collections.emptyList();
 
         List<TestCaseJsonMapper> cases = new ArrayList<>();
 
-        // استخدام try-with-resources لضمان إغلاق الـ Stream
         try (Stream<Path> paths = Files.walk(testCasesRoot)) {
             paths.filter(Files::isRegularFile)
                     .filter(p -> p.toString().endsWith(".json"))
@@ -106,7 +102,6 @@ public class TestRunEditor {
         return new DefaultTreeModel(root);
     }
 
-    // 🌟 4. ترقية دالة بناء الشجرة لتعمل بنظام الـ Path بالكامل
     private static DefaultMutableTreeNode buildDirectoryTree(Path folder, boolean isRoot) {
         Object label = isRoot
                 ? "Test Cases (" + folder.getParent().getFileName().toString() + ")"
@@ -117,7 +112,6 @@ public class TestRunEditor {
         if (!Files.exists(folder) || !Files.isDirectory(folder)) return node;
 
         try (Stream<Path> paths = Files.list(folder)) {
-            // 🌟 5. ترتيب الـ Stream (المجلدات أولاً، ثم ترتيب أبجدي)
             List<Path> sortedPaths = paths.sorted(Comparator
                             .comparing((Path p) -> !Files.isDirectory(p))
                             .thenComparing(p -> p.getFileName().toString().toLowerCase()))
@@ -143,12 +137,10 @@ public class TestRunEditor {
         return node;
     }
 
-    // 🌟 6. دالة مساعدة لتحديد نوع المجلد (تعويضاً عن TestSetMapper.map القديمة)
     private static Object resolveDirectoryObject(Path folder) {
         if (Files.exists(folder.resolve(".tcp"))) return TestSetPackageMapper.map(folder);
         if (Files.exists(folder.resolve(".ts"))) return TestSetMapper.map(folder);
 
-        // إرجاع الاسم كنص في حال لم يكن المجلد معروفاً (Fallback)
         return folder.getFileName().toString();
     }
 }

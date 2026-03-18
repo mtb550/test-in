@@ -226,6 +226,7 @@ public class TestRunEditorUI implements Disposable, ToolBar.Callbacks {
         mainPanel = new JBPanel<>(new BorderLayout());
 
         metadataHeader = new TestRunMetadataHeader();
+        metadataHeader.setRunNameDisabled(vf.getPkg().getName());
         mainPanel.add(metadataHeader.getPanel(), BorderLayout.NORTH);
 
         checklistTree = new CheckboxTree(createTreeRenderer(), root,
@@ -318,7 +319,7 @@ public class TestRunEditorUI implements Disposable, ToolBar.Callbacks {
             run.setDeviceType(metadata.getDeviceType());
         }
 
-        String fileName = DirectoryType.TR.name() + "_" + metadata.getBuildNumber() + "_" + ProjectStatus.AC.name() + ".json";
+        String fileName = DirectoryType.TR.name() + "_" + vf.getPkg().getName() + "_" + ProjectStatus.AC.name() + ".json";
         run.setRunName(fileName);
         run.setCreatedAt(LocalDateTime.now());
         run.setStatus(TestRunStatus.CREATED);
@@ -334,7 +335,7 @@ public class TestRunEditorUI implements Disposable, ToolBar.Callbacks {
             e.printStackTrace(System.err);
         }
 
-        projectPanel.getTestRunTabController().buildTreeAsync(
+        projectPanel.getTestRunTreeBuilder().buildTree(
                 projectPanel.getTestProjectSelector().getSelectedTestProject().getItem());
         FileEditorManager.getInstance(Config.getProject()).closeFile(currentFile);
     }

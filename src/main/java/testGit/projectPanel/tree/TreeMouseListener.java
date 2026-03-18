@@ -14,15 +14,15 @@ import javax.swing.tree.TreePath;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class MouseAdapterImpl extends MouseAdapter {
+public class TreeMouseListener extends MouseAdapter {
     private final ProjectPanel projectPanel;
     private final SimpleTree tree;
-    private final ContextMenu contextMenu;
+    private final TreeContextMenu treeContextMenu;
 
-    public MouseAdapterImpl(ProjectPanel projectPanel, SimpleTree tree, ContextMenu contextMenu) {
+    public TreeMouseListener(final ProjectPanel projectPanel, final SimpleTree tree, final TreeContextMenu treeContextMenu) {
         this.projectPanel = projectPanel;
         this.tree = tree;
-        this.contextMenu = contextMenu;
+        this.treeContextMenu = treeContextMenu;
     }
 
     @Override
@@ -33,9 +33,7 @@ public class MouseAdapterImpl extends MouseAdapter {
             return;
 
         if (SwingUtilities.isRightMouseButton(e)) {
-            ActionPopupMenu popupMenu = ActionManager.
-                    getInstance()
-                    .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, contextMenu);
+            ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
             popupMenu.getComponent().show(e.getComponent(), e.getX(), e.getY());
 
         } else if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {

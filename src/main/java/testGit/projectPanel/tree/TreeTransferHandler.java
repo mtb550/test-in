@@ -18,7 +18,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
 
-public class TransferHandlerImpl extends TransferHandler {
+public class TreeTransferHandler extends TransferHandler {
     private static final DataFlavor NODE_FLAVOR;
 
     static {
@@ -34,7 +34,7 @@ public class TransferHandlerImpl extends TransferHandler {
     private final Set<DefaultMutableTreeNode> selectedNodes;
     private Integer lastAction;
 
-    public TransferHandlerImpl(SimpleTree tree, Set<DefaultMutableTreeNode> selectedNodes) {
+    public TreeTransferHandler(SimpleTree tree, Set<DefaultMutableTreeNode> selectedNodes) {
         this.tree = tree;
         this.selectedNodes = selectedNodes;
     }

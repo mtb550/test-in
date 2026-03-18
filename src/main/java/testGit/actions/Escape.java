@@ -5,14 +5,14 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import testGit.projectPanel.tree.TransferHandlerImpl;
+import testGit.projectPanel.tree.TreeTransferHandler;
 import testGit.util.KeyboardSet;
 
 public class Escape extends DumbAwareAction {
     private final SimpleTree tree;
-    private final TransferHandlerImpl transferHandler;
+    private final TreeTransferHandler transferHandler;
 
-    public Escape(final SimpleTree tree, final TransferHandlerImpl transferHandler) {
+    public Escape(final SimpleTree tree, final TreeTransferHandler transferHandler) {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
         this.tree = tree;
         this.transferHandler = transferHandler;

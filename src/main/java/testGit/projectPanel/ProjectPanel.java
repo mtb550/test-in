@@ -11,8 +11,8 @@ import lombok.Getter;
 import testGit.actions.CreateTestProject;
 import testGit.projectPanel.projectSelector.TestProjectSelector;
 import testGit.projectPanel.tree.ProjectTree;
-import testGit.projectPanel.tree.TestCaseTabController;
-import testGit.projectPanel.tree.TestRunTabController;
+import testGit.projectPanel.tree.TestCaseTreeBuilder;
+import testGit.projectPanel.tree.TestRunTreeBuilder;
 import testGit.projectPanel.versionSelector.VersionSelector;
 
 import java.awt.*;
@@ -21,8 +21,8 @@ import java.awt.*;
 public class ProjectPanel implements Disposable {
     private final JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
     private final TestProjectSelector testProjectSelector;
-    private final TestCaseTabController testCaseTabController;
-    private final TestRunTabController testRunTabController;
+    private final TestCaseTreeBuilder testCaseTreeBuilder;
+    private final TestRunTreeBuilder testRunTreeBuilder;
     private VersionSelector versionSelector;
     private ProjectTree projectTree;
 
@@ -30,8 +30,8 @@ public class ProjectPanel implements Disposable {
         System.out.println("ProjectPanel.ProjectPanel()");
 
         testProjectSelector = new TestProjectSelector(this);
-        testCaseTabController = new TestCaseTabController(this);
-        testRunTabController = new TestRunTabController(this);
+        testCaseTreeBuilder = new TestCaseTreeBuilder(this);
+        testRunTreeBuilder = new TestRunTreeBuilder(this);
 
         boolean status = testProjectSelector.init();
 
