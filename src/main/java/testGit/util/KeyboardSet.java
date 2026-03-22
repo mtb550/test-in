@@ -22,12 +22,13 @@ public enum KeyboardSet {
     CreateNode(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK),
     CopyNode(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK),
     CutNode(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK),
-    PasteNode(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK);
+    PasteNode(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK),
+    CopyTestCaseTitle(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK);
 
     private final int keyCode;
     private final int modifiers;
 
-    KeyboardSet(int keyCode, int modifiers) {
+    KeyboardSet(final int keyCode, final int modifiers) {
         this.keyCode = keyCode;
         this.modifiers = modifiers;
     }

@@ -86,5 +86,7 @@ change structure of test run to be same test set, folder and inside it will be t
 
 bug, after add new test case, it is not linked to the sorting.
 
-add shortcut, if click CTRL+C on the selected test case on editor, then copy test case title.
+add shortcut, if click CTRL+C on the selected test case on editor, then copy test case title. DONE!!
+
+add popup menu in test case editor, groups for copy, copy -> title, expected, steps, priority ...etc
 

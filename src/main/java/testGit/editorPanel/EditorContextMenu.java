@@ -36,6 +36,7 @@ public class EditorContextMenu extends DefaultActionGroup {
         new OpenTestCaseDetails(list);
         new ShowTestCaseCM(dir, list, model);
         new CloseTestCaseDetails(list);
+        new CopyTestCaseTitle(list);
     }
 
     private DefaultActionGroup createSubGroup(final String title, final Icon icon, final AnAction... actions) {
