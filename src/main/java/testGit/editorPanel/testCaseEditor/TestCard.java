@@ -32,10 +32,8 @@ public class TestCard extends JBPanel<TestCard> {
     private final JBLabel idLabel = createDetailLabel();
     private final JBLabel navigateIcon = new JBLabel(AllIcons.General.ArrowRight);
     private final JBLabel runIcon = new JBLabel(AllIcons.RunConfigurations.TestState.Run);
-    private Color currentRowColor;
-
-    // 🌟 1. اللوحة التي ستحتوي على الأيقونات (ستكون مخفية افتراضياً)
     private final JBPanel<?> actionPanel = new JBPanel<>();
+    private Color currentRowColor;
 
     public TestCard() {
         setLayout(new BorderLayout());
@@ -46,16 +44,40 @@ public class TestCard extends JBPanel<TestCard> {
         titleLabel.setForeground(UIUtil.getLabelForeground());
         badgePanel.setOpaque(false);
 
-        JBPanel<?> titleLine = new JBPanel<>(new BorderLayout());
+        // 🌟 1. تجهيز سطر العنوان ليكون أفقياً
+        JBPanel<?> titleLine = new JBPanel<>();
+        titleLine.setLayout(new BoxLayout(titleLine, BoxLayout.X_AXIS));
         titleLine.setOpaque(false);
         titleLine.setAlignmentX(Component.LEFT_ALIGNMENT);
-        titleLine.add(titleLabel, BorderLayout.WEST);
+
+        // 🌟 2. تجهيز لوحة الأيقونات
+        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
+        actionPanel.setOpaque(false);
+
+        navigateIcon.setToolTipText("Navigate to Code");
+        navigateIcon.setOpaque(true);
+        navigateIcon.setBorder(JBUI.Borders.empty(4, 6));
+
+        runIcon.setToolTipText("Run test case");
+        runIcon.setOpaque(true);
+        runIcon.setBorder(JBUI.Borders.empty(4, 6));
+
+        actionPanel.add(navigateIcon);
+        actionPanel.add(Box.createRigidArea(new Dimension(8, 0)));
+        actionPanel.add(runIcon);
+        actionPanel.setVisible(false);
+
+        // 🌟 3. إضافة العنوان، ثم مسافة 10 بكسل، ثم الأيقونات بجانبه مباشرة!
+        titleLine.add(titleLabel);
+        titleLine.add(Box.createRigidArea(new Dimension(10, 0)));
+        titleLine.add(actionPanel);
+
         badgePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
         content.setOpaque(false);
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
-        content.add(titleLine);
+        content.add(titleLine); // سطر العنوان والأيقونات معاً
         content.add(badgePanel);
         content.add(expectedLabel);
         content.add(stepsLabel);
@@ -64,34 +86,10 @@ public class TestCard extends JBPanel<TestCard> {
         content.add(moduleLabel);
         content.add(idLabel);
 
-        // 🌟 2. تجهيز لوحة الأيقونات (Action Panel)
-        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
-        actionPanel.setOpaque(false); // شفافة ليظهر لون الخلفية
-
-        // إعداد أيقونة الانتقال (استخدمنا المتغير العام مباشرة بدون كتابة JBLabel قبله)
-        navigateIcon.setToolTipText("Navigate to Code");
-        navigateIcon.setOpaque(true); // مهم جداً ليقبل لون الـ Hover
-        navigateIcon.setBorder(JBUI.Borders.empty(4, 6)); // مساحة داخلية أنيقة
-
-        // إعداد أيقونة التشغيل
-        runIcon.setToolTipText("Run test case");
-        runIcon.setOpaque(true); // مهم جداً ليقبل لون الـ Hover
-        runIcon.setBorder(JBUI.Borders.empty(4, 6)); // مساحة داخلية أنيقة
-
-        // ترتيب الأيقونات داخل اللوحة مع مسافة دقيقة بينهما
-        actionPanel.add(navigateIcon);
-        actionPanel.add(Box.createRigidArea(new Dimension(8, 0))); // فاصل مساحته 8 بكسل
-        actionPanel.add(runIcon);
-
-        actionPanel.setVisible(false);
-
         BorderLayoutPanel wrapper = new BorderLayoutPanel();
         wrapper.setOpaque(false);
         wrapper.setBorder(JBUI.Borders.empty(12, 16));
         wrapper.addToCenter(content);
-
-        // 🌟 3. إضافة لوحة الأيقونات إلى أقصى اليمين في الـ wrapper
-        wrapper.addToRight(actionPanel);
 
         add(wrapper, BorderLayout.CENTER);
     }
@@ -105,7 +103,6 @@ public class TestCard extends JBPanel<TestCard> {
         moduleLabel.setText("Module: " + tc.getModule());
         idLabel.setText("ID: " + tc.getId());
 
-        // 🌟 حساب لون الصف وحفظه في المتغير، ثم تطبيقه
         currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
         setBackground(currentRowColor);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
@@ -119,7 +116,6 @@ public class TestCard extends JBPanel<TestCard> {
 
         badgePanel.removeAll();
 
-        // 🌟 2. كود رسم الشارة الحمراء للاختبارات غير المرتبة
         if (isUnsorted) {
             JBLabel unsortedBadge = new JBLabel("Unsorted");
             unsortedBadge.setOpaque(true);
@@ -140,17 +136,16 @@ public class TestCard extends JBPanel<TestCard> {
         badgePanel.repaint();
     }
 
-    // 🌟 4. الدالة التي يناديها الـ TestListRenderer عند مرور الماوس
-    public void setHovered(boolean isHovered, String hoveredIconName) {
-        if (actionPanel.isVisible() != isHovered) {
-            actionPanel.setVisible(isHovered);
+    // 🌟 4. تم تغيير الاسم ليكون منطقياً (إظهار الأيقونات يعتمد على التحديد الآن)
+    public void setActionsState(boolean showActions, String hoveredIconName) {
+        if (actionPanel.isVisible() != showActions) {
+            actionPanel.setVisible(showActions);
         }
 
-        if (isHovered) {
-            // 🌟 الذكاء هنا: إذا كانت الخلفية داكنة، نقوم بتفتيحها قليلاً. وإذا كانت فاتحة، نقوم بتغميقها.
+        if (showActions) {
             Color hoverColor = ColorUtil.isDark(currentRowColor)
-                    ? ColorUtil.brighter(currentRowColor, 2)  // تفتيح للوضع الداكن
-                    : ColorUtil.darker(currentRowColor, 1);   // تغميق للوضع الفاتح
+                    ? ColorUtil.brighter(currentRowColor, 2)
+                    : ColorUtil.darker(currentRowColor, 1);
 
             navigateIcon.setBackground("NAVIGATE".equals(hoveredIconName) ? hoverColor : UIUtil.TRANSPARENT_COLOR);
             runIcon.setBackground("RUN".equals(hoveredIconName) ? hoverColor : UIUtil.TRANSPARENT_COLOR);

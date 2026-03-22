@@ -48,10 +48,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     @Setter
     private int pageSize = 50;
 
-    @Getter
-    @Setter
-    private int hoveredIndex = -1;
-
+    // 🌟 المتغير الوحيد المتبقي لتلوين الأيقونة عند التمرير فوقها
     @Getter
     @Setter
     private String hoveredIconAction = null;
@@ -64,11 +61,9 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
         pageSize = PropertiesComponent.getInstance().getInt("testGit.pageSize", 50);
 
-        // Header — 'this' implements Callbacks so the header can notify us of changes
         this.toolBar = new ToolBar(this);
         mainPanel.add(toolBar, BorderLayout.NORTH);
 
-        // Model + sync listener
         this.model = new CollectionListModel<>(new ArrayList<>());
         this.syncListener = new ModelSyncListener<>(allTestCaseDtos, model);
         this.syncListener.setOnUpdate(() -> {
@@ -78,7 +73,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         });
         this.model.addListDataListener(syncListener);
 
-        // List
         this.list = new JBList<>(model);
         list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
         list.setOpaque(true);
@@ -96,22 +90,18 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         EditorContextMenu.registerShortcuts(vf.getTestSet(), list, model);
         mainPanel.add(new JBScrollPane(list), BorderLayout.CENTER);
 
-        // Status bar
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         PaginationController.attach(this);
         list.addListSelectionListener(new SelectionListener(list, this));
 
         refreshView();
-
-        //list.addKeyListener(new KeyListener(list, this));
         new TestFocusListener(this.list, vf).register(this);
 
-        HoverListener hoverListener = new HoverListener(list, this);
-        list.addMouseMotionListener(hoverListener);
-        list.addMouseListener(hoverListener);
-
-
+        // 🌟 المستمع الجديد الذكي (يجمع بين التلوين والنقر)
+        ActionInteractionListener actionListener = new ActionInteractionListener(list, this);
+        list.addMouseMotionListener(actionListener);
+        list.addMouseListener(actionListener);
     }
 
     public int getTotalPageCount() {
@@ -126,10 +116,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         return list;
     }
 
-    // -------------------------------------------------------------------------
-    // EditorHeader.Callbacks implementation
-    // -------------------------------------------------------------------------
-
     @Override
     public void onFilterChanged() {
         applyFilters();
@@ -143,10 +129,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         list.repaint();
     }
 
-    // -------------------------------------------------------------------------
-    // Getters delegated to header — used by RendererImpl
-    // -------------------------------------------------------------------------
-
     public boolean isShowGroups() {
         return toolBar.isShowGroups();
     }
@@ -158,10 +140,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     public Set<String> getSelectedDetails() {
         return toolBar.getSelectedDetails();
     }
-
-    // -------------------------------------------------------------------------
-    // Filtering and pagination
-    // -------------------------------------------------------------------------
 
     public void applyFilters() {
         currentPage = 1;
@@ -187,7 +165,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), totalItems);
     }
 
-    /// used with refresh button that will be added to tool bar later
     public void loadData(List<TestCaseDto> loadedData) {
         this.allTestCaseDtos = loadedData;
         sortAndIdentifyUnsorted();
@@ -214,67 +191,36 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
     private void sortAndIdentifyUnsorted() {
         if (allTestCaseDtos == null || allTestCaseDtos.isEmpty()) return;
-
-        // 1. خريطة للبحث السريع
-        java.util.Map<String, TestCaseDto> map = allTestCaseDtos.stream()
-                .collect(Collectors.toMap(TestCaseDto::getId, tc -> tc));
-
-        // 2. إيجاد نقطة البداية (isHead)
-        TestCaseDto head = allTestCaseDtos.stream()
-                .filter(tc -> Boolean.TRUE.equals(tc.getIsHead()))
-                .findFirst()
-                .orElse(null);
+        java.util.Map<String, TestCaseDto> map = allTestCaseDtos.stream().collect(Collectors.toMap(TestCaseDto::getId, tc -> tc));
+        TestCaseDto head = allTestCaseDtos.stream().filter(tc -> Boolean.TRUE.equals(tc.getIsHead())).findFirst().orElse(null);
 
         List<TestCaseDto> sortedList = new ArrayList<>();
-        Set<String> sortedIds = new HashSet<>(); // 🌟 جديد: قائمة التتبع السريع والآمن
+        Set<String> sortedIds = new HashSet<>();
         unsortedIds.clear();
 
-        // 3. تتبع السلسلة السليمة
         TestCaseDto current = head;
         while (current != null && !sortedIds.contains(current.getId())) {
             sortedList.add(current);
-            sortedIds.add(current.getId()); // 🌟 نضيفه هنا لنتذكره
-
-            if (current.getNext() != null) {
-                current = map.get(current.getNext().toString());
-            } else {
-                current = null;
-            }
+            sortedIds.add(current.getId());
+            current = current.getNext() != null ? map.get(current.getNext().toString()) : null;
         }
 
-        // 4. وضع ما تبقى (غير المرتب) في النهاية
         for (TestCaseDto tc : allTestCaseDtos) {
-            if (!sortedIds.contains(tc.getId())) { // 🌟 الفحص أصبح O(1) سريع جداً
+            if (!sortedIds.contains(tc.getId())) {
                 sortedList.add(tc);
                 unsortedIds.add(tc.getId());
             }
         }
-
-        // 🌟 5. الإصلاح الحاسم: نقوم بتفريغ القائمة الأصلية وتعبئتها بدلاً من إنشاء واحدة جديدة
-        // هذا يحافظ على الاتصال السليم مع (ModelSyncListener)
         this.allTestCaseDtos.clear();
         this.allTestCaseDtos.addAll(sortedList);
     }
 
-    // -------------------------------------------------------------------------
-    // Disposal & memory management
-    // -------------------------------------------------------------------------
     @Override
     public void dispose() {
-        System.out.println("Disposing TestCaseEditorUI...");
-
         TestCaseDto selectedInThisFile = list.getSelectedValue();
         ViewPanel.hideIfShowing(selectedInThisFile);
-
-        if (model != null && syncListener != null) {
-            model.removeListDataListener(syncListener);
-        }
-
-        if (model != null) {
-            model.removeAll();
-        }
-        if (mainPanel != null) {
-            mainPanel.removeAll();
-        }
+        if (model != null && syncListener != null) model.removeListDataListener(syncListener);
+        if (model != null) model.removeAll();
+        if (mainPanel != null) mainPanel.removeAll();
     }
 }

@@ -21,16 +21,12 @@ public class TestListRenderer implements ListCellRenderer<TestCaseDto> {
     public Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
 
         int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
-
         boolean isUnsorted = ui.getUnsortedIds().contains(tc.getId());
-
-        // 🌟 1. هل الماوس يقف فوق هذا الصف حالياً؟
-        boolean isHovered = (index == ui.getHoveredIndex());
 
         rendererCard.updateData(globalIndex, tc, ui.isShowGroups(), ui.isShowPriority(), ui.getSelectedDetails(), isUnsorted);
 
-        // 🌟 2. استدعاء الدالة! (بمجرد إضافة هذا السطر سيختفي التحذير وتعمل الأيقونات)
-        rendererCard.setHovered(isHovered, isHovered ? ui.getHoveredIconAction() : null);
+        // 🌟 1. الأيقونات تظهر فقط إذا كان الصف محدداً!
+        rendererCard.setActionsState(isSelected, isSelected ? ui.getHoveredIconAction() : null);
 
         rendererCard.setBorder(isSelected ?
                 JBUI.Borders.customLine(JBColor.blue, 1) :
