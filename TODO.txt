@@ -93,3 +93,5 @@ add popup menu in test case editor, groups for copy, copy -> title, expected, st
 how to add offecial listener for status bar
 
 make mouse released after update paging value the click enter
+
+return the code for bgcolor for navigate, run

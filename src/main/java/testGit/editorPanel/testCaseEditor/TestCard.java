@@ -1,7 +1,5 @@
 package testGit.editorPanel.testCaseEditor;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.ui.ColorUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -30,10 +28,8 @@ public class TestCard extends JBPanel<TestCard> {
     private final JBLabel businessRefLabel = createDetailLabel();
     private final JBLabel moduleLabel = createDetailLabel();
     private final JBLabel idLabel = createDetailLabel();
-    private final JBLabel navigateIcon = new JBLabel(AllIcons.General.ArrowRight);
-    private final JBLabel runIcon = new JBLabel(AllIcons.RunConfigurations.TestState.Run);
-    private final JBPanel<?> actionPanel = new JBPanel<>();
-    private Color currentRowColor;
+
+    private boolean isSelected;
 
     public TestCard() {
         setLayout(new BorderLayout());
@@ -44,40 +40,18 @@ public class TestCard extends JBPanel<TestCard> {
         titleLabel.setForeground(UIUtil.getLabelForeground());
         badgePanel.setOpaque(false);
 
-        // 🌟 1. تجهيز سطر العنوان ليكون أفقياً
         JBPanel<?> titleLine = new JBPanel<>();
         titleLine.setLayout(new BoxLayout(titleLine, BoxLayout.X_AXIS));
         titleLine.setOpaque(false);
         titleLine.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        // 🌟 2. تجهيز لوحة الأيقونات
-        actionPanel.setLayout(new BoxLayout(actionPanel, BoxLayout.X_AXIS));
-        actionPanel.setOpaque(false);
-
-        navigateIcon.setToolTipText("Navigate to Code");
-        navigateIcon.setOpaque(true);
-        navigateIcon.setBorder(JBUI.Borders.empty(4, 6));
-
-        runIcon.setToolTipText("Run test case");
-        runIcon.setOpaque(true);
-        runIcon.setBorder(JBUI.Borders.empty(4, 6));
-
-        actionPanel.add(navigateIcon);
-        actionPanel.add(Box.createRigidArea(new Dimension(8, 0)));
-        actionPanel.add(runIcon);
-        actionPanel.setVisible(false);
-
-        // 🌟 3. إضافة العنوان، ثم مسافة 10 بكسل، ثم الأيقونات بجانبه مباشرة!
         titleLine.add(titleLabel);
-        titleLine.add(Box.createRigidArea(new Dimension(10, 0)));
-        titleLine.add(actionPanel);
 
         badgePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
         content.setOpaque(false);
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
-        content.add(titleLine); // سطر العنوان والأيقونات معاً
+        content.add(titleLine);
         content.add(badgePanel);
         content.add(expectedLabel);
         content.add(stepsLabel);
@@ -103,7 +77,7 @@ public class TestCard extends JBPanel<TestCard> {
         moduleLabel.setText("Module: " + tc.getModule());
         idLabel.setText("ID: " + tc.getId());
 
-        currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
+        Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
         setBackground(currentRowColor);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
@@ -136,22 +110,17 @@ public class TestCard extends JBPanel<TestCard> {
         badgePanel.repaint();
     }
 
-    // 🌟 4. تم تغيير الاسم ليكون منطقياً (إظهار الأيقونات يعتمد على التحديد الآن)
-    public void setActionsState(boolean showActions, String hoveredIconName) {
-        if (actionPanel.isVisible() != showActions) {
-            actionPanel.setVisible(showActions);
-        }
+    public void setActionsState(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
 
-        if (showActions) {
-            Color hoverColor = ColorUtil.isDark(currentRowColor)
-                    ? ColorUtil.brighter(currentRowColor, 2)
-                    : ColorUtil.darker(currentRowColor, 1);
-
-            navigateIcon.setBackground("NAVIGATE".equals(hoveredIconName) ? hoverColor : UIUtil.TRANSPARENT_COLOR);
-            runIcon.setBackground("RUN".equals(hoveredIconName) ? hoverColor : UIUtil.TRANSPARENT_COLOR);
-        } else {
-            navigateIcon.setBackground(UIUtil.TRANSPARENT_COLOR);
-            runIcon.setBackground(UIUtil.TRANSPARENT_COLOR);
+    @Override
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+        if (isSelected) {
+            FontMetrics fm = titleLabel.getFontMetrics(titleLabel.getFont());
+            int titleWidth = fm.stringWidth(titleLabel.getText());
+            Shared.drawTitleActionIcons(this, g, titleWidth, JBUI.scale(12));
         }
     }
 

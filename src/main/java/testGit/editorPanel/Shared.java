@@ -1,5 +1,6 @@
 package testGit.editorPanel;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
@@ -7,29 +8,15 @@ import com.intellij.util.ui.UIUtil;
 import testGit.pojo.GroupType;
 import testGit.pojo.dto.TestCaseDto;
 
+import javax.swing.*;
 import java.awt.*;
 
-/**
- * Shared UI utilities for editor card components.
- * Centralises badge rendering and priority colour logic used across
- * {@code TestCaseCard} and {@code TestRunCard}.
- */
 public class Shared {
     private static final int BADGE_RADIUS = 20;
 
     private Shared() {
     }
 
-    // -------------------------------------------------------------------------
-    // Badge factories
-    // -------------------------------------------------------------------------
-
-    /**
-     * Creates a priority badge for the given test case.
-     * Colour is determined by priority level; corners are rounded by {@code radius}.
-     *
-     * @param tc the test case whose priority is displayed
-     */
     public static JBLabel createPriorityBadge(TestCaseDto tc) {
         Color bg = switch (tc.getPriority()) {
             case HIGH -> JBColor.CYAN;
@@ -39,31 +26,29 @@ public class Shared {
         return new RoundedBadge(tc.getPriority().getDescription(), bg);
     }
 
-    /**
-     * Creates a group badge for the given group type.
-     *
-     * @param groupName the group to label
-     */
     public static JBLabel createGroupBadge(GroupType groupName) {
         return new RoundedBadge(groupName.name(), JBColor.darkGray);
     }
 
-    // -------------------------------------------------------------------------
-    // RoundedBadge
-    // -------------------------------------------------------------------------
+    // 🌟 رسم الأيقونات بشكل نقي ومباشر (بدون حسابات التمرير/Hover)
+    public static void drawTitleActionIcons(Component c, Graphics g, int titleWidth, int y) {
+        int startX = 16 + titleWidth + 10;
 
-    /**
-     * A small pill-shaped label used for priority and group badges on cards.
-     * When {@code radius} is 0 the badge renders with square corners (no custom paint overhead).
-     */
+        Icon navIcon = AllIcons.General.ArrowRight;
+        navIcon.paintIcon(c, g, startX, y);
+
+        int runStartX = startX + 28 + 8;
+        Icon runIcon = AllIcons.RunConfigurations.TestState.Run;
+        runIcon.paintIcon(c, g, runStartX, y);
+    }
+
     public static class RoundedBadge extends JBLabel {
-
         private final int radius;
 
         public RoundedBadge(String text, Color bg) {
             super(text);
             this.radius = BADGE_RADIUS;
-            setOpaque(false); // flat badges can use the default opaque fill
+            setOpaque(false);
             setBackground(bg);
             setForeground(JBColor.WHITE);
             setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD));

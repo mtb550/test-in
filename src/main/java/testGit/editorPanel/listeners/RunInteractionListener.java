@@ -48,30 +48,6 @@ public class RunInteractionListener extends MouseAdapter {
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
-        int index = list.locationToIndex(e.getPoint());
-        if (index == -1) return;
-
-        Rectangle bounds = list.getCellBounds(index, index);
-        String currentIcon = getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y, bounds);
-
-        list.setCursor(currentIcon != null ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-
-        if (currentIcon == null ? ui.getHoveredIconAction() != null : !currentIcon.equals(ui.getHoveredIconAction())) {
-            ui.setHoveredIconAction(currentIcon);
-            list.repaint();
-        }
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        if (ui.getHoveredIconAction() != null) {
-            ui.setHoveredIconAction(null);
-            list.repaint();
-        }
-    }
-
-    @Override
     public void mouseClicked(MouseEvent e) {
         int index = list.locationToIndex(e.getPoint());
         if (index == -1) return;

@@ -46,7 +46,6 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     private JBList<TestCaseDto> list;
     private CollectionListModel<TestCaseDto> model;
-    private String hoveredIconAction = null;
     private int hoveredIndex = -1;
     private int currentPage = 1;
     private int pageSize = 10;
@@ -137,9 +136,11 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setCellRenderer(new RunListRenderer(this));
 
-        RunInteractionListener actionListener = new RunInteractionListener(list, this);
-        list.addMouseListener(actionListener);
-        list.addMouseMotionListener(actionListener);
+        RunInteractionListener runActionListener = new RunInteractionListener(list, this);
+        list.addMouseListener(runActionListener);
+
+        ActionInteractionListener actionIconListener = new ActionInteractionListener(list, this);
+        list.addMouseListener(actionIconListener);
 
         EditorContextMenu editorContextMenu = new EditorContextMenu(this, vf.getDirectoryDto(), list, model);
         TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getDirectoryDto(), editorContextMenu);
@@ -354,7 +355,6 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     @Override
     public void updateSequenceAndSaveAll() {
-        // RunEditor لا يغير الترتيب بالسحب والإفلات، لذلك تظل فارغة
     }
 
     @Override
@@ -369,6 +369,6 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     @Override
     public Set<String> getUnsortedIds() {
-        return Collections.emptySet(); // RunEditor لا يستخدم منطق Unsorted
+        return Collections.emptySet();
     }
 }

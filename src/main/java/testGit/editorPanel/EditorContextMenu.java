@@ -10,6 +10,8 @@ import testGit.actions.*;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.dirs.DirectoryDto;
 
+import javax.swing.*;
+
 public class EditorContextMenu extends DefaultActionGroup {
 
     public EditorContextMenu(final BaseEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {

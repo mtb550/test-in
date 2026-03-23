@@ -36,14 +36,11 @@ public interface BaseEditorUI extends Disposable {
 
     @Nullable JComponent getPreferredFocusedComponent();
 
-    // 🌟 الدوال الجديدة لتوحيد TransferListener و ListRenderers
     boolean isShowGroups();
 
     boolean isShowPriority();
 
     Set<String> getSelectedDetails();
-
-    String getHoveredIconAction();
 
     List<TestCaseDto> getAllTestCaseDtos();
 

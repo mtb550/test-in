@@ -1,6 +1,5 @@
 package testGit.editorPanel.testRunEditor;
 
-import com.intellij.ui.ColorUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -32,7 +31,7 @@ public class RunCard extends JBPanel<RunCard> {
     private final JBLabel failedBtn = createActionLabel("FAILED");
     private final JBLabel blockedBtn = createActionLabel("BLOCKED");
 
-    private Color currentRowColor;
+    private boolean isSelected;
 
     public RunCard() {
         setLayout(new BorderLayout());
@@ -58,7 +57,6 @@ public class RunCard extends JBPanel<RunCard> {
         actionPanel.add(blockedBtn);
         actionPanel.setVisible(false);
 
-        // 🌟 تقليل الهامش العلوي والسفلي للأزرار ليصبح 2 بكسل فقط
         actionPanel.setBorder(JBUI.Borders.empty(2, 0));
 
         badgePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -67,7 +65,6 @@ public class RunCard extends JBPanel<RunCard> {
         content.setOpaque(false);
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // 🌟 إعطاء الهامش (12) للنصوص فقط لكي تحافظ على شكلها
         content.setBorder(JBUI.Borders.empty(12, 0, 12, 10));
 
         content.add(titleLine);
@@ -79,7 +76,6 @@ public class RunCard extends JBPanel<RunCard> {
         BorderLayoutPanel wrapper = new BorderLayoutPanel();
         wrapper.setOpaque(false);
 
-        // 🌟 الـ Wrapper يأخذ هامش يمين ويسار فقط
         wrapper.setBorder(JBUI.Borders.empty(0, 16));
         wrapper.addToCenter(content);
         wrapper.addToRight(actionPanel);
@@ -97,7 +93,7 @@ public class RunCard extends JBPanel<RunCard> {
         stepsLabel.setVisible(activeDetails.contains("Steps"));
         automationRefLabel.setVisible(activeDetails.contains("Automation Ref"));
 
-        currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
+        Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
         setBackground(currentRowColor);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
@@ -110,19 +106,24 @@ public class RunCard extends JBPanel<RunCard> {
         badgePanel.repaint();
     }
 
-    public void setActionsState(boolean showActions, String hoveredAction) {
-        if (actionPanel.isVisible() != showActions) {
-            actionPanel.setVisible(showActions);
+    public void setActionsState(boolean isSelected) {
+        this.isSelected = isSelected;
+        if (actionPanel.isVisible() != isSelected) {
+            actionPanel.setVisible(isSelected);
         }
 
-        if (showActions) {
-            Color passBg = new JBColor(new Color(39, 174, 96, 150), new Color(46, 125, 50, 150));
-            Color failBg = new JBColor(new Color(192, 57, 43, 150), new Color(183, 28, 28, 150));
-            Color blockBg = new JBColor(new Color(243, 156, 18, 150), new Color(237, 108, 2, 150));
+        passedBtn.setBackground(new JBColor(new Color(39, 174, 96, 150), new Color(46, 125, 50, 150)));
+        failedBtn.setBackground(new JBColor(new Color(192, 57, 43, 150), new Color(183, 28, 28, 150)));
+        blockedBtn.setBackground(new JBColor(new Color(243, 156, 18, 150), new Color(237, 108, 2, 150)));
+    }
 
-            passedBtn.setBackground("PASSED".equals(hoveredAction) ? ColorUtil.brighter(passBg, 2) : passBg);
-            failedBtn.setBackground("FAILED".equals(hoveredAction) ? ColorUtil.brighter(failBg, 2) : failBg);
-            blockedBtn.setBackground("BLOCKED".equals(hoveredAction) ? ColorUtil.brighter(blockBg, 2) : blockBg);
+    @Override
+    protected void paintChildren(Graphics g) {
+        super.paintChildren(g);
+        if (isSelected) {
+            FontMetrics fm = titleLabel.getFontMetrics(titleLabel.getFont());
+            int titleWidth = fm.stringWidth(titleLabel.getText());
+            Shared.drawTitleActionIcons(this, g, titleWidth, JBUI.scale(12));
         }
     }
 

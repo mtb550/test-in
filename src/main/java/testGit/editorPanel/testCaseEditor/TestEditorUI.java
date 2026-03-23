@@ -53,10 +53,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     @Setter
     private int pageSize = 50;
 
-    @Getter
-    @Setter
-    private String hoveredIconAction = null;
-
     public TestEditorUI(@NotNull UnifiedVirtualFile vf) {
         this.vf = vf;
         this.allTestCaseDtos = new ArrayList<>(vf.getTestCaseDtos());

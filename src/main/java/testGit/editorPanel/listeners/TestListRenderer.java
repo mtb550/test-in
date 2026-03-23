@@ -11,7 +11,7 @@ import java.awt.*;
 
 public class TestListRenderer implements ListCellRenderer<TestCaseDto> {
     private final TestCard rendererCard = new TestCard();
-    private final BaseEditorUI ui; // 🌟 استخدام الواجهة الأب
+    private final BaseEditorUI ui;
 
     public TestListRenderer(final BaseEditorUI ui) {
         this.ui = ui;
@@ -24,8 +24,7 @@ public class TestListRenderer implements ListCellRenderer<TestCaseDto> {
         boolean isUnsorted = ui.getUnsortedIds().contains(tc.getId());
 
         rendererCard.updateData(globalIndex, tc, ui.isShowGroups(), ui.isShowPriority(), ui.getSelectedDetails(), isUnsorted);
-
-        rendererCard.setActionsState(isSelected, isSelected ? ui.getHoveredIconAction() : null);
+        rendererCard.setActionsState(isSelected); // 🌟 إزالة المعامل الثاني
 
         rendererCard.setBorder(isSelected ?
                 JBUI.Borders.customLine(JBColor.blue, 1) :
