@@ -30,7 +30,6 @@ public class Shared {
         return new RoundedBadge(groupName.name(), JBColor.darkGray);
     }
 
-    // 🌟 رسم الأيقونات بشكل نقي ومباشر (بدون حسابات التمرير/Hover)
     public static void drawTitleActionIcons(Component c, Graphics g, int titleWidth, int y) {
         int startX = 16 + titleWidth + 10;
 

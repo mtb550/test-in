@@ -46,7 +46,6 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     private JBList<TestCaseDto> list;
     private CollectionListModel<TestCaseDto> model;
-    private int hoveredIndex = -1;
     private int currentPage = 1;
     private int pageSize = 10;
     private StatusBar statusBar;

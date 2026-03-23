@@ -95,3 +95,5 @@ how to add offecial listener for status bar
 make mouse released after update paging value the click enter
 
 return the code for bgcolor for navigate, run
+
+in code, build icon to move you to open the test case in view panel

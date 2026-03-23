@@ -28,10 +28,6 @@ public interface BaseEditorUI extends Disposable {
 
     void appendNewTestCase(TestCaseDto tc);
 
-    void onFilterChanged();
-
-    void onDetailsChanged();
-
     @NotNull JComponent getComponent();
 
     @Nullable JComponent getPreferredFocusedComponent();

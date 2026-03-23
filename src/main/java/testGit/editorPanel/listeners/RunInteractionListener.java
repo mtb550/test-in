@@ -2,9 +2,8 @@ package testGit.editorPanel.listeners;
 
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
-import testGit.editorPanel.testRunEditor.RunEditorUI;
+import testGit.editorPanel.BaseEditorUI;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.viewPanel.ViewPanel;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -13,18 +12,15 @@ import java.awt.event.MouseEvent;
 public class RunInteractionListener extends MouseAdapter {
 
     private final JBList<TestCaseDto> list;
-    private final RunEditorUI ui;
 
-    public RunInteractionListener(JBList<TestCaseDto> list, RunEditorUI ui) {
+    public RunInteractionListener(JBList<TestCaseDto> list, BaseEditorUI ui) {
         this.list = list;
-        this.ui = ui;
     }
 
     private String getActionAtPoint(int index, int xInCell, int yInCell, Rectangle bounds) {
         if (index == -1 || !list.isSelectedIndex(index)) return null;
 
         int rightPadding = JBUI.scale(16);
-        // 🌟 تطابق مع الهامش الجديد (2 بكسل) ليحسب منطقة النقر بشكل مثالي
         int topBottomPadding = JBUI.scale(2);
         int actionWidth = JBUI.scale(90);
 
@@ -53,11 +49,6 @@ public class RunInteractionListener extends MouseAdapter {
         if (index == -1) return;
 
         TestCaseDto tc = list.getModel().getElementAt(index);
-
-        if (e.getClickCount() == 2) {
-            ViewPanel.show(tc);
-            return;
-        }
 
         if (!list.isSelectedIndex(index)) return;
 
