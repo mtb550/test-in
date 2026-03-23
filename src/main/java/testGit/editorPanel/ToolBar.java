@@ -90,6 +90,7 @@ public class ToolBar extends JBPanel<ToolBar> {
         showGroupsCheck.setFocusable(false);
         showGroupsCheck.addActionListener(e -> {
             showGroups = showGroupsCheck.isSelected();
+            saveSettings();
             callbacks.onFilterChanged();
         });
         add(showGroupsCheck);
@@ -99,6 +100,7 @@ public class ToolBar extends JBPanel<ToolBar> {
         showPriorityCheck.setOpaque(false);
         showPriorityCheck.addActionListener(e -> {
             showPriority = showPriorityCheck.isSelected();
+            saveSettings();
             callbacks.onFilterChanged();
         });
         add(showPriorityCheck);
