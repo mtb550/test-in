@@ -29,7 +29,10 @@ public abstract class BaseCard<T extends JBPanel<T>> extends JBPanel<T> {
     protected final JBLabel idLabel = createDetailLabel();
     protected final JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final BorderLayoutPanel wrapper = new BorderLayoutPanel();
+
     protected boolean isSelected;
+    protected boolean isRowHovered;
+    protected String hoveredAction;
 
     public BaseCard() {
         setLayout(new BorderLayout());
@@ -97,17 +100,19 @@ public abstract class BaseCard<T extends JBPanel<T>> extends JBPanel<T> {
         }
     }
 
-    public void setActionsState(boolean isSelected) {
+    public void setActionsState(boolean isSelected, boolean isRowHovered, String hoveredAction) {
         this.isSelected = isSelected;
+        this.isRowHovered = isRowHovered;
+        this.hoveredAction = hoveredAction;
     }
 
     @Override
     protected void paintChildren(Graphics g) {
         super.paintChildren(g);
-        if (isSelected) {
+        if (isRowHovered) {
             FontMetrics fm = titleLabel.getFontMetrics(titleLabel.getFont());
             int titleWidth = fm.stringWidth(titleLabel.getText());
-            Shared.drawTitleActionIcons(this, g, titleWidth, JBUI.scale(12));
+            Shared.drawTitleActionIcons(this, g, titleWidth, JBUI.scale(12), hoveredAction);
         }
     }
 

@@ -30,14 +30,25 @@ public class Shared {
         return new RoundedBadge(groupName.name(), JBColor.darkGray);
     }
 
-    public static void drawTitleActionIcons(Component c, Graphics g, int titleWidth, int y) {
-        int startX = 16 + titleWidth + 10;
+    public static void drawTitleActionIcons(Component c, Graphics g, int titleWidth, int y, String hoveredAction) {
+        // تطابق تام مع JBUI.scale الموجودة في مستمع الماوس!
+        int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
 
         Icon navIcon = AllIcons.General.ArrowRight;
+        if ("NAVIGATE".equals(hoveredAction)) {
+            // 🌟 استخدام اللون الرسمي لتظليل الأزرار في الـ IDE
+            g.setColor(JBUI.CurrentTheme.ActionButton.hoverBackground());
+            g.fillRoundRect(startX - JBUI.scale(4), y - JBUI.scale(4), navIcon.getIconWidth() + JBUI.scale(8), navIcon.getIconHeight() + JBUI.scale(8), JBUI.scale(6), JBUI.scale(6));
+        }
         navIcon.paintIcon(c, g, startX, y);
 
-        int runStartX = startX + 28 + 8;
+        int runStartX = startX + navIcon.getIconWidth() + JBUI.scale(8);
         Icon runIcon = AllIcons.RunConfigurations.TestState.Run;
+        if ("RUN".equals(hoveredAction)) {
+            // 🌟 استخدام اللون الرسمي لتظليل الأزرار في الـ IDE
+            g.setColor(JBUI.CurrentTheme.ActionButton.hoverBackground());
+            g.fillRoundRect(runStartX - JBUI.scale(4), y - JBUI.scale(4), runIcon.getIconWidth() + JBUI.scale(8), runIcon.getIconHeight() + JBUI.scale(8), JBUI.scale(6), JBUI.scale(6));
+        }
         runIcon.paintIcon(c, g, runStartX, y);
     }
 

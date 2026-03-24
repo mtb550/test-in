@@ -57,6 +57,13 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
     private Map<UUID, TestRunDto.TestRunItems> resultsMap;
     private TestRunMetadataHeader metadataHeader;
 
+    @Getter
+    @Setter
+    private String hoveredIconAction = null;
+    @Getter
+    @Setter
+    private int hoveredIndex = -1;
+
     public RunEditorUI(UnifiedVirtualFile vf) {
         this.vf = vf;
         this.metadata = vf.getMetadata();
@@ -140,6 +147,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
         ActionInteractionListener actionIconListener = new ActionInteractionListener(list, this);
         list.addMouseListener(actionIconListener);
+        list.addMouseMotionListener(actionIconListener);
 
         EditorContextMenu editorContextMenu = new EditorContextMenu(this, vf.getDirectoryDto(), list, model);
         TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getDirectoryDto(), editorContextMenu);

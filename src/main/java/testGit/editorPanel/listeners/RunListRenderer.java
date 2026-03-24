@@ -22,7 +22,10 @@ public class RunListRenderer implements ListCellRenderer<TestCaseDto> {
         int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
 
         rendererCard.updateData(globalIndex, tc, ui.isShowGroups(), ui.isShowPriority(), ui.getSelectedDetails());
-        rendererCard.setActionsState(isSelected); // 🌟 إزالة المعامل الثاني
+
+        boolean isRowHovered = (index == ui.getHoveredIndex());
+        String hover = isRowHovered ? ui.getHoveredIconAction() : null;
+        rendererCard.setActionsState(isSelected, isRowHovered, hover);
 
         rendererCard.setBorder(isSelected ?
                 JBUI.Borders.customLine(JBColor.blue, 1) :

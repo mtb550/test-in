@@ -53,6 +53,14 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     @Setter
     private int pageSize = 50;
 
+    @Getter
+    @Setter
+    private String hoveredIconAction = null;
+
+    @Getter
+    @Setter
+    private int hoveredIndex = -1;
+
     public TestEditorUI(@NotNull UnifiedVirtualFile vf) {
         this.vf = vf;
         this.allTestCaseDtos = new ArrayList<>(vf.getTestCaseDtos());
@@ -96,6 +104,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
         ActionInteractionListener actionListener = new ActionInteractionListener(list, this);
         list.addMouseListener(actionListener);
+        list.addMouseMotionListener(actionListener);
     }
 
     private void onDataSynced() {

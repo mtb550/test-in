@@ -99,3 +99,9 @@ return the code for bgcolor for navigate, run
 in code, build icon to move you to open the test case in view panel
 
 move all fonts to setting.
+
+separate plugin component for execution test cases. small clean quick. (light mode)
+
+put shortcuts for passed, failed and blocked in run editor
+
+add toolbar item, show (passed, failed, blocked)

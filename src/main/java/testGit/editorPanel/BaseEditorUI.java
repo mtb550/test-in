@@ -45,4 +45,12 @@ public interface BaseEditorUI extends Disposable {
     void selectTestCase(TestCaseDto tc);
 
     Set<String> getUnsortedIds();
+
+    String getHoveredIconAction();
+
+    void setHoveredIconAction(String action);
+
+    int getHoveredIndex();
+
+    void setHoveredIndex(int index);
 }

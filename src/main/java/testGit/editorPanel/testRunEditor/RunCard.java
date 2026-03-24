@@ -41,8 +41,8 @@ public class RunCard extends BaseCard<RunCard> {
     }
 
     @Override
-    public void setActionsState(boolean isSelected) {
-        super.setActionsState(isSelected);
+    public void setActionsState(boolean isSelected, boolean isRowHovered, String hoveredAction) {
+        super.setActionsState(isSelected, isRowHovered, hoveredAction);
 
         if (actionPanel.isVisible() != isSelected) {
             actionPanel.setVisible(isSelected);
