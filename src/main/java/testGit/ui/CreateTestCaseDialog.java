@@ -11,7 +11,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.Nullable;
-import testGit.pojo.GroupType;
+import testGit.pojo.Groups;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,13 +23,13 @@ public class CreateTestCaseDialog extends DialogWrapper {
     private final JBLabel charCounter = new JBLabel("0 / 100");
     private final ComboBox<String> priorityCombo = new ComboBox<>(new String[]{"LOW", "MEDIUM", "HIGH"});
 
-    private final JBCheckBox regressionBox = new JBCheckBox(GroupType.Regression.name());
-    private final JBCheckBox sanityBox = new JBCheckBox(GroupType.Sanity.name());
-    private final JBCheckBox smokeBox = new JBCheckBox(GroupType.Smoke.name());
-    private final JBCheckBox securityBox = new JBCheckBox(GroupType.Security.name());
-    private final JBCheckBox functionalBox = new JBCheckBox(GroupType.Functional.name());
-    private final JBCheckBox validationBox = new JBCheckBox(GroupType.Validation.name());
-    private final JBCheckBox uiBox = new JBCheckBox(GroupType.UI.name());
+    private final JBCheckBox regressionBox = new JBCheckBox(Groups.Regression.name());
+    private final JBCheckBox sanityBox = new JBCheckBox(Groups.Sanity.name());
+    private final JBCheckBox smokeBox = new JBCheckBox(Groups.Smoke.name());
+    private final JBCheckBox securityBox = new JBCheckBox(Groups.Security.name());
+    private final JBCheckBox functionalBox = new JBCheckBox(Groups.Functional.name());
+    private final JBCheckBox validationBox = new JBCheckBox(Groups.Validation.name());
+    private final JBCheckBox uiBox = new JBCheckBox(Groups.UI.name());
 
     public CreateTestCaseDialog() {
         super(true);
@@ -116,15 +116,15 @@ public class CreateTestCaseDialog extends DialogWrapper {
         return (String) priorityCombo.getSelectedItem();
     }
 
-    public List<GroupType> getSelectedGroups() {
-        List<GroupType> groups = new ArrayList<>();
-        if (regressionBox.isSelected()) groups.add(GroupType.Regression);
-        if (sanityBox.isSelected()) groups.add(GroupType.Sanity);
-        if (smokeBox.isSelected()) groups.add(GroupType.Smoke);
-        if (functionalBox.isSelected()) groups.add(GroupType.Functional);
-        if (validationBox.isSelected()) groups.add(GroupType.Validation);
-        if (securityBox.isSelected()) groups.add(GroupType.Security);
-        if (uiBox.isSelected()) groups.add(GroupType.UI);
+    public List<Groups> getSelectedGroups() {
+        List<Groups> groups = new ArrayList<>();
+        if (regressionBox.isSelected()) groups.add(Groups.Regression);
+        if (sanityBox.isSelected()) groups.add(Groups.Sanity);
+        if (smokeBox.isSelected()) groups.add(Groups.Smoke);
+        if (functionalBox.isSelected()) groups.add(Groups.Functional);
+        if (validationBox.isSelected()) groups.add(Groups.Validation);
+        if (securityBox.isSelected()) groups.add(Groups.Security);
+        if (uiBox.isSelected()) groups.add(Groups.UI);
         return groups;
     }
 

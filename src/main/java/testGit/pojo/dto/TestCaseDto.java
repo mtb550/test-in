@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import testGit.pojo.GroupType;
+import testGit.pojo.Groups;
 import testGit.pojo.Priority;
 
 import java.time.LocalDateTime;
@@ -40,7 +40,7 @@ public class TestCaseDto {
 
     private String busiRef;
 
-    private List<GroupType> groups;
+    private List<Groups> groups;
 
     private String createBy;
 

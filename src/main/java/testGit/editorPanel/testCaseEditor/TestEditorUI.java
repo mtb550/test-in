@@ -290,5 +290,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         if (model != null && syncListener != null) model.removeListDataListener(syncListener);
         if (model != null) model.removeAll();
         if (mainPanel != null) mainPanel.removeAll();
+        BaseEditorUI.super.dispose();
     }
 }

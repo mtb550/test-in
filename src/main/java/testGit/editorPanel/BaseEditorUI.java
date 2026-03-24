@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.dto.TestCaseDto;
+import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
 import java.util.List;
@@ -53,4 +54,8 @@ public interface BaseEditorUI extends Disposable {
     int getHoveredIndex();
 
     void setHoveredIndex(int index);
+
+    default void dispose() {
+        ViewPanel.reset();
+    }
 }

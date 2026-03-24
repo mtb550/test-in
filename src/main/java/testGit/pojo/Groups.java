@@ -1,6 +1,6 @@
 package testGit.pojo;
 
-public enum GroupType {
+public enum Groups {
     Regression,
     Smoke,
     Sanity,

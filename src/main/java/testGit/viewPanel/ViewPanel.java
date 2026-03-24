@@ -6,35 +6,18 @@ import com.intellij.ui.content.Content;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 
-import java.util.function.Consumer;
-
 public class ViewPanel {
 
     public static ToolWindow getToolWindow() {
         return ToolWindowManager.getInstance(Config.getProject()).getToolWindow("Details");
     }
 
-    public static void addTestCase(Consumer<TestCaseDto> onSaveCallback) {
+    public static void show(TestCaseDto testCaseDto) {
         ToolWindow tw = getToolWindow();
         if (tw != null) {
             if (!tw.isVisible()) tw.show();
 
-            selectContent(tw, "Create Test Case");
-
-            AddTestCasePanel add = ToolWindowFactoryImpl.getAddInstance();
-            if (add != null) {
-                add.setOnSaveCallback(onSaveCallback);
-            }
-        }
-    }
-
-    public static void show(TestCaseDto testCaseDto) {
-        ToolWindow tw = getToolWindow();
-        if (tw != null) {
-            if (!tw.isVisible())
-                tw.show();
-
-            selectContent(tw, "Details");
+            selectContent(tw);
 
             TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
             if (viewer != null) {
@@ -57,10 +40,10 @@ public class ViewPanel {
         }
     }
 
-    private static void selectContent(ToolWindow tw, String displayName) {
+    private static void selectContent(ToolWindow tw) {
         Content[] contents = tw.getContentManager().getContents();
         for (Content content : contents) {
-            if (displayName.equals(content.getDisplayName())) {
+            if ("Details".equals(content.getDisplayName())) {
                 tw.getContentManager().setSelectedContent(content);
                 break;
             }
@@ -82,5 +65,4 @@ public class ViewPanel {
             }
         }
     }
-
 }

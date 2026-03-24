@@ -20,7 +20,7 @@ public class EditorCM extends DefaultActionGroup {
         add(new CreateTestCase(ui, dir, list, model));
         add(new ViewDetails(list));
         addSeparator();
-        add(new UpdateTestCase(list));
+        add(new EditTestCase(list));
         add(new CopyTestCase(list));
         add(new RemoveTestCase(dir, list, model));
         addSeparator();
@@ -33,6 +33,7 @@ public class EditorCM extends DefaultActionGroup {
         new Escape(list);
         new OpenCM(list, editorCM);
         new CreateTestCase(ui, dir, list, model);
+        new EditTestCase(list);
         new RemoveTestCase(dir, list, model);
         new OpenTestCaseDetails(list);
         new CloseTestCaseDetails(list);

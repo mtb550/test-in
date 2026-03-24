@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 import testGit.editorPanel.*;
 import testGit.editorPanel.listeners.*;
 import testGit.pojo.Config;
-import testGit.pojo.GroupType;
+import testGit.pojo.Groups;
 import testGit.pojo.TestRunStatus;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.TestRunDto;
@@ -185,7 +185,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     private List<TestCaseDto> getFilteredList() {
         String query = toolBar != null ? toolBar.getSearchQuery() : "";
-        Set<GroupType> groups = toolBar != null ? toolBar.getSelectedGroups() : Collections.emptySet();
+        Set<Groups> groups = toolBar != null ? toolBar.getSelectedGroups() : Collections.emptySet();
 
         return initialTestCaseDtos.stream()
                 .filter(tc -> {
@@ -343,6 +343,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         if (initialTestCaseUids != null) initialTestCaseUids.clear();
         if (resultsMap != null) resultsMap.clear();
         if (mainPanel != null) mainPanel.removeAll();
+        BaseEditorUI.super.dispose();
     }
 
     public @Nullable JComponent getPreferredFocusedComponent() {

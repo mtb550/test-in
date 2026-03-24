@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
-import testGit.pojo.GroupType;
+import testGit.pojo.Groups;
 import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -27,7 +27,7 @@ public class Shared {
         return new RoundedBadge(tc.getPriority().getDescription(), bg);
     }
 
-    public static JBLabel createGroupBadge(GroupType groupName) {
+    public static JBLabel createGroupBadge(Groups groupName) {
         return new RoundedBadge(groupName.name(), JBColor.darkGray);
     }
 

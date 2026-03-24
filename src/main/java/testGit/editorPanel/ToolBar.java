@@ -10,7 +10,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
-import testGit.pojo.GroupType;
+import testGit.pojo.Groups;
 
 import javax.swing.*;
 import java.awt.*;
@@ -36,7 +36,7 @@ public class ToolBar extends JBPanel<ToolBar> {
     private static final String DEFAULT_DETAILS = "ID,Module,Expected Result,Steps,Automation Ref,Business Ref";
     // --- State ---
     @Getter
-    private final Set<GroupType> selectedGroups = new HashSet<>();
+    private final Set<Groups> selectedGroups = new HashSet<>();
     @Getter
     private final Set<String> selectedDetails = new HashSet<>();
     // --- Widgets ---
@@ -152,7 +152,7 @@ public class ToolBar extends JBPanel<ToolBar> {
     // -------------------------------------------------------------------------
 
     private void showGroupPopup(JButton anchor) {
-        JBList<GroupType> groupList = new JBList<>(GroupType.values());
+        JBList<Groups> groupList = new JBList<>(Groups.values());
         groupList.setBackground(JBColor.namedColor("Popup.background", new JBColor(0xffffff, 0x3c3f41)));
         groupList.setCellRenderer((list, value, index, isSelected, cellHasFocus) -> {
             JCheckBox cb = new JCheckBox(value.name(), selectedGroups.contains(value));
@@ -167,7 +167,7 @@ public class ToolBar extends JBPanel<ToolBar> {
             public void mouseClicked(MouseEvent e) {
                 int index = groupList.locationToIndex(e.getPoint());
                 if (index >= 0) {
-                    GroupType group = groupList.getModel().getElementAt(index);
+                    Groups group = groupList.getModel().getElementAt(index);
                     if (selectedGroups.contains(group)) selectedGroups.remove(group);
                     else selectedGroups.add(group);
                     groupList.repaint();

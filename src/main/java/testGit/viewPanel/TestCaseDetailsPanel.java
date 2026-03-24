@@ -1,17 +1,23 @@
 package testGit.viewPanel;
 
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.*;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
+import testGit.actions.CancelTestCaseEdit;
+import testGit.actions.EditTestCase;
+import testGit.actions.SaveTestCase;
 import testGit.pojo.DB;
+import testGit.pojo.Groups;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.TestCaseHistoryDto;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestCaseDetailsPanel {
     @Getter
@@ -25,12 +31,18 @@ public class TestCaseDetailsPanel {
     private final JBPanel<?> bugTab;
 
     // Edit Fields
-    private JBTextField titleField, expectedArea, stepsArea, priorityField;
-    private JBTextField autoRefField, busiRefField, groupsField;
+    private JBTextField titleField, expectedArea, stepsArea;
+    private JBTextField autoRefField, busiRefField;
+
+    // 🌟 القوائم المنسدلة بدلاً من الحقول النصية
+    private ComboBox<Priority> priorityComboBox;
+    private JBList<Groups> groupsList;
 
     private JButton saveButton;
     @Getter
     private TestCaseDto currentTestCaseDto;
+
+    @Getter
     private boolean isEditing = false;
 
     public TestCaseDetailsPanel() {
@@ -47,24 +59,14 @@ public class TestCaseDetailsPanel {
 
         panel.add(tabbedPane, BorderLayout.CENTER);
 
-        // Shortcut: Escape to cancel edit
-        panel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
-                .put(KeyStroke.getKeyStroke("ESCAPE"), "cancelEdit");
-        panel.getActionMap().put("cancelEdit", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isEditing) toggleEditMode(false);
-            }
-        });
+        new EditTestCase(this, detailsTab);
+        new CancelTestCaseEdit(detailsTab);
+        new SaveTestCase(this, detailsTab);
     }
 
-    /**
-     * Entry point for updating the UI. Handles null safely.
-     */
     public void update(TestCaseDto testCaseDto) {
         this.currentTestCaseDto = testCaseDto;
 
-        // 1. CLEAR UI IF NULL (Fixes the NPE from reset/escape)
         if (testCaseDto == null) {
             detailsTab.removeAll();
             JBLabel placeholder = new JBLabel("Select a test case to view details");
@@ -75,16 +77,11 @@ public class TestCaseDetailsPanel {
             return;
         }
 
-        // 2. Otherwise, show read-only details
         toggleEditMode(false);
         loadHistoryAndBugs();
     }
 
-    /**
-     * Rebuilds the detail tab based on whether we are viewing or editing.
-     */
     public void toggleEditMode(boolean editable) {
-        // NULL GUARD: Prevents crashes when resetting or closing
         if (currentTestCaseDto == null) return;
 
         isEditing = editable;
@@ -112,23 +109,55 @@ public class TestCaseDetailsPanel {
         titleField = new JBTextField(currentTestCaseDto.getTitle());
         expectedArea = new JBTextField(currentTestCaseDto.getExpected());
         stepsArea = new JBTextField(currentTestCaseDto.getSteps());
-        priorityField = new JBTextField(currentTestCaseDto.getPriority() != null ? currentTestCaseDto.getPriority().getDescription() : "");
         autoRefField = new JBTextField(currentTestCaseDto.getAutoRef());
         busiRefField = new JBTextField(currentTestCaseDto.getBusiRef());
-        groupsField = new JBTextField(currentTestCaseDto.getGroups() != null ? currentTestCaseDto.getGroups().toString() : "");
+
+        priorityComboBox = new ComboBox<>(Priority.values());
+        priorityComboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof Priority) setText(((Priority) value).getDescription());
+                return this;
+            }
+        });
+
+        if (currentTestCaseDto.getPriority() != null) {
+            priorityComboBox.setSelectedItem(currentTestCaseDto.getPriority());
+        } else {
+            priorityComboBox.setSelectedIndex(-1);
+        }
+
+        groupsList = new JBList<>(Groups.values());
+        groupsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        groupsList.setVisibleRowCount(Groups.values().length);
+
+        if (currentTestCaseDto.getGroups() != null) {
+            List<Integer> selectedIndices = new ArrayList<>();
+            Groups[] allGroups = Groups.values();
+            for (Object g : currentTestCaseDto.getGroups()) {
+                for (int i = 0; i < allGroups.length; i++) {
+                    if (allGroups[i].name().equals(g.toString())) {
+                        selectedIndices.add(i);
+                        break;
+                    }
+                }
+            }
+            groupsList.setSelectedIndices(selectedIndices.stream().mapToInt(i -> i).toArray());
+        }
 
         addRow("Title:", titleField, detailsTab, gbc, row++);
         addRow("Expected Result:", expectedArea, detailsTab, gbc, row++);
         addRow("Steps:", stepsArea, detailsTab, gbc, row++);
-        addRow("Priority:", priorityField, detailsTab, gbc, row++);
+        addRow("Priority:", priorityComboBox, detailsTab, gbc, row++); // 🌟 عرض القائمة
         addRow("Automation Ref:", autoRefField, detailsTab, gbc, row++);
         addRow("Business Ref:", busiRefField, detailsTab, gbc, row++);
-        addRow("Groups:", groupsField, detailsTab, gbc, row++);
 
-        addCommonMetaRows(gbc, row);
+        JBScrollPane groupsScrollPane = new JBScrollPane(groupsList);
+        addRow("Groups:", groupsScrollPane, detailsTab, gbc, row++);
 
         saveButton = new JButton("Save Changes");
-        saveButton.addActionListener(e -> onSave());
+        saveButton.addActionListener(e -> saveChanges());
         gbc.gridx = 1;
         gbc.gridy = row + 10;
         gbc.anchor = GridBagConstraints.EAST;
@@ -146,36 +175,30 @@ public class TestCaseDetailsPanel {
         addRow("Priority:", createValueLabel(currentTestCaseDto.getPriority() != null ? currentTestCaseDto.getPriority().getDescription() : "-"), detailsTab, gbc, row++);
         addRow("Automation Ref:", createValueLabel(currentTestCaseDto.getAutoRef()), detailsTab, gbc, row++);
         addRow("Business Ref:", createValueLabel(currentTestCaseDto.getBusiRef()), detailsTab, gbc, row++);
-        addRow("Groups:", createValueLabel(currentTestCaseDto.getGroups() != null ? currentTestCaseDto.getGroups().toString() : "-"), detailsTab, gbc, row++);
+        addRow("Groups:", createValueLabel(currentTestCaseDto.getGroups() != null && !currentTestCaseDto.getGroups().isEmpty() ? currentTestCaseDto.getGroups().toString() : "-"), detailsTab, gbc, row++);
         addRow("UID:", createValueLabel(String.valueOf(currentTestCaseDto.getUid())), detailsTab, gbc, row++);
         addRow("Module:", createValueLabel(currentTestCaseDto.getModule()), detailsTab, gbc, row++);
         addRow("Created By:", createValueLabel(currentTestCaseDto.getCreateBy()), detailsTab, gbc, row++);
         addRow("Updated By:", createValueLabel(currentTestCaseDto.getUpdateBy()), detailsTab, gbc, row++);
         addRow("Created At:", createValueLabel(currentTestCaseDto.getCreateAt() != null ? currentTestCaseDto.getCreateAt().toString() : "-"), detailsTab, gbc, row++);
         addRow("Updated At:", createValueLabel(currentTestCaseDto.getUpdateAt() != null ? currentTestCaseDto.getUpdateAt().toString() : "-"), detailsTab, gbc, row++);
-        addRow("Is Head:", createValueLabel(currentTestCaseDto.getIsHead() != null ? currentTestCaseDto.getIsHead().toString() : "-"), detailsTab, gbc, row++);
-        addRow("Next:", createValueLabel(currentTestCaseDto.getNext() != null ? currentTestCaseDto.getNext().toString() : "-"), detailsTab, gbc, row++);
-
-        addCommonMetaRows(gbc, row);
     }
 
-    private void addCommonMetaRows(GridBagConstraints gbc, int row) {
-
-    }
-
-    private void onSave() {
+    public void saveChanges() {
         if (currentTestCaseDto == null) return;
 
         currentTestCaseDto.setTitle(titleField.getText().trim());
         currentTestCaseDto.setExpected(expectedArea.getText().trim());
         currentTestCaseDto.setSteps(stepsArea.getText().trim());
-        try {
-            currentTestCaseDto.setPriority(Priority.valueOf(priorityField.getText().toUpperCase()));
-        } catch (Exception ignored) {
+
+        if (priorityComboBox.getSelectedItem() != null) {
+            currentTestCaseDto.setPriority((Priority) priorityComboBox.getSelectedItem());
         }
 
+        List<Groups> selectedGroups = groupsList.getSelectedValuesList();
+        currentTestCaseDto.setGroups(selectedGroups);
+
         toggleEditMode(false);
-        // Better than JOptionPane: uses IntelliJ's notification system if available
         System.out.println("Saved: " + currentTestCaseDto.getId());
     }
 
@@ -213,5 +236,4 @@ public class TestCaseDetailsPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(input, gbc);
     }
-
 }

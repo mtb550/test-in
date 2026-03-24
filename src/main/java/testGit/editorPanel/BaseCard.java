@@ -9,7 +9,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
-import testGit.pojo.GroupType;
+import testGit.pojo.Groups;
 import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -94,7 +94,7 @@ public abstract class BaseCard<T extends JBPanel<T>> extends JBPanel<T> {
         if (showPriority) badgePanel.add(Shared.createPriorityBadge(tc));
 
         if (showGroups && tc.getGroups() != null) {
-            for (GroupType groupName : tc.getGroups()) {
+            for (Groups groupName : tc.getGroups()) {
                 badgePanel.add(Shared.createGroupBadge(groupName));
             }
         }
