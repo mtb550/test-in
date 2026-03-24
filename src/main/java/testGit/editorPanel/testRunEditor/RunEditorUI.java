@@ -142,9 +142,6 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setCellRenderer(new RunListRenderer(this));
 
-        RunInteractionListener runActionListener = new RunInteractionListener(list, this);
-        list.addMouseListener(runActionListener);
-
         HoverListener hoverListener = new HoverListener(list, this);
         list.addMouseListener(hoverListener);
         list.addMouseMotionListener(hoverListener);
