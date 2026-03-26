@@ -3,6 +3,7 @@ package testGit.settings.gutter;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
@@ -61,36 +62,41 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider {
         String basePath = project.getBasePath();
         if (basePath == null) return;
 
-        File testGitDir = new File(basePath, "testGit");
-        if (!testGitDir.exists() || !testGitDir.isDirectory()) return;
+        String className = psiClass.getName();
 
-        File[] projectDirs = testGitDir.listFiles(File::isDirectory);
-        if (projectDirs == null) return;
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            File testGitDir = new File(basePath, "testGit");
+            if (!testGitDir.exists() || !testGitDir.isDirectory()) return;
 
-        File targetJsonFile = null;
+            File[] projectDirs = testGitDir.listFiles(File::isDirectory);
+            if (projectDirs == null) return;
 
-        for (File dir : projectDirs) {
-            String dirName = dir.getName();
-            if (dirName.endsWith("_AC") || dirName.endsWith("_IN") || dirName.endsWith("_AR") || dirName.endsWith("_RE")) {
+            File targetJsonFile = null;
 
-                File jsonFile = new File(dir, "testCases/" + psiClass.getName() + "/" + uuid + ".json");
-                if (jsonFile.exists()) {
-                    targetJsonFile = jsonFile;
-                    break;
+            for (File dir : projectDirs) {
+                String dirName = dir.getName();
+                if (dirName.endsWith("_AC") || dirName.endsWith("_IN") || dirName.endsWith("_AR") || dirName.endsWith("_RE")) {
+                    File jsonFile = new File(dir, "testCases/" + className + "/" + uuid + ".json");
+                    if (jsonFile.exists()) {
+                        targetJsonFile = jsonFile;
+                        break;
+                    }
                 }
             }
-        }
 
-        if (targetJsonFile != null) {
-            try {
-                TestCaseDto dto = Config.getMapper().readValue(targetJsonFile, TestCaseDto.class);
-                ViewPanel.show(project, dto);
-            } catch (Exception ex) {
-                System.err.println("Failed to read JSON: " + targetJsonFile.getAbsolutePath());
-                ex.printStackTrace(System.out);
+            if (targetJsonFile != null) {
+                try {
+                    TestCaseDto dto = Config.getMapper().readValue(targetJsonFile, TestCaseDto.class);
+
+                    ApplicationManager.getApplication().invokeLater(() -> ViewPanel.show(project, dto));
+
+                } catch (Exception ex) {
+                    System.err.println("Failed to read JSON: " + targetJsonFile.getAbsolutePath());
+                    ex.printStackTrace(System.out);
+                }
+            } else {
+                System.err.println("Test Case file not found for UUID: " + uuid);
             }
-        } else {
-            System.err.println("Test Case file not found for UUID: " + uuid);
-        }
+        });
     }
 }
