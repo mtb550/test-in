@@ -1,10 +1,11 @@
-package testGit.gutter;
+package testGit.settings.gutter;
 
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
@@ -15,60 +16,53 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 
-public class TestCaseGutterIconProvider extends RelatedItemLineMarkerProvider {
-
+public class TestMethodGutter extends RelatedItemLineMarkerProvider {
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
+        if (!(element instanceof PsiIdentifier)) return;
 
-        if (element instanceof PsiIdentifier && element.getParent() instanceof PsiMethod method) {
+        PsiElement parent = element.getParent();
+        if (!(parent instanceof PsiJavaCodeReferenceElement)) return;
 
-            PsiAnnotation testAnnotation = null;
-            for (PsiAnnotation annotation : method.getModifierList().getAnnotations()) {
-                if (annotation.getQualifiedName() != null && annotation.getQualifiedName().endsWith(".Test")) {
-                    testAnnotation = annotation;
-                    break;
-                }
-            }
+        PsiElement grandParent = parent.getParent();
+        if (!(grandParent instanceof PsiAnnotation annotation)) return;
 
-            if (testAnnotation == null) return;
+        String qualifiedName = annotation.getQualifiedName();
+        if (qualifiedName == null || !qualifiedName.endsWith(".Test")) return;
 
-            PsiAnnotationMemberValue descValue = testAnnotation.findDeclaredAttributeValue("description");
-            if (descValue == null) return;
+        PsiAnnotationMemberValue descValue = annotation.findDeclaredAttributeValue("description");
+        if (descValue == null) return;
 
-            String uuidStr = descValue.getText().replace("\"", "");
+        String uuidStr = StringUtil.unquoteString(descValue.getText());
+        if (uuidStr.length() != 36 || uuidStr.split("-").length != 5) return;
 
-            if (uuidStr.length() != 36 || uuidStr.split("-").length != 5) return;
+        PsiElement modifierList = annotation.getParent();
+        if (!(modifierList instanceof PsiModifierList) || !(modifierList.getParent() instanceof PsiMethod method))
+            return;
 
-            RelatedItemLineMarkerInfo<PsiElement> marker = new RelatedItemLineMarkerInfo<>(
-                    element,
-                    element.getTextRange(),
-                    AllIcons.General.Information,
-                    psiElement -> "View Test Case Details",
-                    (mouseEvent, psiElement) -> openViewPanel(psiElement, method, uuidStr),
-                    GutterIconRenderer.Alignment.LEFT,
-                    Collections::emptyList
-            );
+        RelatedItemLineMarkerInfo<PsiElement> marker = new RelatedItemLineMarkerInfo<>(
+                element,
+                element.getTextRange(),
+                AllIcons.Nodes.Related,
+                psiElement -> "View Test Case Details",
+                (mouseEvent, psiElement) -> openViewPanel(psiElement, method, uuidStr),
+                GutterIconRenderer.Alignment.LEFT,
+                Collections::emptyList
+        );
 
-            result.add(marker);
-        }
+        result.add(marker);
     }
 
     private void openViewPanel(PsiElement element, PsiMethod method, String uuid) {
-        // 🌟 نمسك المشروع من الـ Element مباشرة (مضمون 100% أنه غير فارغ)
         Project project = element.getProject();
         PsiClass psiClass = method.getContainingClass();
-        if (psiClass == null) return;
-
-        String className = psiClass.getName();
-        if (className == null) return;
+        if (psiClass == null || psiClass.getName() == null) return;
 
         String basePath = project.getBasePath();
         if (basePath == null) return;
 
         File testGitDir = new File(basePath, "testGit");
-        if (!testGitDir.exists() || !testGitDir.isDirectory()) {
-            return;
-        }
+        if (!testGitDir.exists() || !testGitDir.isDirectory()) return;
 
         File[] projectDirs = testGitDir.listFiles(File::isDirectory);
         if (projectDirs == null) return;
@@ -79,8 +73,7 @@ public class TestCaseGutterIconProvider extends RelatedItemLineMarkerProvider {
             String dirName = dir.getName();
             if (dirName.endsWith("_AC") || dirName.endsWith("_IN") || dirName.endsWith("_AR") || dirName.endsWith("_RE")) {
 
-                File jsonFile = new File(dir, "testCases/" + className + "/" + uuid + ".json");
-
+                File jsonFile = new File(dir, "testCases/" + psiClass.getName() + "/" + uuid + ".json");
                 if (jsonFile.exists()) {
                     targetJsonFile = jsonFile;
                     break;
@@ -91,10 +84,7 @@ public class TestCaseGutterIconProvider extends RelatedItemLineMarkerProvider {
         if (targetJsonFile != null) {
             try {
                 TestCaseDto dto = Config.getMapper().readValue(targetJsonFile, TestCaseDto.class);
-
-                // 🌟 التعديل السحري: نرسل الـ Project المضمون مع الـ Dto
                 ViewPanel.show(project, dto);
-
             } catch (Exception ex) {
                 System.err.println("Failed to read JSON: " + targetJsonFile.getAbsolutePath());
                 ex.printStackTrace(System.out);
