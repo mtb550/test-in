@@ -2,6 +2,7 @@ package testGit.viewPanel;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.*;
 import com.intellij.util.IconUtil;
@@ -36,11 +37,9 @@ public class TestCaseDetailsPanel {
     @Getter
     private final JBPanel<?> bugTab;
 
-    // Edit Fields
     private JBTextField titleField, expectedArea, stepsArea;
     private JBTextField autoRefField, busiRefField;
 
-    // 🌟 القوائم المنسدلة بدلاً من الحقول النصية
     private ComboBox<Priority> priorityComboBox;
     private JBList<Groups> groupsList;
 
@@ -155,7 +154,7 @@ public class TestCaseDetailsPanel {
         addRow("Title:", titleField, detailsTab, gbc, row++);
         addRow("Expected Result:", expectedArea, detailsTab, gbc, row++);
         addRow("Steps:", stepsArea, detailsTab, gbc, row++);
-        addRow("Priority:", priorityComboBox, detailsTab, gbc, row++); // 🌟 عرض القائمة
+        addRow("Priority:", priorityComboBox, detailsTab, gbc, row++);
         addRow("Automation Ref:", autoRefField, detailsTab, gbc, row++);
         addRow("Business Ref:", busiRefField, detailsTab, gbc, row++);
 
@@ -174,7 +173,34 @@ public class TestCaseDetailsPanel {
     }
 
     private void setupViewMode(GridBagConstraints gbc, int row) {
-        addRow("ID:", createValueLabel(currentTestCaseDto.getId()), detailsTab, gbc, row++);
+        JBLabel idBadge = new JBLabel(currentTestCaseDto.getId()) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(new JBColor(Gray._230, Gray._80));
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16); // حواف دائرية
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        idBadge.setFont(JBUI.Fonts.smallFont());
+        idBadge.setForeground(new JBColor(Gray._130, Gray._170));
+        idBadge.setBorder(JBUI.Borders.empty(3, 10)); // هوامش داخلية للون الفضي
+        idBadge.setOpaque(false);
+
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        gbc.gridwidth = 2; // يمتد على العمودين معاً
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = JBUI.insets(8, 16, 2, 16); // مسافة سفلية صغيرة ليفصل عن العنوان
+        detailsTab.add(idBadge, gbc);
+
+        gbc.gridwidth = 1;
+        gbc.insets = JBUI.insets(6, 16);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
         addRow("Title:", createValueLabel(currentTestCaseDto.getTitle()), detailsTab, gbc, row++);
 
         JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -233,7 +259,7 @@ public class TestCaseDetailsPanel {
         });
 
         actionsPanel.add(navLabel);
-        actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(4))); // مسافة صغيرة
+        actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(4)));
         actionsPanel.add(runLabel);
 
         gbc.gridx = 1;
