@@ -33,6 +33,9 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     private final ModelSyncListener syncListener;
     private final ToolBar toolBar;
 
+    // 🌟 1. تعريف المتغير للتحكم به لاحقاً
+    //private final TestFocusListener focusListener;
+
     @Getter
     private final UnifiedVirtualFile vf;
 
@@ -100,7 +103,10 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         list.addListSelectionListener(new SelectionListener(list, this));
 
         refreshView();
-        new TestFocusListener(this.list, vf).register(this);
+
+        // 🌟 2. تسجيل المستمع بدون تمرير this (لمنع تسريب الذاكرة)
+        //this.focusListener = new TestFocusListener(this.list, vf);
+        //this.focusListener.register();
 
         HoverListener hoverListener = new HoverListener(list, this);
         list.addMouseListener(hoverListener);
@@ -285,6 +291,11 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
     @Override
     public void dispose() {
+        // 🌟 3. إغلاق الاتصال بنظافة قبل مسح البيانات
+        //if (focusListener != null) {
+        //focusListener.disconnect();
+        //}
+
         TestCaseDto selectedInThisFile = list.getSelectedValue();
         ViewPanel.hideIfShowing(selectedInThisFile);
         if (model != null && syncListener != null) model.removeListDataListener(syncListener);

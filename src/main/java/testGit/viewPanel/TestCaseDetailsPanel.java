@@ -6,13 +6,11 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.*;
 import com.intellij.util.IconUtil;
+import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
-import testGit.actions.CancelTestCaseEdit;
-import testGit.actions.EditTestCase;
-import testGit.actions.SaveTestCase;
-import testGit.actions.NavigateToCode;
-import testGit.actions.RunTestCase;
+import testGit.actions.*;
 import testGit.pojo.DB;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
@@ -179,29 +177,38 @@ public class TestCaseDetailsPanel {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(new JBColor(Gray._230, Gray._80));
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16); // حواف دائرية
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 16, 16);
                 g2.dispose();
                 super.paintComponent(g);
             }
         };
         idBadge.setFont(JBUI.Fonts.smallFont());
         idBadge.setForeground(new JBColor(Gray._130, Gray._170));
-        idBadge.setBorder(JBUI.Borders.empty(3, 10)); // هوامش داخلية للون الفضي
+        idBadge.setBorder(JBUI.Borders.empty(3, 10));
         idBadge.setOpaque(false);
 
         gbc.gridx = 0;
         gbc.gridy = row++;
-        gbc.gridwidth = 2; // يمتد على العمودين معاً
+        gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
-        gbc.insets = JBUI.insets(8, 16, 2, 16); // مسافة سفلية صغيرة ليفصل عن العنوان
+        gbc.insets = JBUI.insets(8, 16, 2, 16);
         detailsTab.add(idBadge, gbc);
 
         gbc.gridwidth = 1;
         gbc.insets = JBUI.insets(6, 16);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        addRow("Title:", createValueLabel(currentTestCaseDto.getTitle()), detailsTab, gbc, row++);
+        JBLabel mainTitleLabel = new JBLabel(currentTestCaseDto.getTitle());
+        mainTitleLabel.setFont(JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f));
+        mainTitleLabel.setForeground(UIUtil.getLabelForeground());
+
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = JBUI.insets(0, 16, 4, 16);
+        detailsTab.add(mainTitleLabel, gbc);
 
         JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
@@ -222,10 +229,12 @@ public class TestCaseDetailsPanel {
             public void mouseEntered(MouseEvent e) {
                 navLabel.setIcon(IconUtil.scale(navIcon, navLabel, 1.5f));
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 navLabel.setIcon(navIcon);
             }
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 NavigateToCode.execute(currentTestCaseDto);
@@ -235,7 +244,7 @@ public class TestCaseDetailsPanel {
         Icon runIcon = AllIcons.RunConfigurations.TestState.Run;
         JLabel runLabel = new JLabel(runIcon);
         runLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        runLabel.setToolTipText("Run Test");
+        runLabel.setToolTipText("Run Test Case");
 
         int runTargetWidth = (int) (runIcon.getIconWidth() * 1.5f);
         int runTargetHeight = (int) (runIcon.getIconHeight() * 1.5f);
@@ -248,10 +257,12 @@ public class TestCaseDetailsPanel {
             public void mouseEntered(MouseEvent e) {
                 runLabel.setIcon(IconUtil.scale(runIcon, runLabel, 1.5f));
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
                 runLabel.setIcon(runIcon);
             }
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 RunTestCase.execute(currentTestCaseDto);
@@ -262,12 +273,16 @@ public class TestCaseDetailsPanel {
         actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(4)));
         actionsPanel.add(runLabel);
 
-        gbc.gridx = 1;
+        gbc.gridx = 0;
         gbc.gridy = row++;
+        gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = JBUI.insets(0, 16, 16, 16);
         detailsTab.add(actionsPanel, gbc);
 
+        gbc.gridwidth = 1;
+        gbc.insets = JBUI.insets(6, 16);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         addRow("Expected Result:", createValueLabel(currentTestCaseDto.getExpected()), detailsTab, gbc, row++);

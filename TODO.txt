@@ -127,6 +127,9 @@ open the bug on our onprem github once test case failed within execution of test
 
 I think the method runner can run the class. no need for class runner. to be checked.
 
+extend intellij disposer to save tree state and open editors once close to re-open after run intellij again
+// use activity intellij class to open the editors once run directly
+//public class TestGitStartupActivity implements ProjectActivity {
 
 
 

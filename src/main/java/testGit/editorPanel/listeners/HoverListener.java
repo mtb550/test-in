@@ -113,6 +113,19 @@ public class HoverListener extends MouseAdapter {
         if (currentAction == null ? ui.getHoveredIconAction() != null : !currentAction.equals(ui.getHoveredIconAction())) {
             ui.setHoveredIconAction(currentAction);
             needsRepaint = true;
+
+            if (currentAction != null) {
+                switch (currentAction) {
+                    case "NAVIGATE" -> list.setToolTipText("Navigate to Code");
+                    case "RUN" -> list.setToolTipText("Run Test Case");
+                    case "PASSED" -> list.setToolTipText("Mark as Passed");
+                    case "FAILED" -> list.setToolTipText("Mark as Failed");
+                    case "BLOCKED" -> list.setToolTipText("Mark as Blocked");
+                    default -> list.setToolTipText(null);
+                }
+            } else {
+                list.setToolTipText(null);
+            }
         }
 
         if (needsRepaint) {
