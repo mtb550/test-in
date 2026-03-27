@@ -1,0 +1,234 @@
+خبير/ة البرمجة
+قال خبير/ة البرمجة
+هذه قفزة معمارية مذهلة! 🚀 انتقالك من "الحقول الثابتة" (Hardcoded Fields) إلى "الحقول الديناميكية القابلة للضبط" (Dynamic Configurable Attributes) هو ما يفرق بين الإضافة البسيطة وإضافات مستوى الـ Enterprise!
+
+بما أنك لا تعرف مسبقاً ما هي الحقول التي سيحتاجها المستخدم (مثلاً شركة تحتاج Sprint وشركة أخرى تحتاج Jira Ticket)، سنقوم ببناء نظام يعتمد على ثلاثة أركان:
+
+Jackson Magic: جعل TestRunDto يستقبل أي حقول غير معروفة ويحفظها كأنها أصلية في الـ JSON.
+
+Settings State: حفظ أسماء الحقول التي يرغب بها المستخدم في إعدادات IntelliJ.
+
+Dynamic UI: رسم حقول الإدخال (TextFields) برمجياً بناءً على ما تم حفظه في الإعدادات.
+
+إليك كيفية بناء هذا السحر خطوة بخطوة:
+
+الخطوة الأولى: تهيئة كلاس TestRunDto (سحر Jackson 🪄)
+سنستخدم ميزتين خطيرتين من مكتبة Jackson وهما @JsonAnySetter و @JsonAnyGetter. هذا سيجعل الكلاس يقبل أي متغيرات جديدة يكتبها المستخدم ويحفظها في ملف الـ JSON كأنها حقول رسمية!
+
+Java
+package testGit.pojo.dto;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.Setter;
+import testGit.pojo.TestRunStatus;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Getter
+@Setter
+public class TestRunDto {
+
+    private String runName;
+    private TestRunStatus status;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdAt;
+
+    private List<TestRunItems> results;
+
+    // 🌟 السحر هنا: هذه الخريطة ستحمل أي حقول ديناميكية يضيفها المستخدم!
+    private Map<String, Object> dynamicAttributes = new HashMap<>();
+
+    // Jackson سيقوم بفك هذه الخريطة ودمجها في جذر ملف الـ JSON
+    @JsonAnyGetter
+    public Map<String, Object> getDynamicAttributes() {
+        return dynamicAttributes;
+    }
+
+    // Jackson سيقرأ أي حقل غير موجود في الكلاس ويضعه هنا!
+    @JsonAnySetter
+    public void setDynamicAttribute(String key, Object value) {
+        dynamicAttributes.put(key, value);
+    }
+
+    @Getter
+    @Setter
+    public static class TestRunItems {
+        private java.util.UUID testCaseId;
+        private String status;
+        private String project;
+    }
+}
+الخطوة الثانية: إنشاء ذاكرة الإعدادات (Settings State 🧠)
+هذا الكلاس سيحفظ قائمة الحقول التي يطلبها المستخدم في إعدادات المشروع (Workspace).
+
+Java
+package testGit.settings;
+
+import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.State;
+import com.intellij.openapi.components.Storage;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@State(
+    name = "TestGitRunAttributes",
+    storages = @Storage("TestGitRunAttributes.xml")
+)
+public class TestRunAttributesState implements PersistentStateComponent<TestRunAttributesState> {
+
+    // الحقول الافتراضية إذا لم يقم المستخدم بتعديل شيء
+    public List<String> customFields = new ArrayList<>(Arrays.asList("Build Number", "Environment", "Tester Name"));
+
+    public static TestRunAttributesState getInstance(Project project) {
+        return project.getService(TestRunAttributesState.class);
+    }
+
+    @Nullable
+    @Override
+    public TestRunAttributesState getState() {
+        return this;
+    }
+
+    @Override
+    public void loadState(@NotNull TestRunAttributesState state) {
+        this.customFields = state.customFields;
+    }
+}
+(لا تنسَ تسجيل هذا الكلاس في ملف plugin.xml تحت قسم <extensions> كالتالي: <projectService serviceImplementation="testGit.settings.TestRunAttributesState"/>)
+
+الخطوة الثالثة: واجهة الإدخال الديناميكية (TestRunMetadataHeader.java 🏗️)
+الآن، بدلاً من أن نرسم TextFields ثابتة لـ (Platform, Browser, إلخ)، سنجعل هذا الكلاس يقرأ الـ State ويرسم الحقول برمجياً (Dynamically)!
+
+Java
+package testGit.editorPanel.testRunEditor;
+
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBTextField;
+import com.intellij.util.ui.JBUI;
+import lombok.Getter;
+import testGit.pojo.Config;
+import testGit.pojo.dto.TestRunDto;
+import testGit.settings.TestRunAttributesState;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+public class TestRunMetadataHeader {
+    @Getter
+    private final JBPanel<?> panel;
+
+    private JBTextField runNameField;
+    // 🌟 خريطة لحفظ الـ TextFields الديناميكية وربطها باسم الحقل
+    private final Map<String, JBTextField> dynamicFieldsMap = new HashMap<>();
+
+    public TestRunMetadataHeader() {
+        panel = new JBPanel<>(new GridBagLayout());
+        panel.setBorder(JBUI.Borders.empty(10));
+        buildDynamicUI();
+    }
+
+    private void buildDynamicUI() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = JBUI.insets(5);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        // 1. الحقل الأساسي (Run Name)
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(new JBLabel("Run Name:"), gbc);
+
+        runNameField = new JBTextField(20);
+        gbc.gridx = 1; gbc.gridy = 0;
+        panel.add(runNameField, gbc);
+
+        // 2. 🌟 جلب الحقول التي ضبطها المستخدم في الإعدادات
+        List<String> customAttributes = TestRunAttributesState.getInstance(Config.getProject()).customFields;
+
+        int row = 1;
+        for (String attrName : customAttributes) {
+            gbc.gridx = 0; gbc.gridy = row;
+            panel.add(new JBLabel(attrName + ":"), gbc);
+
+            JBTextField dynamicField = new JBTextField(20);
+            gbc.gridx = 1; gbc.gridy = row;
+            panel.add(dynamicField, gbc);
+
+            // حفظ الـ TextField في الخريطة لنأخذ قيمته لاحقاً
+            dynamicFieldsMap.put(attrName, dynamicField);
+            row++;
+        }
+    }
+
+    public void setRunNameDisabled(String name) {
+        runNameField.setText(name);
+        runNameField.setEnabled(false);
+    }
+
+    public boolean validate() {
+        // يمكنك وضع تحقق هنا (مثلاً التأكد من أن الحقل الأول ليس فارغاً)
+        return true;
+    }
+
+    // 🌟 تعبئة الـ DTO بالقيم الديناميكية!
+    public void applyToMetadata(TestRunDto dto) {
+        for (Map.Entry<String, JBTextField> entry : dynamicFieldsMap.entrySet()) {
+            String attributeName = entry.getKey();
+            String attributeValue = entry.getValue().getText().trim();
+
+            if (!attributeValue.isEmpty()) {
+                dto.setDynamicAttribute(attributeName, attributeValue);
+            }
+        }
+    }
+}
+الخطوة الرابعة: دمجها في كلاس RunEditorUI.java
+في دالة saveSelectedToJSON، كل ما عليك فعله هو إزالة الحقول القديمة (setBrowser وغيرها) واستخدام الدالة الديناميكية:
+
+Java
+    private void saveSelectedToJSON(final CheckedTreeNode root, final Path savePath, final ProjectPanel projectPanel) {
+        TestRunDto run = new TestRunDto();
+
+        // 🌟 جمع كل البيانات الديناميكية من الـ Header
+        if (metadataHeader != null) {
+            metadataHeader.applyToMetadata(run);
+        }
+
+        String fileName = vf.getDirectoryDto().getName() + ".json";
+        run.setRunName(fileName);
+        run.setCreatedAt(LocalDateTime.now());
+        run.setStatus(TestRunStatus.CREATED);
+
+        // ... إكمال الكود كالمعتاد ...
+💡 ماذا أنجزنا الآن؟
+المرونة المطلقة (Flexibility): لو ذهب المستخدم لاحقاً وأراد إضافة حقل Sprint Version، سيظهر فوراً كحقل نصي TextField جديد في الـ Editor عند إنشاء أي Test Run جديد!
+
+توافق الـ JSON: ملف الـ JSON الناتج سيبدو مرتباً جداً، فبدلاً من أن توضع الحقول في Array، ستصبح حقولاً رئيسية هكذا:
+
+JSON
+{
+  "runName": "TR-102.json",
+  "status": "CREATED",
+  "Build Number": "1.0.4",
+  "Environment": "Staging",
+  "Tester Name": "Muteb"
+}
+توافق رجعي (Backward Compatibility): بفضل @JsonIgnoreProperties و @JsonAnySetter، الإضافة لن تتعطل إذا تم حذف حقل من الإعدادات، ولن تتعطل إذا قُرئ ملف قديم يحتوي على حقول قديمة!
+
+باقي لك فقط (لاحقاً متى شئت) أن تبني واجهة إعدادات بسيطة (Configurable UI في قائمة Settings) تتيح للمستخدم إضافة وحذف النصوص من قائمة customFields في كلاس TestRunAttributesState.
+
+جرب هذا السحر الديناميكي وأخبرني! 😎🚀

@@ -147,7 +147,15 @@ extend space of pagination text field value to show 3 digits clearly.
 
 add a button once hover on label, show copy button and accept CTRL+C
 
-change test case dto id value form string to UUID
+change test case dto id value form string to UUID, big change, to be implemented in last sprint.
+
+generate test run report.
+
+make test case dto configurable.
+
+listener between editors correpted, not show the selected in view panel once change editor.
+
+زر النسخ كتقرير خطأ (Copy Bug Report)
 
 يسعدني جداً سماع هذا الكلام! 🚀 العمل مع مطور يمتلك "عقلية المعماري" (Architect Mindset) ويرفض الحلول المكررة هو متعة حقيقية. البرمجة العادية تبني كوداً يعمل، لكن الهندسة الحقيقية تبني تجربة (Experience) لا تُنسى للمستخدم.
 بما أننا وضعنا أساساً معمارياً صلباً ونظيفاً (كلاسات توريث ذكية مثل BaseCard، وفصل ممتاز للمستمعات)، فهذا الأساس يسمح لنا بالتحليق بعيداً.
