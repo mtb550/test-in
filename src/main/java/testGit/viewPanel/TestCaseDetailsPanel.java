@@ -11,6 +11,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import testGit.actions.*;
+import testGit.editorPanel.Shared;
 import testGit.pojo.DB;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
@@ -195,10 +196,6 @@ public class TestCaseDetailsPanel {
         gbc.insets = JBUI.insets(8, 16, 2, 16);
         detailsTab.add(idBadge, gbc);
 
-        gbc.gridwidth = 1;
-        gbc.insets = JBUI.insets(6, 16);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-
         JBLabel mainTitleLabel = new JBLabel(currentTestCaseDto.getTitle());
         mainTitleLabel.setFont(JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f));
         mainTitleLabel.setForeground(UIUtil.getLabelForeground());
@@ -278,8 +275,33 @@ public class TestCaseDetailsPanel {
         gbc.gridwidth = 2;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = JBUI.insets(0, 16, 16, 16);
+        gbc.insets = JBUI.insets(0, 16, 8, 16);
         detailsTab.add(actionsPanel, gbc);
+
+        JPanel badgesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, JBUI.scale(6), 0));
+        badgesPanel.setOpaque(false);
+
+        if (currentTestCaseDto.getPriority() != null) {
+            badgesPanel.add(Shared.createPriorityBadge(currentTestCaseDto));
+        }
+
+        if (currentTestCaseDto.getGroups() != null && !currentTestCaseDto.getGroups().isEmpty()) {
+            for (Object g : currentTestCaseDto.getGroups()) {
+                try {
+                    Groups groupEnum = (g instanceof Groups) ? (Groups) g : Groups.valueOf(g.toString());
+                    badgesPanel.add(Shared.createGroupBadge(groupEnum));
+                } catch (IllegalArgumentException ignored) {
+                }
+            }
+        }
+
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = JBUI.insets(0, 16, 16, 16);
+        detailsTab.add(badgesPanel, gbc);
 
         gbc.gridwidth = 1;
         gbc.insets = JBUI.insets(6, 16);
@@ -287,10 +309,8 @@ public class TestCaseDetailsPanel {
 
         addRow("Expected Result:", createValueLabel(currentTestCaseDto.getExpected()), detailsTab, gbc, row++);
         addRow("Steps:", createValueLabel(currentTestCaseDto.getSteps()), detailsTab, gbc, row++);
-        addRow("Priority:", createValueLabel(currentTestCaseDto.getPriority() != null ? currentTestCaseDto.getPriority().getDescription() : "-"), detailsTab, gbc, row++);
         addRow("Automation Ref:", createValueLabel(currentTestCaseDto.getAutoRef()), detailsTab, gbc, row++);
         addRow("Business Ref:", createValueLabel(currentTestCaseDto.getBusiRef()), detailsTab, gbc, row++);
-        addRow("Groups:", createValueLabel(currentTestCaseDto.getGroups() != null && !currentTestCaseDto.getGroups().isEmpty() ? currentTestCaseDto.getGroups().toString() : "-"), detailsTab, gbc, row++);
         addRow("UID:", createValueLabel(String.valueOf(currentTestCaseDto.getUid())), detailsTab, gbc, row++);
         addRow("Module:", createValueLabel(currentTestCaseDto.getModule()), detailsTab, gbc, row++);
         addRow("Created By:", createValueLabel(currentTestCaseDto.getCreateBy()), detailsTab, gbc, row++);

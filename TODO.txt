@@ -129,8 +129,15 @@ I think the method runner can run the class. no need for class runner. to be che
 
 extend intellij disposer to save tree state and open editors once close to re-open after run intellij again
 // use activity intellij class to open the editors once run directly
-//public class TestGitStartupActivity implements ProjectActivity {
+//public class TestGitStartupActivity implements ProjectActivity {}
 
+add sorting attribute to view panel in test case details so can update the sort value.
+
+make automation referrence auto added once create the test case.
+
+make created by auto added once create the test case.
+
+make modified by auto added once update the test case.
 
 
 يسعدني جداً سماع هذا الكلام! 🚀 العمل مع مطور يمتلك "عقلية المعماري" (Architect Mindset) ويرفض الحلول المكررة هو متعة حقيقية. البرمجة العادية تبني كوداً يعمل، لكن الهندسة الحقيقية تبني تجربة (Experience) لا تُنسى للمستخدم.
