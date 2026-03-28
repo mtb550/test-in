@@ -19,14 +19,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestCaseDto {
-
-    private List<String> path;
-
     private UUID next;
 
     private Boolean isHead;
 
-    private String id; // next step, change this to UUID
+    private String id; /// next step, change this to UUID
 
     private String title;
 

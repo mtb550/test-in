@@ -15,15 +15,18 @@ import testGit.viewPanel.ViewPanel;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.nio.file.Path;
 
 public class TestMouseListener extends MouseAdapter {
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
     private final EditorCM editorCM;
     private final DefaultActionGroup emptyMenu;
+    private final Path path;
 
-    public TestMouseListener(BaseEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorCM editorCM) {
+    public TestMouseListener(final BaseEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorCM editorCM) {
         this.list = list;
+        this.path = dir.getPath();
         this.model = model;
         this.editorCM = editorCM;
         this.emptyMenu = new DefaultActionGroup();
@@ -39,7 +42,7 @@ public class TestMouseListener extends MouseAdapter {
             if (isClickOnItem) {
                 TestCaseDto selected = model.getElementAt(index);
                 if (selected != null) {
-                    ViewPanel.show(selected);
+                    ViewPanel.show(selected, path);
                 }
             }
             return;

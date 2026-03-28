@@ -14,6 +14,7 @@ import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -87,8 +88,8 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider {
             if (targetJsonFile != null) {
                 try {
                     TestCaseDto dto = Config.getMapper().readValue(targetJsonFile, TestCaseDto.class);
-
-                    ApplicationManager.getApplication().invokeLater(() -> ViewPanel.show(project, dto));
+                    Path testSetPath = targetJsonFile.getParentFile().toPath();
+                    ApplicationManager.getApplication().invokeLater(() -> ViewPanel.show(project, dto, testSetPath));
 
                 } catch (Exception ex) {
                     System.err.println("Failed to read JSON: " + targetJsonFile.getAbsolutePath());

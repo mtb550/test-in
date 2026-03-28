@@ -7,9 +7,13 @@ import com.intellij.ui.content.Content;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 
-public class ViewPanel {
+import java.nio.file.Path;
 
-    public static ToolWindow getToolWindow(Project project) {
+public class ViewPanel {
+    private static TestCaseDto pendingDto = null;
+    private static Path pendingPath = null;
+
+    public static ToolWindow getToolWindow(final Project project) {
         if (project == null) return null;
         return ToolWindowManager.getInstance(project).getToolWindow("Details");
     }
@@ -18,22 +22,38 @@ public class ViewPanel {
         return getToolWindow(Config.getProject());
     }
 
-    public static void show(Project project, TestCaseDto testCaseDto) {
+    public static void show(Project project, TestCaseDto testCaseDto, final Path path) {
         ToolWindow tw = getToolWindow(project);
-        if (tw != null) {
-            if (!tw.isVisible()) tw.show();
+        if (tw == null) return;
 
+        TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
+
+        if (viewer != null) {
+            if (!tw.isVisible()) tw.show(null);
             selectContent(tw);
+            viewer.update(testCaseDto, path);
 
-            TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
-            if (viewer != null) {
-                viewer.update(testCaseDto);
-            }
+            pendingDto = null;
+            pendingPath = null;
+        } else {
+            pendingDto = testCaseDto;
+            pendingPath = path;
+            tw.show(null);
         }
     }
 
-    public static void show(TestCaseDto testCaseDto) {
-        show(Config.getProject(), testCaseDto);
+    public static void applyPendingData() {
+        TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
+        if (viewer != null && pendingDto != null) {
+            viewer.update(pendingDto, pendingPath);
+
+            pendingDto = null;
+            pendingPath = null;
+        }
+    }
+
+    public static void show(final TestCaseDto testCaseDto, final Path path) {
+        show(Config.getProject(), testCaseDto, path);
     }
 
     public static void hide() {
@@ -46,11 +66,11 @@ public class ViewPanel {
     public static void reset() {
         TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
         if (viewer != null) {
-            viewer.update(null);
+            viewer.update(null, null);
         }
     }
 
-    private static void selectContent(ToolWindow tw) {
+    private static void selectContent(final ToolWindow tw) {
         Content[] contents = tw.getContentManager().getContents();
         for (Content content : contents) {
             if ("Details".equals(content.getDisplayName())) {
@@ -60,7 +80,7 @@ public class ViewPanel {
         }
     }
 
-    public static void hideIfShowing(TestCaseDto testCaseDtoToMatch) {
+    public static void hideIfShowing(final TestCaseDto testCaseDtoToMatch) {
         ToolWindow tw = getToolWindow();
         if (tw == null || !tw.isVisible()) return;
 

@@ -18,9 +18,9 @@ public class EditorCM extends DefaultActionGroup {
         super("Editor Context Menu", true);
 
         add(new CreateTestCase(ui, dir, list, model));
-        add(new ViewDetails(list));
+        add(new ViewDetails(list, dir.getPath()));
         addSeparator();
-        add(new EditTestCase(list));
+        add(new EditTestCase(list, dir.getPath()));
         add(new CopyTestCase(list));
         add(new RemoveTestCase(dir, list, model));
         addSeparator();
@@ -33,9 +33,9 @@ public class EditorCM extends DefaultActionGroup {
         new Escape(list);
         new OpenCM(list, editorCM);
         new CreateTestCase(ui, dir, list, model);
-        new EditTestCase(list);
+        new EditTestCase(list, dir.getPath());
         new RemoveTestCase(dir, list, model);
-        new OpenTestCaseDetails(list);
+        new OpenTestCaseDetails(list, dir.getPath());
         new CloseTestCaseDetails(list);
         new CopyTestCaseTitle(list);
     }

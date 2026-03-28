@@ -11,15 +11,18 @@ import testGit.viewPanel.ToolWindowFactoryImpl;
 import testGit.viewPanel.ViewPanel;
 
 import javax.swing.*;
+import java.nio.file.Path;
 
 public class EditTestCase extends DumbAwareAction {
 
     private final JBList<TestCaseDto> list;
+    private final Path path;
     private final TestCaseDetailsPanel panelContext;
 
-    public EditTestCase(JBList<TestCaseDto> list) {
+    public EditTestCase(final JBList<TestCaseDto> list, final Path path) {
         super("Edit Test Case");
         this.list = list;
+        this.path = path;
         this.panelContext = null;
         this.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getShortcut(), list);
     }
@@ -28,11 +31,12 @@ public class EditTestCase extends DumbAwareAction {
         super("Edit Test Case");
         this.panelContext = panelContext;
         this.list = null;
+        this.path = null;
         this.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getShortcut(), targetComponent);
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         TestCaseDto targetDto = null;
 
         if (list != null) {
@@ -44,7 +48,7 @@ public class EditTestCase extends DumbAwareAction {
 
         if (targetDto == null) return;
 
-        ViewPanel.show(targetDto);
+        ViewPanel.show(targetDto, path);
 
         TestCaseDetailsPanel detailsPanel = ToolWindowFactoryImpl.getDetailsInstance();
         if (detailsPanel != null && !detailsPanel.isEditing()) {

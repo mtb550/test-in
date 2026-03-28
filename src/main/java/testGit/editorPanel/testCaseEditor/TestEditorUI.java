@@ -100,7 +100,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
-        list.addListSelectionListener(new SelectionListener(list, this));
+        list.addListSelectionListener(new SelectionListener(list, this, vf.getTestSet().getPath()));
 
         refreshView();
 

@@ -16,7 +16,7 @@ public class ToolWindowFactoryImpl implements ToolWindowFactory, DumbAware {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
 
-        detailsInstance = new TestCaseDetailsPanel();
+        detailsInstance = new TestCaseDetailsPanel(project);
 
         ContentFactory contentFactory = ContentFactory.getInstance();
 
@@ -28,5 +28,6 @@ public class ToolWindowFactoryImpl implements ToolWindowFactory, DumbAware {
         toolWindow.getContentManager().addContent(historyTab);
         toolWindow.getContentManager().addContent(bugsTab);
 
+        ViewPanel.applyPendingData();
     }
 }

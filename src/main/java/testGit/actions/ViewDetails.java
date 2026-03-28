@@ -8,17 +8,21 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
 
+import java.nio.file.Path;
+
 public class ViewDetails extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
+    private final Path path;
 
-    public ViewDetails(final JBList<TestCaseDto> list) {
+    public ViewDetails(final JBList<TestCaseDto> list, final Path path) {
         super("View Details", "", AllIcons.Actions.PreviewDetails);
         this.list = list;
+        this.path = path;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         TestCaseDto tc = list.getSelectedValue();
-        ViewPanel.show(tc);
+        ViewPanel.show(tc, path);
     }
 }

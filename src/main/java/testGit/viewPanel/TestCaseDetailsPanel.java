@@ -1,6 +1,7 @@
 package testGit.viewPanel;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.Gray;
@@ -26,12 +27,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TestCaseDetailsPanel {
+    private final Project project;
+
     @Getter
     private final JBPanel<?> panel;
     private final JBTabbedPane tabbedPane;
@@ -54,9 +59,14 @@ public class TestCaseDetailsPanel {
     private TestCaseDto currentTestCaseDto;
 
     @Getter
+    private Path currentPath;
+
+    @Getter
     private boolean isEditing = false;
 
-    public TestCaseDetailsPanel() {
+    public TestCaseDetailsPanel(final Project project) {
+        this.project = project;
+
         panel = new JBPanel<>(new BorderLayout());
         tabbedPane = new JBTabbedPane();
 
@@ -76,14 +86,15 @@ public class TestCaseDetailsPanel {
         //new SaveTestCase(this, detailsTab);
     }
 
-    private static String format(String text) {
+    private static String format(final String text) {
         if (StringUtil.isEmptyOrSpaces(text)) return "";
         String s = text.trim();
         return StringUtil.capitalize(s) + ".";
     }
 
-    public void update(TestCaseDto testCaseDto) {
+    public void update(final TestCaseDto testCaseDto, final Path path) {
         this.currentTestCaseDto = testCaseDto;
+        this.currentPath = path;
 
         if (testCaseDto == null) {
             detailsTab.removeAll();
@@ -99,7 +110,7 @@ public class TestCaseDetailsPanel {
         loadHistoryAndBugs();
     }
 
-    public void toggleEditMode(boolean editable) {
+    public void toggleEditMode(final boolean editable) {
         if (currentTestCaseDto == null) return;
 
         isEditing = editable;
@@ -123,7 +134,14 @@ public class TestCaseDetailsPanel {
         detailsTab.repaint();
     }
 
-    private void setupEditMode(GridBagConstraints gbc, int row) {
+    private void setupEditMode(final GridBagConstraints gbc, int row) {
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = JBUI.insets(12, 0, 8, 0);
+        detailsTab.add(createPathPanel(currentPath), gbc);
+
         titleField = new JBTextField(currentTestCaseDto.getTitle());
         expectedArea = new JBTextField(currentTestCaseDto.getExpected());
 
@@ -187,7 +205,15 @@ public class TestCaseDetailsPanel {
         SwingUtilities.invokeLater(() -> titleField.requestFocusInWindow());
     }
 
-    private void setupViewMode(GridBagConstraints gbc, int row) {
+    private void setupViewMode(final GridBagConstraints gbc, int row) {
+
+        gbc.gridx = 0;
+        gbc.gridy = row++;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = JBUI.insetsTop(12);
+        detailsTab.add(createPathPanel(currentPath), gbc);
+
         JBLabel idBadge = new JBLabel(currentTestCaseDto.getId()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -199,6 +225,7 @@ public class TestCaseDetailsPanel {
                 super.paintComponent(g);
             }
         };
+
         idBadge.setFont(JBUI.Fonts.smallFont());
         idBadge.setForeground(new JBColor(Gray._130, Gray._170));
         idBadge.setBorder(JBUI.Borders.empty(3, 10));
@@ -430,6 +457,45 @@ public class TestCaseDetailsPanel {
     }
 
     // =========================================================================
+
+    private JComponent createPathPanel(final Path currentPath) {
+        JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        pathPanel.setOpaque(false);
+
+        if (currentPath == null) {
+            return pathPanel;
+        }
+
+        List<String> pathList = new ArrayList<>();
+        String basePathString = project.getBasePath();
+        File currentDir = currentPath.toFile();
+
+        if (basePathString != null) {
+            File baseDir = new File(basePathString);
+
+            while (currentDir != null && !currentDir.getAbsolutePath().equalsIgnoreCase(baseDir.getAbsolutePath())) {
+                pathList.add(0, currentDir.getName());
+                currentDir = currentDir.getParentFile();
+            }
+        }
+        pathList.add(0, project.getName());
+
+        for (int i = 0; i < pathList.size(); i++) {
+            JBLabel folderLabel = new JBLabel(pathList.get(i));
+            folderLabel.setFont(JBUI.Fonts.smallFont());
+            folderLabel.setForeground(JBColor.GRAY);
+            pathPanel.add(folderLabel);
+
+            if (i < pathList.size() - 1) {
+                JBLabel separator = new JBLabel(AllIcons.General.ArrowRight);
+                separator.setBorder(JBUI.Borders.empty(0, 4)); // إضافة مسافات حول السهم
+                pathPanel.add(separator);
+            }
+        }
+
+        pathPanel.setBorder(JBUI.Borders.empty(0, 16, 8, 16));
+        return pathPanel;
+    }
 
     private static class StepsEditorComponent extends JBPanel<StepsEditorComponent> {
         private final JBTextArea rawArea = new JBTextArea();

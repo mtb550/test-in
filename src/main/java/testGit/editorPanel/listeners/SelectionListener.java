@@ -8,15 +8,18 @@ import testGit.viewPanel.ViewPanel;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.nio.file.Path;
 
 public class SelectionListener implements ListSelectionListener {
     private final JBList<TestCaseDto> list;
     private final ToolWindow toolWindow = ViewPanel.getToolWindow();
     private final BaseEditorUI ui;
+    private final Path path;
 
-    public SelectionListener(final JBList<TestCaseDto> list, final BaseEditorUI ui) {
+    public SelectionListener(final JBList<TestCaseDto> list, final BaseEditorUI ui, final Path path) {
         this.list = list;
         this.ui = ui;
+        this.path = path;
     }
 
     @Override
@@ -25,7 +28,7 @@ public class SelectionListener implements ListSelectionListener {
             TestCaseDto selected = list.getSelectedValue();
             if (selected != null) {
                 if (toolWindow != null && toolWindow.isVisible()) {
-                    ViewPanel.show(selected);
+                    ViewPanel.show(selected, path);
                 }
                 if (ui.getStatusBar() != null) {
                     ui.getStatusBar().updateSelectionState(
