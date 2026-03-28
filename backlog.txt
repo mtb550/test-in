@@ -157,7 +157,7 @@ listener between editors correpted, not show the selected in view panel once cha
 
 زر النسخ كتقرير خطأ (Copy Bug Report)
 
-path on top of view panel.
+path on top of view panel. DONE!!
 
 persist save action.
 
@@ -165,6 +165,8 @@ make step in the first line. make dot and capitalaize first letter automatic > s
 make capitalize and dot in test case card and run card. move format method to Tools.
 
 create and complete the multi update actions for each test case attribute. start from context menu.(important)
+
+implement progress icon in all 3 components. tree, editor, view
 
 يسعدني جداً سماع هذا الكلام! 🚀 العمل مع مطور يمتلك "عقلية المعماري" (Architect Mindset) ويرفض الحلول المكررة هو متعة حقيقية. البرمجة العادية تبني كوداً يعمل، لكن الهندسة الحقيقية تبني تجربة (Experience) لا تُنسى للمستخدم.
 بما أننا وضعنا أساساً معمارياً صلباً ونظيفاً (كلاسات توريث ذكية مثل BaseCard، وفصل ممتاز للمستمعات)، فهذا الأساس يسمح لنا بالتحليق بعيداً.

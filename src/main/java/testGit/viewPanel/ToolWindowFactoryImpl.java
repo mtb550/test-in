@@ -27,7 +27,5 @@ public class ToolWindowFactoryImpl implements ToolWindowFactory, DumbAware {
         toolWindow.getContentManager().addContent(detailsTab);
         toolWindow.getContentManager().addContent(historyTab);
         toolWindow.getContentManager().addContent(bugsTab);
-
-        ViewPanel.applyPendingData();
     }
 }

@@ -81,7 +81,7 @@
         />
 
         <!-- gutter -->
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="testGit.settings.gutter.TestMethodGutter"/>
+        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="testGit.util.gutter.TestMethodGutter"/>
 
     </extensions>
 

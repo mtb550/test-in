@@ -1,4 +1,4 @@
-package testGit.settings.gutter;
+package testGit.util.gutter;
 
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerInfo;
 import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;

@@ -10,8 +10,6 @@ import testGit.pojo.dto.TestCaseDto;
 import java.nio.file.Path;
 
 public class ViewPanel {
-    private static TestCaseDto pendingDto = null;
-    private static Path pendingPath = null;
 
     public static ToolWindow getToolWindow(final Project project) {
         if (project == null) return null;
@@ -26,30 +24,13 @@ public class ViewPanel {
         ToolWindow tw = getToolWindow(project);
         if (tw == null) return;
 
-        TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
-
-        if (viewer != null) {
-            if (!tw.isVisible()) tw.show(null);
-            selectContent(tw);
-            viewer.update(testCaseDto, path);
-
-            pendingDto = null;
-            pendingPath = null;
-        } else {
-            pendingDto = testCaseDto;
-            pendingPath = path;
-            tw.show(null);
-        }
-    }
-
-    public static void applyPendingData() {
-        TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
-        if (viewer != null && pendingDto != null) {
-            viewer.update(pendingDto, pendingPath);
-
-            pendingDto = null;
-            pendingPath = null;
-        }
+        tw.show(() -> {
+            TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
+            if (viewer != null) {
+                selectContent(tw);
+                viewer.update(testCaseDto, path);
+            }
+        });
     }
 
     public static void show(final TestCaseDto testCaseDto, final Path path) {

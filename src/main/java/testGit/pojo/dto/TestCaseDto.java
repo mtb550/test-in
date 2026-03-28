@@ -23,7 +23,8 @@ public class TestCaseDto {
 
     private Boolean isHead;
 
-    private String id; /// next step, change this to UUID
+    /// change this to UUID
+    private String id;
 
     private String title;
 
@@ -33,6 +34,7 @@ public class TestCaseDto {
 
     private Priority priority;
 
+    /// change this to PATH FCQN
     private String autoRef;
 
     private String busiRef;
