@@ -5,6 +5,7 @@ import com.intellij.codeInsight.daemon.RelatedItemLineMarkerProvider;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
+import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
@@ -18,7 +19,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 
-public class TestMethodGutter extends RelatedItemLineMarkerProvider {
+public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         if (!(element instanceof PsiIdentifier)) return;
@@ -48,7 +49,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider {
                 AllIcons.Nodes.Related,
                 psiElement -> "View Test Case Details",
                 (mouseEvent, psiElement) -> openViewPanel(psiElement, method, uuidStr),
-                GutterIconRenderer.Alignment.LEFT,
+                GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
         );
 

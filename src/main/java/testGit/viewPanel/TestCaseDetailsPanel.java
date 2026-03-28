@@ -2,6 +2,7 @@ package testGit.viewPanel;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.ProjectView;
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.text.StringUtil;
@@ -27,6 +28,7 @@ import testGit.pojo.dto.TestCaseHistoryDto;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -227,13 +229,35 @@ public class TestCaseDetailsPanel {
         idBadge.setBorder(JBUI.Borders.empty(3, 10));
         idBadge.setOpaque(false);
 
+        JBLabel copyIcon = new JBLabel(AllIcons.Actions.Copy);
+        copyIcon.setToolTipText("Copy ID");
+        copyIcon.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        copyIcon.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                CopyPasteManager.getInstance().setContents(new StringSelection(currentTestCaseDto.getId()));
+
+                copyIcon.setIcon(AllIcons.General.InspectionsOK);
+                Timer timer = new Timer(1500, evt -> copyIcon.setIcon(AllIcons.Actions.Copy));
+                timer.setRepeats(false);
+                timer.start();
+            }
+        });
+
+        JPanel idContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, JBUI.scale(8), 0));
+        idContainer.setOpaque(false);
+        idContainer.add(idBadge);
+        idContainer.add(copyIcon);
+
         gbc.gridx = 0;
         gbc.gridy = row++;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.NONE;
         gbc.insets = JBUI.insets(8, 16, 2, 16);
-        detailsTab.add(idBadge, gbc);
+
+        detailsTab.add(idContainer, gbc);
 
         JBLabel mainTitleLabel = new JBLabel(format(currentTestCaseDto.getTitle()));
         mainTitleLabel.setFont(JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f));

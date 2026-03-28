@@ -41,10 +41,14 @@
     <!-- ================================================================== -->
     <extensions defaultExtensionNs="com.intellij">
         <!-- File editors -->
-        <fileEditorProvider implementation="testGit.editorPanel.UnifiedEditorProvider"/>
+        <fileEditorProvider
+                implementation="testGit.editorPanel.UnifiedEditorProvider"
+        />
 
         <!-- Services -->
-        <applicationService serviceImplementation="testGit.settings.AppSettingsState"/>
+        <applicationService
+                serviceImplementation="testGit.settings.AppSettingsState"
+        />
 
         <!-- Tool windows -->
         <toolWindow
@@ -81,7 +85,10 @@
         />
 
         <!-- gutter -->
-        <codeInsight.lineMarkerProvider language="JAVA" implementationClass="testGit.util.gutter.TestMethodGutter"/>
+        <codeInsight.lineMarkerProvider
+                language="JAVA"
+                implementationClass="testGit.util.gutter.TestMethodGutter"
+        />
 
     </extensions>
 

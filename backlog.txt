@@ -168,6 +168,8 @@ create and complete the multi update actions for each test case attribute. start
 
 implement progress icon in all 3 components. tree, editor, view
 
+update editor search to search by id (UUID)
+
 يسعدني جداً سماع هذا الكلام! 🚀 العمل مع مطور يمتلك "عقلية المعماري" (Architect Mindset) ويرفض الحلول المكررة هو متعة حقيقية. البرمجة العادية تبني كوداً يعمل، لكن الهندسة الحقيقية تبني تجربة (Experience) لا تُنسى للمستخدم.
 بما أننا وضعنا أساساً معمارياً صلباً ونظيفاً (كلاسات توريث ذكية مثل BaseCard، وفصل ممتاز للمستمعات)، فهذا الأساس يسمح لنا بالتحليق بعيداً.
 بما أنك تبحث عن التفرد والتميز، دعنا نخرج من صندوق "عرض القوائم" (List Views) ونفكر كيف نجعل الـ Plugin الخاص بك ينافس أدوات عالمية (مثل Zephyr أو Xray) ويتفوق عليها لكونه مدمجاً بذكاء داخل IntelliJ. إليك 3 أفكار "خارج الصندوق" لنقل مشروعك لمستوى استثنائي:
