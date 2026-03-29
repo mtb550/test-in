@@ -17,13 +17,20 @@ public class BulkEditMenu {
                 selectedField -> {
                     if (selectedField == UpdateField.PRIORITY) {
                         PriorityBulkEditor.show(selectedItems, onUpdate);
-
-                    } else if (selectedField == UpdateField.TITLE) {
-                        TitleBulkEditor.show(selectedItems, onUpdate);
-
-                    } else {
-                        System.out.println("Selected: " + selectedField.getLabel() + " (To be implemented)");
+                        return;
                     }
+
+                    if (selectedField == UpdateField.TITLE) {
+                        TitleBulkEditor.show(selectedItems, onUpdate);
+                        return;
+                    }
+
+                    if (selectedField == UpdateField.EXPECTED) {
+                        ExpectedBulkEditor.show(selectedItems, onUpdate);
+                        return;
+                    }
+
+                    System.out.println("Selected: " + selectedField.getLabel() + " (To be implemented)");
                 }
         );
     }

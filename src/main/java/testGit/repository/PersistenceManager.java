@@ -14,9 +14,17 @@ public class PersistenceManager {
                 items.get(i).setTitle(newTitles[i].trim());
             }
         }
+        // TODO: حفظ فعلي في الداتابيز
+        if (onUpdate != null) onUpdate.run();
+    }
 
-        // TODO: مستقبلاً، أضف هنا كود حفظ البيانات في الملفات أو قاعدة البيانات
-
+    public static void updateExpected(List<TestCaseDto> items, String[] newExpected, Runnable onUpdate) {
+        int limit = Math.min(newExpected.length, items.size());
+        for (int i = 0; i < limit; i++) {
+            // نقوم بتحديث النتيجة المتوقعة (حتى لو كانت فارغة لأن بعض المستخدمين قد يرغب بمسحها)
+            items.get(i).setExpected(newExpected[i].trim());
+        }
+        // TODO: حفظ فعلي في الداتابيز
         if (onUpdate != null) onUpdate.run();
     }
 
@@ -24,9 +32,7 @@ public class PersistenceManager {
         for (TestCaseDto tc : items) {
             tc.setPriority(priority);
         }
-
-        // TODO: مستقبلاً، أضف هنا كود حفظ البيانات في الملفات أو قاعدة البيانات
-
+        // TODO: حفظ فعلي في الداتابيز
         if (onUpdate != null) onUpdate.run();
     }
 }

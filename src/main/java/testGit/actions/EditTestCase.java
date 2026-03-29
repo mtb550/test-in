@@ -27,9 +27,6 @@ public class EditTestCase extends DumbAwareAction {
         this.path = path;
         this.panelContext = null;
         this.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getShortcut(), list);
-
-        /// to be implemented. to update the test case from UI without use view panel
-        //this.registerCustomShortcutSet(KeyboardSet.UpdateTestCaseFase.getShortcut(), list);
     }
 
     public EditTestCase(final TestCaseDetailsPanel panelContext, final JComponent targetComponent) {
@@ -55,18 +52,22 @@ public class EditTestCase extends DumbAwareAction {
 
             if (selectedItems.size() > 1) {
                 BulkEditMenu.show(selectedItems, list::repaint);
+                return;
 
-            } else {
-                TestCaseDto targetDto = selectedItems.getFirst();
-                ViewPanel.show(targetDto, path);
-
-                SwingUtilities.invokeLater(() -> {
-                    TestCaseDetailsPanel detailsPanel = ToolWindowFactoryImpl.getDetailsInstance();
-                    if (detailsPanel != null && !detailsPanel.isEditing()) {
-                        detailsPanel.toggleEditMode(true);
-                    }
-                });
             }
+
+            // single edit
+            /// to be updated. remove view panel edit and use a new ui
+            TestCaseDto targetDto = selectedItems.getFirst();
+            ViewPanel.show(targetDto, path);
+
+            SwingUtilities.invokeLater(() -> {
+                TestCaseDetailsPanel detailsPanel = ToolWindowFactoryImpl.getDetailsInstance();
+                if (detailsPanel != null && !detailsPanel.isEditing()) {
+                    detailsPanel.toggleEditMode(true);
+                }
+            });
+
         }
     }
 }
