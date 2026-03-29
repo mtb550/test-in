@@ -20,11 +20,11 @@ public class Shared {
 
     public static JBLabel createPriorityBadge(TestCaseDto tc) {
         Color bg = switch (tc.getPriority()) {
-            case HIGH -> JBColor.CYAN;
-            case MEDIUM -> JBColor.magenta;
-            case LOW -> JBColor.GRAY;
+            case HIGH -> JBColor.magenta;
+            case MEDIUM -> JBColor.magenta.brighter();
+            case LOW -> JBColor.magenta.brighter().brighter();
         };
-        return new RoundedBadge(tc.getPriority().getDescription(), bg);
+        return new RoundedBadge(tc.getPriority().name(), bg);
     }
 
     public static JBLabel createGroupBadge(Groups groupName) {

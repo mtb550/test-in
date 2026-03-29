@@ -108,12 +108,13 @@ add toolbar item, show (passed, failed, blocked)
 
 add dictionary to correct test cases titles
 
+add pre condition test case attribute (or query or test data)
+
 generate reports.
 
 drag and drop for test runs, multi
 
 add dasboards and result in charts for each test run. right click details the show in view panel.
-
 
 auto complete steps.
 

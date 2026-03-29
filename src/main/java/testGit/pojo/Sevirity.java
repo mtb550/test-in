@@ -3,8 +3,9 @@ package testGit.pojo;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum Priority {
-    HIGH,
-    MEDIUM,
-    LOW
+public enum Sevirity {
+    BLOCKER,
+    MAJOR,
+    MINOR,
+    ENHANCEMENT
 }
