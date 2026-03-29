@@ -7,6 +7,8 @@ import com.intellij.openapi.editor.colors.ColorKey;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.colors.EditorFontType;
+import com.intellij.openapi.editor.event.EditorMouseEvent;
+import com.intellij.openapi.editor.event.EditorMouseListener;
 import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -31,6 +33,7 @@ import testGit.viewPanel.ViewPanel;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -130,79 +133,110 @@ public class EditTestCase extends DumbAwareAction {
         Project project = Config.getProject();
         if (project == null) return;
 
+        int maxLen = 0;
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < selectedItems.size(); i++) {
-            sb.append(selectedItems.get(i).getTitle());
+            String title = selectedItems.get(i).getTitle();
+            maxLen = Math.max(maxLen, title.length());
+            sb.append(title);
             if (i < selectedItems.size() - 1) sb.append("\n");
         }
+
+        final int gutterWidth = Math.max(maxLen, 40);
 
         Document document = EditorFactory.getInstance().createDocument(sb.toString());
         Editor editor = EditorFactory.getInstance().createEditor(document, project);
 
         EditorColorsScheme scheme = editor.getColorsScheme();
-        scheme.setEditorFontSize(20);
-        scheme.setLineSpacing(2.0f);
+        scheme.setEditorFontSize(25);
+        scheme.setLineSpacing(1.8f);
 
         EditorSettings settings = editor.getSettings();
         settings.setLineNumbersShown(true);
         settings.setLineMarkerAreaShown(false);
         settings.setFoldingOutlineShown(false);
-        settings.setVirtualSpace(true);
+        settings.setVirtualSpace(false);
         settings.setUseSoftWraps(false);
         settings.setAdditionalLinesCount(0);
-        settings.setAdditionalColumnsCount(5);
+        settings.setAdditionalColumnsCount(0);
 
-        editor.getContentComponent().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "none");
+        editor.addEditorMouseListener(new EditorMouseListener() {
+            @Override
+            public void mousePressed(@NotNull EditorMouseEvent event) {
+                MouseEvent e = event.getMouseEvent();
+                if (e.isControlDown() || e.isMetaDown()) {
+                    CaretModel caretModel = editor.getCaretModel();
+                    VisualPosition visualPos = editor.xyToVisualPosition(e.getPoint());
+
+                    Caret existingCaret = caretModel.getCaretAt(visualPos);
+
+                    if (existingCaret != null) {
+                        if (caretModel.getCaretCount() > 1) {
+                            caretModel.removeCaret(existingCaret);
+                        }
+                    } else {
+                        caretModel.addCaret(visualPos, true);
+                    }
+                    event.consume();
+                }
+            }
+        });
 
         if (editor instanceof EditorEx) {
             ((EditorEx) editor).getGutterComponentEx().registerTextAnnotation(new TextAnnotationGutterProvider() {
                 @Nullable
                 @Override
                 public String getLineText(int line, Editor editor) {
-
                     if (line >= 0 && line < selectedItems.size()) {
-                        return selectedItems.get(line).getTitle();
+                        String title = selectedItems.get(line).getTitle();
+
+                        return String.format("%-" + gutterWidth + "s", title);
                     }
                     return null;
                 }
 
                 @Nullable
                 @Override
-                public String getToolTip(int line, Editor editor) { return null; }
+                public String getToolTip(int line, Editor editor) {
+                    return null;
+                }
 
                 @Override
-                public EditorFontType getStyle(int line, Editor editor) { return EditorFontType.ITALIC; }
+                public EditorFontType getStyle(int line, Editor editor) {
+                    return EditorFontType.PLAIN;
+                }
 
                 @Nullable
                 @Override
-                public ColorKey getColor(int line, Editor editor) { return EditorColors.ANNOTATIONS_COLOR; }
+                public ColorKey getColor(int line, Editor editor) {
+                    return EditorColors.ANNOTATIONS_COLOR;
+                }
 
                 @Nullable
                 @Override
-                public Color getBgColor(int line, Editor editor) { return null; }
+                public Color getBgColor(int line, Editor editor) {
+                    return null;
+                }
 
                 @Override
-                public List<AnAction> getPopupActions(int line, Editor editor) { return null; }
+                public List<AnAction> getPopupActions(int line, Editor editor) {
+                    return null;
+                }
 
                 @Override
-                public void gutterClosed() {}
+                public void gutterClosed() {
+                }
             });
             ((EditorEx) editor).getGutterComponentEx().revalidateMarkup();
         }
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(editor.getComponent(), BorderLayout.CENTER);
-
-        JButton saveBtn = new JButton("Save Changes");
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.add(saveBtn);
-        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
-
-        mainPanel.setPreferredSize(new Dimension(JBUI.scale(800), JBUI.scale(350)));
+        mainPanel.setPreferredSize(new Dimension(JBUI.scale(900), JBUI.scale(350)));
 
         JBPopup popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, editor.getContentComponent())
-                .setTitle("Bulk Edit Titles")
+                .setTitle("Bulk Edit Titles (Press Enter to Save | Ctrl+Click for Multi-Caret)")
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(true)
                 .setMovable(true)
@@ -221,7 +255,13 @@ public class EditTestCase extends DumbAwareAction {
             popup.closeOk(null);
         };
 
-        saveBtn.addActionListener(e -> saveLogic.run());
+        new DumbAwareAction() {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                saveLogic.run();
+            }
+        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), editor.getContentComponent());
 
         popup.addListener(new JBPopupListener() {
             @Override
