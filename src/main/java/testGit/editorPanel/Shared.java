@@ -19,12 +19,10 @@ public class Shared {
     }
 
     public static JBLabel createPriorityBadge(TestCaseDto tc) {
-        Color bg = switch (tc.getPriority()) {
-            case HIGH -> JBColor.magenta;
-            case MEDIUM -> JBColor.magenta.brighter();
-            case LOW -> JBColor.magenta.brighter().brighter();
-        };
-        return new RoundedBadge(tc.getPriority().name(), bg);
+        Color bg = tc.getPriority() != null ? tc.getPriority().getColor() : JBColor.GRAY;
+        String name = tc.getPriority() != null ? tc.getPriority().name() : "UNKNOWN";
+
+        return new RoundedBadge(name, bg);
     }
 
     public static JBLabel createGroupBadge(Groups groupName) {

@@ -3,6 +3,7 @@ package testGit.ui;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.ColoredListCellRenderer;
+import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
@@ -23,9 +24,9 @@ public class GenericSelectionPopup {
                                 T[] items,
                                 Function<T, String> nameFunc,
                                 Function<T, Character> shortcutFunc,
+                                Function<T, Icon> iconFunc,
                                 Consumer<T> onSelected) {
 
-        // 1. إنشاء القائمة مباشرة بدون حقل نصي
         JBList<T> list = new JBList<>(items);
         list.setBorder(JBUI.Borders.empty(4, 0));
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -34,43 +35,48 @@ public class GenericSelectionPopup {
             list.setSelectedIndex(0);
         }
 
-        // 2. تصميم شكل العنصر داخل القائمة (الاسم + الاختصار)
         list.setCellRenderer(new ColoredListCellRenderer<T>() {
             @Override
             protected void customizeCellRenderer(@NotNull JList<? extends T> list, T value, int index, boolean selected, boolean hasFocus) {
                 String name = nameFunc.apply(value);
                 Character shortcut = shortcutFunc.apply(value);
 
-                if (shortcut != null && shortcut != ' ') {
-                    append(name + " (" + shortcut + ")");
-                } else {
-                    append(name);
+                if (iconFunc != null) {
+                    Icon icon = iconFunc.apply(value);
+                    if (icon != null) {
+                        setIcon(icon);
+                    }
                 }
-                setBorder(JBUI.Borders.empty(6, 12)); // مسافات مريحة للعين
+
+                append(name);
+
+                if (shortcut != null && shortcut != ' ') {
+                    append("   " + Character.toUpperCase(shortcut), SimpleTextAttributes.GRAYED_ATTRIBUTES);
+                }
+
+                setBorder(JBUI.Borders.empty(6, 12));
             }
         });
 
-        // 3. إنشاء الـ Popup وتمرير القائمة كعنصر التركيز الأساسي
         JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setBorder(JBUI.Borders.empty());
 
         JBPopup popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(scrollPane, list) // التركيز يذهب للـ list
+                .createComponentPopupBuilder(scrollPane, list)
                 .setTitle(title)
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(true)
                 .setMovable(false)
                 .createPopup();
 
-        // 4. التقاط الاختصارات والضغطات من الكيبورد
         list.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
-                char keyChar = e.getKeyChar();
-                // فحص الاختصارات (حساس لحالة الأحرف)
+                char keyChar = Character.toLowerCase(e.getKeyChar());
+
                 for (T item : items) {
                     Character shortcut = shortcutFunc.apply(item);
-                    if (shortcut != null && shortcut.equals(keyChar)) {
+                    if (shortcut != null && Character.toLowerCase(shortcut) == keyChar) {
                         onSelected.accept(item);
                         popup.cancel();
                         e.consume();
@@ -94,7 +100,6 @@ public class GenericSelectionPopup {
             }
         });
 
-        // 5. التقاط الضغط بالماوس
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -108,7 +113,6 @@ public class GenericSelectionPopup {
             }
         });
 
-        // 6. عرض النافذة
         popup.showCenteredInCurrentWindow(Config.getProject());
     }
 }
