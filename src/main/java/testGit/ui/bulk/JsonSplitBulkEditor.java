@@ -232,8 +232,19 @@ public class JsonSplitBulkEditor {
         splitter.setFirstComponent(leftEditor.getComponent());
         splitter.setSecondComponent(rightEditor.getComponent());
 
+        // ==========================================================
+        // 🌟 شريط الحالة (Status Bar)
+        // ==========================================================
+        JPanel statusBar = new JPanel(new BorderLayout());
+        statusBar.setBorder(JBUI.Borders.empty(6, 10));
+        JLabel shortcutLabel = new JLabel("💡 Shortcuts:  [Enter] Save   |   [Tab] / [↓] Next   |   [Shift+Tab] / [↑] Prev   |   [Ctrl+Click] Multi-Caret");
+        shortcutLabel.setForeground(JBColor.GRAY);
+        shortcutLabel.setFont(JBUI.Fonts.smallFont());
+        statusBar.add(shortcutLabel, BorderLayout.WEST);
+
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(splitter, BorderLayout.CENTER);
+        panel.add(statusBar, BorderLayout.SOUTH);
         panel.setPreferredSize(new Dimension(JBUI.scale(1000), JBUI.scale(450)));
 
         JBPopup popup = JBPopupFactory.getInstance()
