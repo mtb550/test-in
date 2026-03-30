@@ -9,16 +9,17 @@ import com.intellij.ui.content.ContentFactory;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
+import testGit.viewPanel.details.DetailsTab;
 
 public class ToolWindowFactoryImpl implements ToolWindowFactory, DumbAware {
     @Getter
-    private static TestCaseDetailsPanel detailsInstance;
+    private static DetailsTab detailsInstance;
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
         Config.setProject(project); /// to be added for all other components. tree, editor. as we may run one of them first
 
-        detailsInstance = new TestCaseDetailsPanel();
+        detailsInstance = new DetailsTab();
 
         ContentFactory contentFactory = ContentFactory.getInstance();
 

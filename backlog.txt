@@ -186,6 +186,7 @@ fix step issues: 1- remove use CTRL+D, 2- add new array item for all cursors not
 add status bar to the edit all ui in JsonSplitterBulkEditor, and put all shortcuts
 
 if select multi test cases and view panel is open, paginate the view panel and show all.
+
 question not solved
 (attach splitter, title, expected)
 great, all perfect now.

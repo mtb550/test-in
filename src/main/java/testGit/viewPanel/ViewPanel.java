@@ -6,6 +6,7 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.ui.content.Content;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
+import testGit.viewPanel.details.DetailsTab;
 
 import java.nio.file.Path;
 
@@ -25,7 +26,7 @@ public class ViewPanel {
         if (tw == null) return;
 
         tw.show(() -> {
-            TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
+            DetailsTab viewer = ToolWindowFactoryImpl.getDetailsInstance();
             if (viewer != null) {
                 selectContent(tw);
                 viewer.update(testCaseDto, path);
@@ -45,7 +46,7 @@ public class ViewPanel {
     }
 
     public static void reset() {
-        TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
+        DetailsTab viewer = ToolWindowFactoryImpl.getDetailsInstance();
         if (viewer != null) {
             viewer.update(null, null);
         }
@@ -65,7 +66,7 @@ public class ViewPanel {
         ToolWindow tw = getToolWindow();
         if (tw == null || !tw.isVisible()) return;
 
-        TestCaseDetailsPanel viewer = ToolWindowFactoryImpl.getDetailsInstance();
+        DetailsTab viewer = ToolWindowFactoryImpl.getDetailsInstance();
         if (viewer != null) {
             TestCaseDto currentlyShown = viewer.getCurrentTestCaseDto();
 

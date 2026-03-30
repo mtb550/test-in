@@ -4,7 +4,7 @@
 //import com.intellij.openapi.project.DumbAwareAction;
 //import org.jetbrains.annotations.NotNull;
 //import testGit.util.KeyboardSet;
-//import testGit.viewPanel.TestCaseDetailsPanel;
+//import testGit.viewPanel.details.TestCaseDetailsPanel;
 //import testGit.viewPanel.ToolWindowFactoryImpl;
 //
 //import javax.swing.*;
