@@ -184,3 +184,12 @@ make shortcuts to add nodes like edit menu.
 fix step issues: 1- remove use CTRL+D, 2- add new array item for all cursors not for the last only, 3-remove use cotation in step value, 4- step class not use the splitter class. it is too long
 
 add status bar to the edit all ui in JsonSplitterBulkEditor, and put all shortcuts
+
+if select multi test cases and view panel is open, paginate the view panel and show all.
+question not solved
+(attach splitter, title, expected)
+great, all perfect now.
+i attached the classes.
+review and read it then:
+why dont use exted. it is better than static.
+also, enhance and arrange code more to make my maintinance easy.

@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -14,15 +13,12 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
-import testGit.actions.CancelTestCaseEdit;
-import testGit.actions.EditTestCase;
 import testGit.actions.NavigateToCode;
 import testGit.actions.RunTestCase;
 import testGit.editorPanel.Shared;
 import testGit.pojo.Config;
 import testGit.pojo.DB;
 import testGit.pojo.Groups;
-import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.TestCaseHistoryDto;
 
@@ -34,34 +30,18 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TestCaseDetailsPanel {
 
     @Getter
     private final JBPanel<?> panel, detailsTab, historyTab, bugTab;
-
     private final JBTabbedPane tabbedPane;
 
-    private JBTextField titleField, expectedArea, autoRefField, busiRefField;
-
-    private StepsEditorComponent stepsEditor;
-
-    private ComboBox<Priority> priorityComboBox;
-
-    private JBList<Groups> groupsList;
-
-    private JButton saveButton;
     @Getter
     private TestCaseDto currentTestCaseDto;
-
     @Getter
     private Path currentPath;
-
-    @Getter
-    private boolean isEditing = false;
 
     public TestCaseDetailsPanel() {
         panel = new JBPanel<>(new BorderLayout());
@@ -77,10 +57,6 @@ public class TestCaseDetailsPanel {
 
         panel.add(tabbedPane, BorderLayout.CENTER);
 
-        /// to be moved to separate class
-        new EditTestCase(this, detailsTab);
-        new CancelTestCaseEdit(detailsTab);
-        //new SaveTestCase(this, detailsTab);
     }
 
     private static String format(final String text) {
@@ -93,114 +69,29 @@ public class TestCaseDetailsPanel {
         this.currentTestCaseDto = testCaseDto;
         this.currentPath = path;
 
+        detailsTab.removeAll();
+
         if (testCaseDto == null) {
-            detailsTab.removeAll();
             JBLabel placeholder = new JBLabel("Select a test case to view details");
             placeholder.setForeground(JBColor.GRAY);
             detailsTab.add(placeholder, new GridBagConstraints());
-            detailsTab.revalidate();
-            detailsTab.repaint();
-            return;
-        }
 
-        toggleEditMode(false);
-        loadHistoryAndBugs();
-    }
-
-    public void toggleEditMode(final boolean editable) {
-        if (currentTestCaseDto == null) return;
-
-        isEditing = editable;
-        detailsTab.removeAll();
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = JBUI.insets(8, 16);
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-
-        int row = 0;
-
-        if (editable) {
-            setupEditMode(gbc, row);
         } else {
+
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = JBUI.insets(8, 16);
+            gbc.anchor = GridBagConstraints.WEST;
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.weightx = 1.0;
+            int row = 0;
+
             setupViewMode(gbc, row);
+            loadHistoryAndBugs();
         }
 
         detailsTab.revalidate();
         detailsTab.repaint();
 
-    }
-
-    private void setupEditMode(final GridBagConstraints gbc, int row) {
-//        gbc.gridx = 0;
-//        gbc.gridy = row++;
-//        gbc.gridwidth = 2;
-//        gbc.fill = GridBagConstraints.HORIZONTAL;
-//        gbc.insets = JBUI.insets(12, 0, 8, 0);
-//        detailsTab.add(navigationBar(currentPath), gbc);
-
-        titleField = new JBTextField(currentTestCaseDto.getTitle());
-        expectedArea = new JBTextField(currentTestCaseDto.getExpected());
-
-        stepsEditor = new StepsEditorComponent(currentTestCaseDto.getSteps());
-
-        autoRefField = new JBTextField(currentTestCaseDto.getAutoRef());
-        busiRefField = new JBTextField(currentTestCaseDto.getBusiRef());
-
-        priorityComboBox = new ComboBox<>(Priority.values());
-        priorityComboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Priority) setText(((Priority) value).name());
-                return this;
-            }
-        });
-
-        if (currentTestCaseDto.getPriority() != null) {
-            priorityComboBox.setSelectedItem(currentTestCaseDto.getPriority());
-        } else {
-            priorityComboBox.setSelectedIndex(-1);
-        }
-
-        groupsList = new JBList<>(Groups.values());
-        groupsList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        groupsList.setVisibleRowCount(Groups.values().length);
-
-        if (currentTestCaseDto.getGroups() != null) {
-            List<Integer> selectedIndices = new ArrayList<>();
-            Groups[] allGroups = Groups.values();
-            for (Object g : currentTestCaseDto.getGroups()) {
-                for (int i = 0; i < allGroups.length; i++) {
-                    if (allGroups[i].name().equals(g.toString())) {
-                        selectedIndices.add(i);
-                        break;
-                    }
-                }
-            }
-            groupsList.setSelectedIndices(selectedIndices.stream().mapToInt(i -> i).toArray());
-        }
-
-        addRow("Title:", titleField, detailsTab, gbc, row++);
-        addRow("Expected Result:", expectedArea, detailsTab, gbc, row++);
-        addRow("Steps:", stepsEditor, detailsTab, gbc, row++);
-        addRow("Priority:", priorityComboBox, detailsTab, gbc, row++);
-        addRow("Automation Ref:", autoRefField, detailsTab, gbc, row++);
-        addRow("Business Ref:", busiRefField, detailsTab, gbc, row++);
-
-        JBScrollPane groupsScrollPane = new JBScrollPane(groupsList);
-        addRow("Groups:", groupsScrollPane, detailsTab, gbc, row++);
-
-        saveButton = new JButton("Save Changes");
-        saveButton.addActionListener(e -> saveChanges());
-        gbc.gridx = 1;
-        gbc.gridy = row + 10;
-        gbc.anchor = GridBagConstraints.EAST;
-        gbc.fill = GridBagConstraints.NONE;
-        detailsTab.add(saveButton, gbc);
-
-        SwingUtilities.invokeLater(() -> titleField.requestFocusInWindow());
     }
 
     private void setupViewMode(final GridBagConstraints gbc, int row) {
@@ -379,25 +270,6 @@ public class TestCaseDetailsPanel {
         addRow("Updated At:", createValueLabel(currentTestCaseDto.getUpdateAt() != null ? currentTestCaseDto.getUpdateAt().toString() : "-"), detailsTab, gbc, row++);
     }
 
-    public void saveChanges() {
-        if (currentTestCaseDto == null) return;
-
-        currentTestCaseDto.setTitle(titleField.getText().trim());
-        currentTestCaseDto.setExpected(expectedArea.getText().trim());
-
-        currentTestCaseDto.setSteps(stepsEditor.getStepsList());
-
-        if (priorityComboBox.getSelectedItem() != null) {
-            currentTestCaseDto.setPriority((Priority) priorityComboBox.getSelectedItem());
-        }
-
-        List<Groups> selectedGroups = groupsList.getSelectedValuesList();
-        currentTestCaseDto.setGroups(selectedGroups);
-
-        toggleEditMode(false);
-        System.out.println("Saved: " + currentTestCaseDto.getId());
-    }
-
     private void loadHistoryAndBugs() {
         historyTab.removeAll();
         DefaultListModel<String> model = new DefaultListModel<>();
@@ -494,13 +366,13 @@ public class TestCaseDetailsPanel {
         if (basePathString != null) {
             File baseDir = new File(basePathString);
             while (currentDir != null && !currentDir.getAbsolutePath().equalsIgnoreCase(baseDir.getAbsolutePath())) {
-                fileList.add(0, currentDir);
+                fileList.addFirst(currentDir);
                 currentDir = currentDir.getParentFile();
             }
 
-            fileList.add(0, baseDir);
+            fileList.addFirst(baseDir);
         } else {
-            fileList.add(0, currentDir);
+            fileList.addFirst(currentDir);
         }
 
         for (int i = 0; i < fileList.size(); i++) {
@@ -569,150 +441,5 @@ public class TestCaseDetailsPanel {
         java.util.Map<java.awt.font.TextAttribute, Object> attributes = new java.util.HashMap<>(font.getAttributes());
         attributes.put(java.awt.font.TextAttribute.UNDERLINE, underline ? java.awt.font.TextAttribute.UNDERLINE_ON : -1);
         label.setFont(font.deriveFont(attributes));
-    }
-
-    private static class StepsEditorComponent extends JBPanel<StepsEditorComponent> {
-        private final JBTextArea rawArea = new JBTextArea();
-        private final JBPanel<?> listPanel = new JBPanel<>(new BorderLayout());
-        private final JBPanel<?> fieldsContainer = new JBPanel<>();
-        private final List<JBTextField> fields = new ArrayList<>();
-        private final JButton toggleBtn = new JButton("Switch to Text Area");
-        private final JPanel cards;
-        private final CardLayout cardLayout;
-        private boolean rawMode = false;
-
-        public StepsEditorComponent(List<String> initialSteps) {
-            super(new BorderLayout());
-
-            cardLayout = new CardLayout();
-            cards = new JPanel(cardLayout);
-
-            rawArea.setFont(JBUI.Fonts.label(14));
-            rawArea.setLineWrap(true);
-            rawArea.setWrapStyleWord(true);
-            JBScrollPane rawScroll = new JBScrollPane(rawArea);
-            rawScroll.setPreferredSize(new Dimension(-1, 120));
-
-            fieldsContainer.setLayout(new BoxLayout(fieldsContainer, BoxLayout.Y_AXIS));
-
-            JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-            JButton addBtn = new JButton("+ Add Step");
-            addBtn.addActionListener(e -> {
-                addStepField("");
-                fieldsContainer.revalidate();
-                fieldsContainer.repaint();
-            });
-            btnPanel.add(addBtn);
-            btnPanel.setBorder(JBUI.Borders.emptyTop(6));
-
-            listPanel.add(fieldsContainer, BorderLayout.CENTER);
-            listPanel.add(btnPanel, BorderLayout.SOUTH);
-
-            cards.add(listPanel, "LIST");
-            cards.add(rawScroll, "RAW");
-
-            JPanel topBar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-            toggleBtn.addActionListener(e -> toggleMode());
-            topBar.add(toggleBtn);
-
-            add(topBar, BorderLayout.NORTH);
-            add(cards, BorderLayout.CENTER);
-
-            if (initialSteps == null) initialSteps = new ArrayList<>();
-
-            buildListFromSteps(initialSteps);
-            rawArea.setText(String.join("\n", initialSteps));
-
-            cardLayout.show(cards, "LIST");
-        }
-
-        private void toggleMode() {
-            if (rawMode) {
-                List<String> lines = Arrays.stream(rawArea.getText().split("\n"))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .collect(Collectors.toList());
-                buildListFromSteps(lines);
-                cardLayout.show(cards, "LIST");
-                toggleBtn.setText("Switch to Text Area");
-                rawMode = false;
-            } else {
-                rawArea.setText(String.join("\n", getStepsList()));
-                cardLayout.show(cards, "RAW");
-                toggleBtn.setText("Switch to List");
-                rawMode = true;
-            }
-        }
-
-        private void buildListFromSteps(List<String> steps) {
-            fieldsContainer.removeAll();
-            fields.clear();
-
-            for (String step : steps) {
-                if (!step.trim().isEmpty()) {
-                    addStepField(step);
-                }
-            }
-            if (fields.isEmpty()) {
-                addStepField("");
-            }
-
-            fieldsContainer.revalidate();
-            fieldsContainer.repaint();
-        }
-
-        private void addStepField(String text) {
-            JPanel row = new JPanel(new BorderLayout(5, 5));
-            row.setBorder(JBUI.Borders.empty(4, 0));
-
-            JBLabel indexLabel = new JBLabel((fields.size() + 1) + "- ");
-            indexLabel.setForeground(JBColor.GRAY);
-            row.add(indexLabel, BorderLayout.WEST);
-
-            JBTextField field = new JBTextField(text);
-            fields.add(field);
-            row.add(field, BorderLayout.CENTER);
-
-            JButton removeBtn = new JButton(AllIcons.General.Remove);
-            removeBtn.setPreferredSize(new Dimension(24, 24));
-            removeBtn.setToolTipText("Remove step");
-            removeBtn.addActionListener(e -> {
-                fields.remove(field);
-                fieldsContainer.remove(row);
-                reindexLabels();
-                fieldsContainer.revalidate();
-                fieldsContainer.repaint();
-            });
-            row.add(removeBtn, BorderLayout.EAST);
-
-            fieldsContainer.add(row);
-        }
-
-        private void reindexLabels() {
-            int index = 1;
-            for (Component comp : fieldsContainer.getComponents()) {
-                if (comp instanceof JPanel row && row.getLayout() instanceof BorderLayout) {
-                    Component west = ((BorderLayout) row.getLayout()).getLayoutComponent(BorderLayout.WEST);
-                    if (west instanceof JBLabel label) {
-                        label.setText(index + "- ");
-                        index++;
-                    }
-                }
-            }
-        }
-
-        public List<String> getStepsList() {
-            if (rawMode) {
-                return Arrays.stream(rawArea.getText().split("\n"))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .collect(Collectors.toList());
-            } else {
-                return fields.stream()
-                        .map(f -> f.getText().trim())
-                        .filter(s -> !s.isEmpty())
-                        .collect(Collectors.toList());
-            }
-        }
     }
 }
