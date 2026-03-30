@@ -35,4 +35,20 @@ public class PersistenceManager {
         // TODO: حفظ فعلي في الداتابيز
         if (onUpdate != null) onUpdate.run();
     }
+
+    // 🌟 الدالة الجديدة الخاصة بالخطوات
+    public static void updateSteps(List<TestCaseDto> items, List<String> newSteps, Runnable onUpdate) {
+        // تنظيف الخطوات الفارغة من النهاية إذا وجدت
+        List<String> cleanSteps = newSteps.stream()
+                .filter(step -> !step.trim().isEmpty())
+                .toList();
+
+        for (TestCaseDto tc : items) {
+            // افترضت هنا أن Dto يقبل List من النصوص.
+            // إذا كان يقبل String يمكنك استخدام: tc.setSteps(String.join("\n", cleanSteps));
+            tc.setSteps(cleanSteps);
+        }
+
+        if (onUpdate != null) onUpdate.run();
+    }
 }

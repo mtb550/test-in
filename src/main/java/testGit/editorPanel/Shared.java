@@ -34,7 +34,7 @@ public class Shared {
         float scaleFactor = 1.5f;
 
         Icon navIcon = AllIcons.Nodes.Class;
-        if ("NAVIGATE".equals(hoveredAction)) {
+        if ("NAVIGATE" .equals(hoveredAction)) {
             Icon scaledIcon = IconUtil.scale(navIcon, c, scaleFactor);
             int offsetX = (scaledIcon.getIconWidth() - navIcon.getIconWidth()) / 2;
             int offsetY = (scaledIcon.getIconHeight() - navIcon.getIconHeight()) / 2;
@@ -46,7 +46,7 @@ public class Shared {
 
         int runStartX = startX + navIcon.getIconWidth() + JBUI.scale(8);
         Icon runIcon = AllIcons.RunConfigurations.TestState.Run;
-        if ("RUN".equals(hoveredAction)) {
+        if ("RUN" .equals(hoveredAction)) {
             Icon scaledIcon = IconUtil.scale(runIcon, c, scaleFactor);
             int offsetX = (scaledIcon.getIconWidth() - runIcon.getIconWidth()) / 2;
             int offsetY = (scaledIcon.getIconHeight() - runIcon.getIconHeight()) / 2;

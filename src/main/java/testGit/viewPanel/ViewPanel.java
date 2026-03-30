@@ -54,7 +54,7 @@ public class ViewPanel {
     private static void selectContent(final ToolWindow tw) {
         Content[] contents = tw.getContentManager().getContents();
         for (Content content : contents) {
-            if ("Details".equals(content.getDisplayName())) {
+            if ("Details" .equals(content.getDisplayName())) {
                 tw.getContentManager().setSelectedContent(content);
                 break;
             }

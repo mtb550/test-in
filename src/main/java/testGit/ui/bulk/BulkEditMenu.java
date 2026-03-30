@@ -30,6 +30,11 @@ public class BulkEditMenu {
                         return;
                     }
 
+                    if (selectedField == UpdateField.STEPS) {
+                        StepsBulkEditor.show(selectedItems, onUpdate);
+                        return;
+                    }
+
                     System.out.println("Selected: " + selectedField.getLabel() + " (To be implemented)");
                 }
         );

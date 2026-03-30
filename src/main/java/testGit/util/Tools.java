@@ -90,7 +90,7 @@ public class Tools {
         } else {
             // Fallback just in case
             if (path.startsWith("testGit/")) {
-                path = path.substring("testGit/".length());
+                path = path.substring("testGit/" .length());
             }
         }
 

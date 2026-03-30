@@ -79,7 +79,7 @@ public class ImportExcel extends DumbAwareAction {
                 .withDescription("Please choose an .xls or .xlsx file")
                 .withFileFilter(virtualFile -> {
                     String ext = virtualFile.getExtension();
-                    return "xlsx".equalsIgnoreCase(ext) || "xls".equalsIgnoreCase(ext);
+                    return "xlsx" .equalsIgnoreCase(ext) || "xls" .equalsIgnoreCase(ext);
                 });
 
         VirtualFile selectedFile = FileChooser.chooseFile(descriptor, Config.getProject(), null);
