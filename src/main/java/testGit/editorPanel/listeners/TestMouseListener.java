@@ -8,9 +8,10 @@ import com.intellij.ui.components.JBList;
 import testGit.actions.CreateTestCase;
 import testGit.editorPanel.BaseEditorUI;
 import testGit.editorPanel.EditorCM;
+import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.dirs.DirectoryDto;
-import testGit.viewPanel.ViewPanel;
+import testGit.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -43,7 +44,7 @@ public class TestMouseListener extends MouseAdapter {
             if (isClickOnItem) {
                 TestCaseDto selected = model.getElementAt(index);
                 if (selected != null) {
-                    ViewPanel.show(List.of(selected), path);
+                    ViewToolWindowFactory.showPanel(Config.getProject(), List.of(selected), path);
                 }
             }
             return;

@@ -17,6 +17,7 @@ import testGit.editorPanel.listeners.*;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
+import testGit.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -147,8 +148,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         int index = filtered.indexOf(tc);
         if (index == -1) return;
 
-        int targetPage = (index / pageSize) + 1;
-        this.currentPage = targetPage;
+        this.currentPage = (index / pageSize) + 1;
         refreshView();
 
         int localIndex = index % pageSize;
@@ -294,7 +294,12 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         //}
 
         TestCaseDto selectedInThisFile = list.getSelectedValue();
-        ViewPanel.hideIfShowing(selectedInThisFile);
+
+        ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
+        if (viewer != null) {
+            viewer.hide(selectedInThisFile);
+        }
+
         if (model != null && syncListener != null) model.removeListDataListener(syncListener);
         if (model != null) model.removeAll();
         if (mainPanel != null) mainPanel.removeAll();

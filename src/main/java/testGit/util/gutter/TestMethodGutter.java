@@ -9,10 +9,7 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteralExpression;
-import com.intellij.psi.PsiNameValuePair;
+import com.intellij.psi.*;
 import com.intellij.psi.search.FilenameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -20,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.Notifier;
-import testGit.viewPanel.ViewPanel;
+import testGit.viewPanel.ViewToolWindowFactory;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -32,26 +29,29 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
-        if (!(element instanceof PsiLiteralExpression)) return;
+        if (!(element instanceof PsiJavaToken token) ||
+                token.getTokenType() != JavaTokenType.STRING_LITERAL) {
+            return;
+        }
 
-        String content = element.getText();
-        if (content == null || content.length() < 36) return;
+        PsiLiteralExpression literal = PsiTreeUtil.getParentOfType(token, PsiLiteralExpression.class);
+        if (literal == null) return;
 
-        String uuidStr = StringUtil.unquoteString(content);
-        if (uuidStr.length() != 36) return;
-
-        PsiNameValuePair nameValuePair = PsiTreeUtil.getParentOfType(element, PsiNameValuePair.class);
+        PsiNameValuePair nameValuePair = PsiTreeUtil.getParentOfType(literal, PsiNameValuePair.class);
         if (nameValuePair == null || !"description".equals(nameValuePair.getName())) return;
 
         PsiAnnotation annotation = PsiTreeUtil.getParentOfType(nameValuePair, PsiAnnotation.class);
         if (annotation == null || !annotation.getText().contains("@Test")) return;
+
+        String extractedValue = StringUtil.unquoteString(literal.getText()).trim();
+        if (extractedValue.isEmpty()) return;
 
         RelatedItemLineMarkerInfo<PsiElement> marker = new RelatedItemLineMarkerInfo<>(
                 element,
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
                 psiElement -> "View Test Case Details",
-                (mouseEvent, psiElement) -> openViewPanel(element.getProject(), uuidStr),
+                (mouseEvent, psiElement) -> openViewPanel(element.getProject(), extractedValue),
                 GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
         );
@@ -59,13 +59,13 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         result.add(marker);
     }
 
-    private void openViewPanel(Project project, String uuidStr) {
+    private void openViewPanel(Project project, String targetId) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final VirtualFile[] fileRef = new VirtualFile[1];
 
             ApplicationManager.getApplication().runReadAction(() -> {
                 Collection<VirtualFile> files = FilenameIndex.getVirtualFilesByName(
-                        uuidStr + ".json",
+                        targetId + ".json",
                         GlobalSearchScope.projectScope(project)
                 );
                 if (!files.isEmpty()) fileRef[0] = files.iterator().next();
@@ -73,7 +73,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
             if (fileRef[0] == null) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Notifier.warn("Not Found", "No JSON file found for ID: " + uuidStr)
+                        Notifier.warn("Not Mapped", "No JSON file mapped for description: " + targetId)
                 );
                 return;
             }
@@ -83,9 +83,8 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 TestCaseDto dto = Config.getMapper().readValue(file, TestCaseDto.class);
                 Path path = file.getParentFile().toPath();
 
-                ApplicationManager.getApplication().invokeLater(() ->
-                        ViewPanel.show(project, List.of(dto), path)
-                );
+                ApplicationManager.getApplication().invokeLater(() -> ViewToolWindowFactory.showPanel(project, List.of(dto), path));
+
             } catch (Exception ex) {
                 ApplicationManager.getApplication().invokeLater(() ->
                         Notifier.error("Error", "Could not read JSON file.")

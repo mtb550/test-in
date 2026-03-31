@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
+import testGit.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.util.List;
@@ -56,6 +57,9 @@ public interface BaseEditorUI extends Disposable {
     void setHoveredIndex(int index);
 
     default void dispose() {
-        ViewPanel.reset();
+        ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
+        if (viewer != null) {
+            viewer.reset();
+        }
     }
 }

@@ -25,7 +25,7 @@ public class Tools {
         return StringUtil.capitalize(s) + ".";
     }
 
-    public static void printTestSourceRoots(Project project) {
+    public static void printTestSourceRoots(final Project project) {
         System.out.println("printTestSourceRoots.printTestSourceRoots()");
 
         ProjectFileIndex fileIndex = ProjectRootManager.getInstance(project).getFileIndex();
@@ -64,7 +64,7 @@ public class Tools {
 
     }
 
-    public static String toCamelCase(String text) {
+    public static String toCamelCase(final String text) {
         if (text == null || text.isEmpty()) return text;
         String[] words = text.split("[\\W_]+");
         StringBuilder result = new StringBuilder();
@@ -85,7 +85,7 @@ public class Tools {
      * Example: ".../testGit/PR_IBRAM_AC/testCases/PA_ibram pkg_AC/TS_ibram 2_AC"
      * -> "src.test.ibram.ibramPkg.Ibram2"
      */
-    public static String fileToFqcn(File file) {
+    public static String fileToFqcn(final File file) {
         if (file == null) return "";
 
         String path = file.getAbsolutePath().replace("\\", "/");
@@ -138,7 +138,7 @@ public class Tools {
         return fqcn.toString();
     }
 
-    public static boolean isEditorOpen(String editorName) {
+    public static boolean isEditorOpen(final String editorName) {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
         VirtualFile[] openFiles = editorManager.getOpenFiles();
 
@@ -152,7 +152,7 @@ public class Tools {
         return false;
     }
 
-    public static void closeEditor(String editorName) {
+    public static void closeEditor(final String editorName) {
         FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
         VirtualFile[] openFiles = editorManager.getOpenFiles();
 
@@ -164,7 +164,7 @@ public class Tools {
         }
     }
 
-    public static void updateChildrenPathsRecursive(DefaultMutableTreeNode parentNode, Path oldParentPath, Path newParentPath) {
+    public static void updateChildrenPathsRecursive(final DefaultMutableTreeNode parentNode, final Path oldParentPath, final Path newParentPath) {
         for (int i = 0; i < parentNode.getChildCount(); i++) {
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parentNode.getChildAt(i);
 

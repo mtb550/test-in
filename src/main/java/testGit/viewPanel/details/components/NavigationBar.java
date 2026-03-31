@@ -15,6 +15,7 @@ import testGit.editorPanel.testCaseEditor.TestEditor;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.dirs.TestSetDirectoryDto;
+import testGit.util.Tools;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,12 +32,12 @@ import java.util.Map;
 public class NavigationBar extends BaseDetails {
     private final Path currentPath;
 
-    public NavigationBar(@Nullable Path currentPath) {
+    public NavigationBar(@Nullable final Path currentPath) {
         this.currentPath = currentPath;
     }
 
     @Override
-    public int render(@NotNull JBPanel<?> panel, @NotNull GridBagConstraints gbc, @NotNull TestCaseDto dto, int currentRow) {
+    public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
         JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
@@ -71,6 +72,11 @@ public class NavigationBar extends BaseDetails {
                         VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(file);
                         if (vf == null) return;
                         if (isTestSet) {
+
+                            if (Tools.isEditorOpen(file.getName())) {
+                                return;
+                            }
+
                             TestSetDirectoryDto ts = new TestSetDirectoryDto();
                             ts.setPath(file.toPath());
                             ts.setName(file.getName());
@@ -103,7 +109,7 @@ public class NavigationBar extends BaseDetails {
     }
 
     @NotNull
-    private List<File> buildPathFileList(@NotNull Path path) {
+    private List<File> buildPathFileList(@NotNull final Path path) {
         List<File> fileList = new ArrayList<>();
         if (Config.getProject() == null) return fileList;
 
@@ -123,7 +129,7 @@ public class NavigationBar extends BaseDetails {
         return fileList;
     }
 
-    private void setUnderline(@NotNull JLabel label, boolean underline) {
+    private void setUnderline(@NotNull final JLabel label, final boolean underline) {
         Font font = label.getFont();
         Map<TextAttribute, Object> attributes = new HashMap<>(font.getAttributes());
         attributes.put(TextAttribute.UNDERLINE, underline ? TextAttribute.UNDERLINE_ON : -1);

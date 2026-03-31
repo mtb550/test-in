@@ -6,7 +6,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.viewPanel.ViewPanel;
+import testGit.viewPanel.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -26,6 +26,6 @@ public class ViewDetails extends DumbAwareAction {
         List<TestCaseDto> selected = list.getSelectedValuesList();
 
         if (selected != null && !selected.isEmpty())
-            ViewPanel.show(selected, path);
+            ViewToolWindowFactory.showPanel(e.getProject(), selected, path);
     }
 }

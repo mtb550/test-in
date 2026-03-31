@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.projectPanel.tree.TreeTransferHandler;
 import testGit.util.KeyboardSet;
-import testGit.viewPanel.ViewPanel;
+import testGit.viewPanel.ViewToolWindowFactory;
 
 public class Escape extends DumbAwareAction {
     private final SimpleTree tree;
@@ -44,7 +44,7 @@ public class Escape extends DumbAwareAction {
         }
 
         if (list != null) {
-            ToolWindow toolWindow = ViewPanel.getToolWindow();
+            ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow();
 
             if (toolWindow != null && toolWindow.isVisible()) {
                 toolWindow.hide(null);

@@ -29,7 +29,7 @@ public class TestEditor {
         });
     }
 
-    private static VirtualFile createVirtualFile(TestSetDirectoryDto testSetDirectory) {
+    private static VirtualFile createVirtualFile(final TestSetDirectoryDto testSetDirectory) {
 
         List<TestCaseDto> testCaseDtos = Optional.of(testSetDirectory.getPath().toFile())
                 .filter(f -> f.exists() && f.isDirectory())
@@ -43,7 +43,7 @@ public class TestEditor {
         return new UnifiedVirtualFile(testSetDirectory, testCaseDtos);
     }
 
-    private static TestCaseDto addTestCase(File file) {
+    private static TestCaseDto addTestCase(final File file) {
         try {
 
             return Config.getMapper().readValue(file, TestCaseDto.class);
