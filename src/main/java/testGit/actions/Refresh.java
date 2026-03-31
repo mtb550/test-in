@@ -24,7 +24,7 @@ public class Refresh extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) {
-            e.getPresentation().setEnabledAndVisible(false);
+            e.getPresentation().setEnabled(false);
             return;
         }
 

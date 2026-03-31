@@ -15,20 +15,20 @@ import testGit.viewPanel.openBugs.OpenBugsTab;
 
 import java.awt.*;
 import java.nio.file.Path;
+import java.util.List;
 
 @Getter
 public class ViewPanel {
     private final JBPanel<?> detailsTab;
     private final JBPanel<?> historyTab;
     private final JBPanel<?> openBugsTab;
-
-    private TestCaseDto currentTestCaseDto;
-    private Path currentPath;
+    private final ViewPagination page;
 
     public ViewPanel() {
         detailsTab = new JBPanel<>(new GridBagLayout());
         historyTab = new JBPanel<>(new BorderLayout());
         openBugsTab = new JBPanel<>(new BorderLayout());
+        page = new ViewPagination(this);
     }
 
     public static ToolWindow getToolWindow(final Project project) {
@@ -40,21 +40,21 @@ public class ViewPanel {
         return getToolWindow(Config.getProject());
     }
 
-    public static void show(Project project, TestCaseDto testCaseDto, final Path path) {
+    public static void show(Project project, List<TestCaseDto> testCases, final Path path) {
         ToolWindow tw = getToolWindow(project);
-        if (tw == null) return;
+        if (tw == null || testCases == null || testCases.isEmpty()) return;
 
         tw.show(() -> {
             ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
             if (viewer != null) {
                 selectContent(tw);
-                viewer.update(testCaseDto, path);
+                viewer.updateList(testCases, path);
             }
         });
     }
 
-    public static void show(final TestCaseDto testCaseDto, final Path path) {
-        show(Config.getProject(), testCaseDto, path);
+    public static void show(final List<TestCaseDto> testCases, final Path path) {
+        show(Config.getProject(), testCases, path);
     }
 
     public static void hide() {
@@ -67,7 +67,7 @@ public class ViewPanel {
     public static void reset() {
         ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
         if (viewer != null) {
-            viewer.update(null, null);
+            viewer.updateList(null, null);
         }
     }
 
@@ -97,12 +97,21 @@ public class ViewPanel {
         }
     }
 
-    public void update(@Nullable final TestCaseDto testCaseDto, @Nullable final Path path) {
-        this.currentTestCaseDto = testCaseDto;
-        this.currentPath = path;
+    public void updateList(@Nullable final List<TestCaseDto> testCases, @Nullable final Path path) {
+        this.page.updateList(testCases, path);
+        refreshCurrentView();
+    }
 
-        DetailsTab.load(detailsTab, testCaseDto, path);
+    public void refreshCurrentView() {
+        TestCaseDto currentTestCaseDto = getCurrentTestCaseDto();
+        Path currentPath = page.getCurrentPath();
+
+        DetailsTab.load(detailsTab, currentTestCaseDto, currentPath);
         HistoryTab.load(historyTab);
         OpenBugsTab.load(openBugsTab);
+    }
+
+    public TestCaseDto getCurrentTestCaseDto() {
+        return page.getCurrentItem();
     }
 }

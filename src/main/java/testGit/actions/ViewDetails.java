@@ -9,6 +9,7 @@ import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
 
 import java.nio.file.Path;
+import java.util.List;
 
 public class ViewDetails extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
@@ -22,7 +23,9 @@ public class ViewDetails extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        TestCaseDto tc = list.getSelectedValue();
-        ViewPanel.show(tc, path);
+        List<TestCaseDto> selected = list.getSelectedValuesList();
+
+        if (selected != null && !selected.isEmpty())
+            ViewPanel.show(selected, path);
     }
 }

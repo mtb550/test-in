@@ -32,7 +32,7 @@ public class ExpandAll extends DumbAwareAction {
     @Override
     public void update(@NotNull AnActionEvent e) {
         if (e.getProject() == null) {
-            e.getPresentation().setEnabledAndVisible(false);
+            e.getPresentation().setEnabled(false);
             return;
         }
 

@@ -9,6 +9,7 @@ import testGit.viewPanel.ViewPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.nio.file.Path;
+import java.util.List;
 
 public class SelectionListener implements ListSelectionListener {
     private final JBList<TestCaseDto> list;
@@ -25,11 +26,13 @@ public class SelectionListener implements ListSelectionListener {
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            TestCaseDto selected = list.getSelectedValue();
-            if (selected != null) {
+            List<TestCaseDto> selected = list.getSelectedValuesList();
+
+            if (selected != null && !selected.isEmpty()) {
                 if (toolWindow != null && toolWindow.isVisible()) {
                     ViewPanel.show(selected, path);
                 }
+
                 if (ui.getStatusBar() != null) {
                     ui.getStatusBar().updateSelectionState(
                             list.getSelectedIndices(),

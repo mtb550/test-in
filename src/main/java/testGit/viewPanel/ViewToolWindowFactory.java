@@ -16,7 +16,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     private static ViewPanel viewPanel;
 
     @Override
-    public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
+    public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
         /// to be added for all other components. tree, editor. as we may run one of them first
         Config.setProject(project);
 
@@ -31,5 +31,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         toolWindow.getContentManager().addContent(detailsTab);
         toolWindow.getContentManager().addContent(historyTab);
         toolWindow.getContentManager().addContent(bugsTab);
+
+        toolWindow.setTitleActions(ViewPanelActions.create(viewPanel.getPage(), toolWindow.getComponent()));
     }
 }

@@ -38,9 +38,8 @@ public class EditTestCase extends DumbAwareAction {
                 boolean isCurrentAffected = selectedItems.stream()
                         .anyMatch(item -> item.getId().equals(detailsPanel.getCurrentTestCaseDto().getId()));
 
-                if (isCurrentAffected) {
-                    detailsPanel.update(detailsPanel.getCurrentTestCaseDto(), detailsPanel.getCurrentPath());
-                }
+                if (isCurrentAffected)
+                    detailsPanel.refreshCurrentView();
             }
         });
     }

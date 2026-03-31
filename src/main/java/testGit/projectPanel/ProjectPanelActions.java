@@ -5,7 +5,7 @@ import testGit.actions.*;
 
 import java.util.List;
 
-public class TitleActions {
+public class ProjectPanelActions {
 
     public static List<AnAction> create(ProjectPanel projectPanel) {
         return List.of(

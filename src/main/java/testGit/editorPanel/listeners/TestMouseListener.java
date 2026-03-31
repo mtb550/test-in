@@ -16,6 +16,7 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
+import java.util.List;
 
 public class TestMouseListener extends MouseAdapter {
     private final JBList<TestCaseDto> list;
@@ -42,7 +43,7 @@ public class TestMouseListener extends MouseAdapter {
             if (isClickOnItem) {
                 TestCaseDto selected = model.getElementAt(index);
                 if (selected != null) {
-                    ViewPanel.show(selected, path);
+                    ViewPanel.show(List.of(selected), path);
                 }
             }
             return;

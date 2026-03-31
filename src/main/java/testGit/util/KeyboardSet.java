@@ -23,7 +23,9 @@ public enum KeyboardSet {
     CopyNode(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK),
     CutNode(KeyEvent.VK_X, KeyEvent.CTRL_DOWN_MASK),
     PasteNode(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK),
-    CopyTestCaseTitle(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK);
+    CopyTestCaseTitle(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK),
+    NextTestCase(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK),
+    PreviousTestCase(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK);
 
     private final int keyCode;
     private final int modifiers;
