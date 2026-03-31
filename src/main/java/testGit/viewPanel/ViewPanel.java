@@ -3,18 +3,37 @@ package testGit.viewPanel;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.content.Content;
+import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.details.DetailsTab;
+import testGit.viewPanel.history.HistoryTab;
+import testGit.viewPanel.openBugs.OpenBugsTab;
 
+import java.awt.*;
 import java.nio.file.Path;
 
+@Getter
 public class ViewPanel {
+    private final JBPanel<?> detailsTab;
+    private final JBPanel<?> historyTab;
+    private final JBPanel<?> openBugsTab;
+
+    private TestCaseDto currentTestCaseDto;
+    private Path currentPath;
+
+    public ViewPanel() {
+        detailsTab = new JBPanel<>(new GridBagLayout());
+        historyTab = new JBPanel<>(new BorderLayout());
+        openBugsTab = new JBPanel<>(new BorderLayout());
+    }
 
     public static ToolWindow getToolWindow(final Project project) {
         if (project == null) return null;
-        return ToolWindowManager.getInstance(project).getToolWindow("Details");
+        return ToolWindowManager.getInstance(project).getToolWindow("TestGitViewPanel");
     }
 
     public static ToolWindow getToolWindow() {
@@ -26,7 +45,7 @@ public class ViewPanel {
         if (tw == null) return;
 
         tw.show(() -> {
-            DetailsTab viewer = ToolWindowFactoryImpl.getDetailsInstance();
+            ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
             if (viewer != null) {
                 selectContent(tw);
                 viewer.update(testCaseDto, path);
@@ -46,7 +65,7 @@ public class ViewPanel {
     }
 
     public static void reset() {
-        DetailsTab viewer = ToolWindowFactoryImpl.getDetailsInstance();
+        ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
         if (viewer != null) {
             viewer.update(null, null);
         }
@@ -66,7 +85,7 @@ public class ViewPanel {
         ToolWindow tw = getToolWindow();
         if (tw == null || !tw.isVisible()) return;
 
-        DetailsTab viewer = ToolWindowFactoryImpl.getDetailsInstance();
+        ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
         if (viewer != null) {
             TestCaseDto currentlyShown = viewer.getCurrentTestCaseDto();
 
@@ -76,5 +95,14 @@ public class ViewPanel {
                 hide();
             }
         }
+    }
+
+    public void update(@Nullable final TestCaseDto testCaseDto, @Nullable final Path path) {
+        this.currentTestCaseDto = testCaseDto;
+        this.currentPath = path;
+
+        DetailsTab.load(detailsTab, testCaseDto, path);
+        HistoryTab.load(historyTab);
+        OpenBugsTab.load(openBugsTab);
     }
 }

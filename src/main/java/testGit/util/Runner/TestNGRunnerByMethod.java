@@ -24,11 +24,9 @@ public class TestNGRunnerByMethod {
     public static void runTestMethod(String fqcn, String methodName) {
         final Project project = Config.getProject();
 
-        // 1. Move PSI lookup to a background thread to prevent UI freezing
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
 
-                    // 2. Find the class to determine its Module (CRITICAL for the classpath!)
                     PsiClass targetClass = JavaPsiFacade.getInstance(project)
                             .findClass(fqcn, GlobalSearchScope.projectScope(project));
 
@@ -39,17 +37,14 @@ public class TestNGRunnerByMethod {
 
                     final Module finalModule = module;
 
-                    // 3. Jump back to the UI thread to create and execute the Run Configuration
                     ApplicationManager.getApplication().invokeLater(() -> {
 
                         RunManager runManager = RunManager.getInstance(project);
                         TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
-                        // Clean name for the IDE Dropdown (e.g., "LoginTest.verifyValidLogin")
                         String simpleClassName = fqcn.substring(fqcn.lastIndexOf('.') + 1);
                         String configName = simpleClassName + "." + methodName;
 
-                        // 4. ENHANCEMENT: Avoid duplicating configurations! Check if it already exists.
                         RunnerAndConfigurationSettings settings = runManager.findConfigurationByName(configName);
 
                         if (settings == null) {
@@ -61,30 +56,25 @@ public class TestNGRunnerByMethod {
                             configuration.getPersistantData().METHOD_NAME = methodName;
                             configuration.getPersistantData().getPatterns().clear();
 
-                            // Attach the module so TestNG has the correct classpath
                             if (finalModule != null) {
                                 configuration.setModule(finalModule);
                             }
 
                             runManager.addConfiguration(settings);
 
-                            // ENHANCEMENT: Make it temporary so it doesn't clutter the user's permanent list
                             runManager.setTemporaryConfiguration(settings);
                         }
 
-                        // Select it in the dropdown
                         runManager.setSelectedConfiguration(settings);
 
-                        // 5. Add the Notifier you requested
                         Notification notification = new Notification(
-                                "Print", // This should match a group ID in your plugin.xml if you have one, or just a generic string
+                                "Print",
                                 "Starting automated test",
                                 "Running: " + configName,
                                 NotificationType.INFORMATION
                         );
                         Notifications.Bus.notify(notification, project);
 
-                        // 6. Execute!
                         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
                     });
                 }));

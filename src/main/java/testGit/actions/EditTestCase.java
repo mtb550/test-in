@@ -7,8 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.bulk.BulkEditMenu;
 import testGit.util.KeyboardSet;
-import testGit.viewPanel.ToolWindowFactoryImpl;
-import testGit.viewPanel.details.DetailsTab;
+import testGit.viewPanel.ViewPanel;
+import testGit.viewPanel.ViewToolWindowFactory;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ public class EditTestCase extends DumbAwareAction {
         BulkEditMenu.show(selectedItems, () -> {
             list.repaint();
 
-            DetailsTab detailsPanel = ToolWindowFactoryImpl.getDetailsInstance();
+            ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
             if (detailsPanel != null && detailsPanel.getCurrentTestCaseDto() != null) {
 
                 boolean isCurrentAffected = selectedItems.stream()

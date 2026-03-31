@@ -152,7 +152,13 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
         EditorCM.registerShortcuts(this, vf.getDirectoryDto(), list, model, editorCM);
 
-        list.addListSelectionListener(new SelectionListener(list, this, vf.getTestSet().getPath()));
+        Path selectionPath = null;
+        if (vf.getTestSet() != null) {
+            selectionPath = vf.getTestSet().getPath();
+        } else if (vf.getDirectoryDto() != null) {
+            selectionPath = vf.getDirectoryDto().getPath();
+        }
+        list.addListSelectionListener(new SelectionListener(list, this, selectionPath));
 
         JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setBorder(JBUI.Borders.empty());

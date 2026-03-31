@@ -22,19 +22,15 @@ public class ExpectedBulkEditor {
             @Override
             public void appendJsonItem(TestCaseDto tc, int index, boolean isLast, StringBuilder leftSb, StringBuilder rightSb, List<int[]> rightEditableRanges) {
                 String id = "Item-" + (index + 1);
-                // تجهيز العناوين كمرجع للقراءة فقط
                 String escapedTitle = JsonSplitBulkEditor.escapeJson(tc.getTitle());
                 String escapedExpected = JsonSplitBulkEditor.escapeJson(tc.getExpected());
 
-                // عرض الـ id و title قبل حقل التعديل
                 String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"title\": \"" + escapedTitle + "\",\n    \"expected\": \"";
                 String suffix = "\"\n  }";
                 String comma = isLast ? "\n" : ",\n";
 
-                // إضافة للعمود الأيسر
                 leftSb.append(prefix).append(escapedExpected).append(suffix).append(comma);
 
-                // إضافة للعمود الأيمن (حقل expected فقط هو المتاح للتعديل)
                 rightSb.append(prefix);
                 int startOffset = rightSb.length();
                 rightSb.append(escapedExpected);

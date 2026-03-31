@@ -81,7 +81,6 @@ public class CreateNodesDialog {
 
                     @Override
                     public Icon getIcon(boolean hovered) {
-                        // 🌟 سطر واحد هنا أيضاً!
                         DirectoryType dirType = DirectoryType.fromClass(selected);
                         return dirType != null ? dirType.getIcon() : AllIcons.Nodes.Unknown;
                     }

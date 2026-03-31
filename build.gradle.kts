@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "testGit"
-version = "1.0-SNAPSHOT"
+version = "1.2-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -51,7 +51,7 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
-        id.set("testGit")
+        id.set("testGit.demo")
         name.set("Test Git")
         version.set(project.version.toString())
 

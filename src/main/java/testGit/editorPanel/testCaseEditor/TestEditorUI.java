@@ -33,7 +33,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     private final ModelSyncListener syncListener;
     private final ToolBar toolBar;
 
-    // 🌟 1. تعريف المتغير للتحكم به لاحقاً
     //private final TestFocusListener focusListener;
 
     @Getter
@@ -104,7 +103,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
         refreshView();
 
-        // 🌟 2. تسجيل المستمع بدون تمرير this (لمنع تسريب الذاكرة)
         //this.focusListener = new TestFocusListener(this.list, vf);
         //this.focusListener.register();
 
@@ -291,7 +289,6 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
     @Override
     public void dispose() {
-        // 🌟 3. إغلاق الاتصال بنظافة قبل مسح البيانات
         //if (focusListener != null) {
         //focusListener.disconnect();
         //}

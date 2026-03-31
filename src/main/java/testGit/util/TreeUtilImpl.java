@@ -18,7 +18,7 @@ public class TreeUtilImpl {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
                 if (vf != null) {
-                    operation.execute(vf); // تنفيذ الكود المُمرر
+                    operation.execute(vf);
                 } else {
                     Messages.showErrorDialog("Could not find path on disk:\n" + path, errorTitle);
                 }

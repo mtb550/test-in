@@ -36,7 +36,6 @@ public class AppSettingsConfigurable implements Configurable {
     private final TextFieldWithBrowseButton rootTestGitPathField = new TextFieldWithBrowseButton();
     private final JBTextField rootAutomationPathField = new JBTextField();
 
-    // Store projects as Directory objects in a Model
     private final DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList = new DefaultComboBoxModel<>();
     private final ComboBox<TestProjectDirectoryDto> projectComboBox = new ComboBox<>(testProjectList);
 
@@ -56,7 +55,6 @@ public class AppSettingsConfigurable implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        // 1. Setup Browse Listener
         rootTestGitPathField.addBrowseFolderListener(
                 null,
                 FileChooserDescriptorFactory.createSingleFolderDescriptor()
@@ -65,23 +63,18 @@ public class AppSettingsConfigurable implements Configurable {
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
 
-        // (Optional) Add a placeholder/tooltip to guide the user
         rootAutomationPathField.getEmptyText().setText("E.g. src.test");
         rootAutomationPathField.setToolTipText("Base package path for your automation framework");
 
-        // 2. Setup Renderer
         projectComboBox.setRenderer(new RendererImpl());
 
-        // 3. Setup Management Button Listeners
         activateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.AC));
         deactivateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.IN));
         archiveBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.AR));
         //renameBtn.addActionListener(e -> new Rename().actionPerformed(ProjectStatus.AR));
 
-        // 4. Initialize Data
         refreshProjectList();
 
-        // 5. Layout the buttons
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         buttonPanel.add(activateBtn);
         buttonPanel.add(new Box.Filler(new Dimension(5, 0), new Dimension(5, 0), new Dimension(5, 0)));
@@ -112,7 +105,6 @@ public class AppSettingsConfigurable implements Configurable {
         String currentFileName = selected.getName();
 
         if (oldDir.exists() && currentFileName.contains("_")) {
-            // Extract the base (PR_Name) and append the new Status (AC/IN/AR)
             String baseName = currentFileName.substring(0, currentFileName.lastIndexOf("_"));
             String newName = baseName + "_" + newProjectStatus.name();
 
@@ -120,7 +112,6 @@ public class AppSettingsConfigurable implements Configurable {
             if (oldDir.renameTo(newDir)) {
                 refreshProjectList();
 
-                // Re-select the renamed project in the new list
                 for (int i = 0; i < testProjectList.getSize(); i++) {
                     if (testProjectList.getElementAt(i).getPathName().equals(newName)) {
                         projectComboBox.setSelectedIndex(i);
@@ -142,16 +133,14 @@ public class AppSettingsConfigurable implements Configurable {
     private void refreshProjectList() {
         testProjectList.removeAllElements();
 
-        // 🌟 1. تحويل النص مباشرة إلى Path
         Path rootPath = Path.of(rootTestGitPathField.getText());
 
         if (Files.exists(rootPath) && Files.isDirectory(rootPath)) {
 
-            // 🌟 2. استخدام try-with-resources لإغلاق الـ Stream تلقائياً
             try (Stream<Path> paths = Files.list(rootPath)) {
                 paths.filter(Files::isDirectory)
                         .filter(path -> path.getFileName().toString().startsWith("PR_"))
-                        .map(DirectoryMapper::testProjectNode) // 🌟 3. نستخدم المابر الجديد الذي يستقبل Path
+                        .map(DirectoryMapper::testProjectNode)
                         .filter(Objects::nonNull)
                         .forEach(testProjectList::addElement);
 

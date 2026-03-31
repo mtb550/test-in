@@ -57,7 +57,7 @@ public class TestRunMetadataHeader {
 
     public void setRunNameDisabled(String name) {
         buildNumberField.setText(name);
-        buildNumberField.setEditable(false); // يمنع الكتابة
-        buildNumberField.setEnabled(false);  // يجعله باهتاً (Grayed out)
+        buildNumberField.setEditable(false);
+        buildNumberField.setEnabled(false);
     }
 }

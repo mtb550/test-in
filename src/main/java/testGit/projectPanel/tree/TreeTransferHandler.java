@@ -112,17 +112,14 @@ public class TreeTransferHandler extends TransferHandler {
         }
 
         try {
-            // استنساخ الكائن
             DirectoryDto clonedDir = dir.getClass().getDeclaredConstructor().newInstance();
             clonedDir.setName(dir.getName());
 
-            // 🌟 حساب المسار الجديد لهذه النسخة وتعيينه
             Path newPath = newParentPath.resolve(dir.getName());
             clonedDir.setPath(newPath);
 
             DefaultMutableTreeNode clonedNode = new DefaultMutableTreeNode(clonedDir);
 
-            // 🌟 استدعاء ذاتي (Recursion) لنسخ كل الأبناء!
             for (int i = 0; i < node.getChildCount(); i++) {
                 DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
                 clonedNode.add(deepCloneNode(child, newPath));

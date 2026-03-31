@@ -1,5 +1,6 @@
 package testGit.ui.bulk;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
@@ -7,6 +8,8 @@ import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.ex.EditorEx;
+import com.intellij.openapi.editor.highlighter.EditorHighlighter;
+import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
 import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
@@ -16,6 +19,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -47,7 +51,6 @@ public class JsonSplitBulkEditor {
 
         for (int i = 0; i < selectedItems.size(); i++) {
             boolean isLast = (i == selectedItems.size() - 1);
-            // 🌟 بناء النص لكل شاشة بناءً على إعداداتها (Title أو Expected)
             config.appendJsonItem(selectedItems.get(i), i, isLast, leftSb, rightSb, rightEditableRanges);
         }
 
@@ -121,7 +124,6 @@ public class JsonSplitBulkEditor {
             @Override
             public void caretPositionChanged(@NotNull CaretEvent event) {
                 Caret caret = event.getCaret();
-                if (caret == null) return;
 
                 int offset = caret.getOffset();
                 boolean isInsideEditable = false;
@@ -151,36 +153,39 @@ public class JsonSplitBulkEditor {
             }
         });
 
+        Disposable docListenerDisposable = Disposer.newDisposable();
         MarkupModel rightMarkupModel = rightEditor.getMarkupModel();
         rightDoc.addDocumentListener(new DocumentListener() {
-            @Override
-            public void documentChanged(@NotNull DocumentEvent event) {
-                SwingUtilities.invokeLater(() -> {
-                    if (rightEditor.isDisposed()) return;
-                    for (RangeHighlighter h : rightMarkupModel.getAllHighlighters()) {
-                        if (h.getLayer() == HighlighterLayer.SELECTION - 1) rightMarkupModel.removeHighlighter(h);
-                    }
+                                         @Override
+                                         public void documentChanged(@NotNull DocumentEvent event) {
+                                             SwingUtilities.invokeLater(() -> {
+                                                 if (rightEditor.isDisposed()) return;
+                                                 for (RangeHighlighter h : rightMarkupModel.getAllHighlighters()) {
+                                                     if (h.getLayer() == HighlighterLayer.SELECTION - 1) rightMarkupModel.removeHighlighter(h);
+                                                 }
 
-                    TextAttributes diffAttr = new TextAttributes();
-                    diffAttr.setBackgroundColor(new JBColor(new Color(228, 250, 228), new Color(43, 61, 44)));
+                                                 TextAttributes diffAttr = new TextAttributes();
+                                                 diffAttr.setBackgroundColor(new JBColor(new Color(228, 250, 228), new Color(43, 61, 44)));
 
-                    for (int i = 0; i < selectedItems.size(); i++) {
-                        RangeMarker marker = valueMarkers.get(i);
-                        if (marker.isValid()) {
-                            String currentText = rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
-                            String originalText = escapeJson(config.getOriginalValue(selectedItems.get(i)));
+                                                 for (int i = 0; i < selectedItems.size(); i++) {
+                                                     RangeMarker marker = valueMarkers.get(i);
+                                                     if (marker.isValid()) {
+                                                         String currentText = rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
+                                                         String originalText = escapeJson(config.getOriginalValue(selectedItems.get(i)));
 
-                            if (!currentText.equals(originalText)) {
-                                rightMarkupModel.addRangeHighlighter(
-                                        marker.getStartOffset(), marker.getEndOffset(),
-                                        HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE
-                                );
-                            }
-                        }
-                    }
-                });
-            }
-        });
+                                                         if (!currentText.equals(originalText)) {
+                                                             rightMarkupModel.addRangeHighlighter(
+                                                                     marker.getStartOffset(), marker.getEndOffset(),
+                                                                     HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE
+                                                             );
+                                                         }
+                                                     }
+                                                 }
+                                             });
+                                         }
+                                     }, docListenerDisposable
+        );
+
 
         leftEditor.getScrollingModel().addVisibleAreaListener(e -> {
             int targetY = e.getNewRectangle().y;
@@ -232,9 +237,6 @@ public class JsonSplitBulkEditor {
         splitter.setFirstComponent(leftEditor.getComponent());
         splitter.setSecondComponent(rightEditor.getComponent());
 
-        // ==========================================================
-        // 🌟 شريط الحالة (Status Bar)
-        // ==========================================================
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBorder(JBUI.Borders.empty(6, 10));
         JLabel shortcutLabel = new JLabel("💡 Shortcuts:  [Enter] Save   |   [Tab] / [↓] Next   |   [Shift+Tab] / [↑] Prev   |   [Ctrl+Click] Multi-Caret");
@@ -366,7 +368,7 @@ public class JsonSplitBulkEditor {
         SwingUtilities.invokeLater(() -> {
             if (!rightEditor.isDisposed() && !leftEditor.isDisposed()) {
                 if (!valueMarkers.isEmpty()) {
-                    rightEditor.getCaretModel().moveToOffset(valueMarkers.get(0).getEndOffset());
+                    rightEditor.getCaretModel().moveToOffset(valueMarkers.getFirst().getEndOffset());
                 }
                 updateRowHighlights.run();
             }
@@ -401,14 +403,14 @@ public class JsonSplitBulkEditor {
 
     private static void setupEditorAppearance(Editor editor, Project project) {
         FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
-        com.intellij.openapi.editor.highlighter.EditorHighlighter highlighter =
-                com.intellij.openapi.editor.highlighter.EditorHighlighterFactory.getInstance().createEditorHighlighter(project, jsonFileType);
+        EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new com.intellij.testFramework.LightVirtualFile("dummy.json", jsonFileType, ""));
+
         if (editor instanceof EditorEx) {
             ((EditorEx) editor).setHighlighter(highlighter);
         }
 
         EditorColorsScheme scheme = editor.getColorsScheme();
-        scheme.setEditorFontSize(15);
+        scheme.setEditorFontSize(15f);
         scheme.setLineSpacing(1.4f);
 
         EditorSettings settings = editor.getSettings();
@@ -430,7 +432,6 @@ public class JsonSplitBulkEditor {
         return str.replace("\\\"", "\"").replace("\\\\", "\\");
     }
 
-    // 🌟 واجهة الإعدادات (Config) لتخصيص محتوى الـ JSON وطريقة الحفظ لكل نوع
     public interface JsonFieldConfig {
         String getPopupTitle();
 

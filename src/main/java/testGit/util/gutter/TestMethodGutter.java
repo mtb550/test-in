@@ -15,9 +15,12 @@ import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
     @Override
@@ -48,7 +51,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
                 psiElement -> "View Test Case Details",
-                (mouseEvent, psiElement) -> openViewPanel(psiElement, method, uuidStr),
+                (mouseEvent, psiElement) -> openViewPanel(psiElement, uuidStr),
                 GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
         );
@@ -56,34 +59,33 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         result.add(marker);
     }
 
-    private void openViewPanel(PsiElement element, PsiMethod method, String uuid) {
+    private void openViewPanel(PsiElement element, String uuid) {
         Project project = element.getProject();
-        PsiClass psiClass = method.getContainingClass();
-        if (psiClass == null || psiClass.getName() == null) return;
-
         String basePath = project.getBasePath();
         if (basePath == null) return;
 
-        String className = psiClass.getName();
-
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             File testGitDir = new File(basePath, "testGit");
-            if (!testGitDir.exists() || !testGitDir.isDirectory()) return;
-
-            File[] projectDirs = testGitDir.listFiles(File::isDirectory);
-            if (projectDirs == null) return;
+            if (!testGitDir.exists() || !testGitDir.isDirectory()) {
+                System.err.println("testGit directory not found at: " + testGitDir.getAbsolutePath());
+                return;
+            }
 
             File targetJsonFile = null;
+            String targetFileName = uuid + ".json";
 
-            for (File dir : projectDirs) {
-                String dirName = dir.getName();
-                if (dirName.endsWith("_AC") || dirName.endsWith("_IN") || dirName.endsWith("_AR") || dirName.endsWith("_RE")) {
-                    File jsonFile = new File(dir, "testCases/" + className + "/" + uuid + ".json");
-                    if (jsonFile.exists()) {
-                        targetJsonFile = jsonFile;
-                        break;
-                    }
+            try (Stream<Path> stream = Files.walk(testGitDir.toPath())) {
+                Path foundPath = stream
+                        .filter(Files::isRegularFile)
+                        .filter(path -> path.getFileName().toString().equals(targetFileName))
+                        .findFirst()
+                        .orElse(null);
+
+                if (foundPath != null) {
+                    targetJsonFile = foundPath.toFile();
                 }
+            } catch (IOException e) {
+                System.err.println("Error searching for JSON file: " + e.getMessage());
             }
 
             if (targetJsonFile != null) {

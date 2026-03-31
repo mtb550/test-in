@@ -14,17 +14,16 @@ public class PersistenceManager {
                 items.get(i).setTitle(newTitles[i].trim());
             }
         }
-        // TODO: حفظ فعلي في الداتابيز
+        // TODO: save to db
         if (onUpdate != null) onUpdate.run();
     }
 
     public static void updateExpected(List<TestCaseDto> items, String[] newExpected, Runnable onUpdate) {
         int limit = Math.min(newExpected.length, items.size());
         for (int i = 0; i < limit; i++) {
-            // نقوم بتحديث النتيجة المتوقعة (حتى لو كانت فارغة لأن بعض المستخدمين قد يرغب بمسحها)
             items.get(i).setExpected(newExpected[i].trim());
         }
-        // TODO: حفظ فعلي في الداتابيز
+        // TODO: save to db
         if (onUpdate != null) onUpdate.run();
     }
 
@@ -32,20 +31,17 @@ public class PersistenceManager {
         for (TestCaseDto tc : items) {
             tc.setPriority(priority);
         }
-        // TODO: حفظ فعلي في الداتابيز
+        // TODO: save to db
         if (onUpdate != null) onUpdate.run();
     }
 
-    // 🌟 الدالة الجديدة الخاصة بالخطوات
     public static void updateSteps(List<TestCaseDto> items, List<List<String>> newSteps, Runnable onUpdate) {
         int limit = Math.min(newSteps.size(), items.size());
         for (int i = 0; i < limit; i++) {
-            // تنظيف الخطوات الفارغة تماماً
             List<String> cleanSteps = newSteps.get(i).stream()
                     .filter(step -> !step.trim().isEmpty())
                     .toList();
 
-            // تحديث كائن DTO الخاص بهذا الـ TestCase
             items.get(i).setSteps(cleanSteps);
         }
 

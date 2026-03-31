@@ -7,6 +7,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class TestCaseHistoryDto {
     private String timestamp;
-    private String changeSummary;
 
+    private String changeSummary;
 }

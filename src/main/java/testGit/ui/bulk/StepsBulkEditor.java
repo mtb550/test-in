@@ -1,5 +1,6 @@
 package testGit.ui.bulk;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -18,6 +19,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -41,13 +43,12 @@ public class StepsBulkEditor {
         Project project = Config.getProject();
         if (project == null) return;
 
-        // 🌟 حالة البيانات (State) لتتبع التعديلات الحية والأصلية
         List<List<String>> originalSteps = new ArrayList<>();
         List<List<String>> activeSteps = new ArrayList<>();
 
         for (TestCaseDto tc : selectedItems) {
             List<String> current = tc.getSteps() != null ? new ArrayList<>(tc.getSteps()) : new ArrayList<>();
-            if (current.isEmpty()) current.add(""); // ضمان وجود خطوة فارغة على الأقل للبدء
+            if (current.isEmpty()) current.add("");
             originalSteps.add(new ArrayList<>(current));
             activeSteps.add(new ArrayList<>(current));
         }
@@ -80,16 +81,11 @@ public class StepsBulkEditor {
         TextAttributes leftLineAttr = new TextAttributes();
         leftLineAttr.setBackgroundColor(themeCaretRowColor);
 
-        // ==========================================================
-        // 🌟 المحرك الديناميكي: إعادة بناء الواجهة
-        // ==========================================================
-        Runnable[] reRenderUIRef = new Runnable[1];
-
         Runnable syncStateFromEditor = () -> {
             for (StepMarker sm : stepMarkers) {
                 if (sm.marker != null && sm.marker.isValid()) {
                     String text = rightDoc.getText(new TextRange(sm.marker.getStartOffset(), sm.marker.getEndOffset()));
-                    // استخدام unescapeJson لتحويل النص المحمي إلى نص عادي ونظيف للتخزين
+
                     activeSteps.get(sm.tcIdx).set(sm.stepIdx, unescapeJson(text));
                 }
             }
@@ -121,7 +117,7 @@ public class StepsBulkEditor {
                     String stepPrefix = "      \"";
                     String stepSuffix = "\"" + (j < currSteps.size() - 1 ? "," : "") + "\n";
 
-                    rightSb.append(stepPrefix); // إضافة علامة التنصيص (سيتم قفلها لاحقاً)
+                    rightSb.append(stepPrefix);
 
                     StepMarker sm = new StepMarker();
                     sm.tcIdx = i;
@@ -131,7 +127,7 @@ public class StepsBulkEditor {
                     sm.endOffset = rightSb.length();
                     tempMarkers.add(sm);
 
-                    rightSb.append(stepSuffix); // إضافة علامة التنصيص الختامية والفاصلة (سيتم قفلها لاحقاً)
+                    rightSb.append(stepSuffix);
                 }
 
                 String suffix = "    ]\n  }";
@@ -173,15 +169,13 @@ public class StepsBulkEditor {
 
             if (focusTc != null && focusStep != null) {
                 for (StepMarker sm : stepMarkers) {
-                    if (sm.tcIdx == focusTc.intValue() && sm.stepIdx == focusStep.intValue()) {
+                    if (sm.tcIdx == focusTc && sm.stepIdx == focusStep) {
                         rightEditor.getCaretModel().moveToOffset(sm.marker.getEndOffset());
                         break;
                     }
                 }
             }
         };
-
-        reRenderUIRef[0] = () -> renderUI.accept(null, null);
 
         Runnable updateRowHighlights = () -> {
             if (leftEditor.isDisposed() || rightEditor.isDisposed()) return;
@@ -201,7 +195,6 @@ public class StepsBulkEditor {
             @Override
             public void caretPositionChanged(@NotNull CaretEvent event) {
                 Caret caret = event.getCaret();
-                if (caret == null) return;
                 int offset = caret.getOffset();
                 boolean isInsideEditable = stepMarkers.stream().anyMatch(m ->
                         m.marker != null && m.marker.isValid() && offset >= m.marker.getStartOffset() && offset <= m.marker.getEndOffset());
@@ -220,33 +213,35 @@ public class StepsBulkEditor {
             }
         });
 
+        Disposable docListenerDisposable = Disposer.newDisposable();
         rightDoc.addDocumentListener(new DocumentListener() {
-            @Override
-            public void documentChanged(@NotNull DocumentEvent event) {
-                SwingUtilities.invokeLater(() -> {
-                    if (rightEditor.isDisposed()) return;
-                    MarkupModel markupModel = rightEditor.getMarkupModel();
-                    for (RangeHighlighter h : markupModel.getAllHighlighters()) {
-                        if (h.getLayer() == HighlighterLayer.SELECTION - 1) markupModel.removeHighlighter(h);
-                    }
-                    TextAttributes diffAttr = new TextAttributes();
-                    diffAttr.setBackgroundColor(new JBColor(new Color(228, 250, 228), new Color(43, 61, 44)));
+                                         @Override
+                                         public void documentChanged(@NotNull DocumentEvent event) {
+                                             SwingUtilities.invokeLater(() -> {
+                                                 if (rightEditor.isDisposed()) return;
+                                                 MarkupModel markupModel = rightEditor.getMarkupModel();
+                                                 for (RangeHighlighter h : markupModel.getAllHighlighters()) {
+                                                     if (h.getLayer() == HighlighterLayer.SELECTION - 1) markupModel.removeHighlighter(h);
+                                                 }
+                                                 TextAttributes diffAttr = new TextAttributes();
+                                                 diffAttr.setBackgroundColor(new JBColor(new Color(228, 250, 228), new Color(43, 61, 44)));
 
-                    for (StepMarker sm : stepMarkers) {
-                        if (sm.marker != null && sm.marker.isValid()) {
-                            String currentText = rightDoc.getText(new TextRange(sm.marker.getStartOffset(), sm.marker.getEndOffset()));
-                            List<String> origList = originalSteps.get(sm.tcIdx);
-                            String originalText = (sm.stepIdx < origList.size()) ? escapeJson(origList.get(sm.stepIdx)) : "";
+                                                 for (StepMarker sm : stepMarkers) {
+                                                     if (sm.marker != null && sm.marker.isValid()) {
+                                                         String currentText = rightDoc.getText(new TextRange(sm.marker.getStartOffset(), sm.marker.getEndOffset()));
+                                                         List<String> origList = originalSteps.get(sm.tcIdx);
+                                                         String originalText = (sm.stepIdx < origList.size()) ? escapeJson(origList.get(sm.stepIdx)) : "";
 
-                            if (!currentText.equals(originalText)) {
-                                markupModel.addRangeHighlighter(sm.marker.getStartOffset(), sm.marker.getEndOffset(),
-                                        HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE);
-                            }
-                        }
-                    }
-                });
-            }
-        });
+                                                         if (!currentText.equals(originalText)) {
+                                                             markupModel.addRangeHighlighter(sm.marker.getStartOffset(), sm.marker.getEndOffset(),
+                                                                     HighlighterLayer.SELECTION - 1, diffAttr, HighlighterTargetArea.EXACT_RANGE);
+                                                         }
+                                                     }
+                                                 }
+                                             });
+                                         }
+                                     }, docListenerDisposable
+        );
 
         rightEditor.addEditorMouseListener(new EditorMouseListener() {
             @Override
@@ -282,9 +277,6 @@ public class StepsBulkEditor {
         splitter.setFirstComponent(leftEditor.getComponent());
         splitter.setSecondComponent(rightEditor.getComponent());
 
-        // ==========================================================
-        // 🌟 شريط الحالة (Status Bar)
-        // ==========================================================
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBorder(JBUI.Borders.empty(6, 10));
         JLabel shortcutLabel = new JLabel("💡 Shortcuts:  [Enter] Save   |   [Ctrl+Enter] Add Step   |   [Shift+Delete] Remove Step   |   [Tab] / [↓] Next   |   [Ctrl+Click] Multi-Caret");
@@ -306,9 +298,6 @@ public class StepsBulkEditor {
                 .setResizable(true)
                 .createPopup();
 
-        // ==========================================================
-        // 🌟 اختصارات لوحة المفاتيح
-        // ==========================================================
         Runnable saveLogic = () -> {
             syncStateFromEditor.run();
             PersistenceManager.updateSteps(selectedItems, activeSteps, onUpdate);
@@ -329,7 +318,6 @@ public class StepsBulkEditor {
             }
         }.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK)), rightEditor.getContentComponent());
 
-        // 🌟 1. إضافة خطوة لجميع المؤشرات (Multi-Caret Add)
         new DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
@@ -357,13 +345,12 @@ public class StepsBulkEditor {
                     activeSteps.get(target[0]).add(target[1] + 1, "");
                 }
 
-                int[] firstAdded = targets.get(targets.size() - 1);
+                int[] firstAdded = targets.getLast();
                 renderUI.accept(firstAdded[0], firstAdded[1] + 1);
             }
         }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK)), rightEditor.getContentComponent());
 
-        // 🌟 2. مسح خطوة لجميع المؤشرات (Multi-Caret Delete)
         new DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
@@ -387,7 +374,7 @@ public class StepsBulkEditor {
                     return Integer.compare(b[1], a[1]);
                 });
 
-                int focusTc = targets.get(targets.size() - 1)[0];
+                int focusTc = targets.getLast()[0];
                 int focusStep = 0;
 
                 for (int[] target : targets) {
@@ -405,7 +392,6 @@ public class StepsBulkEditor {
         }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
                 KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.SHIFT_DOWN_MASK)), rightEditor.getContentComponent());
 
-        // التنقل (Tab, Shift+Tab, Up, Down)
         new DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
@@ -442,7 +428,6 @@ public class StepsBulkEditor {
             }
         });
 
-        // بناء الواجهة لأول مرة
         renderUI.accept(0, 0);
         popup.showCenteredInCurrentWindow(project);
     }
@@ -483,7 +468,7 @@ public class StepsBulkEditor {
         com.intellij.openapi.editor.highlighter.EditorHighlighter highlighter = com.intellij.openapi.editor.highlighter.EditorHighlighterFactory.getInstance().createEditorHighlighter(project, jsonFileType);
         if (editor instanceof EditorEx) ((EditorEx) editor).setHighlighter(highlighter);
         EditorColorsScheme scheme = editor.getColorsScheme();
-        scheme.setEditorFontSize(15);
+        scheme.setEditorFontSize(15f);
         scheme.setLineSpacing(1.4f);
         EditorSettings settings = editor.getSettings();
         settings.setLineNumbersShown(true);

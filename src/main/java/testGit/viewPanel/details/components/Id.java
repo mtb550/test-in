@@ -1,13 +1,12 @@
-package testGit.viewPanel.details;
+package testGit.viewPanel.details.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.util.ui.JBFont;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
 
@@ -17,10 +16,10 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class HeaderUI {
+public class Id extends BaseDetails {
 
-    @NotNull
-    public static JPanel createIdContainer(@NotNull TestCaseDto dto) {
+    @Override
+    public int render(@NotNull JBPanel<?> panel, @NotNull GridBagConstraints gbc, @NotNull TestCaseDto dto, int currentRow) {
         JBLabel idBadge = new JBLabel(dto.getId()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -58,14 +57,14 @@ public class HeaderUI {
         idContainer.add(idBadge);
         idContainer.add(copyIcon);
 
-        return idContainer;
-    }
+        gbc.gridx = 0;
+        gbc.gridy = currentRow;
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = JBUI.insets(8, 16, 2, 16);
 
-    @NotNull
-    public static JBLabel createTitleLabel(@NotNull TestCaseDto dto) {
-        JBLabel mainTitleLabel = new JBLabel(DetailsUtil.format(dto.getTitle()));
-        mainTitleLabel.setFont(JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f));
-        mainTitleLabel.setForeground(UIUtil.getLabelForeground());
-        return mainTitleLabel;
+        panel.add(idContainer, gbc);
+        return currentRow + 1;
     }
 }

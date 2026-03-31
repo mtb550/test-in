@@ -28,10 +28,8 @@ public class TitleBulkEditor {
                 String suffix = "\"\n  }";
                 String comma = isLast ? "\n" : ",\n";
 
-                // إضافة للعمود الأيسر
                 leftSb.append(prefix).append(escapedTitle).append(suffix).append(comma);
 
-                // إضافة للعمود الأيمن مع تسجيل مساحة التعديل
                 rightSb.append(prefix);
                 int startOffset = rightSb.length();
                 rightSb.append(escapedTitle);

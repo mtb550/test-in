@@ -42,20 +42,16 @@ public class RunTestSet extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        // Double-check the path is still selected
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        // Extract the selected Directory object
         Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
 
         if (userObject instanceof TestSetDirectoryDto ts) {
-            // 1. Convert the physical File path into a Java FQCN
             System.out.println(this.getClass() + "directory file: " + ts.getPath().toFile());
             String fqcn = Tools.fileToFqcn(ts.getPath().toFile());
             System.out.println(this.getClass() + "fqcn path: " + fqcn);
 
-            // 2. Trigger the high-performance background runner!
             if (fqcn != null && !fqcn.trim().isEmpty()) {
                 System.out.println("fqcn: " + fqcn);
                 TestNGRunnerByClass.runTestClass(fqcn);

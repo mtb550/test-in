@@ -107,7 +107,7 @@ public class TestProjectSelector {
             }
         }
 
-        if (indexToRemove == -1) return; // Not found
+        if (indexToRemove == -1) return;
 
         ActionListener[] listeners = selectedTestProject.getActionListeners();
         for (ActionListener l : listeners) selectedTestProject.removeActionListener(l);

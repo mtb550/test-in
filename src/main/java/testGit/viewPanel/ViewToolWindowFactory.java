@@ -9,23 +9,24 @@ import com.intellij.ui.content.ContentFactory;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
-import testGit.viewPanel.details.DetailsTab;
 
-public class ToolWindowFactoryImpl implements ToolWindowFactory, DumbAware {
+public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
+
     @Getter
-    private static DetailsTab detailsInstance;
+    private static ViewPanel viewPanel;
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        Config.setProject(project); /// to be added for all other components. tree, editor. as we may run one of them first
+        /// to be added for all other components. tree, editor. as we may run one of them first
+        Config.setProject(project);
 
-        detailsInstance = new DetailsTab();
+        viewPanel = new ViewPanel();
 
         ContentFactory contentFactory = ContentFactory.getInstance();
 
-        Content detailsTab = contentFactory.createContent(detailsInstance.getDetailsTab(), "Details", false);
-        Content historyTab = contentFactory.createContent(detailsInstance.getHistoryTab(), "History", false);
-        Content bugsTab = contentFactory.createContent(detailsInstance.getBugTab(), "Open Bugs", false);
+        Content detailsTab = contentFactory.createContent(viewPanel.getDetailsTab(), "Details", false);
+        Content historyTab = contentFactory.createContent(viewPanel.getHistoryTab(), "History", false);
+        Content bugsTab = contentFactory.createContent(viewPanel.getOpenBugsTab(), "Open Bugs", false);
 
         toolWindow.getContentManager().addContent(detailsTab);
         toolWindow.getContentManager().addContent(historyTab);

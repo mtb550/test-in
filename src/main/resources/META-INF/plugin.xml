@@ -3,9 +3,9 @@
     <!-- ================================================================== -->
     <!-- Identity                                                           -->
     <!-- ================================================================== -->
-    <id>testGit</id>
+    <id>testGit.demo</id>
     <name>Test Git</name>
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
     <vendor email="mtb550@gmail.com" url="https://mtb.com">Muteb Almughyiri</vendor>
     <resource-bundle>messages.bundle</resource-bundle>
     <description><![CDATA[
@@ -52,7 +52,7 @@
 
         <!-- Tool windows -->
         <toolWindow
-                id="TestGit"
+                id="TestGitTreePanel"
                 factoryClass="testGit.projectPanel.Main"
                 anchor="left"
                 icon="/icons/pluginIcon.svg"
@@ -60,8 +60,8 @@
                 doNotActivateOnStart="true"
         />
         <toolWindow
-                id="Details"
-                factoryClass="testGit.viewPanel.ToolWindowFactoryImpl"
+                id="TestGitViewPanel"
+                factoryClass="testGit.viewPanel.ViewToolWindowFactory"
                 anchor="bottom"
                 icon="/icons/pluginIcon.svg"
                 secondary="false"

@@ -18,53 +18,43 @@ public class CodeNavigator {
             return;
         }
 
-        // 1. Cache the project reference locally so we aren't repeatedly calling Config
         final Project project = Config.getProject();
         final String methodName = Tools.toCamelCase(testCaseName);
 
-        // 2. ENHANCEMENT: Move all heavy PSI searching OFF the main UI thread!
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                ApplicationManager.getApplication().runReadAction(() -> {
 
-            // 3. Request read access while on the background thread
-            ApplicationManager.getApplication().runReadAction(() -> {
+                    PsiClass targetClass = JavaPsiFacade.getInstance(project)
+                            .findClass(fqcn, GlobalSearchScope.projectScope(project));
 
-                // Fast cache lookup
-                PsiClass targetClass = JavaPsiFacade.getInstance(project)
-                        .findClass(fqcn, GlobalSearchScope.projectScope(project));
+                    if (targetClass != null) {
+                        Navigatable targetElement = targetClass;
 
-                if (targetClass != null) {
-                    Navigatable targetElement = targetClass;
+                        PsiMethod[] exactMethods = targetClass.findMethodsByName(methodName, false);
 
-                    // Fast exact match lookup
-                    PsiMethod[] exactMethods = targetClass.findMethodsByName(methodName, false);
-
-                    if (exactMethods.length > 0) {
-                        targetElement = exactMethods[0];
-                    } else {
-                        // Fallback: Case-insensitive search
-                        for (PsiMethod method : targetClass.getMethods()) {
-                            if (method.getName().equalsIgnoreCase(methodName)) {
-                                targetElement = method;
-                                break;
+                        if (exactMethods.length > 0) {
+                            targetElement = exactMethods[0];
+                        } else {
+                            for (PsiMethod method : targetClass.getMethods()) {
+                                if (method.getName().equalsIgnoreCase(methodName)) {
+                                    targetElement = method;
+                                    break;
+                                }
                             }
                         }
+
+                        final Navigatable finalTarget = targetElement;
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            if (finalTarget.canNavigate()) {
+                                finalTarget.navigate(true);
+                            }
+                        });
+
+                    } else {
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Messages.showErrorDialog("Could not find class in project:\n" + fqcn, "Class Not Found")
+                        );
                     }
-
-                    // 4. Jump back to the UI thread ONLY to open the editor window
-                    final Navigatable finalTarget = targetElement;
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (finalTarget.canNavigate()) {
-                            finalTarget.navigate(true);
-                        }
-                    });
-
-                } else {
-                    // Show error on UI thread if not found
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Messages.showErrorDialog("Could not find class in project:\n" + fqcn, "Class Not Found")
-                    );
-                }
-            });
-        });
+                }));
     }
 }

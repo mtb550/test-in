@@ -1,6 +1,7 @@
-package testGit.viewPanel.details;
+package testGit.viewPanel.details.components;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -13,10 +14,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class ActionsUI {
+public class ActionIcons extends BaseDetails {
 
-    @NotNull
-    public static JPanel create(@NotNull TestCaseDto dto) {
+    @Override
+    public int render(@NotNull JBPanel<?> panel, @NotNull GridBagConstraints gbc, @NotNull TestCaseDto dto, int currentRow) {
         JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
 
@@ -80,6 +81,14 @@ public class ActionsUI {
         actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(4)));
         actionsPanel.add(runLabel);
 
-        return actionsPanel;
+        gbc.gridx = 0;
+        gbc.gridy = currentRow;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = JBUI.insets(0, 16, 8, 16);
+        panel.add(actionsPanel, gbc);
+
+        return currentRow + 1;
     }
 }

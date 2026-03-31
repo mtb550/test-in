@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 public class TransferListener extends TransferHandler {
     private static final DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
-    private final BaseEditorUI ui; // 🌟 استخدام الواجهة الأب
+    private final BaseEditorUI ui;
     private int[] draggedIndices;
 
     public TransferListener(BaseEditorUI ui) {
