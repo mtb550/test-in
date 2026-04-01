@@ -1,5 +1,6 @@
 package testGit.viewPanel;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
@@ -11,6 +12,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
+import testGit.settings.StartupActivity;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -53,20 +55,28 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
-        Config.setProject(project);
+        System.out.println("ViewToolWindowFactory.createToolWindowContent()");
 
-        viewPanel = new ViewPanel();
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (!project.isDisposed()) {
+                StartupActivity.execute(project);
+            }
 
-        ContentFactory contentFactory = ContentFactory.getInstance();
+            viewPanel = new ViewPanel();
 
-        Content detailsTab = contentFactory.createContent(viewPanel.getDetailsScrollPane(), "Details", false);
-        Content historyTab = contentFactory.createContent(viewPanel.getHistoryScrollPane(), "History", false);
-        Content bugsTab = contentFactory.createContent(viewPanel.getOpenBugsScrollPane(), "Open Bugs", false);
+            ContentFactory contentFactory = ContentFactory.getInstance();
 
-        toolWindow.getContentManager().addContent(detailsTab);
-        toolWindow.getContentManager().addContent(historyTab);
-        toolWindow.getContentManager().addContent(bugsTab);
+            Content detailsTab = contentFactory.createContent(viewPanel.getDetailsScrollPane(), "Details", false);
+            Content historyTab = contentFactory.createContent(viewPanel.getHistoryScrollPane(), "History", false);
+            Content bugsTab = contentFactory.createContent(viewPanel.getOpenBugsScrollPane(), "Open Bugs", false);
 
-        toolWindow.setTitleActions(ViewPanelActions.create(viewPanel.getPage(), toolWindow.getComponent()));
+            toolWindow.getContentManager().addContent(detailsTab);
+            toolWindow.getContentManager().addContent(historyTab);
+            toolWindow.getContentManager().addContent(bugsTab);
+
+            toolWindow.setTitleActions(ViewPanelActions.create(viewPanel.getPage(), toolWindow.getComponent()));
+
+        });
     }
+
 }

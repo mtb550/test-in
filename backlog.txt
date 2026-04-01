@@ -158,14 +158,10 @@ listener between editors correpted, not show the selected in view panel once cha
 
 زر النسخ كتقرير خطأ (Copy Bug Report)
 
-path on top of view panel. DONE!!
-
 persist save action.
 
 make step in the first line. make dot and capitalaize first letter automatic > steps
 make capitalize and dot in test case card and run card. move format method to Tools.
-
-create and complete the multi update actions for each test case attribute. start from context menu.(important)
 
 implement progress icon in all 3 components. tree, editor, view
 
@@ -173,27 +169,7 @@ update editor search to search by id (UUID)
 
 all ui to be updated to the new ui, frameless and buttonless. remove and add and all ui (important)
 
-remove edit test case from view panel. it is complicated. use the new ui but new classes for single edit.
-(in progress)
-
-fix the issue, when open on the navigation bar in code, can open same editor multi times.
-there is a method in util that check the open editor. use it.
-
-make shortcuts to add nodes like edit menu.
-
 fix step issues: 1- remove use CTRL+D, 2- add new array item for all cursors not for the last only, 3-remove use cotation in step value, 4- step class not use the splitter class. it is too long
-
-add status bar to the edit all ui in JsonSplitterBulkEditor, and put all shortcuts
-
-if select multi test cases and view panel is open, paginate the view panel and show all.
-
-question not solved
-(attach splitter, title, expected)
-great, all perfect now.
-i attached the classes.
-review and read it then:
-why dont use exted. it is better than static.
-also, enhance and arrange code more to make my maintinance easy.
 
 view panel enhancments:
 merge created by at and updated by at.
@@ -204,4 +180,9 @@ JBPopupFactory.getInstance()
                 .setFadeoutTime(HINT_FADEOUT_MS)
                 .createBalloon()
                 .show(RelativePoint.getCenterOf(component), Balloon.Position.above);
-    }
+}
+
+how can I get the status after run test method and put it temporarly ad a badge in view panel and card
+ExecutionListener , SMTRunner, ProcessHandler. SMTRunnerEventsListener
+Key<Boolean> IS_MY_PLUGIN_RUN
+boolean isTestNG = env.getRunProfile().getClass().getSimpleName().equals("TestNGConfiguration");

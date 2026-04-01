@@ -22,6 +22,8 @@ public class RunTestCase extends DumbAwareAction {
 
     public static void execute(final TestCaseDto tc) {
         if (tc == null) return;
+        if ("RUNNING".equals(tc.getTempStatus())) return;
+
         TestNGRunnerByMethod.runTestMethod(tc.getAutoRef(), Tools.toCamelCase(tc.getTitle()));
         Notifier.info("Running Test Case: ", tc.getTitle());
     }

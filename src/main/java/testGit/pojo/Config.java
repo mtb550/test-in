@@ -24,6 +24,8 @@ public class Config {
     @Getter
     private static Project project;
 
+    /// to be removed
+
     public static ObjectMapper getMapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())

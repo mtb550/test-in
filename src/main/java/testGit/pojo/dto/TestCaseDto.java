@@ -1,6 +1,7 @@
 package testGit.pojo.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +27,7 @@ public class TestCaseDto {
     /// change this to UUID
     private String id;
 
+    ///  change to name or description to match the testng
     private String title;
 
     private String expected;
@@ -52,5 +54,11 @@ public class TestCaseDto {
     private LocalDateTime updateAt;
 
     private String module;
+
+    @JsonIgnore
+    private String tempStatus;
+
+    @JsonIgnore
+    private String tempError;
 
 }

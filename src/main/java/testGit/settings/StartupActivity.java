@@ -3,6 +3,7 @@ package testGit.settings;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
+import testGit.util.Runner.TestCaseExecutionTracker;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -38,6 +39,10 @@ public class StartupActivity {
 
         Config.setTestGitPath(testGitPath);
         Config.setAutomationPath(automationPath);
+
+        /// to be removed
         Config.setProject(project);
+
+        TestCaseExecutionTracker.initGlobalListener(Config.getProject());
     }
 }

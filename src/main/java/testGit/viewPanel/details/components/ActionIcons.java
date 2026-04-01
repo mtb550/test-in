@@ -27,6 +27,9 @@ public class ActionIcons extends BaseDetails {
     private static final String RUN_TOOLTIP = "Run Test Case";
     private static final Icon navIconRaw = AllIcons.Nodes.Class;
     private static final Icon runIconRaw = AllIcons.RunConfigurations.TestState.Run;
+    private static final Icon suspend = AllIcons.Actions.Suspend;
+    private static final Icon testPassed = AllIcons.RunConfigurations.TestPassed;
+    private static final Icon testFailed = AllIcons.RunConfigurations.TestFailed;
 
     @Override
     public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
@@ -67,15 +70,23 @@ public class ActionIcons extends BaseDetails {
 
         JLabel runLabel = new JLabel();
 
-        Icon runIconBase = IconUtil.scale(runIconRaw, runLabel, BASE_SCALE);
-        Icon runIconHover = IconUtil.scale(runIconRaw, runLabel, HOVER_SCALE);
+        Icon currentRunIconRaw = runIconRaw;
+        if ("RUNNING".equals(dto.getTempStatus()))
+            currentRunIconRaw = suspend;
+        else if ("PASSED".equals(dto.getTempStatus()))
+            currentRunIconRaw = testPassed;
+        else if ("FAILED".equals(dto.getTempStatus()))
+            currentRunIconRaw = testFailed;
+
+        Icon runIconBase = IconUtil.scale(currentRunIconRaw, runLabel, BASE_SCALE);
+        Icon runIconHover = IconUtil.scale(currentRunIconRaw, runLabel, HOVER_SCALE);
 
         runLabel.setIcon(runIconBase);
         runLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         runLabel.setToolTipText(RUN_TOOLTIP);
 
-        int runTargetWidth = (int) (runIconRaw.getIconWidth() * HOVER_SCALE);
-        int runTargetHeight = (int) (runIconRaw.getIconHeight() * HOVER_SCALE);
+        int runTargetWidth = (int) (currentRunIconRaw.getIconWidth() * HOVER_SCALE);
+        int runTargetHeight = (int) (currentRunIconRaw.getIconHeight() * HOVER_SCALE);
         runLabel.setPreferredSize(new Dimension(runTargetWidth, runTargetHeight));
         runLabel.setHorizontalAlignment(SwingConstants.CENTER);
         runLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -93,7 +104,8 @@ public class ActionIcons extends BaseDetails {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                RunTestCase.execute(dto);
+                if (!"RUNNING".equals(dto.getTempStatus()))
+                    RunTestCase.execute(dto);
             }
         });
 
