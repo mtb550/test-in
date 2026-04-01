@@ -31,6 +31,21 @@ public abstract class BaseDetails {
 
     protected int addRow(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final String labelText, @Nullable final String valueText, final int row) {
 
+        final String finalValue = (valueText == null || valueText.trim().isEmpty()) ? EMPTY_VALUE_PLACEHOLDER : valueText;
+
+        final JTextArea valueArea = new JTextArea(finalValue);
+        valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, VALUE_FONT_SIZE));
+        valueArea.setLineWrap(true);
+        valueArea.setWrapStyleWord(true);
+        valueArea.setOpaque(false);
+        valueArea.setEditable(false);
+        valueArea.setBorder(null);
+
+        return addRow(panel, gbc, labelText, valueArea, row);
+    }
+
+    protected int addRow(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final String labelText, @NotNull final JComponent valueComponent, final int row) {
+
         gbc.gridy = row;
         gbc.gridwidth = 1;
 
@@ -56,17 +71,7 @@ public abstract class BaseDetails {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = JBUI.insets(VALUE_INSETS_TOP, VALUE_INSETS_LEFT, VALUE_INSETS_BOTTOM, VALUE_INSETS_RIGHT);
 
-        final String finalValue = (valueText == null || valueText.trim().isEmpty()) ? EMPTY_VALUE_PLACEHOLDER : valueText;
-
-        final JTextArea valueArea = new JTextArea(finalValue);
-        valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, VALUE_FONT_SIZE));
-        valueArea.setLineWrap(true);
-        valueArea.setWrapStyleWord(true);
-        valueArea.setOpaque(false);
-        valueArea.setEditable(false);
-        valueArea.setBorder(null);
-
-        panel.add(valueArea, gbc);
+        panel.add(valueComponent, gbc);
 
         return row + 1;
     }
