@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.bulk.BulkEditMenu;
+import testGit.ui.single.SingleEditMenu;
 import testGit.util.KeyboardSet;
 import testGit.viewPanel.ViewPanel;
 import testGit.viewPanel.ViewToolWindowFactory;
@@ -29,7 +30,8 @@ public class EditTestCase extends DumbAwareAction {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        BulkEditMenu.show(selectedItems, () -> {
+        // 🟢 1. استخراج منطق التحديث (Callback) لعدم تكرار الكود (DRY)
+        Runnable onUpdate = () -> {
             list.repaint();
 
             ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
@@ -41,6 +43,11 @@ public class EditTestCase extends DumbAwareAction {
                 if (isCurrentAffected)
                     detailsPanel.refreshCurrentView();
             }
-        });
+        };
+
+        if (selectedItems.size() == 1)
+            SingleEditMenu.show(selectedItems.getFirst(), updatedDto -> onUpdate.run());
+        else
+            BulkEditMenu.show(selectedItems, onUpdate);
     }
 }

@@ -52,7 +52,7 @@ public class CreateTestCase extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        SingleTestCaseEditor.show(null, newTestCaseDto -> {
+        SingleTestCaseEditor.showForCreate(newTestCaseDto -> {
 
             newTestCaseDto.setId(UUID.randomUUID().toString());
 
