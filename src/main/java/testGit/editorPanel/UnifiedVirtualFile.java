@@ -12,6 +12,7 @@ import testGit.pojo.dto.dirs.TestSetDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 
 import javax.swing.tree.DefaultTreeModel;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 public class UnifiedVirtualFile extends LightVirtualFile {
 
     // Shared Properties
-    private final DirectoryDto directoryDto; // يمكن أن يكون TestSet أو TestRun
+    private final DirectoryDto directoryDto;
     private final List<TestCaseDto> testCaseDtos;
 
     // Test Run
@@ -72,13 +73,15 @@ public class UnifiedVirtualFile extends LightVirtualFile {
                     .flatMap(tc -> tc.getSteps().stream())
                     .filter(step -> step != null && !step.trim().isEmpty())
                     .map(String::trim)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toCollection(HashSet::new));
         }
         return uniqueStepsCache;
     }
 
     public void addNewStepToCache(String newStep) {
-        if (uniqueStepsCache != null && newStep != null && !newStep.trim().isEmpty()) {
+        getUniqueSteps();
+
+        if (newStep != null && !newStep.trim().isEmpty()) {
             uniqueStepsCache.add(newStep.trim());
         }
     }

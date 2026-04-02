@@ -1,9 +1,11 @@
 package testGit.ui.single;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -17,21 +19,22 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static testGit.ui.single.SingleEditorUIFactory.*;
 
 public class SingleTestCaseEditor {
-
-    public static void showForCreate(Consumer<TestCaseDto> onSave) {
-        buildAndShow(new TestCaseDto(), true, null, onSave);
+    public static void showForCreate(Consumer<TestCaseDto> onSave, Set<String> uniqueStepsCache) {
+        buildAndShow(new TestCaseDto(), true, null, onSave, uniqueStepsCache);
     }
 
-    public static void showForEdit(TestCaseDto existingDto, UpdateField targetField, Consumer<TestCaseDto> onSave) {
-        buildAndShow(existingDto, false, targetField, onSave);
+    public static void showForEdit(TestCaseDto existingDto, UpdateField targetField, Consumer<TestCaseDto> onSave, Set<String> uniqueStepsCache) {
+        buildAndShow(existingDto, false, targetField, onSave, uniqueStepsCache);
     }
 
-    private static void buildAndShow(TestCaseDto dto, boolean isExtendable, UpdateField targetField, Consumer<TestCaseDto> onSave) {
+    private static void buildAndShow(TestCaseDto dto, boolean isExtendable, UpdateField targetField, Consumer<TestCaseDto> onSave, Set<String> uniqueStepsCache) {
+        Project project = Config.getProject();
         final JBPopup[] popupWrapper = new JBPopup[1];
         Runnable repackPopup = () -> {
             if (popupWrapper[0] != null) popupWrapper[0].pack(true, true);
@@ -90,24 +93,31 @@ public class SingleTestCaseEditor {
         stepsContainer.setLayout(new BoxLayout(stepsContainer, BoxLayout.Y_AXIS));
         stepsContainer.setOpaque(false);
         JPanel stepsWrapper = wrapComponent(stepsContainer, null);
-        List<ExtendableTextField> stepFields = new ArrayList<>();
+
+        List<TextFieldWithAutoCompletion<String>> stepFields = new ArrayList<>();
 
         // 3. Populate Target Fields
         if (!isExtendable && targetField != null) {
             if (targetField == UpdateField.EXPECTED) {
                 if (dto.getExpected() != null) expectedField.setText(dto.getExpected());
                 contentPanel.add(expectedWrapper);
+
             } else if (targetField == UpdateField.PRIORITY) {
                 contentPanel.add(priorityWrapper);
+
             } else if (targetField == UpdateField.GROUPS) {
                 prefillGroups(groupsPanel, dto.getGroups());
                 contentPanel.add(groupsWrapper);
+
             } else if (targetField == UpdateField.STEPS) {
                 contentPanel.add(stepsWrapper);
+
                 if (dto.getSteps() != null && !dto.getSteps().isEmpty()) {
-                    for (String step : dto.getSteps()) addStepField(stepsContainer, stepFields, step, repackPopup);
+                    for (String step : dto.getSteps())
+                        addStepField(project, stepsContainer, stepFields, step, repackPopup, uniqueStepsCache);
+
                 } else {
-                    addStepField(stepsContainer, stepFields, "", repackPopup);
+                    addStepField(project, stepsContainer, stepFields, "", repackPopup, uniqueStepsCache);
                 }
             }
         }
@@ -137,7 +147,7 @@ public class SingleTestCaseEditor {
                 .setResizable(true)
                 .createPopup();
 
-        // 🟢 6. Delegate Save Logic
+        // 6. Delegate Save Logic
         Runnable saveAction = SingleEditorSaveManager.createSaveAction(
                 dto, titleField,
                 expectedWrapper, expectedField,
@@ -147,8 +157,9 @@ public class SingleTestCaseEditor {
                 onSave, popupWrapper
         );
 
-        // 🟢 7. Delegate Shortcuts
+        // 7. Delegate Shortcuts
         SingleEditorShortcutManager.registerShortcuts(
+                project, uniqueStepsCache,
                 mainPanel, contentPanel, isExtendable, targetField, repackPopup,
                 expectedWrapper, expectedField,
                 priorityWrapper, priorityCombo,
@@ -181,8 +192,10 @@ public class SingleTestCaseEditor {
                     UpdateField.STEPS.getShortcut(), UpdateField.STEPS.getLabel(),
                     UpdateField.PRIORITY.getShortcut(), UpdateField.PRIORITY.getLabel(),
                     UpdateField.GROUPS.getShortcut(), UpdateField.GROUPS.getLabel());
+
         } else if (targetField == UpdateField.STEPS) {
             shortcutText = String.format("💡 Shortcuts:  [Enter] Save   |   [Ctrl+%c] Add Step   |   [Tab] / [Shift+Tab] Navigate", UpdateField.STEPS.getShortcut());
+
         } else {
             shortcutText = "💡 Shortcuts:  [Enter] Save   |   [Tab] / [Shift+Tab] Navigate";
         }

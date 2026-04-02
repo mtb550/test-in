@@ -1,17 +1,25 @@
 package testGit.ui.single;
 
+import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.ColoredListCellRenderer;
+import com.intellij.ui.TextFieldWithAutoCompletion;
+import com.intellij.ui.TextFieldWithAutoCompletionListProvider;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
@@ -19,7 +27,9 @@ import testGit.ui.bulk.UpdateField;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class SingleEditorUIFactory {
 
@@ -54,42 +64,57 @@ public class SingleEditorUIFactory {
         return textField;
     }
 
-    public static void addStepField(JPanel container, List<ExtendableTextField> stepFields, String text, Runnable repackAction) {
-        ExtendableTextField stepField = createTextField("Step " + (stepFields.size() + 1), UpdateField.STEPS.getIcon(), FIELD_FONT_SIZE);
-        stepField.setText(text);
-        stepField.addExtension(new ExtendableTextComponent.Extension() {
+    public static void addStepField(Project project, JPanel container, List<TextFieldWithAutoCompletion<String>> stepFields, String text, Runnable repackAction, Set<String> uniqueStepsCache) {
+        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(uniqueStepsCache != null ? uniqueStepsCache : Collections.emptySet(), null);
+        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(project, provider, true, text != null ? text : "");
+        stepField.setFont(JBFont.regular().deriveFont(FIELD_FONT_SIZE));
+        stepField.setPlaceholder("Step " + (stepFields.size() + 1));
+        stepField.setBorder(JBUI.Borders.empty(6, 10));
+
+        JPanel stepRow = new JPanel(new BorderLayout(JBUI.scale(8), 0));
+        stepRow.setOpaque(false);
+        stepRow.setBorder(JBUI.Borders.emptyBottom(6));
+
+        JLabel removeButton = new JLabel(AllIcons.Actions.Cancel);
+        removeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        removeButton.setToolTipText("Remove step");
+
+        removeButton.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
-            public Icon getIcon(boolean hovered) {
-                return hovered ? AllIcons.Actions.Cancel : AllIcons.General.Remove;
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                removeButton.setIcon(AllIcons.General.Remove);
             }
 
             @Override
-            public boolean isIconBeforeText() {
-                return false;
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                removeButton.setIcon(AllIcons.Actions.Cancel);
             }
 
             @Override
-            public String getTooltip() {
-                return "Remove step";
-            }
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                container.remove(stepRow);
+                stepFields.remove(stepField);
 
-            @Override
-            public Runnable getActionOnClick() {
-                return () -> {
-                    container.remove(stepField);
-                    stepFields.remove(stepField);
-                    for (int i = 0; i < stepFields.size(); i++) {
-                        stepFields.get(i).getEmptyText().setText("Step " + (i + 1));
-                    }
-                    container.revalidate();
-                    container.repaint();
-                    repackAction.run();
-                };
+                for (int i = 0; i < stepFields.size(); i++) {
+                    stepFields.get(i).setPlaceholder("Step " + (i + 1));
+                }
+
+                container.revalidate();
+                container.repaint();
+                repackAction.run();
             }
         });
+
+        JPanel buttonWrapper = new JPanel(new BorderLayout());
+        buttonWrapper.setOpaque(false);
+        buttonWrapper.setBorder(JBUI.Borders.emptyRight(4));
+        buttonWrapper.add(removeButton, BorderLayout.CENTER);
+
+        stepRow.add(stepField, BorderLayout.CENTER);
+        stepRow.add(buttonWrapper, BorderLayout.EAST);
+
         stepFields.add(stepField);
-        container.add(stepField);
-        container.add(Box.createVerticalStrut(JBUI.scale(4)));
+        container.add(stepRow);
     }
 
     public static JPanel wrapComponent(JComponent component, UpdateField field) {
@@ -159,7 +184,7 @@ public class SingleEditorUIFactory {
 
         JLabel textLabel = new JLabel(text != null ? text : "");
         textLabel.setFont(JBFont.regular().deriveFont(fontSize));
-        textLabel.setForeground(com.intellij.util.ui.UIUtil.getContextHelpForeground());
+        textLabel.setForeground(UIUtil.getContextHelpForeground());
         textLabel.setBorder(JBUI.Borders.empty(10, 0));
 
         panel.add(textLabel, BorderLayout.CENTER);
@@ -172,6 +197,27 @@ public class SingleEditorUIFactory {
             public void actionPerformed(@NotNull AnActionEvent e) {
                 action.run();
             }
+
+            @Override
+            public void update(@NotNull AnActionEvent e) {
+                Project project = e.getProject();
+                Editor editor = e.getData(CommonDataKeys.EDITOR);
+
+                if (project != null && editor != null) {
+                    if (LookupManager.getInstance(project).getActiveLookup() != null) {
+                        e.getPresentation().setEnabled(false);
+                        return;
+                    }
+                }
+                e.getPresentation().setEnabled(true);
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.EDT;
+            }
+
         }.registerCustomShortcutSet(shortcutSet, component);
     }
+
 }

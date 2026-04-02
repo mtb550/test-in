@@ -2,6 +2,7 @@ package testGit.ui.single;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import testGit.pojo.Groups;
@@ -22,7 +23,7 @@ public class SingleEditorSaveManager {
             JPanel expectedWrapper, ExtendableTextField expectedField,
             JPanel priorityWrapper, ComboBox<Priority> priorityCombo,
             JPanel groupsWrapper, JPanel groupsPanel,
-            JPanel stepsWrapper, List<ExtendableTextField> stepFields,
+            JPanel stepsWrapper, List<TextFieldWithAutoCompletion<String>> stepFields,
             Consumer<TestCaseDto> onSave,
             JBPopup[] popupWrapper) {
 
@@ -45,8 +46,10 @@ public class SingleEditorSaveManager {
 
             if (stepsWrapper.getParent() != null) {
                 List<String> finalSteps = new ArrayList<>();
-                for (ExtendableTextField sf : stepFields) {
-                    if (!sf.getText().trim().isEmpty()) finalSteps.add(sf.getText().trim());
+                for (TextFieldWithAutoCompletion<String> sf : stepFields) {
+
+                    if (!sf.getText().trim().isEmpty())
+                        finalSteps.add(sf.getText().trim());
                 }
                 dto.setSteps(finalSteps.isEmpty() ? null : finalSteps);
             }
