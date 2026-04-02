@@ -19,6 +19,7 @@ import testGit.pojo.Config;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
+import testGit.ui.bulk.UpdateField;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,10 +30,9 @@ import java.util.function.Consumer;
 
 public class SingleTestCaseEditor {
 
-    // 🟢 الاعتماد على حجم الخط الافتراضي للمستخدم في IntelliJ
     private static final float BASE_FONT_SIZE = JBUI.Fonts.label().getSize2D();
-    private static final float TITLE_FONT_SIZE = BASE_FONT_SIZE + 6f; // للعنوان (أكبر)
-    private static final float FIELD_FONT_SIZE = BASE_FONT_SIZE + 2f; // لباقي الحقول
+    private static final float TITLE_FONT_SIZE = BASE_FONT_SIZE + 6f;
+    private static final float FIELD_FONT_SIZE = BASE_FONT_SIZE + 2f;
 
     public static void show(TestCaseDto existingDto, Consumer<TestCaseDto> onSave) {
         boolean isNew = (existingDto == null);
@@ -46,6 +46,9 @@ public class SingleTestCaseEditor {
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.setBorder(JBUI.Borders.empty());
 
+        // 🟢 ضمان عرض مبدئي مناسب لكي لا تبدو النافذة نحيفة جداً (متناسق مع تصاميمك العريضة)
+        mainPanel.setMinimumSize(new Dimension(JBUI.scale(600), 0));
+
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 
@@ -54,25 +57,25 @@ public class SingleTestCaseEditor {
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
         // ================== 1. حقل العنوان ==================
-        ExtendableTextField titleField = createTextField("Test Case Title", AllIcons.Actions.Edit, TITLE_FONT_SIZE);
+        ExtendableTextField titleField = createTextField(UpdateField.TITLE.getLabel(), UpdateField.TITLE.getIcon(), TITLE_FONT_SIZE);
         if (!isNew && dto.getTitle() != null) titleField.setText(dto.getTitle());
         contentPanel.add(titleField);
 
         // ================== 2. الحقول الديناميكية ==================
-        ExtendableTextField expectedField = createTextField("Expected Result", AllIcons.General.InspectionsOK, FIELD_FONT_SIZE);
-        JPanel expectedWrapper = wrapComponent(expectedField);
+        ExtendableTextField expectedField = createTextField(UpdateField.EXPECTED.getLabel(), UpdateField.EXPECTED.getIcon(), FIELD_FONT_SIZE);
+        JPanel expectedWrapper = wrapComponent(expectedField, null);
 
-        ComboBox<Priority> priorityCombo = createPriorityCombo(FIELD_FONT_SIZE);
+        ComboBox<Priority> priorityCombo = createPriorityCombo();
         priorityCombo.setSelectedItem(dto.getPriority() != null ? dto.getPriority() : Priority.LOW);
-        JPanel priorityWrapper = wrapComponent(priorityCombo);
+        JPanel priorityWrapper = wrapComponent(priorityCombo, UpdateField.PRIORITY);
 
-        JPanel groupsPanel = createGroupsPanel(FIELD_FONT_SIZE);
-        JPanel groupsWrapper = wrapComponent(groupsPanel);
+        JPanel groupsPanel = createGroupsPanel();
+        JPanel groupsWrapper = wrapComponent(groupsPanel, UpdateField.GROUPS);
 
         JPanel stepsContainer = new JPanel();
         stepsContainer.setLayout(new BoxLayout(stepsContainer, BoxLayout.Y_AXIS));
         stepsContainer.setOpaque(false);
-        JPanel stepsWrapper = wrapComponent(stepsContainer);
+        JPanel stepsWrapper = wrapComponent(stepsContainer, null);
 
         List<ExtendableTextField> stepFields = new ArrayList<>();
 
@@ -106,14 +109,17 @@ public class SingleTestCaseEditor {
 
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
-        // ================== 4. شريط الحالة ==================
+        // ================== 4. شريط الحالة (متطابق مع JsonSplitBulkEditor) ==================
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBorder(JBUI.Borders.empty(6, 10));
-        statusBar.setBackground(JBUI.CurrentTheme.Popup.headerBackground(false));
-        JLabel shortcutLabel = new JLabel("Expected:CTRL+E Steps:CTRL+S Priority:CTRL+P Groups:CTRL+G Save:Enter");
-        shortcutLabel.setForeground(JBColor.GRAY);
+        // 🟢 تمت إزالة setBackground لتوحيد مظهر النوافذ بالخلفية الافتراضية للـ Theme
+
+        // 🟢 بناء النص بنفس ستايل JsonSplitBulkEditor تماماً
+        JLabel shortcutLabel = getLabel();
+        shortcutLabel.setForeground(JBColor.BLUE);
         shortcutLabel.setFont(JBUI.Fonts.smallFont());
-        statusBar.add(shortcutLabel, BorderLayout.CENTER);
+        statusBar.add(shortcutLabel, BorderLayout.WEST); // 🟢 محاذاة لليسار ليتطابق مع Bulk Editors
+
         mainPanel.add(statusBar, BorderLayout.SOUTH);
 
         // ================== 5. إنشاء النافذة ==================
@@ -154,10 +160,11 @@ public class SingleTestCaseEditor {
         };
 
         // ================== 7. تسجيل الاختصارات ==================
-        registerShortcut(mainPanel, KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK, showExpected);
-        registerShortcut(mainPanel, KeyEvent.VK_P, KeyEvent.CTRL_DOWN_MASK, showPriority);
-        registerShortcut(mainPanel, KeyEvent.VK_G, KeyEvent.CTRL_DOWN_MASK, showGroups);
-        registerShortcut(mainPanel, KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK, showSteps);
+        registerShortcut(mainPanel, UpdateField.EXPECTED.getShortcut(), KeyEvent.CTRL_DOWN_MASK, showExpected);
+        registerShortcut(mainPanel, UpdateField.PRIORITY.getShortcut(), KeyEvent.CTRL_DOWN_MASK, showPriority);
+        registerShortcut(mainPanel, UpdateField.GROUPS.getShortcut(), KeyEvent.CTRL_DOWN_MASK, showGroups);
+        registerShortcut(mainPanel, UpdateField.STEPS.getShortcut(), KeyEvent.CTRL_DOWN_MASK, showSteps);
+
         registerShortcut(mainPanel, KeyEvent.VK_TAB, 0, () -> KeyboardFocusManager.getCurrentKeyboardFocusManager().focusNextComponent());
         registerShortcut(mainPanel, KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK, () -> KeyboardFocusManager.getCurrentKeyboardFocusManager().focusPreviousComponent());
 
@@ -201,6 +208,17 @@ public class SingleTestCaseEditor {
         popupWrapper[0].showCenteredInCurrentWindow(Config.getProject());
     }
 
+    private static @NotNull JLabel getLabel() {
+        String shortcutText = String.format(
+                "💡 [Enter] Save      [Ctrl+%c] %s      [Ctrl+%c] %s      [Ctrl+%c] %s      [Ctrl+%c] %s",
+                UpdateField.EXPECTED.getShortcut(), UpdateField.EXPECTED.getLabel(),
+                UpdateField.STEPS.getShortcut(), UpdateField.STEPS.getLabel(),
+                UpdateField.PRIORITY.getShortcut(), UpdateField.PRIORITY.getLabel(),
+                UpdateField.GROUPS.getShortcut(), UpdateField.GROUPS.getLabel());
+
+        return new JLabel(shortcutText);
+    }
+
     // ==========================================
     // UI Helpers
     // ==========================================
@@ -208,11 +226,9 @@ public class SingleTestCaseEditor {
     private static ExtendableTextField createTextField(String placeholder, Icon icon, float fontSize) {
         ExtendableTextField textField = new ExtendableTextField();
 
-        // 🟢 ضبط خط الـ TextField بناءً على متغير الـ fontSize
         Font fieldFont = JBFont.regular().deriveFont(fontSize);
         textField.setFont(fieldFont);
 
-        // 🟢 توحيد خط الـ EmptyText (Placeholder) ليكون مطابقاً تماماً لخط النص
         textField.getEmptyText().setFont(fieldFont);
         textField.getEmptyText().setText(placeholder);
 
@@ -239,7 +255,7 @@ public class SingleTestCaseEditor {
     }
 
     private static void addStepField(JPanel container, List<ExtendableTextField> stepFields, String text, Runnable repackAction) {
-        ExtendableTextField stepField = createTextField("Step " + (stepFields.size() + 1), AllIcons.Actions.ListFiles, FIELD_FONT_SIZE);
+        ExtendableTextField stepField = createTextField("Step " + (stepFields.size() + 1), UpdateField.STEPS.getIcon(), FIELD_FONT_SIZE);
         stepField.setText(text);
 
         stepField.addExtension(new ExtendableTextComponent.Extension() {
@@ -280,19 +296,25 @@ public class SingleTestCaseEditor {
         container.add(Box.createVerticalStrut(JBUI.scale(4)));
     }
 
-    private static JPanel wrapComponent(JComponent component) {
+    private static JPanel wrapComponent(JComponent component, UpdateField field) {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(false);
+
+        if (field != null && field.getIcon() != null) {
+            JLabel iconLabel = new JLabel(field.getIcon());
+            iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
+            wrapper.add(iconLabel, BorderLayout.WEST);
+        }
+
         wrapper.add(component, BorderLayout.CENTER);
         wrapper.setBorder(JBUI.Borders.emptyTop(8));
         return wrapper;
     }
 
-    private static ComboBox<Priority> createPriorityCombo(float fontSize) {
+    private static ComboBox<Priority> createPriorityCombo() {
         ComboBox<Priority> combo = new ComboBox<>(Priority.values());
-        // 🟢 ضبط خط الكومبو بوكس
-        combo.setFont(JBFont.regular().deriveFont(fontSize));
-        combo.setRenderer(new ColoredListCellRenderer<Priority>() {
+        combo.setFont(JBFont.regular().deriveFont(SingleTestCaseEditor.FIELD_FONT_SIZE));
+        combo.setRenderer(new ColoredListCellRenderer<>() {
             @Override
             protected void customizeCellRenderer(@NotNull JList<? extends Priority> list, Priority value, int index, boolean selected, boolean hasFocus) {
                 if (value != null) {
@@ -304,13 +326,12 @@ public class SingleTestCaseEditor {
         return combo;
     }
 
-    private static JPanel createGroupsPanel(float fontSize) {
+    private static JPanel createGroupsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, JBUI.scale(4), JBUI.scale(4)));
         panel.setOpaque(false);
         for (Groups group : Groups.values()) {
             JBCheckBox checkBox = new JBCheckBox(group.name());
-            // 🟢 ضبط خط الشيك بوكس
-            checkBox.setFont(JBFont.regular().deriveFont(fontSize - 1f)); // أصغر بقليل ليبدو متناسقاً
+            checkBox.setFont(JBFont.regular().deriveFont(SingleTestCaseEditor.FIELD_FONT_SIZE - 1f));
             panel.add(checkBox);
         }
         return panel;

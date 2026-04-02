@@ -10,7 +10,8 @@ public enum UpdateField {
     TITLE("Title", 'T', AllIcons.Actions.Edit),
     EXPECTED("Expected Results", 'E', AllIcons.General.InspectionsOK),
     STEPS("Steps", 'S', AllIcons.Actions.ListFiles),
-    PRIORITY("Priority", 'P', AllIcons.Nodes.Favorite);
+    PRIORITY("Priority", 'P', AllIcons.Nodes.Favorite),
+    GROUPS("Groups", 'G', AllIcons.Nodes.Tag);
 
     private final String label;
     private final char shortcut;
