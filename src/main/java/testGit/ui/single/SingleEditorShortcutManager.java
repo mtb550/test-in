@@ -21,15 +21,22 @@ import static testGit.ui.single.SingleEditorUIFactory.registerShortcut;
 public class SingleEditorShortcutManager {
 
     public static void registerShortcuts(
-            Project project, Set<String> uniqueStepsCache,
-            JPanel mainPanel, JPanel contentPanel,
-            boolean isExtendable, UpdateField targetField,
-            Runnable repackPopup,
-            JPanel expectedWrapper, ExtendableTextField expectedField,
-            JPanel priorityWrapper, ComboBox<Priority> priorityCombo,
-            JPanel groupsWrapper,
-            JPanel stepsWrapper, JPanel stepsContainer, List<TextFieldWithAutoCompletion<String>> stepFields,
-            Runnable saveAction) {
+            final Project project,
+            final Set<String> uniqueStepsCache,
+            final JPanel mainPanel,
+            final JPanel contentPanel,
+            final boolean isExtendable,
+            final UpdateField targetField,
+            final Runnable repackPopup,
+            final JPanel expectedWrapper,
+            final ExtendableTextField expectedField,
+            final JPanel priorityWrapper,
+            final ComboBox<Priority> priorityCombo,
+            final JPanel groupsWrapper,
+            final JPanel stepsWrapper,
+            final JPanel stepsContainer,
+            final List<TextFieldWithAutoCompletion<String>> stepFields,
+            final Runnable saveAction) {
 
         if (isExtendable) {
 
@@ -71,7 +78,7 @@ public class SingleEditorShortcutManager {
         registerShortcut(mainPanel, KeyboardSet.Enter.getShortcut(), saveAction);
     }
 
-    private static void focusFirstCheckbox(JPanel groupsWrapper) {
+    private static void focusFirstCheckbox(final JPanel groupsWrapper) {
         for (Component child : groupsWrapper.getComponents()) {
             if (child instanceof JPanel groupsPanel) {
                 for (Component c : groupsPanel.getComponents()) {

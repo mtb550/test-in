@@ -19,14 +19,16 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import testGit.pojo.Config;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
 import testGit.ui.bulk.UpdateField;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +39,7 @@ public class SingleEditorUIFactory {
     public static final float TITLE_FONT_SIZE = BASE_FONT_SIZE + 6f;
     public static final float FIELD_FONT_SIZE = BASE_FONT_SIZE + 2f;
 
-    public static ExtendableTextField createTextField(String placeholder, Icon icon, float fontSize) {
+    public static ExtendableTextField createTextField(final String placeholder, final Icon icon, final float fontSize) {
         ExtendableTextField textField = new ExtendableTextField() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -68,7 +70,6 @@ public class SingleEditorUIFactory {
         textField.setFont(fieldFont);
         textField.getEmptyText().setFont(fieldFont);
         textField.getEmptyText().setText(placeholder);
-        textField.putClientProperty("JTextField.Search.noBorderRing", Boolean.TRUE);
         textField.setBorder(JBUI.Borders.empty(10));
         textField.setExtensions(new ExtendableTextComponent.Extension() {
             @Override
@@ -89,7 +90,7 @@ public class SingleEditorUIFactory {
         return textField;
     }
 
-    public static void addStepField(Project project, JPanel container, List<TextFieldWithAutoCompletion<String>> stepFields, String text, Runnable repackAction, Set<String> uniqueStepsCache) {
+    public static void addStepField(final Project project, final JPanel container, final List<TextFieldWithAutoCompletion<String>> stepFields, final String text, final Runnable repackAction, final Set<String> uniqueStepsCache) {
         TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(uniqueStepsCache != null ? uniqueStepsCache : Collections.emptySet(), null);
         TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(project, provider, true, text != null ? text : "");
         stepField.setFont(JBFont.regular().deriveFont(FIELD_FONT_SIZE));
@@ -105,19 +106,19 @@ public class SingleEditorUIFactory {
         removeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         removeButton.setToolTipText("Remove step");
 
-        removeButton.addMouseListener(new java.awt.event.MouseAdapter() {
+        removeButton.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
+            public void mouseEntered(MouseEvent e) {
                 removeButton.setIcon(AllIcons.General.Remove);
             }
 
             @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
+            public void mouseExited(MouseEvent e) {
                 removeButton.setIcon(AllIcons.Actions.Cancel);
             }
 
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 container.remove(stepRow);
                 stepFields.remove(stepField);
 
@@ -143,7 +144,7 @@ public class SingleEditorUIFactory {
         container.add(stepRow);
     }
 
-    public static JPanel wrapComponent(JComponent component, UpdateField field) {
+    public static JPanel wrapComponent(final JComponent component, final UpdateField field) {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setOpaque(false);
         if (field != null && field.getIcon() != null) {
@@ -174,16 +175,12 @@ public class SingleEditorUIFactory {
     public static JPanel createGroupsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT, JBUI.scale(4), JBUI.scale(4)));
         panel.setOpaque(false);
-        panel.setFocusable(false);
 
-        java.util.Arrays.stream(Groups.values())
+        Arrays.stream(Groups.values())
                 .filter(Groups::isActive)
                 .map(group -> {
                     JBCheckBox checkBox = new JBCheckBox(group.name());
                     checkBox.setFont(JBFont.regular().deriveFont(FIELD_FONT_SIZE - 1f));
-                    checkBox.setFocusable(true);
-                    checkBox.setRequestFocusEnabled(true);
-                    checkBox.setFocusPainted(true);
                     return checkBox;
                 })
                 .forEach(panel::add);
@@ -191,7 +188,7 @@ public class SingleEditorUIFactory {
         return panel;
     }
 
-    public static void prefillGroups(JPanel groupsPanel, List<Groups> groups) {
+    public static void addGroups(final JPanel groupsPanel, final List<Groups> groups) {
         if (groups == null || groups.isEmpty()) return;
         for (Component c : groupsPanel.getComponents()) {
             if (c instanceof JBCheckBox checkBox) {
@@ -205,7 +202,7 @@ public class SingleEditorUIFactory {
         }
     }
 
-    public static JPanel createReadOnlyField(String text, Icon icon, float fontSize) {
+    public static JPanel createReadOnlyField(final String text, final Icon icon, final float fontSize) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setOpaque(false);
 
@@ -224,7 +221,7 @@ public class SingleEditorUIFactory {
         return panel;
     }
 
-    public static void registerShortcut(JComponent component, CustomShortcutSet shortcutSet, Runnable action) {
+    public static void registerShortcut(final JComponent component, final CustomShortcutSet shortcutSet, final Runnable action) {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
@@ -233,11 +230,7 @@ public class SingleEditorUIFactory {
 
             @Override
             public void update(@NotNull AnActionEvent e) {
-                Project project = e.getProject();
-                if (project == null) {
-                    project = Config.getProject();
-                }
-                if (project != null && LookupManager.getInstance(project).getActiveLookup() != null) {
+                if (e.getProject() != null && LookupManager.getInstance(e.getProject()).getActiveLookup() != null) {
                     e.getPresentation().setEnabled(false);
                     return;
                 }

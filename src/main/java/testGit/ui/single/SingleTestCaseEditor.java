@@ -6,9 +6,9 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
-import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.Priority;
@@ -27,15 +27,15 @@ import static testGit.ui.single.SingleEditorUIFactory.*;
 
 public class SingleTestCaseEditor {
 
-    public static void showForCreate(Consumer<TestCaseDto> onSave, Set<String> uniqueStepsCache) {
+    public static void showForCreate(final Consumer<TestCaseDto> onSave, final Set<String> uniqueStepsCache) {
         buildAndShow(new TestCaseDto(), true, null, onSave, uniqueStepsCache);
     }
 
-    public static void showForEdit(TestCaseDto existingDto, UpdateField targetField, Consumer<TestCaseDto> onSave, Set<String> uniqueStepsCache) {
+    public static void showForEdit(final TestCaseDto existingDto, final UpdateField targetField, final Consumer<TestCaseDto> onSave, final Set<String> uniqueStepsCache) {
         buildAndShow(existingDto, false, targetField, onSave, uniqueStepsCache);
     }
 
-    private static void buildAndShow(TestCaseDto dto, boolean isExtendable, UpdateField targetField, Consumer<TestCaseDto> onSave, Set<String> uniqueStepsCache) {
+    private static void buildAndShow(final TestCaseDto dto, final boolean isExtendable, final UpdateField targetField, final Consumer<TestCaseDto> onSave, final Set<String> uniqueStepsCache) {
         Project project = Config.getProject();
         final JBPopup[] popupWrapper = new JBPopup[1];
         Runnable repackPopup = () -> {
@@ -106,7 +106,7 @@ public class SingleTestCaseEditor {
                 contentPanel.add(priorityWrapper);
 
             } else if (targetField == UpdateField.GROUPS) {
-                prefillGroups(groupsPanel, dto.getGroups());
+                addGroups(groupsPanel, dto.getGroups());
                 contentPanel.add(groupsWrapper);
 
             } else if (targetField == UpdateField.STEPS) {
@@ -115,7 +115,6 @@ public class SingleTestCaseEditor {
                 if (dto.getSteps() != null && !dto.getSteps().isEmpty()) {
                     for (String step : dto.getSteps())
                         addStepField(project, stepsContainer, stepFields, step, repackPopup, uniqueStepsCache);
-
                 } else {
                     addStepField(project, stepsContainer, stepFields, "", repackPopup, uniqueStepsCache);
                 }
@@ -128,7 +127,7 @@ public class SingleTestCaseEditor {
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBorder(JBUI.Borders.empty(6, 10));
         statusBar.setOpaque(true);
-        statusBar.setBackground(com.intellij.util.ui.UIUtil.getPanelBackground());
+        statusBar.setBackground(UIUtil.getPanelBackground());
 
         JLabel shortcutLabel = getLabel(isExtendable, targetField);
         //shortcutLabel.setForeground(UIUtil.getLabelForeground());
@@ -137,13 +136,22 @@ public class SingleTestCaseEditor {
         statusBar.add(shortcutLabel, BorderLayout.WEST);
         mainPanel.add(statusBar, BorderLayout.SOUTH);
 
-        // 5. Resolve initial focus — for GROUPS pass the first checkbox directly
-        final JBCheckBox firstCheckBox = getFirstCheckbox(groupsPanel);
-        final boolean focusGroups = !isExtendable && targetField == UpdateField.GROUPS && firstCheckBox != null;
+        // 5. Resolve initial focus
+        JComponent initialFocus = null;
+        if (isExtendable || targetField == UpdateField.TITLE)
+            initialFocus = titleField;
 
-        JComponent initialFocus = focusGroups
-                ? firstCheckBox
-                : (titleField != null ? titleField : expectedField);
+        else if (targetField == UpdateField.EXPECTED)
+            initialFocus = expectedField;
+
+        else if (targetField == UpdateField.PRIORITY)
+            initialFocus = priorityCombo;
+
+        else if (targetField == UpdateField.GROUPS && groupsPanel.getComponentCount() > 0)
+            initialFocus = (JComponent) groupsPanel.getComponent(0);
+
+        else if (targetField == UpdateField.STEPS && !stepFields.isEmpty())
+            initialFocus = stepFields.getLast();
 
         // 6. Build Popup
         popupWrapper[0] = JBPopupFactory.getInstance()
@@ -178,25 +186,9 @@ public class SingleTestCaseEditor {
 
         // 9. Show popup
         popupWrapper[0].showCenteredInCurrentWindow(Config.getProject());
-
-        if (focusGroups) {
-            SwingUtilities.invokeLater(() ->
-                    SwingUtilities.invokeLater(firstCheckBox::requestFocusInWindow)
-            );
-        }
     }
 
-    @SuppressWarnings("unchecked")
-    private static JBCheckBox getFirstCheckbox(JPanel groupsPanel) {
-        List<JBCheckBox> checkBoxes = (List<JBCheckBox>) groupsPanel.getClientProperty("checkBoxes");
-        if (checkBoxes != null && !checkBoxes.isEmpty()) return checkBoxes.get(0);
-        for (Component c : groupsPanel.getComponents()) {
-            if (c instanceof JBCheckBox cb) return cb;
-        }
-        return null;
-    }
-
-    private static @NotNull JLabel getLabel(boolean isExtendable, UpdateField targetField) {
+    private static @NotNull JLabel getLabel(final boolean isExtendable, final UpdateField targetField) {
         String shortcutText;
         if (isExtendable) {
             shortcutText = String.format("💡 [Enter] Save   |   [Ctrl+%c] %s   |   [Ctrl+%c] %s   |   [Ctrl+%c] %s   |   [Ctrl+%c] %s",
