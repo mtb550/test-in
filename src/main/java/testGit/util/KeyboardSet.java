@@ -36,7 +36,7 @@ public enum KeyboardSet {
     CreateTestCaseTitle(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK),
     CreateTestCaseExpected(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK),
     CreateTestCaseAddStep(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
-    CreateTestCaseRemoveStep(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
+    CreateTestCaseRemoveStep(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK),
     CreateTestCaseGroups(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK),
     CreateTestCasePriority(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
     // add edit shortcuts
