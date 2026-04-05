@@ -167,21 +167,8 @@ public class SingleTestCaseEditor {
                 .createPopup();
 
         // 7. Delegate Save Logic
-        Runnable saveAction = SingleEditorSaveManager.createSaveAction(
-                dto,
-                titleWrapper,
-                titleField,
-                expectedWrapper,
-                expectedField,
-                priorityWrapper,
-                priorityCombo,
-                groupsWrapper,
-                groupsPanel,
-                stepsWrapper,
-                stepFields,
-                onSave,
-                popupWrapper
-        );
+        Runnable saveAction = SingleEditorSaveManager.createSaveAction(null, dto, onSave, popupWrapper);
+        //Runnable saveAction = SingleEditorSaveManager.createSaveAction(this, dto, onSave, popupWrapper);
 
         // 8. Delegate Shortcuts
         SingleEditorShortcutManager.registerShortcuts(

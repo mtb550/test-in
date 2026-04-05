@@ -6,13 +6,14 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Priority;
+import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class PrioritySection {
     private final ComboBox<Priority> priority;
-    private final JPanel wrapperPanel;
+    private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public PrioritySection() {
@@ -30,26 +31,26 @@ public class PrioritySection {
             }
         });
 
-        this.wrapperPanel = new JPanel(new BorderLayout());
-        this.wrapperPanel.setOpaque(false);
+        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper.setOpaque(false);
         JLabel iconLabel = new JLabel(CreateField.PRIORITY.getIcon());
         iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
-        this.wrapperPanel.add(iconLabel, BorderLayout.WEST);
-        this.wrapperPanel.add(this.priority, BorderLayout.CENTER);
-        this.wrapperPanel.setBorder(JBUI.Borders.emptyTop(8));
+        this.wrapper.add(iconLabel, BorderLayout.WEST);
+        this.wrapper.add(this.priority, BorderLayout.CENTER);
+        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
     public void showSection(JPanel contentPanel) {
-        if (wrapperPanel.getParent() == null)
-            contentPanel.add(wrapperPanel);
+        if (wrapper.getParent() == null)
+            contentPanel.add(wrapper);
         priority.requestFocus();
     }
 
-    public ComboBox<Priority> getCombo() {
-        return priority;
-    }
-
-    public JPanel getWrapper() {
-        return wrapperPanel;
+    public void applyTo(TestCaseDto dto) {
+        if (wrapper.getParent() != null) {
+            dto.setPriority((Priority) priority.getSelectedItem());
+        } else if (dto.getPriority() == null) {
+            dto.setPriority(Priority.LOW);
+        }
     }
 }

@@ -10,7 +10,8 @@ import java.awt.*;
 
 @Getter
 @AllArgsConstructor
-public enum Priority { ///  to be implemented, filter by active
+public enum Priority {
+    ///  to be implemented, filter by active
     HIGH(JBColor.RED.brighter().brighter(), true),
     MEDIUM(JBColor.BLUE.brighter(), true),
     LOW(JBColor.GRAY.brighter(), true);

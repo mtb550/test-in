@@ -5,6 +5,7 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +13,7 @@ import java.awt.geom.Rectangle2D;
 
 public class ExpectedSection {
     private final ExtendableTextField expectedField;
-    private final JPanel wrapperPanel;
+    private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
 
@@ -45,7 +46,7 @@ public class ExpectedSection {
 
         this.expectedField.setFont(fieldFont);
         this.expectedField.getEmptyText().setFont(fieldFont);
-        this.expectedField.getEmptyText().setText(CreateField.EXPECTED.getPlaceHolder());
+        this.expectedField.getEmptyText().setText(CreateField.EXPECTED.getLabel());
         this.expectedField.setBorder(JBUI.Borders.empty(10));
 
         this.expectedField.setExtensions(new ExtendableTextComponent.Extension() {
@@ -65,23 +66,21 @@ public class ExpectedSection {
             }
         });
 
-        this.wrapperPanel = new JPanel(new BorderLayout());
-        this.wrapperPanel.setOpaque(false);
-        this.wrapperPanel.add(this.expectedField, BorderLayout.CENTER);
-        this.wrapperPanel.setBorder(JBUI.Borders.emptyTop(8));
-    }
-
-    public ExtendableTextField getField() {
-        return expectedField;
-    }
-
-    public JPanel getWrapper() {
-        return wrapperPanel;
+        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper.setOpaque(false);
+        this.wrapper.add(this.expectedField, BorderLayout.CENTER);
+        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
     public void showSection(JPanel contentPanel) {
-        if (wrapperPanel.getParent() == null)
-            contentPanel.add(wrapperPanel);
+        if (wrapper.getParent() == null)
+            contentPanel.add(wrapper);
         expectedField.requestFocus();
+    }
+
+    public void applyTo(TestCaseDto dto) {
+        if (wrapper.getParent() != null) {
+            dto.setExpected(expectedField.getText().trim());
+        }
     }
 }

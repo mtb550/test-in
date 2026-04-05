@@ -1,67 +1,28 @@
 package testGit.ui.single;
 
-import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.ui.TextFieldWithAutoCompletion;
-import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.fields.ExtendableTextField;
-import testGit.pojo.Groups;
-import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
+import testGit.ui.single.nnew.BaseCreateTestCase;
 
-import javax.swing.*;
-import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class SingleEditorSaveManager {
 
     public static Runnable createSaveAction(
+            BaseCreateTestCase form,
             TestCaseDto dto,
-            JPanel titleWrapper,
-            ExtendableTextField titleField,
-            JPanel expectedWrapper,
-            ExtendableTextField expectedField,
-            JPanel priorityWrapper,
-            ComboBox<Priority> priorityCombo,
-            JPanel groupsWrapper,
-            JPanel groupsPanel,
-            JPanel stepsWrapper,
-            List<TextFieldWithAutoCompletion<String>> stepFields,
             Consumer<TestCaseDto> onSave,
             JBPopup[] popupWrapper) {
 
         return () -> {
-            if (titleWrapper.getParent() != null) dto.setTitle(titleField.getText().trim());
-
-            if (expectedWrapper.getParent() != null) dto.setExpected(expectedField.getText().trim());
-
-            if (priorityWrapper.getParent() != null) dto.setPriority((Priority) priorityCombo.getSelectedItem());
-            else if (dto.getPriority() == null) dto.setPriority(Priority.LOW);
-
-            if (groupsWrapper.getParent() != null) {
-                List<Groups> selectedGroups = new ArrayList<>();
-                for (Component c : groupsPanel.getComponents()) {
-                    if (c instanceof JBCheckBox checkBox && checkBox.isSelected()) {
-                        selectedGroups.add(Groups.valueOf(checkBox.getText()));
-                    }
-                }
-                dto.setGroups(selectedGroups.isEmpty() ? null : selectedGroups);
-            }
-
-            if (stepsWrapper.getParent() != null) {
-                List<String> finalSteps = new ArrayList<>();
-                for (TextFieldWithAutoCompletion<String> sf : stepFields) {
-
-                    if (!sf.getText().trim().isEmpty())
-                        finalSteps.add(sf.getText().trim());
-                }
-                dto.setSteps(finalSteps.isEmpty() ? null : finalSteps);
-            }
+            form.getTitleSection().applyTo(dto);
+            form.getExpectedSection().applyTo(dto);
+            form.getPrioritySection().applyTo(dto);
+            form.getGroupsSection().applyTo(dto);
+            form.getStepsSection().applyTo(dto);
 
             String title = dto.getTitle();
-            if (titleField == null || (title != null && !title.isEmpty())) {
+            if (form.getTitleSection().getWrapper().getParent() == null || (title != null && !title.isEmpty())) {
                 onSave.accept(dto);
                 popupWrapper[0].closeOk(null);
             }

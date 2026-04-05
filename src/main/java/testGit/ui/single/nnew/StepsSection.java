@@ -1,13 +1,13 @@
 package testGit.ui.single.nnew;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.TextFieldWithAutoCompletionListProvider;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import testGit.pojo.Config;
+import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Set;
 
 public class StepsSection {
-    private final JPanel stepsContainer;
-    private final JPanel wrapperPanel;
     @Getter
     private final List<TextFieldWithAutoCompletion<String>> stepFields;
-    private final float fontSize = JBUI.Fonts.label().getSize2D() + 2f;
+    private final JPanel stepsContainer;
+    private final JPanel wrapper;
+    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public StepsSection() {
         this.stepFields = new ArrayList<>();
@@ -31,25 +31,34 @@ public class StepsSection {
         this.stepsContainer = new JPanel();
         this.stepsContainer.setLayout(new BoxLayout(this.stepsContainer, BoxLayout.Y_AXIS));
         this.stepsContainer.setOpaque(false);
-        this.wrapperPanel = new JPanel(new BorderLayout());
-        this.wrapperPanel.setOpaque(false);
-        this.wrapperPanel.add(this.stepsContainer, BorderLayout.CENTER);
-        this.wrapperPanel.setBorder(JBUI.Borders.emptyTop(8));
+
+        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper.setOpaque(false);
+
+        JLabel iconLabel = new JLabel(CreateField.STEPS.getIcon());
+        iconLabel.setBorder(JBUI.Borders.empty(6, 10, 0, 8));
+        JPanel iconPanel = new JPanel(new BorderLayout());
+        iconPanel.setOpaque(false);
+        iconPanel.add(iconLabel, BorderLayout.CENTER);
+
+        this.wrapper.add(iconPanel, BorderLayout.WEST);
+        this.wrapper.add(this.stepsContainer, BorderLayout.CENTER);
+        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
     public void showSection(JPanel contentPanel, BaseCreateTestCase.UIAction repackAction, Set<String> uniqueStepsCache) {
-        if (wrapperPanel.getParent() == null)
-            contentPanel.add(wrapperPanel);
+        if (wrapper.getParent() == null)
+            contentPanel.add(wrapper);
         addStepField("", repackAction, uniqueStepsCache);
         repackAction.execute();
         stepFields.getLast().requestFocus();
     }
 
     public void addStepField(final String text, final BaseCreateTestCase.UIAction repackAction, final Set<String> uniqueStepsCache) {
-        Project project = Config.getProject();
         TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(uniqueStepsCache != null ? uniqueStepsCache : Collections.emptySet(), null);
-        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(project, provider, true, text != null ? text : "");
-        stepField.setFont(JBFont.regular().deriveFont(fontSize));
+        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(Config.getProject(), provider, true, text != null ? text : "");
+
+        stepField.setFont(fieldFont);
         stepField.setPlaceholder("Step " + (stepFields.size() + 1));
         stepField.setShowPlaceholderWhenFocused(true);
         stepField.setBorder(JBUI.Borders.empty(6, 10));
@@ -100,8 +109,16 @@ public class StepsSection {
         stepsContainer.add(stepRow);
     }
 
-    public JPanel getWrapper() {
-        return wrapperPanel;
+    public void applyTo(TestCaseDto dto) {
+        if (wrapper.getParent() != null) {
+            List<String> finalSteps = new ArrayList<>();
+            for (TextFieldWithAutoCompletion<String> sf : stepFields) {
+                if (!sf.getText().trim().isEmpty()) {
+                    finalSteps.add(sf.getText().trim());
+                }
+            }
+            dto.setSteps(finalSteps.isEmpty() ? null : finalSteps);
+        }
     }
 
 }

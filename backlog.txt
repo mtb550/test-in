@@ -182,7 +182,8 @@ JBPopupFactory.getInstance()
 ui enhance:
 fix if priority open i can not use enter.
 enhance edit after finish create.
-enhance status bar.
 add: if click enter without set title then show title and place holder with red font color.
 add edit shortcuts to KeybooardSet
 enable filter enum priority by active
+fix create ui if dialog is long, add scroll pane or make dialog go up as it open in the middle.
+remove current focused step.

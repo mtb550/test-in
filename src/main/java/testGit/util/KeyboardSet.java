@@ -1,6 +1,7 @@
 package testGit.util;
 
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.keymap.KeymapUtil;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
@@ -28,14 +29,14 @@ public enum KeyboardSet {
     PreviousTestCase(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK),
     SaveAlternate(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK),
     AddStep(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK),
-    RemoveStep(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK),
     TabNext(KeyEvent.VK_TAB, 0),
     TabPrevious(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK),
     ArrowDown(KeyEvent.VK_DOWN, 0),
     ArrowUp(KeyEvent.VK_UP, 0),
     CreateTestCaseTitle(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK),
     CreateTestCaseExpected(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK),
-    CreateTestCaseStep(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
+    CreateTestCaseAddStep(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
+    CreateTestCaseRemoveStep(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
     CreateTestCaseGroups(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK),
     CreateTestCasePriority(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
     // add edit shortcuts
@@ -56,6 +57,11 @@ public enum KeyboardSet {
     @SuppressWarnings("MagicConstant")
     public CustomShortcutSet getShortcut() {
         return new CustomShortcutSet(KeyStroke.getKeyStroke(this.keyCode, this.modifiers));
+    }
+
+    @SuppressWarnings("MagicConstant")
+    public String getShortcutText() {
+        return KeymapUtil.getKeystrokeText(KeyStroke.getKeyStroke(this.keyCode, this.modifiers));
     }
 
 }

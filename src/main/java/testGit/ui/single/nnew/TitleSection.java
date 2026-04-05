@@ -5,14 +5,18 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import lombok.Getter;
+import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
 public class TitleSection {
+    @Getter
     private final ExtendableTextField titleField;
-    private final JPanel wrapperPanel;
+    @Getter
+    private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
 
 
@@ -45,7 +49,7 @@ public class TitleSection {
 
         this.titleField.setFont(fieldFont);
         this.titleField.getEmptyText().setFont(fieldFont);
-        this.titleField.getEmptyText().setText(CreateField.TITLE.getPlaceHolder());
+        this.titleField.getEmptyText().setText(CreateField.TITLE.getLabel());
         this.titleField.setBorder(JBUI.Borders.empty(10));
 
         this.titleField.setExtensions(new ExtendableTextComponent.Extension() {
@@ -65,24 +69,22 @@ public class TitleSection {
             }
         });
 
-        this.wrapperPanel = new JPanel(new BorderLayout());
-        this.wrapperPanel.setOpaque(false);
-        this.wrapperPanel.add(this.titleField, BorderLayout.CENTER);
-        this.wrapperPanel.setBorder(JBUI.Borders.emptyTop(8));
-    }
-
-    public ExtendableTextField getField() {
-        return titleField;
-    }
-
-    public JPanel getWrapper() {
-        return wrapperPanel;
+        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper.setOpaque(false);
+        this.wrapper.add(this.titleField, BorderLayout.CENTER);
+        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
     public void showSection(JPanel contentPanel) {
-        if (wrapperPanel.getParent() == null)
-            contentPanel.add(wrapperPanel, 0);
+        if (wrapper.getParent() == null)
+            contentPanel.add(wrapper, 0);
         titleField.requestFocus();
+    }
+
+    public void applyTo(TestCaseDto dto) {
+        if (wrapper.getParent() != null) {
+            dto.setTitle(titleField.getText().trim());
+        }
     }
 
 }
