@@ -10,12 +10,14 @@ import java.awt.*;
 
 @Getter
 @AllArgsConstructor
-public enum Priority {
-    HIGH(JBColor.RED.brighter().brighter()),
-    MEDIUM(JBColor.BLUE.brighter()),
-    LOW(JBColor.GRAY.brighter());
+public enum Priority { ///  to be implemented, filter by active
+    HIGH(JBColor.RED.brighter().brighter(), true),
+    MEDIUM(JBColor.BLUE.brighter(), true),
+    LOW(JBColor.GRAY.brighter(), true);
 
     private final Color color;
+    private final boolean active;
+
 
     public Icon getIcon() {
         return new Icon() {

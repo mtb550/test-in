@@ -178,3 +178,11 @@ JBPopupFactory.getInstance()
                 .setFadeoutTime(HINT_FADEOUT_MS)
                 .createBalloon()
                 .show(RelativePoint.getCenterOf(component), Balloon.Position.above);
+
+ui enhance:
+fix if priority open i can not use enter.
+enhance edit after finish create.
+enhance status bar.
+add: if click enter without set title then show title and place holder with red font color.
+add edit shortcuts to KeybooardSet
+enable filter enum priority by active

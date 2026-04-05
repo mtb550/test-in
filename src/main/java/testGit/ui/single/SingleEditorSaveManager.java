@@ -19,16 +19,22 @@ public class SingleEditorSaveManager {
 
     public static Runnable createSaveAction(
             TestCaseDto dto,
+            JPanel titleWrapper,
             ExtendableTextField titleField,
-            JPanel expectedWrapper, ExtendableTextField expectedField,
-            JPanel priorityWrapper, ComboBox<Priority> priorityCombo,
-            JPanel groupsWrapper, JPanel groupsPanel,
-            JPanel stepsWrapper, List<TextFieldWithAutoCompletion<String>> stepFields,
+            JPanel expectedWrapper,
+            ExtendableTextField expectedField,
+            JPanel priorityWrapper,
+            ComboBox<Priority> priorityCombo,
+            JPanel groupsWrapper,
+            JPanel groupsPanel,
+            JPanel stepsWrapper,
+            List<TextFieldWithAutoCompletion<String>> stepFields,
             Consumer<TestCaseDto> onSave,
             JBPopup[] popupWrapper) {
 
         return () -> {
-            if (titleField != null) dto.setTitle(titleField.getText().trim());
+            if (titleWrapper.getParent() != null) dto.setTitle(titleField.getText().trim());
+
             if (expectedWrapper.getParent() != null) dto.setExpected(expectedField.getText().trim());
 
             if (priorityWrapper.getParent() != null) dto.setPriority((Priority) priorityCombo.getSelectedItem());
@@ -54,7 +60,8 @@ public class SingleEditorSaveManager {
                 dto.setSteps(finalSteps.isEmpty() ? null : finalSteps);
             }
 
-            if (titleField == null || !dto.getTitle().isEmpty()) {
+            String title = dto.getTitle();
+            if (titleField == null || (title != null && !title.isEmpty())) {
                 onSave.accept(dto);
                 popupWrapper[0].closeOk(null);
             }

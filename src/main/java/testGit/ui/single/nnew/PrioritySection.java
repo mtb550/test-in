@@ -6,24 +6,23 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Priority;
-import testGit.ui.bulk.UpdateField;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class PrioritySection {
-    private final ComboBox<Priority> priorityCombo;
+    private final ComboBox<Priority> priority;
     private final JPanel wrapperPanel;
-    private final float fontSize = JBUI.Fonts.label().getSize2D() + 2f;
+    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public PrioritySection() {
-        // 1. بناء القائمة المنسدلة (ComboBox)
-        this.priorityCombo = new ComboBox<>(Priority.values());
-        this.priorityCombo.setSelectedItem(Priority.LOW); // القيمة الافتراضية
-        this.priorityCombo.setFont(JBFont.regular().deriveFont(fontSize));
-        this.priorityCombo.setRenderer(new ColoredListCellRenderer<>() {
+        this.priority = new ComboBox<>(Priority.values());
+        this.priority.setSelectedItem(Priority.LOW);
+        this.priority.setFont(fieldFont);
+
+        this.priority.setRenderer(new ColoredListCellRenderer<>() {
             @Override
-            protected void customizeCellRenderer(@NotNull JList<? extends Priority> list, Priority value, int index, boolean selected, boolean hasFocus) {
+            protected void customizeCellRenderer(@NotNull final JList<? extends Priority> list, final Priority value, final int index, final boolean selected, final boolean hasFocus) {
                 if (value != null) {
                     setIcon(value.getIcon());
                     append(" Priority: " + value.name());
@@ -31,30 +30,23 @@ public class PrioritySection {
             }
         });
 
-        // 2. تغليف الحقل في JPanel مع إضافة الأيقونة الجانبية
         this.wrapperPanel = new JPanel(new BorderLayout());
         this.wrapperPanel.setOpaque(false);
-
-        JLabel iconLabel = new JLabel(UpdateField.PRIORITY.getIcon());
+        JLabel iconLabel = new JLabel(CreateField.PRIORITY.getIcon());
         iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
-
         this.wrapperPanel.add(iconLabel, BorderLayout.WEST);
-        this.wrapperPanel.add(this.priorityCombo, BorderLayout.CENTER);
+        this.wrapperPanel.add(this.priority, BorderLayout.CENTER);
         this.wrapperPanel.setBorder(JBUI.Borders.emptyTop(8));
     }
 
-    public Runnable getShowAction(JPanel contentPanel, Runnable repackPopup) {
-        return () -> {
-            if (wrapperPanel.getParent() == null) {
-                contentPanel.add(wrapperPanel);
-            }
-            repackPopup.run();
-            priorityCombo.requestFocus();
-        };
+    public void showSection(JPanel contentPanel) {
+        if (wrapperPanel.getParent() == null)
+            contentPanel.add(wrapperPanel);
+        priority.requestFocus();
     }
 
     public ComboBox<Priority> getCombo() {
-        return priorityCombo;
+        return priority;
     }
 
     public JPanel getWrapper() {

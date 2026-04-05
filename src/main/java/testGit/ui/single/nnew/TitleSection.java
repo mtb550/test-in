@@ -5,7 +5,6 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
-import testGit.ui.bulk.UpdateField;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,9 +12,9 @@ import java.awt.geom.Rectangle2D;
 
 public class TitleSection {
     private final ExtendableTextField titleField;
-    private final String placeholder = UpdateField.TITLE.getLabel();
-    private final Icon icon = UpdateField.TITLE.getIcon();
-    private final float fontSize = JBUI.Fonts.label().getSize2D() + 6f;
+    private final JPanel wrapperPanel;
+    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
+
 
     public TitleSection() {
         this.titleField = new ExtendableTextField() {
@@ -35,7 +34,7 @@ public class TitleSection {
                             int x = (int) r.getX() + JBUI.scale(1);
                             int y = (int) r.getY() + fm.getAscent();
 
-                            g2.drawString(placeholder, x, y);
+                            g2.drawString(CreateField.TITLE.getLabel(), x, y);
                             g2.dispose();
                         }
                     } catch (Exception ignored) {
@@ -44,16 +43,15 @@ public class TitleSection {
             }
         };
 
-        Font fieldFont = JBFont.regular().deriveFont(fontSize);
         this.titleField.setFont(fieldFont);
         this.titleField.getEmptyText().setFont(fieldFont);
-        this.titleField.getEmptyText().setText(placeholder);
+        this.titleField.getEmptyText().setText(CreateField.TITLE.getPlaceHolder());
         this.titleField.setBorder(JBUI.Borders.empty(10));
 
         this.titleField.setExtensions(new ExtendableTextComponent.Extension() {
             @Override
             public Icon getIcon(boolean hovered) {
-                return icon;
+                return CreateField.TITLE.getIcon();
             }
 
             @Override
@@ -66,13 +64,25 @@ public class TitleSection {
                 return JBUI.scale(8);
             }
         });
+
+        this.wrapperPanel = new JPanel(new BorderLayout());
+        this.wrapperPanel.setOpaque(false);
+        this.wrapperPanel.add(this.titleField, BorderLayout.CENTER);
+        this.wrapperPanel.setBorder(JBUI.Borders.emptyTop(8));
     }
 
     public ExtendableTextField getField() {
         return titleField;
     }
 
-    public void appendTo(JPanel parentPanel) {
-        parentPanel.add(titleField);
+    public JPanel getWrapper() {
+        return wrapperPanel;
     }
+
+    public void showSection(JPanel contentPanel) {
+        if (wrapperPanel.getParent() == null)
+            contentPanel.add(wrapperPanel, 0);
+        titleField.requestFocus();
+    }
+
 }

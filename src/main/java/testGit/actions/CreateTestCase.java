@@ -14,6 +14,7 @@ import testGit.editorPanel.UnifiedVirtualFile;
 import testGit.editorPanel.testCaseEditor.TestEditorUI;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.dirs.DirectoryDto;
+import testGit.ui.single.nnew.CreateTestCaseUI;
 import testGit.util.KeyboardSet;
 import testGit.util.Notifier;
 
@@ -64,7 +65,7 @@ public class CreateTestCase extends DumbAwareAction {
         Set<String> stepCache = unifiedFile != null ? unifiedFile.getUniqueSteps() : null;
         final UnifiedVirtualFile finalUnifiedFile = unifiedFile;
 
-        new testGit.ui.single.nnew.CreateTestCase().show(newTestCaseDto -> {
+        new CreateTestCaseUI().show(newTestCaseDto -> {
             newTestCaseDto.setId(UUID.randomUUID().toString());
 
             if (newTestCaseDto.getSteps() != null && finalUnifiedFile != null)

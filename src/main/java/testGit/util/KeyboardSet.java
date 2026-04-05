@@ -32,7 +32,13 @@ public enum KeyboardSet {
     TabNext(KeyEvent.VK_TAB, 0),
     TabPrevious(KeyEvent.VK_TAB, InputEvent.SHIFT_DOWN_MASK),
     ArrowDown(KeyEvent.VK_DOWN, 0),
-    ArrowUp(KeyEvent.VK_UP, 0);
+    ArrowUp(KeyEvent.VK_UP, 0),
+    CreateTestCaseTitle(KeyEvent.VK_T, InputEvent.CTRL_DOWN_MASK),
+    CreateTestCaseExpected(KeyEvent.VK_E, InputEvent.CTRL_DOWN_MASK),
+    CreateTestCaseStep(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
+    CreateTestCaseGroups(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK),
+    CreateTestCasePriority(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
+    // add edit shortcuts
 
     private final int keyCode;
     private final int modifiers;
@@ -51,4 +57,5 @@ public enum KeyboardSet {
     public CustomShortcutSet getShortcut() {
         return new CustomShortcutSet(KeyStroke.getKeyStroke(this.keyCode, this.modifiers));
     }
+
 }

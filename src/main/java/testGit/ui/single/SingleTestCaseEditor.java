@@ -73,10 +73,13 @@ public class SingleTestCaseEditor {
         }
 
         // 2. Editable Fields
+        JPanel titleWrapper = null;
         if (isExtendable || targetField == UpdateField.TITLE) {
             titleField = createTextField(UpdateField.TITLE.getLabel(), UpdateField.TITLE.getIcon(), TITLE_FONT_SIZE);
+            titleWrapper = SingleEditorUIFactory.wrapComponent(titleField, null);
+
             if (dto.getTitle() != null) titleField.setText(dto.getTitle());
-            contentPanel.add(titleField);
+            contentPanel.add(titleWrapper);
         }
 
         ExtendableTextField expectedField = createTextField(UpdateField.EXPECTED.getLabel(), UpdateField.EXPECTED.getIcon(), FIELD_FONT_SIZE);
@@ -165,22 +168,38 @@ public class SingleTestCaseEditor {
 
         // 7. Delegate Save Logic
         Runnable saveAction = SingleEditorSaveManager.createSaveAction(
-                dto, titleField,
-                expectedWrapper, expectedField,
-                priorityWrapper, priorityCombo,
-                groupsWrapper, groupsPanel,
-                stepsWrapper, stepFields,
-                onSave, popupWrapper
+                dto,
+                titleWrapper,
+                titleField,
+                expectedWrapper,
+                expectedField,
+                priorityWrapper,
+                priorityCombo,
+                groupsWrapper,
+                groupsPanel,
+                stepsWrapper,
+                stepFields,
+                onSave,
+                popupWrapper
         );
 
         // 8. Delegate Shortcuts
         SingleEditorShortcutManager.registerShortcuts(
-                project, uniqueStepsCache,
-                mainPanel, contentPanel, isExtendable, targetField, repackPopup,
-                expectedWrapper, expectedField,
-                priorityWrapper, priorityCombo,
+                project,
+                uniqueStepsCache,
+                mainPanel,
+                contentPanel,
+                isExtendable,
+                targetField,
+                repackPopup,
+                expectedWrapper,
+                expectedField,
+                priorityWrapper,
+                priorityCombo,
                 groupsWrapper,
-                stepsWrapper, stepsContainer, stepFields,
+                stepsWrapper,
+                stepsContainer,
+                stepFields,
                 saveAction
         );
 

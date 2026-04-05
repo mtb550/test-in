@@ -28,32 +28,24 @@ public class StepsSection {
     public StepsSection() {
         this.stepFields = new ArrayList<>();
 
-        // 1. حاوية الخطوات (التي ستُرتب العناصر فوق بعضها)
         this.stepsContainer = new JPanel();
         this.stepsContainer.setLayout(new BoxLayout(this.stepsContainer, BoxLayout.Y_AXIS));
         this.stepsContainer.setOpaque(false);
-
-        // 2. تغليف الحاوية (بدون أيقونة جانبية لأن الخطوات ليس لها أيقونة رئيسية في الخارج)
         this.wrapperPanel = new JPanel(new BorderLayout());
         this.wrapperPanel.setOpaque(false);
         this.wrapperPanel.add(this.stepsContainer, BorderLayout.CENTER);
         this.wrapperPanel.setBorder(JBUI.Borders.emptyTop(8));
     }
 
-    // إجراء الإظهار (يضيف خطوة فارغة افتراضياً عند فتح القسم)
-    public Runnable getShowAction(JPanel contentPanel, Runnable repackPopup, Set<String> uniqueStepsCache) {
-        return () -> {
-            if (wrapperPanel.getParent() == null) {
-                contentPanel.add(wrapperPanel);
-            }
-            addStepField("", repackPopup, uniqueStepsCache);
-            repackPopup.run();
-            stepFields.getLast().requestFocus();
-        };
+    public void showSection(JPanel contentPanel, BaseCreateTestCase.UIAction repackAction, Set<String> uniqueStepsCache) {
+        if (wrapperPanel.getParent() == null)
+            contentPanel.add(wrapperPanel);
+        addStepField("", repackAction, uniqueStepsCache);
+        repackAction.execute();
+        stepFields.getLast().requestFocus();
     }
 
-    // تم نقل هذه الدالة من BaseCreateTestCase إلى هنا
-    public void addStepField(final String text, final Runnable repackAction, final Set<String> uniqueStepsCache) {
+    public void addStepField(final String text, final BaseCreateTestCase.UIAction repackAction, final Set<String> uniqueStepsCache) {
         Project project = Config.getProject();
         TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(uniqueStepsCache != null ? uniqueStepsCache : Collections.emptySet(), null);
         TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(project, provider, true, text != null ? text : "");
@@ -92,7 +84,7 @@ public class StepsSection {
 
                 stepsContainer.revalidate();
                 stepsContainer.repaint();
-                repackAction.run();
+                repackAction.execute();
             }
         });
 
