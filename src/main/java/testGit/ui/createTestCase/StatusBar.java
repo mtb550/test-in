@@ -1,4 +1,4 @@
-package testGit.ui.single.nnew;
+package testGit.ui.createTestCase;
 
 import testGit.util.statusBar.StatusBarBase;
 

@@ -1,4 +1,4 @@
-package testGit.ui.single.nnew;
+package testGit.ui.createTestCase;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.ColoredListCellRenderer;

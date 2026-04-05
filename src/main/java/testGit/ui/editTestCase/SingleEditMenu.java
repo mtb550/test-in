@@ -1,8 +1,8 @@
-package testGit.ui.single;
+package testGit.ui.editTestCase;
 
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.GenericSelectionPopup;
-import testGit.ui.bulk.UpdateField;
+import testGit.ui.editTestCase.single.SingleTestCaseEditor;
 
 import java.util.Arrays;
 import java.util.Set;

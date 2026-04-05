@@ -1,4 +1,4 @@
-package testGit.ui.single;
+package testGit.ui.editTestCase.single;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.bulk.UpdateField;
+import testGit.ui.editTestCase.UpdateField;
 import testGit.util.KeyboardSet;
 
 import javax.swing.*;
@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static testGit.ui.single.SingleEditorUIFactory.*;
+import static testGit.ui.editTestCase.single.SingleEditorUIFactory.*;
 
 public class SingleTestCaseEditor {
 

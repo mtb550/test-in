@@ -1,4 +1,4 @@
-package testGit.ui.single.nnew;
+package testGit.ui.createTestCase;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.single.SingleEditorSaveManager;
+import testGit.ui.editTestCase.single.SingleEditorSaveManager;
 import testGit.util.KeyboardSet;
 
 import javax.swing.*;

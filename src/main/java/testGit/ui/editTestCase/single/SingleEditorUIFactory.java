@@ -1,4 +1,4 @@
-package testGit.ui.single;
+package testGit.ui.editTestCase.single;
 
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.icons.AllIcons;
@@ -21,7 +21,7 @@ import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
-import testGit.ui.bulk.UpdateField;
+import testGit.ui.editTestCase.UpdateField;
 
 import javax.swing.*;
 import java.awt.*;

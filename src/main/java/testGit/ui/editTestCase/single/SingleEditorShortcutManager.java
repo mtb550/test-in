@@ -1,4 +1,4 @@
-package testGit.ui.single;
+package testGit.ui.editTestCase.single;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
@@ -6,7 +6,7 @@ import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import testGit.pojo.Priority;
-import testGit.ui.bulk.UpdateField;
+import testGit.ui.editTestCase.UpdateField;
 import testGit.util.KeyboardSet;
 
 import javax.swing.*;
@@ -14,8 +14,8 @@ import java.awt.*;
 import java.util.List;
 import java.util.Set;
 
-import static testGit.ui.single.SingleEditorUIFactory.addStepField;
-import static testGit.ui.single.SingleEditorUIFactory.registerShortcut;
+import static testGit.ui.editTestCase.single.SingleEditorUIFactory.addStepField;
+import static testGit.ui.editTestCase.single.SingleEditorUIFactory.registerShortcut;
 
 public class SingleEditorShortcutManager {
 

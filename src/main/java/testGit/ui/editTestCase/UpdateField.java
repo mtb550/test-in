@@ -1,4 +1,4 @@
-package testGit.ui.bulk;
+package testGit.ui.editTestCase;
 
 import com.intellij.icons.AllIcons;
 import lombok.Getter;

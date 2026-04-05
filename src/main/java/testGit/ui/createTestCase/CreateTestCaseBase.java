@@ -1,4 +1,4 @@
-package testGit.ui.single.nnew;
+package testGit.ui.createTestCase;
 
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;

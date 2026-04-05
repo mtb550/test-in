@@ -1,8 +1,8 @@
-package testGit.ui.single;
+package testGit.ui.editTestCase.single;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.single.nnew.CreateTestCaseBase;
+import testGit.ui.createTestCase.CreateTestCaseBase;
 
 import java.util.function.Consumer;
 

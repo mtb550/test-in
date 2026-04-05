@@ -1,4 +1,4 @@
-package testGit.ui.bulk;
+package testGit.ui.editTestCase.bulk;
 
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;

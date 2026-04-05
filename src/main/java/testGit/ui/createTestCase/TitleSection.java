@@ -1,4 +1,4 @@
-package testGit.ui.single.nnew;
+package testGit.ui.createTestCase;
 
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
