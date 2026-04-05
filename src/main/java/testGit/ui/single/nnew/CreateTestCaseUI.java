@@ -15,7 +15,7 @@ import java.awt.*;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class CreateTestCaseUI extends BaseCreateTestCase {
+public class CreateTestCaseUI extends CreateTestCaseBase {
 
     public void show(final Consumer<TestCaseDto> onSave, final Set<String> uniqueStepsCache) {
         TestCaseDto dto = new TestCaseDto();
@@ -47,23 +47,22 @@ public class CreateTestCaseUI extends BaseCreateTestCase {
 
         JPanel titleSlot = new JPanel(new BorderLayout());
         titleSlot.setOpaque(false);
+        contentPanel.add(titleSlot);
 
         JPanel expectedSlot = new JPanel(new BorderLayout());
         expectedSlot.setOpaque(false);
+        contentPanel.add(expectedSlot);
 
         JPanel stepsSlot = new JPanel(new BorderLayout());
         stepsSlot.setOpaque(false);
+        contentPanel.add(stepsSlot);
 
         JPanel prioritySlot = new JPanel(new BorderLayout());
         prioritySlot.setOpaque(false);
+        contentPanel.add(prioritySlot);
 
         JPanel groupsSlot = new JPanel(new BorderLayout());
         groupsSlot.setOpaque(false);
-
-        contentPanel.add(titleSlot);
-        contentPanel.add(expectedSlot);
-        contentPanel.add(stepsSlot);
-        contentPanel.add(prioritySlot);
         contentPanel.add(groupsSlot);
 
         // 1. Title
@@ -125,12 +124,13 @@ public class CreateTestCaseUI extends BaseCreateTestCase {
 
         // status bar
         mainPanel.add(scrollPane, BorderLayout.CENTER);
-        mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
+        mainPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);
 
         // Popup
         popupWrapper[0] = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, titleField)
                 .setTitle("Create Test Case")
+                //.setTitleIcon()
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(true)
                 .setMovable(true)

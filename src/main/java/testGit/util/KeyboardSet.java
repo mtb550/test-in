@@ -38,8 +38,12 @@ public enum KeyboardSet {
     CreateTestCaseAddStep(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
     CreateTestCaseRemoveStep(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK),
     CreateTestCaseGroups(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK),
-    CreateTestCasePriority(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
-    // add edit shortcuts
+    CreateTestCasePriority(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
+    UpdateTestCaseTitle(KeyEvent.VK_T, 0),
+    UpdateTestCaseExpected(KeyEvent.VK_E, 0),
+    UpdateTestCaseSteps(KeyEvent.VK_S, 0),
+    UpdateTestCasePriority(KeyEvent.VK_P, 0),
+    UpdateTestCaseGroups(KeyEvent.VK_G, 0);
 
     private final int keyCode;
     private final int modifiers;
@@ -63,5 +67,4 @@ public enum KeyboardSet {
     public String getShortcutText() {
         return KeymapUtil.getKeystrokeText(KeyStroke.getKeyStroke(this.keyCode, this.modifiers));
     }
-
 }

@@ -11,11 +11,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-public class ExpectedSection {
+public class ExpectedSection implements CreateTestCaseSection {
     private final ExtendableTextField expectedField;
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
-
 
     public ExpectedSection() {
         this.expectedField = new ExtendableTextField() {
@@ -72,12 +71,19 @@ public class ExpectedSection {
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
+    @Override
+    public JPanel getWrapper() {
+        return wrapper;
+    }
+
+    @Override
     public void showSection(JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         expectedField.requestFocus();
     }
 
+    @Override
     public void applyTo(TestCaseDto dto) {
         if (wrapper.getParent() != null) {
             dto.setExpected(expectedField.getText().trim());

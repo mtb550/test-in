@@ -14,6 +14,7 @@ import testGit.pojo.Config;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.bulk.UpdateField;
+import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
@@ -194,17 +195,19 @@ public class SingleTestCaseEditor {
         popupWrapper[0].showCenteredInCurrentWindow(Config.getProject());
     }
 
+    // 🌟 تم إصلاح هذه الدالة لتقرأ النص من KeyboardSet بدلاً من البحث عن الحرف (char)
     private static @NotNull JLabel getLabel(final boolean isExtendable, final UpdateField targetField) {
         String shortcutText;
         if (isExtendable) {
-            shortcutText = String.format("💡 [Enter] Save   |   [Ctrl+%c] %s   |   [Ctrl+%c] %s   |   [Ctrl+%c] %s   |   [Ctrl+%c] %s",
-                    UpdateField.EXPECTED.getShortcut(), UpdateField.EXPECTED.getLabel(),
-                    UpdateField.STEPS.getShortcut(), UpdateField.STEPS.getLabel(),
-                    UpdateField.PRIORITY.getShortcut(), UpdateField.PRIORITY.getLabel(),
-                    UpdateField.GROUPS.getShortcut(), UpdateField.GROUPS.getLabel());
+            shortcutText = String.format("💡 [Enter] Save   |   [%s] %s   |   [%s] %s   |   [%s] %s   |   [%s] %s",
+                    KeyboardSet.CreateTestCaseExpected.getShortcutText(), UpdateField.EXPECTED.getLabel(),
+                    KeyboardSet.CreateTestCaseAddStep.getShortcutText(), UpdateField.STEPS.getLabel(),
+                    KeyboardSet.CreateTestCasePriority.getShortcutText(), UpdateField.PRIORITY.getLabel(),
+                    KeyboardSet.CreateTestCaseGroups.getShortcutText(), UpdateField.GROUPS.getLabel());
 
         } else if (targetField == UpdateField.STEPS) {
-            shortcutText = String.format("💡 Shortcuts:  [Enter] Save   |   [Ctrl+%c] Add Step   |   [Tab] / [Shift+Tab] Navigate", UpdateField.STEPS.getShortcut());
+            shortcutText = String.format("💡 Shortcuts:  [Enter] Save   |   [%s] Add Step   |   [Tab] / [Shift+Tab] Navigate",
+                    KeyboardSet.CreateTestCaseAddStep.getShortcutText());
 
         } else {
             shortcutText = "💡 Shortcuts:  [Enter] Save   |   [Tab] / [Shift+Tab] Navigate";

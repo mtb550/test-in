@@ -16,10 +16,9 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 
-public class TitleSection {
+public class TitleSection implements CreateTestCaseSection {
     @Getter
     private final ExtendableTextField titleField;
-    @Getter
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     private boolean isError = false;
@@ -113,16 +112,22 @@ public class TitleSection {
         titleField.repaint();
     }
 
+    @Override
+    public JPanel getWrapper() {
+        return wrapper;
+    }
+
+    @Override
     public void showSection(JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         titleField.requestFocus();
     }
 
+    @Override
     public void applyTo(TestCaseDto dto) {
         if (wrapper.getParent() != null) {
             dto.setTitle(titleField.getText().trim());
         }
     }
-
 }

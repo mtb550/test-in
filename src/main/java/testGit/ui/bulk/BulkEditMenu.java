@@ -3,16 +3,21 @@ package testGit.ui.bulk;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.GenericSelectionPopup;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class BulkEditMenu {
 
     public static void show(final List<TestCaseDto> selectedItems, final Runnable onUpdate) {
+        UpdateField[] editableFields = Arrays.stream(UpdateField.values())
+                .filter(f -> f != UpdateField.SAVE)
+                .toArray(UpdateField[]::new);
+
         GenericSelectionPopup.show(
                 "Update " + selectedItems.size() + " Test Cases",
-                UpdateField.values(),
+                editableFields,
                 UpdateField::getLabel,
-                UpdateField::getShortcut,
+                field -> field.getShortcutText().charAt(0),
                 UpdateField::getIcon,
                 selectedField -> {
                     if (selectedField == UpdateField.PRIORITY) {

@@ -9,34 +9,46 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import java.util.Arrays;
+import java.util.List;
 
 @Getter
-public class BaseCreateTestCase {
+public class CreateTestCaseBase {
     protected final TitleSection titleSection;
     protected final ExpectedSection expectedSection;
     protected final PrioritySection prioritySection;
     protected final GroupsSection groupsSection;
     protected final StepsSection stepsSection;
-    protected final StatusBarSection statusBarSection;
+    protected final StatusBar statusBar;
 
-    public BaseCreateTestCase() {
+    public CreateTestCaseBase() {
         this.titleSection = new TitleSection();
         this.expectedSection = new ExpectedSection();
         this.prioritySection = new PrioritySection();
         this.groupsSection = new GroupsSection();
         this.stepsSection = new StepsSection();
-        this.statusBarSection = new StatusBarSection();
+        this.statusBar = new StatusBar();
+    }
+
+    public List<CreateTestCaseSection> getAllSections() {
+        return Arrays.asList(
+                titleSection,
+                expectedSection,
+                prioritySection,
+                groupsSection,
+                stepsSection
+        );
     }
 
     public void registerShortcut(final JComponent component, final CustomShortcutSet shortcutSet, final UIAction action) {
         new DumbAwareAction() {
             @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
+            public void actionPerformed(@NotNull final AnActionEvent e) {
                 action.execute();
             }
 
             @Override
-            public void update(@NotNull AnActionEvent e) {
+            public void update(@NotNull final AnActionEvent e) {
                 if (e.getProject() != null && LookupManager.getInstance(e.getProject()).getActiveLookup() != null) {
                     e.getPresentation().setEnabled(false);
                     return;

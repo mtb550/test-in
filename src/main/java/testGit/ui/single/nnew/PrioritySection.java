@@ -11,7 +11,7 @@ import testGit.pojo.dto.TestCaseDto;
 import javax.swing.*;
 import java.awt.*;
 
-public class PrioritySection {
+public class PrioritySection implements CreateTestCaseSection {
     private final ComboBox<Priority> priority;
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
@@ -40,6 +40,12 @@ public class PrioritySection {
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
+    @Override
+    public JPanel getWrapper() {
+        return wrapper;
+    }
+
+    @Override
     public void showSection(JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
@@ -50,6 +56,7 @@ public class PrioritySection {
         return priority;
     }
 
+    @Override
     public void applyTo(TestCaseDto dto) {
         if (wrapper.getParent() != null) {
             dto.setPriority((Priority) priority.getSelectedItem());

@@ -22,7 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class StepsSection {
+public class StepsSection implements CreateTestCaseSection {
     @Getter
     private final List<TextFieldWithAutoCompletion<String>> stepFields;
     private final JPanel stepsContainer;
@@ -50,9 +50,19 @@ public class StepsSection {
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
-    public void showSection(JPanel contentPanel, BaseCreateTestCase.UIAction repackAction, Set<String> uniqueStepsCache) {
+    @Override
+    public JPanel getWrapper() {
+        return wrapper;
+    }
+
+    @Override
+    public void showSection(JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
+    }
+
+    public void showSection(JPanel contentPanel, CreateTestCaseBase.UIAction repackAction, Set<String> uniqueStepsCache) {
+        showSection(contentPanel);
         wrapper.setVisible(true);
         addStepField("", repackAction, uniqueStepsCache);
         SwingUtilities.invokeLater(() -> {
@@ -61,7 +71,7 @@ public class StepsSection {
         });
     }
 
-    public void addStepField(final String text, final BaseCreateTestCase.UIAction repackAction, final Set<String> uniqueStepsCache) {
+    public void addStepField(final String text, final CreateTestCaseBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
         TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(uniqueStepsCache != null ? uniqueStepsCache : Collections.emptySet(), null);
         TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(Config.getProject(), provider, true, text != null ? text : "");
 
@@ -99,7 +109,6 @@ public class StepsSection {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-
                 if (SwingUtilities.isDescendingFrom(focusOwner, stepField)) {
                     removeStepAction(stepRow, stepField, repackAction);
                 }
@@ -118,7 +127,7 @@ public class StepsSection {
         stepsContainer.add(stepRow);
     }
 
-    private void removeStepAction(JPanel stepRow, TextFieldWithAutoCompletion<String> stepField, BaseCreateTestCase.UIAction repackAction) {
+    private void removeStepAction(JPanel stepRow, TextFieldWithAutoCompletion<String> stepField, CreateTestCaseBase.UIAction repackAction) {
         stepsContainer.remove(stepRow);
         stepFields.remove(stepField);
 
@@ -131,6 +140,7 @@ public class StepsSection {
         SwingUtilities.invokeLater(repackAction::execute);
     }
 
+    @Override
     public void applyTo(TestCaseDto dto) {
         if (wrapper.getParent() != null && wrapper.isVisible()) {
             List<String> finalSteps = new ArrayList<>();
@@ -142,5 +152,4 @@ public class StepsSection {
             dto.setSteps(finalSteps.isEmpty() ? null : finalSteps);
         }
     }
-
 }

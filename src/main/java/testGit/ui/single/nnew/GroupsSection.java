@@ -11,11 +11,10 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class GroupsSection {
+public class GroupsSection implements CreateTestCaseSection {
     private final JPanel groups;
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 1f);
-
 
     public GroupsSection() {
         this.groups = new JPanel(new FlowLayout(FlowLayout.LEFT, JBUI.scale(4), JBUI.scale(4)));
@@ -39,6 +38,12 @@ public class GroupsSection {
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
+    @Override
+    public JPanel getWrapper() {
+        return wrapper;
+    }
+
+    @Override
     public void showSection(JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
@@ -54,6 +59,7 @@ public class GroupsSection {
         }
     }
 
+    @Override
     public void applyTo(TestCaseDto dto) {
         if (wrapper.getParent() != null) {
             ArrayList<Groups> selectedGroups = new ArrayList<>();

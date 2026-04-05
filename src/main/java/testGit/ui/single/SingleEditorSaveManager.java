@@ -2,14 +2,14 @@ package testGit.ui.single;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.single.nnew.BaseCreateTestCase;
+import testGit.ui.single.nnew.CreateTestCaseBase;
 
 import java.util.function.Consumer;
 
 public class SingleEditorSaveManager {
 
     public static Runnable createSaveAction(
-            BaseCreateTestCase form,
+            CreateTestCaseBase form,
             TestCaseDto dto,
             Consumer<TestCaseDto> onSave,
             JBPopup[] popupWrapper) {

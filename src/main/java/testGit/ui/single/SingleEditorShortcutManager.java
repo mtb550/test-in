@@ -11,7 +11,6 @@ import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.util.List;
 import java.util.Set;
 
@@ -40,25 +39,25 @@ public class SingleEditorShortcutManager {
 
         if (isExtendable) {
 
-            registerShortcut(mainPanel, KeyboardSet.getShortcutFor(UpdateField.EXPECTED.getShortcut(), InputEvent.CTRL_DOWN_MASK), () -> {
+            registerShortcut(mainPanel, KeyboardSet.CreateTestCaseExpected.getShortcut(), () -> {
                 if (expectedWrapper.getParent() == null) contentPanel.add(expectedWrapper);
                 repackPopup.run();
                 expectedField.requestFocus();
             });
 
-            registerShortcut(mainPanel, KeyboardSet.getShortcutFor(UpdateField.PRIORITY.getShortcut(), InputEvent.CTRL_DOWN_MASK), () -> {
+            registerShortcut(mainPanel, KeyboardSet.CreateTestCasePriority.getShortcut(), () -> {
                 if (priorityWrapper.getParent() == null) contentPanel.add(priorityWrapper);
                 repackPopup.run();
                 priorityCombo.requestFocus();
             });
 
-            registerShortcut(mainPanel, KeyboardSet.getShortcutFor(UpdateField.GROUPS.getShortcut(), InputEvent.CTRL_DOWN_MASK), () -> {
+            registerShortcut(mainPanel, KeyboardSet.CreateTestCaseGroups.getShortcut(), () -> {
                 if (groupsWrapper.getParent() == null) contentPanel.add(groupsWrapper);
                 repackPopup.run();
                 focusFirstCheckbox(groupsWrapper);
             });
 
-            registerShortcut(mainPanel, KeyboardSet.getShortcutFor(UpdateField.STEPS.getShortcut(), InputEvent.CTRL_DOWN_MASK), () -> {
+            registerShortcut(mainPanel, KeyboardSet.CreateTestCaseAddStep.getShortcut(), () -> {
                 if (stepsWrapper.getParent() == null) contentPanel.add(stepsWrapper);
                 addStepField(project, stepsContainer, stepFields, "", repackPopup, uniqueStepsCache);
                 repackPopup.run();
@@ -66,7 +65,7 @@ public class SingleEditorShortcutManager {
             });
 
         } else if (targetField == UpdateField.STEPS) {
-            registerShortcut(mainPanel, KeyboardSet.getShortcutFor(UpdateField.STEPS.getShortcut(), InputEvent.CTRL_DOWN_MASK), () -> {
+            registerShortcut(mainPanel, KeyboardSet.CreateTestCaseAddStep.getShortcut(), () -> {
                 addStepField(project, stepsContainer, stepFields, "", repackPopup, uniqueStepsCache);
                 repackPopup.run();
                 stepFields.getLast().requestFocus();
