@@ -20,6 +20,6 @@ public class SingleEditMenu {
                 UpdateField::getLabel,
                 field -> field.getShortcutText().charAt(0),
                 UpdateField::getIcon,
-                selectedField -> new UpdateTestCaseUI().showForEdit(existingDto, selectedField, onUpdate, uniqueStepsCache));
+                selectedField -> new UpdateTestCaseUI().show(existingDto, selectedField, onUpdate, uniqueStepsCache));
     }
 }

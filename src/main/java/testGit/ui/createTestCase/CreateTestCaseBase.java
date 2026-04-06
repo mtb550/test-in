@@ -5,12 +5,15 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.ui.popup.JBPopup;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 @Getter
 public class CreateTestCaseBase {
@@ -66,6 +69,20 @@ public class CreateTestCaseBase {
                 return ActionUpdateThread.EDT;
             }
         }.registerCustomShortcutSet(shortcutSet, component);
+    }
+
+    public Runnable save(final TestCaseDto dto, final Consumer<TestCaseDto> onSave, final JBPopup[] popupWrapper) {
+        return () -> {
+            getAllSections().forEach(section -> section.applyTo(dto));
+
+            String title = dto.getTitle();
+            if (titleSection.getWrapper().getParent() == null || (title != null && !title.trim().isEmpty())) {
+                onSave.accept(dto);
+                if (popupWrapper[0] != null) popupWrapper[0].closeOk(null);
+
+            } else
+                titleSection.setError(true);
+        };
     }
 
     public interface UIAction {

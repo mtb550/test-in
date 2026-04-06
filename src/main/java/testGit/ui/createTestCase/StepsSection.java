@@ -128,21 +128,25 @@ public class StepsSection implements CreateTestCaseSection {
     }
 
     private void removeStepAction(JPanel stepRow, TextFieldWithAutoCompletion<String> stepField, CreateTestCaseBase.UIAction repackAction) {
+        if (stepFields.size() == 1) {
+            stepField.setText("");
+            stepField.requestFocus();
+            return;
+        }
+
         stepsContainer.remove(stepRow);
         stepFields.remove(stepField);
 
         for (int i = 0; i < stepFields.size(); i++)
             stepFields.get(i).setPlaceholder("Step " + (i + 1));
 
-        if (stepFields.isEmpty()) wrapper.setVisible(false);
-        else stepFields.getLast().requestFocus();
-
+        stepFields.getLast().requestFocus();
         SwingUtilities.invokeLater(repackAction::execute);
     }
 
     @Override
     public void applyTo(TestCaseDto dto) {
-        if (wrapper.getParent() != null && wrapper.isVisible()) {
+        if (wrapper.getParent() != null) {
             List<String> finalSteps = new ArrayList<>();
             for (TextFieldWithAutoCompletion<String> sf : stepFields) {
                 if (!sf.getText().trim().isEmpty()) {

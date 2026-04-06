@@ -43,7 +43,10 @@ public enum KeyboardSet {
     UpdateTestCaseExpected(KeyEvent.VK_E, 0),
     UpdateTestCaseSteps(KeyEvent.VK_S, 0),
     UpdateTestCasePriority(KeyEvent.VK_P, 0),
-    UpdateTestCaseGroups(KeyEvent.VK_G, 0);
+    UpdateTestCaseGroups(KeyEvent.VK_G, 0),
+    PriorityHigh(KeyEvent.VK_H, 0),
+    PriorityMedium(KeyEvent.VK_M, 0),
+    PriorityLow(KeyEvent.VK_L, 0);
 
     private final int keyCode;
     private final int modifiers;
@@ -51,11 +54,6 @@ public enum KeyboardSet {
     KeyboardSet(final int keyCode, final int modifiers) {
         this.keyCode = keyCode;
         this.modifiers = modifiers;
-    }
-
-    @SuppressWarnings("MagicConstant")
-    public static CustomShortcutSet getShortcutFor(int keyCode, int modifiers) {
-        return new CustomShortcutSet(KeyStroke.getKeyStroke(keyCode, modifiers));
     }
 
     @SuppressWarnings("MagicConstant")

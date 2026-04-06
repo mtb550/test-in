@@ -180,9 +180,10 @@ JBPopupFactory.getInstance()
                 .show(RelativePoint.getCenterOf(component), Balloon.Position.above);
 
 ui enhance:
-enhance edit after finish create. (in progress)
-enable filter enum priority by active. (bug)
-if steps edited to remove all, enter not work. (bug)
-if steps was empty, just showing the icon of step without step 1 field.(bug)
-expected result not shown in priority and groups edit ui, should be shown as disabled like title. (bug)
-add short cut for priority H,M and L beside each label. (enhancement)
+
+enhance edit test case ui. (in progress)
+persist save and create
+allign all icons
+
+done :
+use another status bar for each edit component (enhancement). where is it ?

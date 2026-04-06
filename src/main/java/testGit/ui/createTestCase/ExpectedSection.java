@@ -18,7 +18,7 @@ public class ExpectedSection implements CreateTestCaseSection {
     @Getter
     private final ExtendableTextField expectedField;
     private final JPanel wrapper;
-    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
+    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ExpectedSection() {
         this.expectedField = new ExtendableTextField() {

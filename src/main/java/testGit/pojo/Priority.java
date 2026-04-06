@@ -4,6 +4,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,14 +12,17 @@ import java.awt.*;
 @Getter
 @AllArgsConstructor
 public enum Priority {
-    ///  to be implemented, filter by active
-    HIGH(JBColor.RED.brighter().brighter(), true),
-    MEDIUM(JBColor.BLUE.brighter(), true),
-    LOW(JBColor.GRAY.brighter(), true);
+    HIGH(JBColor.RED.brighter().brighter(), true, KeyboardSet.PriorityHigh),
+    MEDIUM(JBColor.BLUE.brighter(), true, KeyboardSet.PriorityMedium),
+    LOW(JBColor.GRAY.brighter(), true, KeyboardSet.PriorityLow);
 
     private final Color color;
     private final boolean active;
+    private final KeyboardSet shortcut;
 
+    public String getShortcutText() {
+        return shortcut.getShortcutText();
+    }
 
     public Icon getIcon() {
         return new Icon() {

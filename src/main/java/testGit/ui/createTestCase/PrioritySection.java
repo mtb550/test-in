@@ -2,6 +2,8 @@ package testGit.ui.createTestCase;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.ColoredListCellRenderer;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -11,6 +13,7 @@ import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Set;
 
 public class PrioritySection implements CreateTestCaseSection {
@@ -19,7 +22,11 @@ public class PrioritySection implements CreateTestCaseSection {
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public PrioritySection() {
-        this.priority = new ComboBox<>(Priority.values());
+        Priority[] activePriorities = Arrays.stream(Priority.values())
+                .filter(Priority::isActive)
+                .toArray(Priority[]::new);
+
+        this.priority = new ComboBox<>(activePriorities);
         this.priority.setSelectedItem(Priority.LOW);
         this.priority.setFont(fieldFont);
 
@@ -28,7 +35,9 @@ public class PrioritySection implements CreateTestCaseSection {
             protected void customizeCellRenderer(@NotNull final JList<? extends Priority> list, final Priority value, final int index, final boolean selected, final boolean hasFocus) {
                 if (value != null) {
                     setIcon(value.getIcon());
-                    append(" Priority: " + value.name());
+                    append(" Priority:  ");
+                    append(value.name());
+                    append("    " + value.getShortcutText(), new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GRAY));
                 }
             }
         });

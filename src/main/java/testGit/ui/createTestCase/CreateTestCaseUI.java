@@ -6,7 +6,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.editTestCase.single.SingleEditorSaveManager;
 import testGit.util.KeyboardSet;
 
 import javax.swing.*;
@@ -98,7 +97,7 @@ public class CreateTestCaseUI extends CreateTestCaseBase {
                 .createPopup();
 
         // save
-        Runnable saveAction = SingleEditorSaveManager.createSaveAction(this, dto, onSave, popupWrapper);
+        Runnable saveAction = save(dto, onSave, popupWrapper);
 
         // registe enter shortcut
         registerShortcut(mainPanel, KeyboardSet.Enter.getShortcut(), saveAction::run);
