@@ -1,8 +1,10 @@
 package testGit.repository;
 
+import testGit.pojo.Groups;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PersistenceManager {
@@ -44,7 +46,15 @@ public class PersistenceManager {
 
             items.get(i).setSteps(cleanSteps);
         }
+        // TODO: save to db
+        if (onUpdate != null) onUpdate.run();
+    }
 
+    public static void updateGroups(List<TestCaseDto> items, List<Groups> newGroups, Runnable onUpdate) {
+        for (TestCaseDto tc : items) {
+            tc.setGroups(newGroups.isEmpty() ? null : new ArrayList<>(newGroups));
+        }
+        // TODO: save to db
         if (onUpdate != null) onUpdate.run();
     }
 }

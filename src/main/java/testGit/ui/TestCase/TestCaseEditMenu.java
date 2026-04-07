@@ -12,10 +12,7 @@ import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.TestCase.edit.EditTestCaseUI;
 import testGit.ui.TestCase.edit.UpdateField;
-import testGit.ui.TestCase.edit.bulk.ExpectedBulkEditor;
-import testGit.ui.TestCase.edit.bulk.PriorityBulkEditor;
-import testGit.ui.TestCase.edit.bulk.StepsBulkEditor;
-import testGit.ui.TestCase.edit.bulk.TitleBulkEditor;
+import testGit.ui.TestCase.edit.bulk.*;
 
 import javax.swing.*;
 import java.awt.event.KeyAdapter;
@@ -59,6 +56,7 @@ public class TestCaseEditMenu {
                 case TITLE -> TitleBulkEditor.show(selectedItems, onUpdate);
                 case EXPECTED -> ExpectedBulkEditor.show(selectedItems, onUpdate);
                 case STEPS -> StepsBulkEditor.show(selectedItems, onUpdate);
+                case GROUPS -> GroupsBulkEditor.show(selectedItems, onUpdate);
                 default -> System.out.println("Selected: " + selectedField.getLabel() + " (Not supported for bulk)");
             }
         });
