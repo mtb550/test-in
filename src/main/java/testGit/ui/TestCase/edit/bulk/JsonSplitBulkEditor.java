@@ -246,7 +246,7 @@ public abstract class JsonSplitBulkEditor {
 
         JPanel statusBar = new JPanel(new BorderLayout());
         statusBar.setBorder(JBUI.Borders.empty(6, 10));
-        JLabel shortcutLabel = new JLabel("庁 Shortcuts:  [Enter] Save   |   [Tab] / [竊転 Next   |   [Shift+Tab] / [竊曽 Prev   |   [Ctrl+Click] Multi-Caret");
+        JLabel shortcutLabel = new JLabel("💡 Shortcuts:  [Enter] Save   |   [Tab]/[↓] Next   |   [Ctrl+Click] Multi-Caret   |   [Ctrl+Shift+A] All Carets");
         shortcutLabel.setForeground(JBColor.GRAY);
         shortcutLabel.setFont(JBUI.Fonts.smallFont());
         statusBar.add(shortcutLabel, BorderLayout.WEST);
@@ -388,6 +388,33 @@ public abstract class JsonSplitBulkEditor {
                 if (!rightEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(rightEditor);
             }
         });
+
+        new DumbAwareAction() {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                CaretModel caretModel = rightEditor.getCaretModel();
+                caretModel.removeSecondaryCarets();
+
+                boolean isFirst = true;
+                for (RangeMarker marker : valueMarkers) {
+                    if (marker.isValid()) {
+                        int offset = marker.getEndOffset();
+                        LogicalPosition logPos = rightEditor.offsetToLogicalPosition(offset);
+                        VisualPosition visPos = rightEditor.logicalToVisualPosition(logPos);
+
+                        if (isFirst) {
+                            caretModel.moveToVisualPosition(visPos);
+                            isFirst = false;
+                        } else {
+                            caretModel.addCaret(visPos, true);
+                        }
+                    }
+                }
+                updateRowHighlights.run();
+            }
+        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
+                KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | KeyEvent.SHIFT_DOWN_MASK)
+        ), rightEditor.getContentComponent());
 
         popup.showCenteredInCurrentWindow(project);
     }

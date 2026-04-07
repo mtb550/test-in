@@ -29,9 +29,12 @@ public class PersistenceManager {
         if (onUpdate != null) onUpdate.run();
     }
 
-    public static void updatePriority(List<TestCaseDto> items, Priority priority, Runnable onUpdate) {
-        for (TestCaseDto tc : items) {
-            tc.setPriority(priority);
+    public static void updatePriority(List<TestCaseDto> items, Priority[] newPriorities, Runnable onUpdate) {
+        int limit = Math.min(newPriorities.length, items.size());
+        for (int i = 0; i < limit; i++) {
+            if (newPriorities[i] != null) {
+                items.get(i).setPriority(newPriorities[i]);
+            }
         }
         // TODO: save to db
         if (onUpdate != null) onUpdate.run();

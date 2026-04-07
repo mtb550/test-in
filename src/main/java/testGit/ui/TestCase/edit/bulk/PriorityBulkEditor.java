@@ -1,106 +1,62 @@
 package testGit.ui.TestCase.edit.bulk;
 
-import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.ColoredListCellRenderer;
-import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.ui.JBUI;
-import org.jetbrains.annotations.NotNull;
-import testGit.pojo.Config;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.repository.PersistenceManager;
 
-import javax.swing.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
 
-public class PriorityBulkEditor {
+public class PriorityBulkEditor extends JsonSplitBulkEditor {
 
-    public void show(List<TestCaseDto> selectedItems, Runnable onUpdate) {
-        Priority[] items = Priority.values();
+    @Override
+    protected String getPopupTitle() {
+        return "Bulk Edit Priorities (Enter to Save | Tab/Arrows to Navigate)";
+    }
 
-        JBList<Priority> list = new JBList<>(items);
-        list.setBorder(JBUI.Borders.empty(4, 0));
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        if (items.length > 0) list.setSelectedIndex(0);
+    @Override
+    protected String getOriginalValue(TestCaseDto tc) {
+        return tc.getPriority() != null ? tc.getPriority().name() : "";
+    }
 
-        list.setCellRenderer(new ColoredListCellRenderer<>() {
-            @Override
-            protected void customizeCellRenderer(@NotNull JList<? extends Priority> list, Priority value, int index, boolean selected, boolean hasFocus) {
-                setIcon(value.getIcon());
-                append(value.name());
+    @Override
+    protected void appendJsonItem(TestCaseDto tc, int index, boolean isLast, StringBuilder leftSb, StringBuilder rightSb, List<int[]> rightEditableRanges) {
+        String id = "Item-" + (index + 1);
+        String escapedTitle = escapeJson(tc.getTitle());
+        String priorityStr = tc.getPriority() != null ? tc.getPriority().name() : "";
+        String escapedPriority = escapeJson(priorityStr);
 
-                char shortcut = value.name().charAt(0);
-                append("   " + Character.toUpperCase(shortcut), SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                setBorder(JBUI.Borders.empty(6, 12));
-            }
-        });
+        String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"title\": \"" + escapedTitle + "\",\n    \"priority\": \"";
+        String suffix = "\"\n  }";
+        String comma = isLast ? "\n" : ",\n";
 
-        JBScrollPane scrollPane = new JBScrollPane(list);
-        scrollPane.setBorder(JBUI.Borders.empty());
+        leftSb.append(prefix).append(escapedPriority).append(suffix).append(comma);
 
-        JBPopup popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(scrollPane, list)
-                .setTitle("Select Priority")
-                .setRequestFocus(true)
-                .setCancelOnClickOutside(true)
-                .setMovable(false)
-                .createPopup();
+        rightSb.append(prefix);
+        int startOffset = rightSb.length();
+        rightSb.append(escapedPriority);
+        int endOffset = rightSb.length();
+        rightEditableRanges.add(new int[]{startOffset, endOffset});
+        rightSb.append(suffix).append(comma);
+    }
 
-        list.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                char keyChar = Character.toLowerCase(e.getKeyChar());
-                for (Priority item : items) {
-                    char shortcut = item.name().charAt(0);
-                    if (Character.toLowerCase(shortcut) == keyChar) {
-                        PersistenceManager.updatePriority(selectedItems, item, onUpdate);
-                        System.out.println("Priority updated to " + item + " for " + selectedItems.size() + " test cases.");
-                        popup.cancel();
-                        e.consume();
-                        return;
-                    }
+    @Override
+    protected void saveValues(List<TestCaseDto> items, List<String> newValues, Runnable onUpdate) {
+        Priority[] newPriorities = new Priority[newValues.size()];
+
+        for (int i = 0; i < newValues.size(); i++) {
+            String val = newValues.get(i).trim();
+            Priority matched = items.get(i).getPriority();
+
+            // (High == HIGH == high)
+            for (Priority p : Priority.values()) {
+                if (p.name().equalsIgnoreCase(val)) {
+                    matched = p;
+                    break;
                 }
             }
+            newPriorities[i] = matched;
+        }
 
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    if (list.getSelectedValue() != null) {
-                        Priority selectedPriority = list.getSelectedValue();
-                        PersistenceManager.updatePriority(selectedItems, selectedPriority, onUpdate);
-                        System.out.println("Priority updated to " + selectedPriority + " for " + selectedItems.size() + " test cases.");
-                        popup.closeOk(null);
-                    }
-                    e.consume();
-                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    popup.cancel();
-                    e.consume();
-                }
-            }
-        });
-
-        list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1 || e.getClickCount() == 2) {
-                    int clickedIndex = list.locationToIndex(e.getPoint());
-                    if (clickedIndex >= 0) {
-                        Priority selectedPriority = items[clickedIndex];
-                        PersistenceManager.updatePriority(selectedItems, selectedPriority, onUpdate);
-                        System.out.println("Priority updated to " + selectedPriority + " for " + selectedItems.size() + " test cases.");
-                        popup.closeOk(null);
-                    }
-                }
-            }
-        });
-
-        popup.showCenteredInCurrentWindow(Config.getProject());
+        PersistenceManager.updatePriority(items, newPriorities, onUpdate);
     }
 }
