@@ -11,12 +11,11 @@ import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class EditTestCaseUI extends TestCaseUIBase {
 
-    public void show(final TestCaseDto existingDto, final UpdateField targetField, final Consumer<TestCaseDto> onUpdate, final Set<String> uniqueStepsCache) {
+    public void show(final TestCaseDto existingDto, final UpdateField targetField, final Consumer<TestCaseDto> onUpdate) {
         final JBPopup[] popupWrapper = new JBPopup[1];
         UIAction repackPopup = () -> {
             if (popupWrapper[0] != null)
@@ -47,14 +46,14 @@ public class EditTestCaseUI extends TestCaseUIBase {
             JPanel slot = new JPanel(new BorderLayout());
             slot.setOpaque(false);
 
-            section.fillData(existingDto, repackPopup, uniqueStepsCache);
+            section.fillData(existingDto, repackPopup);
 
             boolean isTarget = isTargetSection(section, targetField);
             section.setEditable(isTarget);
 
             if (isTarget && section instanceof StepsSection s) {
                 if (s.getStepFields().isEmpty()) {
-                    s.addStepField("", repackPopup, uniqueStepsCache);
+                    s.addStepField("", repackPopup);
                 }
             }
 
@@ -67,7 +66,7 @@ public class EditTestCaseUI extends TestCaseUIBase {
             }
 
             if (isTarget) {
-                section.setupShortcut(mainPanel, slot, this, repackPopup, uniqueStepsCache);
+                section.setupShortcut(mainPanel, slot, this, repackPopup);
             }
         }
 

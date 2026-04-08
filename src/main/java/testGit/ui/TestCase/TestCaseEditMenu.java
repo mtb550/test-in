@@ -21,30 +21,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class TestCaseEditMenu {
 
-    public static void show(final List<TestCaseDto> selectedItems,
-                            final Consumer<TestCaseDto> onSingleUpdate,
-                            final Runnable onBulkUpdate,
-                            final Set<String> uniqueStepsCache) {
-
-        if (selectedItems == null || selectedItems.isEmpty()) {
+    public static void show(final List<TestCaseDto> selectedItems, final Consumer<TestCaseDto> onSingleUpdate, final Runnable onBulkUpdate) {
+        if (selectedItems == null || selectedItems.isEmpty())
             return;
-        }
-
-        if (selectedItems.size() == 1) {
-            showSingle(selectedItems.getFirst(), onSingleUpdate, uniqueStepsCache);
-        } else {
+        if (selectedItems.size() == 1)
+            showSingle(selectedItems.getFirst(), onSingleUpdate);
+        else
             showBulk(selectedItems, onBulkUpdate);
-        }
     }
 
-    private static void showSingle(final TestCaseDto existingDto, final Consumer<TestCaseDto> onUpdate, final Set<String> uniqueStepsCache) {
+    private static void showSingle(final TestCaseDto existingDto, final Consumer<TestCaseDto> onUpdate) {
         showMenu("Edit Test Case", selectedField ->
-                new EditTestCaseUI().show(existingDto, selectedField, onUpdate, uniqueStepsCache));
+                new EditTestCaseUI().show(existingDto, selectedField, onUpdate));
     }
 
     private static void showBulk(final List<TestCaseDto> selectedItems, final Runnable onUpdate) {

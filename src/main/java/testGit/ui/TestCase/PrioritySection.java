@@ -14,7 +14,6 @@ import testGit.util.KeyboardSet;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Arrays;
-import java.util.Set;
 
 public class PrioritySection implements CreateTestCaseSection {
     private final ComboBox<Priority> priority;
@@ -75,7 +74,7 @@ public class PrioritySection implements CreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCasePriority.getShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -93,7 +92,7 @@ public class PrioritySection implements CreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
+    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction) {
         if (dto.getPriority() != null) {
             priority.setSelectedItem(dto.getPriority());
         }

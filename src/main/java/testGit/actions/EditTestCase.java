@@ -2,20 +2,18 @@ package testGit.actions;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import testGit.editorPanel.UnifiedVirtualFile;
+import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.TestCase.TestCaseEditMenu;
 import testGit.util.KeyboardSet;
+import testGit.util.cache.TestCaseCacheService;
 import testGit.viewPanel.ViewPanel;
 import testGit.viewPanel.ViewToolWindowFactory;
 
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class EditTestCase extends DumbAwareAction {
@@ -35,15 +33,6 @@ public class EditTestCase extends DumbAwareAction {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        UnifiedVirtualFile unifiedFile = null;
-        VirtualFile virtualFile = e.getData(CommonDataKeys.VIRTUAL_FILE);
-
-        if (virtualFile instanceof UnifiedVirtualFile)
-            unifiedFile = (UnifiedVirtualFile) virtualFile;
-
-        Set<String> stepCache = unifiedFile != null ? unifiedFile.getUniqueSteps() : null;
-        final UnifiedVirtualFile finalUnifiedFile = unifiedFile;
-
         Runnable onBulkUpdate = () -> {
             list.repaint();
 
@@ -58,14 +47,18 @@ public class EditTestCase extends DumbAwareAction {
             }
         };
 
+        // update cache
         Consumer<TestCaseDto> onSingleUpdate = updatedDto -> {
-            if (updatedDto.getSteps() != null && finalUnifiedFile != null)
-                updatedDto.getSteps().forEach(finalUnifiedFile::addNewStepToCache);
+            TestCaseCacheService cache = TestCaseCacheService.getInstance(Config.getProject());
+            cache.addTitle(updatedDto.getTitle());
+            cache.addExpected(updatedDto.getExpected());
+            if (updatedDto.getSteps() != null)
+                updatedDto.getSteps().forEach(cache::addStep);
 
             onBulkUpdate.run();
         };
 
-        TestCaseEditMenu.show(selectedItems, onSingleUpdate, onBulkUpdate, stepCache);
+        TestCaseEditMenu.show(selectedItems, onSingleUpdate, onBulkUpdate);
     }
 
     @Override

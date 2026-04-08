@@ -14,7 +14,6 @@ import testGit.util.KeyboardSet;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class CreateTestCaseUI extends TestCaseUIBase {
@@ -30,7 +29,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         );
     }
 
-    public void show(final Consumer<TestCaseDto> onSave, final Set<String> uniqueStepsCache) {
+    public void show(final Consumer<TestCaseDto> onSave) {
         TestCaseDto dto = new TestCaseDto();
         final JBPopup[] popupWrapper = new JBPopup[1];
 
@@ -75,7 +74,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
             slot.setOpaque(false);
             contentPanel.add(slot);
 
-            section.setupShortcut(mainPanel, slot, this, repackPopup, uniqueStepsCache);
+            section.setupShortcut(mainPanel, slot, this, repackPopup);
 
             if (section instanceof TitleSection)
                 section.showSection(slot);

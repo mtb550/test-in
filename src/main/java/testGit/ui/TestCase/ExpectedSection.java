@@ -1,54 +1,29 @@
 package testGit.ui.TestCase;
 
-import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
+import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
+import testGit.util.cache.TestCaseCacheService;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.util.Set;
 
 public class ExpectedSection implements CreateTestCaseSection {
     @Getter
-    private final ExtendableTextField expectedField;
+    private final TextFieldWithAutoCompletion<String> expectedField;
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ExpectedSection() {
-        this.expectedField = new ExtendableTextField() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                if (getText().isEmpty() && hasFocus()) {
-                    try {
-                        Rectangle2D r = modelToView2D(0);
-                        if (r != null) {
-                            Graphics2D g2 = (Graphics2D) g.create();
-                            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                            g2.setColor(UIUtil.getContextHelpForeground());
-                            g2.setFont(getFont());
-                            FontMetrics fm = g2.getFontMetrics();
-
-                            int x = (int) r.getX() + JBUI.scale(1);
-                            int y = (int) r.getY() + fm.getAscent() - JBUI.scale(1);
-
-                            g2.drawString(getEmptyText().getText(), x, y);
-                            g2.dispose();
-                        }
-                    } catch (Exception ignored) {
-                    }
-                }
-            }
-        };
+        this.expectedField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getExpectedResults(), CreateField.EXPECTED.getIcon()), false, "");
 
         this.expectedField.setFont(fieldFont);
-        this.expectedField.getEmptyText().setFont(fieldFont);
-        this.expectedField.getEmptyText().setText(CreateField.EXPECTED.getLabel());
+        this.expectedField.setPlaceholder(CreateField.EXPECTED.getLabel());
+        this.expectedField.setShowPlaceholderWhenFocused(true);
         this.expectedField.setBorder(JBUI.Borders.empty(10));
 
         this.wrapper = new JPanel(new BorderLayout());
@@ -78,7 +53,7 @@ public class ExpectedSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseExpected.getShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -92,15 +67,11 @@ public class ExpectedSection implements CreateTestCaseSection {
 
     @Override
     public void setEditable(final boolean editable) {
-        expectedField.setEditable(editable);
         expectedField.setEnabled(editable);
-        if (!editable) {
-            expectedField.setForeground(UIUtil.getContextHelpForeground());
-        }
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
+    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction) {
         if (dto.getExpected() != null) {
             expectedField.setText(dto.getExpected());
         }

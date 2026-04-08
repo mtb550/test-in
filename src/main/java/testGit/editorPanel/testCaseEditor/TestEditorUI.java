@@ -16,6 +16,7 @@ import testGit.editorPanel.*;
 import testGit.editorPanel.listeners.*;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
+import testGit.util.cache.TestCaseCacheService;
 import testGit.viewPanel.ViewPanel;
 import testGit.viewPanel.ViewToolWindowFactory;
 
@@ -68,6 +69,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         this.vf = vf;
         this.allTestCaseDtos = new ArrayList<>(vf.getTestCaseDtos());
         sortAndIdentifyUnsorted();
+        TestCaseCacheService.getInstance(Config.getProject()).load(this.allTestCaseDtos);
 
         this.mainPanel = new JBPanel<>(new BorderLayout());
         this.pageSize = PropertiesComponent.getInstance().getInt("testGit.pageSize", 50);

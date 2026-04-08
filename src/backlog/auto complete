@@ -1,0 +1,26 @@
+ملاحظة دقيقة جداً ومهمة! أنت محق تماماً في التأكيد على هذه النقطة كمتطلب أساسي ومستقل لضمان عدم نسيانه أثناء التطبيق.
+
+إليك القائمة المحدثة والنهائية للمتطلبات بناءً على اتفاقنا:
+
+🧹 1. مرحلة تنظيف الكود (Refactoring & Cleanup)
+حذف المتغير القديم: إزالة Set<String> uniqueStepsCache من جميع دوال العرض (show) والمنشئات في كلاسات الواجهة (مثل TestCaseEditMenu، EditTestCaseUI، StepsSection).
+
+الاعتماد على الخدمة (Service): استبدال أي استخدام قديم للكاش باستدعاء TestCaseCacheService.getInstance(project).
+
+⚡ 2. التجميع في مسار منفصل (Background Thread Collection) - [مهم جداً]
+التنفيذ غير المتزامن: التأكد من أن عملية قراءة ملف الـ Test Set وجمع الآلاف من العناوين والنتائج والخطوات تتم داخل executeOnPooledThread لضمان بقاء واجهة IntelliJ سريعة وخفيفة (Lightweight) دون أي تجميد (UI Freeze).
+
+أمان الخيوط (Thread-Safety): استخدام ConcurrentHashMap.newKeySet() داخل الكاش لمنع تداخل البيانات أثناء القراءة والكتابة.
+
+🔄 3. مرحلة التحديث والمزامنة (Initialization & Updating)
+عند الفتح: استدعاء populateFrom(testCases) فور فتح وقراءة ملف الـ Test Set.
+
+عند الحفظ: تحديث PersistenceManager ليقوم بإضافة أي نصوص جديدة (Title, Expected, Step) إلى الكاش فور حفظها.
+
+🎯 4. مرحلة الإكمال التلقائي للتعديل الفردي (Single Edit Auto-Complete)
+تحديث الأقسام الفردية: ربط حقول الإدخال في TitleSection و ExpectedSection و StepsSection بالخدمة الجديدة لجلب الاقتراحات الحية أثناء الكتابة.
+
+🚀 5. مرحلة الإكمال التلقائي للتعديل الجماعي (Bulk Edit Auto-Complete)
+دعم محرر الـ JSON: إنشاء CompletionContributor مخصص ليقرأ من الخدمة الجديدة ويعرض الاقتراحات للمستخدم أثناء التعديل الجماعي داخل نوافذ JsonSplitBulkEditor و JsonArraySplitBulkEditor.
+
+القائمة الآن مكتملة ومثالية معمارياً. أنا في انتظار الكلاسات التي سترسلها لنبدأ بتطبيق هذه الخطوات!

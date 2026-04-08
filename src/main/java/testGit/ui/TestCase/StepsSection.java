@@ -12,15 +12,14 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
+import testGit.util.cache.TestCaseCacheService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class StepsSection implements CreateTestCaseSection {
     @Getter
@@ -49,24 +48,27 @@ public class StepsSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void showSection(JPanel contentPanel) {
-        if (wrapper.getParent() == null)
+    public void showSection(final JPanel contentPanel) {
+        if (wrapper.getParent() == null) {
             contentPanel.add(wrapper);
+        }
     }
 
-    public void showSection(final JPanel contentPanel, final TestCaseUIBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
+    public void showSection(final JPanel contentPanel, final TestCaseUIBase.UIAction repackAction) {
         showSection(contentPanel);
         wrapper.setVisible(true);
-        addStepField("", repackAction, uniqueStepsCache);
+        addStepField("", repackAction);
         SwingUtilities.invokeLater(() -> {
             repackAction.execute();
-            stepFields.getLast().requestFocus();
+            if (!stepFields.isEmpty()) {
+                stepFields.getLast().requestFocus();
+            }
         });
     }
 
-    public void addStepField(final String text, final TestCaseUIBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
-        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(uniqueStepsCache != null ? uniqueStepsCache : Collections.emptySet(), null);
-        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(Config.getProject(), provider, true, text != null ? text : "");
+    public void addStepField(final String text, final TestCaseUIBase.UIAction repackAction) {
+        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getSteps(), CreateField.STEPS.getIcon());
+        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(Config.getProject(), provider, false, text != null ? text : "");
 
         stepField.setFont(fieldFont);
         stepField.setPlaceholder("Step " + (stepFields.size() + 1));
@@ -133,7 +135,8 @@ public class StepsSection implements CreateTestCaseSection {
         for (int i = 0; i < stepFields.size(); i++)
             stepFields.get(i).setPlaceholder("Step " + (i + 1));
 
-        stepFields.getLast().requestFocus();
+        if (!stepFields.isEmpty())
+            stepFields.getLast().requestFocus();
         SwingUtilities.invokeLater(repackAction::execute);
     }
 
@@ -151,9 +154,9 @@ public class StepsSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseAddStep.getShortcut(), () ->
-                showSection(slot, repackAction, uniqueStepsCache));
+                showSection(slot, repackAction));
     }
 
     @Override
@@ -179,18 +182,18 @@ public class StepsSection implements CreateTestCaseSection {
         }
     }
 
-    public void setStepsData(List<String> steps, TestCaseUIBase.UIAction repack, Set<String> cache) {
+    public void setStepsData(List<String> steps, TestCaseUIBase.UIAction repack) {
         stepsContainer.removeAll();
         stepFields.clear();
         if (steps != null && !steps.isEmpty()) {
             for (String step : steps) {
-                addStepField(step, repack, cache);
+                addStepField(step, repack);
             }
         }
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction, final Set<String> uniqueStepsCache) {
-        setStepsData(dto.getSteps(), repackAction, uniqueStepsCache);
+    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction) {
+        setStepsData(dto.getSteps(), repackAction);
     }
 }
