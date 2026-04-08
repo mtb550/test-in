@@ -15,7 +15,7 @@ import testGit.pojo.dto.dirs.DirectoryDto;
 import testGit.ui.TestCase.CreateTestCaseUI;
 import testGit.util.KeyboardSet;
 import testGit.util.cache.TestCaseCacheService;
-import testGit.util.persist.PersistenceManager;
+import testGit.util.persist.TestCasePersistService;
 
 import java.util.UUID;
 
@@ -52,7 +52,7 @@ public class CreateTestCase extends DumbAwareAction {
             else
                 model.add(newTc);
 
-            PersistenceManager.getInstance(Config.getProject()).persistNewTestCase(dir.getPath(), newTc, lastTc);
+            TestCasePersistService.getInstance(Config.getProject()).persistNewTestCase(dir.getPath(), newTc, lastTc);
 
             /// to be implemented by use brodcasting
             /*

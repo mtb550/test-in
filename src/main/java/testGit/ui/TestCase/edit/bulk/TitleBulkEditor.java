@@ -2,7 +2,7 @@ package testGit.ui.TestCase.edit.bulk;
 
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.util.persist.PersistenceManager;
+import testGit.util.persist.TestCasePersistService;
 
 import java.util.List;
 
@@ -39,6 +39,6 @@ public class TitleBulkEditor extends JsonSplitBulkEditor {
 
     @Override
     protected void saveValues(List<TestCaseDto> items, List<String> newValues, Runnable onUpdate) {
-        PersistenceManager.getInstance(Config.getProject()).updateTitles(items, newValues.toArray(new String[0]), onUpdate);
+        TestCasePersistService.getInstance(Config.getProject()).updateTitles(items, newValues.toArray(new String[0]), onUpdate);
     }
 }

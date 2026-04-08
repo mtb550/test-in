@@ -3,7 +3,7 @@ package testGit.ui.TestCase.edit.bulk;
 import testGit.pojo.Config;
 import testGit.pojo.Groups;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.util.persist.PersistenceManager;
+import testGit.util.persist.TestCasePersistService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +60,6 @@ public class GroupsBulkEditor extends JsonArraySplitBulkEditor {
             newGroupsList.add(enumList);
         }
 
-        PersistenceManager.getInstance(Config.getProject()).updateGroups(items, newGroupsList, onUpdate);
+        TestCasePersistService.getInstance(Config.getProject()).updateGroups(items, newGroupsList, onUpdate);
     }
 }

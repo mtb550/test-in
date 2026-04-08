@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service(Level.PROJECT)
-public final class PersistenceManager implements Disposable {
-    public static PersistenceManager getInstance(final Project project) {
-        return project.getService(PersistenceManager.class);
+public final class TestCasePersistService implements Disposable {
+    public static TestCasePersistService getInstance(final Project project) {
+        return project.getService(TestCasePersistService.class);
     }
 
     public void updateTitles(final List<TestCaseDto> items, final String[] newTitles, final Runnable onUpdate) {
