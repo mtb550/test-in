@@ -1,5 +1,6 @@
 package testGit.util;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -14,7 +15,7 @@ import java.nio.file.Path;
 
 public class TreeUtilImpl {
     public static void executeVfsAction(Path path, String errorTitle, VfsOperation operation) {
-        WriteAction.run(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
                 if (vf != null) {
@@ -25,11 +26,11 @@ public class TreeUtilImpl {
             } catch (IOException ex) {
                 Messages.showErrorDialog("Operation failed: " + ex.getMessage(), errorTitle);
             }
-        });
+        }));
     }
 
     public static void executeVfsAction(Path sourcePath, Path targetPath, String errorTitle, VfsBiOperation operation) {
-        WriteAction.run(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
                 VirtualFile targetVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
@@ -42,28 +43,29 @@ public class TreeUtilImpl {
             } catch (IOException ex) {
                 Messages.showErrorDialog("Operation failed: " + ex.getMessage(), errorTitle);
             }
-        });
+        }));
     }
 
-    public static DefaultMutableTreeNode createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object newTestPackage) {
-
-        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+    public static void createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object newTestPackage) {
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newTestPackage);
 
-        model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
+        ApplicationManager.getApplication().invokeLater(() -> {
+            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+            model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
+            TreeUtil.selectNode(tree, newNode);
+        });
 
-        TreeUtil.selectNode(tree, newNode);
-
-        return newNode;
     }
 
     public static void removeNode(DefaultMutableTreeNode node, final SimpleTree tree) {
-        DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-        model.removeNodeFromParent(node);
+        ApplicationManager.getApplication().invokeLater(() -> {
+            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+            model.removeNodeFromParent(node);
+        });
     }
 
     public static void createVf(final Object requester, final Path parentPath, final String folderName) {
-        WriteAction.run(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
                 if (parentVf != null && parentVf.isDirectory()) {
@@ -72,11 +74,11 @@ public class TreeUtilImpl {
             } catch (IOException ex) {
                 Messages.showErrorDialog("Could not create directory: " + ex.getMessage(), "Error");
             }
-        });
+        }));
     }
 
     public static void createDataVf(final Object requester, final Path parentPath, final String fileName) {
-        WriteAction.run(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
 
@@ -88,11 +90,11 @@ public class TreeUtilImpl {
             } catch (IOException ex) {
                 Messages.showErrorDialog("Could not create marker file: " + ex.getMessage(), "Error");
             }
-        });
+        }));
     }
 
     public static void removeVf(final Object requester, final Path path) {
-        WriteAction.run(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
                 if (vf != null) {
@@ -101,7 +103,7 @@ public class TreeUtilImpl {
             } catch (IOException ex) {
                 Messages.showErrorDialog("Could not delete file: " + ex.getMessage(), "Error");
             }
-        });
+        }));
     }
 
     public interface VfsOperation {

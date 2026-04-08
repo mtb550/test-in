@@ -1,5 +1,6 @@
 package testGit.ui.TestCase.edit.bulk;
 
+import testGit.pojo.Config;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.persist.PersistenceManager;
@@ -56,6 +57,6 @@ public class PriorityBulkEditor extends JsonSplitBulkEditor {
             newPriorities[i] = matched;
         }
 
-        PersistenceManager.updatePriority(items, newPriorities, onUpdate);
+        PersistenceManager.getInstance(Config.getProject()).updatePriority(items, newPriorities, onUpdate);
     }
 }

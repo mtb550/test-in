@@ -10,8 +10,8 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.TestCase.edit.EditTestCaseUI;
 import testGit.ui.TestCase.edit.EditField;
+import testGit.ui.TestCase.edit.EditTestCaseUI;
 import testGit.ui.TestCase.edit.bulk.*;
 
 import javax.swing.*;

@@ -1,4 +1,4 @@
-add new tool window (To Do or Notes) that stored content in db.
+add new tool window (To Do or Notes) that stored tester temp content.
 
 implement all notifications.
 
@@ -180,5 +180,13 @@ JBPopupFactory.getInstance()
                 .show(RelativePoint.getCenterOf(component), Balloon.Position.above);
 
 ui enhance:
-persist save and create
+1-
+persist edit. (pending). remove save method in section classes,
+instead use persistance manages in action consumer.
+
+2-
 refactor remove test case class: RemoveTestCaseDialog.java
+
+3-
+implement broadcating to update project tree.
+Config.getProject().getMessageBus().syncPublisher(TestCaseEventListener.TEST_CASE_ADDED_TOPIC).onTestCaseAdded(newTc);});

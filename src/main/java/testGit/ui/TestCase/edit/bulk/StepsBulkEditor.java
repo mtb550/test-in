@@ -1,5 +1,6 @@
 package testGit.ui.TestCase.edit.bulk;
 
+import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.persist.PersistenceManager;
 
@@ -33,6 +34,6 @@ public class StepsBulkEditor extends JsonArraySplitBulkEditor {
 
     @Override
     protected void saveValues(List<TestCaseDto> items, List<List<String>> activeValues, Runnable onUpdate) {
-        PersistenceManager.updateSteps(items, activeValues, onUpdate);
+        PersistenceManager.getInstance(Config.getProject()).updateSteps(items, activeValues, onUpdate);
     }
 }
