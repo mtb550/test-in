@@ -1,4 +1,4 @@
-package testGit.ui.TestCase.edit;
+package testGit.ui.TestCase.update;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -13,9 +13,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.Consumer;
 
-public class EditTestCaseUI extends TestCaseUIBase {
+public class UpdateTestCaseUI extends TestCaseUIBase {
 
-    public void show(final TestCaseDto existingDto, final EditField targetField, final Consumer<TestCaseDto> updatedItems) {
+    public void show(final TestCaseDto existingDto, final UpdateTestCaseFields targetField, final Consumer<TestCaseDto> updatedItems) {
         final JBPopup[] popupWrapper = new JBPopup[1];
         UIAction repackPopup = () -> {
             if (popupWrapper[0] != null)
@@ -75,7 +75,7 @@ public class EditTestCaseUI extends TestCaseUIBase {
         setupUI(mainPanel, contentPanel, popupWrapper, existingDto, targetField, targetSection, updatedItems);
     }
 
-    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final EditField target, final CreateTestCaseSection targetSection, final Consumer<TestCaseDto> updatedItems) {
+    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final UpdateTestCaseFields target, final CreateTestCaseSection targetSection, final Consumer<TestCaseDto> updatedItems) {
         JPanel anchorPanel = new JPanel(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
@@ -87,10 +87,10 @@ public class EditTestCaseUI extends TestCaseUIBase {
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        statusBar.updateItems(target.getStatusBarItems());
+        statusBarSection.updateItems(target.getStatusBarItems());
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
-        mainPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);
+        mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
         // Use the focus component from the dynamically identified target section
         popupWrapper[0] = JBPopupFactory.getInstance()

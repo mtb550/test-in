@@ -1,4 +1,4 @@
-package testGit.util.persist;
+package testGit.util.Services;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.util.Notifier;
+import testGit.util.Notifications.Notifier;
 
 import java.io.File;
 import java.io.IOException;

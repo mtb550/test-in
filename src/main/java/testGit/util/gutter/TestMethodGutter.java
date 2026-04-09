@@ -16,7 +16,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.util.Notifier;
+import testGit.util.Notifications.Notifier;
 import testGit.viewPanel.ViewToolWindowFactory;
 
 import java.io.File;

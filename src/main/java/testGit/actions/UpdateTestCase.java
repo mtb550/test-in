@@ -8,22 +8,22 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.TestCase.TestCaseEditMenu;
+import testGit.ui.TestCase.TestCaseUpdateMenu;
 import testGit.util.KeyboardSet;
-import testGit.util.cache.TestCaseCacheService;
-import testGit.util.persist.TestCasePersistService;
+import testGit.util.Services.TestCaseCacheService;
+import testGit.util.Services.TestCasePersistService;
 import testGit.viewPanel.ViewPanel;
 import testGit.viewPanel.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.List;
 
-public class EditTestCase extends DumbAwareAction {
+public class UpdateTestCase extends DumbAwareAction {
 
     private final JBList<TestCaseDto> list;
     private final Path path;
 
-    public EditTestCase(final JBList<TestCaseDto> list, final Path path) {
+    public UpdateTestCase(final JBList<TestCaseDto> list, final Path path) {
         super("Edit Test Case");
         this.list = list;
         this.path = path;
@@ -37,7 +37,7 @@ public class EditTestCase extends DumbAwareAction {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        new TestCaseEditMenu().show(selectedItems, updatedItems -> {
+        new TestCaseUpdateMenu().show(selectedItems, updatedItems -> {
             TestCaseCacheService.getInstance(Config.getProject()).addNewItems(updatedItems);
             TestCasePersistService.getInstance(Config.getProject()).persist(path, updatedItems);
 

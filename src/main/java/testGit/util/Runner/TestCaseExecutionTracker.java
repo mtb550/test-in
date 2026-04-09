@@ -6,7 +6,7 @@ import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import testGit.util.listeners.TestCaseExecutionListener;
+import testGit.util.Broadcasts.listeners.TestCaseExecutionListener;
 
 public class TestCaseExecutionTracker {
 

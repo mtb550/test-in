@@ -1,7 +1,7 @@
 package testGit.pojo;
 
 import testGit.pojo.dto.dirs.*;
-import testGit.util.Notifier;
+import testGit.util.Notifications.Notifier;
 
 import java.nio.file.Path;
 

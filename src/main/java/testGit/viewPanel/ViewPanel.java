@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
 import testGit.pojo.ViewTab;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.util.listeners.TestCaseExecutionListener;
+import testGit.util.Broadcasts.listeners.TestCaseExecutionListener;
 import testGit.viewPanel.details.DetailsTab;
 import testGit.viewPanel.history.HistoryTab;
 import testGit.viewPanel.openBugs.OpenBugsTab;

@@ -9,7 +9,7 @@ import lombok.Getter;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
-import testGit.util.cache.TestCaseCacheService;
+import testGit.util.Services.TestCaseCacheService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,16 +21,16 @@ public class TitleSection implements CreateTestCaseSection {
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
 
     public TitleSection() {
-        this.titleField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getTitles(), CreateField.TITLE.getIcon()), false, "");
+        this.titleField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getTitles(), CreateTestCaseFields.TITLE.getIcon()), false, "");
 
         this.titleField.setFont(fieldFont);
-        this.titleField.setPlaceholder(CreateField.TITLE.getLabel());
+        this.titleField.setPlaceholder(CreateTestCaseFields.TITLE.getLabel());
         this.titleField.setShowPlaceholderWhenFocused(true);
         this.titleField.setBorder(JBUI.Borders.empty(10));
 
         this.wrapper = new JPanel(new BorderLayout());
         this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateField.TITLE.getIcon()), BorderLayout.WEST);
+        this.wrapper.add(createIconPanel(CreateTestCaseFields.TITLE.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.titleField, BorderLayout.CENTER);
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }

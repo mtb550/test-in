@@ -16,7 +16,7 @@ import testGit.editorPanel.*;
 import testGit.editorPanel.listeners.*;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.util.cache.TestCaseCacheService;
+import testGit.util.Services.TestCaseCacheService;
 import testGit.viewPanel.ViewPanel;
 import testGit.viewPanel.ViewToolWindowFactory;
 

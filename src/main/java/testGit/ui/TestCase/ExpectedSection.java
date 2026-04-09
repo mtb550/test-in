@@ -7,7 +7,7 @@ import lombok.Getter;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
-import testGit.util.cache.TestCaseCacheService;
+import testGit.util.Services.TestCaseCacheService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,16 +19,16 @@ public class ExpectedSection implements CreateTestCaseSection {
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ExpectedSection() {
-        this.expectedField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getExpectedResults(), CreateField.EXPECTED.getIcon()), false, "");
+        this.expectedField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getExpectedResults(), CreateTestCaseFields.EXPECTED.getIcon()), false, "");
 
         this.expectedField.setFont(fieldFont);
-        this.expectedField.setPlaceholder(CreateField.EXPECTED.getLabel());
+        this.expectedField.setPlaceholder(CreateTestCaseFields.EXPECTED.getLabel());
         this.expectedField.setShowPlaceholderWhenFocused(true);
         this.expectedField.setBorder(JBUI.Borders.empty(10));
 
         this.wrapper = new JPanel(new BorderLayout());
         this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateField.EXPECTED.getIcon()), BorderLayout.WEST);
+        this.wrapper.add(createIconPanel(CreateTestCaseFields.EXPECTED.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.expectedField, BorderLayout.CENTER);
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }

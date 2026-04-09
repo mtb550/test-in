@@ -96,7 +96,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
 
         // status bar
         mainPanel.add(scrollPane, BorderLayout.CENTER);
-        mainPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);
+        mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
         // Popup
         popupWrapper[0] = JBPopupFactory.getInstance()

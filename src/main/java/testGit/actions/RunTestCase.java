@@ -7,7 +7,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
-import testGit.util.Notifier;
+import testGit.util.Notifications.Notifier;
 import testGit.util.Runner.TestNGRunnerByMethod;
 import testGit.util.Tools;
 

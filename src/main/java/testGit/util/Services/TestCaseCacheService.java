@@ -1,4 +1,4 @@
-package testGit.util.cache;
+package testGit.util.Services;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;

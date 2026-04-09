@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.dirs.TestSetDirectoryDto;
-import testGit.util.Notifier;
+import testGit.util.Notifications.Notifier;
 import testGit.util.Runner.TestNGRunnerByClass;
 import testGit.util.Tools;
 

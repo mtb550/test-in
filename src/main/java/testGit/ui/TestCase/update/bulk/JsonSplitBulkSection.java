@@ -1,4 +1,4 @@
-package testGit.ui.TestCase.edit.bulk;
+package testGit.ui.TestCase.update.bulk;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public abstract class JsonSplitBulkEditor {
+public abstract class JsonSplitBulkSection {
     protected abstract void applyValues(final List<TestCaseDto> items, final List<String> newValues);
 
     protected abstract String getPopupTitle();

@@ -14,7 +14,7 @@ import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
 import testGit.pojo.dto.dirs.TestRunsDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 import testGit.ui.CreateTestProjectDialog;
-import testGit.util.Notifier;
+import testGit.util.Notifications.Notifier;
 import testGit.util.TreeUtilImpl;
 
 import java.nio.file.Path;

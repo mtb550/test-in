@@ -13,8 +13,8 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.TestCase.edit.EditField;
-import testGit.ui.TestCase.edit.EditTestCaseUI;
+import testGit.ui.TestCase.update.UpdateTestCaseFields;
+import testGit.ui.TestCase.update.UpdateTestCaseUI;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class TestCaseEditMenu {
+public class TestCaseUpdateMenu {
 
     public void show(final List<TestCaseDto> items, final Consumer<List<TestCaseDto>> updatedItems) {
         boolean isSingle = items.size() == 1;
@@ -31,23 +31,23 @@ public class TestCaseEditMenu {
 
         showMenu(title, field -> {
             if (isSingle)
-                new EditTestCaseUI().show(items.getFirst(), field, tc -> updatedItems.accept(items));
+                new UpdateTestCaseUI().show(items.getFirst(), field, tc -> updatedItems.accept(items));
             else
                 field.getBulkAction().show(items, updatedItems);
         });
     }
 
-    private void showMenu(final String title, final Consumer<EditField> onSelection) {
-        EditField[] fields = Arrays.stream(EditField.values()).filter(EditField::isEditMenuItem).toArray(EditField[]::new);
-        JBList<EditField> list = buildMenuList(fields);
+    private void showMenu(final String title, final Consumer<UpdateTestCaseFields> onSelection) {
+        UpdateTestCaseFields[] fields = Arrays.stream(UpdateTestCaseFields.values()).filter(UpdateTestCaseFields::isEditMenuItem).toArray(UpdateTestCaseFields[]::new);
+        JBList<UpdateTestCaseFields> list = buildMenuList(fields);
         JBPopup popup = buildPopup(title, list);
         registerShortcuts(list, popup, onSelection);
         popup.showCenteredInCurrentWindow(Config.getProject());
     }
 
     @NotNull
-    private JBList<EditField> buildMenuList(final EditField[] fields) {
-        JBList<EditField> list = new JBList<>(fields);
+    private JBList<UpdateTestCaseFields> buildMenuList(final UpdateTestCaseFields[] fields) {
+        JBList<UpdateTestCaseFields> list = new JBList<>(fields);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
         list.setCellRenderer(createCellRenderer());
@@ -55,10 +55,10 @@ public class TestCaseEditMenu {
     }
 
     @NotNull
-    private ColoredListCellRenderer<EditField> createCellRenderer() {
+    private ColoredListCellRenderer<UpdateTestCaseFields> createCellRenderer() {
         return new ColoredListCellRenderer<>() {
             @Override
-            protected void customizeCellRenderer(@NotNull JList<? extends EditField> l, EditField val, int i, boolean sel, boolean focus) {
+            protected void customizeCellRenderer(@NotNull JList<? extends UpdateTestCaseFields> l, UpdateTestCaseFields val, int i, boolean sel, boolean focus) {
                 setIcon(val.getIcon());
                 append(val.getLabel());
                 append("   " + val.getShortcutText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
@@ -67,7 +67,7 @@ public class TestCaseEditMenu {
         };
     }
 
-    private JBPopup buildPopup(final String title, final JBList<EditField> list) {
+    private JBPopup buildPopup(final String title, final JBList<UpdateTestCaseFields> list) {
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(list), list)
                 .setTitle(title)
@@ -77,7 +77,7 @@ public class TestCaseEditMenu {
                 .createPopup();
     }
 
-    private void registerShortcuts(final JBList<EditField> list, final JBPopup popup, final Consumer<EditField> onSelection) {
+    private void registerShortcuts(final JBList<UpdateTestCaseFields> list, final JBPopup popup, final Consumer<UpdateTestCaseFields> onSelection) {
         Runnable triggerSelection = () -> {
             if (list.getSelectedValue() != null) {
                 onSelection.accept(list.getSelectedValue());
@@ -85,8 +85,8 @@ public class TestCaseEditMenu {
             }
         };
 
-        Arrays.stream(EditField.values())
-                .filter(EditField::isEditMenuItem)
+        Arrays.stream(UpdateTestCaseFields.values())
+                .filter(UpdateTestCaseFields::isEditMenuItem)
                 .forEach(f -> f.bindShortcut(list, () -> {
                     onSelection.accept(f);
                     popup.closeOk(null);

@@ -9,7 +9,7 @@ import javax.swing.*;
 import java.util.function.Function;
 
 @Getter
-public enum CreateField implements StatusBarItem {
+public enum CreateTestCaseFields implements StatusBarItem {
     SAVE(
             "Save",
             KeyboardSet.Enter,
@@ -135,7 +135,7 @@ public enum CreateField implements StatusBarItem {
     private final boolean createMenuItem;
     private final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor;
 
-    CreateField(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
+    CreateTestCaseFields(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
         this.label = label;
         this.shortcut = shortcut;
         this.customShortcutText = null;
@@ -145,7 +145,7 @@ public enum CreateField implements StatusBarItem {
         this.sectionExtractor = sectionExtractor;
     }
 
-    CreateField(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
+    CreateTestCaseFields(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
         this.label = label;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;

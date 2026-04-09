@@ -1,4 +1,4 @@
-package testGit.ui.TestCase.edit;
+package testGit.ui.TestCase.update;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.TestCase.CreateTestCaseSection;
 import testGit.ui.TestCase.TestCaseUIBase;
-import testGit.ui.TestCase.edit.bulk.*;
+import testGit.ui.TestCase.update.bulk.*;
 import testGit.util.KeyboardSet;
 import testGit.util.statusBar.StatusBarItem;
 
@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Getter
-public enum EditField implements StatusBarItem {
+public enum UpdateTestCaseFields implements StatusBarItem {
     SAVE(
             "Save",
             KeyboardSet.Enter,
@@ -74,7 +74,7 @@ public enum EditField implements StatusBarItem {
             AllIcons.Actions.Edit,
             new StatusBarItem[]{SAVE},
             true,
-            (items, updatedItems) -> new TitleBulkEditor().show(items, updatedItems),
+            (items, updatedItems) -> new TitleBulkSection().show(items, updatedItems),
             TestCaseUIBase::getTitleSection
     ),
 
@@ -84,7 +84,7 @@ public enum EditField implements StatusBarItem {
             AllIcons.General.InspectionsOK,
             new StatusBarItem[]{SAVE},
             true,
-            (items, updatedItems) -> new ExpectedBulkEditor().show(items, updatedItems),
+            (items, updatedItems) -> new ExpectedBulkSection().show(items, updatedItems),
             TestCaseUIBase::getExpectedSection
     ),
 
@@ -104,7 +104,7 @@ public enum EditField implements StatusBarItem {
             AllIcons.Actions.ListFiles,
             new StatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
             true,
-            (items, updatedItems) -> new StepsBulkEditor().show(items, updatedItems),
+            (items, updatedItems) -> new StepsBulkSection().show(items, updatedItems),
             TestCaseUIBase::getStepsSection
     ),
 
@@ -124,7 +124,7 @@ public enum EditField implements StatusBarItem {
             AllIcons.Nodes.Favorite,
             new StatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
             true,
-            (items, updatedItems) -> new PriorityBulkEditor().show(items, updatedItems),
+            (items, updatedItems) -> new PriorityBulkSection().show(items, updatedItems),
             TestCaseUIBase::getPrioritySection
     ),
 
@@ -144,7 +144,7 @@ public enum EditField implements StatusBarItem {
             AllIcons.Nodes.Tag,
             new StatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
-            (items, updatedItems) -> new GroupsBulkEditor().show(items, updatedItems),
+            (items, updatedItems) -> new GroupsBulkSection().show(items, updatedItems),
             TestCaseUIBase::getGroupsSection
     );
 
@@ -157,7 +157,7 @@ public enum EditField implements StatusBarItem {
     private final BulkEditorAction bulkAction;
     private final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor;
 
-    EditField(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
         this.label = label;
         this.shortcut = shortcut;
         this.customShortcutText = null;
@@ -168,7 +168,7 @@ public enum EditField implements StatusBarItem {
         this.sectionExtractor = sectionExtractor;
     }
 
-    EditField(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
         this.label = label;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;

@@ -1,4 +1,4 @@
-package testGit.util.listeners;
+package testGit.util.Broadcasts.listeners;
 
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;

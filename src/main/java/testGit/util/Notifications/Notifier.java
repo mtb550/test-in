@@ -1,4 +1,4 @@
-package testGit.util;
+package testGit.util.Notifications;
 
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;

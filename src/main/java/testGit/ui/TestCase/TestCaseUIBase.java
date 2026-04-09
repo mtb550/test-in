@@ -27,7 +27,7 @@ public abstract class TestCaseUIBase {
     protected final PrioritySection prioritySection;
     protected final GroupsSection groupsSection;
     protected final StepsSection stepsSection;
-    protected final StatusBar statusBar;
+    protected final StatusBarSection statusBarSection;
     private final List<CreateTestCaseSection> cachedSections;
     protected Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
@@ -38,18 +38,18 @@ public abstract class TestCaseUIBase {
         this.stepsSection = new StepsSection();
         this.prioritySection = new PrioritySection();
         this.groupsSection = new GroupsSection();
-        this.statusBar = new StatusBar();
+        this.statusBarSection = new StatusBarSection();
 
-        this.cachedSections = Arrays.stream(CreateField.values())
-                .filter(CreateField::isCreateMenuItem)
+        this.cachedSections = Arrays.stream(CreateTestCaseFields.values())
+                .filter(CreateTestCaseFields::isCreateMenuItem)
                 .map(field -> field.getSectionExtractor().apply(this))
                 .toList();
 
-        this.statusBarMapping = Arrays.stream(CreateField.values())
-                .filter(CreateField::isCreateMenuItem)
+        this.statusBarMapping = Arrays.stream(CreateTestCaseFields.values())
+                .filter(CreateTestCaseFields::isCreateMenuItem)
                 .collect(Collectors.toMap(
                         field -> field.getSectionExtractor().apply(this),
-                        CreateField::getStatusBarItems
+                        CreateTestCaseFields::getStatusBarItems
                 ));
     }
 
@@ -60,7 +60,7 @@ public abstract class TestCaseUIBase {
                 for (CreateTestCaseSection section : getAllSections()) {
                     if (SwingUtilities.isDescendingFrom(focusOwner, section.getWrapper())) {
                         StatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(titleSection));
-                        if (items != null) statusBar.updateItems(items);
+                        if (items != null) statusBarSection.updateItems(items);
                         return;
                     }
                 }

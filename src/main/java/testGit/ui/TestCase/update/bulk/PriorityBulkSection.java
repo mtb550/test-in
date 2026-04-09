@@ -1,35 +1,38 @@
-package testGit.ui.TestCase.edit.bulk;
+package testGit.ui.TestCase.update.bulk;
 
+import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 
 import java.util.List;
 
-public class TitleBulkEditor extends JsonSplitBulkEditor {
+public class PriorityBulkSection extends JsonSplitBulkSection {
 
     @Override
     protected String getPopupTitle() {
-        return "Bulk Edit Titles (Enter to Save | Tab/Arrows to Navigate)";
+        return "Bulk Edit Priorities (Enter to Save | Tab/Arrows to Navigate)";
     }
 
     @Override
     protected String getOriginalValue(TestCaseDto tc) {
-        return tc.getTitle();
+        return tc.getPriority() != null ? tc.getPriority().name() : "";
     }
 
     @Override
     protected void appendJsonItem(TestCaseDto tc, int index, boolean isLast, StringBuilder leftSb, StringBuilder rightSb, List<int[]> rightEditableRanges) {
         String id = "Item-" + (index + 1);
         String escapedTitle = escapeJson(tc.getTitle());
+        String priorityStr = tc.getPriority() != null ? tc.getPriority().name() : "";
+        String escapedPriority = escapeJson(priorityStr);
 
-        String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"title\": \"";
+        String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"title\": \"" + escapedTitle + "\",\n    \"priority\": \"";
         String suffix = "\"\n  }";
         String comma = isLast ? "\n" : ",\n";
 
-        leftSb.append(prefix).append(escapedTitle).append(suffix).append(comma);
+        leftSb.append(prefix).append(escapedPriority).append(suffix).append(comma);
 
         rightSb.append(prefix);
         int startOffset = rightSb.length();
-        rightSb.append(escapedTitle);
+        rightSb.append(escapedPriority);
         int endOffset = rightSb.length();
         rightEditableRanges.add(new int[]{startOffset, endOffset});
         rightSb.append(suffix).append(comma);
@@ -38,8 +41,12 @@ public class TitleBulkEditor extends JsonSplitBulkEditor {
     @Override
     protected void applyValues(final List<TestCaseDto> items, final List<String> newValues) {
         for (int i = 0; i < items.size(); i++) {
-            if (newValues.get(i) != null && !newValues.get(i).trim().isEmpty()) {
-                items.get(i).setTitle(newValues.get(i).trim());
+            String val = newValues.get(i).trim();
+            if (!val.isEmpty()) {
+                try {
+                    items.get(i).setPriority(Priority.valueOf(val.toUpperCase()));
+                } catch (IllegalArgumentException ignored) {
+                }
             }
         }
     }

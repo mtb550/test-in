@@ -1,11 +1,11 @@
-package testGit.ui.TestCase.edit.bulk;
+package testGit.ui.TestCase.update.bulk;
 
 import testGit.pojo.dto.TestCaseDto;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StepsBulkEditor extends JsonArraySplitBulkEditor {
+public class StepsBulkSection extends JsonArraySplitBulkSection {
 
     @Override
     protected String getPopupTitle() {

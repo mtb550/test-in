@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
-import testGit.util.cache.TestCaseCacheService;
+import testGit.util.Services.TestCaseCacheService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +37,7 @@ public class StepsSection implements CreateTestCaseSection {
 
         this.wrapper = new JPanel(new BorderLayout());
         this.wrapper.setOpaque(false);
-        this.wrapper.add(createIconPanel(CreateField.STEPS.getIcon()), BorderLayout.WEST);
+        this.wrapper.add(createIconPanel(CreateTestCaseFields.STEPS.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.stepsContainer, BorderLayout.CENTER);
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
@@ -67,7 +67,7 @@ public class StepsSection implements CreateTestCaseSection {
     }
 
     public void addStepField(final String text, final TestCaseUIBase.UIAction repackAction) {
-        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getSteps(), CreateField.STEPS.getIcon());
+        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getSteps(), CreateTestCaseFields.STEPS.getIcon());
         TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(Config.getProject(), provider, false, text != null ? text : "");
 
         stepField.setFont(fieldFont);
