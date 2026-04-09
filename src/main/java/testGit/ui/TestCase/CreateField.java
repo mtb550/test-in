@@ -6,6 +6,7 @@ import testGit.util.KeyboardSet;
 import testGit.util.statusBar.StatusBarItem;
 
 import javax.swing.*;
+import java.util.function.Function;
 
 @Getter
 public enum CreateField implements StatusBarItem {
@@ -14,7 +15,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.Enter,
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     ADD_STEP(
@@ -22,7 +24,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.CreateTestCaseAddStep,
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     REMOVE_STEP(
@@ -30,7 +33,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.CreateTestCaseRemoveStep,
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     AUTO_COMPLETE(
@@ -38,7 +42,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.AutoComplete.getShortcutText(),
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     SET_PRIORITY(
@@ -46,7 +51,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.PriorityHigh.getShortcutText() + " / " + KeyboardSet.PriorityMedium.getShortcutText() + " / " + KeyboardSet.PriorityLow.getShortcutText(),
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     NAVIGATE_TAB(
@@ -54,7 +60,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.TabNext.getShortcutText() + " / " + KeyboardSet.TabPrevious.getShortcutText(),
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     NAVIGATE_ARROWS(
@@ -62,7 +69,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.ArrowUp.getShortcutText() + " / " + KeyboardSet.ArrowDown.getShortcutText(),
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     TITLE(
@@ -70,7 +78,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.CreateTestCaseTitle,
             AllIcons.Actions.Edit,
             new StatusBarItem[]{SAVE, NAVIGATE_TAB},
-            true
+            true,
+            TestCaseUIBase::getTitleSection
     ),
 
     EXPECTED(
@@ -78,7 +87,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.CreateTestCaseExpected,
             AllIcons.General.InspectionsOK,
             new StatusBarItem[]{SAVE, NAVIGATE_TAB},
-            true
+            true,
+            TestCaseUIBase::getExpectedSection
     ),
 
     STEPS(
@@ -86,7 +96,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.CreateTestCaseAddStep,
             AllIcons.Actions.ListFiles,
             new StatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
-            true
+            true,
+            TestCaseUIBase::getStepsSection
     ),
 
     PRIORITY(
@@ -94,7 +105,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.CreateTestCasePriority,
             AllIcons.Nodes.Favorite,
             new StatusBarItem[]{SAVE, SET_PRIORITY, NAVIGATE_ARROWS},
-            true
+            true,
+            TestCaseUIBase::getPrioritySection
     ),
 
     SELECT_GROUP(
@@ -102,7 +114,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.SelectGroup,
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     GROUPS(
@@ -110,7 +123,8 @@ public enum CreateField implements StatusBarItem {
             KeyboardSet.CreateTestCaseGroups,
             AllIcons.Nodes.Tag,
             new StatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
-            true
+            true,
+            TestCaseUIBase::getGroupsSection
     );
 
     private final String label;
@@ -119,23 +133,26 @@ public enum CreateField implements StatusBarItem {
     private final Icon icon;
     private final StatusBarItem[] statusBarItems;
     private final boolean createMenuItem;
+    private final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor;
 
-    CreateField(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem) {
+    CreateField(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
         this.label = label;
         this.shortcut = shortcut;
         this.customShortcutText = null;
         this.icon = icon;
         this.statusBarItems = statusBarItems;
         this.createMenuItem = createMenuItem;
+        this.sectionExtractor = sectionExtractor;
     }
 
-    CreateField(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem) {
+    CreateField(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
         this.label = label;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;
         this.icon = icon;
         this.statusBarItems = statusBarItems;
         this.createMenuItem = createMenuItem;
+        this.sectionExtractor = sectionExtractor;
     }
 
     @Override

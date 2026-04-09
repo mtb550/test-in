@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Getter
 public abstract class TestCaseUIBase {
@@ -27,6 +28,7 @@ public abstract class TestCaseUIBase {
     protected final GroupsSection groupsSection;
     protected final StepsSection stepsSection;
     protected final StatusBar statusBar;
+    private final List<CreateTestCaseSection> cachedSections;
     protected Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
@@ -37,6 +39,18 @@ public abstract class TestCaseUIBase {
         this.prioritySection = new PrioritySection();
         this.groupsSection = new GroupsSection();
         this.statusBar = new StatusBar();
+
+        this.cachedSections = Arrays.stream(CreateField.values())
+                .filter(CreateField::isCreateMenuItem)
+                .map(field -> field.getSectionExtractor().apply(this))
+                .toList();
+
+        this.statusBarMapping = Arrays.stream(CreateField.values())
+                .filter(CreateField::isCreateMenuItem)
+                .collect(Collectors.toMap(
+                        field -> field.getSectionExtractor().apply(this),
+                        CreateField::getStatusBarItems
+                ));
     }
 
     protected void initDynamicStatusBar(JComponent parentPanel) {
@@ -63,13 +77,7 @@ public abstract class TestCaseUIBase {
     }
 
     public List<CreateTestCaseSection> getAllSections() {
-        return Arrays.asList(
-                titleSection, // arranged, sequence that related to place of each component
-                expectedSection,
-                stepsSection,
-                prioritySection,
-                groupsSection
-        );
+        return cachedSections;
     }
 
     public void registerShortcut(final JComponent component, final CustomShortcutSet shortcutSet, final UIAction action) {

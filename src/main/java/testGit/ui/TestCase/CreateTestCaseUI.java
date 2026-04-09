@@ -13,22 +13,9 @@ import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
 import java.util.function.Consumer;
 
 public class CreateTestCaseUI extends TestCaseUIBase {
-
-    public CreateTestCaseUI() {
-        super();
-        this.statusBarMapping = Map.of(
-                titleSection, CreateField.TITLE.getStatusBarItems(),
-                expectedSection, CreateField.EXPECTED.getStatusBarItems(),
-                stepsSection, CreateField.STEPS.getStatusBarItems(),
-                prioritySection, CreateField.PRIORITY.getStatusBarItems(),
-                groupsSection, CreateField.GROUPS.getStatusBarItems()
-        );
-    }
-
     public void show(final Consumer<TestCaseDto> onSave) {
         TestCaseDto dto = new TestCaseDto();
         final JBPopup[] popupWrapper = new JBPopup[1];

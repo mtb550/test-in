@@ -22,6 +22,8 @@ public class EditTestCaseUI extends TestCaseUIBase {
                 popupWrapper[0].pack(false, true);
         };
 
+        CreateTestCaseSection targetSection = targetField.getSectionExtractor().apply(this);
+
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
             public Dimension getPreferredSize() {
@@ -48,7 +50,7 @@ public class EditTestCaseUI extends TestCaseUIBase {
 
             section.fillData(existingDto, repackPopup);
 
-            boolean isTarget = isTargetSection(section, targetField);
+            boolean isTarget = (section == targetSection);
             section.setEditable(isTarget);
 
             if (isTarget && section instanceof StepsSection s) {
@@ -70,29 +72,10 @@ public class EditTestCaseUI extends TestCaseUIBase {
             }
         }
 
-        setupUI(mainPanel, contentPanel, popupWrapper, existingDto, targetField, updatedItems);
+        setupUI(mainPanel, contentPanel, popupWrapper, existingDto, targetField, targetSection, updatedItems);
     }
 
-    private boolean isTargetSection(final CreateTestCaseSection section, final EditField target) {
-        return switch (target) {
-            case TITLE -> section instanceof TitleSection;
-            case EXPECTED -> section instanceof ExpectedSection;
-            case PRIORITY -> section instanceof PrioritySection;
-            case GROUPS -> section instanceof GroupsSection;
-            case STEPS -> section instanceof StepsSection;
-            default -> false;
-        };
-    }
-
-    private JComponent getTargetFocus(final EditField target) {
-        return getAllSections().stream()
-                .filter(section -> isTargetSection(section, target))
-                .map(CreateTestCaseSection::getFocusComponent)
-                .findFirst()
-                .orElse(titleSection.getFocusComponent());
-    }
-
-    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final EditField target, final Consumer<TestCaseDto> updatedItems) {
+    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final EditField target, final CreateTestCaseSection targetSection, final Consumer<TestCaseDto> updatedItems) {
         JPanel anchorPanel = new JPanel(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
@@ -109,9 +92,9 @@ public class EditTestCaseUI extends TestCaseUIBase {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);
 
-        // Popup
+        // Use the focus component from the dynamically identified target section
         popupWrapper[0] = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(mainPanel, getTargetFocus(target))
+                .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
                 .setTitle("Edit " + target.getLabel())
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(true)
@@ -119,13 +102,13 @@ public class EditTestCaseUI extends TestCaseUIBase {
                 .setResizable(true)
                 .createPopup();
 
-        // save
+        // save logic remains centralized in the base class
         Runnable saveAction = save(dto, updatedItems, popupWrapper);
 
-        // register enter shortcut
+        // register enter shortcut via the base class helper
         registerShortcut(mainPanel, KeyboardSet.Enter.getShortcut(), saveAction::run);
 
-        // show first
+        // show the popup
         popupWrapper[0].showCenteredInCurrentWindow(Config.getProject());
     }
 }

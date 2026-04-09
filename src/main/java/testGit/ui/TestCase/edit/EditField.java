@@ -5,6 +5,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
+import testGit.ui.TestCase.CreateTestCaseSection;
+import testGit.ui.TestCase.TestCaseUIBase;
 import testGit.ui.TestCase.edit.bulk.*;
 import testGit.util.KeyboardSet;
 import testGit.util.statusBar.StatusBarItem;
@@ -12,6 +14,7 @@ import testGit.util.statusBar.StatusBarItem;
 import javax.swing.*;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @Getter
 public enum EditField implements StatusBarItem {
@@ -21,6 +24,7 @@ public enum EditField implements StatusBarItem {
             null,
             new StatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -30,6 +34,7 @@ public enum EditField implements StatusBarItem {
             null,
             new StatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -39,6 +44,7 @@ public enum EditField implements StatusBarItem {
             null,
             new StatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -48,6 +54,7 @@ public enum EditField implements StatusBarItem {
             null,
             new StatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -57,6 +64,7 @@ public enum EditField implements StatusBarItem {
             null,
             new StatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -66,7 +74,8 @@ public enum EditField implements StatusBarItem {
             AllIcons.Actions.Edit,
             new StatusBarItem[]{SAVE},
             true,
-            (items, updatedItems) -> new TitleBulkEditor().show(items, updatedItems)
+            (items, updatedItems) -> new TitleBulkEditor().show(items, updatedItems),
+            TestCaseUIBase::getTitleSection
     ),
 
     EXPECTED(
@@ -75,7 +84,8 @@ public enum EditField implements StatusBarItem {
             AllIcons.General.InspectionsOK,
             new StatusBarItem[]{SAVE},
             true,
-            (items, updatedItems) -> new ExpectedBulkEditor().show(items, updatedItems)
+            (items, updatedItems) -> new ExpectedBulkEditor().show(items, updatedItems),
+            TestCaseUIBase::getExpectedSection
     ),
 
     AUTO_COMPLETE(
@@ -84,6 +94,7 @@ public enum EditField implements StatusBarItem {
             null,
             new StatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -93,7 +104,8 @@ public enum EditField implements StatusBarItem {
             AllIcons.Actions.ListFiles,
             new StatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
             true,
-            (items, updatedItems) -> new StepsBulkEditor().show(items, updatedItems)
+            (items, updatedItems) -> new StepsBulkEditor().show(items, updatedItems),
+            TestCaseUIBase::getStepsSection
     ),
 
     SET_PRIORITY(
@@ -102,6 +114,7 @@ public enum EditField implements StatusBarItem {
             null,
             new StatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -111,7 +124,8 @@ public enum EditField implements StatusBarItem {
             AllIcons.Nodes.Favorite,
             new StatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
             true,
-            (items, updatedItems) -> new PriorityBulkEditor().show(items, updatedItems)
+            (items, updatedItems) -> new PriorityBulkEditor().show(items, updatedItems),
+            TestCaseUIBase::getPrioritySection
     ),
 
     SELECT_GROUP(
@@ -120,6 +134,7 @@ public enum EditField implements StatusBarItem {
             null,
             new StatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -129,7 +144,8 @@ public enum EditField implements StatusBarItem {
             AllIcons.Nodes.Tag,
             new StatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
-            (items, updatedItems) -> new GroupsBulkEditor().show(items, updatedItems)
+            (items, updatedItems) -> new GroupsBulkEditor().show(items, updatedItems),
+            TestCaseUIBase::getGroupsSection
     );
 
     private final String label;
@@ -139,8 +155,9 @@ public enum EditField implements StatusBarItem {
     private final StatusBarItem[] statusBarItems;
     private final boolean editMenuItem;
     private final BulkEditorAction bulkAction;
+    private final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor;
 
-    EditField(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction) {
+    EditField(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
         this.label = label;
         this.shortcut = shortcut;
         this.customShortcutText = null;
@@ -148,9 +165,10 @@ public enum EditField implements StatusBarItem {
         this.statusBarItems = statusBarItems;
         this.editMenuItem = editMenuItem;
         this.bulkAction = bulkAction;
+        this.sectionExtractor = sectionExtractor;
     }
 
-    EditField(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction) {
+    EditField(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
         this.label = label;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;
@@ -158,6 +176,7 @@ public enum EditField implements StatusBarItem {
         this.statusBarItems = statusBarItems;
         this.editMenuItem = editMenuItem;
         this.bulkAction = bulkAction;
+        this.sectionExtractor = sectionExtractor;
     }
 
     @Override
