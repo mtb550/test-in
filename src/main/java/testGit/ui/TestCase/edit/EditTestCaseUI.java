@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class EditTestCaseUI extends TestCaseUIBase {
 
-    public void show(final TestCaseDto existingDto, final EditField targetField, final Consumer<TestCaseDto> onUpdate) {
+    public void show(final TestCaseDto existingDto, final EditField targetField, final Consumer<TestCaseDto> updatedItems) {
         final JBPopup[] popupWrapper = new JBPopup[1];
         UIAction repackPopup = () -> {
             if (popupWrapper[0] != null)
@@ -70,7 +70,7 @@ public class EditTestCaseUI extends TestCaseUIBase {
             }
         }
 
-        setupUI(mainPanel, contentPanel, popupWrapper, existingDto, targetField, onUpdate);
+        setupUI(mainPanel, contentPanel, popupWrapper, existingDto, targetField, updatedItems);
     }
 
     private boolean isTargetSection(final CreateTestCaseSection section, final EditField target) {
@@ -92,7 +92,7 @@ public class EditTestCaseUI extends TestCaseUIBase {
                 .orElse(titleSection.getFocusComponent());
     }
 
-    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final EditField target, final Consumer<TestCaseDto> onUpdate) {
+    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final EditField target, final Consumer<TestCaseDto> updatedItems) {
         JPanel anchorPanel = new JPanel(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
@@ -120,7 +120,7 @@ public class EditTestCaseUI extends TestCaseUIBase {
                 .createPopup();
 
         // save
-        Runnable saveAction = save(dto, onUpdate, popupWrapper);
+        Runnable saveAction = save(dto, updatedItems, popupWrapper);
 
         // register enter shortcut
         registerShortcut(mainPanel, KeyboardSet.Enter.getShortcut(), saveAction::run);

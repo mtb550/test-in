@@ -2,10 +2,14 @@ package testGit.ui.TestCase.edit;
 
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.ui.TestCase.edit.bulk.*;
 import testGit.util.KeyboardSet;
 import testGit.util.statusBar.StatusBarItem;
 
 import javax.swing.*;
+import java.util.List;
+import java.util.function.Consumer;
 
 @Getter
 public enum EditField implements StatusBarItem {
@@ -14,7 +18,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.Enter,
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     ADD_STEP(
@@ -22,7 +27,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.CreateTestCaseAddStep,
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     REMOVE_STEP(
@@ -30,7 +36,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.CreateTestCaseRemoveStep,
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     NAVIGATE_TAB(
@@ -38,7 +45,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.TabNext.getShortcutText() + " / " + KeyboardSet.TabPrevious.getShortcutText(),
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     NAVIGATE_ARROWS(
@@ -46,7 +54,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.ArrowUp.getShortcutText() + " / " + KeyboardSet.ArrowDown.getShortcutText(),
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     TITLE(
@@ -54,7 +63,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.UpdateTestCaseTitle,
             AllIcons.Actions.Edit,
             new StatusBarItem[]{SAVE},
-            true
+            true,
+            (items, updatedItems) -> new TitleBulkEditor().show(items, updatedItems)
     ),
 
     EXPECTED(
@@ -62,7 +72,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.UpdateTestCaseExpected,
             AllIcons.General.InspectionsOK,
             new StatusBarItem[]{SAVE},
-            true
+            true,
+            (items, updatedItems) -> new ExpectedBulkEditor().show(items, updatedItems)
     ),
 
     AUTO_COMPLETE(
@@ -70,7 +81,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.AutoComplete.getShortcutText(),
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     STEPS(
@@ -78,7 +90,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.UpdateTestCaseSteps,
             AllIcons.Actions.ListFiles,
             new StatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
-            true
+            true,
+            (items, updatedItems) -> new StepsBulkEditor().show(items, updatedItems)
     ),
 
     SET_PRIORITY(
@@ -86,7 +99,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.PriorityHigh.getShortcutText() + " / " + KeyboardSet.PriorityMedium.getShortcutText() + " / " + KeyboardSet.PriorityLow.getShortcutText(),
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     PRIORITY(
@@ -94,7 +108,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.UpdateTestCasePriority,
             AllIcons.Nodes.Favorite,
             new StatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
-            true
+            true,
+            (items, updatedItems) -> new PriorityBulkEditor().show(items, updatedItems)
     ),
 
     SELECT_GROUP(
@@ -102,7 +117,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.SelectGroup,
             null,
             new StatusBarItem[]{},
-            false
+            false,
+            null
     ),
 
     GROUPS(
@@ -110,7 +126,8 @@ public enum EditField implements StatusBarItem {
             KeyboardSet.UpdateTestCaseGroups,
             AllIcons.Nodes.Tag,
             new StatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
-            true
+            true,
+            (items, updatedItems) -> new GroupsBulkEditor().show(items, updatedItems)
     );
 
     private final String label;
@@ -119,23 +136,26 @@ public enum EditField implements StatusBarItem {
     private final Icon icon;
     private final StatusBarItem[] statusBarItems;
     private final boolean editMenuItem;
+    private final BulkEditorAction bulkAction;
 
-    EditField(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem) {
+    EditField(final String label, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction) {
         this.label = label;
         this.shortcut = shortcut;
         this.customShortcutText = null;
         this.icon = icon;
         this.statusBarItems = statusBarItems;
         this.editMenuItem = editMenuItem;
+        this.bulkAction = bulkAction;
     }
 
-    EditField(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem) {
+    EditField(final String label, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction) {
         this.label = label;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;
         this.icon = icon;
         this.statusBarItems = statusBarItems;
         this.editMenuItem = editMenuItem;
+        this.bulkAction = bulkAction;
     }
 
     @Override
@@ -144,5 +164,9 @@ public enum EditField implements StatusBarItem {
             return customShortcutText;
         }
         return shortcut != null ? shortcut.getShortcutText() : "";
+    }
+
+    public interface BulkEditorAction {
+        void show(final List<TestCaseDto> items, final Consumer<List<TestCaseDto>> updatedItems);
     }
 }

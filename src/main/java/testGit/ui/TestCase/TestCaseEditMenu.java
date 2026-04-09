@@ -1,5 +1,8 @@
 package testGit.ui.TestCase;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonShortcuts;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.ColoredListCellRenderer;
@@ -12,11 +15,8 @@ import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.TestCase.edit.EditField;
 import testGit.ui.TestCase.edit.EditTestCaseUI;
-import testGit.ui.TestCase.edit.bulk.*;
 
 import javax.swing.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
@@ -25,109 +25,93 @@ import java.util.function.Consumer;
 
 public class TestCaseEditMenu {
 
-    public void show(final List<TestCaseDto> selectedItems, final Consumer<List<TestCaseDto>> updatedItems) {
-        if (selectedItems == null || selectedItems.isEmpty()) return;
-
-        boolean isSingle = selectedItems.size() == 1;
-        String title = isSingle ? "Edit Test Case" : "Update " + selectedItems.size() + " Test Cases";
-
-        showMenu(title, selectedField -> {
-            if (isSingle) {
-                new EditTestCaseUI().show(selectedItems.getFirst(), selectedField, dto -> updatedItems.accept(selectedItems));
-            } else {
-                switch (selectedField) {
-                    case PRIORITY -> new PriorityBulkEditor().show(selectedItems, updatedItems);
-                    case TITLE -> new TitleBulkEditor().show(selectedItems, updatedItems);
-                    case EXPECTED -> new ExpectedBulkEditor().show(selectedItems, updatedItems);
-                    case STEPS -> new StepsBulkEditor().show(selectedItems, updatedItems);
-                    case GROUPS -> new GroupsBulkEditor().show(selectedItems, updatedItems);
-                    default ->
-                            System.out.println("Selected: " + selectedField.getLabel() + " (Not supported for bulk)");
-                }
-            }
+    public void show(final List<TestCaseDto> items, final Consumer<List<TestCaseDto>> updatedItems) {
+        boolean isSingle = items.size() == 1;
+        String title = isSingle ? "Edit Test Case" : "Edit " + items.size() + " Test Cases";
+        showMenu(title, field -> {
+            if (isSingle)
+                new EditTestCaseUI().show(items.getFirst(), field, tc -> updatedItems.accept(items));
+            else
+                field.getBulkAction().show(items, updatedItems);
         });
     }
 
     private void showMenu(String title, Consumer<EditField> onSelection) {
-        EditField[] editableFields = Arrays.stream(EditField.values())
-                .filter(EditField::isEditMenuItem)
-                .toArray(EditField[]::new);
+        EditField[] fields = Arrays.stream(EditField.values()).filter(EditField::isEditMenuItem).toArray(EditField[]::new);
+        JBList<EditField> list = buildMenuList(fields);
+        JBPopup popup = buildPopup(title, list);
+        registerShortcuts(list, fields, popup, onSelection);
+        registerMouseClick(list, fields, popup, onSelection);
+        popup.showCenteredInCurrentWindow(Config.getProject());
+    }
 
-        JBList<EditField> list = new JBList<>(editableFields);
-        list.setBorder(JBUI.Borders.empty(4, 0));
+    @NotNull
+    private JBList<EditField> buildMenuList(EditField[] fields) {
+        JBList<EditField> list = new JBList<>(fields);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        if (editableFields.length > 0) list.setSelectedIndex(0);
+        list.setSelectedIndex(0);
+        list.setCellRenderer(createCellRenderer());
+        return list;
+    }
 
-        list.setCellRenderer(new ColoredListCellRenderer<>() {
+    @NotNull
+    private ColoredListCellRenderer<EditField> createCellRenderer() {
+        return new ColoredListCellRenderer<>() {
             @Override
-            protected void customizeCellRenderer(@NotNull JList<? extends EditField> list, EditField value, int index, boolean selected, boolean hasFocus) {
-                if (value.getIcon() != null) setIcon(value.getIcon());
-                append(value.getLabel());
-
-                String shortcutStr = value.getShortcutText();
-                char shortcut = shortcutStr.isEmpty() ? ' ' : shortcutStr.charAt(0);
-                if (shortcut != ' ') {
-                    append("   " + Character.toUpperCase(shortcut), SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                }
+            protected void customizeCellRenderer(@NotNull JList<? extends EditField> l, EditField val, int i, boolean sel, boolean focus) {
+                setIcon(val.getIcon());
+                append(val.getLabel());
+                append("   " + val.getShortcutText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
                 setBorder(JBUI.Borders.empty(6, 12));
             }
-        });
+        };
+    }
 
-        JBScrollPane scrollPane = new JBScrollPane(list);
-        scrollPane.setBorder(JBUI.Borders.empty());
-
-        JBPopup popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(scrollPane, list)
+    private JBPopup buildPopup(String title, JBList<EditField> list) {
+        return JBPopupFactory.getInstance()
+                .createComponentPopupBuilder(new JBScrollPane(list), list)
                 .setTitle(title)
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(true)
                 .setMovable(false)
                 .createPopup();
+    }
 
-        list.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyTyped(KeyEvent e) {
-                char keyChar = Character.toLowerCase(e.getKeyChar());
-                for (EditField item : editableFields) {
-                    String shortcutStr = item.getShortcutText();
-                    char shortcut = shortcutStr.isEmpty() ? ' ' : shortcutStr.charAt(0);
-                    if (shortcut != ' ' && Character.toLowerCase(shortcut) == keyChar) {
-                        onSelection.accept(item);
-                        popup.cancel();
-                        e.consume();
-                        return;
-                    }
-                }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    if (list.getSelectedValue() != null) {
-                        onSelection.accept(list.getSelectedValue());
+    private void registerShortcuts(JBList<EditField> list, EditField[] fields, JBPopup popup, Consumer<EditField> onSelection) {
+        for (EditField f : fields) {
+            if (f.getShortcut() != null) {
+                new DumbAwareAction() {
+                    @Override
+                    public void actionPerformed(@NotNull AnActionEvent e) {
+                        onSelection.accept(f);
                         popup.closeOk(null);
                     }
-                    e.consume();
-                } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    popup.cancel();
-                    e.consume();
+                }.registerCustomShortcutSet(f.getShortcut().getShortcut(), list);
+            }
+        }
+
+        // Enter
+        new DumbAwareAction() {
+            @Override
+            public void actionPerformed(@NotNull AnActionEvent e) {
+                if (list.getSelectedValue() != null) {
+                    onSelection.accept(list.getSelectedValue());
+                    popup.closeOk(null);
                 }
             }
-        });
+        }.registerCustomShortcutSet(CommonShortcuts.ENTER, list);
+    }
 
+    private void registerMouseClick(JBList<EditField> list, EditField[] fields, JBPopup popup, Consumer<EditField> onSelection) {
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1 || e.getClickCount() == 2) {
-                    int clickedIndex = list.locationToIndex(e.getPoint());
-                    if (clickedIndex >= 0) {
-                        onSelection.accept(editableFields[clickedIndex]);
-                        popup.closeOk(null);
-                    }
+                int idx = list.locationToIndex(e.getPoint());
+                if (idx >= 0) {
+                    onSelection.accept(fields[idx]);
+                    popup.closeOk(null);
                 }
             }
         });
-
-        popup.showCenteredInCurrentWindow(Config.getProject());
     }
 }
