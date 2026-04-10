@@ -33,7 +33,7 @@ public class Id extends BaseDetails {
 
     @Override
     public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
-        JBLabel idBadge = new JBLabel(dto.getId()) {
+        JBLabel idBadge = new JBLabel(dto.getId().toString()) {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
@@ -57,7 +57,7 @@ public class Id extends BaseDetails {
         copyIcon.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                CopyPasteManager.getInstance().setContents(new StringSelection(dto.getId()));
+                CopyPasteManager.getInstance().setContents(new StringSelection(dto.getId().toString()));
                 copyIcon.setIcon(AllIcons.General.InspectionsOK);
                 Timer timer = new Timer(COPY_SUCCESS_DELAY_MS, evt -> copyIcon.setIcon(AllIcons.Actions.Copy));
                 timer.setRepeats(false);

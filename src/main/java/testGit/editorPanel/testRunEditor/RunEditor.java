@@ -48,9 +48,8 @@ public class RunEditor {
                 );
                 virtualFile.setMetadata(metadata);
 
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    FileEditorManager.getInstance(Config.getProject()).openFile(virtualFile, true);
-                });
+                ApplicationManager.getApplication().invokeLater(() ->
+                        FileEditorManager.getInstance(Config.getProject()).openFile(virtualFile, true));
 
             } catch (IOException e) {
                 System.err.println("Failed to open Test Run: " + e.getMessage());
@@ -73,17 +72,16 @@ public class RunEditor {
             );
             virtualFile.setMetadata(metadata);
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                FileEditorManager.getInstance(Config.getProject()).openFile(virtualFile, true);
-            });
+            ApplicationManager.getApplication().invokeLater(() ->
+                    FileEditorManager.getInstance(Config.getProject()).openFile(virtualFile, true));
         });
     }
 
     private static List<TestCaseDto> loadTestCasesForRun(TestRunDto metadata, ProjectPanel projectPanel) {
         if (metadata.getResults() == null) return Collections.emptyList();
 
-        Set<String> targetIds = metadata.getResults().stream()
-                .map(item -> item.getTestCaseId().toString())
+        Set<UUID> targetIds = metadata.getResults().stream()
+                .map(TestRunDto.TestRunItems::getTestCaseId)
                 .collect(Collectors.toSet());
 
         Path testCasesRoot = projectPanel.getTestProjectSelector().getSelectedTestProject().getItem().getTestCasesDirectory().getPath();

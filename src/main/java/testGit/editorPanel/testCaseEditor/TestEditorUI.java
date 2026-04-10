@@ -47,7 +47,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     private List<TestCaseDto> allTestCaseDtos;
 
     @Getter
-    private Set<String> unsortedIds = new HashSet<>();
+    private Set<UUID> unsortedIds = new HashSet<>();
 
     @Getter
     @Setter
@@ -127,7 +127,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
             for (int i = 0; i < snapshot.size(); i++) {
                 TestCaseDto current = snapshot.get(i);
                 current.setIsHead(i == 0);
-                current.setNext(i < snapshot.size() - 1 ? UUID.fromString(snapshot.get(i + 1).getId()) : null);
+                current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
 
                 try {
                     Config.getMapper().writerWithDefaultPrettyPrinter()
@@ -265,18 +265,18 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
     public void sortAndIdentifyUnsorted() {
         if (allTestCaseDtos == null || allTestCaseDtos.isEmpty()) return;
-        java.util.Map<String, TestCaseDto> map = allTestCaseDtos.stream().collect(Collectors.toMap(TestCaseDto::getId, tc -> tc));
+        Map<UUID, TestCaseDto> map = allTestCaseDtos.stream().collect(Collectors.toMap(TestCaseDto::getId, tc -> tc));
         TestCaseDto head = allTestCaseDtos.stream().filter(tc -> Boolean.TRUE.equals(tc.getIsHead())).findFirst().orElse(null);
 
         List<TestCaseDto> sortedList = new ArrayList<>();
-        Set<String> sortedIds = new HashSet<>();
+        Set<UUID> sortedIds = new HashSet<>();
         unsortedIds.clear();
 
         TestCaseDto current = head;
         while (current != null && !sortedIds.contains(current.getId())) {
             sortedList.add(current);
             sortedIds.add(current.getId());
-            current = current.getNext() != null ? map.get(current.getNext().toString()) : null;
+            current = current.getNext() != null ? map.get(current.getNext()) : null;
         }
 
         for (TestCaseDto tc : allTestCaseDtos) {

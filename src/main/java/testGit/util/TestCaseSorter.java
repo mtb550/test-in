@@ -13,7 +13,7 @@ public class TestCaseSorter {
             return new ArrayList<>();
         }
 
-        Map<String, TestCaseDto> idMap = new HashMap<>();
+        Map<UUID, TestCaseDto> idMap = new HashMap<>();
         TestCaseDto head = null;
 
         for (TestCaseDto tc : unsortedList) {
@@ -31,7 +31,7 @@ public class TestCaseSorter {
         List<TestCaseDto> sortedList = new ArrayList<>();
         TestCaseDto current = head;
 
-        Set<String> visited = new HashSet<>();
+        Set<UUID> visited = new HashSet<>();
 
         while (current != null && !visited.contains(current.getId())) {
             sortedList.add(current);
@@ -39,7 +39,7 @@ public class TestCaseSorter {
 
             UUID nextUuid = current.getNext();
             if (nextUuid != null) {
-                current = idMap.get(nextUuid.toString());
+                current = idMap.get(nextUuid);
             } else {
                 current = null;
             }

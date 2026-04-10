@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 public class RemoveTestCase extends DumbAwareAction {
     private final DirectoryDto dir;
@@ -63,7 +62,7 @@ public class RemoveTestCase extends DumbAwareAction {
             }
         } else {
             TestCaseDto predecessor = model.getElementAt(firstIdx - 1);
-            predecessor.setNext(successor != null ? UUID.fromString(successor.getId()) : null);
+            predecessor.setNext(successor != null ? successor.getId() : null);
             saveToFile(predecessor);
         }
 

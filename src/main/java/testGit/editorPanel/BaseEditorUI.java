@@ -10,6 +10,7 @@ import testGit.viewPanel.ViewToolWindowFactory;
 import javax.swing.*;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public interface BaseEditorUI extends Disposable {
     StatusBar getStatusBar();
@@ -46,7 +47,7 @@ public interface BaseEditorUI extends Disposable {
 
     void selectTestCase(TestCaseDto tc);
 
-    Set<String> getUnsortedIds();
+    Set<UUID> getUnsortedIds();
 
     String getHoveredIconAction();
 

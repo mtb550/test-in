@@ -24,8 +24,7 @@ public class TestCaseDto {
 
     private Boolean isHead;
 
-    /// change this to UUID
-    private String id;
+    private UUID id;
 
     ///  change to name or description to match the testng
     private String title;

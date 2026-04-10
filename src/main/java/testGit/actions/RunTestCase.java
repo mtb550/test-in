@@ -7,9 +7,9 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
-import testGit.util.runner.TestNGRunnerByMethod;
 import testGit.util.Tools;
 import testGit.util.notifications.Notifier;
+import testGit.util.runner.TestNGRunnerByMethod;
 
 public class RunTestCase extends DumbAwareAction {
     private final JBList<TestCaseDto> list;

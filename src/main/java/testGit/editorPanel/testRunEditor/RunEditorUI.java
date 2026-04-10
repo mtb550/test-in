@@ -41,7 +41,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     private final UnifiedVirtualFile vf;
     private final List<TestCaseDto> initialTestCaseDtos;
-    private final Set<String> initialTestCaseIds;
+    private final Set<UUID> initialTestCaseIds;
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
 
     private JBList<TestCaseDto> list;
@@ -68,6 +68,13 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         this.vf = vf;
         this.metadata = vf.getMetadata();
         this.currentFile = vf;
+
+        if (this.metadata != null && this.metadata.getResults() != null) {
+            this.resultsMap = this.metadata.getResults().stream()
+                    .collect(Collectors.toMap(TestRunDto.TestRunItems::getTestCaseId, item -> item));
+        } else {
+            this.resultsMap = new HashMap<>();
+        }
 
         List<TestCaseDto> cases = vf.getTestCaseDtos() != null ? vf.getTestCaseDtos() : Collections.emptyList();
         this.initialTestCaseDtos = TestCaseSorter.sortTestCases(cases);
@@ -323,7 +330,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
     private void collectCheckedItems(CheckedTreeNode node, List<TestRunDto.TestRunItems> items) {
         if (node.getUserObject() instanceof TestCaseDto tc && node.isChecked()) {
             TestRunDto.TestRunItems item = new TestRunDto.TestRunItems();
-            item.setTestCaseId(UUID.fromString(tc.getId()));
+            item.setTestCaseId(tc.getId());
             item.setStatus("PENDING");
             Object rootObj = ((DefaultMutableTreeNode) node.getRoot()).getUserObject();
             item.setProject(rootObj instanceof DirectoryDto d ? d.getName() : String.valueOf(rootObj));
@@ -334,10 +341,10 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
         }
     }
 
-    private TestRunDto.TestRunItems findResultFor(String testCaseId) {
+    private TestRunDto.TestRunItems findResultFor(UUID testCaseId) {
         if (resultsMap == null) return null;
         try {
-            return resultsMap.get(UUID.fromString(testCaseId));
+            return resultsMap.get(testCaseId);
         } catch (IllegalArgumentException e) {
             return null;
         }
@@ -380,7 +387,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
     }
 
     @Override
-    public Set<String> getUnsortedIds() {
+    public Set<UUID> getUnsortedIds() {
         return Collections.emptySet();
     }
 }

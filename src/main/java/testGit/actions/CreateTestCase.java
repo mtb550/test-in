@@ -39,12 +39,12 @@ public class CreateTestCase extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         new CreateTestCaseUI().show(newTc -> {
-            newTc.setId(UUID.randomUUID().toString());
+            newTc.setId(UUID.randomUUID());
 
             boolean isEmpty = model.isEmpty();
             newTc.setIsHead(isEmpty);
             TestCaseDto lastTc = isEmpty ? null : model.getElementAt(model.getSize() - 1);
-            if (lastTc != null) lastTc.setNext(UUID.fromString(newTc.getId()));
+            if (lastTc != null) lastTc.setNext(newTc.getId());
 
             if (ui != null) ui.appendNewTestCase(newTc);
             else model.add(newTc);

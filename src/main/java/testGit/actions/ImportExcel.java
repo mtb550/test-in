@@ -123,7 +123,7 @@ public class ImportExcel extends DumbAwareAction {
                 }
 
                 TestCaseDto testCaseDto = new TestCaseDto();
-                String generatedUuid = UUID.randomUUID().toString();
+                UUID generatedUuid = UUID.randomUUID();
 
                 testCaseDto.setId(generatedUuid);
                 testCaseDto.setTitle(title);
