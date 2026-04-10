@@ -10,8 +10,8 @@ import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.TestCase.TestCaseUpdateMenu;
 import testGit.util.KeyboardSet;
-import testGit.util.Services.TestCaseCacheService;
-import testGit.util.Services.TestCasePersistService;
+import testGit.util.services.TestCaseCacheService;
+import testGit.util.services.TestCasePersistService;
 import testGit.viewPanel.ViewPanel;
 import testGit.viewPanel.ViewToolWindowFactory;
 

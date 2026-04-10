@@ -1,4 +1,4 @@
-package testGit.util.Runner;
+package testGit.util.runner;
 
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsAdapter;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener;

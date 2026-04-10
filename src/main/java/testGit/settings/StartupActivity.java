@@ -3,7 +3,7 @@ package testGit.settings;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
-import testGit.util.Runner.TestCaseExecutionTracker;
+import testGit.util.runner.TestCaseExecutionTracker;
 
 import java.nio.file.Path;
 import java.util.Optional;

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
-import testGit.util.Services.TestCaseCacheService;
+import testGit.util.services.TestCaseCacheService;
 
 import javax.swing.*;
 import java.awt.*;
