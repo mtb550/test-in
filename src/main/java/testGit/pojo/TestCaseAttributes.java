@@ -1,36 +1,40 @@
 package testGit.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public enum TestCaseAttributes {
-    id,
 
-    title,
+    ID("ID"),
 
-    expected,
+    TITLE("Title"),
 
-    steps,
+    EXPECTED_RESULT("Expected Result"),
 
-    priority,
+    STEPS("Steps"),
 
-    autoRef,
+    PRIORITY("Priority"),
 
-    busiRef,
+    AUTO_REF("Automation Referrence"),
 
-    groups,
+    BUSI_REF("Business Referrence"),
 
-    createBy,
+    GROUPS("Groups"),
 
-    updateBy,
+    CREATE_BY("Created By"),
 
-    createAt,
+    UPDATE_BY("Updated By"),
 
-    updateAt,
+    CREATE_AT("Created At"),
 
-    module,
+    UPDATE_AT("Updated At"),
 
-    tempStatus,
+    MODULE("Module"),
 
-    tempError,
+    APPROVAL_STATUS("Approval Status");
+
+
+    private final String displayName;
 }

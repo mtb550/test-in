@@ -24,7 +24,7 @@ public class ToolBar extends JBPanel<ToolBar> {
     private final SearchTextField searchField = new SearchTextField();
     private final JButton detailsButton;
 
-    public ToolBar(ToolBarCallback callbacks) {
+    public ToolBar(final ToolBarCallback callbacks) {
         super(new FlowLayout(FlowLayout.LEFT, JBUI.scale(5), JBUI.scale(2)));
         this.settings = new ToolBarSettings();
 
@@ -66,19 +66,17 @@ public class ToolBar extends JBPanel<ToolBar> {
     }
 
     private void updateDetailsButtonState() {
-
         int activeFiltersCount = settings.getSelectedDetails().size() + settings.getSelectedGroups().size();
         if (activeFiltersCount == 0) {
             detailsButton.setText("Details");
             detailsButton.setForeground(JBColor.foreground());
-
         } else {
             detailsButton.setText("Details (" + activeFiltersCount + ")");
             detailsButton.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
         }
     }
 
-    private JButton createToolbarButton(String text, Icon icon) {
+    private JButton createToolbarButton(final String text, final Icon icon) {
         JButton btn = new JButton(text, icon);
         btn.setFocusable(false);
         btn.setBorderPainted(false);

@@ -4,6 +4,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import lombok.Getter;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
+import testGit.pojo.TestCaseAttributes;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -13,8 +14,19 @@ import java.util.stream.Collectors;
 
 @Getter
 public class ToolBarSettings {
-    private static final String KEY_DETAILS = "testGit.selectedDetails";
-    private static final String DEFAULT_DETAILS = "ID,Module,Expected Result,Steps,Automation Ref,Business Ref,Priority,Groups";
+    private static final String KEY_DETAILS = "testGit.selectedDetails.v2";
+
+    ///  to be implemented, use dynamic
+    private static final String DEFAULT_DETAILS = String.join(",",
+            TestCaseAttributes.ID.name(),
+            TestCaseAttributes.MODULE.name(),
+            TestCaseAttributes.EXPECTED_RESULT.name(),
+            TestCaseAttributes.STEPS.name(),
+            TestCaseAttributes.AUTO_REF.name(),
+            TestCaseAttributes.BUSI_REF.name(),
+            TestCaseAttributes.PRIORITY.name(),
+            TestCaseAttributes.GROUPS.name()
+    );
 
     private final Set<Groups> selectedGroups = new HashSet<>();
     private final Set<String> selectedDetails = new HashSet<>();
@@ -28,11 +40,11 @@ public class ToolBarSettings {
     }
 
     public boolean isShowPriorityBadge() {
-        return selectedDetails.contains("Priority");
+        return selectedDetails.contains(TestCaseAttributes.PRIORITY.name());
     }
 
     public boolean isShowGroupsBadge() {
-        return selectedDetails.contains("Groups");
+        return selectedDetails.contains(TestCaseAttributes.GROUPS.name());
     }
 
     public Set<String> getSelectedPriorityFilters() {

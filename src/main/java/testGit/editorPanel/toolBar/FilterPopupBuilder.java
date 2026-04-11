@@ -9,24 +9,32 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
+import testGit.pojo.TestCaseAttributes;
 
 import javax.swing.*;
 import java.util.Set;
 
 public class FilterPopupBuilder {
-
-    public static void showDetailsPopup(JButton anchor, Set<String> selectedDetails, Set<Groups> selectedGroups, Runnable onChange) {
+    /// to be implemented, change Runnable to Consumer
+    public static void showDetailsPopup(final JButton anchor, final Set<String> selectedDetails, final Set<Groups> selectedGroups, final Runnable onChange) {
         DefaultActionGroup actionGroup = new DefaultActionGroup();
 
-        String[] standardOptions = {"ID", "Module", "Expected Result", "Steps", "Automation Ref", "Business Ref"};
-        for (String option : standardOptions) {
-            actionGroup.add(createCheckboxAction(option, option, null, selectedDetails, onChange));
+        ///  to be implemented, standardOptions to be in enum @{@link TestCaseAttributes}
+        TestCaseAttributes[] standardOptions = {
+                TestCaseAttributes.ID, TestCaseAttributes.MODULE,
+                TestCaseAttributes.EXPECTED_RESULT, TestCaseAttributes.STEPS,
+                TestCaseAttributes.AUTO_REF, TestCaseAttributes.BUSI_REF
+        };
+
+        for (TestCaseAttributes option : standardOptions) {
+            actionGroup.add(createCheckboxAction(option.getDisplayName(), option.name(), null, selectedDetails, onChange));
         }
 
         actionGroup.addSeparator();
 
-        DefaultActionGroup priorityMenu = new DefaultActionGroup("Priority", true);
-        priorityMenu.add(createCheckboxAction("Show Priority Badge", "Priority", null, selectedDetails, onChange));
+        DefaultActionGroup priorityMenu = new DefaultActionGroup(TestCaseAttributes.PRIORITY.getDisplayName(), true);
+        priorityMenu.add(createCheckboxAction("Show " + TestCaseAttributes.PRIORITY.getDisplayName() + " Badge",
+                TestCaseAttributes.PRIORITY.name(), null, selectedDetails, onChange));
         priorityMenu.addSeparator();
 
         for (Priority p : Priority.values()) {
@@ -36,8 +44,9 @@ public class FilterPopupBuilder {
 
         actionGroup.add(priorityMenu);
 
-        DefaultActionGroup groupsMenu = new DefaultActionGroup("Groups", true);
-        groupsMenu.add(createCheckboxAction("Show Groups Badge", "Groups", null, selectedDetails, onChange));
+        DefaultActionGroup groupsMenu = new DefaultActionGroup(TestCaseAttributes.GROUPS.getDisplayName(), true);
+        groupsMenu.add(createCheckboxAction("Show " + TestCaseAttributes.GROUPS.getDisplayName() + " Badge",
+                TestCaseAttributes.GROUPS.name(), null, selectedDetails, onChange));
         groupsMenu.addSeparator();
 
         for (Groups g : Groups.values()) {
@@ -65,7 +74,7 @@ public class FilterPopupBuilder {
         showActionPopup(anchor, actionGroup);
     }
 
-    private static CheckboxAction createCheckboxAction(String title, String key, Icon icon, Set<String> selectedDetails, Runnable onChange) {
+    private static CheckboxAction createCheckboxAction(final String title, final String key, final Icon icon, final Set<String> selectedDetails, final Runnable onChange) {
         CheckboxAction action = new CheckboxAction(title) {
             @Override
             public boolean isSelected(@NotNull AnActionEvent e) {
@@ -93,7 +102,7 @@ public class FilterPopupBuilder {
         return action;
     }
 
-    private static void showActionPopup(JButton anchor, DefaultActionGroup actionGroup) {
+    private static void showActionPopup(final JButton anchor, final DefaultActionGroup actionGroup) {
         JBPopupFactory.getInstance()
                 .createActionGroupPopup(
                         null,
