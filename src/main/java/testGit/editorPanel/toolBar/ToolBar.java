@@ -69,15 +69,6 @@ public class ToolBar extends JBPanel<ToolBar> {
         });
         add(showGroupsCheck);
 
-        JCheckBox showPriorityCheck = new JCheckBox("Show Priority", settings.isShowPriority());
-        showPriorityCheck.setOpaque(false);
-        showPriorityCheck.addActionListener(e -> {
-            settings.setShowPriority(showPriorityCheck.isSelected());
-            settings.save();
-            callbacks.onFilterChanged();
-        });
-        add(showPriorityCheck);
-
         updateGroupButtonState();
         updateDetailsButtonState();
     }

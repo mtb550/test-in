@@ -41,8 +41,16 @@ public class FilterPopupBuilder {
     }
 
     public static void showDetailsPopup(JButton anchor, Set<String> selectedDetails, Runnable onChange) {
-        List<String> detailOptions = List.of("ID", "Module", "Expected Result", "Steps", "Automation Ref", "Business Ref");
-        JBList<String> detailsList = new JBList<>(detailOptions);
+        JBList<String> detailsList = new JBList<>(
+                List.of("ID",
+                        "Module",
+                        "Expected Result",
+                        "Steps",
+                        "Automation Ref",
+                        "Business Ref",
+                        "Priority"
+                )
+        );
         setupListUI(detailsList);
 
         detailsList.setCellRenderer((list, value, index, isSelected, cellHasFocus) ->
