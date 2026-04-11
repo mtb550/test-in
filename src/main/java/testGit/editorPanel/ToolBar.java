@@ -40,6 +40,7 @@ public class ToolBar extends JBPanel<ToolBar> {
     @Getter
     private final Set<String> selectedDetails = new HashSet<>();
     // --- Widgets ---
+    private final JButton refreshButton;
     @Getter
     private final SearchTextField searchField = new SearchTextField();
     private final JButton groupButton;
@@ -63,6 +64,11 @@ public class ToolBar extends JBPanel<ToolBar> {
         showPriority = props.getBoolean(KEY_SHOW_PRIORITY, true);
         String saved = props.getValue(KEY_DETAILS, DEFAULT_DETAILS);
         if (!saved.isEmpty()) selectedDetails.addAll(List.of(saved.split(",")));
+
+        // --- Refresh button ---
+        refreshButton = createToolbarButton("Refresh", AllIcons.Actions.Refresh);
+        refreshButton.addActionListener(e -> callbacks.onRefresh());
+        add(refreshButton);
 
         // --- Group filter button ---
         groupButton = createToolbarButton("Groups", AllIcons.Actions.GroupBy);
@@ -248,18 +254,13 @@ public class ToolBar extends JBPanel<ToolBar> {
         props.setValue(KEY_DETAILS, String.join(",", selectedDetails));
     }
 
-    /**
-     * Implemented by the owning editor to react to header state changes.
-     */
+
     public interface Callbacks {
-        /**
-         * Called when group filter, details filter, or search text changes — editor should re-filter and repaint.
-         */
+
         void onFilterChanged();
 
-        /**
-         * Called when the details selection changes — editor should also force a cell-renderer refresh.
-         */
         void onDetailsChanged();
+
+        void onRefresh();
     }
 }

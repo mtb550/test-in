@@ -13,12 +13,12 @@ import testGit.editorPanel.testRunEditor.RunEditorUI;
 public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
 
     @Override
-    public boolean accept(@NotNull Project project, @NotNull VirtualFile file) {
+    public boolean accept(final @NotNull Project project, final @NotNull VirtualFile file) {
         return file instanceof UnifiedVirtualFile vf && vf.isValid();
     }
 
     @Override
-    public @NotNull FileEditor createEditor(@NotNull Project project, @NotNull VirtualFile file) {
+    public @NotNull FileEditor createEditor(final @NotNull Project project, final @NotNull VirtualFile file) {
         if (file instanceof UnifiedVirtualFile unifiedFile) {
 
             BaseEditorUI ui;

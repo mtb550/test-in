@@ -36,7 +36,7 @@ public class TestMouseListener extends MouseAdapter {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(final MouseEvent e) {
         int index = list.locationToIndex(e.getPoint());
         boolean isClickOnItem = index >= 0 && list.getCellBounds(index, index).contains(e.getPoint());
 

@@ -27,14 +27,14 @@ public class FileType extends FakeFileType {
     private final String description;
     private final Icon icon;
 
-    private FileType(String name, String description, Icon icon) {
+    private FileType(final String name, final String description, final Icon icon) {
         this.name = name;
         this.description = description;
         this.icon = icon;
     }
 
     @Override
-    public boolean isMyFileType(@NotNull VirtualFile file) {
+    public boolean isMyFileType(final @NotNull VirtualFile file) {
         return false;
     }
 

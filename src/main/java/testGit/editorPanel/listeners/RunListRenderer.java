@@ -18,7 +18,7 @@ public class RunListRenderer implements ListCellRenderer<TestCaseDto> {
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends TestCaseDto> list, TestCaseDto tc, int index, boolean isSelected, boolean cellHasFocus) {
+    public Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
         int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
 
         rendererCard.updateData(globalIndex, tc, ui.isShowGroups(), ui.isShowPriority(), ui.getSelectedDetails());

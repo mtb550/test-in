@@ -19,12 +19,20 @@ public class TestSessionCache {
     @Setter
     private CacheListener listener;
 
+    private volatile boolean isDisposed = false;
+
     public TestSessionCache(final Path directoryPath) {
         this.directoryPath = directoryPath;
     }
 
     public List<TestCaseDto> getLoadedItems() {
         return new ArrayList<>(loadedItems);
+    }
+
+    public void dispose() {
+        isDisposed = true;
+        loadedItems.clear();
+        listener = null;
     }
 
     public void startLoadingAsync() {
@@ -36,6 +44,8 @@ public class TestSessionCache {
                 paths.filter(Files::isRegularFile)
                         .filter(p -> p.toString().endsWith(".json"))
                         .forEach(filePath -> {
+                            if (isDisposed) return;
+
                             try {
                                 TestCaseDto tc = Config.getMapper().readValue(filePath.toFile(), TestCaseDto.class);
                                 if (tc != null) {
@@ -46,33 +56,39 @@ public class TestSessionCache {
                                         List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
                                         batch.clear();
 
-                                        if (listener != null) {
-                                            ApplicationManager.getApplication().invokeLater(() ->
-                                                    listener.onItemsLoaded(itemsToSend));
+                                        if (listener != null && !isDisposed) {
+                                            ApplicationManager.getApplication().invokeLater(() -> {
+                                                if (!isDisposed && listener != null) {
+                                                    listener.onItemsLoaded(itemsToSend);
+                                                }
+                                            });
                                         }
                                     }
                                 }
-                            } catch (Exception ignored) {}
+                            } catch (Exception ignored) {
+                            }
                         });
 
-                if (!batch.isEmpty() && listener != null) {
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            listener.onItemsLoaded(batch));
+                if (!batch.isEmpty() && listener != null && !isDisposed) {
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (!isDisposed && listener != null) listener.onItemsLoaded(batch);
+                    });
                 }
 
             } catch (Exception e) {
-                e.printStackTrace(System.out);
+                if (!isDisposed) e.printStackTrace(System.out);
             }
 
-            if (listener != null) {
-                ApplicationManager.getApplication().invokeLater(() ->
-                        listener.onLoadComplete(getLoadedItems()));
+            if (listener != null && !isDisposed) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!isDisposed && listener != null) listener.onLoadComplete(getLoadedItems());
+                });
             }
         });
     }
 
     public interface CacheListener {
-        void onItemsLoaded(List<TestCaseDto> items);
-        void onLoadComplete(List<TestCaseDto> allItems);
+        void onItemsLoaded(final List<TestCaseDto> items);
+        void onLoadComplete(final List<TestCaseDto> allItems);
     }
 }

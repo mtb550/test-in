@@ -16,17 +16,17 @@ public class TransferListener extends TransferHandler {
     private final BaseEditorUI ui;
     private int[] draggedIndices;
 
-    public TransferListener(BaseEditorUI ui) {
+    public TransferListener(final BaseEditorUI ui) {
         this.ui = ui;
     }
 
     @Override
-    public int getSourceActions(JComponent c) {
+    public int getSourceActions(final JComponent c) {
         return MOVE;
     }
 
     @Override
-    protected Transferable createTransferable(JComponent c) {
+    protected Transferable createTransferable(final JComponent c) {
         if (!(c instanceof JList<?> rawList)) return null;
 
         draggedIndices = rawList.getSelectedIndices();
@@ -55,12 +55,12 @@ public class TransferListener extends TransferHandler {
     }
 
     @Override
-    public boolean canImport(TransferSupport support) {
+    public boolean canImport(final TransferSupport support) {
         return support.isDataFlavorSupported(FLAVOR);
     }
 
     @Override
-    public boolean importData(TransferSupport support) {
+    public boolean importData(final TransferSupport support) {
         try {
             Object data = support.getTransferable().getTransferData(FLAVOR);
             if (!(data instanceof List<?> rawList)) return false;
@@ -82,24 +82,26 @@ public class TransferListener extends TransferHandler {
             }
 
             List<TestCaseDto> allItems = ui.getAllTestCaseDtos();
-
-            int shift = 0;
-            for (int globalDraggedIndex : globalDraggedIndices) {
-                if (globalDraggedIndex < insertAtGlobal) shift++;
-            }
-            insertAtGlobal -= shift;
-
             List<TestCaseDto> itemsToMove = new ArrayList<>();
-            for (int i = globalDraggedIndices.length - 1; i >= 0; i--) {
-                itemsToMove.add(0, allItems.remove(globalDraggedIndices[i]));
-            }
 
-            allItems.addAll(insertAtGlobal, itemsToMove);
+            synchronized (allItems) {
+                int shift = 0;
+                for (int globalDraggedIndex : globalDraggedIndices) {
+                    if (globalDraggedIndex < insertAtGlobal) shift++;
+                }
+                insertAtGlobal -= shift;
+
+                for (int i = globalDraggedIndices.length - 1; i >= 0; i--) {
+                    itemsToMove.addFirst(allItems.remove(globalDraggedIndices[i]));
+                }
+
+                allItems.addAll(insertAtGlobal, itemsToMove);
+            }
 
             ui.updateSequenceAndSaveAll();
 
             if (!itemsToMove.isEmpty()) {
-                ui.selectTestCase(itemsToMove.get(0));
+                ui.selectTestCase(itemsToMove.getFirst());
             } else {
                 ui.refreshView();
             }

@@ -4,7 +4,7 @@ import testGit.editorPanel.BaseEditorUI;
 
 public class StatusBarListener {
 
-    public static void attach(BaseEditorUI ui) {
+    public static void attach(final BaseEditorUI ui) {
         ui.getStatusBar().getFirstButton().addActionListener(e -> {
             ui.setCurrentPage(1);
             ui.refreshView();

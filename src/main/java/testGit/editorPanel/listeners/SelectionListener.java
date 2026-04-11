@@ -24,7 +24,7 @@ public class SelectionListener implements ListSelectionListener {
     }
 
     @Override
-    public void valueChanged(ListSelectionEvent e) {
+    public void valueChanged(final ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
             List<TestCaseDto> selected = list.getSelectedValuesList();
 

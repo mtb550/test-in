@@ -38,7 +38,7 @@ public class TestRunMetadataHeader {
         ));
     }
 
-    public void applyToMetadata(TestRunDto metadata) {
+    public void applyToMetadata(final TestRunDto metadata) {
         if (metadata == null) return;
         metadata.setBuildNumber(buildNumberField.getText().trim());
         metadata.setPlatform((String) platformCombo.getSelectedItem());
@@ -51,11 +51,7 @@ public class TestRunMetadataHeader {
         return !buildNumberField.getText().trim().isEmpty();
     }
 
-    public JComponent getPreferredFocusedComponent() {
-        return buildNumberField;
-    }
-
-    public void setRunNameDisabled(String name) {
+    public void setRunNameDisabled(final String name) {
         buildNumberField.setText(name);
         buildNumberField.setEditable(false);
         buildNumberField.setEnabled(false);

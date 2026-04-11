@@ -56,8 +56,4 @@ public class UnifiedVirtualFile extends LightVirtualFile {
         return directoryDto instanceof TestSetDirectoryDto ? (TestSetDirectoryDto) directoryDto : null;
     }
 
-    public TestRunDirectoryDto getTestRunPkg() {
-        return directoryDto instanceof TestRunDirectoryDto ? (TestRunDirectoryDto) directoryDto : null;
-    }
-
 }

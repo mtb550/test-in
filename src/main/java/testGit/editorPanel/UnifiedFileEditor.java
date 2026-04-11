@@ -15,7 +15,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     private final BaseEditorUI ui;
     private final UnifiedVirtualFile vf;
 
-    public UnifiedFileEditor(UnifiedVirtualFile vf, BaseEditorUI ui) {
+    public UnifiedFileEditor(final UnifiedVirtualFile vf, final BaseEditorUI ui) {
         this.vf = vf;
         this.ui = ui;
     }
@@ -56,14 +56,14 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     }
 
     @Override
-    public void addPropertyChangeListener(@NotNull PropertyChangeListener l) {
+    public void addPropertyChangeListener(final @NotNull PropertyChangeListener l) {
     }
 
     @Override
-    public void removePropertyChangeListener(@NotNull PropertyChangeListener l) {
+    public void removePropertyChangeListener(final @NotNull PropertyChangeListener l) {
     }
 
     @Override
-    public void setState(@NotNull FileEditorState state) {
+    public void setState(final @NotNull FileEditorState state) {
     }
 }

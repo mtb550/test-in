@@ -18,7 +18,9 @@ import javax.swing.tree.DefaultTreeModel;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class RunEditor {
@@ -71,44 +73,6 @@ public class RunEditor {
             ApplicationManager.getApplication().invokeLater(() ->
                     FileEditorManager.getInstance(Config.getProject()).openFile(virtualFile, true));
         });
-    }
-
-    public static List<TestCaseDto> loadTestCasesForRun(final TestRunDto metadata) {
-        if (metadata.getTestCase() == null || metadata.getTestCase().isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        List<TestCaseDto> cases = Collections.synchronizedList(new ArrayList<>());
-
-        for (TestRunDto.TestCase tcPathObj : metadata.getTestCase()) {
-            Path dirPath = tcPathObj.getPath();
-            List<UUID> targetIds = tcPathObj.getUuid();
-
-            if (dirPath == null || !Files.exists(dirPath) || targetIds == null || targetIds.isEmpty()) {
-                continue;
-            }
-
-            Set<UUID> idsToFind = new HashSet<>(targetIds);
-
-            try (Stream<Path> paths = Files.list(dirPath)) {
-                paths.filter(Files::isRegularFile)
-                        .filter(p -> p.toString().endsWith(".json"))
-                        .parallel()
-                        .forEach(p -> {
-                            try {
-                                TestCaseDto tc = Config.getMapper().readValue(p.toFile(), TestCaseDto.class);
-                                if (tc.getId() != null && idsToFind.contains(tc.getId())) {
-                                    cases.add(tc);
-                                }
-                            } catch (Exception ignored) {
-                            }
-                        });
-            } catch (IOException e) {
-                System.err.println("Failed to load test cases from specific path " + dirPath + ": " + e.getMessage());
-            }
-        }
-
-        return cases;
     }
 
     private static DefaultMutableTreeNode buildDirectoryTree(final Path folder, final boolean isRoot) {

@@ -48,6 +48,8 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     @Getter
     private final List<TestCaseDto> allTestCaseDtos;
 
+    private TestSessionCache sessionCache;
+
     @Getter
     private Set<UUID> unsortedIds;
 
@@ -127,7 +129,7 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
     }
 
     private void loadDataAsync() {
-        TestSessionCache sessionCache = new TestSessionCache(vf.getTestSet().getPath());
+        this.sessionCache = new TestSessionCache(vf.getTestSet().getPath());
 
         sessionCache.setListener(new TestSessionCache.CacheListener() {
 
@@ -163,13 +165,18 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
 
         sessionCache.startLoadingAsync();
     }
+
     private void onDataSynced() {
         sortAndIdentifyUnsorted();
         refreshView();
     }
 
     public void updateSequenceAndSaveAll() {
-        List<TestCaseDto> snapshot = new ArrayList<>(this.allTestCaseDtos);
+        List<TestCaseDto> snapshot;
+        synchronized (this.allTestCaseDtos) {
+            snapshot = new ArrayList<>(this.allTestCaseDtos);
+        }
+
         Path dirPath = vf.getTestSet().getPath();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -328,6 +335,9 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
         ///focusListener.disconnect();
         ///}
 
+        if (sessionCache != null)
+            sessionCache.dispose();
+
         TestCaseDto selectedInThisFile = list.getSelectedValue();
 
         ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
@@ -335,9 +345,27 @@ public class TestEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI
             viewer.hide(selectedInThisFile);
         }
 
+        if (allTestCaseDtos != null) allTestCaseDtos.clear();
+        if (unsortedIds != null) unsortedIds.clear();
+
         if (model != null && syncListener != null) model.removeListDataListener(syncListener);
         if (model != null) model.removeAll();
         if (mainPanel != null) mainPanel.removeAll();
+
         BaseEditorUI.super.dispose();
+    }
+
+    @Override
+    public void onRefresh() {
+        if (sessionCache != null)
+            sessionCache.dispose();
+
+        this.allTestCaseDtos.clear();
+        this.unsortedIds.clear();
+        this.model.removeAll();
+        this.list.setPaintBusy(true);
+        this.list.getEmptyText().setText("Refreshing...");
+
+        loadDataAsync();
     }
 }

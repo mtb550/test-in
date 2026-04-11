@@ -18,7 +18,7 @@ public class ModelSyncListener implements ListDataListener {
     @Setter
     private UpdateCallback onUpdateCallback;
 
-    public ModelSyncListener(TestEditorUI ui, CollectionListModel<TestCaseDto> model) {
+    public ModelSyncListener(final TestEditorUI ui, final CollectionListModel<TestCaseDto> model) {
         this.ui = ui;
         this.model = model;
     }
@@ -32,7 +32,7 @@ public class ModelSyncListener implements ListDataListener {
     }
 
     @Override
-    public void intervalAdded(ListDataEvent e) {
+    public void intervalAdded(final ListDataEvent e) {
         if (!active) return;
 
         int globalStart = (ui.getCurrentPage() - 1) * ui.getPageSize() + e.getIndex0();
@@ -59,21 +59,27 @@ public class ModelSyncListener implements ListDataListener {
     }
 
     @Override
-    public void intervalRemoved(ListDataEvent e) {
+    public void intervalRemoved(final ListDataEvent e) {
         if (!active) return;
 
         int globalStart = (ui.getCurrentPage() - 1) * ui.getPageSize();
-        int pageEnd = Math.min(globalStart + ui.getPageSize(), ui.getAllTestCaseDtos().size());
+        List<TestCaseDto> allItems = ui.getAllTestCaseDtos();
 
-        if (globalStart >= ui.getAllTestCaseDtos().size()) return;
+        if (globalStart >= allItems.size()) return;
 
-        List<TestCaseDto> pageInMaster = new ArrayList<>(ui.getAllTestCaseDtos().subList(globalStart, pageEnd));
+        int pageEnd = Math.min(globalStart + ui.getPageSize(), allItems.size());
+
+        List<TestCaseDto> pageInMaster;
+        synchronized (allItems) {
+            pageInMaster = new ArrayList<>(allItems.subList(globalStart, pageEnd));
+        }
+
         List<TestCaseDto> pageInModel = model.getItems();
 
         boolean changed = false;
         for (TestCaseDto tc : pageInMaster) {
             if (!pageInModel.contains(tc)) {
-                ui.getAllTestCaseDtos().remove(tc);
+                allItems.remove(tc);
                 changed = true;
             }
         }
@@ -88,7 +94,7 @@ public class ModelSyncListener implements ListDataListener {
     }
 
     @Override
-    public void contentsChanged(ListDataEvent e) {
+    public void contentsChanged(final ListDataEvent e) {
     }
 
     public interface UpdateCallback {

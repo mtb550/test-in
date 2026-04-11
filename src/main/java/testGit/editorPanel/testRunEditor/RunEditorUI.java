@@ -43,6 +43,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
     private final UnifiedVirtualFile vf;
     private final List<TestCaseDto> initialTestCaseDtos = new ArrayList<>();
     private final Set<UUID> initialTestCaseIds = new HashSet<>();
+    private RunSessionCache sessionCache;
 
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
 
@@ -86,7 +87,7 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
     }
 
     private void loadDataAsync() {
-        RunSessionCache sessionCache = new RunSessionCache(metadata);
+        this.sessionCache = new RunSessionCache(metadata);
 
         sessionCache.setListener(new RunSessionCache.CacheListener() {
             @Override
@@ -402,9 +403,14 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
 
     @Override
     public void dispose() {
+        if (sessionCache != null) {
+            sessionCache.dispose();
+        }
+
         initialTestCaseDtos.clear();
         initialTestCaseIds.clear();
         resultsMap.clear();
+        if (model != null) model.removeAll();
         if (mainPanel != null) mainPanel.removeAll();
         BaseEditorUI.super.dispose();
     }
@@ -439,5 +445,13 @@ public class RunEditorUI implements Disposable, ToolBar.Callbacks, BaseEditorUI 
     @Override
     public Set<UUID> getUnsortedIds() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public void onRefresh() {
+        if (list != null) {
+            list.revalidate();
+            list.repaint();
+        }
     }
 }

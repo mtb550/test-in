@@ -21,12 +21,12 @@ public class HoverListener extends MouseAdapter {
     private final JBList<TestCaseDto> list;
     private final BaseEditorUI ui;
 
-    public HoverListener(JBList<TestCaseDto> list, BaseEditorUI ui) {
+    public HoverListener(final JBList<TestCaseDto> list, final BaseEditorUI ui) {
         this.list = list;
         this.ui = ui;
     }
 
-    private String getActionAtPoint(int index, int xInCell, int yInCell, Rectangle bounds) {
+    private String getActionAtPoint(final int index, final int xInCell, final int yInCell, final Rectangle bounds) {
         if (index == -1) return null;
 
         if (yInCell <= JBUI.scale(45)) {
@@ -65,7 +65,7 @@ public class HoverListener extends MouseAdapter {
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(final MouseEvent e) {
         int index = list.locationToIndex(e.getPoint());
         if (index == -1) return;
 
@@ -88,7 +88,7 @@ public class HoverListener extends MouseAdapter {
     }
 
     @Override
-    public void mouseMoved(MouseEvent e) {
+    public void mouseMoved(final MouseEvent e) {
         int index = list.locationToIndex(e.getPoint());
         String currentAction = null;
 
@@ -134,7 +134,7 @@ public class HoverListener extends MouseAdapter {
     }
 
     @Override
-    public void mouseExited(MouseEvent e) {
+    public void mouseExited(final MouseEvent e) {
         if (ui.getHoveredIndex() != -1 || ui.getHoveredIconAction() != null) {
             ui.setHoveredIndex(-1);
             ui.setHoveredIconAction(null);

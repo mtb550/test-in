@@ -15,21 +15,18 @@ import java.awt.*;
 public class Shared {
     private static final int BADGE_RADIUS = 20;
 
-    private Shared() {
-    }
-
-    public static JBLabel createPriorityBadge(TestCaseDto tc) {
+    public static JBLabel createPriorityBadge(final TestCaseDto tc) {
         Color bg = tc.getPriority() != null ? tc.getPriority().getColor() : JBColor.GRAY;
         String name = tc.getPriority() != null ? tc.getPriority().name() : "UNKNOWN";
 
         return new RoundedBadge(name, bg);
     }
 
-    public static JBLabel createGroupBadge(Groups groupName) {
+    public static JBLabel createGroupBadge(final Groups groupName) {
         return new RoundedBadge(groupName.name(), JBColor.darkGray);
     }
 
-    public static void drawTitleActionIcons(Component c, Graphics g, int titleWidth, int y, String hoveredAction) {
+    public static void drawTitleActionIcons(final Component c, final Graphics g, final int titleWidth, final int y, final String hoveredAction) {
         int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
         float scaleFactor = 1.5f;
 
