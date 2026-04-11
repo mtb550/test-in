@@ -47,6 +47,7 @@ public class ToolBar extends JBPanel<ToolBar> {
             settings.save();
             updateDetailsButtonState();
             callbacks.onDetailsChanged();
+            callbacks.onFilterChanged();
         }));
         add(detailsButton);
 

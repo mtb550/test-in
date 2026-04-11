@@ -4,10 +4,13 @@ import com.intellij.ide.util.PropertiesComponent;
 import lombok.Getter;
 import lombok.Setter;
 import testGit.pojo.Groups;
+import testGit.pojo.Priority;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 public class ToolBarSettings {
@@ -31,8 +34,18 @@ public class ToolBarSettings {
         }
     }
 
-    public boolean isShowPriority() {
+    public boolean isShowPriorityBadge() {
         return selectedDetails.contains("Priority");
+    }
+
+    public Set<String> getSelectedPriorityFilters() {
+        Set<String> validPriorityKeys = Arrays.stream(Priority.values())
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+
+        return selectedDetails.stream()
+                .filter(validPriorityKeys::contains)
+                .collect(Collectors.toSet());
     }
 
     public void save() {

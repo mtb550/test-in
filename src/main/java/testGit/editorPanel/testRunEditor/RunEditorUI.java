@@ -353,7 +353,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     public boolean isShowPriority() {
-        return toolBar != null && toolBar.getSettings().isShowPriority();
+        return toolBar != null && toolBar.getSettings().isShowPriorityBadge();
     }
 
     public Set<String> getSelectedDetails() {

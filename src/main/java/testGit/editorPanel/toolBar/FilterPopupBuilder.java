@@ -1,100 +1,96 @@
 package testGit.editorPanel.toolBar;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.ex.CheckboxAction;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Groups;
+import testGit.pojo.Priority;
 
 import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
 import java.util.Set;
 
 public class FilterPopupBuilder {
 
     public static void showGroupPopup(JButton anchor, Set<Groups> selectedGroups, Runnable onChange) {
-        JBList<Groups> groupList = new JBList<>(Groups.values());
-        setupListUI(groupList);
+        DefaultActionGroup actionGroup = new DefaultActionGroup();
 
-        groupList.setCellRenderer((list, value, index, isSelected, cellHasFocus) ->
-                createCheckBoxRenderer(value.name(), selectedGroups.contains(value), list, isSelected));
+        for (Groups g : Groups.values()) {
+            actionGroup.add(new CheckboxAction(g.name()) {
+                @Override
+                public boolean isSelected(@NotNull AnActionEvent e) {
+                    return selectedGroups.contains(g);
+                }
 
-        groupList.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int index = groupList.locationToIndex(e.getPoint());
-                if (index >= 0) {
-                    Groups group = groupList.getModel().getElementAt(index);
-                    if (selectedGroups.contains(group)) selectedGroups.remove(group);
-                    else selectedGroups.add(group);
-
-                    groupList.repaint();
+                @Override
+                public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                    if (state) selectedGroups.add(g);
+                    else selectedGroups.remove(g);
                     if (onChange != null) onChange.run();
                 }
-            }
-        });
+            });
+        }
 
-        showPopup(anchor, groupList);
+        showActionPopup(anchor, actionGroup);
     }
 
     public static void showDetailsPopup(JButton anchor, Set<String> selectedDetails, Runnable onChange) {
-        JBList<String> detailsList = new JBList<>(
-                List.of("ID",
-                        "Module",
-                        "Expected Result",
-                        "Steps",
-                        "Automation Ref",
-                        "Business Ref",
-                        "Priority"
-                )
-        );
-        setupListUI(detailsList);
+        DefaultActionGroup actionGroup = new DefaultActionGroup();
 
-        detailsList.setCellRenderer((list, value, index, isSelected, cellHasFocus) ->
-                createCheckBoxRenderer(value, selectedDetails.contains(value), list, isSelected));
+        String[] standardOptions = {"ID", "Module", "Expected Result", "Steps", "Automation Ref", "Business Ref"};
+        for (String option : standardOptions) {
+            actionGroup.add(createCheckboxAction(option, option, null, selectedDetails, onChange));
+        }
 
-        detailsList.addMouseListener(new MouseAdapter() {
+        actionGroup.addSeparator();
+
+        DefaultActionGroup priorityMenu = new DefaultActionGroup("Priority", true);
+        priorityMenu.add(createCheckboxAction("Show Priority Badge", "Priority", null, selectedDetails, onChange));
+        priorityMenu.addSeparator();
+
+        for (Priority p : Priority.values()) {
+            String displayName = p.name().charAt(0) + p.name().substring(1).toLowerCase();
+            priorityMenu.add(createCheckboxAction(displayName, p.name(), p.getIcon(), selectedDetails, onChange));
+        }
+
+        actionGroup.add(priorityMenu);
+
+        showActionPopup(anchor, actionGroup);
+    }
+
+    private static CheckboxAction createCheckboxAction(String title, String key, Icon icon, Set<String> selectedDetails, Runnable onChange) {
+        CheckboxAction action = new CheckboxAction(title) {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                int index = detailsList.locationToIndex(e.getPoint());
-                if (index >= 0) {
-                    String detail = detailsList.getModel().getElementAt(index);
-                    if (selectedDetails.contains(detail)) selectedDetails.remove(detail);
-                    else selectedDetails.add(detail);
-
-                    detailsList.repaint();
-                    if (onChange != null) onChange.run();
-                }
+            public boolean isSelected(@NotNull AnActionEvent e) {
+                return selectedDetails.contains(key);
             }
-        });
 
-        showPopup(anchor, detailsList);
+            @Override
+            public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                if (state) selectedDetails.add(key);
+                else selectedDetails.remove(key);
+                if (onChange != null) onChange.run();
+            }
+        };
+
+        /// here put the icon or color for priority. retrieve it from enum.
+        if (icon != null) {
+            action.getTemplatePresentation().setIcon(icon);
+        }
+
+        return action;
     }
 
-    // --- Private UI Helpers ---
-
-    private static void setupListUI(JBList<?> list) {
-        list.setBackground(JBColor.namedColor("Popup.background", new JBColor(0xffffff, 0x3c3f41)));
-    }
-
-    private static JCheckBox createCheckBoxRenderer(String text, boolean isChecked, JList<?> list, boolean isSelected) {
-        JCheckBox cb = new JCheckBox(text, isChecked);
-        cb.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
-        cb.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
-        cb.setBorder(JBUI.Borders.empty(2, 8));
-        cb.setOpaque(true);
-        return cb;
-    }
-
-    private static void showPopup(JButton anchor, JComponent content) {
+    private static void showActionPopup(JButton anchor, DefaultActionGroup actionGroup) {
         JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(new JBScrollPane(content), null)
-                .setRequestFocus(true)
-                .setCancelOnClickOutside(true)
-                .createPopup()
-                .showUnderneathOf(anchor);
+                .createActionGroupPopup(
+                        null,
+                        actionGroup,
+                        DataManager.getInstance().getDataContext(anchor),
+                        JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
+                        false
+                ).showUnderneathOf(anchor);
     }
 }
