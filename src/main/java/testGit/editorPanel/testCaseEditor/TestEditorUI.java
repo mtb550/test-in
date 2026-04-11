@@ -266,7 +266,7 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     public boolean isShowGroups() {
-        return toolBar.getSettings().isShowGroups();
+        return toolBar.getSettings().isShowGroupsBadge();
     }
 
     public boolean isShowPriority() {

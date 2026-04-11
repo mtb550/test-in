@@ -1,6 +1,7 @@
 package testGit.editorPanel.toolBar;
 
 import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.actionSystem.ex.CheckboxAction;
@@ -14,29 +15,7 @@ import java.util.Set;
 
 public class FilterPopupBuilder {
 
-    public static void showGroupPopup(JButton anchor, Set<Groups> selectedGroups, Runnable onChange) {
-        DefaultActionGroup actionGroup = new DefaultActionGroup();
-
-        for (Groups g : Groups.values()) {
-            actionGroup.add(new CheckboxAction(g.name()) {
-                @Override
-                public boolean isSelected(@NotNull AnActionEvent e) {
-                    return selectedGroups.contains(g);
-                }
-
-                @Override
-                public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                    if (state) selectedGroups.add(g);
-                    else selectedGroups.remove(g);
-                    if (onChange != null) onChange.run();
-                }
-            });
-        }
-
-        showActionPopup(anchor, actionGroup);
-    }
-
-    public static void showDetailsPopup(JButton anchor, Set<String> selectedDetails, Runnable onChange) {
+    public static void showDetailsPopup(JButton anchor, Set<String> selectedDetails, Set<Groups> selectedGroups, Runnable onChange) {
         DefaultActionGroup actionGroup = new DefaultActionGroup();
 
         String[] standardOptions = {"ID", "Module", "Expected Result", "Steps", "Automation Ref", "Business Ref"};
@@ -57,6 +36,32 @@ public class FilterPopupBuilder {
 
         actionGroup.add(priorityMenu);
 
+        DefaultActionGroup groupsMenu = new DefaultActionGroup("Groups", true);
+        groupsMenu.add(createCheckboxAction("Show Groups Badge", "Groups", null, selectedDetails, onChange));
+        groupsMenu.addSeparator();
+
+        for (Groups g : Groups.values()) {
+            groupsMenu.add(new CheckboxAction(g.name()) {
+                @Override
+                public boolean isSelected(@NotNull AnActionEvent e) {
+                    return selectedGroups.contains(g);
+                }
+
+                @Override
+                public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                    if (state) selectedGroups.add(g);
+                    else selectedGroups.remove(g);
+                    if (onChange != null) onChange.run();
+                }
+
+                @Override
+                public @NotNull ActionUpdateThread getActionUpdateThread() {
+                    return ActionUpdateThread.BGT;
+                }
+            });
+        }
+        actionGroup.add(groupsMenu);
+
         showActionPopup(anchor, actionGroup);
     }
 
@@ -72,6 +77,11 @@ public class FilterPopupBuilder {
                 if (state) selectedDetails.add(key);
                 else selectedDetails.remove(key);
                 if (onChange != null) onChange.run();
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.BGT;
             }
         };
 

@@ -349,7 +349,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     public boolean isShowGroups() {
-        return toolBar != null && toolBar.getSettings().isShowGroups();
+        return toolBar != null && toolBar.getSettings().isShowGroupsBadge();
     }
 
     public boolean isShowPriority() {

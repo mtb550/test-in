@@ -1,13 +1,16 @@
 package testGit.editorPanel.toolBar;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ui.DocumentAdapter;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SearchTextField;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -19,9 +22,6 @@ public class ToolBar extends JBPanel<ToolBar> {
 
     @Getter
     private final SearchTextField searchField = new SearchTextField();
-
-    private final JButton groupButton;
-
     private final JButton detailsButton;
 
     public ToolBar(ToolBarCallback callbacks) {
@@ -35,15 +35,8 @@ public class ToolBar extends JBPanel<ToolBar> {
         refreshButton.addActionListener(e -> callbacks.onRefresh());
         add(refreshButton);
 
-        groupButton = createToolbarButton("Groups", AllIcons.Actions.GroupBy);
-        groupButton.addActionListener(e -> FilterPopupBuilder.showGroupPopup(groupButton, settings.getSelectedGroups(), () -> {
-            updateGroupButtonState();
-            callbacks.onFilterChanged();
-        }));
-        add(groupButton);
-
         detailsButton = createToolbarButton("Details", AllIcons.Actions.PreviewDetailsVertically);
-        detailsButton.addActionListener(e -> FilterPopupBuilder.showDetailsPopup(detailsButton, settings.getSelectedDetails(), () -> {
+        detailsButton.addActionListener(e -> FilterPopupBuilder.showDetailsPopup(detailsButton, settings.getSelectedDetails(), settings.getSelectedGroups(), () -> {
             settings.save();
             updateDetailsButtonState();
             callbacks.onDetailsChanged();
@@ -52,25 +45,14 @@ public class ToolBar extends JBPanel<ToolBar> {
         add(detailsButton);
 
         searchField.getTextEditor().setColumns(30);
-        searchField.addDocumentListener(new com.intellij.ui.DocumentAdapter() {
+        searchField.addDocumentListener(new DocumentAdapter() {
             @Override
-            protected void textChanged(@org.jetbrains.annotations.NotNull javax.swing.event.DocumentEvent e) {
+            protected void textChanged(@NotNull DocumentEvent e) {
                 callbacks.onFilterChanged();
             }
         });
         add(searchField);
 
-        JCheckBox showGroupsCheck = new JCheckBox("Show Groups", settings.isShowGroups());
-        showGroupsCheck.setOpaque(false);
-        showGroupsCheck.setFocusable(false);
-        showGroupsCheck.addActionListener(e -> {
-            settings.setShowGroups(showGroupsCheck.isSelected());
-            settings.save();
-            callbacks.onFilterChanged();
-        });
-        add(showGroupsCheck);
-
-        updateGroupButtonState();
         updateDetailsButtonState();
     }
 
@@ -80,28 +62,18 @@ public class ToolBar extends JBPanel<ToolBar> {
 
     public void resetFilters() {
         settings.resetFilters();
-        updateGroupButtonState();
         updateDetailsButtonState();
     }
 
-    private void updateGroupButtonState() {
-        if (settings.getSelectedGroups().isEmpty()) {
-            groupButton.setText("Groups");
-            groupButton.setForeground(JBColor.foreground());
-
-        } else {
-            groupButton.setText("Groups (" + settings.getSelectedGroups().size() + ")");
-            groupButton.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
-        }
-    }
-
     private void updateDetailsButtonState() {
-        if (settings.getSelectedDetails().isEmpty()) {
+
+        int activeFiltersCount = settings.getSelectedDetails().size() + settings.getSelectedGroups().size();
+        if (activeFiltersCount == 0) {
             detailsButton.setText("Details");
             detailsButton.setForeground(JBColor.foreground());
 
         } else {
-            detailsButton.setText("Details (" + settings.getSelectedDetails().size() + ")");
+            detailsButton.setText("Details (" + activeFiltersCount + ")");
             detailsButton.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
         }
     }
