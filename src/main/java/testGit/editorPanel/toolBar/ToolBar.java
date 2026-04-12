@@ -31,12 +31,12 @@ public class ToolBar extends JBPanel<ToolBar> {
         setBorder(JBUI.Borders.customLine(JBColor.border(), 0, 0, 1, 0));
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        JButton refreshButton = createToolbarButton("Refresh", AllIcons.Actions.Refresh);
+        final JButton refreshButton = createToolbarButton("Refresh", AllIcons.Actions.Refresh);
         refreshButton.addActionListener(e -> callbacks.onRefresh());
         add(refreshButton);
 
         detailsButton = createToolbarButton("Details", AllIcons.Actions.PreviewDetailsVertically);
-        detailsButton.addActionListener(e -> FilterPopupBuilder.showDetailsPopup(detailsButton, settings.getSelectedDetails(), settings.getSelectedGroups(), () -> {
+        detailsButton.addActionListener(e -> FilterPopupBuilder.showDetailsPopup(detailsButton, settings.getSelectedDetails(), settings.getSelectedGroups(), v -> {
             settings.save();
             updateDetailsButtonState();
             callbacks.onDetailsChanged();
@@ -47,7 +47,7 @@ public class ToolBar extends JBPanel<ToolBar> {
         searchField.getTextEditor().setColumns(30);
         searchField.addDocumentListener(new DocumentAdapter() {
             @Override
-            protected void textChanged(@NotNull DocumentEvent e) {
+            protected void textChanged(final @NotNull DocumentEvent e) {
                 callbacks.onFilterChanged();
             }
         });
@@ -66,7 +66,7 @@ public class ToolBar extends JBPanel<ToolBar> {
     }
 
     private void updateDetailsButtonState() {
-        int activeFiltersCount = settings.getSelectedDetails().size() + settings.getSelectedGroups().size();
+        final int activeFiltersCount = settings.getSelectedDetails().size() + settings.getSelectedGroups().size();
         if (activeFiltersCount == 0) {
             detailsButton.setText("Details");
             detailsButton.setForeground(JBColor.foreground());
@@ -77,7 +77,7 @@ public class ToolBar extends JBPanel<ToolBar> {
     }
 
     private JButton createToolbarButton(final String text, final Icon icon) {
-        JButton btn = new JButton(text, icon);
+        final JButton btn = new JButton(text, icon);
         btn.setFocusable(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
@@ -86,13 +86,13 @@ public class ToolBar extends JBPanel<ToolBar> {
         btn.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mouseEntered(MouseEvent e) {
+            public void mouseEntered(final MouseEvent e) {
                 btn.setContentAreaFilled(true);
                 btn.setBackground(JBUI.CurrentTheme.ActionButton.hoverBackground());
             }
 
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseExited(final MouseEvent e) {
                 btn.setContentAreaFilled(false);
             }
         });

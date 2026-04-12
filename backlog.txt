@@ -201,3 +201,37 @@ make the sorting and unsorted badge run in separate thread.
 add actual result to test run and use it.
 
 let us continue, why do you need t retieve all list as I use paging ? why dont use the paging value to get the first x list, once go next page, load the next x list.
+
+@ToolBar put title in tool bar details options and make checked and enabled.
+
+@BaseCard, put backgroound color for odd and even in Config and use it in all project to unify the UI.
+
+@all classes, how to remove null checks or reduce it ? use empty strings in json files.
+another solution, here new code:
+        Optional.ofNullable(ViewToolWindowFactory.getViewPanel()).ifPresent(ViewPanel::reset);
+old code:
+ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
+        if (viewer != null) {
+            viewer.reset();
+        }
+also, will reduce @Nullable and put @NotNull
+
+remove most of static in project.
+
+remove metadata and put make its logic inside run editor.
+
+refactor sorting logic, unsorted are the remain in the list, no need for the loop again.
+
+move all hash maps from: (to bypass re-hashing & over size reserving)
+Map<UUID, TestCaseDto> idMap = new HashMap<>();
+to:
+Maps.newHashMapWithExpectedSize(unsortedList.size()); (for key-value) --no equivelant exists in jdk17 but exist in jdk21
+or new ArrayList<>(unsortedList.size()); (for numbers, names)
+so also, you need to refactor the ArrayList in project.
+
+TestEditorUI (review pending) refactor sorting logic
+
+optional of nullable not recommended inside loop as it create temp objects in ram within process.
+
+istead of passing attributes between methods, use consumer or callback interface.
+

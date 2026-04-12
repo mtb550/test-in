@@ -7,16 +7,16 @@ import testGit.pojo.Config;
 import testGit.pojo.dto.dirs.TestSetDirectoryDto;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class TestEditor {
 
     public static void open(final TestSetDirectoryDto ts) {
-        UnifiedVirtualFile newVirtualFile = new UnifiedVirtualFile(ts, new ArrayList<>());
+        final UnifiedVirtualFile newVirtualFile = new UnifiedVirtualFile(ts, new ArrayList<>());
 
-        ApplicationManager.getApplication().invokeLater(() -> {
-            FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
-            editorManager.openFile(newVirtualFile, true);
-        });
+        ApplicationManager.getApplication().invokeLater(() ->
+                Optional.ofNullable(FileEditorManager.getInstance(Config.getProject()))
+                        .ifPresent(editorManager -> editorManager.openFile(newVirtualFile, true))
+        );
     }
-
 }

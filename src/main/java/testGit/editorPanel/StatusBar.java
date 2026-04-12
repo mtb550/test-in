@@ -43,24 +43,24 @@ public class StatusBar extends JBPanel<StatusBar> {
         syncLabel.setForeground(UIUtil.getInactiveTextColor());
         syncLabel.setBorder(JBUI.Borders.emptyRight(10));
 
-        JPanel paginationPanel = new JBPanel<>(new FlowLayout(FlowLayout.CENTER, JBUI.scale(5), 0));
+        final JPanel paginationPanel = new JBPanel<>(new FlowLayout(FlowLayout.CENTER, JBUI.scale(5), 0));
         paginationPanel.setOpaque(false);
 
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
         pageSizeField.setToolTipText("Test cases per page");
 
-        //makeCompact(firstButton);
+        ///makeCompact(firstButton);
         makeCompact(prevButton);
         makeCompact(nextButton);
-        //makeCompact(lastButton);
+        ///makeCompact(lastButton);
 
-        //paginationPanel.add(firstButton);
+        ///paginationPanel.add(firstButton);
         paginationPanel.add(prevButton);
         paginationPanel.add(currentPageLabel);
-        //paginationPanel.add(new JBLabel(" | Per page:"));
+        ///paginationPanel.add(new JBLabel(" | Per page:"));
         paginationPanel.add(pageSizeField);
         paginationPanel.add(nextButton);
-        //paginationPanel.add(lastButton);
+        ///paginationPanel.add(lastButton);
 
         add(statusLabel, BorderLayout.WEST);
         add(paginationPanel, BorderLayout.CENTER);
@@ -75,7 +75,7 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     public void updatePaginationState(final int currentPage, final int totalPages, final int visibleCount, final int totalCount) {
-        //statusLabel.setText(String.format("Showing %d of %d test cases", visibleCount, totalCount));
+        ///statusLabel.setText(String.format("Showing %d of %d test cases", visibleCount, totalCount));
         statusLabel.setText(String.format("0 of %d test cases", totalCount));
         syncLabel.setText("Last updated: " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
@@ -87,13 +87,13 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     public void updateSelectionState(final int[] selectedIndices, final int currentPage, final int pageSize, final int totalCount) {
-        int selectedCount = selectedIndices.length;
+        final int selectedCount = selectedIndices.length;
 
         if (selectedCount > 1) {
             statusLabel.setText(String.format("%d selected of %d test cases", selectedCount, totalCount));
 
         } else if (selectedCount == 1) {
-            int globalIndex = ((currentPage - 1) * pageSize) + selectedIndices[0];
+            final int globalIndex = ((currentPage - 1) * pageSize) + selectedIndices[0];
             statusLabel.setText(String.format("%d of %d test cases", globalIndex + 1, totalCount));
 
         } else {

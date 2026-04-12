@@ -9,6 +9,7 @@ import testGit.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,10 +36,6 @@ public interface BaseEditorUI extends Disposable {
 
     @Nullable JComponent getPreferredFocusedComponent();
 
-    boolean isShowGroups();
-
-    boolean isShowPriority();
-
     Set<String> getSelectedDetails();
 
     List<TestCaseDto> getAllTestCaseDtos();
@@ -58,9 +55,6 @@ public interface BaseEditorUI extends Disposable {
     void setHoveredIndex(int index);
 
     default void dispose() {
-        ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
-        if (viewer != null) {
-            viewer.reset();
-        }
+        Optional.ofNullable(ViewToolWindowFactory.getViewPanel()).ifPresent(ViewPanel::reset);
     }
 }

@@ -4,13 +4,13 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import testGit.editorPanel.BaseEditorUI;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.viewPanel.ViewPanel;
 import testGit.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 public class SelectionListener implements ListSelectionListener {
     private final JBList<TestCaseDto> list;
@@ -26,26 +26,23 @@ public class SelectionListener implements ListSelectionListener {
     @Override
     public void valueChanged(final ListSelectionEvent e) {
         if (!e.getValueIsAdjusting()) {
-            List<TestCaseDto> selected = list.getSelectedValuesList();
+            final List<TestCaseDto> selected = list.getSelectedValuesList();
 
             if (selected != null && !selected.isEmpty()) {
-                ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow();
-                if (toolWindow != null && toolWindow.isVisible()) {
-                    ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
-                    if (viewer != null) {
-                        viewer.show(selected, path);
-                    }
-                }
+                Optional.ofNullable(ViewToolWindowFactory.getToolWindow())
+                        .filter(ToolWindow::isVisible)
+                        .map(tw -> ViewToolWindowFactory.getViewPanel())
+                        .ifPresent(viewer -> viewer.show(selected, path));
             }
 
-            if (ui.getStatusBar() != null) {
-                ui.getStatusBar().updateSelectionState(
-                        list.getSelectedIndices(),
-                        ui.getCurrentPage(),
-                        ui.getPageSize(),
-                        ui.getTotalItemsCount()
-                );
-            }
+            Optional.ofNullable(ui.getStatusBar()).ifPresent(statusBar ->
+                    statusBar.updateSelectionState(
+                            list.getSelectedIndices(),
+                            ui.getCurrentPage(),
+                            ui.getPageSize(),
+                            ui.getTotalItemsCount()
+                    )
+            );
         }
     }
 }

@@ -20,13 +20,13 @@ public class TestListRenderer implements ListCellRenderer<TestCaseDto> {
     @Override
     public Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
 
-        int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
-        boolean isUnsorted = ui.getUnsortedIds().contains(tc.getId());
+        final int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
+        final boolean isUnsorted = ui.getUnsortedIds().contains(tc.getId());
 
-        rendererCard.updateData(globalIndex, tc, ui.isShowGroups(), ui.isShowPriority(), ui.getSelectedDetails(), isUnsorted);
+        rendererCard.updateData(globalIndex, tc, ui.getSelectedDetails(), isUnsorted);
 
-        boolean isRowHovered = (index == ui.getHoveredIndex());
-        String hover = isRowHovered ? ui.getHoveredIconAction() : null;
+        final boolean isRowHovered = (index == ui.getHoveredIndex());
+        final String hover = isRowHovered ? ui.getHoveredIconAction() : null;
 
         rendererCard.setActionsState(isSelected, isRowHovered, hover);
 

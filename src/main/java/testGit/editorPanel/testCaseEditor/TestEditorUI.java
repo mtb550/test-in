@@ -54,10 +54,10 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     @Getter
     private final List<TestCaseDto> allTestCaseDtos;
 
-    private TestSessionCache sessionCache;
-
     @Getter
-    private Set<UUID> unsortedIds;
+    private final Set<UUID> unsortedIds;
+
+    private TestSessionCache sessionCache;
 
     @Getter
     @Setter
@@ -96,7 +96,7 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
 
-        JBScrollPane scrollPane = new JBScrollPane(list);
+        final JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);
         scrollPane.setBackground(UIUtil.getPanelBackground());
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -110,8 +110,8 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         this.syncListener.setOnUpdateCallback(this::onDataSynced);
         this.model.addListDataListener(syncListener);
 
-        EditorCM editorCM = new EditorCM(this, vf.getTestSet(), list, model);
-        TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getTestSet(), editorCM);
+        final EditorCM editorCM = new EditorCM(this, vf.getTestSet(), list, model);
+        final TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getTestSet(), editorCM);
         list.addMouseListener(testMouseListener);
 
         list.setTransferHandler(new TransferListener(this));
@@ -125,7 +125,7 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         StatusBarListener.attach(this);
         list.addListSelectionListener(new SelectionListener(list, this, vf.getTestSet().getPath()));
 
-        HoverListener hoverListener = new HoverListener(list, this);
+        final HoverListener hoverListener = new HoverListener(list, this);
         list.addMouseListener(hoverListener);
         list.addMouseMotionListener(hoverListener);
 
@@ -140,16 +140,16 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         sessionCache.setListener(new TestSessionCache.CacheListener() {
 
             @Override
-            public void onItemsLoaded(List<TestCaseDto> items) {
+            public void onItemsLoaded(final List<TestCaseDto> items) {
                 allTestCaseDtos.addAll(items);
                 items.forEach(item -> unsortedIds.add(item.getId()));
                 refreshView();
             }
 
             @Override
-            public void onLoadComplete(List<TestCaseDto> allItems) {
+            public void onLoadComplete(final List<TestCaseDto> allItems) {
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(allItems);
+                    final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(allItems);
                     TestCaseCacheService.getInstance(Config.getProject()).load(result.sortedList());
 
                     ApplicationManager.getApplication().invokeLater(() -> {
@@ -163,7 +163,11 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
                             list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
                         }
 
+//                        if (!unsortedIds.isEmpty()) {
+//                            updateSequenceAndSaveAll();
+//                        } else {
                         refreshView();
+                        //}
                     });
                 });
             }
@@ -178,12 +182,13 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     public void updateSequenceAndSaveAll() {
-        List<TestCaseDto> snapshot;
+        final List<TestCaseDto> snapshot;
         synchronized (this.allTestCaseDtos) {
             snapshot = new ArrayList<>(this.allTestCaseDtos);
         }
 
-        Path dirPath = vf.getTestSet().getPath();
+        this.unsortedIds.clear();
+        final Path dirPath = vf.getTestSet().getPath();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             for (int i = 0; i < snapshot.size(); i++) {
@@ -194,9 +199,10 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
                 try {
                     Config.getMapper().writerWithDefaultPrettyPrinter()
                             .writeValue(new File(dirPath.toFile(), current.getId() + ".json"), current);
-                } catch (Exception ignored) {
+                } catch (final Exception ignored) {
                 }
             }
+            ApplicationManager.getApplication().invokeLater(this::refreshView);
         });
     }
 
@@ -209,13 +215,13 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
             filtered = getFilteredList();
         }
 
-        int index = filtered.indexOf(tc);
+        final int index = filtered.indexOf(tc);
         if (index == -1) return;
 
         this.currentPage = (index / pageSize) + 1;
         refreshView();
 
-        int localIndex = index % pageSize;
+        final int localIndex = index % pageSize;
         SwingUtilities.invokeLater(() -> {
             list.setSelectedIndex(localIndex);
             list.ensureIndexIsVisible(localIndex);
@@ -226,9 +232,10 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     @Override
     public void appendNewTestCase(final TestCaseDto tc) {
         this.allTestCaseDtos.add(tc);
+        //sortAndIdentifyUnsorted();
         updateSequenceAndSaveAll();
 
-        VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(vf.getTestSet().getPath().toFile());
+        final VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(vf.getTestSet().getPath().toFile());
         if (vDir != null) vDir.refresh(false, true);
 
         selectTestCase(tc);
@@ -236,7 +243,7 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
 
     @Override
     public int getTotalItemsCount() {
-        return allTestCaseDtos != null ? allTestCaseDtos.size() : 0;
+        return allTestCaseDtos.size();
     }
 
     @Override
@@ -265,14 +272,6 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         list.repaint();
     }
 
-    public boolean isShowGroups() {
-        return toolBar.getSettings().isShowGroupsBadge();
-    }
-
-    public boolean isShowPriority() {
-        return toolBar.getSettings().isShowPriorityBadge();
-    }
-
     public Set<String> getSelectedDetails() {
         return toolBar.getSettings().getSelectedDetails();
     }
@@ -283,14 +282,14 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     public void refreshView() {
-        List<TestCaseDto> filtered = getFilteredList();
-        int totalItems = filtered.size();
-        int totalPages = getTotalPages(filtered);
+        final List<TestCaseDto> filtered = getFilteredList();
+        final int totalItems = filtered.size();
+        final int totalPages = getTotalPages(filtered);
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
 
-        int startIndex = (currentPage - 1) * pageSize;
-        int endIndex = Math.min(startIndex + pageSize, totalItems);
-        List<TestCaseDto> pageItems = startIndex < totalItems
+        final int startIndex = (currentPage - 1) * pageSize;
+        final int endIndex = Math.min(startIndex + pageSize, totalItems);
+        final List<TestCaseDto> pageItems = startIndex < totalItems
                 ? new ArrayList<>(filtered.subList(startIndex, endIndex))
                 : new ArrayList<>();
 
@@ -302,20 +301,20 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     private List<TestCaseDto> getFilteredList() {
-        String query = toolBar.getSearchQuery();
-        Set<Groups> groups = toolBar.getSettings().getSelectedGroups();
-        Set<String> priorityFilters = toolBar.getSettings().getSelectedPriorityFilters();
+        final String query = toolBar.getSearchQuery();
+        final Set<Groups> groups = toolBar.getSettings().getSelectedGroups();
+        final Set<String> priorityFilters = toolBar.getSettings().getSelectedPriorityFilters();
 
         synchronized (allTestCaseDtos) {
             return allTestCaseDtos.stream()
                     .filter(tc -> {
-                        boolean matchesSearch = query.isEmpty() ||
+                        final boolean matchesSearch = query.isEmpty() ||
                                 (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query));
 
-                        boolean matchesGroup = groups.isEmpty() ||
+                        final boolean matchesGroup = groups.isEmpty() ||
                                 (tc.getGroups() != null && tc.getGroups().stream().anyMatch(groups::contains));
 
-                        boolean matchesPriority = priorityFilters.isEmpty() ||
+                        final boolean matchesPriority = priorityFilters.isEmpty() ||
                                 (tc.getPriority() != null && priorityFilters.contains(tc.getPriority().name()));
 
                         return matchesSearch && matchesGroup && matchesPriority;
@@ -329,40 +328,39 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     public void sortAndIdentifyUnsorted() {
-        if (allTestCaseDtos == null || allTestCaseDtos.isEmpty()) return;
+        if (allTestCaseDtos.isEmpty()) return;
 
-        TestCaseSorter.SortResult result;
         synchronized (allTestCaseDtos) {
-            result = TestCaseSorter.sortTestCases(new ArrayList<>(allTestCaseDtos));
-        }
+            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(new ArrayList<>(allTestCaseDtos));
 
-        this.allTestCaseDtos.clear();
-        this.allTestCaseDtos.addAll(result.sortedList());
-        this.unsortedIds.clear();
-        this.unsortedIds.addAll(result.unsortedIds());
+            this.allTestCaseDtos.clear();
+            this.allTestCaseDtos.addAll(result.sortedList());
+
+            this.unsortedIds.clear();
+            this.unsortedIds.addAll(result.unsortedIds());
+        }
     }
 
     @Override
     public void dispose() {
-        ///if (focusListener != null) {
-        ///focusListener.disconnect();
-        ///}
-
-        if (sessionCache != null)
+        if (sessionCache != null) {
             sessionCache.dispose();
+        }
 
-        TestCaseDto selectedInThisFile = list.getSelectedValue();
+        final TestCaseDto selectedInThisFile = list.getSelectedValue();
 
-        ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
+        final ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
         if (viewer != null) {
             viewer.hide(selectedInThisFile);
         }
 
-        if (allTestCaseDtos != null) allTestCaseDtos.clear();
-        if (unsortedIds != null) unsortedIds.clear();
+        allTestCaseDtos.clear();
+        unsortedIds.clear();
 
-        if (model != null && syncListener != null) model.removeListDataListener(syncListener);
-        if (model != null) model.removeAll();
+        if (model != null) {
+            model.removeListDataListener(syncListener);
+            model.removeAll();
+        }
         if (mainPanel != null) mainPanel.removeAll();
 
         BaseEditorUI.super.dispose();
@@ -370,8 +368,9 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
 
     @Override
     public void onRefresh() {
-        if (sessionCache != null)
+        if (sessionCache != null) {
             sessionCache.dispose();
+        }
 
         this.allTestCaseDtos.clear();
         this.unsortedIds.clear();

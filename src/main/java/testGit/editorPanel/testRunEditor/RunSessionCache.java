@@ -36,71 +36,73 @@ public class RunSessionCache {
 
     public void startLoadingAsync() {
         if (metadata == null || metadata.getTestCase() == null || metadata.getTestCase().isEmpty()) {
-            if (listener != null) listener.onLoadComplete(Collections.emptyList());
+            notifyLoadComplete(Collections.emptyList());
             return;
         }
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            List<TestCaseDto> batch = new ArrayList<>();
+            final List<TestCaseDto> batch = new ArrayList<>();
             final int BATCH_SIZE = 5;
 
-            for (TestRunDto.TestCase tcPathObj : metadata.getTestCase()) {
+            for (final TestRunDto.TestCase tcPathObj : metadata.getTestCase()) {
                 if (isDisposed) break;
 
-                Path dirPath = tcPathObj.getPath();
-                List<UUID> targetIds = tcPathObj.getUuid();
+                final Path dirPath = tcPathObj.getPath();
+                final List<UUID> targetIds = tcPathObj.getUuid();
 
                 if (dirPath == null || !Files.exists(dirPath) || targetIds == null || targetIds.isEmpty()) {
                     continue;
                 }
 
-                Set<UUID> idsToFind = new HashSet<>(targetIds);
+                final Set<UUID> idsToFind = new HashSet<>(targetIds);
 
-                try (Stream<Path> paths = Files.list(dirPath)) {
+                try (final Stream<Path> paths = Files.list(dirPath)) {
                     paths.filter(Files::isRegularFile)
                             .filter(p -> p.toString().endsWith(".json"))
                             .forEach(filePath -> {
                                 if (isDisposed) return;
 
                                 try {
-                                    TestCaseDto tc = Config.getMapper().readValue(filePath.toFile(), TestCaseDto.class);
+                                    final TestCaseDto tc = Config.getMapper().readValue(filePath.toFile(), TestCaseDto.class);
                                     if (tc != null && tc.getId() != null && idsToFind.contains(tc.getId())) {
                                         loadedItems.add(tc);
                                         batch.add(tc);
 
                                         if (batch.size() >= BATCH_SIZE) {
-                                            List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
+                                            final List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
                                             batch.clear();
-
-                                            if (listener != null && !isDisposed) {
-                                                ApplicationManager.getApplication().invokeLater(() -> {
-                                                    if (!isDisposed && listener != null) {
-                                                        listener.onItemsLoaded(itemsToSend);
-                                                    }
-                                                });
-                                            }
+                                            notifyItemsLoaded(itemsToSend);
                                         }
                                     }
-                                } catch (Exception ignored) {
+                                } catch (final Exception ignored) {
                                 }
                             });
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     if (!isDisposed) System.err.println("Failed to load cases from: " + dirPath);
                 }
             }
 
-            if (!batch.isEmpty() && listener != null && !isDisposed) {
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    if (!isDisposed && listener != null) listener.onItemsLoaded(batch);
-                });
+            if (!batch.isEmpty()) {
+                notifyItemsLoaded(batch);
             }
-
-            if (listener != null && !isDisposed) {
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    if (!isDisposed && listener != null) listener.onLoadComplete(getLoadedItems());
-                });
-            }
+            notifyLoadComplete(getLoadedItems());
         });
+    }
+
+    private void notifyItemsLoaded(final List<TestCaseDto> items) {
+        Optional.ofNullable(listener).filter(l -> !isDisposed).ifPresent(l ->
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!isDisposed) l.onItemsLoaded(items);
+                })
+        );
+    }
+
+    private void notifyLoadComplete(final List<TestCaseDto> items) {
+        Optional.ofNullable(listener).filter(l -> !isDisposed).ifPresent(listener ->
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!isDisposed) listener.onLoadComplete(items);
+                })
+        );
     }
 
     public interface CacheListener {

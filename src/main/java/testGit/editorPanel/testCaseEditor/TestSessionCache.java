@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class TestSessionCache {
@@ -37,54 +38,57 @@ public class TestSessionCache {
 
     public void startLoadingAsync() {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            List<TestCaseDto> batch = new ArrayList<>();
+            final List<TestCaseDto> batch = new ArrayList<>();
             final int BATCH_SIZE = 5;
 
-            try (Stream<Path> paths = Files.list(directoryPath)) {
+            try (final Stream<Path> paths = Files.list(directoryPath)) {
                 paths.filter(Files::isRegularFile)
                         .filter(p -> p.toString().endsWith(".json"))
                         .forEach(filePath -> {
                             if (isDisposed) return;
 
                             try {
-                                TestCaseDto tc = Config.getMapper().readValue(filePath.toFile(), TestCaseDto.class);
+                                final TestCaseDto tc = Config.getMapper().readValue(filePath.toFile(), TestCaseDto.class);
                                 if (tc != null) {
                                     loadedItems.add(tc);
                                     batch.add(tc);
 
                                     if (batch.size() >= BATCH_SIZE) {
-                                        List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
+                                        final List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
                                         batch.clear();
-
-                                        if (listener != null && !isDisposed) {
-                                            ApplicationManager.getApplication().invokeLater(() -> {
-                                                if (!isDisposed && listener != null) {
-                                                    listener.onItemsLoaded(itemsToSend);
-                                                }
-                                            });
-                                        }
+                                        notifyItemsLoaded(itemsToSend);
                                     }
                                 }
-                            } catch (Exception ignored) {
+                            } catch (final Exception ignored) {
                             }
                         });
 
-                if (!batch.isEmpty() && listener != null && !isDisposed) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (!isDisposed && listener != null) listener.onItemsLoaded(batch);
-                    });
+                if (!batch.isEmpty()) {
+                    notifyItemsLoaded(batch);
                 }
 
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 if (!isDisposed) e.printStackTrace(System.out);
             }
 
-            if (listener != null && !isDisposed) {
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    if (!isDisposed && listener != null) listener.onLoadComplete(getLoadedItems());
-                });
-            }
+            notifyLoadComplete();
         });
+    }
+
+    private void notifyItemsLoaded(final List<TestCaseDto> items) {
+        Optional.ofNullable(listener)
+                .filter(l -> !isDisposed)
+                .ifPresent(l -> ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!isDisposed) l.onItemsLoaded(items);
+                }));
+    }
+
+    private void notifyLoadComplete() {
+        Optional.ofNullable(listener)
+                .filter(l -> !isDisposed)
+                .ifPresent(l -> ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!isDisposed) l.onLoadComplete(getLoadedItems());
+                }));
     }
 
     public interface CacheListener {

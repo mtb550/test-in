@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 public class FileType extends FakeFileType {
-
+    /// TODO:: move to enum or remove by find another way
     public static final FileType TEST_RUN = new FileType(
             "Test Run",
             "Test Run Editor",
@@ -20,7 +20,6 @@ public class FileType extends FakeFileType {
             "Test Case",
             "Test Case Editor",
             AllIcons.FileTypes.Text
-
     );
 
     private final String name;

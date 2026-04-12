@@ -19,12 +19,12 @@ public class RunListRenderer implements ListCellRenderer<TestCaseDto> {
 
     @Override
     public Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
-        int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
+        final int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
 
-        rendererCard.updateData(globalIndex, tc, ui.isShowGroups(), ui.isShowPriority(), ui.getSelectedDetails());
+        rendererCard.updateData(globalIndex, tc, ui.getSelectedDetails());
 
-        boolean isRowHovered = (index == ui.getHoveredIndex());
-        String hover = isRowHovered ? ui.getHoveredIconAction() : null;
+        final boolean isRowHovered = (index == ui.getHoveredIndex());
+        final String hover = isRowHovered ? ui.getHoveredIconAction() : null;
         rendererCard.setActionsState(isSelected, isRowHovered, hover);
 
         rendererCard.setBorder(isSelected ?

@@ -10,11 +10,13 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ModelSyncListener implements ListDataListener {
     private final TestEditorUI ui;
     private final CollectionListModel<TestCaseDto> model;
     private boolean active = true;
+
     @Setter
     private UpdateCallback onUpdateCallback;
 
@@ -39,7 +41,7 @@ public class ModelSyncListener implements ListDataListener {
         TestCaseDto newlyAdded = null;
 
         for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
-            TestCaseDto item = model.getElementAt(i);
+            final TestCaseDto item = model.getElementAt(i);
             if (!ui.getAllTestCaseDtos().contains(item)) {
                 ui.getAllTestCaseDtos().add(globalStart++, item);
                 newlyAdded = item;
@@ -48,9 +50,7 @@ public class ModelSyncListener implements ListDataListener {
 
         ui.updateSequenceAndSaveAll();
 
-        if (onUpdateCallback != null) {
-            SwingUtilities.invokeLater(() -> onUpdateCallback.onUpdate());
-        }
+        Optional.ofNullable(onUpdateCallback).ifPresent(cb -> SwingUtilities.invokeLater(cb::onUpdate));
 
         if (newlyAdded != null) {
             final TestCaseDto target = newlyAdded;
@@ -62,35 +62,30 @@ public class ModelSyncListener implements ListDataListener {
     public void intervalRemoved(final ListDataEvent e) {
         if (!active) return;
 
-        int globalStart = (ui.getCurrentPage() - 1) * ui.getPageSize();
-        List<TestCaseDto> allItems = ui.getAllTestCaseDtos();
+        final int globalStart = (ui.getCurrentPage() - 1) * ui.getPageSize();
+        final List<TestCaseDto> allItems = ui.getAllTestCaseDtos();
 
         if (globalStart >= allItems.size()) return;
 
-        int pageEnd = Math.min(globalStart + ui.getPageSize(), allItems.size());
+        final int pageEnd = Math.min(globalStart + ui.getPageSize(), allItems.size());
+        final List<TestCaseDto> pageInMaster;
 
-        List<TestCaseDto> pageInMaster;
         synchronized (allItems) {
             pageInMaster = new ArrayList<>(allItems.subList(globalStart, pageEnd));
         }
 
-        List<TestCaseDto> pageInModel = model.getItems();
+        final List<TestCaseDto> pageInModel = model.getItems();
 
-        boolean changed = false;
-        for (TestCaseDto tc : pageInMaster) {
-            if (!pageInModel.contains(tc)) {
-                allItems.remove(tc);
-                changed = true;
-            }
-        }
+        final List<TestCaseDto> toRemove = pageInMaster.stream()
+                .filter(tc -> !pageInModel.contains(tc))
+                .toList();
 
-        if (changed) {
+        if (!toRemove.isEmpty()) {
+            allItems.removeAll(toRemove);
             ui.updateSequenceAndSaveAll();
         }
 
-        if (onUpdateCallback != null) {
-            SwingUtilities.invokeLater(() -> onUpdateCallback.onUpdate());
-        }
+        Optional.ofNullable(onUpdateCallback).ifPresent(cb -> SwingUtilities.invokeLater(cb::onUpdate));
     }
 
     @Override

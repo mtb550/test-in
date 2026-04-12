@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import testGit.editorPanel.BaseCard;
-import testGit.pojo.HoverAction;
+import testGit.pojo.CardHoverAction;
 import testGit.pojo.TestStatus;
 import testGit.pojo.dto.TestCaseDto;
 
@@ -27,9 +27,9 @@ public class RunCard extends BaseCard<RunCard> {
         actionPanel.setOpaque(false);
         actionPanel.setPreferredSize(new Dimension(JBUI.scale(ACTIONS_TOTAL_WIDTH), 0));
 
-        for (TestStatus status : TestStatus.values()) {
+        for (final TestStatus status : TestStatus.values()) {
             if (status != TestStatus.PENDING) {
-                JBLabel btn = createActionLabel(status.name());
+                final JBLabel btn = createActionLabel(status.name());
                 statusLabels.put(status, btn);
                 actionPanel.add(btn);
             }
@@ -40,21 +40,21 @@ public class RunCard extends BaseCard<RunCard> {
         this.add(actionPanel, BorderLayout.EAST);
     }
 
-    public void updateData(int index, TestCaseDto tc, boolean showGroups, boolean showPriority, Set<String> activeDetails) {
-        super.updateBaseData(index, tc, showPriority, showGroups, activeDetails);
+    public void updateData(final int index, final TestCaseDto tc, final Set<String> activeDetails) {
+        super.updateBaseData(index, tc, activeDetails);
         badgePanel.revalidate();
         badgePanel.repaint();
     }
 
     @Override
-    public void setActionsState(boolean isSelected, boolean isRowHovered, String hoveredAction) {
+    public void setActionsState(final boolean isSelected, final boolean isRowHovered, final String hoveredAction) {
         super.setActionsState(isSelected, isRowHovered, hoveredAction);
 
         if (actionPanel.isVisible() != isSelected) {
             actionPanel.setVisible(isSelected);
         }
 
-        for (JBLabel label : statusLabels.values()) {
+        for (final JBLabel label : statusLabels.values()) {
             label.setOpaque(false);
             label.setForeground(JBColor.GRAY);
             label.setBackground(null);
@@ -62,22 +62,22 @@ public class RunCard extends BaseCard<RunCard> {
 
         if (hoveredAction != null) {
             try {
-                TestStatus activeStatus = TestStatus.valueOf(hoveredAction);
-                JBLabel activeLabel = statusLabels.get(activeStatus);
+                final TestStatus activeStatus = TestStatus.valueOf(hoveredAction);
+                final JBLabel activeLabel = statusLabels.get(activeStatus);
 
                 if (activeLabel != null) {
-                    HoverAction hoverStyle = activeStatus.getHoverAction();
+                    final CardHoverAction actionStyle = activeStatus.getHoverAction();
                     activeLabel.setOpaque(true);
-                    activeLabel.setBackground(hoverStyle.background());
-                    activeLabel.setForeground(hoverStyle.foreground());
+                    activeLabel.setBackground(actionStyle.getBackground());
+                    activeLabel.setForeground(actionStyle.getForeground());
                 }
-            } catch (IllegalArgumentException ignored) {
+            } catch (final IllegalArgumentException ignored) {
             }
         }
     }
 
-    private JBLabel createActionLabel(String text) {
-        JBLabel lbl = new JBLabel(text, SwingConstants.CENTER);
+    private JBLabel createActionLabel(final String text) {
+        final JBLabel lbl = new JBLabel(text, SwingConstants.CENTER);
         lbl.setOpaque(false);
         lbl.setFont(JBFont.regular().asBold());
         lbl.setBorder(JBUI.Borders.empty());

@@ -8,8 +8,8 @@ import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TransferListener extends TransferHandler {
     private static final DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
@@ -31,10 +31,10 @@ public class TransferListener extends TransferHandler {
 
         draggedIndices = rawList.getSelectedIndices();
 
-        List<TestCaseDto> items = rawList.getSelectedValuesList().stream()
+        final List<TestCaseDto> items = rawList.getSelectedValuesList().stream()
                 .filter(TestCaseDto.class::isInstance)
                 .map(TestCaseDto.class::cast)
-                .collect(Collectors.toList());
+                .toList();
 
         return new Transferable() {
             @Override
@@ -43,12 +43,12 @@ public class TransferListener extends TransferHandler {
             }
 
             @Override
-            public boolean isDataFlavorSupported(DataFlavor flavor) {
+            public boolean isDataFlavorSupported(final DataFlavor flavor) {
                 return FLAVOR.equals(flavor);
             }
 
             @Override
-            public @NotNull Object getTransferData(DataFlavor flavor) {
+            public @NotNull Object getTransferData(final DataFlavor flavor) {
                 return items;
             }
         };
@@ -62,33 +62,33 @@ public class TransferListener extends TransferHandler {
     @Override
     public boolean importData(final TransferSupport support) {
         try {
-            Object data = support.getTransferable().getTransferData(FLAVOR);
+            final Object data = support.getTransferable().getTransferData(FLAVOR);
             if (!(data instanceof List<?> rawList)) return false;
 
-            List<TestCaseDto> items = rawList.stream()
+            final List<TestCaseDto> items = rawList.stream()
                     .filter(TestCaseDto.class::isInstance)
                     .map(TestCaseDto.class::cast)
                     .toList();
 
             if (items.isEmpty()) return false;
 
-            JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
-            int insertAtLocal = dl.getIndex();
-            int insertAtGlobal = (ui.getCurrentPage() - 1) * ui.getPageSize() + insertAtLocal;
+            final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
+            final int offset = (ui.getCurrentPage() - 1) * ui.getPageSize();
+            int insertAtGlobal = offset + dl.getIndex();
 
-            int[] globalDraggedIndices = new int[draggedIndices.length];
-            for (int i = 0; i < draggedIndices.length; i++) {
-                globalDraggedIndices[i] = (ui.getCurrentPage() - 1) * ui.getPageSize() + draggedIndices[i];
-            }
+            final int[] globalDraggedIndices = Arrays.stream(draggedIndices)
+                    .map(i -> offset + i)
+                    .toArray();
 
-            List<TestCaseDto> allItems = ui.getAllTestCaseDtos();
-            List<TestCaseDto> itemsToMove = new ArrayList<>();
+            final List<TestCaseDto> allItems = ui.getAllTestCaseDtos();
+            final List<TestCaseDto> itemsToMove = new ArrayList<>();
 
             synchronized (allItems) {
-                int shift = 0;
-                for (int globalDraggedIndex : globalDraggedIndices) {
-                    if (globalDraggedIndex < insertAtGlobal) shift++;
-                }
+                int finalInsertAtGlobal = insertAtGlobal;
+                final int shift = (int) Arrays.stream(globalDraggedIndices)
+                        .filter(idx -> idx < finalInsertAtGlobal)
+                        .count();
+
                 insertAtGlobal -= shift;
 
                 for (int i = globalDraggedIndices.length - 1; i >= 0; i--) {
@@ -100,14 +100,13 @@ public class TransferListener extends TransferHandler {
 
             ui.updateSequenceAndSaveAll();
 
-            if (!itemsToMove.isEmpty()) {
-                ui.selectTestCase(itemsToMove.getFirst());
-            } else {
-                ui.refreshView();
-            }
+            itemsToMove.stream().findFirst().ifPresentOrElse(
+                    ui::selectTestCase,
+                    ui::refreshView
+            );
 
             return true;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace(System.err);
             return false;
         }

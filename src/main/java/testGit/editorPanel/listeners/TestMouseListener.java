@@ -18,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
 public class TestMouseListener extends MouseAdapter {
     private final JBList<TestCaseDto> list;
@@ -37,32 +38,28 @@ public class TestMouseListener extends MouseAdapter {
 
     @Override
     public void mouseClicked(final MouseEvent e) {
-        int index = list.locationToIndex(e.getPoint());
-        boolean isClickOnItem = index >= 0 && list.getCellBounds(index, index).contains(e.getPoint());
+        final int index = list.locationToIndex(e.getPoint());
+        final boolean isClickOnItem = index >= 0 && list.getCellBounds(index, index).contains(e.getPoint());
 
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
             if (isClickOnItem) {
-                TestCaseDto selected = model.getElementAt(index);
-                if (selected != null) {
-                    ViewToolWindowFactory.showPanel(Config.getProject(), List.of(selected), path);
-                }
+                Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(Config.getProject(), List.of(selected), path));
             }
             return;
         }
 
         if (SwingUtilities.isRightMouseButton(e)) {
+            final ActionManager actionManager = ActionManager.getInstance();
+            final String place = ActionPlaces.TOOLWINDOW_POPUP;
+
             if (isClickOnItem) {
                 if (!list.isSelectedIndex(index)) {
                     list.setSelectedIndex(index);
                 }
-                ActionManager.getInstance()
-                        .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, editorCM)
-                        .getComponent().show(e.getComponent(), e.getX(), e.getY());
+                actionManager.createActionPopupMenu(place, editorCM).getComponent().show(e.getComponent(), e.getX(), e.getY());
             } else {
                 list.clearSelection();
-                ActionManager.getInstance()
-                        .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, emptyMenu)
-                        .getComponent().show(e.getComponent(), e.getX(), e.getY());
+                actionManager.createActionPopupMenu(place, emptyMenu).getComponent().show(e.getComponent(), e.getX(), e.getY());
             }
         }
     }

@@ -30,36 +30,38 @@ public class KeyListener extends KeyAdapter {
     public void keyPressed(final KeyEvent e) {
 
         if (KeyboardSet.CopyTestCaseTitle.matches(e)) {
-            List<TestCaseDto> selectedCases = list.getSelectedValuesList();
+            final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
             if (selectedCases != null && !selectedCases.isEmpty()) {
-                String titles = selectedCases.stream()
+                final String titles = selectedCases.stream()
                         .map(TestCaseDto::getTitle)
                         .collect(Collectors.joining("\n"));
 
-                StringSelection selection = new StringSelection(titles);
-                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                final StringSelection selection = new StringSelection(titles);
+                final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
                 clipboard.setContents(selection, selection);
             }
             return;
         }
 
         if (e.getKeyCode() == KeyboardSet.DeletePackage.getKeyCode()) {
-            List<TestCaseDto> selectedCases = list.getSelectedValuesList();
+            final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
 
             if (selectedCases != null && !selectedCases.isEmpty()) {
                 ui.getAllTestCaseDtos().removeAll(selectedCases);
                 ui.refreshView();
 
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    Path dirPath = ui.getVf().getTestSet().getPath();
+                    final Path dirPath = ui.getVf().getTestSet().getPath();
 
-                    for (TestCaseDto tc : selectedCases) {
+                    selectedCases.forEach(tc -> {
                         try {
+                            /// TODO: move to files controller class, any file action should be in the file calls
+                            /// TODO: same tree class, any crud on tree should be from the unified class TreeUtilImpl
                             Files.deleteIfExists(dirPath.resolve(tc.getId() + ".json"));
-                        } catch (Exception ex) {
+                        } catch (final Exception ex) {
                             System.err.println("Failed to delete test case JSON: " + tc.getId());
                         }
-                    }
+                    });
 
                     ApplicationManager.getApplication().invokeLater(ui::updateSequenceAndSaveAll);
                 });

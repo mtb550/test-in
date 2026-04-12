@@ -2,6 +2,9 @@ package testGit.editorPanel.listeners;
 
 import testGit.editorPanel.BaseEditorUI;
 
+import javax.swing.*;
+import java.util.Optional;
+
 public class StatusBarListener {
 
     public static void attach(final BaseEditorUI ui) {
@@ -31,19 +34,17 @@ public class StatusBarListener {
 
         ui.getStatusBar().getPageSizeField().addActionListener(e -> {
             try {
-                int newSize = Integer.parseInt(ui.getStatusBar().getPageSizeField().getText().trim());
+                final int newSize = Integer.parseInt(ui.getStatusBar().getPageSizeField().getText().trim());
                 if (newSize > 0) {
                     ui.setPageSize(newSize);
                     ui.setCurrentPage(1);
                     ui.refreshView();
                 }
-            } catch (NumberFormatException ex) {
+            } catch (final NumberFormatException ex) {
                 ui.getStatusBar().getPageSizeField().setText(String.valueOf(ui.getPageSize()));
             }
 
-            if (ui.getPreferredFocusedComponent() != null) {
-                ui.getPreferredFocusedComponent().requestFocusInWindow();
-            }
+            Optional.ofNullable(ui.getPreferredFocusedComponent()).ifPresent(JComponent::requestFocusInWindow);
         });
     }
 }

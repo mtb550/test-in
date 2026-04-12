@@ -48,21 +48,18 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     private final UnifiedVirtualFile vf;
     private final List<TestCaseDto> initialTestCaseDtos = new ArrayList<>();
     private final Set<UUID> initialTestCaseIds = new HashSet<>();
+    private final VirtualFile currentFile;
+    private final @NotNull Map<UUID, TestRunDto.TestRunItems> resultsMap;
     private RunSessionCache sessionCache;
-
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
-
     private JBList<TestCaseDto> list;
     private CollectionListModel<TestCaseDto> model;
     private int currentPage = 1;
     private int pageSize = 50;
     private StatusBar statusBar;
     private ToolBar toolBar;
-
     private CheckboxTree checklistTree;
     private TestRunDto metadata;
-    private VirtualFile currentFile;
-    private @NotNull Map<UUID, TestRunDto.TestRunItems> resultsMap;
     private TestRunMetadataHeader metadataHeader;
 
     @Getter
@@ -96,16 +93,16 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
 
         sessionCache.setListener(new RunSessionCache.CacheListener() {
             @Override
-            public void onItemsLoaded(List<TestCaseDto> items) {
+            public void onItemsLoaded(final List<TestCaseDto> items) {
                 initialTestCaseDtos.addAll(items);
                 items.forEach(item -> initialTestCaseIds.add(item.getId()));
                 refreshView();
             }
 
             @Override
-            public void onLoadComplete(List<TestCaseDto> allItems) {
+            public void onLoadComplete(final List<TestCaseDto> allItems) {
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(allItems).sortedList();
+                    final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(allItems).sortedList();
                     TestCaseCacheService.getInstance(Config.getProject()).load(sorted);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
@@ -153,12 +150,12 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setCellRenderer(new RunListRenderer(this));
 
-        HoverListener hoverListener = new HoverListener(list, this);
+        final HoverListener hoverListener = new HoverListener(list, this);
         list.addMouseListener(hoverListener);
         list.addMouseMotionListener(hoverListener);
 
-        EditorCM editorCM = new EditorCM(this, vf.getDirectoryDto(), list, model);
-        TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getDirectoryDto(), editorCM);
+        final EditorCM editorCM = new EditorCM(this, vf.getDirectoryDto(), list, model);
+        final TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getDirectoryDto(), editorCM);
         list.addMouseListener(testMouseListener);
 
         EditorCM.registerShortcuts(this, vf.getDirectoryDto(), list, model, editorCM);
@@ -171,7 +168,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         }
         list.addListSelectionListener(new SelectionListener(list, this, selectionPath));
 
-        JBScrollPane scrollPane = new JBScrollPane(list);
+        final JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setBorder(JBUI.Borders.empty());
 
         statusBar = new StatusBar();
@@ -186,7 +183,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     private void buildCreationPanel(final DefaultTreeModel testCaseModel, final Path savePath, final ProjectPanel projectPanel) {
-        CheckedTreeNode root = convertToCheckedNodes((DefaultMutableTreeNode) testCaseModel.getRoot());
+        final CheckedTreeNode root = convertToCheckedNodes((DefaultMutableTreeNode) testCaseModel.getRoot());
 
         mainPanel = new JBPanel<>(new BorderLayout());
 
@@ -205,10 +202,10 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     private CheckboxTree.CheckboxTreeCellRenderer createTreeRenderer() {
         return new CheckboxTree.CheckboxTreeCellRenderer() {
             @Override
-            public void customizeRenderer(@NotNull JTree tree, @NotNull Object value, boolean selected,
-                                          boolean expanded, boolean leaf, int row, boolean hasFocus) {
+            public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected,
+                                          final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
                 if (!(value instanceof CheckedTreeNode node)) return;
-                Object userObj = node.getUserObject();
+                final Object userObj = node.getUserObject();
 
                 if (userObj instanceof DirectoryDto dir) {
                     getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
@@ -220,8 +217,8 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
             }
 
             private void renderTestCaseNode(final TestCaseDto tc) {
-                @NotNull TestRunDto.TestRunItems result = resultsMap.get(tc.getId());
-                TestStatus status = result.getStatus();
+                final @NotNull TestRunDto.TestRunItems result = resultsMap.get(tc.getId());
+                final TestStatus status = result.getStatus();
                 getTextRenderer().append(tc.getTitle(), status.getStyle());
                 getTextRenderer().append(status.getDisplayText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
             }
@@ -229,7 +226,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     private JButton createSaveButton(final CheckedTreeNode root, final Path savePath, final ProjectPanel projectPanel) {
-        JButton saveButton = new JButton("Save Test Run");
+        final JButton saveButton = new JButton("Save Test Run");
         saveButton.addActionListener(e -> {
             if (!metadataHeader.validate()) {
                 JOptionPane.showMessageDialog(mainPanel, "Build number is required.", "Validation Error", JOptionPane.ERROR_MESSAGE);
@@ -245,7 +242,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     private void saveSelectedToJSON(final CheckedTreeNode root, final Path savePath, final ProjectPanel projectPanel) {
-        TestRunDto run = new TestRunDto();
+        final TestRunDto run = new TestRunDto();
         if (metadata != null) {
             run.setBuildNumber(metadata.getBuildNumber())
                     .setPlatform(metadata.getPlatform())
@@ -254,21 +251,21 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
                     .setDeviceType(metadata.getDeviceType());
         }
 
-        String fileName = vf.getDirectoryDto().getName() + ".json";
+        final String fileName = vf.getDirectoryDto().getName() + ".json";
         run.setRunName(fileName);
         run.setCreatedAt(LocalDateTime.now());
         run.setStatus(TestRunStatus.CREATED);
 
-        List<TestRunDto.TestRunItems> items = new ArrayList<>();
-        Map<Path, List<UUID>> pathMap = new HashMap<>();
+        final List<TestRunDto.TestRunItems> items = new ArrayList<>();
+        final Map<Path, List<UUID>> pathMap = new HashMap<>();
 
         collectCheckedItems(root, items, pathMap);
 
         run.setResults(items);
 
-        List<TestRunDto.TestCase> testCasesPaths = new ArrayList<>();
-        for (Map.Entry<Path, List<UUID>> entry : pathMap.entrySet()) {
-            TestRunDto.TestCase tcPath = new TestRunDto.TestCase();
+        final List<TestRunDto.TestCase> testCasesPaths = new ArrayList<>();
+        for (final Map.Entry<Path, List<UUID>> entry : pathMap.entrySet()) {
+            final TestRunDto.TestCase tcPath = new TestRunDto.TestCase();
             tcPath.setPath(entry.getKey());
             tcPath.setUuid(entry.getValue());
             testCasesPaths.add(tcPath);
@@ -283,7 +280,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
                     projectPanel.getTestRunTreeBuilder().buildTree(projectPanel.getTestProjectSelector().getSelectedTestProject().getItem());
                     FileEditorManager.getInstance(Config.getProject()).closeFile(currentFile);
                 });
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 e.printStackTrace(System.err);
             }
         });
@@ -291,10 +288,10 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
 
     private void collectCheckedItems(final CheckedTreeNode node, final List<TestRunDto.TestRunItems> items, final Map<Path, List<UUID>> pathMap) {
         if (node.getUserObject() instanceof TestCaseDto tc && node.isChecked()) {
-            TestRunDto.TestRunItems item = new TestRunDto.TestRunItems();
+            final TestRunDto.TestRunItems item = new TestRunDto.TestRunItems();
             item.setTestCaseId(tc.getId());
             item.setStatus(TestStatus.PENDING);
-            Object rootObj = ((DefaultMutableTreeNode) node.getRoot()).getUserObject();
+            final Object rootObj = ((DefaultMutableTreeNode) node.getRoot()).getUserObject();
             item.setProject(rootObj instanceof DirectoryDto d ? d.getName() : String.valueOf(rootObj));
             items.add(item);
 
@@ -320,8 +317,8 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     private CheckedTreeNode convertToCheckedNodes(final DefaultMutableTreeNode node) {
-        Object userObj = node.getUserObject();
-        CheckedTreeNode newNode = new CheckedTreeNode(userObj);
+        final Object userObj = node.getUserObject();
+        final CheckedTreeNode newNode = new CheckedTreeNode(userObj);
 
         if (userObj instanceof TestCaseDto tc && initialTestCaseIds.contains(tc.getId())) {
             newNode.setChecked(true);
@@ -348,14 +345,6 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         }
     }
 
-    public boolean isShowGroups() {
-        return toolBar != null && toolBar.getSettings().isShowGroupsBadge();
-    }
-
-    public boolean isShowPriority() {
-        return toolBar != null && toolBar.getSettings().isShowPriorityBadge();
-    }
-
     public Set<String> getSelectedDetails() {
         return toolBar != null ? toolBar.getSettings().getSelectedDetails() : Collections.emptySet();
     }
@@ -377,14 +366,14 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     public void refreshView() {
-        List<TestCaseDto> filtered = getFilteredList();
-        int total = filtered.size();
-        int totalPages = getTotalPageCount();
+        final List<TestCaseDto> filtered = getFilteredList();
+        final int total = filtered.size();
+        final int totalPages = getTotalPageCount();
         currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
-        int fromIndex = (currentPage - 1) * pageSize;
-        int toIndex = Math.min(fromIndex + pageSize, total);
-        List<TestCaseDto> pageItems = filtered.subList(fromIndex, toIndex);
+        final int fromIndex = (currentPage - 1) * pageSize;
+        final int toIndex = Math.min(fromIndex + pageSize, total);
+        final List<TestCaseDto> pageItems = filtered.subList(fromIndex, toIndex);
 
         model.replaceAll(pageItems);
 
@@ -392,16 +381,22 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     private List<TestCaseDto> getFilteredList() {
-        String query = toolBar != null ? toolBar.getSearchQuery() : "";
-        Set<Groups> groups = toolBar != null ? toolBar.getSettings().getSelectedGroups() : Collections.emptySet();
+        final String queryFilters = toolBar != null ? toolBar.getSearchQuery() : "";
+        final Set<Groups> groupsFilters = toolBar != null ? toolBar.getSettings().getSelectedGroups() : Collections.emptySet();
+        final Set<String> priorityFilters = toolBar != null ? toolBar.getSettings().getSelectedPriorityFilters() : Collections.emptySet();
 
         return initialTestCaseDtos.stream()
                 .filter(tc -> {
-                    boolean matchesSearch = query.isEmpty() ||
-                            (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query));
-                    boolean matchesGroup = groups.isEmpty() ||
-                            (tc.getGroups() != null && tc.getGroups().stream().anyMatch(groups::contains));
-                    return matchesSearch && matchesGroup;
+                    final boolean matchesSearch = queryFilters.isEmpty() ||
+                            (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(queryFilters));
+
+                    final boolean matchesGroup = groupsFilters.isEmpty() ||
+                            (tc.getGroups() != null && tc.getGroups().stream().anyMatch(groupsFilters::contains));
+
+                    final boolean matchesPriority = priorityFilters.isEmpty() ||
+                            (tc.getPriority() != null && priorityFilters.contains(tc.getPriority().name()));
+
+                    return matchesSearch && matchesGroup && matchesPriority;
                 })
                 .collect(Collectors.toList());
     }
@@ -440,7 +435,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     @Override
     public void selectTestCase(final TestCaseDto tc) {
         if (tc == null) return;
-        int index = model.getItems().indexOf(tc);
+        final int index = model.getItems().indexOf(tc);
         if (index != -1) {
             list.setSelectedIndex(index);
             list.ensureIndexIsVisible(index);

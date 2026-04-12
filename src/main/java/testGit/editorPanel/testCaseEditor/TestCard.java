@@ -15,11 +15,11 @@ public class TestCard extends BaseCard<TestCard> {
         super();
     }
 
-    public void updateData(final int index, final TestCaseDto tc, final boolean showGroups, final boolean showPriority, final Set<String> activeDetails, final boolean isUnsorted) {
-        super.updateBaseData(index, tc, showPriority, showGroups, activeDetails);
+    public void updateData(final int index, final TestCaseDto tc, final Set<String> activeDetails, final boolean isUnsorted) {
+        super.updateBaseData(index, tc, activeDetails);
 
         if (isUnsorted) {
-            JBLabel unsortedBadge = new JBLabel("Unsorted");
+            final JBLabel unsortedBadge = new JBLabel("Unsorted");
             unsortedBadge.setOpaque(true);
             unsortedBadge.setBackground(new JBColor(new Color(255, 200, 200), new Color(130, 50, 50)));
             unsortedBadge.setForeground(JBColor.RED);

@@ -8,11 +8,13 @@ import testGit.actions.NavigateToCode;
 import testGit.actions.RunTestCase;
 import testGit.editorPanel.BaseEditorUI;
 import testGit.editorPanel.testRunEditor.RunEditorUI;
+import testGit.pojo.CardHoverAction;
 import testGit.pojo.dto.TestCaseDto;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Optional;
 
 import static testGit.editorPanel.testRunEditor.RunCard.ACTIONS_TOTAL_WIDTH;
 
@@ -26,38 +28,38 @@ public class HoverListener extends MouseAdapter {
         this.ui = ui;
     }
 
-    private String getActionAtPoint(final int index, final int xInCell, final int yInCell, final Rectangle bounds) {
+    private CardHoverAction getActionAtPoint(final int index, final int xInCell, final int yInCell, final Rectangle bounds) {
         if (index == -1) return null;
 
         if (yInCell <= JBUI.scale(45)) {
-            TestCaseDto tc = list.getModel().getElementAt(index);
-            int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
-            String titleText = String.format("%d. %s", globalIndex + 1, tc.getTitle());
+            final TestCaseDto tc = list.getModel().getElementAt(index);
+            final int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
+            final String titleText = String.format("%d. %s", globalIndex + 1, tc.getTitle());
 
-            Font titleFont = JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f);
-            FontMetrics fm = list.getFontMetrics(titleFont);
-            int titleWidth = fm.stringWidth(titleText);
+            final Font titleFont = JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f);
+            final FontMetrics fm = list.getFontMetrics(titleFont);
+            final int titleWidth = fm.stringWidth(titleText);
 
-            int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
-            int navStartX = startX - JBUI.scale(6);
-            int runStartX = startX + JBUI.scale(22);
-            int runEndX = runStartX + JBUI.scale(28);
+            final int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
+            final int navStartX = startX - JBUI.scale(6);
+            final int runStartX = startX + JBUI.scale(22);
+            final int runEndX = runStartX + JBUI.scale(28);
 
-            if (xInCell >= navStartX && xInCell <= runStartX) return "NAVIGATE";
-            if (xInCell > runStartX && xInCell <= runEndX) return "RUN";
+            if (xInCell >= navStartX && xInCell <= runStartX) return CardHoverAction.NAVIGATE;
+            if (xInCell > runStartX && xInCell <= runEndX) return CardHoverAction.RUN;
         }
 
         if (ui instanceof RunEditorUI && list.isSelectedIndex(index)) {
-            int actionWidth = JBUI.scale(ACTIONS_TOTAL_WIDTH);
-            int actionStartX = bounds.width - actionWidth;
+            final int actionWidth = JBUI.scale(ACTIONS_TOTAL_WIDTH);
+            final int actionStartX = bounds.width - actionWidth;
 
             if (xInCell >= actionStartX && xInCell <= bounds.width) {
-                int relativeX = xInCell - actionStartX;
-                int chunk = actionWidth / 3;
+                final int relativeX = xInCell - actionStartX;
+                final int chunk = actionWidth / 3;
 
-                if (relativeX < chunk) return "PASSED";
-                if (relativeX < chunk * 2) return "FAILED";
-                return "BLOCKED";
+                if (relativeX < chunk) return CardHoverAction.PASSED;
+                if (relativeX < chunk * 2) return CardHoverAction.FAILED;
+                return CardHoverAction.BLOCKED;
             }
         }
 
@@ -66,22 +68,21 @@ public class HoverListener extends MouseAdapter {
 
     @Override
     public void mouseClicked(final MouseEvent e) {
-        int index = list.locationToIndex(e.getPoint());
+        final int index = list.locationToIndex(e.getPoint());
         if (index == -1) return;
 
-        Rectangle bounds = list.getCellBounds(index, index);
-        String action = getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y, bounds);
+        final Rectangle bounds = list.getCellBounds(index, index);
+        final CardHoverAction action = getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y, bounds);
 
         if (action != null) {
-            TestCaseDto tc = list.getModel().getElementAt(index);
-            if (action.equals("NAVIGATE")) {
+            final TestCaseDto tc = list.getModel().getElementAt(index);
+
+            if (action == CardHoverAction.NAVIGATE) {
                 NavigateToCode.execute(tc);
-
-            } else if (action.equals("RUN")) {
+            } else if (action == CardHoverAction.RUN) {
                 RunTestCase.execute(tc);
-
             } else {
-                System.out.println("Test Case [" + tc.getTitle() + "] updated to: " + action);
+                System.out.println("Test Case [" + tc.getTitle() + "] updated to: " + action.name());
             }
             e.consume();
         }
@@ -89,19 +90,15 @@ public class HoverListener extends MouseAdapter {
 
     @Override
     public void mouseMoved(final MouseEvent e) {
-        int index = list.locationToIndex(e.getPoint());
-        String currentAction = null;
+        final int index = list.locationToIndex(e.getPoint());
+        CardHoverAction currentAction = null;
 
         if (index != -1) {
-            Rectangle bounds = list.getCellBounds(index, index);
+            final Rectangle bounds = list.getCellBounds(index, index);
             currentAction = getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y, bounds);
         }
 
-        if (currentAction != null) {
-            list.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        } else {
-            list.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        }
+        list.setCursor(Cursor.getPredefinedCursor(currentAction != null ? Cursor.HAND_CURSOR : Cursor.DEFAULT_CURSOR));
 
         boolean needsRepaint = false;
 
@@ -110,22 +107,13 @@ public class HoverListener extends MouseAdapter {
             needsRepaint = true;
         }
 
-        if (currentAction == null ? ui.getHoveredIconAction() != null : !currentAction.equals(ui.getHoveredIconAction())) {
-            ui.setHoveredIconAction(currentAction);
+        final String actionName = currentAction != null ? currentAction.name() : null;
+
+        if (actionName == null ? ui.getHoveredIconAction() != null : !actionName.equals(ui.getHoveredIconAction())) {
+            ui.setHoveredIconAction(actionName);
             needsRepaint = true;
 
-            if (currentAction != null) {
-                switch (currentAction) {
-                    case "NAVIGATE" -> list.setToolTipText("Navigate to Code");
-                    case "RUN" -> list.setToolTipText("Run Test Case");
-                    case "PASSED" -> list.setToolTipText("Mark as Passed");
-                    case "FAILED" -> list.setToolTipText("Mark as Failed");
-                    case "BLOCKED" -> list.setToolTipText("Mark as Blocked");
-                    default -> list.setToolTipText(null);
-                }
-            } else {
-                list.setToolTipText(null);
-            }
+            list.setToolTipText(Optional.ofNullable(currentAction).map(CardHoverAction::getTooltip).orElse(null));
         }
 
         if (needsRepaint) {
