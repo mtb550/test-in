@@ -235,5 +235,10 @@ optional of nullable not recommended inside loop as it create temp objects in ra
 
 istead of passing attributes between methods, use consumer or callback interface.
 
-editor toolbar must read from map, whatever in the map, show it. one map all use it, editor tool bar, edit tc popup, view panel, create tc. start oe by one
+editor toolbar must read from map, whatever in the map, show it. one map all use it, editor tool bar, edit tc popup, view panel, create tc. start oe by one.
 
+add the buttons: reset to filter button on tool bar editor, default to details button.
+
+make tool bar search on the right.
+remove tool bar texts(details, filter, refresh) and just put the icons.
+reset filter on tob of filter list toolbar.(Reset)

@@ -16,30 +16,19 @@ public class ToolBarSettings {
     private static final String KEY_DETAILS = "testGit.selectedDetails.v2";
     /// TODO: remove default selected as will depend on preferrences, otherwise show all.
     private static final String DEFAULT_DETAILS = Arrays.stream(TestCaseAttributes.values())
-            .filter(TestCaseAttributes::isDefaultSelected)
+            .filter(TestCaseAttributes::isDefaultToolBarSelected)
             .map(Enum::name)
             .collect(Collectors.joining(","));
 
     private final Set<Groups> selectedGroups = new HashSet<>();
+    private final Set<Priority> selectedPriorities = new HashSet<>();
     private final Set<String> selectedDetails = new HashSet<>();
 
     public ToolBarSettings() {
         final PropertiesComponent props = PropertiesComponent.getInstance();
         final String saved = props.getValue(KEY_DETAILS, DEFAULT_DETAILS);
 
-        Arrays.stream(saved.split(","))
-                .filter(s -> !s.isEmpty())
-                .forEach(selectedDetails::add);
-    }
-
-    public Set<String> getSelectedPriorityFilters() {
-        final Set<String> validPriorityKeys = Arrays.stream(Priority.values())
-                .map(Enum::name)
-                .collect(Collectors.toSet());
-
-        return selectedDetails.stream()
-                .filter(validPriorityKeys::contains)
-                .collect(Collectors.toSet());
+        Arrays.stream(saved.split(",")).filter(s -> !s.isEmpty()).forEach(selectedDetails::add);
     }
 
     public void save() {
@@ -49,6 +38,6 @@ public class ToolBarSettings {
 
     public void resetFilters() {
         selectedGroups.clear();
-        selectedDetails.clear();
+        selectedPriorities.clear();
     }
 }

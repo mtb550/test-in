@@ -381,9 +381,10 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     }
 
     private List<TestCaseDto> getFilteredList() {
-        final String queryFilters = toolBar != null ? toolBar.getSearchQuery() : "";
-        final Set<Groups> groupsFilters = toolBar != null ? toolBar.getSettings().getSelectedGroups() : Collections.emptySet();
-        final Set<String> priorityFilters = toolBar != null ? toolBar.getSettings().getSelectedPriorityFilters() : Collections.emptySet();
+        final Optional<ToolBar> toolBarOpt = Optional.ofNullable(toolBar);
+        final String queryFilters = toolBarOpt.map(ToolBar::getSearchQuery).orElse("");
+        final Set<Groups> groupsFilters = toolBarOpt.map(t -> t.getSettings().getSelectedGroups()).orElse(Collections.emptySet());
+        final Set<Priority> priorityFilters = toolBarOpt.map(t -> t.getSettings().getSelectedPriorities()).orElse(Collections.emptySet());
 
         return initialTestCaseDtos.stream()
                 .filter(tc -> {
@@ -394,7 +395,7 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
                             (tc.getGroups() != null && tc.getGroups().stream().anyMatch(groupsFilters::contains));
 
                     final boolean matchesPriority = priorityFilters.isEmpty() ||
-                            (tc.getPriority() != null && priorityFilters.contains(tc.getPriority().name()));
+                            (tc.getPriority() != null && priorityFilters.contains(tc.getPriority()));
 
                     return matchesSearch && matchesGroup && matchesPriority;
                 })

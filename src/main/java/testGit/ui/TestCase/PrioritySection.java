@@ -7,6 +7,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import testGit.editorPanel.IconManager;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.KeyboardSet;
@@ -33,10 +34,10 @@ public class PrioritySection implements CreateTestCaseSection {
             @Override
             protected void customizeCellRenderer(@NotNull final JList<? extends Priority> list, final Priority value, final int index, final boolean selected, final boolean hasFocus) {
                 if (value != null) {
-                    setIcon(value.getIcon());
+                    setIcon(IconManager.createIcon(value.getColor()));
                     append(" Priority:  ");
                     append(value.name());
-                    append("    " + value.getShortcutText(), new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GRAY));
+                    append("    " + value.getShortcut().getShortcutText(), new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GRAY));
                 }
             }
         });

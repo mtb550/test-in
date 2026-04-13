@@ -6,6 +6,7 @@ import testGit.pojo.dto.TestCaseDto;
 
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -17,11 +18,11 @@ public enum TestCaseAttributes {
 
     ID("ID",
             true,
-            true,
+            false,
             tc -> String.valueOf(tc.getId())
     ),
 
-    TITLE("Title",
+    TITLE("Title",      /// TODO:: added to tool bar details, to be shown but disabled
             false,
             false,
             TestCaseDto::getTitle
@@ -36,74 +37,75 @@ public enum TestCaseAttributes {
     STEPS("Steps",
             true,
             true,
-            tc -> Optional.ofNullable(tc.getSteps()).map(Object::toString).orElse(null)
+            tc -> Optional.ofNullable(tc.getSteps()).map(Object::toString).orElse("")
     ),
 
     PRIORITY("Priority",
-            false,
             true,
-            tc -> null
+            true,
+            tc -> Optional.ofNullable(tc.getPriority()).map(Priority::getName).orElse("")
     ),
 
     AUTO_REF("Automation Referrence",
             true,
-            true,
+            false,
             TestCaseDto::getAutoRef
     ),
 
     BUSI_REF("Business Referrence",
             true,
-            true,
+            false,
             TestCaseDto::getBusiRef
     ),
 
     GROUPS("Groups",
-            false,
             true,
-            tc -> null
+            true,
+            tc -> Optional.ofNullable(tc.getGroups()).map(groups -> groups.stream().map(Groups::getName).collect(Collectors.joining(", "))).orElse("")
     ),
 
+    ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
+
     CREATE_BY("Created By",
-            false,
+            true,
             false,
             tc -> null
     ),
 
     UPDATE_BY("Updated By",
-            false,
+            true,
             false,
             tc -> null
     ),
 
     CREATE_AT("Created At",
-            false,
+            true,
             false,
             tc -> null
     ),
 
     UPDATE_AT("Updated At",
-            false,
+            true,
             false,
             tc -> null
     ),
 
     MODULE("Module",
             true,
-            true,
+            false,
             TestCaseDto::getModule
     ),
 
     APPROVAL_STATUS(
             "Approval Status",
-            false,
+            true,
             false,
             tc -> null
     );
 
     private final String displayName;
-    private final boolean standardOption;
-    private final boolean defaultSelected;
-
+    private final boolean standardToolBarOption;
+    private final boolean defaultToolBarSelected;
     private final Function<TestCaseDto, String> valueExtractor;
 
     public String getValue(final TestCaseDto tc) {

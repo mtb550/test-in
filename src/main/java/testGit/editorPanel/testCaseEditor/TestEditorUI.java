@@ -23,6 +23,7 @@ import testGit.editorPanel.toolBar.ToolBar;
 import testGit.editorPanel.toolBar.ToolBarCallback;
 import testGit.pojo.Config;
 import testGit.pojo.Groups;
+import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.TestCaseSorter;
 import testGit.util.services.TestCaseCacheService;
@@ -303,7 +304,7 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     private List<TestCaseDto> getFilteredList() {
         final String query = toolBar.getSearchQuery();
         final Set<Groups> groups = toolBar.getSettings().getSelectedGroups();
-        final Set<String> priorityFilters = toolBar.getSettings().getSelectedPriorityFilters();
+        final Set<Priority> priorityFilters = toolBar.getSettings().getSelectedPriorities();
 
         synchronized (allTestCaseDtos) {
             return allTestCaseDtos.stream()
@@ -315,7 +316,7 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
                                 (tc.getGroups() != null && tc.getGroups().stream().anyMatch(groups::contains));
 
                         final boolean matchesPriority = priorityFilters.isEmpty() ||
-                                (tc.getPriority() != null && priorityFilters.contains(tc.getPriority().name()));
+                                (tc.getPriority() != null && priorityFilters.contains(tc.getPriority()));
 
                         return matchesSearch && matchesGroup && matchesPriority;
                     })

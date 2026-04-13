@@ -19,37 +19,35 @@ public class Shared {
 
     public static JBLabel createPriorityBadge(final TestCaseDto tc) {
         return Optional.ofNullable(tc.getPriority())
-                .map(p -> new RoundedBadge(p.getDisplayName(), p.getColor()))
+                .map(p -> new RoundedBadge(p.getName(), p.getColor()))
                 .orElseGet(() -> new RoundedBadge("Unknown", JBColor.GRAY));
     }
 
     public static JBLabel createGroupBadge(final Groups groupName) {
-        return new RoundedBadge(groupName.getDisplayName(), JBColor.darkGray);
+        return new RoundedBadge(groupName.getName(), JBColor.darkGray);
     }
 
     public static void drawTitleActionIcons(final Component c, final Graphics g, final int titleWidth, final int y, final String hoveredAction) {
         final int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
-        final float scaleFactor = 1.5f;
 
         final Icon navIcon = AllIcons.Nodes.Class;
-        if (CardHoverAction.NAVIGATE.name().equals(hoveredAction)) {
-            final Icon scaledIcon = IconUtil.scale(navIcon, c, scaleFactor);
-            final int offsetX = (scaledIcon.getIconWidth() - navIcon.getIconWidth()) / 2;
-            final int offsetY = (scaledIcon.getIconHeight() - navIcon.getIconHeight()) / 2;
-            scaledIcon.paintIcon(c, g, startX - offsetX, y - offsetY);
-        } else {
-            navIcon.paintIcon(c, g, startX, y);
-        }
+        final boolean isNavHovered = CardHoverAction.NAVIGATE.name().equals(hoveredAction);
+        drawHoverableIcon(c, g, navIcon, startX, y, isNavHovered);
 
         final int runStartX = startX + navIcon.getIconWidth() + JBUI.scale(8);
         final Icon runIcon = AllIcons.RunConfigurations.TestState.Run;
-        if (CardHoverAction.RUN.name().equals(hoveredAction)) {
-            final Icon scaledIcon = IconUtil.scale(runIcon, c, scaleFactor);
-            final int offsetX = (scaledIcon.getIconWidth() - runIcon.getIconWidth()) / 2;
-            final int offsetY = (scaledIcon.getIconHeight() - runIcon.getIconHeight()) / 2;
-            scaledIcon.paintIcon(c, g, runStartX - offsetX, y - offsetY);
+        final boolean isRunHovered = CardHoverAction.RUN.name().equals(hoveredAction);
+        drawHoverableIcon(c, g, runIcon, runStartX, y, isRunHovered);
+    }
+
+    private static void drawHoverableIcon(final Component c, final Graphics g, final Icon baseIcon, final int x, final int y, final boolean isHovered) {
+        if (isHovered) {
+            final Icon scaledIcon = IconUtil.scale(baseIcon, c, 1.5f);
+            final int offsetX = (scaledIcon.getIconWidth() - baseIcon.getIconWidth()) / 2;
+            final int offsetY = (scaledIcon.getIconHeight() - baseIcon.getIconHeight()) / 2;
+            scaledIcon.paintIcon(c, g, x - offsetX, y - offsetY);
         } else {
-            runIcon.paintIcon(c, g, runStartX, y);
+            baseIcon.paintIcon(c, g, x, y);
         }
     }
 
