@@ -7,9 +7,9 @@ import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import testGit.editorPanel.IconManager;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
+import testGit.util.IconManager;
 import testGit.util.KeyboardSet;
 
 import javax.swing.*;

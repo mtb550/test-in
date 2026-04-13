@@ -1,12 +1,13 @@
-package testGit.editorPanel;
+package testGit.util;
 
+import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class IconManager {
-    private static final float SCALE_FACTOR = 1.5f;
+    private static final float SCALE_FACTOR = 1.3f;
     private static final float DEFAULT_FACTOR = 1.0f;
 
     public static Icon createIcon(final Color color) {
@@ -15,6 +16,10 @@ public class IconManager {
 
     public static Icon createZoomedIcon(final Color color) {
         return createScaledIcon(color, SCALE_FACTOR);
+    }
+
+    public static Icon zoomStandardIcon(final Icon icon, final Component contextComponent) {
+        return IconUtil.scale(icon, contextComponent, SCALE_FACTOR);
     }
 
     private static Icon createScaledIcon(final Color color, final float scale) {

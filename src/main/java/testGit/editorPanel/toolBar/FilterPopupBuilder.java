@@ -8,10 +8,10 @@ import com.intellij.openapi.actionSystem.ToggleAction;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import org.jetbrains.annotations.NotNull;
-import testGit.editorPanel.IconManager;
 import testGit.pojo.Groups;
 import testGit.pojo.Priority;
 import testGit.pojo.TestCaseAttributes;
+import testGit.util.IconManager;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -77,7 +77,7 @@ public class FilterPopupBuilder {
 
                     @Override
                     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                        g.onChange(selectedGroups, state); // استدعاء الـ BiConsumer من الـ Enum
+                        g.onChange(selectedGroups, state);
                         Optional.ofNullable(onChange).ifPresent(c -> c.accept(null));
                     }
 

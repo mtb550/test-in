@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import testGit.util.IconManager;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -17,7 +18,7 @@ import java.awt.event.MouseEvent;
 
 public class ToolBar extends JBPanel<ToolBar> {
     ///  TODO: use interface that implement any tool bar button.
-    /// TODO: remove refresh text, details text, same as what you did with filter btn
+
     @Getter
     private final ToolBarSettings settings;
 
@@ -66,11 +67,12 @@ public class ToolBar extends JBPanel<ToolBar> {
     private void updateFilterButtonState() {
         final int activeFiltersCount = settings.getSelectedPriorities().size() + settings.getSelectedGroups().size();
         if (activeFiltersCount == 0) {
-            filterBtn.setText("");
+            filterBtn.setText(null);
             filterBtn.setToolTipText("Filter");
             filterBtn.setForeground(JBColor.foreground());
         } else {
             filterBtn.setText("(" + activeFiltersCount + ")");
+            filterBtn.setToolTipText("Filter [" + activeFiltersCount + " active]");
             filterBtn.setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
         }
     }
@@ -85,25 +87,30 @@ public class ToolBar extends JBPanel<ToolBar> {
         updateFilterButtonState();
     }
 
-    private JButton createToolbarButton(final String text, final Icon icon) {
-        final JButton btn = new JButton(text, icon);
+    private JButton createToolbarButton(final String tooltip, final Icon icon) {
+        final JButton btn = new JButton(null, icon);
+        btn.setToolTipText(tooltip);
         btn.setFocusable(false);
         btn.setBorderPainted(false);
         btn.setContentAreaFilled(false);
-        btn.setMargin(JBUI.insets(2));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        btn.setFont(JBUI.Fonts.label(12f));
+
+        btn.setMargin(JBUI.insets(4));
+        final Icon zoomedIcon = IconManager.zoomStandardIcon(icon, btn);
+
         btn.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseEntered(final MouseEvent e) {
                 btn.setContentAreaFilled(true);
                 btn.setBackground(JBUI.CurrentTheme.ActionButton.hoverBackground());
+                btn.setIcon(zoomedIcon);
             }
 
             @Override
             public void mouseExited(final MouseEvent e) {
                 btn.setContentAreaFilled(false);
+                btn.setIcon(icon);
             }
         });
         return btn;
