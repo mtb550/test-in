@@ -22,8 +22,6 @@ import testGit.editorPanel.listeners.*;
 import testGit.editorPanel.toolBar.ToolBar;
 import testGit.editorPanel.toolBar.ToolBarCallback;
 import testGit.pojo.Config;
-import testGit.pojo.Groups;
-import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.TestCaseSorter;
 import testGit.util.services.TestCaseCacheService;
@@ -36,7 +34,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
 
@@ -44,6 +41,8 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
     private final ModelSyncListener syncListener;
+
+    @Getter
     private final ToolBar toolBar;
 
     @Getter
@@ -299,32 +298,6 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         syncListener.resume();
 
         statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), totalItems);
-    }
-
-    private List<TestCaseDto> getFilteredList() {
-        final String query = toolBar.getSearchQuery();
-        final Set<Groups> groups = toolBar.getSettings().getSelectedGroups();
-        final Set<Priority> priorityFilters = toolBar.getSettings().getSelectedPriorities();
-
-        synchronized (allTestCaseDtos) {
-            return allTestCaseDtos.stream()
-                    .filter(tc -> {
-                        final boolean matchesSearch = query.isEmpty() ||
-                                tc.getTitle() != null && tc.getTitle().toLowerCase().contains(query) ||
-                                tc.getId().toString().toLowerCase().contains(query) ||
-                                tc.getExpected() != null && tc.getExpected().toLowerCase().contains(query) ||
-                                tc.getSteps() != null && tc.getSteps().stream().anyMatch(step -> step != null && step.toLowerCase().contains(query));
-
-                        final boolean matchesGroup = groups.isEmpty() ||
-                                (tc.getGroups() != null && tc.getGroups().stream().anyMatch(groups::contains));
-
-                        final boolean matchesPriority = priorityFilters.isEmpty() ||
-                                (tc.getPriority() != null && priorityFilters.contains(tc.getPriority()));
-
-                        return matchesSearch && matchesGroup && matchesPriority;
-                    })
-                    .collect(Collectors.toList());
-        }
     }
 
     private int getTotalPages(final List<TestCaseDto> filtered) {

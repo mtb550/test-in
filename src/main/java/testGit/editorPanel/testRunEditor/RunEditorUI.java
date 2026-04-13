@@ -21,7 +21,10 @@ import testGit.editorPanel.UnifiedVirtualFile;
 import testGit.editorPanel.listeners.*;
 import testGit.editorPanel.toolBar.ToolBar;
 import testGit.editorPanel.toolBar.ToolBarCallback;
-import testGit.pojo.*;
+import testGit.pojo.Config;
+import testGit.pojo.EditorType;
+import testGit.pojo.TestRunStatus;
+import testGit.pojo.TestStatus;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.TestRunDto;
 import testGit.pojo.dto.dirs.DirectoryDto;
@@ -41,8 +44,6 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
-@Setter
 public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
 
     private final UnifiedVirtualFile vf;
@@ -50,16 +51,22 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     private final Set<UUID> initialTestCaseIds = new HashSet<>();
     private final VirtualFile currentFile;
     private final @NotNull Map<UUID, TestRunDto.TestRunItems> resultsMap;
+    CheckboxTree checklistTree;
+    TestRunDto metadata;
     private RunSessionCache sessionCache;
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
     private JBList<TestCaseDto> list;
     private CollectionListModel<TestCaseDto> model;
+    @Getter
+    @Setter
     private int currentPage = 1;
+    @Getter
+    @Setter
     private int pageSize = 50;
+    @Getter
     private StatusBar statusBar;
+    @Getter
     private ToolBar toolBar;
-    private CheckboxTree checklistTree;
-    private TestRunDto metadata;
     private TestRunMetadataHeader metadataHeader;
 
     @Getter
@@ -378,28 +385,6 @@ public class RunEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         model.replaceAll(pageItems);
 
         statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), total);
-    }
-
-    private List<TestCaseDto> getFilteredList() {
-        final Optional<ToolBar> toolBarOpt = Optional.ofNullable(toolBar);
-        final String queryFilters = toolBarOpt.map(ToolBar::getSearchQuery).orElse("");
-        final Set<Groups> groupsFilters = toolBarOpt.map(t -> t.getSettings().getSelectedGroups()).orElse(Collections.emptySet());
-        final Set<Priority> priorityFilters = toolBarOpt.map(t -> t.getSettings().getSelectedPriorities()).orElse(Collections.emptySet());
-
-        return initialTestCaseDtos.stream()
-                .filter(tc -> {
-                    final boolean matchesSearch = queryFilters.isEmpty() ||
-                            (tc.getTitle() != null && tc.getTitle().toLowerCase().contains(queryFilters));
-
-                    final boolean matchesGroup = groupsFilters.isEmpty() ||
-                            (tc.getGroups() != null && tc.getGroups().stream().anyMatch(groupsFilters::contains));
-
-                    final boolean matchesPriority = priorityFilters.isEmpty() ||
-                            (tc.getPriority() != null && priorityFilters.contains(tc.getPriority()));
-
-                    return matchesSearch && matchesGroup && matchesPriority;
-                })
-                .collect(Collectors.toList());
     }
 
     @Override

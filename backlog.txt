@@ -249,3 +249,8 @@ unify the filteredlist method that in test editor ui and run editor ui (getFilte
 put and use @NotNull in test case dto and clear all related and update create test case to put empty not null. (major)
 implement tool bar button interface and enum that allow to add new buton later easely.
 sorting number should be fixed in editor once search and list the results. (major)
+
+add shortcut ALT+> and ALT+< to navigate between test or run editors pages
+add shortcut CTRL+F to make focus on tool bar search filed
+add shortcut ESCAPE to remove focus in tool bar search filed
+disable F2 and edit test case button on context menu if the active editor is run editor.

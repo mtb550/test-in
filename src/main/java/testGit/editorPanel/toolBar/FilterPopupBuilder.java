@@ -22,12 +22,13 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class FilterPopupBuilder {
-    private static final CheckBoxList<TestCaseAttributes> detailsList = new CheckBoxList<>();
-    private static final DefaultActionGroup filterResetBtn = new DefaultActionGroup();
-    private static final DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestCaseAttributes.PRIORITY.getDisplayName(), true);
-    private static final DefaultActionGroup filterGroupsMenu = new DefaultActionGroup(TestCaseAttributes.GROUPS.getDisplayName(), true);
+    protected static CheckBoxList<TestCaseAttributes> detailsList;
+    protected static DefaultActionGroup filterResetBtn;
+    protected static DefaultActionGroup filterPriorityMenu;
+    protected static DefaultActionGroup filterGroupsMenu;
 
     public static void detailsPopup(final JButton anchor, final Set<String> selectedDetails, final Consumer<Void> onChange) {
+        detailsList = new CheckBoxList<>();
         Arrays.stream(TestCaseAttributes.values())
                 .filter(TestCaseAttributes::isStandardToolBarOption)
                 .forEach(attr -> detailsList.addItem(attr, attr.getDisplayName(), selectedDetails.contains(attr.name())));
@@ -51,6 +52,7 @@ public class FilterPopupBuilder {
 
     public static void filterPopup(final JButton anchor, final Set<Priority> selectedPriorities, final Set<Groups> selectedGroups, final Runnable onReset, final Consumer<Void> onChange) {
         // reset btn
+        filterResetBtn = new DefaultActionGroup();
         filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
             @Override
             public void update(@NotNull AnActionEvent e) {
@@ -71,6 +73,7 @@ public class FilterPopupBuilder {
         filterResetBtn.addSeparator();
 
         // priority menu
+        filterPriorityMenu = new DefaultActionGroup(TestCaseAttributes.PRIORITY.getDisplayName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
                 filterPriorityMenu.add(new DumbAwareToggleAction(p.getName(), null, IconManager.createIcon(p.getColor())) {
                     @Override
@@ -92,6 +95,7 @@ public class FilterPopupBuilder {
         filterResetBtn.add(filterPriorityMenu);
 
         // group menu
+        filterGroupsMenu = new DefaultActionGroup(TestCaseAttributes.GROUPS.getDisplayName(), true);
         Arrays.stream(Groups.values()).forEach(g ->
                 filterGroupsMenu.add(new DumbAwareToggleAction(g.getName()) {
                     @Override
