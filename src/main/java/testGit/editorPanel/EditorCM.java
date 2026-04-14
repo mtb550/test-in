@@ -14,7 +14,7 @@ import javax.swing.*;
 
 public class EditorCM extends DefaultActionGroup {
 
-    public EditorCM(final BaseEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public EditorCM(final IEditor ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
 
         add(new CreateTestCase(ui, dir.getPath(), list, model));
@@ -29,7 +29,7 @@ public class EditorCM extends DefaultActionGroup {
         add(new NavigateToCode(list));
     }
 
-    public static void registerShortcuts(final BaseEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final EditorCM editorCM) {
+    public static void registerShortcuts(final IEditor ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final EditorCM editorCM) {
         new Escape(list);
         new OpenCM(list, editorCM);
         new CreateTestCase(ui, dir.getPath(), list, model);

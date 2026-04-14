@@ -2,7 +2,7 @@ package testGit.editorPanel.listeners;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
-import testGit.editorPanel.BaseEditorUI;
+import testGit.editorPanel.IEditor;
 import testGit.editorPanel.testCaseEditor.TestCard;
 import testGit.pojo.dto.TestCaseDto;
 
@@ -11,9 +11,9 @@ import java.awt.*;
 
 public class TestListRenderer implements ListCellRenderer<TestCaseDto> {
     private final TestCard rendererCard = new TestCard();
-    private final BaseEditorUI ui;
+    private final IEditor ui;
 
-    public TestListRenderer(final BaseEditorUI ui) {
+    public TestListRenderer(final IEditor ui) {
         this.ui = ui;
     }
 

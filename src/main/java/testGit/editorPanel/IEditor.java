@@ -3,7 +3,7 @@ package testGit.editorPanel;
 import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import testGit.editorPanel.toolBar.ToolBar;
+import testGit.editorPanel.toolBar.ActionToolbarPanel;
 import testGit.pojo.Group;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
@@ -14,10 +14,10 @@ import javax.swing.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public interface BaseEditorUI extends Disposable {
+public interface IEditor extends Disposable {
     StatusBar getStatusBar();
 
-    ToolBar getToolBar();
+    ActionToolbarPanel getToolBar();
 
     int getCurrentPage();
 
@@ -58,10 +58,10 @@ public interface BaseEditorUI extends Disposable {
     void setHoveredIndex(final int index);
 
     default List<TestCaseDto> getFilteredList() {
-        final ToolBar toolBar = getToolBar();
-        final String query = toolBar != null ? toolBar.getSearchQuery() : "";
-        final Set<Group> groupFilter = toolBar != null ? toolBar.getSettings().getSelectedGroup() : Collections.emptySet();
-        final Set<Priority> priorityFilter = toolBar != null ? toolBar.getSettings().getSelectedPriority() : Collections.emptySet();
+        final ActionToolbarPanel baseToolBar = getToolBar();
+        final String query = baseToolBar != null ? baseToolBar.getSearchField().getSearchQuery() : "";
+        final Set<Group> groupFilter = baseToolBar != null ? baseToolBar.getSettings().getSelectedGroup() : Collections.emptySet();
+        final Set<Priority> priorityFilter = baseToolBar != null ? baseToolBar.getSettings().getSelectedPriority() : Collections.emptySet();
 
         final List<TestCaseDto> allItems = getAllTestCaseDtos();
         if (allItems == null || allItems.isEmpty()) {

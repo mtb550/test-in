@@ -1,13 +1,13 @@
 package testGit.editorPanel.listeners;
 
-import testGit.editorPanel.BaseEditorUI;
+import testGit.editorPanel.IEditor;
 
 import javax.swing.*;
 import java.util.Optional;
 
 public class StatusBarListener {
 
-    public static void attach(final BaseEditorUI ui) {
+    public static void attach(final IEditor ui) {
         ui.getStatusBar().getFirstButton().addActionListener(e -> {
             ui.setCurrentPage(1);
             ui.refreshView();

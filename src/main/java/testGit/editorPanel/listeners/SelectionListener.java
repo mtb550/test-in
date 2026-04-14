@@ -2,7 +2,7 @@ package testGit.editorPanel.listeners;
 
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
-import testGit.editorPanel.BaseEditorUI;
+import testGit.editorPanel.IEditor;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewToolWindowFactory;
 
@@ -14,10 +14,10 @@ import java.util.Optional;
 
 public class SelectionListener implements ListSelectionListener {
     private final JBList<TestCaseDto> list;
-    private final BaseEditorUI ui;
+    private final IEditor ui;
     private final Path path;
 
-    public SelectionListener(final JBList<TestCaseDto> list, final BaseEditorUI ui, final Path path) {
+    public SelectionListener(final JBList<TestCaseDto> list, final IEditor ui, final Path path) {
         this.list = list;
         this.ui = ui;
         this.path = path;

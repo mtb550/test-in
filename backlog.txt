@@ -255,8 +255,21 @@ add shortcut CTRL+F to make focus on tool bar search filed
 add shortcut ESCAPE to remove focus in tool bar search filed
 disable F2 and edit test case button on context menu if the active editor is run editor.
 
-fix create test run issue.
+fix create test run issue. (resolved)
 
 keep create test case popup open if click ouside to prevent miss written data
 
 make the search global from project view.
+
+apply searchDebounceTimer in BaseToolBar for more stabability:
+searchDebounceTimer = new Timer(300, e -> callbacks.onFilterChanged());
+searchDebounceTimer.setRepeats(false);
+@Override
+protected void textChanged(final @NotNull DocumentEvent e) {
+searchDebounceTimer.restart();
+}
+
+
+question: intellij Task.Backgroundable vs ApplicationManager.getApplication().executeOnPooledThread
+
+change all interfaces to starts with I

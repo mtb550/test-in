@@ -21,7 +21,7 @@ public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
     public @NotNull FileEditor createEditor(final @NotNull Project project, final @NotNull VirtualFile file) {
         if (file instanceof UnifiedVirtualFile unifiedFile) {
 
-            BaseEditorUI ui;
+            final IEditor ui;
 
             if (unifiedFile.getFileType() == FileType.TEST_RUN)
                 ui = new RunEditorUI(unifiedFile);

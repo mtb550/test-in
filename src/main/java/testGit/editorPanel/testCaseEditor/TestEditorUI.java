@@ -14,13 +14,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import testGit.editorPanel.BaseEditorUI;
+import testGit.editorPanel.IEditor;
 import testGit.editorPanel.EditorCM;
 import testGit.editorPanel.StatusBar;
 import testGit.editorPanel.UnifiedVirtualFile;
 import testGit.editorPanel.listeners.*;
-import testGit.editorPanel.toolBar.ToolBar;
-import testGit.editorPanel.toolBar.ToolBarCallback;
+import testGit.editorPanel.toolBar.ActionToolbarPanel;
+import testGit.editorPanel.toolBar.TestToolBar;
+import testGit.editorPanel.toolBar.IToolBar;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.TestCaseSorter;
@@ -35,7 +36,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 
-public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
+public class TestEditorUI implements Disposable, IToolBar, IEditor {
 
     private final JBPanel<?> mainPanel;
     private final JBList<TestCaseDto> list;
@@ -43,7 +44,7 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
     private final ModelSyncListener syncListener;
 
     @Getter
-    private final ToolBar toolBar;
+    private final ActionToolbarPanel toolBar;
 
     @Getter
     private final UnifiedVirtualFile vf;
@@ -103,7 +104,7 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
 
         this.pageSize = PropertiesComponent.getInstance().getInt("testGit.pageSize", 50);
 
-        this.toolBar = new ToolBar(this);
+        this.toolBar = new TestToolBar(this,this);
         mainPanel.add(toolBar, BorderLayout.NORTH);
 
         this.syncListener = new ModelSyncListener(this, model);
@@ -340,11 +341,11 @@ public class TestEditorUI implements Disposable, ToolBarCallback, BaseEditorUI {
         }
         if (mainPanel != null) mainPanel.removeAll();
 
-        BaseEditorUI.super.dispose();
+        IEditor.super.dispose();
     }
 
     @Override
-    public void onRefresh() {
+    public void onRefreshing() {
         if (sessionCache != null) {
             sessionCache.dispose();
         }

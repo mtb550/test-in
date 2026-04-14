@@ -6,7 +6,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import testGit.actions.NavigateToCode;
 import testGit.actions.RunTestCase;
-import testGit.editorPanel.BaseEditorUI;
+import testGit.editorPanel.IEditor;
 import testGit.editorPanel.testRunEditor.RunEditorUI;
 import testGit.pojo.CardHoverAction;
 import testGit.pojo.dto.TestCaseDto;
@@ -21,9 +21,9 @@ import static testGit.editorPanel.testRunEditor.RunCard.ACTIONS_TOTAL_WIDTH;
 public class HoverListener extends MouseAdapter {
 
     private final JBList<TestCaseDto> list;
-    private final BaseEditorUI ui;
+    private final IEditor ui;
 
-    public HoverListener(final JBList<TestCaseDto> list, final BaseEditorUI ui) {
+    public HoverListener(final JBList<TestCaseDto> list, final IEditor ui) {
         this.list = list;
         this.ui = ui;
     }

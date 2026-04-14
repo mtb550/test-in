@@ -12,10 +12,10 @@ import java.beans.PropertyChangeListener;
 
 public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor {
 
-    private final BaseEditorUI ui;
+    private final IEditor ui;
     private final UnifiedVirtualFile vf;
 
-    public UnifiedFileEditor(final UnifiedVirtualFile vf, final BaseEditorUI ui) {
+    public UnifiedFileEditor(final UnifiedVirtualFile vf, final IEditor ui) {
         this.vf = vf;
         this.ui = ui;
     }

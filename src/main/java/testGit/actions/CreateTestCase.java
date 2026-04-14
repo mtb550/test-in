@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import testGit.editorPanel.BaseEditorUI;
+import testGit.editorPanel.IEditor;
 import testGit.editorPanel.testCaseEditor.TestEditorUI;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
@@ -24,10 +24,10 @@ import java.util.stream.Stream;
 
 public class CreateTestCase extends DumbAwareAction {
     private final CollectionListModel<TestCaseDto> model;
-    private final BaseEditorUI ui;
+    private final IEditor ui;
     private final Path path;
 
-    public CreateTestCase(final BaseEditorUI ui, final Path path, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public CreateTestCase(final IEditor ui, final Path path, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
         this.model = model;
         this.ui = ui;

@@ -1,4 +1,4 @@
-package testGit.editorPanel.toolBar;
+package testGit.editorPanel.toolBar.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.DataManager;
@@ -8,45 +8,47 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.DumbAwareToggleAction;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.CheckBoxList;
+import com.intellij.ui.JBColor;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import testGit.editorPanel.toolBar.ToolBarSettings;
 import testGit.pojo.Group;
 import testGit.pojo.Priority;
 import testGit.pojo.TestCaseAttributes;
 import testGit.util.IconManager;
 
-import javax.swing.*;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 
-public class FilterPopupBuilder {
-    public static void detailsPopup(final JButton anchor, final Set<String> selectedDetails, final Consumer<Void> onChange) {
-        CheckBoxList<TestCaseAttributes> detailsList = new CheckBoxList<>();
+public class FilterButton extends ToolbarActionButton {
+    private final ToolBarSettings settings;
 
-        Arrays.stream(TestCaseAttributes.values())
-                .filter(TestCaseAttributes::isStandardToolBarOption)
-                .forEach(attr -> detailsList.addItem(attr, attr.getName(), selectedDetails.contains(attr.name())));
+    public FilterButton(ToolBarSettings settings, Runnable onReset, Runnable onFilterChanged) {
+        super("Filter", AllIcons.General.Filter);
+        this.settings = settings;
 
-        detailsList.setCheckBoxListListener((index, state) -> {
-            TestCaseAttributes item = detailsList.getItemAt(index);
-            if (item != null) {
-                if (state) selectedDetails.add(item.name());
-                else selectedDetails.remove(item.name());
-            }
-            Optional.ofNullable(onChange).ifPresent(c -> c.accept(null));
-        });
+        addActionListener(e -> showFilterPopup(onReset, onFilterChanged));
 
-        // popup
-        JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(detailsList, detailsList)
-                .setRequestFocus(true)
-                .createPopup()
-                .showUnderneathOf(anchor);
+        updateState();
     }
 
-    public static void filterPopup(final JButton anchor, final Set<Priority> selectedPriorities, final Set<Group> selectedGroups, final Runnable onReset, final Consumer<Void> onChange) {
+    public void updateState() {
+        int activeFiltersCount = settings.getSelectedPriority().size() + settings.getSelectedGroup().size();
+        if (activeFiltersCount == 0) {
+            setText(null);
+            setToolTipText("Filter");
+            setForeground(JBColor.foreground());
+        } else {
+            setText("(" + activeFiltersCount + ")");
+            setToolTipText("Filter [" + activeFiltersCount + " active]");
+            setForeground(JBUI.CurrentTheme.Link.Foreground.ENABLED);
+        }
+    }
+
+    private void showFilterPopup(Runnable onReset, Runnable onFilterChanged) {
+        Set<Priority> selectedPriorities = settings.getSelectedPriority();
+        Set<Group> selectedGroups = settings.getSelectedGroup();
+
         DefaultActionGroup filterResetBtn = new DefaultActionGroup();
 
         filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
@@ -63,7 +65,9 @@ public class FilterPopupBuilder {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                Optional.ofNullable(onReset).ifPresent(Runnable::run);
+                if (onReset != null) {
+                    onReset.run();
+                }
             }
         });
         filterResetBtn.addSeparator();
@@ -80,7 +84,10 @@ public class FilterPopupBuilder {
                     @Override
                     public void setSelected(@NotNull AnActionEvent e, boolean state) {
                         p.onChange(selectedPriorities, state);
-                        Optional.ofNullable(onChange).ifPresent(c -> c.accept(null));
+                        updateState(); // تحديث شكل الزر فوراً
+                        if (onFilterChanged != null) {
+                            onFilterChanged.run();
+                        }
                     }
 
                     @Override
@@ -102,7 +109,10 @@ public class FilterPopupBuilder {
                     @Override
                     public void setSelected(@NotNull AnActionEvent e, boolean state) {
                         g.onChange(selectedGroups, state);
-                        Optional.ofNullable(onChange).ifPresent(c -> c.accept(null));
+                        updateState(); // تحديث شكل الزر فوراً
+                        if (onFilterChanged != null) {
+                            onFilterChanged.run();
+                        }
                     }
 
                     @Override
@@ -113,12 +123,11 @@ public class FilterPopupBuilder {
         );
         filterResetBtn.add(filterGroupMenu);
 
-        // popup
         JBPopupFactory.getInstance()
                 .createActionGroupPopup(null, filterResetBtn,
-                        DataManager.getInstance().getDataContext(anchor),
+                        DataManager.getInstance().getDataContext(this),
                         JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
                         true)
-                .showUnderneathOf(anchor);
+                .showUnderneathOf(this);
     }
 }
