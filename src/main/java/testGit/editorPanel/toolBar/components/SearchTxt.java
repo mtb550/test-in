@@ -8,19 +8,20 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
+import java.util.function.Consumer;
 
-public class SearchTxt extends SearchTextField implements Disposable {
+public class SearchTxt extends SearchTextField implements Disposable, IToolbarItem {
     private final Timer searchDebounceTimer;
 
     // TODO: CHANGE RUNNABLE TO BE CONSUMER OR BYCONSUMER
-    public SearchTxt(Runnable onSearchChanged) {
+    public SearchTxt(final Consumer<String> onToolBarSearchValueChanged) {
         super();
 
         setOpaque(false);
         getTextEditor().setOpaque(false);
         getTextEditor().setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        searchDebounceTimer = new Timer(300, e -> onSearchChanged.run());
+        searchDebounceTimer = new Timer(300, e -> onToolBarSearchValueChanged.accept(getQuery()));
         searchDebounceTimer.setRepeats(false);
 
         addDocumentListener(new DocumentAdapter() {
@@ -31,12 +32,8 @@ public class SearchTxt extends SearchTextField implements Disposable {
         });
     }
 
-    public String getSearchQuery() {
+    public String getQuery() {
         return getText().trim().toLowerCase();
-    }
-
-    public void resetSearch() {
-        setText(null);
     }
 
     @Override

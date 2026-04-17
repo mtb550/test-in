@@ -9,14 +9,14 @@ import testGit.pojo.TestCaseAttributes;
 import java.util.Arrays;
 import java.util.Set;
 
-public class DetailsPopup extends AbstractButton {
+public class DetailsPopup extends AbstractButton implements IToolbarItem {
 
-    public DetailsPopup(ToolBarSettings settings, Runnable onDetailsChanged) {
+    public DetailsPopup(final ToolBarSettings settings, final Runnable onToolBarDetailsSelectedChanged) {
         super("Details", AllIcons.Actions.PreviewDetailsVertically);
-        addActionListener(e -> showDetailsPopup(settings, onDetailsChanged));
+        addActionListener(e -> showDetailsPopup(settings, onToolBarDetailsSelectedChanged));
     }
 
-    private void showDetailsPopup(ToolBarSettings settings, Runnable onDetailsChanged) {
+    private void showDetailsPopup(final ToolBarSettings settings, final Runnable onToolBarDetailsSelectedChanged) {
         Set<String> selectedDetails = settings.getSelectedDetails();
         CheckBoxList<TestCaseAttributes> detailsList = new CheckBoxList<>();
 
@@ -34,8 +34,8 @@ public class DetailsPopup extends AbstractButton {
                 }
             }
             settings.save();
-            if (onDetailsChanged != null) {
-                onDetailsChanged.run();
+            if (onToolBarDetailsSelectedChanged != null) {
+                onToolBarDetailsSelectedChanged.run();
             }
         });
 

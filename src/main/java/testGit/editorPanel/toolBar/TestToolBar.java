@@ -1,24 +1,35 @@
 package testGit.editorPanel.toolBar;
 
 import com.intellij.openapi.Disposable;
-import testGit.editorPanel.toolBar.components.CreateTestCaseBtn;
+import testGit.editorPanel.toolBar.components.*;
 
-import javax.swing.*;
 import java.util.List;
 
 public class TestToolBar extends AbstractToolbarPanel {
+    private FilterPopup filter;
 
     public TestToolBar(final Disposable pDisposable, final IToolBar callbacks) {
         super(pDisposable, callbacks);
+        layoutComponents();
     }
 
     @Override
-    public List<JComponent> getCustomComponents() {
-        CreateTestCaseBtn addTestBtn = new CreateTestCaseBtn(() -> {
-            // TODO: "Create Test Case" call action here
-            System.out.println("Add Test Case clicked");
-        });
+    protected void updateFilterPopupState() {
+        if (filter != null) {
+            filter.updateState();
+        }
+    }
 
-        return List.of(addTestBtn);
+    @Override
+    public List<IToolbarItem> getCustomComponents() {
+        // todo: move all filter login inside filter class.
+        this.filter = new FilterPopup(settings, this::resetFilters, callbacks::onToolBarFilterSelectedChanged);
+
+        return List.of(
+                new RefreshBtn(callbacks::onToolBarRefreshClicked),
+                new DetailsPopup(settings, callbacks::onToolBarDetailsSelectedChanged),
+                filter,
+                new CreateTestCaseBtn()
+        );
     }
 }

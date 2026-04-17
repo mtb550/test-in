@@ -2,10 +2,11 @@ package testGit.editorPanel.toolBar.components;
 
 import com.intellij.icons.AllIcons;
 
-// TODO: change Runnable to Consumer or BiConsumer
-public class RefreshBtn extends AbstractButton {
-    public RefreshBtn(Runnable onRefreshAction) {
+public class RefreshBtn extends AbstractButton implements IToolbarItem {
+
+    public RefreshBtn(final Runnable onToolBarRefreshClicked) {
         super("Refresh", AllIcons.Actions.Refresh);
-        addActionListener(e -> onRefreshAction.run());
+
+        addActionListener(e -> onToolBarRefreshClicked.run());
     }
 }

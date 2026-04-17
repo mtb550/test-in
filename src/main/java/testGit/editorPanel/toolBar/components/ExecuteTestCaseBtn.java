@@ -2,10 +2,14 @@ package testGit.editorPanel.toolBar.components;
 
 import com.intellij.icons.AllIcons;
 
-public class ExecuteTestCaseBtn extends AbstractButton {
+public class ExecuteTestCaseBtn extends AbstractButton implements IToolbarItem {
 
-    public ExecuteTestCaseBtn(Runnable onClickAction) {
-        super("Start", AllIcons.Nodes.Services);
-        addActionListener(e -> onClickAction.run());
+    public ExecuteTestCaseBtn() {
+        super("Start Execution", AllIcons.Nodes.Services);
+
+        addActionListener(e -> {
+            // TODO: Gatling/TestNG trigger
+            System.out.println("Executing tests...");
+        });
     }
 }

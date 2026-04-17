@@ -260,26 +260,52 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         return list;
     }
 
+
     @Override
-    public void onFilterChanged() {
-        applyFilters();
+    public void onToolBarSearchValueChanged(final String query) {
+        // You can utilize the 'query' variable here if you are applying search logic directly,
+        // or just trigger the refresh if your getFilteredList() reads from the component.
+        this.currentPage = 1;
+        refreshView();
     }
 
     @Override
-    public void onDetailsChanged() {
+    public void onToolBarFilterSelectedChanged() {
+        this.currentPage = 1;
+        refreshView();
+    }
+
+    @Override
+    public void onToolBarFilterResetted() {
+        this.currentPage = 1;
+        refreshView();
+    }
+
+    @Override
+    public void onToolBarDetailsSelectedChanged() {
         list.setFixedCellHeight(-1);
         list.setCellRenderer(new TestListRenderer(this));
         list.revalidate();
         list.repaint();
     }
 
-    public Set<String> getSelectedDetails() {
-        return toolBar.getSettings().getSelectedDetails();
+    @Override
+    public void onToolBarRefreshClicked() {
+        if (sessionCache != null) {
+            sessionCache.dispose();
+        }
+
+        this.allTestCaseDtos.clear();
+        this.unsortedIds.clear();
+        this.model.removeAll();
+        this.list.setPaintBusy(true);
+        this.list.getEmptyText().setText("Refreshing...");
+
+        loadDataAsync();
     }
 
-    public void applyFilters() {
-        currentPage = 1;
-        refreshView();
+    public Set<String> getSelectedDetails() {
+        return toolBar.getSettings().getSelectedDetails();
     }
 
     public void refreshView() {
@@ -342,20 +368,5 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         if (mainPanel != null) mainPanel.removeAll();
 
         IEditorUI.super.dispose();
-    }
-
-    @Override
-    public void onRefreshing() {
-        if (sessionCache != null) {
-            sessionCache.dispose();
-        }
-
-        this.allTestCaseDtos.clear();
-        this.unsortedIds.clear();
-        this.model.removeAll();
-        this.list.setPaintBusy(true);
-        this.list.getEmptyText().setText("Refreshing...");
-
-        loadDataAsync();
     }
 }

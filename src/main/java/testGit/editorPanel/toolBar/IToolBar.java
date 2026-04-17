@@ -1,12 +1,13 @@
 package testGit.editorPanel.toolBar;
 
 public interface IToolBar {
-    void onFilterChanged();
+    void onToolBarSearchValueChanged(final String query);
 
-    void onDetailsChanged();
+    void onToolBarFilterSelectedChanged();
 
-    void onRefreshing();
+    void onToolBarFilterResetted();
 
-    // TODO: move resett filter call back here
-    //void onilterReseted();
+    void onToolBarDetailsSelectedChanged();
+
+    void onToolBarRefreshClicked();
 }

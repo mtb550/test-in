@@ -5,9 +5,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
-import testGit.editorPanel.toolBar.components.DetailsPopup;
-import testGit.editorPanel.toolBar.components.FilterPopup;
-import testGit.editorPanel.toolBar.components.RefreshBtn;
+import testGit.editorPanel.toolBar.components.IToolbarItem;
 import testGit.editorPanel.toolBar.components.SearchTxt;
 
 import javax.swing.*;
@@ -16,15 +14,12 @@ import java.util.List;
 
 public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel> implements Disposable {
 
-    private final IToolBar callbacks;
+    protected final IToolBar callbacks;
     @Getter
-    private final ToolBarSettings settings;
+    protected final ToolBarSettings settings;
 
-    private final RefreshBtn refreshBtn;
-    private final DetailsPopup detailsPopup;
-    private final FilterPopup filterPopup;
     @Getter
-    private final SearchTxt searchField;
+    protected final SearchTxt searchTxtField;
 
     public AbstractToolbarPanel(final Disposable pDisposable, final IToolBar callbacks) {
         super(new GridBagLayout());
@@ -33,53 +28,41 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        this.refreshBtn = new RefreshBtn(callbacks::onRefreshing);
-        this.detailsPopup = new DetailsPopup(settings, callbacks::onDetailsChanged);
-        this.filterPopup = new FilterPopup(settings, this::resetFilters, callbacks::onFilterChanged);
-        this.searchField = new SearchTxt(callbacks::onFilterChanged);
-
-        layoutComponents();
+        this.searchTxtField = new SearchTxt(callbacks::onToolBarSearchValueChanged);
 
         Disposer.register(pDisposable, this);
-        Disposer.register(this, this.searchField);
+        Disposer.register(this, this.searchTxtField);
     }
 
-    private void layoutComponents() {
+    protected void layoutComponents() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
 
-        add(refreshBtn, gbc);
-        gbc.gridx++;
-
-        add(detailsPopup, gbc);
-        gbc.gridx++;
-
-        add(filterPopup, gbc);
-        gbc.gridx++;
-
-        for (JComponent customComponent : getCustomComponents()) {
-            add(customComponent, gbc);
-            gbc.gridx++;
+        for (IToolbarItem item : getCustomComponents()) {
+            if (item instanceof JComponent component) {
+                add(component, gbc);
+                gbc.gridx++;
+            }
         }
 
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(searchField, gbc);
+        add(searchTxtField, gbc);
     }
 
     public void resetFilters() {
-        settings.resetFilters();
-        searchField.resetSearch();
-        filterPopup.updateState();
-        callbacks.onFilterChanged();
+        settings.resetFilters(); // todo: to be removed after refactor filter class
+        updateFilterPopupState(); // todo: to be removed after refactor filter class
+        callbacks.onToolBarFilterResetted();
     }
 
-    protected List<JComponent> getCustomComponents() {
-        return List.of();
-    }
+    // todo: to be removed after refactor filter class
+    protected abstract void updateFilterPopupState();
+
+    protected abstract List<IToolbarItem> getCustomComponents();
 
     @Override
     public void dispose() {

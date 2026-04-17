@@ -342,16 +342,36 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onFilterChanged() {
+    public void onToolBarSearchValueChanged(final String query) {
         currentPage = 1;
         refreshView();
     }
 
     @Override
-    public void onDetailsChanged() {
+    public void onToolBarFilterSelectedChanged() {
+        currentPage = 1;
+        refreshView();
+    }
+
+    @Override
+    public void onToolBarFilterResetted() {
+        currentPage = 1;
+        refreshView();
+    }
+
+    @Override
+    public void onToolBarDetailsSelectedChanged() {
         if (list != null) {
             list.setFixedCellHeight(-1);
             list.setCellRenderer(new RunListRenderer(this));
+            list.revalidate();
+            list.repaint();
+        }
+    }
+
+    @Override
+    public void onToolBarRefreshClicked() {
+        if (list != null) {
             list.revalidate();
             list.repaint();
         }
@@ -387,9 +407,13 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         final int toIndex = Math.min(fromIndex + pageSize, total);
         final List<TestCaseDto> pageItems = filtered.subList(fromIndex, toIndex);
 
-        model.replaceAll(pageItems);
+        if (model != null) {
+            model.replaceAll(pageItems);
+        }
 
-        statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), total);
+        if (statusBar != null) {
+            statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), total);
+        }
     }
 
     @Override
@@ -426,23 +450,17 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     @Override
     public void selectTestCase(final TestCaseDto tc) {
         if (tc == null) return;
-        final int index = model.getItems().indexOf(tc);
-        if (index != -1) {
-            list.setSelectedIndex(index);
-            list.ensureIndexIsVisible(index);
+        if (model != null) {
+            final int index = model.getItems().indexOf(tc);
+            if (index != -1 && list != null) {
+                list.setSelectedIndex(index);
+                list.ensureIndexIsVisible(index);
+            }
         }
     }
 
     @Override
     public Set<UUID> getUnsortedIds() {
         return Collections.emptySet();
-    }
-
-    @Override
-    public void onRefreshing() {
-        if (list != null) {
-            list.revalidate();
-            list.repaint();
-        }
     }
 }

@@ -20,11 +20,11 @@ import testGit.util.IconManager;
 import java.util.Arrays;
 import java.util.Set;
 
-public class FilterPopup extends AbstractButton {
+public class FilterPopup extends AbstractButton implements IToolbarItem {
     private final ToolBarSettings settings;
 
     // TODO: change both to consumer
-    public FilterPopup(ToolBarSettings settings, Runnable onReset, Runnable onFilterChanged) {
+    public FilterPopup(final ToolBarSettings settings, final Runnable onReset, final Runnable onFilterChanged) {
         super("Filter", AllIcons.General.Filter);
         this.settings = settings;
 
@@ -46,7 +46,7 @@ public class FilterPopup extends AbstractButton {
         }
     }
 
-    private void showFilterPopup(Runnable onReset, Runnable onFilterChanged) {
+    private void showFilterPopup(final Runnable onToolBarFilterResetted, final Runnable onToolBarFilterSelectedChanged) {
         Set<Priority> selectedPriorities = settings.getSelectedPriority();
         Set<Group> selectedGroups = settings.getSelectedGroup();
 
@@ -66,10 +66,12 @@ public class FilterPopup extends AbstractButton {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                if (onReset != null) {
-                    onReset.run();
+                if (onToolBarFilterResetted != null) {
+                    onToolBarFilterResetted.run();
                 }
+
             }
+
         });
         filterResetBtn.addSeparator();
 
@@ -86,8 +88,8 @@ public class FilterPopup extends AbstractButton {
                     public void setSelected(@NotNull AnActionEvent e, boolean state) {
                         p.onChange(selectedPriorities, state);
                         updateState();
-                        if (onFilterChanged != null) {
-                            onFilterChanged.run();
+                        if (onToolBarFilterSelectedChanged != null) {
+                            onToolBarFilterSelectedChanged.run();
                         }
                     }
 
@@ -111,8 +113,8 @@ public class FilterPopup extends AbstractButton {
                     public void setSelected(@NotNull AnActionEvent e, boolean state) {
                         g.onChange(selectedGroups, state);
                         updateState();
-                        if (onFilterChanged != null) {
-                            onFilterChanged.run();
+                        if (onToolBarFilterSelectedChanged != null) {
+                            onToolBarFilterSelectedChanged.run();
                         }
                     }
 

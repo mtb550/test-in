@@ -59,7 +59,7 @@ public interface IEditorUI extends Disposable {
 
     default List<TestCaseDto> getFilteredList() {
         final AbstractToolbarPanel baseToolBar = getToolBar();
-        final String query = baseToolBar != null ? baseToolBar.getSearchField().getSearchQuery() : "";
+        final String query = baseToolBar != null ? baseToolBar.getSearchTxtField().getQuery() : "";
         final Set<Group> groupFilter = baseToolBar != null ? baseToolBar.getSettings().getSelectedGroup() : Collections.emptySet();
         final Set<Priority> priorityFilter = baseToolBar != null ? baseToolBar.getSettings().getSelectedPriority() : Collections.emptySet();
 
