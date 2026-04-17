@@ -9,7 +9,7 @@ public class GenerateReportBtn extends AbstractButton implements IToolbarItem {
         super("Export Results", AllIcons.ToolbarDecorator.Export);
 
         addActionListener(e -> {
-            // TODO: JSON/Report export logic
+            // TODO: JSON/Report export logic, use same action in action package.
             System.out.println("Exporting results...");
         });
     }

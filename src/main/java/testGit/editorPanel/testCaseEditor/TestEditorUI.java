@@ -22,6 +22,9 @@ import testGit.editorPanel.listeners.*;
 import testGit.editorPanel.toolBar.AbstractToolbarPanel;
 import testGit.editorPanel.toolBar.IToolBar;
 import testGit.editorPanel.toolBar.TestToolBar;
+import testGit.editorPanel.toolBar.components.DetailsPopup;
+import testGit.editorPanel.toolBar.components.FilterPopup;
+import testGit.editorPanel.toolBar.components.SearchTxt;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.TestCaseSorter;
@@ -37,17 +40,19 @@ import java.util.*;
 import java.util.List;
 
 public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
+    @Getter
+    private final UnifiedVirtualFile vf;
 
     private final JBPanel<?> mainPanel;
+
     private final JBList<TestCaseDto> list;
+
     private final CollectionListModel<TestCaseDto> model;
+
     private final ModelSyncListener syncListener;
 
     @Getter
     private final AbstractToolbarPanel toolBar;
-
-    @Getter
-    private final UnifiedVirtualFile vf;
 
     @Getter
     private final StatusBar statusBar;
@@ -57,6 +62,9 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Getter
     private final Set<UUID> unsortedIds;
+
+    @Getter
+    private List<TestCaseDto> currentTestCaseDtos;
 
     private TestSessionCache sessionCache;
 
@@ -80,6 +88,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
         this.vf = vf;
         this.allTestCaseDtos = Collections.synchronizedList(new ArrayList<>());
+        this.currentTestCaseDtos = Collections.synchronizedList(new ArrayList<>());
+
         this.unsortedIds = Collections.synchronizedSet(new HashSet<>());
 
         this.mainPanel = new JBPanel<>(new BorderLayout());
@@ -143,6 +153,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
             @Override
             public void onItemsLoaded(final List<TestCaseDto> items) {
                 allTestCaseDtos.addAll(items);
+                currentTestCaseDtos.addAll(items);
                 items.forEach(item -> unsortedIds.add(item.getId()));
                 refreshView();
             }
@@ -156,12 +167,17 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         allTestCaseDtos.clear();
                         allTestCaseDtos.addAll(result.sortedList());
+                        currentTestCaseDtos.clear();
+                        currentTestCaseDtos.addAll(result.sortedList());
+
                         unsortedIds.clear();
                         unsortedIds.addAll(result.unsortedIds());
 
-                        list.setPaintBusy(false);
-                        if (allTestCaseDtos.isEmpty()) {
-                            list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
+                        if (list != null) {
+                            list.setPaintBusy(false);
+                            if (allTestCaseDtos.isEmpty()) {
+                                list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
+                            }
                         }
 
 //                        if (!unsortedIds.isEmpty()) {
@@ -210,13 +226,15 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     public void selectTestCase(final TestCaseDto tc) {
         if (tc == null) return;
 
-        List<TestCaseDto> filtered = getFilteredList();
-        if (!filtered.contains(tc)) {
-            toolBar.resetFilters();
-            filtered = getFilteredList();
+        if (!currentTestCaseDtos.contains(tc)) {
+            FilterPopup popup = toolBar.getToolbarItem(FilterPopup.class);
+            if (popup != null) popup.resetToolBarFilter();
+
+            currentTestCaseDtos.clear();
+            currentTestCaseDtos.addAll(getFilteredList());
         }
 
-        final int index = filtered.indexOf(tc);
+        final int index = currentTestCaseDtos.indexOf(tc);
         if (index == -1) return;
 
         this.currentPage = (index / pageSize) + 1;
@@ -239,6 +257,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         final VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(vf.getTestSet().getPath().toFile());
         if (vDir != null) vDir.refresh(false, true);
 
+        currentTestCaseDtos.clear();
+        currentTestCaseDtos.addAll(getFilteredList());
         selectTestCase(tc);
     }
 
@@ -249,7 +269,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public int getTotalPageCount() {
-        return getTotalPages(getFilteredList());
+        return getTotalPages(currentTestCaseDtos);
     }
 
     public @NotNull JComponent getComponent() {
@@ -260,23 +280,26 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         return list;
     }
 
-
     @Override
     public void onToolBarSearchValueChanged(final String query) {
-        // You can utilize the 'query' variable here if you are applying search logic directly,
-        // or just trigger the refresh if your getFilteredList() reads from the component.
+        currentTestCaseDtos.clear();
+        currentTestCaseDtos.addAll(getFilteredList());
         this.currentPage = 1;
         refreshView();
     }
 
     @Override
     public void onToolBarFilterSelectedChanged() {
+        currentTestCaseDtos.clear();
+        currentTestCaseDtos.addAll(getFilteredList());
         this.currentPage = 1;
         refreshView();
     }
 
     @Override
     public void onToolBarFilterResetted() {
+        currentTestCaseDtos.clear();
+        currentTestCaseDtos.addAll(getFilteredList());
         this.currentPage = 1;
         refreshView();
     }
@@ -291,11 +314,22 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onToolBarRefreshClicked() {
+        FilterPopup toolBarFilter = toolBar.getToolbarItem(FilterPopup.class);
+        if (toolBarFilter != null) {
+            toolBarFilter.resetToolBarFilter();
+        }
+
+        SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
+        if (toolBarSearch != null) {
+            toolBarSearch.resetSearchQuery();
+        }
+
         if (sessionCache != null) {
             sessionCache.dispose();
         }
 
         this.allTestCaseDtos.clear();
+        this.currentTestCaseDtos.clear();
         this.unsortedIds.clear();
         this.model.removeAll();
         this.list.setPaintBusy(true);
@@ -305,19 +339,26 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     public Set<String> getSelectedDetails() {
-        return toolBar.getSettings().getSelectedDetails();
+        AbstractToolbarPanel baseToolBar = getToolBar();
+        if (baseToolBar != null) {
+            DetailsPopup popup = baseToolBar.getToolbarItem(DetailsPopup.class);
+            if (popup != null) {
+                return popup.getSelectedDetails();
+            }
+        }
+        return Collections.emptySet();
     }
 
     public void refreshView() {
-        final List<TestCaseDto> filtered = getFilteredList();
-        final int totalItems = filtered.size();
-        final int totalPages = getTotalPages(filtered);
+        final int totalItems = currentTestCaseDtos.size();
+        final int totalPages = getTotalPages(currentTestCaseDtos);
+
         if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
 
         final int startIndex = (currentPage - 1) * pageSize;
         final int endIndex = Math.min(startIndex + pageSize, totalItems);
         final List<TestCaseDto> pageItems = startIndex < totalItems
-                ? new ArrayList<>(filtered.subList(startIndex, endIndex))
+                ? new ArrayList<>(currentTestCaseDtos.subList(startIndex, endIndex))
                 : new ArrayList<>();
 
         syncListener.pause();
@@ -359,6 +400,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         }
 
         allTestCaseDtos.clear();
+        currentTestCaseDtos.clear();
         unsortedIds.clear();
 
         if (model != null) {

@@ -1,23 +1,46 @@
 package testGit.editorPanel.toolBar.components;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
-import testGit.editorPanel.toolBar.ToolBarSettings;
+import lombok.Getter;
 import testGit.pojo.TestCaseAttributes;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class DetailsPopup extends AbstractButton implements IToolbarItem {
 
-    public DetailsPopup(final ToolBarSettings settings, final Runnable onToolBarDetailsSelectedChanged) {
+    private static final String KEY_DETAILS = "testGit.selectedDetails.v3";
+
+    private static final String DEFAULT_DETAILS = Arrays.stream(TestCaseAttributes.values())
+            .filter(TestCaseAttributes::isStandardToolBarOption)
+            .map(Enum::name)
+            .collect(Collectors.joining(","));
+
+    @Getter
+    private final Set<String> selectedDetails = new HashSet<>();
+
+    public DetailsPopup(final Runnable onToolBarDetailsSelectedChanged) {
         super("Details", AllIcons.Actions.PreviewDetailsVertically);
-        addActionListener(e -> showDetailsPopup(settings, onToolBarDetailsSelectedChanged));
+
+        final PropertiesComponent props = PropertiesComponent.getInstance();
+        final String saved = props.getValue(KEY_DETAILS, DEFAULT_DETAILS);
+
+        Arrays.stream(saved.split(",")).filter(s -> !s.isEmpty()).forEach(selectedDetails::add);
+
+        addActionListener(e -> showDetailsPopup(onToolBarDetailsSelectedChanged));
     }
 
-    private void showDetailsPopup(final ToolBarSettings settings, final Runnable onToolBarDetailsSelectedChanged) {
-        Set<String> selectedDetails = settings.getSelectedDetails();
+    private void saveProps() {
+        final PropertiesComponent props = PropertiesComponent.getInstance();
+        props.setValue(KEY_DETAILS, String.join(",", selectedDetails));
+    }
+
+    private void showDetailsPopup(final Runnable onToolBarDetailsSelectedChanged) {
         CheckBoxList<TestCaseAttributes> detailsList = new CheckBoxList<>();
 
         Arrays.stream(TestCaseAttributes.values())
@@ -33,7 +56,9 @@ public class DetailsPopup extends AbstractButton implements IToolbarItem {
                     selectedDetails.remove(item.name());
                 }
             }
-            settings.saveProps();
+
+            saveProps();
+
             if (onToolBarDetailsSelectedChanged != null) {
                 onToolBarDetailsSelectedChanged.run();
             }

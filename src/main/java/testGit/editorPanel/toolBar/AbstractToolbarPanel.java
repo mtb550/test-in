@@ -10,28 +10,34 @@ import testGit.editorPanel.toolBar.components.SearchTxt;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel> implements Disposable {
 
     protected final IToolBar callbacks;
-    @Getter
-    protected final ToolBarSettings settings;
 
     @Getter
-    protected final SearchTxt searchTxtField;
+    protected final SearchTxt searchTxt;
+
+    @Getter
+    private final Map<Class<? extends IToolbarItem>, IToolbarItem> toolbarItems = new HashMap<>();
 
     public AbstractToolbarPanel(final Disposable pDisposable, final IToolBar callbacks) {
         super(new GridBagLayout());
         this.callbacks = callbacks;
-        this.settings = new ToolBarSettings();
 
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        this.searchTxtField = new SearchTxt(callbacks::onToolBarSearchValueChanged);
+        this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged);
 
         Disposer.register(pDisposable, this);
-        Disposer.register(this, this.searchTxtField);
+        Disposer.register(this, this.searchTxt);
+    }
+
+    public <T extends IToolbarItem> T getToolbarItem(Class<T> itemClass) {
+        return itemClass.cast(toolbarItems.get(itemClass));
     }
 
     protected void layoutComponents() {
@@ -42,6 +48,8 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         gbc.weightx = 0.0;
 
         for (IToolbarItem item : getCustomComponents()) {
+            toolbarItems.put(item.getClass(), item);
+
             if (item instanceof JComponent component) {
                 add(component, gbc);
                 gbc.gridx++;
@@ -50,22 +58,16 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        add(searchTxtField, gbc);
-    }
+        add(searchTxt, gbc);
 
-    public void resetFilters() {
-        settings.resetFilters(); // todo: to be removed after refactor filter class
-        updateFilterPopupState(); // todo: to be removed after refactor filter class
-        callbacks.onToolBarFilterResetted();
+        toolbarItems.put(SearchTxt.class, searchTxt);
     }
-
-    // todo: to be removed after refactor filter class
-    protected abstract void updateFilterPopupState();
 
     protected abstract List<IToolbarItem> getCustomComponents();
 
     @Override
     public void dispose() {
         this.removeAll();
+        this.toolbarItems.clear();
     }
 }

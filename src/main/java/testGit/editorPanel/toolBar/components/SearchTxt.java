@@ -13,7 +13,6 @@ import java.util.function.Consumer;
 public class SearchTxt extends SearchTextField implements Disposable, IToolbarItem {
     private final Timer searchDebounceTimer;
 
-    // TODO: CHANGE RUNNABLE TO BE CONSUMER OR BYCONSUMER
     public SearchTxt(final Consumer<String> onToolBarSearchValueChanged) {
         super();
 
@@ -21,7 +20,7 @@ public class SearchTxt extends SearchTextField implements Disposable, IToolbarIt
         getTextEditor().setOpaque(false);
         getTextEditor().setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        searchDebounceTimer = new Timer(300, e -> onToolBarSearchValueChanged.accept(getQuery()));
+        searchDebounceTimer = new Timer(300, e -> onToolBarSearchValueChanged.accept(getSearchQuery()));
         searchDebounceTimer.setRepeats(false);
 
         addDocumentListener(new DocumentAdapter() {
@@ -32,8 +31,17 @@ public class SearchTxt extends SearchTextField implements Disposable, IToolbarIt
         });
     }
 
-    public String getQuery() {
+    public String getSearchQuery() {
         return getText().trim().toLowerCase();
+    }
+
+    public void resetSearchQuery() {
+        if (!getText().isEmpty()) {
+            setText("");
+            if (searchDebounceTimer.isRunning()) {
+                searchDebounceTimer.stop();
+            }
+        }
     }
 
     @Override

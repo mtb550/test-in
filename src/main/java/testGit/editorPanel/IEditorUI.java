@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.editorPanel.toolBar.AbstractToolbarPanel;
+import testGit.editorPanel.toolBar.components.FilterPopup;
 import testGit.pojo.Group;
 import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
@@ -43,6 +44,8 @@ public interface IEditorUI extends Disposable {
 
     List<TestCaseDto> getAllTestCaseDtos();
 
+    List<TestCaseDto> getCurrentTestCaseDtos();
+
     void updateSequenceAndSaveAll();
 
     void selectTestCase(final TestCaseDto tc);
@@ -59,9 +62,17 @@ public interface IEditorUI extends Disposable {
 
     default List<TestCaseDto> getFilteredList() {
         final AbstractToolbarPanel baseToolBar = getToolBar();
-        final String query = baseToolBar != null ? baseToolBar.getSearchTxtField().getQuery() : "";
-        final Set<Group> groupFilter = baseToolBar != null ? baseToolBar.getSettings().getSelectedGroup() : Collections.emptySet();
-        final Set<Priority> priorityFilter = baseToolBar != null ? baseToolBar.getSettings().getSelectedPriority() : Collections.emptySet();
+
+        final String query = (baseToolBar != null && baseToolBar.getSearchTxt() != null)
+                ? baseToolBar.getSearchTxt().getSearchQuery() : "";
+
+        FilterPopup filterPopup = null;
+        if (baseToolBar != null) {
+            filterPopup = baseToolBar.getToolbarItem(FilterPopup.class);
+        }
+
+        final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
+        final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
 
         final List<TestCaseDto> allItems = getAllTestCaseDtos();
         if (allItems == null || allItems.isEmpty()) {
@@ -72,9 +83,7 @@ public interface IEditorUI extends Disposable {
             return allItems.stream()
                     .filter(tc -> {
                         final boolean matchesSearch = query.isEmpty() || tc.getDescription().toLowerCase().contains(query) || tc.getId().toString().toLowerCase().contains(query) || tc.getExpectedResult().toLowerCase().contains(query) || tc.getSteps().stream().anyMatch(step -> step != null && step.toLowerCase().contains(query));
-
                         final boolean matchesGroup = groupFilter.isEmpty() || tc.getGroup().stream().anyMatch(groupFilter::contains);
-
                         final boolean matchesPriority = priorityFilter.isEmpty() || priorityFilter.contains(tc.getPriority());
 
                         return matchesSearch && matchesGroup && matchesPriority;

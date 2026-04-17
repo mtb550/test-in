@@ -22,6 +22,9 @@ import testGit.editorPanel.listeners.*;
 import testGit.editorPanel.toolBar.AbstractToolbarPanel;
 import testGit.editorPanel.toolBar.IToolBar;
 import testGit.editorPanel.toolBar.RunToolBar;
+import testGit.editorPanel.toolBar.components.DetailsPopup;
+import testGit.editorPanel.toolBar.components.FilterPopup;
+import testGit.editorPanel.toolBar.components.SearchTxt;
 import testGit.pojo.Config;
 import testGit.pojo.EditorType;
 import testGit.pojo.TestRunStatus;
@@ -48,37 +51,61 @@ import java.util.stream.Collectors;
 public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     private final UnifiedVirtualFile vf;
-    private final List<TestCaseDto> initialTestCaseDtos = new ArrayList<>();
+
+    @Getter
+    private final List<TestCaseDto> allTestCaseDtos;
+
+    @Getter
+    private final List<TestCaseDto> currentTestCaseDtos;
+
     private final Set<UUID> initialTestCaseIds = new HashSet<>();
+
     private final VirtualFile currentFile;
+
     private final @NotNull Map<UUID, TestRunDto.TestRunItems> resultsMap;
+
     CheckboxTree checklistTree;
+
     TestRunDto metadata;
+
     private RunSessionCache sessionCache;
+
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
+
     private JBList<TestCaseDto> list;
+
     private CollectionListModel<TestCaseDto> model;
+
     @Getter
     @Setter
     private int currentPage = 1;
+
     @Getter
     @Setter
     private int pageSize = 50;
+
     @Getter
     private StatusBar statusBar;
+
     @Getter
     private AbstractToolbarPanel toolBar;
+
     private TestRunMetadataHeader metadataHeader;
 
     @Getter
     @Setter
     private String hoveredIconAction = null;
+
     @Getter
     @Setter
     private int hoveredIndex = -1;
 
     public RunEditorUI(final UnifiedVirtualFile vf) {
         this.vf = vf;
+
+        this.allTestCaseDtos = Collections.synchronizedList(new ArrayList<>());
+        this.currentTestCaseDtos = Collections.synchronizedList(new ArrayList<>());
+
         this.metadata = vf.getMetadata();
         this.currentFile = vf;
 
@@ -102,7 +129,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         sessionCache.setListener(new RunSessionCache.CacheListener() {
             @Override
             public void onItemsLoaded(final List<TestCaseDto> items) {
-                initialTestCaseDtos.addAll(items);
+                allTestCaseDtos.addAll(items);
+                currentTestCaseDtos.addAll(items);
                 items.forEach(item -> initialTestCaseIds.add(item.getId()));
                 refreshView();
             }
@@ -114,15 +142,18 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     TestCaseCacheService.getInstance(Config.getProject()).load(sorted);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        initialTestCaseDtos.clear();
-                        initialTestCaseDtos.addAll(sorted);
+                        allTestCaseDtos.clear();
+                        allTestCaseDtos.addAll(sorted);
+
+                        currentTestCaseDtos.clear();
+                        currentTestCaseDtos.addAll(sorted);
 
                         initialTestCaseIds.clear();
                         initialTestCaseIds.addAll(sorted.stream().map(TestCaseDto::getId).collect(Collectors.toSet()));
 
                         if (list != null) {
                             list.setPaintBusy(false);
-                            if (initialTestCaseDtos.isEmpty()) {
+                            if (allTestCaseDtos.isEmpty()) {
                                 list.getEmptyText().setText("No test cases found in this run.");
                             }
                         }
@@ -343,18 +374,24 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onToolBarSearchValueChanged(final String query) {
+        currentTestCaseDtos.clear();
+        currentTestCaseDtos.addAll(getFilteredList());
         currentPage = 1;
         refreshView();
     }
 
     @Override
     public void onToolBarFilterSelectedChanged() {
+        currentTestCaseDtos.clear();
+        currentTestCaseDtos.addAll(getFilteredList());
         currentPage = 1;
         refreshView();
     }
 
     @Override
     public void onToolBarFilterResetted() {
+        currentTestCaseDtos.clear();
+        currentTestCaseDtos.addAll(getFilteredList());
         currentPage = 1;
         refreshView();
     }
@@ -371,41 +408,72 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onToolBarRefreshClicked() {
-        if (list != null) {
-            list.revalidate();
-            list.repaint();
+        FilterPopup toolBarFilter = toolBar.getToolbarItem(FilterPopup.class);
+        if (toolBarFilter != null) {
+            toolBarFilter.resetToolBarFilter();
         }
+
+        SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
+        if (toolBarSearch != null) {
+            toolBarSearch.resetSearchQuery();
+        }
+
+        if (sessionCache != null) {
+            sessionCache.dispose();
+        }
+
+        this.allTestCaseDtos.clear();
+        this.currentTestCaseDtos.clear();
+        this.initialTestCaseIds.clear();
+        this.resultsMap.clear();
+
+        if (this.model != null) {
+            this.model.removeAll();
+        }
+
+        if (this.list != null) {
+            this.list.setPaintBusy(true);
+            this.list.getEmptyText().setText("Refreshing...");
+        }
+
+        loadDataAsync();
     }
 
     public Set<String> getSelectedDetails() {
-        return toolBar != null ? toolBar.getSettings().getSelectedDetails() : Collections.emptySet();
+        AbstractToolbarPanel baseToolBar = getToolBar();
+        if (baseToolBar != null) {
+            DetailsPopup popup = baseToolBar.getToolbarItem(DetailsPopup.class);
+            if (popup != null) {
+                return popup.getSelectedDetails();
+            }
+        }
+        return Collections.emptySet();
     }
 
     @Override
     public int getTotalPageCount() {
-        return Math.max(1, (int) Math.ceil((double) getFilteredList().size() / pageSize));
+        return Math.max(1, (int) Math.ceil((double) currentTestCaseDtos.size() / pageSize));
     }
 
     @Override
     public int getTotalItemsCount() {
-        return initialTestCaseDtos.size();
+        return allTestCaseDtos.size();
     }
 
     @Override
     public void appendNewTestCase(final TestCaseDto tc) {
-        this.initialTestCaseDtos.add(tc);
+        this.allTestCaseDtos.add(tc);
         refreshView();
     }
 
     public void refreshView() {
-        final List<TestCaseDto> filtered = getFilteredList();
-        final int total = filtered.size();
+        final int total = currentTestCaseDtos.size();
         final int totalPages = getTotalPageCount();
         currentPage = Math.max(1, Math.min(currentPage, totalPages));
 
         final int fromIndex = (currentPage - 1) * pageSize;
         final int toIndex = Math.min(fromIndex + pageSize, total);
-        final List<TestCaseDto> pageItems = filtered.subList(fromIndex, toIndex);
+        final List<TestCaseDto> pageItems = currentTestCaseDtos.subList(fromIndex, toIndex);
 
         if (model != null) {
             model.replaceAll(pageItems);
@@ -422,7 +490,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
             sessionCache.dispose();
         }
 
-        initialTestCaseDtos.clear();
+        allTestCaseDtos.clear();
         initialTestCaseIds.clear();
         resultsMap.clear();
         if (model != null) model.removeAll();
@@ -436,11 +504,6 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     public @NotNull JComponent getComponent() {
         return mainPanel;
-    }
-
-    @Override
-    public List<TestCaseDto> getAllTestCaseDtos() {
-        return initialTestCaseDtos;
     }
 
     @Override

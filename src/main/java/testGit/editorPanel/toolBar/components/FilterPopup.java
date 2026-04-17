@@ -10,30 +10,40 @@ import com.intellij.openapi.project.DumbAwareToggleAction;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import testGit.editorPanel.toolBar.ToolBarSettings;
 import testGit.pojo.Group;
 import testGit.pojo.Priority;
 import testGit.pojo.TestCaseAttributes;
 import testGit.util.IconManager;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class FilterPopup extends AbstractButton implements IToolbarItem {
-    private final ToolBarSettings settings;
+    @Getter
+    private final Set<Group> selectedGroup = new HashSet<>();
 
-    public FilterPopup(final ToolBarSettings settings, final Runnable onReset, final Runnable onFilterChanged) {
+    @Getter
+    private final Set<Priority> selectedPriority = new HashSet<>();
+
+    private final DefaultActionGroup cachedActionGroup;
+
+    private final Runnable onToolBarFilterResetted;
+
+    public FilterPopup(final Runnable onToolBarFilterResetted, final Runnable onToolBarFilterSelectedChanged) {
         super("Filter", AllIcons.General.Filter);
-        this.settings = settings;
+        this.onToolBarFilterResetted = onToolBarFilterResetted;
 
-        addActionListener(e -> showFilterPopup(onReset, onFilterChanged));
+        this.cachedActionGroup = buildActionGroup(onToolBarFilterSelectedChanged);
 
+        addActionListener(e -> showFilterPopup());
         updateToolBarFilterState();
     }
 
     public void updateToolBarFilterState() {
-        int activeFiltersCount = settings.getSelectedPriority().size() + settings.getSelectedGroup().size();
+        int activeFiltersCount = selectedPriority.size() + selectedGroup.size();
         if (activeFiltersCount == 0) {
             setText(null);
             setToolTipText("Filter");
@@ -45,16 +55,22 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
         }
     }
 
-    private void showFilterPopup(final Runnable onToolBarFilterResetted, final Runnable onToolBarFilterSelectedChanged) {
-        Set<Priority> selectedPriorities = settings.getSelectedPriority();
-        Set<Group> selectedGroups = settings.getSelectedGroup();
+    public void resetToolBarFilter() {
+        selectedPriority.clear();
+        selectedGroup.clear();
+        updateToolBarFilterState();
+        if (onToolBarFilterResetted != null) {
+            onToolBarFilterResetted.run();
+        }
+    }
 
+    private DefaultActionGroup buildActionGroup(final Runnable onToolBarFilterSelectedChanged) {
         DefaultActionGroup filterResetBtn = new DefaultActionGroup();
 
         filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
             @Override
             public void update(@NotNull AnActionEvent e) {
-                boolean hasActiveFilters = !selectedPriorities.isEmpty() || !selectedGroups.isEmpty();
+                boolean hasActiveFilters = !selectedPriority.isEmpty() || !selectedGroup.isEmpty();
                 e.getPresentation().setEnabledAndVisible(hasActiveFilters);
             }
 
@@ -65,12 +81,8 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
 
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
-                if (onToolBarFilterResetted != null) {
-                    onToolBarFilterResetted.run();
-                }
-
+                resetToolBarFilter();
             }
-
         });
         filterResetBtn.addSeparator();
 
@@ -80,12 +92,12 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
                 filterPriorityMenu.add(new DumbAwareToggleAction(p.getName(), null, IconManager.createIcon(p.getColor())) {
                     @Override
                     public boolean isSelected(@NotNull AnActionEvent e) {
-                        return selectedPriorities.contains(p);
+                        return selectedPriority.contains(p);
                     }
 
                     @Override
                     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                        p.onChange(selectedPriorities, state);
+                        p.onChange(selectedPriority, state);
                         updateToolBarFilterState();
                         if (onToolBarFilterSelectedChanged != null) {
                             onToolBarFilterSelectedChanged.run();
@@ -105,12 +117,12 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
                 filterGroupMenu.add(new DumbAwareToggleAction(g.getName()) {
                     @Override
                     public boolean isSelected(@NotNull AnActionEvent e) {
-                        return selectedGroups.contains(g);
+                        return selectedGroup.contains(g);
                     }
 
                     @Override
                     public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                        g.onChange(selectedGroups, state);
+                        g.onChange(selectedGroup, state);
                         updateToolBarFilterState();
                         if (onToolBarFilterSelectedChanged != null) {
                             onToolBarFilterSelectedChanged.run();
@@ -125,8 +137,12 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
         );
         filterResetBtn.add(filterGroupMenu);
 
+        return filterResetBtn;
+    }
+
+    private void showFilterPopup() {
         JBPopupFactory.getInstance()
-                .createActionGroupPopup(null, filterResetBtn,
+                .createActionGroupPopup(null, cachedActionGroup,
                         DataManager.getInstance().getDataContext(this),
                         JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
                         true)

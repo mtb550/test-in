@@ -6,7 +6,6 @@ import testGit.editorPanel.toolBar.components.*;
 import java.util.List;
 
 public class TestToolBar extends AbstractToolbarPanel {
-    private FilterPopup filter;
 
     public TestToolBar(final Disposable pDisposable, final IToolBar callbacks) {
         super(pDisposable, callbacks);
@@ -14,21 +13,11 @@ public class TestToolBar extends AbstractToolbarPanel {
     }
 
     @Override
-    protected void updateFilterPopupState() {
-        if (filter != null) {
-            filter.updateToolBarFilterState();
-        }
-    }
-
-    @Override
     public List<IToolbarItem> getCustomComponents() {
-        // todo: move all filter login inside filter class.
-        this.filter = new FilterPopup(settings, this::resetFilters, callbacks::onToolBarFilterSelectedChanged);
-
         return List.of(
                 new RefreshBtn(callbacks::onToolBarRefreshClicked),
-                new DetailsPopup(settings, callbacks::onToolBarDetailsSelectedChanged),
-                filter,
+                new DetailsPopup(callbacks::onToolBarDetailsSelectedChanged),
+                new FilterPopup(callbacks::onToolBarFilterResetted, callbacks::onToolBarFilterSelectedChanged),
                 new CreateTestCaseBtn()
         );
     }

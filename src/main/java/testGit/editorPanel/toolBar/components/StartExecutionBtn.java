@@ -8,7 +8,7 @@ public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
         super("Start Execution", AllIcons.Nodes.Services);
 
         addActionListener(e -> {
-            // TODO: Gatling/TestNG trigger
+            // TODO: Gatling/TestNG action trigger, add new action class in action package
             System.out.println("Executing tests...");
         });
     }
