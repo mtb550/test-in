@@ -4,16 +4,12 @@ import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.editorPanel.toolBar.AbstractToolbarPanel;
-import testGit.editorPanel.toolBar.components.FilterPopup;
-import testGit.pojo.Group;
-import testGit.pojo.Priority;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.viewPanel.ViewPanel;
 import testGit.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public interface IEditorUI extends Disposable {
     StatusBar getStatusBar();
@@ -59,38 +55,6 @@ public interface IEditorUI extends Disposable {
     int getHoveredIndex();
 
     void setHoveredIndex(final int index);
-
-    default List<TestCaseDto> getFilteredList() {
-        final AbstractToolbarPanel baseToolBar = getToolBar();
-
-        final String query = (baseToolBar != null && baseToolBar.getSearchTxt() != null)
-                ? baseToolBar.getSearchTxt().getSearchQuery() : "";
-
-        FilterPopup filterPopup = null;
-        if (baseToolBar != null) {
-            filterPopup = baseToolBar.getToolbarItem(FilterPopup.class);
-        }
-
-        final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
-        final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
-
-        final List<TestCaseDto> allItems = getAllTestCaseDtos();
-        if (allItems == null || allItems.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        synchronized (allItems) {
-            return allItems.stream()
-                    .filter(tc -> {
-                        final boolean matchesSearch = query.isEmpty() || tc.getDescription().toLowerCase().contains(query) || tc.getId().toString().toLowerCase().contains(query) || tc.getExpectedResult().toLowerCase().contains(query) || tc.getSteps().stream().anyMatch(step -> step != null && step.toLowerCase().contains(query));
-                        final boolean matchesGroup = groupFilter.isEmpty() || tc.getGroup().stream().anyMatch(groupFilter::contains);
-                        final boolean matchesPriority = priorityFilter.isEmpty() || priorityFilter.contains(tc.getPriority());
-
-                        return matchesSearch && matchesGroup && matchesPriority;
-                    })
-                    .collect(Collectors.toList());
-        }
-    }
 
     default void dispose() {
         Optional.ofNullable(ViewToolWindowFactory.getViewPanel()).ifPresent(ViewPanel::reset);

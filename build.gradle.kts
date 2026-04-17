@@ -124,3 +124,10 @@ intellijPlatformTesting {
         parallelStream()
     }
 }
+
+configurations.all {
+    resolutionStrategy {
+        cacheDynamicVersionsFor(7, TimeUnit.DAYS)
+        cacheChangingModulesFor(7, TimeUnit.DAYS)
+    }
+}
