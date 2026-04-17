@@ -48,9 +48,8 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         gbc.weightx = 0.0;
 
         for (IToolbarItem item : getCustomComponents()) {
-            toolbarItems.put(item.getClass(), item);
-
             if (item instanceof JComponent component) {
+                toolbarItems.put(item.getClass(), item);
                 add(component, gbc);
                 gbc.gridx++;
             }

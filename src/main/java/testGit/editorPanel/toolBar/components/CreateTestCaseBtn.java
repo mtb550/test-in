@@ -4,12 +4,9 @@ import com.intellij.icons.AllIcons;
 
 public class CreateTestCaseBtn extends AbstractButton implements IToolbarItem {
 
-    public CreateTestCaseBtn() {
+    public CreateTestCaseBtn(final Runnable onToolBarCreateTestCaseClicked) {
         super("Add Test Case", AllIcons.General.Add);
 
-        addActionListener(e -> {
-            // TODO: "Create Test Case" call action here
-            System.out.println("Add Test Case clicked");
-        });
+        addActionListener(e -> onToolBarCreateTestCaseClicked.run());
     }
 }

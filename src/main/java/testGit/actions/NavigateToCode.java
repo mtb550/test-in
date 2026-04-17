@@ -1,9 +1,11 @@
 package testGit.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.util.CodeNavigator;
@@ -28,5 +30,10 @@ public class NavigateToCode extends DumbAwareAction {
     @Override
     public void actionPerformed(@Nullable AnActionEvent e) {
         execute(list.getSelectedValue());
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

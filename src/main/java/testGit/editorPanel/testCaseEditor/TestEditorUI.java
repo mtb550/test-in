@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import testGit.actions.CreateTestCase;
 import testGit.editorPanel.EditorCM;
 import testGit.editorPanel.IEditorUI;
 import testGit.editorPanel.StatusBar;
@@ -284,6 +285,11 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
+    public void onToolBarCreateTestCaseClicked() {
+        CreateTestCase.execute(this, vf.getTestSet().getPath(), model);
+    }
+
+    @Override
     public void onToolBarSearchValueChanged(final String query) {
         currentTestCaseDtos.clear();
         currentTestCaseDtos.addAll(getFilteredList());
@@ -292,7 +298,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onToolBarFilterSelectedChanged() {
+    public void onToolBarFilterSelectionChanged() {
         currentTestCaseDtos.clear();
         currentTestCaseDtos.addAll(getFilteredList());
         this.currentPage = 1;
@@ -300,7 +306,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onToolBarFilterResetted() {
+    public void onToolBarFilterResetButtonClicked() {
         currentTestCaseDtos.clear();
         currentTestCaseDtos.addAll(getFilteredList());
         this.currentPage = 1;
@@ -308,7 +314,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onToolBarDetailsSelectedChanged() {
+    public void onToolBarDetailsSelectionChanged() {
         list.setFixedCellHeight(-1);
         list.setCellRenderer(new TestListRenderer(this));
         list.revalidate();
@@ -316,7 +322,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onToolBarRefreshClicked() {
+    public void onToolBarRefreshButtonClicked() {
         FilterPopup toolBarFilter = toolBar.getToolbarItem(FilterPopup.class);
         if (toolBarFilter != null) {
             toolBarFilter.resetToolBarFilter();

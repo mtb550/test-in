@@ -35,13 +35,29 @@ public class CreateTestCase extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getShortcut(), list);
     }
 
+    // todo: isolate the bedy as it same action performed, create new method and call it in both.
+    public static void execute(final IEditorUI ui, final Path path, final CollectionListModel<TestCaseDto> model) {
+        new CreateTestCaseUI().show(newTc -> {
+
+            boolean isEmpty = model.isEmpty();
+            newTc.setIsHead(isEmpty);
+            TestCaseDto lastTc = isEmpty ? null : model.getElementAt(model.getSize() - 1);
+            if (lastTc != null) lastTc.setNext(newTc.getId());
+
+            if (ui != null) ui.appendNewTestCase(newTc);
+            else model.add(newTc);
+
+            Project project = Config.getProject();
+            List<TestCaseDto> affectedNodes = Stream.of(newTc, lastTc).filter(Objects::nonNull).toList();
+            TestCaseCacheService.getInstance(project).addNewItems(affectedNodes);
+            TestCasePersistService.getInstance(Config.getProject()).persist(path, affectedNodes);
+
+        });
+    }
+
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         new CreateTestCaseUI().show(newTc -> {
-            /// TODO: created by default, no need to be removed
-            @Deprecated
-            //newTc.setId(UUID.randomUUID());
-
             boolean isEmpty = model.isEmpty();
             newTc.setIsHead(isEmpty);
             TestCaseDto lastTc = isEmpty ? null : model.getElementAt(model.getSize() - 1);

@@ -3,11 +3,14 @@ package testGit.editorPanel.toolBar;
 public interface IToolBar {
     void onToolBarSearchValueChanged(final String query);
 
-    void onToolBarFilterSelectedChanged();
+    void onToolBarFilterSelectionChanged();
 
-    void onToolBarFilterResetted();
+    void onToolBarFilterResetButtonClicked();
 
-    void onToolBarDetailsSelectedChanged();
+    void onToolBarDetailsSelectionChanged();
 
-    void onToolBarRefreshClicked();
+    void onToolBarRefreshButtonClicked();
+
+    default void onToolBarCreateTestCaseClicked() {
+    }
 }

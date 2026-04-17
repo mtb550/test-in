@@ -15,10 +15,10 @@ public class TestToolBar extends AbstractToolbarPanel {
     @Override
     public List<IToolbarItem> getCustomComponents() {
         return List.of(
-                new RefreshBtn(callbacks::onToolBarRefreshClicked),
-                new DetailsPopup(callbacks::onToolBarDetailsSelectedChanged),
-                new FilterPopup(callbacks::onToolBarFilterResetted, callbacks::onToolBarFilterSelectedChanged),
-                new CreateTestCaseBtn()
+                new CreateTestCaseBtn(callbacks::onToolBarCreateTestCaseClicked),
+                new RefreshBtn(callbacks::onToolBarRefreshButtonClicked),
+                new DetailsPopup(callbacks::onToolBarDetailsSelectionChanged),
+                new FilterPopup(callbacks::onToolBarFilterResetButtonClicked, callbacks::onToolBarFilterSelectionChanged)
         );
     }
 }

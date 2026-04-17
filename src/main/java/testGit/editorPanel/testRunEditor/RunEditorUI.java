@@ -25,12 +25,7 @@ import testGit.editorPanel.toolBar.RunToolBar;
 import testGit.editorPanel.toolBar.components.DetailsPopup;
 import testGit.editorPanel.toolBar.components.FilterPopup;
 import testGit.editorPanel.toolBar.components.SearchTxt;
-import testGit.pojo.Config;
-import testGit.pojo.EditorType;
-import testGit.pojo.Group;
-import testGit.pojo.Priority;
-import testGit.pojo.TestRunStatus;
-import testGit.pojo.TestStatus;
+import testGit.pojo.*;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.TestRunDto;
 import testGit.pojo.dto.dirs.DirectoryDto;
@@ -383,7 +378,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onToolBarFilterSelectedChanged() {
+    public void onToolBarFilterSelectionChanged() {
         currentTestCaseDtos.clear();
         currentTestCaseDtos.addAll(getFilteredList());
         currentPage = 1;
@@ -391,7 +386,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onToolBarFilterResetted() {
+    public void onToolBarFilterResetButtonClicked() {
         currentTestCaseDtos.clear();
         currentTestCaseDtos.addAll(getFilteredList());
         currentPage = 1;
@@ -399,7 +394,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onToolBarDetailsSelectedChanged() {
+    public void onToolBarDetailsSelectionChanged() {
         if (list != null) {
             list.setFixedCellHeight(-1);
             list.setCellRenderer(new RunListRenderer(this));
@@ -409,7 +404,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     @Override
-    public void onToolBarRefreshClicked() {
+    public void onToolBarRefreshButtonClicked() {
         FilterPopup toolBarFilter = toolBar.getToolbarItem(FilterPopup.class);
         if (toolBarFilter != null) {
             toolBarFilter.resetToolBarFilter();

@@ -14,10 +14,11 @@ public class RunToolBar extends AbstractToolbarPanel {
     @Override
     public List<IToolbarItem> getCustomComponents() {
         return List.of(
-                new RefreshBtn(callbacks::onToolBarRefreshClicked),
-                new DetailsPopup(callbacks::onToolBarDetailsSelectedChanged),
-                new FilterPopup(callbacks::onToolBarFilterResetted, callbacks::onToolBarFilterSelectedChanged), new StartExecutionBtn(),
-                new GenerateReportBtn()
+                new StartExecutionBtn(),
+                new GenerateReportBtn(),
+                new RefreshBtn(callbacks::onToolBarRefreshButtonClicked),
+                new DetailsPopup(callbacks::onToolBarDetailsSelectionChanged),
+                new FilterPopup(callbacks::onToolBarFilterResetButtonClicked, callbacks::onToolBarFilterSelectionChanged)
         );
     }
 }

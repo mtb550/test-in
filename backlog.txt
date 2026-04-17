@@ -278,10 +278,9 @@ parent if abstract to starts with Abstract, otherwise start with Base.
 fix change viow panel to show selected test case if change editor.
 
 add test run duration
-continue enhance editor tool bar
 make tool bar deails checkable one click anywhere without need to exactly click check box.
 make tool bar filter auto hide once move mouse outside.
 make search bar logic in separate thread in initiate in test editor ui & test run ui.
 remove edit test case in test run
 remove getFilteredList() in IEditorUI.
-customize run tool bar to add duration and other items to details.
+customize run tool bar to add duration and other items to details. pending

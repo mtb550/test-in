@@ -1,5 +1,6 @@
 package testGit.actions;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
@@ -22,5 +23,10 @@ public class CloseTestCaseDetails extends DumbAwareAction {
         if (viewer != null) {
             viewer.hide().reset();
         }
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }
