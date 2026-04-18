@@ -5,7 +5,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
-import testGit.pojo.TestCaseAttributes;
+import testGit.pojo.TestEditorAttributes;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,8 +16,8 @@ public class DetailsPopup extends AbstractButton implements IToolbarItem {
 
     private static final String KEY_DETAILS = "testGit.selectedDetails.v3";
 
-    private static final String DEFAULT_DETAILS = Arrays.stream(TestCaseAttributes.values())
-            .filter(TestCaseAttributes::isStandardToolBarOption)
+    private static final String DEFAULT_DETAILS = Arrays.stream(TestEditorAttributes.values())
+            .filter(TestEditorAttributes::isStandardToolBarOption)
             .map(Enum::name)
             .collect(Collectors.joining(","));
 
@@ -41,14 +41,14 @@ public class DetailsPopup extends AbstractButton implements IToolbarItem {
     }
 
     private void showDetailsPopup(final Runnable onToolBarDetailsSelectedChanged) {
-        CheckBoxList<TestCaseAttributes> detailsList = new CheckBoxList<>();
+        CheckBoxList<TestEditorAttributes> detailsList = new CheckBoxList<>();
 
-        Arrays.stream(TestCaseAttributes.values())
-                .filter(TestCaseAttributes::isStandardToolBarOption)
+        Arrays.stream(TestEditorAttributes.values())
+                .filter(TestEditorAttributes::isStandardToolBarOption)
                 .forEach(attr -> detailsList.addItem(attr, attr.getName(), selectedDetails.contains(attr.name())));
 
         detailsList.setCheckBoxListListener((index, state) -> {
-            TestCaseAttributes item = detailsList.getItemAt(index);
+            TestEditorAttributes item = detailsList.getItemAt(index);
             if (item != null) {
                 if (state) {
                     selectedDetails.add(item.name());

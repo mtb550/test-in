@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /// TODO: add all to edit menu: auto ref, business ref..etc
 ///  TODO: also, map all to view panel dynamically.
 /// TODO: may you need to unify enum map to map all with one source of truth
-public enum TestCaseAttributes {
+public enum TestEditorAttributes {
 
     ID("ID",
             true,

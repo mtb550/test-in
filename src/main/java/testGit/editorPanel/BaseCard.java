@@ -9,7 +9,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
-import testGit.pojo.TestCaseAttributes;
+import testGit.pojo.TestEditorAttributes;
 import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -25,7 +25,7 @@ public abstract class BaseCard<T extends JBPanel<T>> extends JBPanel<T> {
     protected final JBLabel titleLabel = new JBLabel();
     protected final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
 
-    protected final Map<TestCaseAttributes, JBLabel> attributeLabels = new EnumMap<>(TestCaseAttributes.class);
+    protected final Map<TestEditorAttributes, JBLabel> attributeLabels = new EnumMap<>(TestEditorAttributes.class);
 
     protected final JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final BorderLayoutPanel wrapper = new BorderLayoutPanel();
@@ -57,10 +57,10 @@ public abstract class BaseCard<T extends JBPanel<T>> extends JBPanel<T> {
         content.add(titleLine);
         content.add(badgePanel);
 
-        for (TestCaseAttributes attr : TestCaseAttributes.values()) {
+        for (TestEditorAttributes attr : TestEditorAttributes.values()) {
             /// TODO: if statement here to be removed as all will title will shown and use preferrences that store others shown attributes.
             /// backlog: put title in tool bar details options and make checked and enabled.
-            if (attr == TestCaseAttributes.DESCRIPTION || attr == TestCaseAttributes.PRIORITY || attr == TestCaseAttributes.GROUP) {
+            if (attr == TestEditorAttributes.DESCRIPTION || attr == TestEditorAttributes.PRIORITY || attr == TestEditorAttributes.GROUP) {
                 continue;
             }
             final JBLabel label = createDetailLabel();
@@ -82,8 +82,8 @@ public abstract class BaseCard<T extends JBPanel<T>> extends JBPanel<T> {
         setBackground(currentRowColor);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
-        for (TestCaseAttributes attr : TestCaseAttributes.values()) {
-            if (attr == TestCaseAttributes.DESCRIPTION || attr == TestCaseAttributes.PRIORITY || attr == TestCaseAttributes.GROUP) {
+        for (TestEditorAttributes attr : TestEditorAttributes.values()) {
+            if (attr == TestEditorAttributes.DESCRIPTION || attr == TestEditorAttributes.PRIORITY || attr == TestEditorAttributes.GROUP) {
                 continue;
             }
 
@@ -101,11 +101,11 @@ public abstract class BaseCard<T extends JBPanel<T>> extends JBPanel<T> {
 
         badgePanel.removeAll();
 
-        if (activeDetails.contains(TestCaseAttributes.PRIORITY.name())) {
+        if (activeDetails.contains(TestEditorAttributes.PRIORITY.name())) {
             badgePanel.add(Shared.createPriorityBadge(tc));
         }
 
-        if (activeDetails.contains(TestCaseAttributes.GROUP.name())) {
+        if (activeDetails.contains(TestEditorAttributes.GROUP.name())) {
             Optional.of(tc.getGroup())
                     .ifPresent(group -> group.forEach(groupName -> badgePanel.add(Shared.createGroupBadge(groupName))));
         }

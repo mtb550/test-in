@@ -14,7 +14,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Group;
 import testGit.pojo.Priority;
-import testGit.pojo.TestCaseAttributes;
+import testGit.pojo.TestEditorAttributes;
 import testGit.util.IconManager;
 
 import java.util.Arrays;
@@ -87,7 +87,7 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
         filterResetBtn.addSeparator();
 
         // priority menu
-        DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestCaseAttributes.PRIORITY.getName(), true);
+        DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
                 filterPriorityMenu.add(new DumbAwareToggleAction(p.getName(), null, IconManager.createIcon(p.getColor())) {
                     @Override
@@ -112,7 +112,7 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
         filterResetBtn.add(filterPriorityMenu);
 
         // group menu
-        DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestCaseAttributes.GROUP.getName(), true);
+        DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestEditorAttributes.GROUP.getName(), true);
         Arrays.stream(Group.values()).forEach(g ->
                 filterGroupMenu.add(new DumbAwareToggleAction(g.getName()) {
                     @Override
