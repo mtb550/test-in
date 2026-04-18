@@ -10,7 +10,7 @@ import testGit.util.KeyboardSet;
 public class RedoNode extends DumbAwareAction {
     public RedoNode(SimpleTree tree) {
         super("Redo", "Redo last action", AllIcons.Actions.Redo);
-        this.registerCustomShortcutSet(KeyboardSet.Redo.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.Redo.getCustomShortcut(), tree);
     }
 
     @Override

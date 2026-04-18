@@ -1,6 +1,8 @@
 package testGit.util;
 
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
 import lombok.Getter;
 
@@ -66,12 +68,17 @@ public enum KeyboardSet {
     }
 
     @SuppressWarnings("MagicConstant")
-    public CustomShortcutSet getShortcut() {
+    public CustomShortcutSet getCustomShortcut() {
         return new CustomShortcutSet(KeyStroke.getKeyStroke(this.keyCode, this.modifiers));
     }
 
     @SuppressWarnings("MagicConstant")
     public String getShortcutText() {
         return KeymapUtil.getKeystrokeText(KeyStroke.getKeyStroke(this.keyCode, this.modifiers));
+    }
+
+    @SuppressWarnings("MagicConstant")
+    public Shortcut getShortcut() {
+        return new KeyboardShortcut(KeyStroke.getKeyStroke(this.keyCode, this.modifiers), null);
     }
 }

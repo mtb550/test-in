@@ -22,7 +22,7 @@ public class Escape extends DumbAwareAction {
         this.tree = tree;
         this.transferHandler = transferHandler;
         this.list = null;
-        this.registerCustomShortcutSet(KeyboardSet.Escape.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.Escape.getCustomShortcut(), tree);
     }
 
     public Escape(final JBList<TestCaseDto> list) {
@@ -30,7 +30,7 @@ public class Escape extends DumbAwareAction {
         this.list = list;
         this.tree = null;
         this.transferHandler = null;
-        this.registerCustomShortcutSet(KeyboardSet.Escape.getShortcut(), list);
+        this.registerCustomShortcutSet(KeyboardSet.Escape.getCustomShortcut(), list);
     }
 
     @Override

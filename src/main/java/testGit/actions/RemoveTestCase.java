@@ -30,7 +30,7 @@ public class RemoveTestCase extends DumbAwareAction {
         this.dir = dir;
         this.list = list;
         this.model = model;
-        this.registerCustomShortcutSet(KeyboardSet.DeletePackage.getShortcut(), list);
+        this.registerCustomShortcutSet(KeyboardSet.DeletePackage.getCustomShortcut(), list);
     }
 
     @Override

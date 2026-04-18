@@ -108,7 +108,7 @@ public class StepsSection implements CreateTestCaseSection {
                     removeStepAction(stepRow, stepField, repackAction);
                 }
             }
-        }.registerCustomShortcutSet(KeyboardSet.CreateTestCaseRemoveStep.getShortcut(), stepField);
+        }.registerCustomShortcutSet(KeyboardSet.CreateTestCaseRemoveStep.getCustomShortcut(), stepField);
 
         JPanel buttonWrapper = new JPanel(new BorderLayout());
         buttonWrapper.setOpaque(false);
@@ -155,7 +155,7 @@ public class StepsSection implements CreateTestCaseSection {
 
     @Override
     public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
-        base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseAddStep.getShortcut(), () ->
+        base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseAddStep.getCustomShortcut(), () ->
                 showSection(slot, repackAction));
     }
 

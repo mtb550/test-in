@@ -32,7 +32,7 @@ public class CreateTestCase extends DumbAwareAction {
         this.model = model;
         this.ui = ui;
         this.path = path;
-        this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getShortcut(), list);
+        this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getCustomShortcut(), list);
     }
 
     // todo: isolate the bedy as it same action performed, create new method and call it in both.

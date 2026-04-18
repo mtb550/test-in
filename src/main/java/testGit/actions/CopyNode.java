@@ -17,7 +17,7 @@ public class CopyNode extends DumbAwareAction {
     public CopyNode(final SimpleTree tree) {
         super("Copy", "Copy selected items", AllIcons.Actions.Copy);
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.CopyNode.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.CopyNode.getCustomShortcut(), tree);
     }
 
     @Override

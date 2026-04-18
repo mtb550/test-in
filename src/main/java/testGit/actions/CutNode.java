@@ -17,7 +17,7 @@ public class CutNode extends DumbAwareAction {
     public CutNode(final SimpleTree tree) {
         super("Cut", "Cut selected items", AllIcons.Actions.MenuCut);
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.CutNode.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.CutNode.getCustomShortcut(), tree);
     }
 
     @Override

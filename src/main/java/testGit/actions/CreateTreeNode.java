@@ -31,7 +31,7 @@ public class CreateTreeNode extends DumbAwareAction {
         super("Create", "Create new node", AllIcons.General.Add);
         this.projectPanel = projectPanel;
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.CreateNode.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.CreateNode.getCustomShortcut(), tree);
         this.option = new DirectoryOptions();
     }
 

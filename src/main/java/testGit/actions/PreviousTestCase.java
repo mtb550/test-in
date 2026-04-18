@@ -18,7 +18,7 @@ public class PreviousTestCase extends DumbAwareAction {
         this.controller = controller;
 
         if (component != null)
-            this.registerCustomShortcutSet(KeyboardSet.PreviousTestCase.getShortcut(), component);
+            this.registerCustomShortcutSet(KeyboardSet.PreviousTestCase.getCustomShortcut(), component);
 
     }
 

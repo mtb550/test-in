@@ -106,7 +106,7 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
         Runnable saveAction = save(dto, updatedItems, popupWrapper);
 
         // register enter shortcut via the base class helper
-        registerShortcut(mainPanel, KeyboardSet.Enter.getShortcut(), saveAction::run);
+        registerShortcut(mainPanel, KeyboardSet.Enter.getCustomShortcut(), saveAction::run);
 
         // show the popup
         popupWrapper[0].showCenteredInCurrentWindow(Config.getProject());

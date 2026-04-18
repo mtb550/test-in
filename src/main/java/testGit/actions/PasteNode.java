@@ -17,7 +17,7 @@ public class PasteNode extends DumbAwareAction {
     public PasteNode(final SimpleTree tree) {
         super("Paste", "Paste items", AllIcons.Actions.MenuPaste);
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.PasteNode.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.PasteNode.getCustomShortcut(), tree);
     }
 
     @Override

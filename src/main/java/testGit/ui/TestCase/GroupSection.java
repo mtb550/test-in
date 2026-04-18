@@ -74,7 +74,7 @@ public class GroupSection implements CreateTestCaseSection {
 
     @Override
     public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
-        base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseGroup.getShortcut(), () -> {
+        base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseGroup.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
         });

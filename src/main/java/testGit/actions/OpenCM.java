@@ -22,7 +22,7 @@ public class OpenCM extends DumbAwareAction {
         this.tree = tree;
         this.cm = cm;
         this.list = null;
-        this.registerCustomShortcutSet(KeyboardSet.OpenContextMenu.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.OpenContextMenu.getCustomShortcut(), tree);
     }
 
     public OpenCM(final JBList<?> list, final DefaultActionGroup cm) {
@@ -30,7 +30,7 @@ public class OpenCM extends DumbAwareAction {
         this.list = list;
         this.cm = cm;
         this.tree = null;
-        this.registerCustomShortcutSet(KeyboardSet.OpenContextMenu.getShortcut(), list);
+        this.registerCustomShortcutSet(KeyboardSet.OpenContextMenu.getCustomShortcut(), list);
     }
 
     @Override

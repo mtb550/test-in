@@ -24,7 +24,7 @@ public class Remove extends DumbAwareAction {
     public Remove(SimpleTree tree) {
         super("Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.tree = tree;
-        this.registerCustomShortcutSet(DeletePackage.getShortcut(), tree);
+        this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
 
     private boolean isRemovable(Object dir) {

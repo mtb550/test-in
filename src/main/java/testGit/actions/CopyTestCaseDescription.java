@@ -17,7 +17,7 @@ public class CopyTestCaseDescription extends DumbAwareAction {
     public CopyTestCaseDescription(final JBList<TestCaseDto> list) {
         super("Copy Test Case Title");
         this.list = list;
-        registerCustomShortcutSet(KeyboardSet.CopyTestCaseTitle.getShortcut(), list);
+        registerCustomShortcutSet(KeyboardSet.CopyTestCaseTitle.getCustomShortcut(), list);
     }
 
     @Override

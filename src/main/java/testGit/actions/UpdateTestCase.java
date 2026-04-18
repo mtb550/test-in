@@ -27,7 +27,7 @@ public class UpdateTestCase extends DumbAwareAction {
         super("Edit Test Case");
         this.list = list;
         this.path = path;
-        this.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getShortcut(), list);
+        this.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getCustomShortcut(), list);
     }
 
     @Override

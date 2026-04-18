@@ -64,7 +64,7 @@ public class TitleSection implements CreateTestCaseSection {
 
     @Override
     public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
-        base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseTitle.getShortcut(), () -> {
+        base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseTitle.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
         });

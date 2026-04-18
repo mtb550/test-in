@@ -194,7 +194,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
                 public void actionPerformed(@NotNull com.intellij.openapi.actionSystem.AnActionEvent e) {
                     onTrigger.run();
                 }
-            }.registerCustomShortcutSet(this.shortcut.getShortcut(), component);
+            }.registerCustomShortcutSet(this.shortcut.getCustomShortcut(), component);
         }
     }
 

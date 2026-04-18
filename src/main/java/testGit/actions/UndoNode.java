@@ -10,7 +10,7 @@ import testGit.util.KeyboardSet;
 public class UndoNode extends DumbAwareAction {
     public UndoNode(SimpleTree tree) {
         super("Undo", "Undo last action", AllIcons.Actions.Undo);
-        this.registerCustomShortcutSet(KeyboardSet.Undo.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.Undo.getCustomShortcut(), tree);
     }
 
     @Override

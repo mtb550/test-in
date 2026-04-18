@@ -120,7 +120,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         Runnable saveAction = save(dto, onSave, popupWrapper);
 
         // registe enter shortcut
-        registerShortcut(mainPanel, KeyboardSet.Enter.getShortcut(), saveAction::run);
+        registerShortcut(mainPanel, KeyboardSet.Enter.getCustomShortcut(), saveAction::run);
 
         // show first
         popupWrapper[0].showCenteredInCurrentWindow(Config.getProject());

@@ -1,71 +1,162 @@
 package testGit.pojo.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import testGit.pojo.TestRunStatus;
 import testGit.pojo.TestStatus;
 
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
-@Getter
 @Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Accessors(chain = true)
+@Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TestRunDto {
-    private String runName;
 
-    private String buildNumber;
+    @NotNull
+    @Builder.Default
+    private String runName = "";
 
-    private String platform;
+    @NotNull
+    @Builder.Default
+    private String buildNumber = "";
 
-    private String language;
+    @NotNull
+    @Builder.Default
+    private String platform = "";
 
-    private String browser;
+    @NotNull
+    @Builder.Default
+    private String language = "";
 
-    private String deviceType;
+    @NotNull
+    @Builder.Default
+    private String browser = "";
 
-    private TestRunStatus status;
+    @NotNull
+    @Builder.Default
+    private String deviceType = "";
 
-    private LocalDateTime createdAt;
+    @NotNull
+    @Builder.Default
+    private TestRunStatus status = TestRunStatus.CREATED;
 
-    private List<TestCase> testCase;
+    @NotNull
+    @Builder.Default
+    @Getter(AccessLevel.PRIVATE)
+    @JsonFormat(pattern = "EEEE hh:mm a dd.MM.yyyy", locale = "en_US")
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    private List<TestRunItems> results;
+    @NotNull
+    @Builder.Default
+    private List<TestCase> testCase = new ArrayList<>();
 
-    @Getter
-    @Setter
-    @Accessors(chain = true)
-    public static class TestCase {
-        private Path path;
+    @NotNull
+    @Builder.Default
+    private List<TestRunItems> results = new ArrayList<>();
 
-        private List<UUID> uuid;
+    @JsonIgnore
+    @JsonProperty("createAt")
+    public String getFormattedCreatedAt() {
+        return formatTime(this.createdAt);
     }
 
-    @Getter
-    @Setter
-    @Accessors(chain = true)
-    public static class TestRunItems {
-        private UUID testCaseId;
+    private String formatTime(final LocalDateTime time) {
+        if (time == null) return "";
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE hh:mm a dd.MM.yyyy", Locale.US);
+        return time.format(formatter);
+    }
 
-        private String project;
+    @JsonProperty("createAt")
+    private LocalDateTime getCreateAtForJson() {
+        return this.createdAt;
+    }
+
+    @Setter
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    @Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class TestCase {
+
+        @Nullable
+        private Path path;
 
         @NotNull
-        private TestStatus status;
+        @Builder.Default
+        private List<UUID> uuid = new ArrayList<>();
+    }
 
-        private String actualResult;
+    @Setter
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Accessors(chain = true)
+    @Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class TestRunItems {
 
-        private Duration duration;
+        @Nullable
+        private UUID testCaseId;
 
-        private String executedBy;
+        @NotNull
+        @Builder.Default
+        private String project = "";
 
-        private LocalDateTime executedAt;
+        @NotNull
+        @Builder.Default
+        private TestStatus status = TestStatus.PENDING;
 
-        private String stacktrace;
+        @NotNull
+        @Builder.Default
+        private String actualResult = "";
 
+        @NotNull
+        @Builder.Default
+        private Duration duration = Duration.ZERO;
+
+        @NotNull
+        @Builder.Default
+        private String executedBy = "";
+
+        @NotNull
+        @Builder.Default
+        @Getter(AccessLevel.PRIVATE)
+        @JsonFormat(pattern = "EEEE hh:mm a dd.MM.yyyy", locale = "en_US")
+        private LocalDateTime executedAt = LocalDateTime.now();
+
+        @NotNull
+        @Builder.Default
+        private String stacktrace = "";
+
+        @JsonIgnore
+        @JsonProperty("executedAtFormatted")
+        public String getFormattedExecutedAt() {
+            final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE hh:mm a dd.MM.yyyy", Locale.US);
+            return this.executedAt.format(formatter);
+        }
+
+        @JsonProperty("executedAt")
+        private LocalDateTime getExecutedAtForJson() {
+            return this.executedAt;
+        }
     }
 }

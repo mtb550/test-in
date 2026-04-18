@@ -27,7 +27,7 @@ public class Open extends DumbAwareAction {
         this.projectPanel = projectPanel;
         this.tree = tree;
 
-        this.registerCustomShortcutSet(KeyboardSet.Enter.getShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), tree);
     }
 
     public static void execute(final ProjectPanel projectPanel, final SimpleTree tree) {
