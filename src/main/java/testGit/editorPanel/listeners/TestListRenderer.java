@@ -9,6 +9,7 @@ import testGit.pojo.dto.TestCaseDto;
 import javax.swing.*;
 import java.awt.*;
 
+// todo, renderes are used every seconds, how to make it faster?
 public class TestListRenderer implements ListCellRenderer<TestCaseDto> {
     private final TestCard rendererCard = new TestCard();
     private final IEditorUI ui;

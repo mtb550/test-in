@@ -22,28 +22,14 @@ public class TestCard extends BaseCard {
         final List<JComponent> badges = new ArrayList<>();
         final Map<String, String> details = new LinkedHashMap<>();
 
-        String title = TestEditorAttributes.DESCRIPTION.getValue(tc);
-        if (title == null) title = "Unknown Title";
-
         Arrays.stream(TestEditorAttributes.values())
-                .filter(attr -> attr != TestEditorAttributes.DESCRIPTION)
                 .filter(attr -> activeDetails.contains(attr.name()))
-                .forEach(attr -> {
-
-                    if (attr.getBadgeExtractor() != null) {
-                        badges.addAll(attr.getBadgeExtractor().apply(tc));
-
-                    } else {
-                        String value = attr.getValue(tc);
-                        details.put(attr.getName(), value != null ? value : "");
-                    }
-
-                });
+                .forEach(attr -> attr.applyToUI(tc, badges, details));
 
         if (isUnsorted) {
             badges.add(new Shared.RoundedBadge("Unsorted", new JBColor(new Color(255, 100, 100), new Color(130, 50, 50))));
         }
 
-        updateUI(index, title, badges, details);
+        updateUI(index, TestEditorAttributes.DESCRIPTION.getValue(tc), badges, details);
     }
 }

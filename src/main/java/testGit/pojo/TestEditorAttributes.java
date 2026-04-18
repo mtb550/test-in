@@ -6,16 +6,15 @@ import testGit.editorPanel.Shared;
 import testGit.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
 /// TODO: add order, then add it toolbar details (select by the order number) & add it to edit menu.
 /// TODO: add all to edit menu: auto ref, business ref..etc
-/// TODO: also, map all to view panel dynamically.
+///  TODO: also, map all to view panel dynamically.
 /// TODO: may you need to unify enum map to map all with one source of truth
 @AllArgsConstructor
 public enum TestEditorAttributes {
@@ -29,8 +28,8 @@ public enum TestEditorAttributes {
 
     /// TODO:: added to tool bar details, to be shown but disabled
     DESCRIPTION("Description",
-            false,
-            false,
+            true,
+            true,
             TestCaseDto::getDescription,
             null
     ),
@@ -45,17 +44,15 @@ public enum TestEditorAttributes {
     STEPS("Steps",
             true,
             true,
-            tc -> Optional.of(tc.getSteps()).map(Object::toString).orElse(""),
+            tc -> String.join(", ", tc.getSteps()),
             null
     ),
 
     PRIORITY("Priority",
             true,
             true,
-            tc -> Optional.of(tc.getPriority()).map(Priority::getName).orElse(""),
-            tc -> Optional.of(tc.getPriority())
-                    .map(p -> List.<JComponent>of(Shared.createPriorityBadge(tc)))
-                    .orElse(Collections.emptyList())
+            tc -> tc.getPriority().getName(),
+            tc -> List.of(Shared.createPriorityBadge(tc))
     ),
 
     FCQN("FCQN",
@@ -75,12 +72,8 @@ public enum TestEditorAttributes {
     GROUP("Group",
             true,
             true,
-            tc -> Optional.of(tc.getGroup()).map(groups -> groups.stream().map(Group::getName).collect(Collectors.joining(", "))).orElse(""),
-            tc -> Optional.of(tc.getGroup())
-                    .map(groups -> groups.stream()
-                            .map(Shared::createGroupBadge)
-                            .collect(Collectors.<JComponent>toList()))
-                    .orElse(Collections.emptyList())
+            tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")), // تم إزالة Optional
+            tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList())
     ),
 
     ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
@@ -88,28 +81,28 @@ public enum TestEditorAttributes {
     CREATE_BY("Created By",
             true,
             false,
-            tc -> null,
+            TestCaseDto::getCreatedBy,
             null
     ),
 
     UPDATE_BY("Updated By",
             true,
             false,
-            tc -> null,
+            TestCaseDto::getUpdatedBy, 
             null
     ),
 
     CREATE_AT("Created At",
             true,
             false,
-            tc -> null,
+            TestCaseDto::getFormattedCreatedAt,
             null
     ),
 
     UPDATE_AT("Updated At",
             true,
             false,
-            tc -> null,
+            TestCaseDto::getFormattedUpdatedAt, 
             null
     ),
 
@@ -123,21 +116,31 @@ public enum TestEditorAttributes {
     STATUS("Status",
             true,
             false,
-            tc -> null,
+            TestCaseDto::getTempStatus,
             null
     );
 
     private final String name;
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
+
     private final Function<TestCaseDto, String> valueExtractor;
-    private final Function<TestCaseDto, List<JComponent>> badgeExtractor;
+    private final Function<TestCaseDto, List<JComponent>> drawItem;
 
     public String getValue(final TestCaseDto tc) {
         try {
             return valueExtractor.apply(tc);
         } catch (Exception e) {
             return "Unknown";
+        }
+    }
+
+    //todo, to be removed, use runnable
+    public void applyToUI(final TestCaseDto tc, final List<JComponent> badges, final Map<String, String> details) {
+        if (drawItem != null) {
+            badges.addAll(drawItem.apply(tc));
+        } else {
+            details.put(name, getValue(tc));
         }
     }
 }
