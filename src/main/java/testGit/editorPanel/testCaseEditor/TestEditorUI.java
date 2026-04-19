@@ -414,8 +414,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
             return allTestCaseDtos.stream()
                     .filter(tc -> {
                         final boolean matchesSearch = query.isEmpty() || tc.getDescription().toLowerCase().contains(query) || tc.getId().toString().toLowerCase().contains(query) || tc.getExpectedResult().toLowerCase().contains(query) || tc.getSteps().stream().anyMatch(step -> step != null && step.toLowerCase().contains(query));
-                        final boolean matchesGroup = groupFilter.isEmpty() || tc.getGroup().stream().anyMatch(groupFilter::contains);
                         final boolean matchesPriority = priorityFilter.isEmpty() || priorityFilter.contains(tc.getPriority());
+                        final boolean matchesGroup = groupFilter.isEmpty() || (groupFilter.contains(Group.UNASSIGNED) && (tc.getGroup().isEmpty())) || (tc.getGroup().stream().anyMatch(groupFilter::contains));
 
                         return matchesSearch && matchesGroup && matchesPriority;
                     })

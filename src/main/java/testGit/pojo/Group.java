@@ -7,46 +7,63 @@ import java.util.function.BiConsumer;
 
 @Getter
 public enum Group {
+    UNASSIGNED(
+            "<No Group>",
+            false,
+            false
+    ),
+
     REGRESSION(
             "Regression",
+            true,
             true
     ),
 
     SMOKE(
             "Smoke",
+            true,
             true
     ),
 
     SANITY(
             "Sanity",
-            true),
+            true,
+            true
+    ),
 
     SECURITY(
             "Security",
-            false),
+            false,
+            true
+    ),
 
     UI(
             "UI",
-            false
+            false,
+            true
     ),
 
     FUNCTIONAL(
             "Functional",
-            false
+            false,
+            true
     ),
 
     VALIDATION(
             "Validation",
-            false
+            false,
+            true
     );
 
     private final String name;
     private final boolean active;
+    private final boolean assignable;
     private final BiConsumer<Set<Group>, Boolean> action;
 
-    Group(final String name, final boolean active) {
+    Group(final String name, final boolean active, final boolean assignable) {
         this.name = name;
         this.active = active;
+        this.assignable = assignable;
 
         this.action = (set, state) -> {
             if (state) set.add(this);

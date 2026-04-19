@@ -113,28 +113,32 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
 
         // group menu
         DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestEditorAttributes.GROUP.getName(), true);
-        Arrays.stream(Group.values()).forEach(g ->
-                filterGroupMenu.add(new DumbAwareToggleAction(g.getName()) {
-                    @Override
-                    public boolean isSelected(@NotNull AnActionEvent e) {
-                        return selectedGroup.contains(g);
-                    }
+        Arrays.stream(Group.values()).forEach(g -> {
+            if (g == Group.REGRESSION) {
+                filterGroupMenu.addSeparator();
+            }
 
-                    @Override
-                    public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                        g.onChange(selectedGroup, state);
-                        updateToolBarFilterState();
-                        if (onToolBarFilterSelectedChanged != null) {
-                            onToolBarFilterSelectedChanged.run();
-                        }
-                    }
+            filterGroupMenu.add(new DumbAwareToggleAction(g.getName()) {
+                @Override
+                public boolean isSelected(@NotNull AnActionEvent e) {
+                    return selectedGroup.contains(g);
+                }
 
-                    @Override
-                    public @NotNull ActionUpdateThread getActionUpdateThread() {
-                        return ActionUpdateThread.BGT;
+                @Override
+                public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                    g.onChange(selectedGroup, state);
+                    updateToolBarFilterState();
+                    if (onToolBarFilterSelectedChanged != null) {
+                        onToolBarFilterSelectedChanged.run();
                     }
-                })
-        );
+                }
+
+                @Override
+                public @NotNull ActionUpdateThread getActionUpdateThread() {
+                    return ActionUpdateThread.BGT;
+                }
+            });
+        });
         filterResetBtn.add(filterGroupMenu);
 
         return filterResetBtn;
