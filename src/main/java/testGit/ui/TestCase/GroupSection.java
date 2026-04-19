@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GroupSection implements CreateTestCaseSection {
+public class GroupSection implements ICreateTestCaseSection {
     private final JPanel group;
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 1f);
@@ -73,7 +73,7 @@ public class GroupSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseGroup.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -114,7 +114,7 @@ public class GroupSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction) {
+    public void fillData(final TestCaseDto dto, final TestCaseUIBase.IUIAction repackAction) {
         setSelectedGroup(dto.getGroup());
     }
 }

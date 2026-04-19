@@ -6,7 +6,7 @@ import com.intellij.execution.testframework.sm.runner.SMTestProxy;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import testGit.util.broadcasts.listeners.TestCaseExecutionListener;
+import testGit.util.broadcasts.listeners.ITestCaseExecutionListener;
 
 public class TestCaseExecutionTracker {
 
@@ -39,6 +39,6 @@ public class TestCaseExecutionTracker {
 
     private static void broadcastStatusChange(final @NotNull Project project, @NotNull final String testName, @NotNull final String status, final String error) {
         ApplicationManager.getApplication().invokeLater(() ->
-                project.getMessageBus().syncPublisher(TestCaseExecutionListener.TOPIC).onStatusChanged(testName, status, error));
+                project.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(testName, status, error));
     }
 }

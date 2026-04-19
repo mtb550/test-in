@@ -20,7 +20,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         TestCaseDto dto = new TestCaseDto();
         final JBPopup[] popupWrapper = new JBPopup[1];
 
-        UIAction repackPopup = () -> {
+        IUIAction repackPopup = () -> {
             if (popupWrapper[0] != null) {
                 popupWrapper[0].pack(false, true);
 
@@ -56,7 +56,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
-        for (CreateTestCaseSection section : getAllSections()) {
+        for (ICreateTestCaseSection section : getAllSections()) {
             JPanel slot = new JPanel(new BorderLayout());
             slot.setOpaque(false);
             contentPanel.add(slot);

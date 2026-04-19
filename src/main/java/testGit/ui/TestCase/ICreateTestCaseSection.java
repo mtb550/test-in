@@ -6,20 +6,20 @@ import testGit.pojo.dto.TestCaseDto;
 import javax.swing.*;
 import java.awt.*;
 
-public interface CreateTestCaseSection {
+public interface ICreateTestCaseSection {
     JPanel getWrapper();
 
     void showSection(final JPanel contentPanel);
 
     void applyTo(final TestCaseDto dto);
 
-    void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction);
+    void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.IUIAction repackAction);
 
     JComponent getFocusComponent();
 
     void setEditable(final boolean editable);
 
-    void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction);
+    void fillData(final TestCaseDto dto, final TestCaseUIBase.IUIAction repackAction);
 
     default JPanel createIconPanel(final Icon icon) {
         JPanel iconPanel = new JPanel(new GridBagLayout());

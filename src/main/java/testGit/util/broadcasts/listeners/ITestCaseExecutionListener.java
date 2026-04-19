@@ -3,9 +3,9 @@ package testGit.util.broadcasts.listeners;
 import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
 
-public interface TestCaseExecutionListener {
+public interface ITestCaseExecutionListener {
 
-    Topic<TestCaseExecutionListener> TOPIC = Topic.create("RunTestCaseNotification", TestCaseExecutionListener.class);
+    Topic<ITestCaseExecutionListener> TOPIC = Topic.create("RunTestCaseNotification", ITestCaseExecutionListener.class);
 
     void onStatusChanged(@NotNull final String testName, @NotNull final String status, final String error);
 

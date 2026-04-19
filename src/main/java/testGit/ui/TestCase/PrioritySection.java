@@ -17,7 +17,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class PrioritySection implements CreateTestCaseSection {
+public class PrioritySection implements ICreateTestCaseSection {
     private final ComboBox<Priority> priority;
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
@@ -74,7 +74,7 @@ public class PrioritySection implements CreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCasePriority.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -92,7 +92,7 @@ public class PrioritySection implements CreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction) {
+    public void fillData(final TestCaseDto dto, final TestCaseUIBase.IUIAction repackAction) {
         priority.setSelectedItem(dto.getPriority());
     }
 }

@@ -16,7 +16,7 @@ public class RunSessionCache {
     private final TestRunDto metadata;
     private final List<TestCaseDto> loadedItems = Collections.synchronizedList(new ArrayList<>());
     @Setter
-    private CacheListener listener;
+    private ICacheListener listener;
 
     private volatile boolean isDisposed = false;
 
@@ -105,7 +105,7 @@ public class RunSessionCache {
         );
     }
 
-    public interface CacheListener {
+    public interface ICacheListener {
         void onItemsLoaded(final List<TestCaseDto> items);
 
         void onLoadComplete(final List<TestCaseDto> allItems);

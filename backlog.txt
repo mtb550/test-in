@@ -253,13 +253,6 @@ sorting number should be fixed in editor once search and list the results. (majo
 add shortcut CTRL+> and CTRL+< to navigate between test or run editors pages
 add shortcut CTRL+F to make focus on tool bar search filed
 add shortcut ESCAPE to remove focus in tool bar search filed
-disable F2 and edit test case button on context menu if the active editor is run editor.
-
-fix create test run issue. (resolved)
-
-keep create test case popup open if click ouside to prevent miss written data
-
-make the search global from project view.
 
 apply searchDebounceTimer in BaseToolBar for more stabability:
 searchDebounceTimer = new Timer(300, e -> callbacks.onFilterChanged());
@@ -272,10 +265,11 @@ searchDebounceTimer.restart();
 
 question: intellij Task.Backgroundable vs ApplicationManager.getApplication().executeOnPooledThread
 
-change all interfaces to starts with I
 parent if abstract to starts with Abstract, otherwise start with Base.
 
-make search bar logic in separate thread in initiate in test editor ui & test run ui.
+make the search global from project view.
+make search bar ui & logic in separate ui in test editor ui & test run ui. make toolbar better,
+can add option to search in all test cases, get the test runs that test case added to.
 
 remove getFilteredList() in IEditorUI.
 

@@ -20,12 +20,12 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
 
     public void show(final TestCaseDto existingDto, final UpdateTestCaseFields targetField, final Consumer<TestCaseDto> updatedItems) {
         final JBPopup[] popupWrapper = new JBPopup[1];
-        UIAction repackPopup = () -> {
+        IUIAction repackPopup = () -> {
             if (popupWrapper[0] != null)
                 popupWrapper[0].pack(false, true);
         };
 
-        CreateTestCaseSection targetSection = targetField.getSectionExtractor().apply(this);
+        ICreateTestCaseSection targetSection = targetField.getSectionExtractor().apply(this);
 
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
@@ -47,7 +47,7 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
-        for (CreateTestCaseSection section : getAllSections()) {
+        for (ICreateTestCaseSection section : getAllSections()) {
             JPanel slot = new JPanel(new BorderLayout());
             slot.setOpaque(false);
 
@@ -78,7 +78,7 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
         setupUI(mainPanel, contentPanel, popupWrapper, existingDto, targetField, targetSection, updatedItems);
     }
 
-    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final UpdateTestCaseFields target, final CreateTestCaseSection targetSection, final Consumer<TestCaseDto> updatedItems) {
+    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final UpdateTestCaseFields target, final ICreateTestCaseSection targetSection, final Consumer<TestCaseDto> updatedItems) {
         JPanel anchorPanel = new JPanel(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);

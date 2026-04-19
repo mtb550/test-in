@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class TreeUtilImpl {
-    public static void executeVfsAction(Path path, String errorTitle, VfsOperation operation) {
+    public static void executeVfsAction(Path path, String errorTitle, IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
@@ -29,7 +29,7 @@ public class TreeUtilImpl {
         }));
     }
 
-    public static void executeVfsAction(Path sourcePath, Path targetPath, String errorTitle, VfsBiOperation operation) {
+    public static void executeVfsAction(Path sourcePath, Path targetPath, String errorTitle, IVfsBiOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
@@ -106,11 +106,11 @@ public class TreeUtilImpl {
         }));
     }
 
-    public interface VfsOperation {
+    public interface IVfsOperation {
         void execute(VirtualFile vf) throws IOException;
     }
 
-    public interface VfsBiOperation {
+    public interface IVfsBiOperation {
         void execute(VirtualFile sourceVf, VirtualFile targetVf) throws IOException;
     }
 }

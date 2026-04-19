@@ -21,7 +21,7 @@ public abstract class StatusBarBase {
     private final Icon icon = AllIcons.Actions.IntentionBulb;
     private final Border border = JBUI.Borders.emptyRight(4);
 
-    public StatusBarBase(final StatusBarItem[] items) {
+    public StatusBarBase(final IStatusBarItem[] items) {
         this.statusBar = new JPanel(new BorderLayout());
         this.statusBar.setBorder(JBUI.Borders.empty(6, 10));
         this.statusBar.setOpaque(true);
@@ -30,7 +30,7 @@ public abstract class StatusBarBase {
         updateItems(items);
     }
 
-    public void updateItems(final StatusBarItem[] items) {
+    public void updateItems(final IStatusBarItem[] items) {
         this.statusBar.removeAll();
 
         JPanel contentPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -39,7 +39,7 @@ public abstract class StatusBarBase {
         contentPanel.add(setStatusBarIcon());
 
         for (int i = 0; i < items.length; i++) {
-            StatusBarItem item = items[i];
+            IStatusBarItem item = items[i];
             contentPanel.add(createShortcut(item.getShortcutText()));
             contentPanel.add(createDot());
             contentPanel.add(createLabel(item.getName()));

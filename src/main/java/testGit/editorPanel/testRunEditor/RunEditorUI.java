@@ -125,7 +125,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     private void loadDataAsync() {
         this.sessionCache = new RunSessionCache(metadata);
 
-        sessionCache.setListener(new RunSessionCache.CacheListener() {
+        sessionCache.setListener(new RunSessionCache.ICacheListener() {
             @Override
             public void onItemsLoaded(final List<TestCaseDto> items) {
                 allTestCaseDtos.addAll(items);

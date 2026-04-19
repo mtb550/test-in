@@ -3,18 +3,18 @@ package testGit.ui.TestCase;
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
 import testGit.util.KeyboardSet;
-import testGit.util.statusBar.StatusBarItem;
+import testGit.util.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 import java.util.function.Function;
 
 @Getter
-public enum CreateTestCaseFields implements StatusBarItem {
+public enum CreateTestCaseFields implements IStatusBarItem {
     SAVE(
             "Save",
             KeyboardSet.Enter,
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null
     ),
@@ -23,7 +23,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Add Step",
             KeyboardSet.CreateTestCaseAddStep,
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null
     ),
@@ -32,7 +32,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Remove Step",
             KeyboardSet.CreateTestCaseRemoveStep,
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null
     ),
@@ -41,7 +41,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Auto Complete",
             KeyboardSet.AutoComplete.getShortcutText(),
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null
     ),
@@ -50,7 +50,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Set Priority",
             KeyboardSet.PriorityHigh.getShortcutText() + " / " + KeyboardSet.PriorityMedium.getShortcutText() + " / " + KeyboardSet.PriorityLow.getShortcutText(),
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null
     ),
@@ -59,7 +59,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Navigate",
             KeyboardSet.TabNext.getShortcutText() + " / " + KeyboardSet.TabPrevious.getShortcutText(),
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null
     ),
@@ -68,7 +68,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Navigate Priority",
             KeyboardSet.ArrowUp.getShortcutText() + " / " + KeyboardSet.ArrowDown.getShortcutText(),
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null
     ),
@@ -77,7 +77,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Description",
             KeyboardSet.CreateTestCaseTitle,
             AllIcons.Actions.Edit,
-            new StatusBarItem[]{SAVE, NAVIGATE_TAB},
+            new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
             TestCaseUIBase::getDescriptionSection
     ),
@@ -86,7 +86,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Expected Results",
             KeyboardSet.CreateTestCaseExpected,
             AllIcons.General.InspectionsOK,
-            new StatusBarItem[]{SAVE, NAVIGATE_TAB},
+            new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
             TestCaseUIBase::getExpectedResultSection
     ),
@@ -95,7 +95,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Steps",
             KeyboardSet.CreateTestCaseAddStep,
             AllIcons.Actions.ListFiles,
-            new StatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
+            new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
             true,
             TestCaseUIBase::getStepsSection
     ),
@@ -104,7 +104,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Priority",
             KeyboardSet.CreateTestCasePriority,
             AllIcons.Nodes.Favorite,
-            new StatusBarItem[]{SAVE, SET_PRIORITY, NAVIGATE_ARROWS},
+            new IStatusBarItem[]{SAVE, SET_PRIORITY, NAVIGATE_ARROWS},
             true,
             TestCaseUIBase::getPrioritySection
     ),
@@ -113,7 +113,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Select / Unselect Group",
             KeyboardSet.SelectGroup,
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null
     ),
@@ -122,7 +122,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
             "Group",
             KeyboardSet.CreateTestCaseGroup,
             AllIcons.Nodes.Tag,
-            new StatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
+            new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
             TestCaseUIBase::getGroupSection
     );
@@ -131,11 +131,11 @@ public enum CreateTestCaseFields implements StatusBarItem {
     private final KeyboardSet shortcut;
     private final String customShortcutText;
     private final Icon icon;
-    private final StatusBarItem[] statusBarItems;
+    private final IStatusBarItem[] statusBarItems;
     private final boolean createMenuItem;
-    private final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor;
+    private final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor;
 
-    CreateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
+    CreateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = shortcut;
         this.customShortcutText = null;
@@ -145,7 +145,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
         this.sectionExtractor = sectionExtractor;
     }
 
-    CreateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
+    CreateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;

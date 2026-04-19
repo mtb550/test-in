@@ -154,7 +154,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     private void loadDataAsync() {
         this.sessionCache = new TestSessionCache(vf.getTestSet().getPath());
 
-        sessionCache.setListener(new TestSessionCache.CacheListener() {
+        sessionCache.setListener(new TestSessionCache.ICacheListener() {
 
             @Override
             public void onItemsLoaded(final List<TestCaseDto> items) {

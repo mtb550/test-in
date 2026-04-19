@@ -9,7 +9,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.util.statusBar.StatusBarItem;
+import testGit.util.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,8 +28,8 @@ public abstract class TestCaseUIBase {
     protected final GroupSection groupSection;
     protected final StepsSection stepsSection;
     protected final StatusBarSection statusBarSection;
-    private final List<CreateTestCaseSection> cachedSections;
-    protected Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
+    private final List<ICreateTestCaseSection> cachedSections;
+    protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
     public TestCaseUIBase() {
@@ -57,9 +57,9 @@ public abstract class TestCaseUIBase {
         focusListener = evt -> {
             Component focusOwner = (Component) evt.getNewValue();
             if (focusOwner != null && SwingUtilities.isDescendingFrom(focusOwner, parentPanel)) {
-                for (CreateTestCaseSection section : getAllSections()) {
+                for (ICreateTestCaseSection section : getAllSections()) {
                     if (SwingUtilities.isDescendingFrom(focusOwner, section.getWrapper())) {
-                        StatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(DescriptionSection));
+                        IStatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(DescriptionSection));
                         if (items != null) statusBarSection.updateItems(items);
                         return;
                     }
@@ -76,11 +76,11 @@ public abstract class TestCaseUIBase {
         }
     }
 
-    public List<CreateTestCaseSection> getAllSections() {
+    public List<ICreateTestCaseSection> getAllSections() {
         return cachedSections;
     }
 
-    public void registerShortcut(final JComponent component, final CustomShortcutSet shortcutSet, final UIAction action) {
+    public void registerShortcut(final JComponent component, final CustomShortcutSet shortcutSet, final IUIAction action) {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull final AnActionEvent e) {
@@ -122,7 +122,7 @@ public abstract class TestCaseUIBase {
         };
     }
 
-    public interface UIAction {
+    public interface IUIAction {
         void execute();
     }
 }

@@ -5,11 +5,11 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.ui.TestCase.CreateTestCaseSection;
+import testGit.ui.TestCase.ICreateTestCaseSection;
 import testGit.ui.TestCase.TestCaseUIBase;
 import testGit.ui.TestCase.update.bulk.*;
 import testGit.util.KeyboardSet;
-import testGit.util.statusBar.StatusBarItem;
+import testGit.util.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 import java.util.List;
@@ -17,12 +17,12 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Getter
-public enum UpdateTestCaseFields implements StatusBarItem {
+public enum UpdateTestCaseFields implements IStatusBarItem {
     SAVE(
             "Save",
             KeyboardSet.Enter,
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null,
             null
@@ -32,7 +32,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Add Step",
             KeyboardSet.CreateTestCaseAddStep,
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null,
             null
@@ -42,7 +42,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Remove Step",
             KeyboardSet.CreateTestCaseRemoveStep,
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null,
             null
@@ -52,7 +52,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Navigate",
             KeyboardSet.TabNext.getShortcutText() + " / " + KeyboardSet.TabPrevious.getShortcutText(),
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null,
             null
@@ -62,7 +62,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Navigate Priority",
             KeyboardSet.ArrowUp.getShortcutText() + " / " + KeyboardSet.ArrowDown.getShortcutText(),
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null,
             null
@@ -72,7 +72,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Title",
             KeyboardSet.UpdateTestCaseTitle,
             AllIcons.Actions.Edit,
-            new StatusBarItem[]{SAVE},
+            new IStatusBarItem[]{SAVE},
             true,
             (items, updatedItems) -> new TitleBulkSection().show(items, updatedItems),
             TestCaseUIBase::getDescriptionSection
@@ -82,7 +82,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Expected Results",
             KeyboardSet.UpdateTestCaseExpected,
             AllIcons.General.InspectionsOK,
-            new StatusBarItem[]{SAVE},
+            new IStatusBarItem[]{SAVE},
             true,
             (items, updatedItems) -> new ExpectedBulkSection().show(items, updatedItems),
             TestCaseUIBase::getExpectedResultSection
@@ -92,7 +92,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Auto Complete",
             KeyboardSet.AutoComplete.getShortcutText(),
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null,
             null
@@ -102,7 +102,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Steps",
             KeyboardSet.UpdateTestCaseSteps,
             AllIcons.Actions.ListFiles,
-            new StatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
+            new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
             true,
             (items, updatedItems) -> new StepsBulkSection().show(items, updatedItems),
             TestCaseUIBase::getStepsSection
@@ -112,7 +112,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Set Priority",
             KeyboardSet.PriorityHigh.getShortcutText() + " / " + KeyboardSet.PriorityMedium.getShortcutText() + " / " + KeyboardSet.PriorityLow.getShortcutText(),
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null,
             null
@@ -122,7 +122,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Priority",
             KeyboardSet.UpdateTestCasePriority,
             AllIcons.Nodes.Favorite,
-            new StatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
+            new IStatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
             true,
             (items, updatedItems) -> new PriorityBulkSection().show(items, updatedItems),
             TestCaseUIBase::getPrioritySection
@@ -132,7 +132,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Select / Unselect Group",
             KeyboardSet.SelectGroup,
             null,
-            new StatusBarItem[]{},
+            new IStatusBarItem[]{},
             false,
             null,
             null
@@ -142,7 +142,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
             "Group",
             KeyboardSet.UpdateTestCaseGroup,
             AllIcons.Nodes.Tag,
-            new StatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
+            new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
             (items, updatedItems) -> new GroupBulkSection().show(items, updatedItems),
             TestCaseUIBase::getGroupSection
@@ -152,12 +152,12 @@ public enum UpdateTestCaseFields implements StatusBarItem {
     private final KeyboardSet shortcut;
     private final String customShortcutText;
     private final Icon icon;
-    private final StatusBarItem[] statusBarItems;
+    private final IStatusBarItem[] statusBarItems;
     private final boolean editMenuItem;
-    private final BulkEditorAction bulkAction;
-    private final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor;
+    private final IBulkEditorAction bulkAction;
+    private final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor;
 
-    UpdateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean editMenuItem, final IBulkEditorAction bulkAction, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = shortcut;
         this.customShortcutText = null;
@@ -168,7 +168,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
         this.sectionExtractor = sectionExtractor;
     }
 
-    UpdateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final StatusBarItem[] statusBarItems, final boolean editMenuItem, final BulkEditorAction bulkAction, final Function<TestCaseUIBase, CreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean editMenuItem, final IBulkEditorAction bulkAction, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;
@@ -198,7 +198,7 @@ public enum UpdateTestCaseFields implements StatusBarItem {
         }
     }
 
-    public interface BulkEditorAction {
+    public interface IBulkEditorAction {
         void show(final List<TestCaseDto> items, final Consumer<List<TestCaseDto>> updatedItems);
     }
 }

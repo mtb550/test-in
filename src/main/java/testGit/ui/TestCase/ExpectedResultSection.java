@@ -12,7 +12,7 @@ import testGit.util.services.TestCaseCacheService;
 import javax.swing.*;
 import java.awt.*;
 
-public class ExpectedResultSection implements CreateTestCaseSection {
+public class ExpectedResultSection implements ICreateTestCaseSection {
     @Getter
     private final TextFieldWithAutoCompletion<String> expectedResultField;
     private final JPanel wrapper;
@@ -52,7 +52,7 @@ public class ExpectedResultSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.UIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseExpected.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -70,7 +70,7 @@ public class ExpectedResultSection implements CreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseUIBase.UIAction repackAction) {
+    public void fillData(final TestCaseDto dto, final TestCaseUIBase.IUIAction repackAction) {
         expectedResultField.setText(dto.getExpectedResult());
     }
 }

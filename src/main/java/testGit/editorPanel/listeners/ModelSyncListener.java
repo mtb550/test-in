@@ -18,7 +18,7 @@ public class ModelSyncListener implements ListDataListener {
     private boolean active = true;
 
     @Setter
-    private UpdateCallback onUpdateCallback;
+    private IUpdateCallback onUpdateCallback;
 
     public ModelSyncListener(final TestEditorUI ui, final CollectionListModel<TestCaseDto> model) {
         this.ui = ui;
@@ -92,7 +92,7 @@ public class ModelSyncListener implements ListDataListener {
     public void contentsChanged(final ListDataEvent e) {
     }
 
-    public interface UpdateCallback {
+    public interface IUpdateCallback {
         void onUpdate();
     }
 }

@@ -6,12 +6,11 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
 import testGit.pojo.ViewTab;
 import testGit.pojo.dto.TestCaseDto;
-import testGit.util.broadcasts.listeners.TestCaseExecutionListener;
+import testGit.util.broadcasts.listeners.ITestCaseExecutionListener;
 import testGit.viewPanel.details.DetailsTab;
 import testGit.viewPanel.history.HistoryTab;
 import testGit.viewPanel.openBugs.OpenBugsTab;
@@ -48,16 +47,13 @@ public class ViewPanel {
 
         refreshCurrentView();
 
-        Config.getProject().getMessageBus().connect().subscribe(TestCaseExecutionListener.TOPIC, new TestCaseExecutionListener() {
-            @Override
-            public void onStatusChanged(@NotNull final String testName, @NotNull final String status, final String error) {
-                final TestCaseDto currentDto = getCurrentTestCaseDto();
+        Config.getProject().getMessageBus().connect().subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
+            final TestCaseDto currentDto = getCurrentTestCaseDto();
 
-                if (currentDto != null && testName.contains(currentDto.getDescription())) {
-                    currentDto.setTempStatus(status);
-                    currentDto.setTempError(error);
-                    refreshCurrentView();
-                }
+            if (currentDto != null && testName.contains(currentDto.getDescription())) {
+                currentDto.setTempStatus(status);
+                currentDto.setTempError(error);
+                refreshCurrentView();
             }
         });
     }
@@ -160,15 +156,4 @@ public class ViewPanel {
         detailsTab.requestFocusInWindow();
     }
 
-    public void focusHistoryTab() {
-        this.selectContent(ViewTab.HISTORY);
-        historyTab.setFocusable(true);
-        historyTab.requestFocusInWindow();
-    }
-
-    public void focusOpenBugsTab() {
-        this.selectContent(ViewTab.OPEN_BUGS);
-        openBugsTab.setFocusable(true);
-        openBugsTab.requestFocusInWindow();
-    }
 }
