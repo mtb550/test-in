@@ -39,6 +39,10 @@ public class TestRunDto {
 
     @NotNull
     @Builder.Default
+    private String commitId = "";
+
+    @NotNull
+    @Builder.Default
     private String platform = "";
 
     @NotNull

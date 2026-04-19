@@ -1,16 +1,22 @@
 package testGit.projectPanel.tree;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
+import testGit.pojo.Config;
 import testGit.pojo.DirectoryType;
+import testGit.pojo.dto.TestRunDto;
 import testGit.pojo.dto.dirs.DirectoryDto;
 import testGit.pojo.dto.dirs.TestCasesDirectoryDto;
+import testGit.pojo.dto.dirs.TestRunDirectoryDto;
 import testGit.pojo.dto.dirs.TestRunsDirectoryDto;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Set;
 
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
@@ -28,6 +34,9 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                     DirectoryType type = DirectoryType.fromClass(dir.getClass());
                     setIcon(type != null ? type.getIcon() : AllIcons.Nodes.Folder);
                     append(dir.getName(), getSimpleTextAttributes(node, dir));
+                    append(" ");
+                    statusTag(dir, tree);
+                    // todo, here test set tag.
                 }
 
                 case DefaultMutableTreeNode node -> {
@@ -60,4 +69,35 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                     : SimpleTextAttributes.REGULAR_ATTRIBUTES;
         };
     }
+
+    private void statusTag(final DirectoryDto dir, final JTree tree) {
+        // todo, why dont move all test run configs in .tr and make the json for the added test cases ?
+        if (dir instanceof TestRunDirectoryDto runDir) {
+            if (runDir.getRunStatus() != null) {
+                append(runDir.getRunStatus().getLabel(), SimpleTextAttributes.GRAY_ATTRIBUTES);
+
+            } else if (runDir.getIsLoadingStatus().compareAndSet(false, true)) {
+                ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                    try {
+                        Path jsonFile = runDir.getPath().resolve(runDir.getName() + ".json");
+
+                        if (Files.exists(jsonFile)) {
+                            TestRunDto dto = Config.getMapper().readValue(jsonFile.toFile(), TestRunDto.class);
+                            runDir.setRunStatus(dto.getStatus());
+                            ApplicationManager.getApplication().invokeLater(tree::repaint);
+                        }
+
+                    } catch (Exception e) {
+                        System.err.println("Failed to load status for " + runDir.getName() + ": " + e.getMessage());
+                    }
+                });
+            }
+
+        }
+
+        // todo, if (dir instanceof TestSetDirectoryDto setDir) {
+        // todo, later, make a tag for test set if it is approved or still, need to set business and plan before implement
+    }
+
+
 }

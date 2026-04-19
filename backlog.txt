@@ -295,3 +295,4 @@ move updateUi from test card and run card to its rederer.
 add test case path to run card.
 add new object: commit id to RunEditorAttributes, it is required in each test run.
 in tool bar, add filtering by empty group or not setted group.
+work on test run properties, to show the test run configs like commit id and platform and status and language, add right click context menu and tool bar button

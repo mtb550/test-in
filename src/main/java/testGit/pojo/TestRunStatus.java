@@ -1,7 +1,10 @@
 package testGit.pojo;
 
+import lombok.Getter;
+
 import java.util.Objects;
 
+@Getter
 public enum TestRunStatus {
     CREATED(
             0,
@@ -16,6 +19,16 @@ public enum TestRunStatus {
     COMPLETED(
             2,
             "Completed"
+    ),
+
+    ASSIGNED(
+            3,
+            "Assigned to Alzamil" //todo, later, use xml to add tester's name dynamic
+    ),
+
+    CLOSED(
+            3,
+            "Closed"
     );
 
     private final Integer code;
