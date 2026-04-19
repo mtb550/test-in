@@ -285,7 +285,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        CreateTestCase.execute(this, vf.getTestSet().getPath(), model);
+        CreateTestCase.execute(this, vf.getTestSet().getPath(), list, model);
     }
 
     @Override
@@ -369,9 +369,15 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 ? new ArrayList<>(currentTestCaseDtos.subList(startIndex, endIndex))
                 : new ArrayList<>();
 
+        final TestCaseDto selectedItem = list != null ? list.getSelectedValue() : null;
+
         syncListener.pause();
         model.replaceAll(pageItems);
         syncListener.resume();
+
+        if (selectedItem != null && pageItems.contains(selectedItem)) {
+            list.setSelectedValue(selectedItem, true);
+        }
 
         statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), totalItems);
     }

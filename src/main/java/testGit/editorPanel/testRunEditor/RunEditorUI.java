@@ -481,8 +481,14 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         final int toIndex = Math.min(fromIndex + pageSize, total);
         final List<TestCaseDto> pageItems = currentTestCaseDtos.subList(fromIndex, toIndex);
 
+        final TestCaseDto selectedItem = list != null ? list.getSelectedValue() : null;
+
         if (model != null) {
             model.replaceAll(pageItems);
+        }
+
+        if (selectedItem != null && pageItems.contains(selectedItem) && list != null) {
+            list.setSelectedValue(selectedItem, true);
         }
 
         if (statusBar != null) {
