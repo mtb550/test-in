@@ -260,9 +260,11 @@ public abstract class JsonSplitBulkSection {
                 .createComponentPopupBuilder(panel, rightEditor.getContentComponent())
                 .setTitle(getPopupTitle())
                 .setRequestFocus(true)
-                .setCancelOnClickOutside(true)
+                .setCancelOnClickOutside(false)
+                .setCancelOnWindowDeactivation(false)
                 .setMovable(true)
                 .setResizable(true)
+                // todo, add disposer on close same as @CreateTestCaseUI
                 .createPopup();
 
         Runnable saveLogic = () -> {

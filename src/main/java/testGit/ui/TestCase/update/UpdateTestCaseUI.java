@@ -2,8 +2,11 @@ package testGit.ui.TestCase.update;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import com.intellij.openapi.ui.popup.JBPopupListener;
+import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.TestCase.*;
@@ -95,11 +98,19 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
         // Use the focus component from the dynamically identified target section
         popupWrapper[0] = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
-                .setTitle("Edit " + target.getName())
+                .setTitle("Update " + target.getName())
+                //.setTitleIcon()
                 .setRequestFocus(true)
-                .setCancelOnClickOutside(true)
-                .setMovable(true)
-                .setResizable(true)
+                .setCancelOnWindowDeactivation(false)
+                .setCancelOnClickOutside(false)
+                .setMovable(false)
+                .setResizable(false)
+                .addListener(new JBPopupListener() {
+                    @Override
+                    public void onClosed(@NotNull LightweightWindowEvent event) {
+                        dispose();
+                    }
+                })
                 .createPopup();
 
         // save logic remains centralized in the base class

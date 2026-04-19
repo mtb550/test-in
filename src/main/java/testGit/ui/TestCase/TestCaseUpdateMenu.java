@@ -27,7 +27,7 @@ public class TestCaseUpdateMenu {
 
     public void show(final List<TestCaseDto> items, final Consumer<List<TestCaseDto>> updatedItems) {
         boolean isSingle = items.size() == 1;
-        String title = isSingle ? "Edit Test Case" : "Edit " + items.size() + " Test Cases";
+        String title = isSingle ? "Update Test Case" : "Update " + items.size() + " Test Cases";
 
         showMenu(title, field -> {
             if (isSingle)
