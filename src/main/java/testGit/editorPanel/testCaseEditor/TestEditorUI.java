@@ -186,11 +186,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                             }
                         }
 
-//                        if (!unsortedIds.isEmpty()) {
-//                            updateSequenceAndSaveAll();
-//                        } else {
                         refreshView();
-                        //}
                     });
                 });
             }
@@ -205,6 +201,9 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     public void updateSequenceAndSaveAll() {
+        currentTestCaseDtos.clear();
+        currentTestCaseDtos.addAll(getFilteredList());
+
         final List<TestCaseDto> snapshot;
         synchronized (this.allTestCaseDtos) {
             snapshot = new ArrayList<>(this.allTestCaseDtos);
@@ -257,14 +256,12 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     @Override
     public void appendNewTestCase(final TestCaseDto tc) {
         this.allTestCaseDtos.add(tc);
-        //sortAndIdentifyUnsorted();
+        sortAndIdentifyUnsorted();
         updateSequenceAndSaveAll();
 
         final VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(vf.getTestSet().getPath().toFile());
         if (vDir != null) vDir.refresh(false, true);
 
-        currentTestCaseDtos.clear();
-        currentTestCaseDtos.addAll(getFilteredList());
         selectTestCase(tc);
     }
 
