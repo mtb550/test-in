@@ -45,8 +45,6 @@ public interface IEditorUI extends Disposable {
 
     List<TestCaseDto> getAllTestCaseDtos();
 
-    List<TestCaseDto> getCurrentTestCaseDtos();
-
     void updateSequenceAndSaveAll();
 
     void selectTestCase(final TestCaseDto tc);
