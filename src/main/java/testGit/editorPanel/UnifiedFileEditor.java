@@ -4,11 +4,16 @@ import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.wm.ToolWindow;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import testGit.pojo.dto.TestCaseDto;
+import testGit.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
+import java.util.List;
+import java.util.Optional;
 
 public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor {
 
@@ -65,5 +70,17 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
 
     @Override
     public void setState(final @NotNull FileEditorState state) {
+    }
+
+    @Override
+    public void selectNotify() {
+        List<TestCaseDto> selected = ui.getSelectedTestCases();
+
+        if (selected != null && !selected.isEmpty()) {
+            Optional.ofNullable(ViewToolWindowFactory.getToolWindow())
+                    .filter(ToolWindow::isVisible)
+                    .map(tw -> ViewToolWindowFactory.getViewPanel())
+                    .ifPresent(viewer -> viewer.show(selected, vf.getDirectoryDto().getPath()));
+        }
     }
 }

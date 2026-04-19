@@ -459,4 +459,9 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
         IEditorUI.super.dispose();
     }
+
+    @Override
+    public List<TestCaseDto> getSelectedTestCases() {
+        return list != null ? list.getSelectedValuesList() : Collections.emptyList();
+    }
 }

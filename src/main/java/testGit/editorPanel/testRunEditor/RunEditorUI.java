@@ -571,4 +571,9 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     public Set<UUID> getUnsortedIds() {
         return Collections.emptySet();
     }
+
+    @Override
+    public List<TestCaseDto> getSelectedTestCases() {
+        return list != null ? list.getSelectedValuesList() : Collections.emptyList();
+    }
 }

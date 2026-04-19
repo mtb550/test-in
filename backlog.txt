@@ -275,16 +275,12 @@ question: intellij Task.Backgroundable vs ApplicationManager.getApplication().ex
 change all interfaces to starts with I
 parent if abstract to starts with Abstract, otherwise start with Base.
 
-fix change viow panel to show selected test case if change editor.
-
-add test run duration
-make tool bar deails checkable one click anywhere without need to exactly click check box.
-make tool bar filter auto hide once move mouse outside.
 make search bar logic in separate thread in initiate in test editor ui & test run ui.
-remove edit test case in test run
+
 remove getFilteredList() in IEditorUI.
+
 customize run tool bar to add duration and other items to details. pending
-selcet on test case after create it. pending
+
 put the description in details and apply controll to hide or show it.
 
 /// TODO: if statement here to be removed as all will title will shown and use preferrences that store others shown attributes.

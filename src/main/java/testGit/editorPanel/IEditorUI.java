@@ -33,6 +33,8 @@ public interface IEditorUI extends Disposable {
 
     void refreshView();
 
+    List<TestCaseDto> getSelectedTestCases();
+
     void appendNewTestCase(final TestCaseDto tc);
 
     @NotNull JComponent getComponent();
