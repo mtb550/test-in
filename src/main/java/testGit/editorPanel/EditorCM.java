@@ -17,7 +17,7 @@ public class EditorCM extends DefaultActionGroup {
         add(new CreateTestCase(ui, dir.getPath(), list, model));
         add(new ViewDetails(list, dir.getPath()));
         addSeparator();
-        add(new UpdateTestCase(list, dir.getPath()));
+        add(new UpdateTestCase(ui, list, dir.getPath()));
         add(new CopyTestCase(list));
         add(new RemoveTestCase(dir, list, model));
         addSeparator();
@@ -30,7 +30,7 @@ public class EditorCM extends DefaultActionGroup {
         new Escape(list);
         new OpenCM(list, editorCM);
         new CreateTestCase(ui, dir.getPath(), list, model);
-        new UpdateTestCase(list, dir.getPath());
+        new UpdateTestCase(ui, list, dir.getPath());
         new RemoveTestCase(dir, list, model);
         new OpenTestCaseDetails(list, dir.getPath());
         new CloseTestCaseDetails(list);

@@ -6,6 +6,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import testGit.editorPanel.IEditorUI;
+import testGit.editorPanel.testCaseEditor.TestEditorUI;
 import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.TestCase.TestCaseUpdateMenu;
@@ -22,11 +24,13 @@ public class UpdateTestCase extends DumbAwareAction {
 
     private final JBList<TestCaseDto> list;
     private final Path path;
+    private final IEditorUI ui;
 
-    public UpdateTestCase(final JBList<TestCaseDto> list, final Path path) {
+    public UpdateTestCase(final IEditorUI ui, final JBList<TestCaseDto> list, final Path path) {
         super("Edit Test Case");
         this.list = list;
         this.path = path;
+        this.ui = ui;
         this.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getCustomShortcut(), list);
     }
 
@@ -55,6 +59,11 @@ public class UpdateTestCase extends DumbAwareAction {
                 }
             });
         });
+    }
+
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(ui instanceof TestEditorUI);
     }
 
     @Override
