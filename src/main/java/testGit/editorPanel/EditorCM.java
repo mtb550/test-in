@@ -24,6 +24,9 @@ public class EditorCM extends DefaultActionGroup {
         add(new GenerateTestCase(list));
         add(new RunTestCase(list));
         add(new NavigateToCode(list));
+        addSeparator();
+        add(new NextPageAction(ui, list));
+        add(new PrevPageAction(ui, list));
     }
 
     public static void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final EditorCM editorCM) {
@@ -35,6 +38,8 @@ public class EditorCM extends DefaultActionGroup {
         new OpenTestCaseDetails(list, dir.getPath());
         new CloseTestCaseDetails(list);
         new CopyTestCaseDescription(list);
+        new NextPageAction(ui, list);
+        new PrevPageAction(ui, list);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package testGit.editorPanel;
 
+import com.intellij.ide.HelpTooltip;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -7,6 +8,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
+import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,6 +55,16 @@ public class StatusBar extends JBPanel<StatusBar> {
         makeCompact(prevButton);
         makeCompact(nextButton);
         ///makeCompact(lastButton);
+
+        new HelpTooltip()
+                .setTitle("Previous page")
+                .setShortcut(KeyboardSet.PreviousTestCase.getShortcutText())
+                .installOn(prevButton);
+
+        new HelpTooltip()
+                .setTitle("Next page")
+                .setShortcut(KeyboardSet.NextTestCase.getShortcutText())
+                .installOn(nextButton);
 
         ///paginationPanel.add(firstButton);
         paginationPanel.add(prevButton);
