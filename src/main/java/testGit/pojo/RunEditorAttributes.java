@@ -54,8 +54,13 @@ public enum RunEditorAttributes {
             null
     ),
 
-    DURATION("Duration", true, true,
-            item -> item.getDuration().toString(),
+    DURATION("Duration",
+            true,
+            true,
+            item -> {
+                long s = item.getDuration().getSeconds();
+                return String.format("%02d:%02d", (s % 3600) / 60, (s % 60));
+            },
             null
     );
 

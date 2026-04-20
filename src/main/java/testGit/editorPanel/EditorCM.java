@@ -16,6 +16,7 @@ public class EditorCM extends DefaultActionGroup {
 
         add(new CreateTestCase(ui, dir.getPath(), list, model));
         add(new ViewDetails(list, dir.getPath()));
+        add(new StartExecution(ui.getToolBar().getCallbacks()));
         addSeparator();
         add(new UpdateTestCase(ui, list, dir.getPath()));
         add(new CopyTestCase(list));

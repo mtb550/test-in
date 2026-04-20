@@ -8,7 +8,9 @@ import com.intellij.ui.components.JBList;
 import testGit.actions.CreateTestCase;
 import testGit.editorPanel.EditorCM;
 import testGit.editorPanel.IEditorUI;
+import testGit.editorPanel.testRunEditor.RunEditorUI;
 import testGit.pojo.Config;
+import testGit.pojo.TestStatus;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.pojo.dto.dirs.DirectoryDto;
 import testGit.viewPanel.ViewToolWindowFactory;
@@ -20,14 +22,17 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+// todo, it is used for test and run but name is TestMouseListener, isolate the logic of run in separate class.
 public class TestMouseListener extends MouseAdapter {
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
     private final EditorCM editorCM;
     private final DefaultActionGroup emptyMenu;
     private final Path path;
+    private final IEditorUI ui;
 
     public TestMouseListener(final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorCM editorCM) {
+        this.ui = ui;
         this.list = list;
         this.path = dir.getPath();
         this.model = model;
@@ -60,6 +65,23 @@ public class TestMouseListener extends MouseAdapter {
             } else {
                 list.clearSelection();
                 actionManager.createActionPopupMenu(place, emptyMenu).getComponent().show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+    }
+
+    // ابحث عن الجزء الذي يعالج النقر في TestMouseListener
+    public void mousePressed(MouseEvent e) {
+        // ... كود تحديد العنصر الحالي
+
+        if (ui instanceof RunEditorUI runUI) {
+            String hoveredAction = runUI.getHoveredIconAction();
+            if (hoveredAction != null) {
+                try {
+                    // تحويل النص (مثل "PASSED") إلى Enum واستدعاء المحرك
+                    TestStatus status = TestStatus.valueOf(hoveredAction);
+                    runUI.updateStatusAndNext(status);
+                } catch (IllegalArgumentException ignored) {
+                }
             }
         }
     }

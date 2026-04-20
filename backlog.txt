@@ -283,3 +283,34 @@ add test case path to run card.
 
 add new object: commit id to RunEditorAttributes, it is required in each test run.
 work on test run properties, to show the test run configs like commit id and platform and status and language, add right click context menu and tool bar button
+on test properties, add charts for conclution of run, diagrams and by chart, and put it to the reports.
+in properties, show startedAt, endedAt, total duration.
+
+how to build light wait dialog for executing test cases that can be alwayse on top, show imprtant info,
+separate from intellij so i can minimize intellij and it will keep on top.
+show important info and i can click button to select what i can see,
+accept CTRL+V to add base64 screenshots or exceptions,
+show pass/fail/blocked in proper and big ui.
+render to next test case if set the run status.
+may be pop up can help, mostly if can be alwayse on top.
+
+------------------------------------
+timer:===============
+add to dto: startedAt, EndedAt, total duration, path.
+add path to run attributes.
+update status bar to show the total duration once start the first test case until the last.
+once start, change execute icon to stop icon, use white and black icon.
+build the logic if stop, stop status bar duration, stop current test case duration.
+if start run, fill started at.
+if finish fill ended at.
+if stop fill dto duration for test run and current test case.
+implement disposer.
+
+update edit menu to show the actual result (with base64 screenshot or textearea exception), test case run status,
+or use current edit menu be make it not visible if current editor is test to not make tester confuse.
+make shortcut to set actual result, screenshot or exception (evidence, find another word), test case run status.
+
+how to make timer is accurate
+--------------
+
+add new item in create test case ui: query or pre-condition.

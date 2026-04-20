@@ -34,6 +34,7 @@ import testGit.util.TestCaseSorter;
 import testGit.util.services.TestCaseCacheService;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
@@ -41,6 +42,7 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
@@ -98,6 +100,10 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
     @Setter
     private int hoveredIndex = -1;
+
+    private Timer executionTimer;
+    private long currentTestStartTime;
+    private int currentlyExecutingIndex = -1;
 
     public RunEditorUI(final UnifiedVirtualFile vf) {
         this.vf = vf;
@@ -575,5 +581,70 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     @Override
     public List<TestCaseDto> getSelectedTestCases() {
         return list != null ? list.getSelectedValuesList() : Collections.emptyList();
+    }
+
+    private void startTimerForIndex(int index) {
+        if (index >= currentTestCaseDtos.size()) {
+            stopExecution();
+            return;
+        }
+
+        currentlyExecutingIndex = index;
+        list.setSelectedIndex(index);
+        list.ensureIndexIsVisible(index);
+
+        TestCaseDto currentTc = currentTestCaseDtos.get(index);
+        TestRunDto.TestRunItems runItem = resultsMap.get(currentTc.getId());
+
+        if (runItem == null) return;
+
+        // تصفير الوقت عند البدء الجديد
+        runItem.setDuration(Duration.ZERO);
+        currentTestStartTime = System.currentTimeMillis();
+
+        if (executionTimer != null) executionTimer.stop();
+
+        executionTimer = new Timer(1000, e -> {
+            // حساب الوقت المنقضي وتحديث الـ DTO مباشرة
+            long seconds = (System.currentTimeMillis() - currentTestStartTime) / 1000;
+            runItem.setDuration(Duration.ofSeconds(seconds));
+
+            // إعادة رسم القائمة لتحديث قيمة الـ Duration الظاهرة في البطاقة
+            list.repaint();
+        });
+        executionTimer.start();
+    }
+
+    // استدعاء هذه الدالة عند النقر على (PASS/FAIL)
+    public void updateStatusAndNext(TestStatus status) {
+        if (currentlyExecutingIndex == -1) return;
+
+        TestCaseDto currentTc = currentTestCaseDtos.get(currentlyExecutingIndex);
+        TestRunDto.TestRunItems item = resultsMap.get(currentTc.getId());
+
+        if (item != null) {
+            item.setStatus(status);
+            item.setExecutedAt(LocalDateTime.now());
+            // الـ duration تم تحديثه بالفعل بواسطة الـ timer
+        }
+
+        startTimerForIndex(currentlyExecutingIndex + 1);
+    }
+
+    private void stopExecution() {
+        if (executionTimer != null) {
+            executionTimer.stop();
+        }
+        currentlyExecutingIndex = -1;
+        // يمكن إضافة تنبيه للمستخدم أو تحديث حالة الـ Toolbar
+    }
+
+    @Override
+    public void onStartExecutionClicked() {
+        // البدء من أول عنصر محدد، أو من البداية إذا لم يكن هناك تحديد
+        int startIndex = list.getSelectedIndex() != -1 ? list.getSelectedIndex() : 0;
+
+        // استدعاء الدالة التي قمنا ببرمجتها سابقاً
+        startTimerForIndex(startIndex);
     }
 }

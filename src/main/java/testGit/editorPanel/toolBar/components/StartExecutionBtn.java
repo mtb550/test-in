@@ -4,12 +4,9 @@ import com.intellij.icons.AllIcons;
 
 public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
 
-    public StartExecutionBtn() {
+    public StartExecutionBtn(final Runnable onStartExecutionClicked) {
         super("Start Execution", AllIcons.Nodes.Services);
+        addActionListener(e -> onStartExecutionClicked.run());
 
-        addActionListener(e -> {
-            // TODO: Gatling/TestNG action trigger, add new action class in action package
-            System.out.println("Executing tests...");
-        });
     }
 }

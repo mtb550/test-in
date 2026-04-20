@@ -80,7 +80,7 @@ public class CreateTestCase extends DumbAwareAction {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(ui instanceof TestEditorUI);
     }
 

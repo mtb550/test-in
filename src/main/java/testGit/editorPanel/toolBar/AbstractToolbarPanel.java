@@ -16,11 +16,10 @@ import java.util.Map;
 
 public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel> implements Disposable {
 
-    protected final IToolBar callbacks;
-
     @Getter
     protected final SearchTxt searchTxt;
-
+    @Getter
+    private final IToolBar callbacks;
     @Getter
     private final Map<Class<? extends IToolbarItem>, IToolbarItem> toolbarItems = new HashMap<>();
 

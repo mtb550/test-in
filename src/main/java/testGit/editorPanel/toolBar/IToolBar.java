@@ -13,4 +13,7 @@ public interface IToolBar {
 
     default void onToolBarCreateTestCaseClicked() {
     }
+
+    default void onStartExecutionClicked() {
+    }
 }

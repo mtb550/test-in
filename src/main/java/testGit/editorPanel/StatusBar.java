@@ -19,6 +19,8 @@ public class StatusBar extends JBPanel<StatusBar> {
     private final JBLabel statusLabel = new JBLabel();
     private final JBLabel syncLabel = new JBLabel();
 
+    private final Timer clockTimer;
+
     @Getter
     private final JButton firstButton = new JButton("<<");
     @Getter
@@ -33,6 +35,12 @@ public class StatusBar extends JBPanel<StatusBar> {
 
     public StatusBar() {
         super(new BorderLayout());
+
+        clockTimer = new Timer(60000, e -> updateClock());
+        clockTimer.start();
+        updateClock();
+
+
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0));
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
         setPreferredSize(new Dimension(-1, JBUI.scale(28)));
@@ -79,6 +87,11 @@ public class StatusBar extends JBPanel<StatusBar> {
         add(syncLabel, BorderLayout.EAST);
     }
 
+    private void updateClock() {
+        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        syncLabel.setText("System Time: " + currentTime);
+    }
+
     private void makeCompact(final JButton button) {
         button.putClientProperty("ActionToolbar.smallVariant", true);
         button.setMargin(JBUI.insets(0, 4));
@@ -90,6 +103,9 @@ public class StatusBar extends JBPanel<StatusBar> {
     public void updatePaginationState(final int currentPage, final int totalPages, final int visibleCount, final int totalCount) {
         ///statusLabel.setText(String.format("Showing %d of %d test cases", visibleCount, totalCount));
         statusLabel.setText(String.format("0 of %d test cases", totalCount));
+
+        currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
+
         syncLabel.setText("Last updated: " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
 
