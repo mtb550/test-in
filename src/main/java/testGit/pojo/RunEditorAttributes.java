@@ -7,6 +7,7 @@ import testGit.pojo.dto.TestRunDto;
 
 import javax.swing.*;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -59,7 +60,7 @@ public enum RunEditorAttributes {
             true,
             item -> {
                 long s = item.getDuration().getSeconds();
-                return String.format("%02d:%02d", (s % 3600) / 60, (s % 60));
+                return String.format(Locale.ENGLISH,"%02d:%02d", (s % 3600) / 60, (s % 60));
             },
             null
     );
