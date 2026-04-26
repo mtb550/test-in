@@ -68,9 +68,9 @@ public class AppSettingsConfigurable implements Configurable {
 
         projectComboBox.setRenderer(new RendererImpl());
 
-        activateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.AC));
-        deactivateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.IN));
-        archiveBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.AR));
+        activateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.ACTIVE));
+        deactivateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.INACTIVE));
+        archiveBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.ARCHIVED));
         //renameBtn.addActionListener(e -> new Rename().actionPerformed(ProjectStatus.AR));
 
         refreshProjectList();
@@ -97,6 +97,7 @@ public class AppSettingsConfigurable implements Configurable {
                 .getPanel();
     }
 
+    @Deprecated(forRemoval = true, since = "after remove status from name, this method logic should be moved to .pr with remove split and _")
     private void updateProjectStatus(ProjectStatus newProjectStatus) {
         DirectoryDto selected = (DirectoryDto) projectComboBox.getSelectedItem();
         if (selected == null) return;
@@ -104,9 +105,9 @@ public class AppSettingsConfigurable implements Configurable {
         File oldDir = selected.getPath().toFile();
         String currentFileName = selected.getName();
 
-        if (oldDir.exists() && currentFileName.contains("_")) {
-            String baseName = currentFileName.substring(0, currentFileName.lastIndexOf("_"));
-            String newName = baseName + "_" + newProjectStatus.name();
+        if (oldDir.exists() && currentFileName.contains("_")) { // todo, to be removed _ , no need after move project status logic to .pr.
+            String baseName = currentFileName.substring(0, currentFileName.lastIndexOf("_")); // todo, no need for _
+            String newName = baseName + "_" + newProjectStatus.name(); //todo, no need for _
 
             File newDir = new File(oldDir.getParent(), newName);
             if (oldDir.renameTo(newDir)) {

@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.Setter;
 import testGit.pojo.Config;
 import testGit.pojo.DirectoryMapper;
-import testGit.pojo.ProjectStatus;
 import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
 import testGit.projectPanel.ProjectPanel;
 
@@ -56,12 +55,12 @@ public class TestProjectSelector {
                 paths.filter(java.nio.file.Files::isDirectory)
                         .filter(path -> {
                             String name = path.getFileName().toString();
-                            return !name.startsWith(".") && name.contains("_");
+                            return !name.startsWith(".");
                         })
                         .peek(System.out::println)
                         .map(DirectoryMapper::testProjectNode)
                         .filter(Objects::nonNull)
-                        .filter(p -> p.getProjectStatus() == ProjectStatus.AC)
+                        //.filter(p -> p.getProjectStatus() == ProjectStatus.ACTIVE)
                         .forEach(testProjectList::addElement);
 
             } catch (Exception e) {

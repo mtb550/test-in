@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
-import testGit.pojo.ProjectStatus;
 import testGit.pojo.dto.dirs.TestCasesDirectoryDto;
 import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
 import testGit.pojo.dto.dirs.TestRunsDirectoryDto;
@@ -41,10 +40,12 @@ public class CreateTestProject extends DumbAwareAction {
         if (name == null || name.trim().isEmpty()) return;
 
         TestProjectDirectoryDto newTestProjectDirectory = new TestProjectDirectoryDto()
-                .setProjectStatus(ProjectStatus.AC)
+                //.setProjectStatus(ProjectStatus.ACTIVE) // TODO: move project status to .pr file, with date created and created by..etc
                 .setName(name);
 
-        String folderName = String.format("%s_%s", newTestProjectDirectory.getName(), newTestProjectDirectory.getProjectStatus());
+        //String folderName = String.format("%s_%s", newTestProjectDirectory.getName(), newTestProjectDirectory.getProjectStatus());
+        String folderName = newTestProjectDirectory.getName();
+
         Path projectPath = Config.getTestGitPath().resolve(folderName);
 
         newTestProjectDirectory.setPathName(folderName)

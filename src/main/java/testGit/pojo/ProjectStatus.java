@@ -6,10 +6,10 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ProjectStatus {
-    AC("Active"),
-    IN("Inactive"),
-    RE("Removed"),
-    AR("Archived");
+    ACTIVE("Active"),
+    INACTIVE("Inactive"),
+    REMOVED("Removed"),
+    ARCHIVED("Archived");
 
     private final String description;
 }

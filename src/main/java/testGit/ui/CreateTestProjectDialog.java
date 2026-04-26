@@ -12,6 +12,6 @@ public class CreateTestProjectDialog {
             return null;
         }
 
-        return name.replace("_", " ");
+        return name.replace("_", " "); // todo, add lass special chars to separate method and use it.
     }
 }

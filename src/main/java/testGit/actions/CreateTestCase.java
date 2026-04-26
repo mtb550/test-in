@@ -14,6 +14,7 @@ import testGit.pojo.Config;
 import testGit.pojo.dto.TestCaseDto;
 import testGit.ui.TestCase.CreateTestCaseUI;
 import testGit.util.KeyboardSet;
+import testGit.util.Tools;
 import testGit.util.services.TestCaseCacheService;
 import testGit.util.services.TestCasePersistService;
 
@@ -42,13 +43,15 @@ public class CreateTestCase extends DumbAwareAction {
         performCreation(ui, path, list, model);
     }
 
-    private static void performCreation(final @NotNull IEditorUI ui, final @NotNull Path path, final @NotNull JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    private static void performCreation(final @NotNull IEditorUI ui, final @NotNull Path path, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         new CreateTestCaseUI().show(newTc -> {
             boolean isEmpty = model.isEmpty();
-            newTc.setIsHead(isEmpty).setPath(path);
+            newTc.setIsHead(isEmpty);
 
             TestCaseDto lastTc = isEmpty ? null : model.getElementAt(model.getSize() - 1);
             if (lastTc != null) lastTc.setNext(newTc.getId());
+
+            newTc.setPath(Tools.pathToFqcn(path));
 
             ui.appendNewTestCase(newTc);
 

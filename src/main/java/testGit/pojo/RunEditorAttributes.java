@@ -16,53 +16,69 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public enum RunEditorAttributes {
 
-    DESCRIPTION("Description", true, true,
+    DESCRIPTION(
+            "Description",
+            true,
+            true,
             item -> item.getTestCaseDetails().getDescription(),
             null
     ),
 
-    EXPECTED_RESULT("Expected Result", true, true,
+    EXPECTED_RESULT(
+            "Expected Result",
+            true,
+            true,
             item -> item.getTestCaseDetails().getExpectedResult(),
             null
     ),
 
-    STEPS("Steps", true, true,
+    STEPS(
+            "Steps",
+            true,
+            true,
             item -> String.join(", ", item.getTestCaseDetails().getSteps()),
             null
     ),
 
-    PRIORITY("Priority", true, true,
+    PRIORITY(
+            "Priority",
+            true,
+            true,
             item -> item.getTestCaseDetails().getPriority().getName(),
             item -> List.of(Shared.createPriorityBadge(item.getTestCaseDetails()))
     ),
 
-    GROUP("Group", true, true,
-            item -> item.getTestCaseDetails().getGroup().stream()
-                    .map(Group::getName)
-                    .collect(Collectors.joining(", ")),
-            item -> item.getTestCaseDetails().getGroup().stream()
-                    .map(Shared::createGroupBadge)
-                    .collect(Collectors.<JComponent>toList())
+    GROUP(
+            "Group",
+            true,
+            true,
+            item -> item.getTestCaseDetails().getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
+            item -> item.getTestCaseDetails().getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList())
     ),
 
-    ACTUAL_RESULT("Actual Result", true, true,
+    ACTUAL_RESULT(
+            "Actual Result",
+            true,
+            true,
             TestRunDto.TestRunItems::getActualResult,
             null
     ),
 
-    RUN_STATUS("Run Status",
+    RUN_STATUS(
+            "Run Status",
             true,
             true,
             item -> item.getStatus().name(),
             null
     ),
 
-    DURATION("Duration",
+    DURATION(
+            "Duration",
             true,
             true,
             item -> {
                 long s = item.getDuration().getSeconds();
-                return String.format(Locale.ENGLISH,"%02d:%02d", (s % 3600) / 60, (s % 60));
+                return String.format(Locale.ENGLISH, "%02d:%02d", (s % 3600) / 60, (s % 60));
             },
             null
     ),
@@ -71,7 +87,7 @@ public enum RunEditorAttributes {
             "Path",
             true,
             true,
-            item -> item.getTestCaseDetails().getPath().toString(),
+            item -> item.getTestCaseDetails().getPath(),
             null
     );
 
@@ -82,9 +98,7 @@ public enum RunEditorAttributes {
     private final Function<TestRunDto.TestRunItems, List<JComponent>> drawItem;
 
     public void applyToUI(final TestRunDto.TestRunItems runItem, final List<JComponent> badges, final Map<String, String> details) {
-        if (drawItem != null)
-            badges.addAll(drawItem.apply(runItem));
-        else
-            details.put(name, valueExtractor.apply(runItem));
+        if (drawItem != null) badges.addAll(drawItem.apply(runItem));
+        else details.put(name, valueExtractor.apply(runItem));
     }
 }

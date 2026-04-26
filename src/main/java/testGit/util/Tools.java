@@ -17,6 +17,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Tools {
     @NotNull
@@ -81,11 +83,7 @@ public class Tools {
         return result.toString();
     }
 
-    /**
-     * Converts a physical file path into a Java Fully Qualified Class Name.
-     * Example: ".../testGit/PR_IBRAM_AC/testCases/PA_ibram pkg_AC/TS_ibram 2_AC"
-     * -> "src.test.ibram.ibramPkg.Ibram2"
-     */
+    @Deprecated
     public static String fileToFqcn(final File file) {
         if (file == null) return "";
 
@@ -121,7 +119,7 @@ public class Tools {
 
             if (segment.equals("testCases")) continue;
 
-            String[] parts = segment.split("_", 3);
+            String[] parts = segment.split("_", 3); // todo, no need. to be removed _
             String rawName = (parts.length >= 2) ? parts[1] : segment;
 
             String javaName = toCamelCase(rawName);
@@ -137,6 +135,56 @@ public class Tools {
         }
 
         return fqcn.toString();
+    }
+
+    public static @NotNull String pathToFqcn(final @NotNull Path path) {
+        if (path.toString().isEmpty()) return "";
+
+        String pathStr = extractRelativePath(path);
+        List<String> fqcnParts = new ArrayList<>();
+
+        String basePath = testGit.settings.AppSettingsState.getInstance().rootAutomationPath;
+        if (basePath != null && !basePath.trim().isEmpty()) {
+            fqcnParts.add(basePath.trim());
+        }
+
+        String[] segments = pathStr.split("/");
+
+        for (int i = 0; i < segments.length; i++) {
+            String segment = segments[i];
+
+            if (segment.isEmpty() || segment.equals("testCases")) continue;
+
+            String[] parts = segment.split("_", 3); // todo, no need for _ to be removed.
+            String rawName = (parts.length >= 2) ? parts[1] : segment;
+
+            if (rawName.isEmpty()) continue;
+
+            if (i == segments.length - 1) {
+                rawName = rawName.substring(0, 1).toUpperCase() + rawName.substring(1);
+            }
+
+            fqcnParts.add(rawName);
+        }
+
+        return String.join(" > ", fqcnParts);
+    }
+
+    private static @NotNull String extractRelativePath(@NotNull Path path) {
+        String pathStr = path.toAbsolutePath().toString().replace("\\", "/");
+
+        int markerIndex = pathStr.indexOf("/testGit/");
+        if (markerIndex != -1) {
+            pathStr = pathStr.substring(markerIndex + "/testGit/".length());
+        } else if (pathStr.startsWith("testGit/")) {
+            pathStr = pathStr.substring("testGit/".length());
+        }
+
+        int dotIndex = pathStr.lastIndexOf('.');
+        if (dotIndex != -1) {
+            pathStr = pathStr.substring(0, dotIndex);
+        }
+        return pathStr;
     }
 
     public static boolean isEditorOpen(final String editorName) {

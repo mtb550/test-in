@@ -19,7 +19,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public enum TestEditorAttributes {
 
-    ID("ID",
+    ID(
+            "ID",
             true,
             false,
             tc -> String.valueOf(tc.getId()),
@@ -27,49 +28,56 @@ public enum TestEditorAttributes {
     ),
 
     /// TODO:: added to tool bar details, to be shown but disabled
-    DESCRIPTION("Description",
+    DESCRIPTION(
+            "Description",
             true,
             true,
             TestCaseDto::getDescription,
             null
     ),
 
-    EXPECTED_RESULT("Expected Result",
+    EXPECTED_RESULT(
+            "Expected Result",
             true,
             true,
             TestCaseDto::getExpectedResult,
             null
     ),
 
-    STEPS("Steps",
+    STEPS(
+            "Steps",
             true,
             true,
             tc -> String.join(", ", tc.getSteps()),
             null
     ),
 
-    PRIORITY("Priority",
+    PRIORITY(
+            "Priority",
             true,
             true,
             tc -> tc.getPriority().getName(),
             tc -> List.of(Shared.createPriorityBadge(tc))
     ),
 
-    FCQN("FCQN",
+    FCQN(
+            "FCQN",
             true,
             false,
             TestCaseDto::getFqcn,
             null
     ),
 
-    REFERENCE("Reference",
+    REFERENCE(
+            "Reference",
             true,
             false,
             TestCaseDto::getReference,
             null
     ),
 
-    GROUP("Group",
+    GROUP(
+            "Group",
             true,
             true,
             tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")), // تم إزالة Optional
@@ -80,48 +88,54 @@ public enum TestEditorAttributes {
             "Path",
             true,
             false,
-            tc -> tc.getPath().toString(),
+            tc -> tc.getPath(),
             null
     ),
 
     ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
 
-    CREATE_BY("Created By",
+    CREATE_BY(
+            "Created By",
             true,
             false,
             TestCaseDto::getCreatedBy,
             null
     ),
 
-    UPDATE_BY("Updated By",
+    UPDATE_BY(
+            "Updated By",
             true,
             false,
             TestCaseDto::getUpdatedBy,
             null
     ),
 
-    CREATE_AT("Created At",
+    CREATE_AT(
+            "Created At",
             true,
             false,
             TestCaseDto::getFormattedCreatedAt,
             null
     ),
 
-    UPDATE_AT("Updated At",
+    UPDATE_AT(
+            "Updated At",
             true,
             false,
             TestCaseDto::getFormattedUpdatedAt,
             null
     ),
 
-    MODULE("Module",
+    MODULE(
+            "Module",
             true,
             false,
             TestCaseDto::getModule,
             null
     ),
 
-    STATUS("Status",
+    STATUS(
+            "Status",
             true,
             false,
             TestCaseDto::getTempStatus,
@@ -136,9 +150,7 @@ public enum TestEditorAttributes {
     private final Function<TestCaseDto, List<JComponent>> drawItem;
 
     public void applyToUI(final TestCaseDto tc, final List<JComponent> badges, final Map<String, String> details) {
-        if (drawItem != null)
-            badges.addAll(drawItem.apply(tc));
-        else
-            details.put(name, valueExtractor.apply(tc));
+        if (drawItem != null) badges.addAll(drawItem.apply(tc));
+        else details.put(name, valueExtractor.apply(tc));
     }
 }

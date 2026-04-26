@@ -6,10 +6,8 @@ import testGit.util.notifications.Notifier;
 import java.nio.file.Path;
 
 public class DirectoryMapper {
-    public static TestProjectDirectoryDto testProjectNode(Path path) {
+    public static TestProjectDirectoryDto testProjectNode(final Path path) {
         try {
-            String[] parts = path.getFileName().toString().split("_", 2);
-
             TestCasesDirectoryDto tcd = new TestCasesDirectoryDto()
                     .setPath(path.resolve("testCases"))
                     .setName("Test Cases");
@@ -21,8 +19,8 @@ public class DirectoryMapper {
             return new TestProjectDirectoryDto()
                     .setTestCasesDirectory(tcd)
                     .setTestRunsDirectory(trd)
-                    .setName(parts[0])
-                    .setProjectStatus(ProjectStatus.valueOf(parts[1]))
+                    .setName(path.getFileName().toString())
+                    //.setProjectStatus(ProjectStatus.valueOf(parts[1])) // todo, to be moved to .pr file with date created and created by and modified by. modifed at.
                     .setPath(path)
                     .setPathName(path.getFileName().toString());
 
