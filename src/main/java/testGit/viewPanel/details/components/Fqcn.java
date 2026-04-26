@@ -12,6 +12,6 @@ public class Fqcn extends BaseDetails {
 
     @Override
     public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
-        return addRow(panel, gbc, LABEL_TEXT, dto.getFqcn(), currentRow);
+        return addRow(panel, gbc, LABEL_TEXT, dto.getFqcn().toString(), currentRow);
     }
 }

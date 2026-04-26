@@ -19,16 +19,21 @@ import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
 import testGit.pojo.Config;
 
+import java.util.List;
+
 public class TestNGRunnerByMethod {
 
-    public static void runTestMethod(String fqcn, String methodName) {
+    public static void runTestMethod(List<String> fqcn, String methodName) {
         final Project project = Config.getProject();
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
 
+                    String fqcnString = String.join(".", fqcn);
+                    System.out.println("fqcn: " + fqcnString);
+
                     PsiClass targetClass = JavaPsiFacade.getInstance(project)
-                            .findClass(fqcn, GlobalSearchScope.projectScope(project));
+                            .findClass(fqcnString, GlobalSearchScope.projectScope(project));
 
                     Module module = null;
                     if (targetClass != null) {
@@ -42,7 +47,7 @@ public class TestNGRunnerByMethod {
                         RunManager runManager = RunManager.getInstance(project);
                         TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
-                        String simpleClassName = fqcn.substring(fqcn.lastIndexOf('.') + 1);
+                        String simpleClassName = fqcnString.substring(fqcn.lastIndexOf('.') + 1);
                         String configName = simpleClassName + "." + methodName;
 
                         RunnerAndConfigurationSettings settings = runManager.findConfigurationByName(configName);
@@ -52,7 +57,7 @@ public class TestNGRunnerByMethod {
                             TestNGConfiguration configuration = (TestNGConfiguration) settings.getConfiguration();
 
                             configuration.getPersistantData().TEST_OBJECT = TestType.METHOD.getType();
-                            configuration.getPersistantData().MAIN_CLASS_NAME = fqcn;
+                            configuration.getPersistantData().MAIN_CLASS_NAME = fqcnString;
                             configuration.getPersistantData().METHOD_NAME = methodName;
                             configuration.getPersistantData().getPatterns().clear();
 

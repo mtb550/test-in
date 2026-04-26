@@ -64,7 +64,7 @@ public enum TestEditorAttributes {
             "FCQN",
             true,
             false,
-            TestCaseDto::getFqcn,
+            tc -> String.join(".", tc.getFqcn()),
             null
     ),
 
@@ -88,7 +88,7 @@ public enum TestEditorAttributes {
             "Path",
             true,
             false,
-            tc -> tc.getPath(),
+            tc -> String.join(".", tc.getPath()),
             null
     ),
 

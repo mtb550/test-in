@@ -34,7 +34,7 @@ public class TestCaseDto {
 
     @NotNull
     @Builder.Default
-    private String path = ""; // todo, change it to array: List<String> path
+    private List<String> path = new ArrayList<>();
 
     @NotNull
     @Builder.Default
@@ -58,7 +58,7 @@ public class TestCaseDto {
 
     @NotNull
     @Builder.Default
-    private String fqcn = ""; // todo, change it to array: List<String> fqcn
+    private List<String> fqcn = new ArrayList<>();
 
     @NotNull
     @Builder.Default

@@ -87,7 +87,7 @@ public enum RunEditorAttributes {
             "Path",
             true,
             true,
-            item -> item.getTestCaseDetails().getPath(),
+            item -> String.join(".", item.getTestCaseDetails().getPath()),
             null
     );
 

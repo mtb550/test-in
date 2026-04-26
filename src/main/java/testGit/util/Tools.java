@@ -137,8 +137,8 @@ public class Tools {
         return fqcn.toString();
     }
 
-    public static @NotNull String pathToFqcn(final @NotNull Path path) {
-        if (path.toString().isEmpty()) return "";
+    public static @NotNull List<String> pathToFqcn(final @NotNull Path path) {
+        if (path.toString().isEmpty()) return new ArrayList<>();
 
         String pathStr = extractRelativePath(path);
         List<String> fqcnParts = new ArrayList<>();
@@ -155,10 +155,7 @@ public class Tools {
 
             if (segment.isEmpty() || segment.equals("testCases")) continue;
 
-            String[] parts = segment.split("_", 3); // todo, no need for _ to be removed.
-            String rawName = (parts.length >= 2) ? parts[1] : segment;
-
-            if (rawName.isEmpty()) continue;
+            String rawName = segment;
 
             if (i == segments.length - 1) {
                 rawName = rawName.substring(0, 1).toUpperCase() + rawName.substring(1);
@@ -167,7 +164,7 @@ public class Tools {
             fqcnParts.add(rawName);
         }
 
-        return String.join(" > ", fqcnParts);
+        return fqcnParts;
     }
 
     private static @NotNull String extractRelativePath(@NotNull Path path) {

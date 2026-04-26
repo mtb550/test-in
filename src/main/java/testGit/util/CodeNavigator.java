@@ -8,12 +8,15 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
+import org.jetbrains.annotations.NotNull;
 import testGit.pojo.Config;
+
+import java.util.List;
 
 public class CodeNavigator {
 
-    public static void toCode(String fqcn, String testCaseName) {
-        if (fqcn == null || fqcn.trim().isEmpty()) {
+    public static void toCode(final @NotNull List<String> fqcn, final @NotNull String testCaseName) {
+        if (fqcn.isEmpty()) {
             Messages.showWarningDialog("This test case has no automation reference.", "Missing Reference");
             return;
         }
@@ -24,8 +27,11 @@ public class CodeNavigator {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
 
+                    String fqcnString = String.join(".", fqcn);
+                    System.out.println("fqcn: " + fqcnString);
+
                     PsiClass targetClass = JavaPsiFacade.getInstance(project)
-                            .findClass(fqcn, GlobalSearchScope.projectScope(project));
+                            .findClass(fqcnString, GlobalSearchScope.projectScope(project));
 
                     if (targetClass != null) {
                         Navigatable targetElement = targetClass;
@@ -55,6 +61,7 @@ public class CodeNavigator {
                                 Messages.showErrorDialog("Could not find class in project:\n" + fqcn, "Class Not Found")
                         );
                     }
-                }));
+                })
+        );
     }
 }
