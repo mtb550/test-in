@@ -17,12 +17,13 @@ import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Getter
 public abstract class TestCaseUIBase {
-    protected final TitleSection DescriptionSection;
+    protected final GenerateOrUpdateCodeCheckBox generateOrUpdateCodeCheckBox;
+    protected final DescriptionSection DescriptionSection;
     protected final ExpectedResultSection expectedResultSection;
     protected final PrioritySection prioritySection;
     protected final GroupSection groupSection;
@@ -33,7 +34,8 @@ public abstract class TestCaseUIBase {
     private PropertyChangeListener focusListener;
 
     public TestCaseUIBase() {
-        this.DescriptionSection = new TitleSection();
+        this.generateOrUpdateCodeCheckBox = new GenerateOrUpdateCodeCheckBox(this);
+        this.DescriptionSection = new DescriptionSection();
         this.expectedResultSection = new ExpectedResultSection();
         this.stepsSection = new StepsSection();
         this.prioritySection = new PrioritySection();
@@ -108,14 +110,16 @@ public abstract class TestCaseUIBase {
         }.registerCustomShortcutSet(shortcutSet, component);
     }
 
-    public Runnable save(final TestCaseDto dto, final Consumer<TestCaseDto> onSave, final JBPopup[] popupWrapper) {
+    public Runnable save(final TestCaseDto dto, final BiConsumer<TestCaseDto, Boolean> onSave, final JBPopup[] popupWrapper) {
         return () -> {
             getAllSections().forEach(section -> section.applyTo(dto));
 
             String title = dto.getDescription();
             if (DescriptionSection.getWrapper().getParent() == null || !title.trim().isEmpty()) {
-                onSave.accept(dto);
-                if (popupWrapper[0] != null) popupWrapper[0].closeOk(null);
+                onSave.accept(dto, generateOrUpdateCodeCheckBox.isSelected());
+
+                if (popupWrapper[0] != null)
+                    popupWrapper[0].closeOk(null);
 
             } else
                 DescriptionSection.setError(true);

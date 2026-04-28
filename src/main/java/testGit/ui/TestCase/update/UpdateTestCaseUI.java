@@ -14,11 +14,11 @@ import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class UpdateTestCaseUI extends TestCaseUIBase {
 
-    public void show(final TestCaseDto existingDto, final UpdateTestCaseFields targetField, final Consumer<TestCaseDto> updatedItems) {
+    public void show(final TestCaseDto existingDto, final UpdateTestCaseFields targetField, final BiConsumer<TestCaseDto, Boolean> onSave) {
         final JBPopup[] popupWrapper = new JBPopup[1];
         IUIAction repackPopup = () -> {
             if (popupWrapper[0] != null)
@@ -62,7 +62,7 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
                 }
             }
 
-            boolean showAlways = section instanceof TitleSection;
+            boolean showAlways = section instanceof DescriptionSection;
             boolean showIfNotEmpty = section instanceof ExpectedResultSection && !existingDto.getExpectedResult().isEmpty();
 
             if (showAlways || showIfNotEmpty || isTarget) {
@@ -75,10 +75,10 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
             }
         }
 
-        setupUI(mainPanel, contentPanel, popupWrapper, existingDto, targetField, targetSection, updatedItems);
+        setupUI(mainPanel, contentPanel, popupWrapper, existingDto, targetField, targetSection, onSave);
     }
 
-    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final UpdateTestCaseFields target, final ICreateTestCaseSection targetSection, final Consumer<TestCaseDto> updatedItems) {
+    private void setupUI(final JPanel mainPanel, final JPanel contentPanel, final JBPopup[] popupWrapper, final TestCaseDto dto, final UpdateTestCaseFields target, final ICreateTestCaseSection targetSection, final BiConsumer<TestCaseDto, Boolean> onSave) {
         JPanel anchorPanel = new JPanel(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
@@ -100,6 +100,7 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
                 .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
                 .setTitle("Update " + target.getName())
                 //.setTitleIcon()
+                .setSettingButtons(generateOrUpdateCodeCheckBox)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)
@@ -114,7 +115,7 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
                 .createPopup();
 
         // save logic remains centralized in the base class
-        Runnable saveAction = save(dto, updatedItems, popupWrapper);
+        Runnable saveAction = save(dto, onSave, popupWrapper);
 
         // register enter shortcut via the base class helper
         registerShortcut(mainPanel, KeyboardSet.Enter.getCustomShortcut(), saveAction::run);

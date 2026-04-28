@@ -14,13 +14,13 @@ import testGit.util.services.TestCaseCacheService;
 import javax.swing.*;
 import java.awt.*;
 
-public class TitleSection implements ICreateTestCaseSection {
+public class DescriptionSection implements ICreateTestCaseSection {
     @Getter
     private final TextFieldWithAutoCompletion<String> titleField;
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
 
-    public TitleSection() {
+    public DescriptionSection() {
         this.titleField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
 
         this.titleField.setFont(fieldFont);

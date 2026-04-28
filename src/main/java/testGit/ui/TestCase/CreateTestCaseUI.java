@@ -13,11 +13,11 @@ import testGit.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class CreateTestCaseUI extends TestCaseUIBase {
-    public void show(final Consumer<TestCaseDto> onSave) {
-        TestCaseDto dto = new TestCaseDto();
+    public void show(final BiConsumer<TestCaseDto, Boolean> onSave) {
+        final TestCaseDto dto = new TestCaseDto();
         final JBPopup[] popupWrapper = new JBPopup[1];
 
         IUIAction repackPopup = () -> {
@@ -63,7 +63,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
 
             section.setupShortcut(mainPanel, slot, this, repackPopup);
 
-            if (section instanceof TitleSection)
+            if (section instanceof DescriptionSection)
                 section.showSection(slot);
         }
 
@@ -102,6 +102,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         popupWrapper[0] = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
                 .setTitle("Create Test Case")
+                .setSettingButtons(generateOrUpdateCodeCheckBox)
                 //.setTitleIcon()
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)

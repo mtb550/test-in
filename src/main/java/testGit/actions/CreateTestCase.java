@@ -44,7 +44,7 @@ public class CreateTestCase extends DumbAwareAction {
     }
 
     private static void performCreation(final @NotNull IEditorUI ui, final @NotNull Path path, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
-        new CreateTestCaseUI().show(newTc -> {
+        new CreateTestCaseUI().show((newTc, shouldGenerateOrUpdateCode) -> {
             boolean isEmpty = model.isEmpty();
             newTc.setIsHead(isEmpty);
 
@@ -64,7 +64,8 @@ public class CreateTestCase extends DumbAwareAction {
             TestCaseCacheService.getInstance(project).addNewItems(affectedNodes);
             TestCasePersistService.getInstance(project).persist(path, affectedNodes);
 
-            Tools.createJavaMethodInClass(project, newTc.getFqcn(), newTc.getDescription());
+            if (shouldGenerateOrUpdateCode)
+                Tools.createJavaMethodInClass(project, newTc.getFqcn(), newTc.getDescription());
 
             SwingUtilities.invokeLater(() -> ui.selectTestCase(newTc));
 

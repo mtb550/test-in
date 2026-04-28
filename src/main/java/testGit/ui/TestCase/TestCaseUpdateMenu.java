@@ -31,7 +31,7 @@ public class TestCaseUpdateMenu {
 
         showMenu(title, field -> {
             if (isSingle)
-                new UpdateTestCaseUI().show(items.getFirst(), field, tc -> updatedItems.accept(items));
+                new UpdateTestCaseUI().show(items.getFirst(), field, (tc, shouldGenerateOrUpdateCode) -> updatedItems.accept(items));
             else
                 field.getBulkAction().show(items, updatedItems);
         });
