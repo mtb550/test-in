@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import testGit.projectPanel.ProjectPanel;
 
 public class Refresh extends DumbAwareAction {
@@ -16,9 +15,13 @@ public class Refresh extends DumbAwareAction {
         this.projectPanel = projectPanel;
     }
 
-    @Override
-    public void actionPerformed(@Nullable AnActionEvent e) {
+    public void execute() {
         projectPanel.setupMainLayout();
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        execute();
     }
 
     @Override

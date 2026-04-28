@@ -124,7 +124,7 @@ public class AppSettingsConfigurable implements Configurable {
 
                 ProjectPanel panel = ProjectPanelService.getInstance(Config.getProject()).getPanel();
                 if (panel != null) {
-                    new Refresh(panel).actionPerformed(null);
+                    new Refresh(panel).execute();
                     System.out.println("ToolWindow refresh triggered successfully.");
                 }
             }

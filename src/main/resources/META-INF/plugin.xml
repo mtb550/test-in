@@ -3,18 +3,18 @@
     <!-- ================================================================== -->
     <!-- Identity                                                           -->
     <!-- ================================================================== -->
-    <id>testGit.demo</id>
-    <name>Test Git</name>
-    <version>1.3.2-SNAPSHOT</version>
-    <vendor email="mtb550@gmail.com" url="https://mtb.com">Muteb Almughyiri</vendor>
+    <id>org.testin</id>
+    <name>test in</name>
+    <version>2.0.0-SNAPSHOT</version>
+    <vendor email="mtb550@gmail.com" url="https://github.com/mtb550/test-in">Muteb Almughyiri</vendor>
     <resource-bundle>messages.bundle</resource-bundle>
     <description><![CDATA[
-        <b>Test Git</b> — a QC management plugin for IntelliJ-based IDEs.<br/><br/>
+        <b>test in</b> — a QC management plugin for IntelliJ-based IDEs.<br/><br/>
         Browse test projects, manage test cases, track test runs, and integrate
-        with Git version control — all from within your IDE.
+        with git version control — all from within your IDE.
     ]]></description>
     <change-notes><![CDATA[
-        <b>1.0.0</b>
+        <b>2.0.0</b>
         <ul>
             <li>Initial release</li>
             <li>Test case editor with filtering, search, and pagination</li>
@@ -26,7 +26,7 @@
     <!-- ================================================================== -->
     <!-- Compatibility                                                        -->
     <!-- ================================================================== -->
-    <idea-version since-build="253" until-build="253.*"/>
+    <idea-version since-build="251"/>
 
     <!-- ================================================================== -->
     <!-- Dependencies                                                         -->
@@ -59,6 +59,7 @@
                 secondary="false"
                 doNotActivateOnStart="true"
         />
+
         <toolWindow
                 id="TestGitViewPanel"
                 factoryClass="testGit.viewPanel.ViewToolWindowFactory"
@@ -97,67 +98,5 @@
         />
 
     </extensions>
-
-    <!--    <actions>-->
-    <!--        <action id="TestGit.CreateNode" class="testGit.actions.CreateNode" text="Create Node" description="Create a new node or test case">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="control M"/>-->
-    <!--            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta M" replace-all="true"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.GenerateTestCase" class="testGit.actions.GenerateTestCase" text="Generate Test Case" description="Generate a test case">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="control F12"/>-->
-    <!--            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta F12" replace-all="true"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.RunTestCase" class="testGit.actions.RunTestCase" text="Run Test Case" description="Run the selected test case">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="F5"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.NavigateToCode" class="testGit.actions.NavigateToCode" text="Navigate to Code" description="Navigate to the source code">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="shift F5"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.UpdateTestCase" class="testGit.actions.UpdateTestCase" text="Update Test Case" description="Update the selected test case">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="F2"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.RenameNode" class="testGit.actions.Rename" text="Rename Node">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="shift F6"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.CopyNode" class="testGit.actions.CopyNode" text="Copy Node">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="control C"/>-->
-    <!--            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta C" replace-all="true"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.CutNode" class="testGit.actions.CutNode" text="Cut Node">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="control X"/>-->
-    <!--            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta X" replace-all="true"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.PasteNode" class="testGit.actions.PasteNode" text="Paste Node">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="control V"/>-->
-    <!--            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta V" replace-all="true"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.UndoNode" class="testGit.actions.UndoNode" text="Undo Node">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="control Z"/>-->
-    <!--            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta Z" replace-all="true"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.RedoNode" class="testGit.actions.RedoNode" text="Redo Node">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="control shift Z"/>-->
-    <!--            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta shift Z" replace-all="true"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.RemoveNode" class="testGit.actions.Remove" text="Remove Node">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="DELETE"/>-->
-    <!--        </action>-->
-
-    <!--        <action id="TestGit.Open" class="testGit.actions.Open" text="Open Test Git" description="Open the Test Git interface">-->
-    <!--            <keyboard-shortcut keymap="$default" first-keystroke="ENTER"/>-->
-    <!--            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>-->
-    <!--        </action>-->
-    <!--    </actions>-->
 
 </idea-plugin>

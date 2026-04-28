@@ -66,12 +66,12 @@ public class StatusBar extends JBPanel<StatusBar> {
         ///makeCompact(lastButton);
 
         new HelpTooltip()
-                .setTitle("Previous page")
+                .setDescription("Previous page")
                 .setShortcut(KeyboardSet.PreviousTestCase.getShortcutText())
                 .installOn(prevButton);
 
         new HelpTooltip()
-                .setTitle("Next page")
+                .setDescription("Next page")
                 .setShortcut(KeyboardSet.NextTestCase.getShortcutText())
                 .installOn(nextButton);
 

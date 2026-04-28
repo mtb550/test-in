@@ -11,7 +11,7 @@ plugins {
     id("com.gradle.develocity") version "3.17.2"
 }
 
-rootProject.name = "TestGit"
+rootProject.name = "testin"
 
 develocity {
     buildScan {

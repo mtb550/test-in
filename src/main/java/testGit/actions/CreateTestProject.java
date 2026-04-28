@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import testGit.pojo.Config;
 import testGit.pojo.dto.dirs.TestCasesDirectoryDto;
 import testGit.pojo.dto.dirs.TestProjectDirectoryDto;
@@ -26,15 +25,7 @@ public class CreateTestProject extends DumbAwareAction {
         this.projectPanel = projectPanel;
     }
 
-    @Override
-    /// TODO:: use execute method instad of direct use here to resolve intellij issues
-    /// issues in CreateTestProject & Refresh. execute is used before in other some of actions.
-    /*
-    Override-only methods usage violations (2)
-    CreateTestProject.actionPerformed(AnActionEvent)
-    (1)Refresh.actionPerformed(AnActionEvent) (1)
-    */
-    public void actionPerformed(@Nullable AnActionEvent e) {
+    public void execute() {
         String name = CreateTestProjectDialog.show();
 
         if (name == null || name.trim().isEmpty()) return;
@@ -78,6 +69,11 @@ public class CreateTestProject extends DumbAwareAction {
             projectPanel.getTestProjectSelector().addTestProject(newTestProjectDirectory);
             Notifier.info("New Test Project", String.format("Test Project %s has been added", name));
         });
+    }
+
+    @Override
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        execute();
     }
 
     @Override

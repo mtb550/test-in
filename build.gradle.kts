@@ -5,8 +5,8 @@ plugins {
     id("org.jetbrains.intellij.platform")
 }
 
-group = "testGit"
-version = "1.3.2-SNAPSHOT"
+group = "org.testin"
+version = "2.0.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -76,14 +76,14 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
-        id.set("testGit.demo")
-        name.set("Test Git")
+        id.set("org.testin")
+        name.set("test in")
         version.set(project.version.toString())
 
         vendor {
             name.set("Muteb Almughyiri")
             email.set("mtb550@gmail.com")
-            url.set("https://mtb.com")
+            url.set("https://github.com/mtb550/test-in")
         }
 
         ideaVersion {
