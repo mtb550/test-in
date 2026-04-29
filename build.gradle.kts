@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.testin"
-version = "2.0.0-SNAPSHOT"
+version = "2.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -77,7 +77,7 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         id.set("org.testin")
-        name.set("test in")
+        name.set("Test in")
         version.set(project.version.toString())
 
         vendor {

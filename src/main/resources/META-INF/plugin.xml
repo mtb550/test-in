@@ -4,8 +4,8 @@
     <!-- Identity                                                           -->
     <!-- ================================================================== -->
     <id>org.testin</id>
-    <name>test in</name>
-    <version>2.0.0-SNAPSHOT</version>
+    <name>Test in</name>
+    <version>2.0.1-SNAPSHOT</version>
     <vendor email="mtb550@gmail.com" url="https://github.com/mtb550/test-in">Muteb Almughyiri</vendor>
     <resource-bundle>messages.bundle</resource-bundle>
     <description><![CDATA[
