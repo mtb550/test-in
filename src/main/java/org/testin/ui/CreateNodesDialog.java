@@ -1,6 +1,7 @@
 package org.testin.ui;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.util.IconLoader;
@@ -27,11 +28,15 @@ import java.util.function.Predicate;
 public class CreateNodesDialog {
 
     public static void show(String title, Class<?>[] items, Predicate<Class<?>> isDisabled, BiConsumer<String, Class<?>> onSelected) {
+        show(title, items, isDisabled, null, onSelected);
+    }
+
+    public static void show(String title, Class<?>[] items, Predicate<Class<?>> isDisabled, JComponent settingButton, BiConsumer<String, Class<?>> onSelected) {
 
         ExtendableTextField textField = new ExtendableTextField();
         textField.getEmptyText().setText("Name");
         textField.setFont(JBFont.regular());
-        textField.setBorder(JBUI.Borders.empty(6, 10));
+        textField.setBorder(JBUI.Borders.empty(8, 10));
         textField.putClientProperty("JTextField.Search.noBorderRing", Boolean.TRUE);
 
         JBList<Class<?>> list = new JBList<>(items);
@@ -92,7 +97,7 @@ public class CreateNodesDialog {
 
                     @Override
                     public int getIconGap() {
-                        return JBUI.scale(6);
+                        return JBUI.scale(10);
                     }
                 });
                 textField.repaint();
@@ -104,7 +109,7 @@ public class CreateNodesDialog {
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.add(textField, BorderLayout.CENTER);
-        topPanel.setPreferredSize(new Dimension(JBUI.scale(350), JBUI.scale(32)));
+        topPanel.setPreferredSize(new Dimension(JBUI.scale(350), JBUI.scale(36)));
         topPanel.setBorder(JBUI.Borders.empty());
 
         JPanel listPanel = new JPanel(new BorderLayout());
@@ -113,16 +118,25 @@ public class CreateNodesDialog {
 
         JPanel mainPanel = new JPanel(new BorderLayout());
         mainPanel.add(topPanel, BorderLayout.NORTH);
-        mainPanel.add(listPanel, BorderLayout.CENTER);
+
+        if (items.length > 1) {
+            mainPanel.add(listPanel, BorderLayout.CENTER);
+        }
+
         mainPanel.setBorder(JBUI.Borders.empty());
 
-        JBPopup popup = JBPopupFactory.getInstance()
+        ComponentPopupBuilder builder = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, textField)
                 .setTitle(title)
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(true)
-                .setMovable(false)
-                .createPopup();
+                .setMovable(false);
+
+        if (settingButton != null) {
+            builder.setSettingButtons(settingButton);
+        }
+
+        JBPopup popup = builder.createPopup();
 
         textField.addKeyListener(new KeyAdapter() {
             @Override
@@ -132,16 +146,13 @@ public class CreateNodesDialog {
                     list.setSelectedIndex(newIdx);
                     list.ensureIndexIsVisible(newIdx);
                     e.consume();
-
                 } else if (e.getKeyCode() == KeyEvent.VK_UP) {
                     int newIdx = getNextEnabledIndex(items, isDisabled, list.getSelectedIndex(), -1);
                     list.setSelectedIndex(newIdx);
                     list.ensureIndexIsVisible(newIdx);
                     e.consume();
-
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     submit(textField, list, popup, onSelected);
-
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     popup.cancel();
                 }
