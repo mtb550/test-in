@@ -7,6 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
+import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.dirs.TestCasesDirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsDirectoryDto;
@@ -42,28 +43,29 @@ public class CreateTestProject extends DumbAwareAction {
         newTestProjectDirectory.setPathName(folderName)
                 .setPath(projectPath);
 
-        newTestProjectDirectory.setTestCasesDirectory(
+        newTestProjectDirectory
+                .setTestCasesDirectory(
                         new TestCasesDirectoryDto()
-                                .setPath(newTestProjectDirectory.getPath().resolve("testCases"))
-                                .setName("Test Cases")
+                                .setPath(newTestProjectDirectory.getPath().resolve(DirectoryType.TCD.getPathName()))
+                                .setName(DirectoryType.TCD.getDisplayedName())
                 )
                 .setTestRunsDirectory(
                         new TestRunsDirectoryDto()
-                                .setPath(newTestProjectDirectory.getPath().resolve("testRuns"))
-                                .setName("Test Runs")
+                                .setPath(newTestProjectDirectory.getPath().resolve(DirectoryType.TRD.getPathName()))
+                                .setName(DirectoryType.TRD.getDisplayedName())
                 );
 
         TreeUtilImpl.executeVfsAction(Config.getTestinPath(), "IO Error", vf -> {
             VirtualFile projectDir = vf.createChildDirectory(this, folderName);
-            projectDir.createChildData(this, ".pr");
+            projectDir.createChildData(this, DirectoryType.TP.getMarker());
 
             String tcdName = newTestProjectDirectory.getTestCasesDirectory().getPath().getFileName().toString();
             VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);
-            tcdDir.createChildData(this, ".tcd");
+            tcdDir.createChildData(this, DirectoryType.TCD.getMarker());
 
             String trdName = newTestProjectDirectory.getTestRunsDirectory().getPath().getFileName().toString();
             VirtualFile trdDir = projectDir.createChildDirectory(this, trdName);
-            trdDir.createChildData(this, ".trd");
+            trdDir.createChildData(this, DirectoryType.TRD.getMarker());
 
             projectDir.refresh(false, true);
             projectPanel.getTestProjectSelector().addTestProject(newTestProjectDirectory);
@@ -78,9 +80,8 @@ public class CreateTestProject extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) {
+        if (e.getProject() == null || Config.getTestinPath() == null)
             e.getPresentation().setEnabled(false);
-        }
     }
 
     @Override

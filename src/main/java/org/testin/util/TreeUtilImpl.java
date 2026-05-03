@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -14,7 +15,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class TreeUtilImpl {
-    public static void executeVfsAction(Path path, String errorTitle, IVfsOperation operation) {
+    public static void executeVfsAction(final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
@@ -29,7 +30,7 @@ public class TreeUtilImpl {
         }));
     }
 
-    public static void executeVfsAction(Path sourcePath, Path targetPath, String errorTitle, IVfsBiOperation operation) {
+    public static void executeVfsAction(final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);

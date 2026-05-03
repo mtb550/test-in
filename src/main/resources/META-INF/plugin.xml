@@ -4,10 +4,10 @@
     <!-- Identity                                                           -->
     <!-- ================================================================== -->
     <id>org.testin</id>
-    <name>Test in</name>
+    <name>Testin</name>
     <version>2.0.1-SNAPSHOT</version>
     <vendor email="mtb550@gmail.com" url="https://github.com/mtb550/test-in">Muteb Almughyiri</vendor>
-    <resource-bundle>messages.bundle</resource-bundle>
+    <resource-bundle>messages</resource-bundle>
     <description><![CDATA[
         <b>test in</b> — a QC management plugin for IntelliJ-based IDEs.<br/><br/>
         Browse test projects, manage test cases, track test runs, and integrate
@@ -52,7 +52,7 @@
 
         <!-- Tool windows -->
         <toolWindow
-                id="testinTreePanel"
+                id="testin.tree"
                 factoryClass="org.testin.projectPanel.Main"
                 anchor="left"
                 icon="/icons/pluginIcon.svg"
@@ -61,33 +61,29 @@
         />
 
         <toolWindow
-                id="testinViewPanel"
+                id="testin.view"
                 factoryClass="org.testin.viewPanel.ViewToolWindowFactory"
-                anchor="bottom"
+                anchor="right"
                 icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
 
         <!-- Notifications -->
-        <notificationGroup id="testin Notifications"
-                           displayType="BALLOON"
-                           isLogByDefault="true"
-                           key="notification.group.testin"
-        />
-
-        <notificationGroup id="testin ToolWindow Notifications"
-                           displayType="TOOL_WINDOW"
-                           toolWindowId="testinViewPanel"
-                           isLogByDefault="true"
+        <notificationGroup
+                id="testin.notifications"
+                displayType="BALLOON"
+                isLogByDefault="true"
+                bundle="messages"
+                key="testin.display.name"
         />
 
         <!-- Settings -->
         <applicationConfigurable
                 instance="org.testin.settings.AppSettingsConfigurable"
                 id="org.testin.settings.AppSettingsConfigurable"
-                key="settings.display.name.testin"
-                bundle="messages.bundle"
+                key="testin.display.name"
+                bundle="messages"
                 groupId="tools"
         />
 

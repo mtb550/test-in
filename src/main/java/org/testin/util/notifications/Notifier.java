@@ -23,11 +23,9 @@ import java.awt.datatransfer.StringSelection;
 import java.io.File;
 
 public class Notifier {
-    private static final String GROUP_ID = "testin Notifications";
-    private static final String TOOL_WINDOW_GROUP = "testin ToolWindow Notifications";
+    private static final String GROUP_ID = "testin.notifications";
 
     public static void showCustomBottomRightBalloon(String title, String message) {
-        if (Config.getProject() == null) return;
 
         SwingUtilities.invokeLater(() -> {
             IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(Config.getProject());
@@ -48,13 +46,6 @@ public class Notifier {
 
             balloon.show(relativePoint, Balloon.Position.above);
         });
-    }
-
-    public static void showProjectPanelToolWindowHint(String title, String message) {
-        NotificationGroupManager.getInstance()
-                .getNotificationGroup(TOOL_WINDOW_GROUP)
-                .createNotification(title, message, NotificationType.INFORMATION)
-                .notify(Config.getProject());
     }
 
     public static void info(final @NotNull String message) {
@@ -97,6 +88,15 @@ public class Notifier {
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.ERROR)
                 .notify(Config.getProject());
+    }
+
+    public static void warnWithAction(final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {
+        Notification notification = NotificationGroupManager.getInstance()
+                .getNotificationGroup(GROUP_ID)
+                .createNotification(title, message, NotificationType.WARNING); // استخدام نوع WARNING
+
+        notification.addAction(NotificationAction.createSimple(actionName, action));
+        notification.notify(Config.getProject());
     }
 
     public static void infoWithAction(final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {

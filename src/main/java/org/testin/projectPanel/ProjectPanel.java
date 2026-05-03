@@ -2,6 +2,7 @@ package org.testin.projectPanel;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
@@ -9,11 +10,14 @@ import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.testin.actions.CreateTestProject;
+import org.testin.pojo.Config;
 import org.testin.projectPanel.projectSelector.TestProjectSelector;
 import org.testin.projectPanel.tree.ProjectTree;
 import org.testin.projectPanel.tree.TestCaseTreeBuilder;
+import org.testin.projectPanel.tree.TestProjectTreeBuilder;
 import org.testin.projectPanel.tree.TestRunTreeBuilder;
 import org.testin.projectPanel.versionSelector.VersionSelector;
+import org.testin.settings.AppSettingsConfigurable;
 
 import java.awt.*;
 
@@ -21,6 +25,7 @@ import java.awt.*;
 public class ProjectPanel implements Disposable {
     private final JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
     private final TestProjectSelector testProjectSelector;
+    private final TestProjectTreeBuilder testProjectTreeBuilder;
     private final TestCaseTreeBuilder testCaseTreeBuilder;
     private final TestRunTreeBuilder testRunTreeBuilder;
     private VersionSelector versionSelector;
@@ -30,6 +35,7 @@ public class ProjectPanel implements Disposable {
         System.out.println("ProjectPanel.ProjectPanel()");
 
         testProjectSelector = new TestProjectSelector(this);
+        testProjectTreeBuilder = new TestProjectTreeBuilder(this);
         testCaseTreeBuilder = new TestCaseTreeBuilder(this);
         testRunTreeBuilder = new TestRunTreeBuilder(this);
 
@@ -108,9 +114,23 @@ public class ProjectPanel implements Disposable {
         emptyText.appendLine("Muteb Almughyiri", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine("");
-        emptyText.appendLine(AllIcons.General.Add, "", SimpleTextAttributes.LINK_ATTRIBUTES, null);
-        emptyText.appendLine("Create your first new test project", SimpleTextAttributes.LINK_ATTRIBUTES, e ->
-                new CreateTestProject(this).execute());
+
+        if (Config.getTestinPath() == null)
+            emptyText.appendLine(
+                    AllIcons.General.Settings,
+                    "Configure testin settings",
+                    SimpleTextAttributes.LINK_ATTRIBUTES,
+                    e -> ShowSettingsUtil.getInstance().showSettingsDialog(Config.getProject(), AppSettingsConfigurable.class)
+            );
+
+        else
+            emptyText.appendLine(
+                    AllIcons.General.Add,
+                    " Create your first test project",
+                    SimpleTextAttributes.LINK_ATTRIBUTES,
+                    e -> new CreateTestProject(this).execute()
+            );
+
         panel.revalidate();
         panel.repaint();
     }

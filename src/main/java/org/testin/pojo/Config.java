@@ -6,6 +6,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 
@@ -14,17 +16,19 @@ public class Config {
 
     @Setter
     @Getter
-    private static Path testinPath;
+    @Nullable
+    private static Path testinPath = null;
 
     @Setter
     @Getter
-    private static Path automationPath;
+    @Nullable
+    private static Path automationPath = null;
 
     @Setter
     @Getter
-    private static Project project;
+    @NotNull
+    private static Project project; // todo, to be removed as we can get the project from toolwindow class e.getProject()
 
-    /// to be removed
 
     public static ObjectMapper getMapper() {
         return new ObjectMapper()

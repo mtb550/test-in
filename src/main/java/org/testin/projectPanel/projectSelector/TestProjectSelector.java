@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryMapper;
+import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 
@@ -14,6 +15,7 @@ import java.awt.event.ActionListener;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class TestProjectSelector {
     private final ProjectPanel projectPanel;
@@ -48,16 +50,16 @@ public class TestProjectSelector {
 
         Path root = Config.getTestinPath();
 
+        if (root == null) return false;
+
         if (Files.exists(root) && Files.isDirectory(root)) {
 
-            try (java.util.stream.Stream<Path> paths = java.nio.file.Files.list(root)) {
+            try (Stream<Path> paths = Files.list(root)) {
 
-                paths.filter(java.nio.file.Files::isDirectory)
-                        .filter(path -> {
-                            String name = path.getFileName().toString();
-                            return !name.startsWith(".");
-                        })
-                        .peek(System.out::println)
+                paths.filter(Files::isDirectory)
+                        .filter(path -> !path.getFileName().toString().startsWith("."))
+                        .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
+                        //.peek(System.out::println)
                         .map(DirectoryMapper::testProjectNode)
                         .filter(Objects::nonNull)
                         //.filter(p -> p.getProjectStatus() == ProjectStatus.ACTIVE)

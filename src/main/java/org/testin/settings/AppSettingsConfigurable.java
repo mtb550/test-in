@@ -11,7 +11,6 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
-import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.Refresh;
 import org.testin.pojo.Config;
@@ -22,6 +21,7 @@ import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.projectSelector.RendererImpl;
 import org.testin.settings.service.ProjectPanelService;
+import org.testin.util.TestInBundle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,15 +46,15 @@ public class AppSettingsConfigurable implements Configurable {
     private final JButton archiveBtn = new JButton("Archive");
     private final JButton renameBtn = new JButton("Rename");
 
-    @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
-        return "testin Settings";
+        return TestInBundle.message("testin.display.name");
     }
 
     @Nullable
     @Override
     public JComponent createComponent() {
+        ((JBTextField) rootTestinPathField.getTextField()).getEmptyText().setText("Example -> c:\\users\\{username}\\documents\\testin");
         rootTestinPathField.addBrowseFolderListener(
                 null,
                 FileChooserDescriptorFactory.createSingleFolderDescriptor()
@@ -63,7 +63,7 @@ public class AppSettingsConfigurable implements Configurable {
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
 
-        rootAutomationPathField.getEmptyText().setText("E.g. src.test");
+        rootAutomationPathField.getEmptyText().setText("Example -> src.test");
         rootAutomationPathField.setToolTipText("Base package path for your automation framework");
 
         projectComboBox.setRenderer(new RendererImpl());
@@ -164,10 +164,26 @@ public class AppSettingsConfigurable implements Configurable {
     @Override
     public void apply() {
         AppSettingsState settings = AppSettingsState.getInstance();
+
         settings.rootTestinPath = rootTestinPathField.getText();
         settings.rootAutomationPath = rootAutomationPathField.getText();
-
         settings.readMode = readModeCheckBox.isSelected();
+
+        if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty())
+            Config.setTestinPath(Path.of(settings.rootTestinPath));
+        else
+            Config.setTestinPath(null);
+
+        if (settings.rootAutomationPath != null && !settings.rootAutomationPath.trim().isEmpty())
+            Config.setAutomationPath(Path.of(settings.rootAutomationPath));
+        else
+            Config.setAutomationPath(null);
+
+        ProjectPanel panel = ProjectPanelService.getInstance(Config.getProject()).getPanel();
+        if (panel != null) {
+            new Refresh(panel).execute();
+            System.out.println("ToolWindow refresh triggered successfully.");
+        }
     }
 
     @Override
