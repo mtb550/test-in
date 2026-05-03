@@ -3,7 +3,10 @@ package org.testin.util;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.text.StringUtil;
@@ -15,6 +18,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.settings.AppSettingsState;
@@ -408,6 +412,21 @@ public class Tools {
                 }
             });
         });
+    }
+
+    public static @Nullable VirtualFile getMainSourceRoot(final @NotNull Project project) {
+        Module[] modules = ModuleManager.getInstance(project).getModules();
+
+        for (Module module : modules) {
+            List<VirtualFile> sourceRoots = ModuleRootManager.getInstance(module)
+                    .getSourceRoots(JavaSourceRootType.SOURCE);
+
+            if (!sourceRoots.isEmpty()) {
+                return sourceRoots.getFirst();
+            }
+        }
+
+        return null;
     }
 
 

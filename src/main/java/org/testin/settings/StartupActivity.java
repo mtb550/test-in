@@ -33,6 +33,7 @@ public class StartupActivity {
         Config.setTestinPath(testinPath);
 
         Path automationPath = null;
+
         if (settings.rootAutomationPath != null && !settings.rootAutomationPath.trim().isEmpty()) {
             String folderFormat = settings.rootAutomationPath.replace(".", "/");
 

@@ -2,10 +2,12 @@ package org.testin.settings;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
@@ -22,6 +24,7 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.projectSelector.RendererImpl;
 import org.testin.settings.service.ProjectPanelService;
 import org.testin.util.TestInBundle;
+import org.testin.util.Tools;
 
 import javax.swing.*;
 import java.awt.*;
@@ -63,8 +66,8 @@ public class AppSettingsConfigurable implements Configurable {
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
 
-        rootAutomationPathField.getEmptyText().setText("Example -> src.test");
-        rootAutomationPathField.setToolTipText("Base package path for your automation framework");
+        rootAutomationPathField.setEnabled(false);
+        rootAutomationPathField.setToolTipText("Automatically detected base package path for your automation framework");
 
         projectComboBox.setRenderer(new RendererImpl());
 
@@ -190,7 +193,16 @@ public class AppSettingsConfigurable implements Configurable {
     public void reset() {
         AppSettingsState settings = AppSettingsState.getInstance();
         rootTestinPathField.setText(settings.rootTestinPath != null ? settings.rootTestinPath : "");
-        rootAutomationPathField.setText(settings.rootAutomationPath != null ? settings.rootAutomationPath : "");
+
+        Project project = Config.getProject();
+        VirtualFile mainSourceRoot = Tools.getMainSourceRoot(project);
+
+        if (mainSourceRoot != null) {
+            rootAutomationPathField.setText(mainSourceRoot.getPath());
+        } else {
+            rootAutomationPathField.setText(settings.rootAutomationPath != null ? settings.rootAutomationPath : "No source root detected");
+        }
+
         readModeCheckBox.setSelected(settings.readMode);
         refreshProjectList();
     }
