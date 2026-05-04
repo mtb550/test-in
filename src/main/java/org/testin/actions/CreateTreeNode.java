@@ -52,7 +52,7 @@ public class CreateTreeNode extends DumbAwareAction {
                 .findFirst()
                 .orElse(CreateNodeMenu.TEST_PROJECT);
 
-        CreateNodesDialog.show(menu, (enteredName, selectedType) -> {
+        CreateNodesDialog.show(menu, null, (enteredName, selectedType) -> {
             if (enteredName == null || enteredName.isEmpty()) return;
 
             Path newDirPath = parentDir.getPath().resolve(enteredName);

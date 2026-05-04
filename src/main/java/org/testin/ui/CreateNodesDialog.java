@@ -6,8 +6,10 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
@@ -24,22 +26,23 @@ import java.util.function.BiConsumer;
 
 public class CreateNodesDialog {
 
-    public static void show(final CreateNodeMenu menu, final BiConsumer<String, DirectoryType> onSelected) {
-        show(menu, null, onSelected);
-    }
-
     public static void show(final CreateNodeMenu menu, final JComponent settingButton, final BiConsumer<String, DirectoryType> onSelected) {
 
         ExtendableTextField textField = new ExtendableTextField();
         textField.getEmptyText().setText("Name");
 
-        textField.setBorder(JBUI.Borders.empty(8, 10));
-        textField.putClientProperty("JTextField.Search.noBorderRing", Boolean.TRUE);
+        Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
+        textField.setFont(fieldFont);
+
+        textField.setBorder(JBUI.Borders.compound(
+                JBUI.Borders.customLine(JBUI.CurrentTheme.CustomFrameDecorations.separatorForeground(), 0, 0, 1, 0),
+                JBUI.Borders.empty(8, 12)
+        ));
 
         DirectoryType[] items = menu.getAvailableOptions();
         JBList<DirectoryType> list = new JBList<>(items);
-        list.setBorder(JBUI.Borders.empty());
-        list.setFont(textField.getFont());
+        list.setBorder(JBUI.Borders.empty(4, 0));
+        list.setFont(JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f));
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         if (items.length > 0) {
@@ -52,7 +55,7 @@ public class CreateNodesDialog {
                 setIcon(value.getIcon());
                 String description = value.getDescription() != null ? value.getDescription() : value.name();
                 append(description, SimpleTextAttributes.REGULAR_ATTRIBUTES);
-                setBorder(JBUI.Borders.empty(4, 12));
+                setBorder(JBUI.Borders.empty(6, 12));
             }
         });
 
@@ -72,7 +75,7 @@ public class CreateNodesDialog {
 
                     @Override
                     public int getIconGap() {
-                        return JBUI.scale(10);
+                        return JBUI.scale(8);
                     }
                 });
                 textField.repaint();
@@ -82,30 +85,35 @@ public class CreateNodesDialog {
         list.addListSelectionListener(e -> updateIcon.run());
         updateIcon.run();
 
-        JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.add(textField, BorderLayout.CENTER);
-        topPanel.setPreferredSize(new Dimension(JBUI.scale(350), JBUI.scale(36)));
-        topPanel.setBorder(JBUI.Borders.empty());
-
-        JPanel listPanel = new JPanel(new BorderLayout());
-        listPanel.add(list, BorderLayout.CENTER);
-        listPanel.setBorder(JBUI.Borders.empty());
-
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.add(topPanel, BorderLayout.NORTH);
-
-        if (items.length > 1) {
-            mainPanel.add(listPanel, BorderLayout.CENTER);
-        }
-
         mainPanel.setBorder(JBUI.Borders.empty());
+
+        mainPanel.add(textField, BorderLayout.NORTH);
+
+        if (items.length > 0) {
+            JPanel listWrapper = new JPanel(new BorderLayout());
+            listWrapper.add(list, BorderLayout.CENTER);
+
+            JBScrollPane scrollPane = new JBScrollPane(listWrapper);
+            scrollPane.setBorder(JBUI.Borders.empty());
+            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+            scrollPane.setPreferredSize(new Dimension(JBUI.scale(350), Math.min(items.length * JBUI.scale(36), JBUI.scale(250))));
+
+            mainPanel.add(scrollPane, BorderLayout.CENTER);
+        } else {
+            textField.setPreferredSize(new Dimension(JBUI.scale(350), JBUI.scale(45)));
+        }
 
         ComponentPopupBuilder builder = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, textField)
                 .setTitle(menu.getTitle())
                 .setRequestFocus(true)
+                .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(true)
-                .setMovable(false);
+                .setMovable(false)
+                .setResizable(items.length > 0);
 
         if (settingButton != null) {
             builder.setSettingButtons(settingButton);
