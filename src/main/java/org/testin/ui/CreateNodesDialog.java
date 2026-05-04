@@ -24,11 +24,11 @@ import java.util.function.BiConsumer;
 
 public class CreateNodesDialog {
 
-    public static void show(CreateNodeMenu menu, BiConsumer<String, DirectoryType> onSelected) {
+    public static void show(final CreateNodeMenu menu, final BiConsumer<String, DirectoryType> onSelected) {
         show(menu, null, onSelected);
     }
 
-    public static void show(CreateNodeMenu menu, JComponent settingButton, BiConsumer<String, DirectoryType> onSelected) {
+    public static void show(final CreateNodeMenu menu, final JComponent settingButton, final BiConsumer<String, DirectoryType> onSelected) {
 
         ExtendableTextField textField = new ExtendableTextField();
         textField.getEmptyText().setText("Name");
@@ -117,18 +117,22 @@ public class CreateNodesDialog {
             @Override
             public void keyPressed(KeyEvent e) {
                 int currentIdx = list.getSelectedIndex();
+
                 if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                     int newIdx = Math.min(items.length - 1, currentIdx + 1);
                     list.setSelectedIndex(newIdx);
                     list.ensureIndexIsVisible(newIdx);
                     e.consume();
+
                 } else if (e.getKeyCode() == KeyEvent.VK_UP) {
                     int newIdx = Math.max(0, currentIdx - 1);
                     list.setSelectedIndex(newIdx);
                     list.ensureIndexIsVisible(newIdx);
                     e.consume();
+
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     submit(textField, list, popup, onSelected);
+
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     popup.cancel();
                 }
@@ -155,7 +159,7 @@ public class CreateNodesDialog {
         });
     }
 
-    private static void submit(ExtendableTextField textField, JBList<DirectoryType> list, JBPopup popup, BiConsumer<String, DirectoryType> onSelected) {
+    private static void submit(final ExtendableTextField textField, final JBList<DirectoryType> list, final JBPopup popup, final BiConsumer<String, DirectoryType> onSelected) {
         String text = textField.getText().trim();
         if (!text.isEmpty() && list.getSelectedValue() != null) {
             onSelected.accept(text, list.getSelectedValue());

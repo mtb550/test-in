@@ -96,7 +96,7 @@ public enum DirectoryType {
 
     private final NodeCreator creator;
 
-    public static DirectoryType fromClass(Class<?> clazz) {
+    public static DirectoryType fromClass(final Class<?> clazz) {
         for (DirectoryType type : values()) {
             if (type.getClazz() == clazz) {
                 return type;
@@ -107,6 +107,6 @@ public enum DirectoryType {
 
     @FunctionalInterface
     public interface NodeCreator {
-        void execute(CreateTreeNode action, Project project, String name, DefaultMutableTreeNode parentNode, DirectoryDto parentDir, Path newDirPath);
+        void execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath);
     }
 }

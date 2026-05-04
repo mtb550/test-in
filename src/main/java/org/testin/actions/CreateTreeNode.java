@@ -23,6 +23,7 @@ import org.testin.util.TreeUtilImpl;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 public class CreateTreeNode extends DumbAwareAction {
     private final ProjectPanel projectPanel;
@@ -46,8 +47,10 @@ public class CreateTreeNode extends DumbAwareAction {
             return;
         }
 
-        DirectoryType parentType = DirectoryType.fromClass(parentDir.getClass());
-        CreateNodeMenu menu = CreateNodeMenu.fromDirectoryType(parentType);
+        CreateNodeMenu menu = Arrays.stream(CreateNodeMenu.values())
+                .filter(m -> m.getTargetDtoClass() == parentDir.getClass())
+                .findFirst()
+                .orElse(CreateNodeMenu.TEST_PROJECT);
 
         CreateNodesDialog.show(menu, (enteredName, selectedType) -> {
             if (enteredName == null || enteredName.isEmpty()) return;
@@ -135,8 +138,15 @@ public class CreateTreeNode extends DumbAwareAction {
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        DirectoryType parentType = DirectoryType.fromClass(userObject.getClass());
-        CreateNodeMenu menu = CreateNodeMenu.fromDirectoryType(parentType);
+        if (userObject == null) {
+            e.getPresentation().setEnabledAndVisible(false);
+            return;
+        }
+
+        CreateNodeMenu menu = Arrays.stream(CreateNodeMenu.values())
+                .filter(m -> m.getTargetDtoClass() == userObject.getClass())
+                .findFirst()
+                .orElse(CreateNodeMenu.TEST_PROJECT);
 
         boolean hasOptions = menu.getAvailableOptions().length > 0;
         e.getPresentation().setVisible(true);
