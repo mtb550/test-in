@@ -330,3 +330,7 @@ install robot framework and try gutter and navigate to code.
 
 amazing feature: select multi test set then open together it in the editor.
 drag and drop for project panel to editor panel
+
+remain enhancements for create new node ui.
+add check box (create folder) in create new node
+add status bar to create new node shows: enter:save scape:cancel
