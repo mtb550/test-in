@@ -7,6 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
+import org.testin.pojo.CreateNodeMenu;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.dirs.TestCasesDirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
@@ -28,25 +29,20 @@ public class CreateTestProject extends DumbAwareAction {
     }
 
     public void execute() {
-        Class<?>[] items = {TestProjectDirectoryDto.class};
-
         GenerateOrUpdateCodeCheckBox checkbox = new GenerateOrUpdateCodeCheckBox(null);
 
         CreateNodesDialog.show(
-                "New Test Project",
-                items,
-                c -> false,
+                CreateNodeMenu.TEST_PROJECT,
                 checkbox,
-                (name, selectedClass) -> {
+                (name, selectedType) -> {
+
                     if (name == null || name.trim().isEmpty()) return;
 
                     String processedName = name.replace("_", " ");
 
                     TestProjectDirectoryDto newTestProjectDirectory = new TestProjectDirectoryDto()
-                            //.setProjectStatus(ProjectStatus.ACTIVE) // TODO: move project status to .pr file, with date created and created by..etc
                             .setName(processedName);
 
-                    //String folderName = String.format("%s_%s", newTestProjectDirectory.getName(), newTestProjectDirectory.getProjectStatus());
                     String folderName = newTestProjectDirectory.getName();
                     Path projectPath = Config.getTestinPath().resolve(folderName);
 
@@ -66,6 +62,7 @@ public class CreateTestProject extends DumbAwareAction {
                             );
 
                     TreeUtilImpl.executeVfsAction(Config.getTestinPath(), "IO Error", vf -> {
+
                         VirtualFile projectDir = vf.createChildDirectory(this, folderName);
                         projectDir.createChildData(this, DirectoryType.TP.getMarker());
 
@@ -79,6 +76,7 @@ public class CreateTestProject extends DumbAwareAction {
 
                         projectDir.refresh(false, true);
                         projectPanel.getTestProjectSelector().addTestProject(newTestProjectDirectory);
+
                         Notifier.info("New Test Project", String.format("Test Project %s has been added", processedName));
                     });
                 }
@@ -92,8 +90,9 @@ public class CreateTestProject extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null || Config.getTestinPath() == null)
+        if (e.getProject() == null || Config.getTestinPath() == null) {
             e.getPresentation().setEnabled(false);
+        }
     }
 
     @Override

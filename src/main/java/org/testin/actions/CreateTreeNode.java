@@ -9,13 +9,13 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testCaseEditor.TestEditor;
 import org.testin.editorPanel.testRunEditor.RunEditor;
+import org.testin.pojo.CreateNodeMenu;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.TestRunStatus;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.*;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.CreateNodesDialog;
-import org.testin.ui.DirectoryOptions;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
@@ -27,14 +27,12 @@ import java.nio.file.Path;
 public class CreateTreeNode extends DumbAwareAction {
     private final ProjectPanel projectPanel;
     private final SimpleTree tree;
-    private final DirectoryOptions option;
 
     public CreateTreeNode(final ProjectPanel projectPanel, final SimpleTree tree) {
         super("Create", "Create new node", AllIcons.General.Add);
         this.projectPanel = projectPanel;
         this.tree = tree;
         this.registerCustomShortcutSet(KeyboardSet.CreateNode.getCustomShortcut(), tree);
-        this.option = new DirectoryOptions();
     }
 
     @Override
@@ -48,34 +46,30 @@ public class CreateTreeNode extends DumbAwareAction {
             return;
         }
 
-        CreateNodesDialog.show("Node Name", option.getItems(), option.getDisabledPredicate(), (enteredName, selectedClass) -> {
+        DirectoryType parentType = DirectoryType.fromClass(parentDir.getClass());
+        CreateNodeMenu menu = CreateNodeMenu.fromDirectoryType(parentType);
+
+        CreateNodesDialog.show(menu, (enteredName, selectedType) -> {
             if (enteredName == null || enteredName.isEmpty()) return;
 
             Path newDirPath = parentDir.getPath().resolve(enteredName);
 
-            switch (selectedClass) {
-                case Class<?> c when c == TestSetPackageDirectoryDto.class ->
-                        createTestSetPackage(e.getProject(), enteredName, parentNode, parentDir, newDirPath);
-
-                case Class<?> c when c == TestRunPackageDirectoryDto.class ->
-                        createTestRunPackage(enteredName, parentNode, parentDir, newDirPath);
-
-                case Class<?> c when c == TestSetDirectoryDto.class ->
-                        createTestSet(e.getProject(), enteredName, parentNode, parentDir, newDirPath);
-
-                case Class<?> c when c == TestRunDirectoryDto.class ->
-                        createTestRun(enteredName, parentDir, newDirPath);
-
-                case Class<?> c when c == TestProjectDirectoryDto.class ->
-                        System.out.println("create project from here to be implemented");
-
-                default -> System.out.println("Unknown or null class selected: " + selectedClass);
+            if (selectedType != null && selectedType.getCreator() != null) {
+                selectedType.getCreator().execute(
+                        this,
+                        e.getProject(),
+                        enteredName,
+                        parentNode,
+                        parentDir,
+                        newDirPath
+                );
+            } else {
+                System.out.println("No creation logic defined for type: " + selectedType);
             }
-
         });
     }
 
-    private void createTestRun(final String name, final DirectoryDto parentDir, final Path newDirPath) {
+    public void createTestRun(final String name, final DirectoryDto parentDir, final Path newDirPath) {
         TestRunDto metadata = new TestRunDto();
         metadata.setStatus(TestRunStatus.CREATED);
 
@@ -94,7 +88,7 @@ public class CreateTreeNode extends DumbAwareAction {
         );
     }
 
-    private void createTestSet(final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+    public void createTestSet(final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         TestSetDirectoryDto newTestSetDirectory = new TestSetDirectoryDto()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
@@ -104,11 +98,10 @@ public class CreateTreeNode extends DumbAwareAction {
         TreeUtilImpl.createNode(tree, parentNode, newTestSetDirectory);
 
         Tools.createJavaClassInTestRoot(project, parentDir.getName(), name);
-
         TestEditor.open(newTestSetDirectory);
     }
 
-    private void createTestSetPackage(final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+    public void createTestSetPackage(final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         TestSetPackageDirectoryDto newTestSetPackageDirectory = new TestSetPackageDirectoryDto()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
@@ -120,7 +113,7 @@ public class CreateTreeNode extends DumbAwareAction {
         Tools.createJavaPackageInTestRoot(project, name);
     }
 
-    private void createTestRunPackage(final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+    public void createTestRunPackage(final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         TestRunPackageDirectoryDto newTestRunPackageDirectory = new TestRunPackageDirectoryDto()
                 .setName(name)
                 .setPath(parentDir.getPath().resolve(name));
@@ -134,43 +127,24 @@ public class CreateTreeNode extends DumbAwareAction {
     public void update(final @NotNull AnActionEvent e) {
         TreePath path = tree.getSelectionPath();
 
-        if (path == null) return;
+        if (path == null) {
+            e.getPresentation().setEnabledAndVisible(false);
+            return;
+        }
 
         DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         Object userObject = parentNode.getUserObject();
 
-        switch (userObject) {
-            case TestSetPackageDirectoryDto ignored ->
-                    option.type(DirectoryType.TP).setInactive().type(DirectoryType.TSP).setActive()
-                            .type(DirectoryType.TRP).setInactive().type(DirectoryType.TS).setActive()
-                            .type(DirectoryType.TR).setInactive();
+        DirectoryType parentType = DirectoryType.fromClass(userObject.getClass());
+        CreateNodeMenu menu = CreateNodeMenu.fromDirectoryType(parentType);
 
-            case TestRunPackageDirectoryDto ignored ->
-                    option.type(DirectoryType.TP).setInactive().type(DirectoryType.TSP).setInactive()
-                            .type(DirectoryType.TRP).setActive().type(DirectoryType.TS).setInactive()
-                            .type(DirectoryType.TR).setActive();
-
-            case TestCasesDirectoryDto ignored ->
-                    option.type(DirectoryType.TP).setActive().type(DirectoryType.TSP).setActive()
-                            .type(DirectoryType.TRP).setInactive().type(DirectoryType.TS).setActive()
-                            .type(DirectoryType.TR).setInactive();
-
-            case TestRunsDirectoryDto ignored ->
-                    option.type(DirectoryType.TP).setActive().type(DirectoryType.TSP).setInactive()
-                            .type(DirectoryType.TRP).setActive().type(DirectoryType.TS).setInactive()
-                            .type(DirectoryType.TR).setActive();
-
-            default -> {
-                e.getPresentation().setVisible(true);
-                e.getPresentation().setEnabled(false);
-            }
-
-        }
+        boolean hasOptions = menu.getAvailableOptions().length > 0;
+        e.getPresentation().setVisible(true);
+        e.getPresentation().setEnabled(hasOptions);
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
     }
-
 }
