@@ -26,10 +26,13 @@ import java.util.function.BiConsumer;
 
 public class CreateNodesDialog {
 
-    public static void show(final CreateNodeMenu menu, final JComponent settingButton, final BiConsumer<String, DirectoryType> onSelected) {
+    public void show(final CreateNodeMenu menu, final JComponent settingButton, final BiConsumer<String, DirectoryType> onSelected) {
 
         ExtendableTextField textField = new ExtendableTextField();
-        textField.getEmptyText().setText("Name");
+
+        // active smart placeholder
+        ///textField.getEmptyText().setText(menu.getPlaceholderText());
+        ///TextComponentEmptyText.setupPlaceholderVisibility(textField);
 
         Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
         textField.setFont(fieldFont);
@@ -45,41 +48,37 @@ public class CreateNodesDialog {
         list.setFont(JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f));
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        if (items.length > 0) {
-            list.setSelectedIndex(0);
-        }
+        list.setSelectedIndex(0);
 
         list.setCellRenderer(new ColoredListCellRenderer<>() {
             @Override
             protected void customizeCellRenderer(@NotNull JList<? extends DirectoryType> list, DirectoryType value, int index, boolean selected, boolean hasFocus) {
                 setIcon(value.getIcon());
-                String description = value.getDescription() != null ? value.getDescription() : value.name();
-                append(description, SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                append(value.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                 setBorder(JBUI.Borders.empty(6, 12));
             }
         });
 
         Runnable updateIcon = () -> {
             DirectoryType selected = list.getSelectedValue();
-            if (selected != null) {
-                textField.setExtensions(new ExtendableTextComponent.Extension() {
-                    @Override
-                    public Icon getIcon(boolean hovered) {
-                        return selected.getIcon();
-                    }
+            textField.setExtensions(new ExtendableTextComponent.Extension() {
+                @Override
+                public Icon getIcon(boolean hovered) {
+                    return selected.getIcon();
+                }
 
-                    @Override
-                    public boolean isIconBeforeText() {
-                        return true;
-                    }
+                @Override
+                public boolean isIconBeforeText() {
+                    return true;
+                }
 
-                    @Override
-                    public int getIconGap() {
-                        return JBUI.scale(8);
-                    }
-                });
-                textField.repaint();
-            }
+                @Override
+                public int getIconGap() {
+                    return JBUI.scale(8);
+                }
+            });
+
+            textField.repaint();
         };
 
         list.addListSelectionListener(e -> updateIcon.run());
@@ -90,23 +89,18 @@ public class CreateNodesDialog {
 
         mainPanel.add(textField, BorderLayout.NORTH);
 
-        if (items.length > 0) {
-            JPanel listWrapper = new JPanel(new BorderLayout());
-            listWrapper.add(list, BorderLayout.CENTER);
+        JPanel listWrapper = new JPanel(new BorderLayout());
+        listWrapper.add(list, BorderLayout.CENTER);
 
-            JBScrollPane scrollPane = new JBScrollPane(listWrapper);
-            scrollPane.setBorder(JBUI.Borders.empty());
+        JBScrollPane scrollPane = new JBScrollPane(listWrapper);
+        scrollPane.setBorder(JBUI.Borders.empty());
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setPreferredSize(new Dimension(JBUI.scale(350), Math.min(items.length * JBUI.scale(36), JBUI.scale(250))));
 
-            scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-            scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
 
-            scrollPane.setPreferredSize(new Dimension(JBUI.scale(350), Math.min(items.length * JBUI.scale(36), JBUI.scale(250))));
-
-            mainPanel.add(scrollPane, BorderLayout.CENTER);
-        } else {
-            textField.setPreferredSize(new Dimension(JBUI.scale(350), JBUI.scale(45)));
-        }
-
+        // popup
         ComponentPopupBuilder builder = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, textField)
                 .setTitle(menu.getTitle())
@@ -155,12 +149,9 @@ public class CreateNodesDialog {
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1 || e.getClickCount() == 2) {
-                    int clickedIndex = list.locationToIndex(e.getPoint());
-                    if (clickedIndex >= 0) {
-                        submit(textField, list, popup, onSelected);
-                    }
-                }
+                int clickedIndex = list.locationToIndex(e.getPoint());
+                if (clickedIndex >= 0)
+                    submit(textField, list, popup, onSelected);
             }
         });
 
@@ -172,8 +163,8 @@ public class CreateNodesDialog {
         });
     }
 
-    private static void submit(final ExtendableTextField textField, final JBList<DirectoryType> list, final JBPopup popup, final BiConsumer<String, DirectoryType> onSelected) {
-        String text = textField.getText().trim();
+    private void submit(final ExtendableTextField textField, final JBList<DirectoryType> list, final JBPopup popup, final BiConsumer<String, DirectoryType> onSelected) {
+        final String text = textField.getText().trim();
 
         if (!text.isEmpty()) {
             onSelected.accept(text, list.getSelectedValue());

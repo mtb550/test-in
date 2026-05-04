@@ -31,7 +31,7 @@ public class CreateTestProject extends DumbAwareAction {
     public void execute() {
         GenerateOrUpdateCodeCheckBox checkbox = new GenerateOrUpdateCodeCheckBox(null);
 
-        CreateNodesDialog.show(
+        new CreateNodesDialog().show(
                 CreateNodeMenu.TEST_PROJECT,
                 checkbox,
                 (name, selectedType) -> {

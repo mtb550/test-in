@@ -52,7 +52,7 @@ public class CreateTreeNode extends DumbAwareAction {
                 .findFirst()
                 .orElse(CreateNodeMenu.TEST_PROJECT);
 
-        CreateNodesDialog.show(menu, null, (enteredName, selectedType) -> {
+        new CreateNodesDialog().show(menu, null, (enteredName, selectedType) -> {
             if (enteredName == null || enteredName.isEmpty()) return;
 
             Path newDirPath = parentDir.getPath().resolve(enteredName);
@@ -143,12 +143,12 @@ public class CreateTreeNode extends DumbAwareAction {
             return;
         }
 
-        CreateNodeMenu menu = Arrays.stream(CreateNodeMenu.values())
+        final CreateNodeMenu menu = Arrays.stream(CreateNodeMenu.values())
                 .filter(m -> m.getTargetDtoClass() == userObject.getClass())
                 .findFirst()
-                .orElse(CreateNodeMenu.TEST_PROJECT);
+                .orElse(null);
 
-        boolean hasOptions = menu.getAvailableOptions().length > 0;
+        boolean hasOptions = menu != null && menu.getAvailableOptions().length > 0;
         e.getPresentation().setVisible(true);
         e.getPresentation().setEnabled(hasOptions);
     }
