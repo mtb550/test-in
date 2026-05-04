@@ -17,6 +17,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Set;
 
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
@@ -31,7 +32,12 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
         try {
             switch (value) {
                 case DefaultMutableTreeNode node when node.getUserObject() instanceof DirectoryDto dir -> {
-                    DirectoryType type = DirectoryType.fromClass(dir.getClass());
+
+                    DirectoryType type = Arrays.stream(DirectoryType.values())
+                            .filter(t -> t.getClazz() == dir.getClass())
+                            .findFirst()
+                            .orElse(null);
+
                     setIcon(type != null ? type.getIcon() : AllIcons.Nodes.Folder);
                     append(dir.getName(), getSimpleTextAttributes(node, dir));
                     append(" ");

@@ -119,19 +119,23 @@ public class CreateNodesDialog {
                 int currentIdx = list.getSelectedIndex();
 
                 if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                    int newIdx = Math.min(items.length - 1, currentIdx + 1);
-                    list.setSelectedIndex(newIdx);
-                    list.ensureIndexIsVisible(newIdx);
+                    if (items.length > 0) {
+                        int newIdx = Math.min(items.length - 1, currentIdx + 1);
+                        list.setSelectedIndex(newIdx);
+                        list.ensureIndexIsVisible(newIdx);
+                    }
                     e.consume();
 
                 } else if (e.getKeyCode() == KeyEvent.VK_UP) {
-                    int newIdx = Math.max(0, currentIdx - 1);
-                    list.setSelectedIndex(newIdx);
-                    list.ensureIndexIsVisible(newIdx);
+                    if (items.length > 0) {
+                        int newIdx = Math.max(0, currentIdx - 1);
+                        list.setSelectedIndex(newIdx);
+                        list.ensureIndexIsVisible(newIdx);
+                    }
                     e.consume();
 
                 } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    submit(textField, list, popup, onSelected);
+                    submit(textField, list, popup, onSelected, items.length);
 
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     popup.cancel();
@@ -145,7 +149,7 @@ public class CreateNodesDialog {
                 if (e.getClickCount() == 1 || e.getClickCount() == 2) {
                     int clickedIndex = list.locationToIndex(e.getPoint());
                     if (clickedIndex >= 0) {
-                        submit(textField, list, popup, onSelected);
+                        submit(textField, list, popup, onSelected, items.length);
                     }
                 }
             }
@@ -159,9 +163,13 @@ public class CreateNodesDialog {
         });
     }
 
-    private static void submit(final ExtendableTextField textField, final JBList<DirectoryType> list, final JBPopup popup, final BiConsumer<String, DirectoryType> onSelected) {
+    private static void submit(final ExtendableTextField textField, final JBList<DirectoryType> list, final JBPopup popup, final BiConsumer<String, DirectoryType> onSelected, final int listSize) {
         String text = textField.getText().trim();
-        if (!text.isEmpty() && list.getSelectedValue() != null) {
+
+        boolean hasText = !text.isEmpty();
+        boolean isValidSelection = (listSize == 0) || (list.getSelectedValue() != null);
+
+        if (hasText && isValidSelection) {
             onSelected.accept(text, list.getSelectedValue());
             popup.closeOk(null);
         } else {
