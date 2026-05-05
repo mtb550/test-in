@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
-import org.testin.actions.CreateTestProject;
+import org.testin.actions.CreateProject;
 import org.testin.pojo.Config;
 import org.testin.projectPanel.projectSelector.TestProjectSelector;
 import org.testin.projectPanel.tree.ProjectTree;
@@ -128,7 +128,7 @@ public class ProjectPanel implements Disposable {
                     AllIcons.General.Add,
                     " Create your first test project",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> new CreateTestProject(this).execute()
+                    e -> new CreateProject(this).execute()
             );
 
         panel.revalidate();

@@ -20,10 +20,10 @@ import org.testin.util.notifications.Notifier;
 
 import java.nio.file.Path;
 
-public class CreateTestProject extends DumbAwareAction {
+public class CreateProject extends DumbAwareAction {
     private final ProjectPanel projectPanel;
 
-    public CreateTestProject(ProjectPanel projectPanel) {
+    public CreateProject(ProjectPanel projectPanel) {
         super("New Test Project", "Create a new test project", AllIcons.General.Add);
         this.projectPanel = projectPanel;
     }
@@ -31,35 +31,25 @@ public class CreateTestProject extends DumbAwareAction {
     public void execute() {
         GenerateOrUpdateCodeCheckBox checkbox = new GenerateOrUpdateCodeCheckBox(null);
 
-        new CreateNodesDialog(
-                CreateNodeMenu.TEST_PROJECT,
-                checkbox,
-                (name, selectedType) -> {
+        new CreateNodesDialog(CreateNodeMenu.TEST_PROJECT, checkbox, (name, selectedType) -> {
 
                     if (name == null || name.trim().isEmpty()) return;
 
                     String processedName = name.replace("_", " ");
 
-                    TestProjectDirectoryDto newTestProjectDirectory = new TestProjectDirectoryDto()
-                            .setName(processedName);
+                    TestProjectDirectoryDto newTestProjectDirectory = new TestProjectDirectoryDto().setName(processedName);
 
                     String folderName = newTestProjectDirectory.getName();
                     Path projectPath = Config.getTestinPath().resolve(folderName);
-
-                    newTestProjectDirectory.setPathName(folderName)
-                            .setPath(projectPath);
+                    newTestProjectDirectory.setPathName(folderName).setPath(projectPath);
 
                     newTestProjectDirectory
-                            .setTestCasesDirectory(
-                                    new TestCasesDirectoryDto()
+                            .setTestCasesDirectory(new TestCasesDirectoryDto()
                                             .setPath(newTestProjectDirectory.getPath().resolve(DirectoryType.TCD.getPathName()))
-                                            .setName(DirectoryType.TCD.getDisplayedName())
-                            )
-                            .setTestRunsDirectory(
-                                    new TestRunsDirectoryDto()
+                                            .setName(DirectoryType.TCD.getDisplayedName()))
+                            .setTestRunsDirectory(new TestRunsDirectoryDto()
                                             .setPath(newTestProjectDirectory.getPath().resolve(DirectoryType.TRD.getPathName()))
-                                            .setName(DirectoryType.TRD.getDisplayedName())
-                            );
+                                            .setName(DirectoryType.TRD.getDisplayedName()));
 
                     TreeUtilImpl.executeVfsAction(Config.getTestinPath(), "IO Error", vf -> {
 

@@ -4,7 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.testin.actions.CreateTreeNode;
+import org.testin.actions.CreateNode;
 import org.testin.pojo.dto.dirs.*;
 
 import javax.swing.*;
@@ -52,7 +52,7 @@ public enum DirectoryType {
             AllIcons.Nodes.WebFolder,
             TestSetPackageDirectoryDto.class,
             ".tsp",
-            CreateTreeNode::createTestSetPackage
+            CreateNode::createTestSetPackage
     ),
 
     TRP(
@@ -73,7 +73,7 @@ public enum DirectoryType {
             AllIcons.FileTypes.Text,
             TestSetDirectoryDto.class,
             ".ts",
-            CreateTreeNode::createTestSet
+            CreateNode::createTestSet
     ),
 
     TR(
@@ -98,6 +98,6 @@ public enum DirectoryType {
 
     @FunctionalInterface
     public interface NodeCreator {
-        void execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath);
+        void execute(final CreateNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath);
     }
 }

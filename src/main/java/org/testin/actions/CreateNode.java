@@ -25,11 +25,11 @@ import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.Arrays;
 
-public class CreateTreeNode extends DumbAwareAction {
+public class CreateNode extends DumbAwareAction {
     private final ProjectPanel projectPanel;
     private final SimpleTree tree;
 
-    public CreateTreeNode(final ProjectPanel projectPanel, final SimpleTree tree) {
+    public CreateNode(final ProjectPanel projectPanel, final SimpleTree tree) {
         super("Create", "Create new node", AllIcons.General.Add);
         this.projectPanel = projectPanel;
         this.tree = tree;
