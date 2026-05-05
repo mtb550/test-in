@@ -15,16 +15,15 @@ import javax.swing.*;
 import java.awt.*;
 
 public class DescriptionSection implements ICreateTestCaseSection {
+    final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
     private final TextFieldWithAutoCompletion<String> titleField;
     private final JPanel wrapper;
-    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
 
     public DescriptionSection() {
         this.titleField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
-
         this.titleField.setFont(fieldFont);
-        this.titleField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getName());
+        this.titleField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());
         this.titleField.setShowPlaceholderWhenFocused(true);
         this.titleField.setBorder(JBUI.Borders.empty(10));
 

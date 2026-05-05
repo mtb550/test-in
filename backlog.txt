@@ -323,6 +323,8 @@ make shortcut to set actual result, screenshot or exception (evidence, find anot
 how to make timer is accurate
 --------------
 
+fix mac shortcuts.
+
 add new item in create test case ui: query or pre-condition.
 
 compatability with by charm, use option of plugin that make same release matched with by charm and IntelliJ.
@@ -334,3 +336,4 @@ drag and drop for project panel to editor panel
 remain enhancements for create new node ui.
 add check box (create folder) in create new node
 add status bar to create new node shows: enter:save scape:cancel
+regex, no dot or special chars

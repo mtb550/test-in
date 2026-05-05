@@ -16,6 +16,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -25,6 +26,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -34,6 +36,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -43,6 +46,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -52,6 +56,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -61,6 +66,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -70,6 +76,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -79,7 +86,8 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Actions.Edit,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
-            TestCaseUIBase::getDescriptionSection
+            TestCaseUIBase::getDescriptionSection,
+            "set description"
     ),
 
     EXPECTED_RESULT(
@@ -88,7 +96,8 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.General.InspectionsOK,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
-            TestCaseUIBase::getExpectedResultSection
+            TestCaseUIBase::getExpectedResultSection,
+            "set expected result"
     ),
 
     STEPS(
@@ -97,7 +106,8 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Actions.ListFiles,
             new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
             true,
-            TestCaseUIBase::getStepsSection
+            TestCaseUIBase::getStepsSection,
+            "set step "
     ),
 
     PRIORITY(
@@ -106,7 +116,8 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Nodes.Favorite,
             new IStatusBarItem[]{SAVE, SET_PRIORITY, NAVIGATE_ARROWS},
             true,
-            TestCaseUIBase::getPrioritySection
+            TestCaseUIBase::getPrioritySection,
+            null
     ),
 
     SELECT_GROUP(
@@ -115,6 +126,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
+            null,
             null
     ),
 
@@ -124,7 +136,8 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Nodes.Tag,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
-            TestCaseUIBase::getGroupSection
+            TestCaseUIBase::getGroupSection,
+            null
     );
 
     private final String name;
@@ -134,8 +147,10 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     private final IStatusBarItem[] statusBarItems;
     private final boolean createMenuItem;
     private final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor;
+    private final String placeholder;
 
-    CreateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
+    ///  todo, remove constructors and use lombok @AllArgsConstructors
+    CreateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor, final String placeholder) {
         this.name = name;
         this.shortcut = shortcut;
         this.customShortcutText = null;
@@ -143,9 +158,11 @@ public enum CreateTestCaseFields implements IStatusBarItem {
         this.statusBarItems = statusBarItems;
         this.createMenuItem = createMenuItem;
         this.sectionExtractor = sectionExtractor;
+        this.placeholder = placeholder;
     }
 
-    CreateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
+    ///  todo, remove constructors and use lombok @AllArgsConstructors
+    CreateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor, final String placeholder) {
         this.name = name;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;
@@ -153,6 +170,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
         this.statusBarItems = statusBarItems;
         this.createMenuItem = createMenuItem;
         this.sectionExtractor = sectionExtractor;
+        this.placeholder = placeholder;
     }
 
     @Override

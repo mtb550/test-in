@@ -11,7 +11,7 @@ import org.testin.settings.AppSettingsConfigurable;
 public class OpenSettings extends DumbAwareAction {
 
     public OpenSettings() {
-        super("Settings", "Configure testin settings", AllIcons.General.Settings);
+        super("Settings", "Configure Testin settings", AllIcons.General.Settings);
     }
 
     @Override

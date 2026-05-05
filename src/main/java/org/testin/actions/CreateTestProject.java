@@ -31,7 +31,7 @@ public class CreateTestProject extends DumbAwareAction {
     public void execute() {
         GenerateOrUpdateCodeCheckBox checkbox = new GenerateOrUpdateCodeCheckBox(null);
 
-        new CreateNodesDialog().show(
+        new CreateNodesDialog(
                 CreateNodeMenu.TEST_PROJECT,
                 checkbox,
                 (name, selectedType) -> {
@@ -80,7 +80,7 @@ public class CreateTestProject extends DumbAwareAction {
                         Notifier.info("New Test Project", String.format("Test Project %s has been added", processedName));
                     });
                 }
-        );
+        ).show();
     }
 
     @Override

@@ -71,7 +71,7 @@ public class StepsSection implements ICreateTestCaseSection {
         TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(Config.getProject(), provider, false, text != null ? text : "");
 
         stepField.setFont(fieldFont);
-        stepField.setPlaceholder("Step " + (stepFields.size() + 1));
+        stepField.setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (stepFields.size() + 1));
         stepField.setShowPlaceholderWhenFocused(true);
         stepField.setBorder(JBUI.Borders.empty(6, 10));
 
@@ -133,7 +133,7 @@ public class StepsSection implements ICreateTestCaseSection {
         stepFields.remove(stepField);
 
         for (int i = 0; i < stepFields.size(); i++)
-            stepFields.get(i).setPlaceholder("Step " + (i + 1));
+            stepFields.get(i).setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (i + 1));
 
         if (!stepFields.isEmpty())
             stepFields.getLast().requestFocus();

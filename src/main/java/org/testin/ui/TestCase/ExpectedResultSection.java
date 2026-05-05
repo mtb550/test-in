@@ -21,7 +21,7 @@ public class ExpectedResultSection implements ICreateTestCaseSection {
     public ExpectedResultSection() {
         this.expectedResultField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), false, "");
         this.expectedResultField.setFont(fieldFont);
-        this.expectedResultField.setPlaceholder(CreateTestCaseFields.EXPECTED_RESULT.getName());
+        this.expectedResultField.setPlaceholder(CreateTestCaseFields.EXPECTED_RESULT.getPlaceholder());
         this.expectedResultField.setShowPlaceholderWhenFocused(true);
         this.expectedResultField.setBorder(JBUI.Borders.empty(10));
 

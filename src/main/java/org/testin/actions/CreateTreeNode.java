@@ -52,7 +52,7 @@ public class CreateTreeNode extends DumbAwareAction {
                 .findFirst()
                 .orElse(CreateNodeMenu.TEST_PROJECT);
 
-        new CreateNodesDialog().show(menu, null, (enteredName, selectedType) -> {
+        new CreateNodesDialog(menu, null, (enteredName, selectedType) -> {
             if (enteredName == null || enteredName.isEmpty()) return;
 
             Path newDirPath = parentDir.getPath().resolve(enteredName);
@@ -69,7 +69,7 @@ public class CreateTreeNode extends DumbAwareAction {
             } else {
                 System.out.println("No creation logic defined for type: " + selectedType);
             }
-        });
+        }).show();
     }
 
     public void createTestRun(final String name, final DirectoryDto parentDir, final Path newDirPath) {
@@ -148,7 +148,7 @@ public class CreateTreeNode extends DumbAwareAction {
                 .findFirst()
                 .orElse(null);
 
-        boolean hasOptions = menu != null && menu.getAvailableOptions().length > 0;
+        boolean hasOptions = menu != null && !menu.getAvailableOptions().isEmpty();
         e.getPresentation().setVisible(true);
         e.getPresentation().setEnabled(hasOptions);
     }
