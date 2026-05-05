@@ -43,7 +43,7 @@ public enum KeyboardSet {
     CreateTestCaseRemoveStep(KeyEvent.VK_W, InputEvent.CTRL_DOWN_MASK),
     CreateTestCaseGroup(KeyEvent.VK_G, InputEvent.CTRL_DOWN_MASK),
     CreateTestCasePriority(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
-    UpdateTestCaseTitle(KeyEvent.VK_T, 0),
+    UpdateTestCaseDescription(KeyEvent.VK_T, 0),
     UpdateTestCaseExpected(KeyEvent.VK_E, 0),
     UpdateTestCaseSteps(KeyEvent.VK_S, 0),
     UpdateTestCasePriority(KeyEvent.VK_P, 0),

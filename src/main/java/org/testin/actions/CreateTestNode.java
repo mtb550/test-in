@@ -42,7 +42,7 @@ public class CreateTestNode extends DumbAwareAction {
         CreateNodeMenu menu = parentDir.getMenu();
 
         // todo, activate checkbox -> setting button.
-        new CreateNodesDialog(menu, null, (enteredName, selectedType) -> {
+        new CreateNodesDialog(menu, (enteredName, selectedType, generateState) -> {
             if (enteredName == null || enteredName.isEmpty()) return;
 
             Path newDirPath = parentDir.getPath().resolve(enteredName);

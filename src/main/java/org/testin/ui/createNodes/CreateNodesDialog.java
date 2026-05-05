@@ -7,17 +7,18 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
+import com.intellij.util.TriConsumer;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.testin.pojo.Config;
 import org.testin.pojo.CreateNodeMenu;
 import org.testin.pojo.DirectoryType;
+import org.testin.util.automationGenerator.GenerateOrUpdateCode;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class CreateNodesDialog {
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
@@ -28,8 +29,9 @@ public class CreateNodesDialog {
     private final ExtendableTextField textField;
     private final JBList<DirectoryType> list;
     private final JBPopup popup;
+    private final GenerateOrUpdateCode checkbox;
 
-    public CreateNodesDialog(final CreateNodeMenu menu, final JComponent settingButton, final BiConsumer<String, DirectoryType> onSelected) {
+    public CreateNodesDialog(final CreateNodeMenu menu, final TriConsumer<String, DirectoryType, GenerateOrUpdateCode> onSelected) {
         textField = new ExtendableTextField();
 
         textField.setFont(fieldFont);
@@ -51,6 +53,9 @@ public class CreateNodesDialog {
         mainPanel.setBorder(JBUI.Borders.empty());
 
         mainPanel.add(textField, BorderLayout.NORTH);
+
+        // todo, what is the benefit for this line below?
+        this.checkbox = (menu.getGeneratorType() != null) ? new GenerateOrUpdateCode(menu.getGeneratorType()) : null;
 
         JPanel listWrapper = new JPanel(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
@@ -79,8 +84,8 @@ public class CreateNodesDialog {
                 })*/
                 .setMinSize(minSize);
 
-        if (settingButton != null) {
-            builder.setSettingButtons(settingButton);
+        if (this.checkbox != null) {
+            builder.setSettingButtons(this.checkbox);
         }
 
         popup = builder.createPopup();
@@ -101,11 +106,11 @@ public class CreateNodesDialog {
         });
     }
 
-    private void executeSubmitAction(final BiConsumer<String, DirectoryType> onSelected) {
+    private void executeSubmitAction(final TriConsumer<String, DirectoryType, GenerateOrUpdateCode> onSelected) {
         final String text = textField.getText().trim();
 
         if (!text.isEmpty()) {
-            onSelected.accept(text, list.getSelectedValue());
+            onSelected.accept(text, list.getSelectedValue(), checkbox);
             popup.closeOk(null);
 
         } else textField.requestFocus();

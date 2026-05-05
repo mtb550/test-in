@@ -14,11 +14,12 @@ import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.createNodes.CreateNodesDialog;
-import org.testin.ui.testCase.GenerateOrUpdateCode;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.automationGenerator.GeneratorType;
 import org.testin.util.notifications.Notifier;
 
 import java.nio.file.Path;
+import java.util.Collections;
 
 public class CreateTestProject extends DumbAwareAction {
     private final ProjectPanel projectPanel;
@@ -29,11 +30,7 @@ public class CreateTestProject extends DumbAwareAction {
     }
 
     public void execute() {
-        // todo, need separate check box class class to add or update new project ?
-        // todo, create automation package -> project
-        GenerateOrUpdateCode checkbox = new GenerateOrUpdateCode(null);
-
-        new CreateNodesDialog(CreateNodeMenu.TEST_PROJECT, checkbox, (name, selectedType) -> {
+        new CreateNodesDialog(CreateNodeMenu.TEST_PROJECT, (name, selectedType, generateState) -> {
 
             if (name == null || name.trim().isEmpty()) return;
 
@@ -71,6 +68,10 @@ public class CreateTestProject extends DumbAwareAction {
                 projectPanel.getTestProjectSelector().addTestProject(newTestProjectDirectory);
 
                 Notifier.info("New Test Project", String.format("Test Project %s has been added", processedName));
+
+                if (generateState.isSelected()) {
+                    GeneratorType.CREATE_PROJECT.getAction().execute(Config.getProject(), processedName, Collections.emptyList());
+                }
             });
         }
         ).show();

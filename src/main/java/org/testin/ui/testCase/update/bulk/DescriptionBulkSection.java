@@ -4,7 +4,7 @@ import org.testin.pojo.dto.TestCaseDto;
 
 import java.util.List;
 
-public class TitleBulkSection extends JsonSplitBulkSection {
+public class DescriptionBulkSection extends JsonSplitBulkSection {
 
     @Override
     protected String getPopupTitle() {

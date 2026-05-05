@@ -10,19 +10,24 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
+import org.testin.util.automationGenerator.GeneratorType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.BiConsumer;
 
 public class CreateTestCaseUI extends TestCaseUIBase {
-    public void show(final BiConsumer<TestCaseDto, Boolean> onSave) {
+
+    private JBPopup popup;
+
+    public CreateTestCaseUI(final BiConsumer<TestCaseDto, Boolean> onSave) {
+        super(GeneratorType.CREATE_TEST_CASE);
+
         final TestCaseDto dto = new TestCaseDto();
-        final JBPopup[] popupWrapper = new JBPopup[1];
 
         IUIAction repackPopup = () -> {
-            if (popupWrapper[0] != null) {
-                popupWrapper[0].pack(false, true);
+            if (popup != null) {
+                popup.pack(false, true);
 
                 // make focus on the new component if scroll pane appear.
                 SwingUtilities.invokeLater(() -> {
@@ -63,8 +68,9 @@ public class CreateTestCaseUI extends TestCaseUIBase {
 
             section.setupShortcut(mainPanel, slot, this, repackPopup);
 
-            if (section instanceof DescriptionSection)
+            if (section instanceof DescriptionSection) {
                 section.showSection(slot);
+            }
         }
 
         JPanel anchorPanel = new JPanel(new BorderLayout());
@@ -98,12 +104,11 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
-        // Popup
-        popupWrapper[0] = JBPopupFactory.getInstance()
+        // Popup creation
+        popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
                 .setTitle("Create Test Case")
                 .setSettingButtons(generateOrUpdateCode)
-                //.setTitleIcon()
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)
@@ -117,14 +122,15 @@ public class CreateTestCaseUI extends TestCaseUIBase {
                 })
                 .createPopup();
 
-        // save
-        Runnable saveAction = save(dto, onSave, popupWrapper);
+        Runnable saveAction = save(dto, onSave, new JBPopup[]{popup});
 
         // registe enter shortcut
         registerShortcut(mainPanel, KeyboardSet.Enter.getCustomShortcut(), saveAction::run);
-
-        // show first
-        popupWrapper[0].showCenteredInCurrentWindow(Config.getProject());
     }
 
+    public void show() {
+        if (popup != null) {
+            popup.showCenteredInCurrentWindow(Config.getProject());
+        }
+    }
 }

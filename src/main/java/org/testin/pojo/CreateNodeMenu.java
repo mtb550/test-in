@@ -3,6 +3,7 @@ package org.testin.pojo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.testin.pojo.dto.dirs.*;
+import org.testin.util.automationGenerator.GeneratorType;
 
 import java.util.List;
 
@@ -15,7 +16,8 @@ public enum CreateNodeMenu {
             List.of(DirectoryType.TP),
             TestProjectDirectoryDto.class,
             DirectoryType.TP,
-            "set name.."
+            "set name..",
+            GeneratorType.CREATE_PROJECT
     ),
 
     TEST_CASES_MAIN_DIR(
@@ -23,7 +25,8 @@ public enum CreateNodeMenu {
             List.of(DirectoryType.TS, DirectoryType.TSP),
             TestCasesMainDirectoryDto.class,
             DirectoryType.TCD,
-            "set name.."
+            "set name..",
+            null
     ),
 
     TEST_RUNS_MAIN_DIR(
@@ -31,7 +34,8 @@ public enum CreateNodeMenu {
             List.of(DirectoryType.TR, DirectoryType.TRP),
             TestRunsMainDirectoryDto.class,
             DirectoryType.TRD,
-            "set name.."
+            "set name..",
+            null
     ),
 
     TEST_SET_PACKAGE(
@@ -39,7 +43,8 @@ public enum CreateNodeMenu {
             List.of(DirectoryType.TS, DirectoryType.TSP),
             TestSetPackageDirectoryDto.class,
             DirectoryType.TSP,
-            "set name.."
+            "set name..",
+            GeneratorType.CREATE_TEST_SET_PACKAGE
     ),
 
     TEST_RUN_PACKAGE(
@@ -47,7 +52,8 @@ public enum CreateNodeMenu {
             List.of(DirectoryType.TR, DirectoryType.TRP),
             TestRunPackageDirectoryDto.class,
             DirectoryType.TRP,
-            "set name.."
+            "set name..",
+            null
     ),
 
     TEST_SET(
@@ -55,7 +61,8 @@ public enum CreateNodeMenu {
             List.of(),
             TestSetDirectoryDto.class,
             DirectoryType.TS,
-            "set name.."
+            "set name..",
+            GeneratorType.CREATE_TEST_SET
     ),
 
     TEST_RUN(
@@ -63,7 +70,8 @@ public enum CreateNodeMenu {
             List.of(),
             TestRunDirectoryDto.class,
             DirectoryType.TR,
-            "set name.."
+            "set name..",
+            null
     );
 
     private final String title;
@@ -71,5 +79,6 @@ public enum CreateNodeMenu {
     private final Class<?> targetDtoClass;
     private final DirectoryType targetParentType;
     private final String placeholder;
+    private final GeneratorType generatorType;
 
 }

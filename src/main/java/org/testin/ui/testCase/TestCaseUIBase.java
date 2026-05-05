@@ -9,6 +9,8 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.automationGenerator.GenerateOrUpdateCode;
+import org.testin.util.automationGenerator.GeneratorType;
 import org.testin.util.statusBar.IStatusBarItem;
 
 import javax.swing.*;
@@ -33,8 +35,8 @@ public abstract class TestCaseUIBase {
     protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
-    public TestCaseUIBase() {
-        this.generateOrUpdateCode = new GenerateOrUpdateCode(this);
+    public TestCaseUIBase(final @NotNull GeneratorType generatorType) {
+        this.generateOrUpdateCode = new GenerateOrUpdateCode(generatorType);
         this.DescriptionSection = new DescriptionSection();
         this.expectedResultSection = new ExpectedResultSection();
         this.stepsSection = new StepsSection();

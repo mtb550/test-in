@@ -68,13 +68,13 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null
     ),
 
-    TITLE(
+    DESCRIPTION(
             "Title",
-            KeyboardSet.UpdateTestCaseTitle,
+            KeyboardSet.UpdateTestCaseDescription,
             AllIcons.Actions.Edit,
             new IStatusBarItem[]{SAVE},
             true,
-            (items, updatedItems) -> new TitleBulkSection().show(items, updatedItems),
+            (items, updatedItems) -> new DescriptionBulkSection().show(items, updatedItems),
             TestCaseUIBase::getDescriptionSection
     ),
 
@@ -102,7 +102,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Steps",
             KeyboardSet.UpdateTestCaseSteps,
             AllIcons.Actions.ListFiles,
-            new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
+            new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE}, // todo, change to list.of()
             true,
             (items, updatedItems) -> new StepsBulkSection().show(items, updatedItems),
             TestCaseUIBase::getStepsSection
