@@ -1,4 +1,4 @@
-package org.testin.ui.TestCase;
+package org.testin.ui.testCase;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonShortcuts;
@@ -13,8 +13,8 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.ui.TestCase.update.UpdateTestCaseFields;
-import org.testin.ui.TestCase.update.UpdateTestCaseUI;
+import org.testin.ui.testCase.update.UpdateTestCaseFields;
+import org.testin.ui.testCase.update.UpdateTestCaseUI;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;

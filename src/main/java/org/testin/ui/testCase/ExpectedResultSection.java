@@ -1,4 +1,4 @@
-package org.testin.ui.TestCase;
+package org.testin.ui.testCase;
 
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.util.ui.JBFont;

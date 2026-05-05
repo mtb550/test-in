@@ -1,4 +1,4 @@
-package org.testin.ui.TestCase;
+package org.testin.ui.testCase;
 
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.util.ui.JBFont;

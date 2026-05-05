@@ -1,13 +1,13 @@
-package org.testin.ui.TestCase.update;
+package org.testin.ui.testCase.update;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.DumbAwareAction;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.ui.TestCase.ICreateTestCaseSection;
-import org.testin.ui.TestCase.TestCaseUIBase;
-import org.testin.ui.TestCase.update.bulk.*;
+import org.testin.ui.testCase.ICreateTestCaseSection;
+import org.testin.ui.testCase.TestCaseUIBase;
+import org.testin.ui.testCase.update.bulk.*;
 import org.testin.util.KeyboardSet;
 import org.testin.util.statusBar.IStatusBarItem;
 

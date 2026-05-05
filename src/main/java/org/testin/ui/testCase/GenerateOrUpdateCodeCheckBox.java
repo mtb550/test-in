@@ -1,9 +1,9 @@
-package org.testin.ui.TestCase;
+package org.testin.ui.testCase;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.util.ui.JBUI;
-import org.testin.ui.TestCase.update.UpdateTestCaseUI;
+import org.testin.ui.testCase.update.UpdateTestCaseUI;
 
 import java.awt.*;
 

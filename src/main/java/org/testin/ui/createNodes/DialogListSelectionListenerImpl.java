@@ -1,4 +1,4 @@
-package org.testin.ui;
+package org.testin.ui.createNodes;
 
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.fields.ExtendableTextComponent;

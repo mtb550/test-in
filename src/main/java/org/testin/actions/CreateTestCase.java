@@ -12,7 +12,7 @@ import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testCaseEditor.TestEditorUI;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.ui.TestCase.CreateTestCaseUI;
+import org.testin.ui.testCase.CreateTestCaseUI;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.services.TestCaseCacheService;

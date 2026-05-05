@@ -1,4 +1,4 @@
-package org.testin.ui.TestCase.update.bulk;
+package org.testin.ui.testCase.update.bulk;
 
 import org.testin.pojo.dto.TestCaseDto;
 

@@ -1,4 +1,4 @@
-package org.testin.ui.TestCase;
+package org.testin.ui.testCase;
 
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;

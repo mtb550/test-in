@@ -13,8 +13,8 @@ import org.testin.pojo.dto.dirs.TestCasesDirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.ui.CreateNodesDialog;
-import org.testin.ui.TestCase.GenerateOrUpdateCodeCheckBox;
+import org.testin.ui.createNodes.CreateNodesDialog;
+import org.testin.ui.testCase.GenerateOrUpdateCodeCheckBox;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.notifications.Notifier;
 

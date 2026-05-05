@@ -15,7 +15,7 @@ import org.testin.pojo.TestRunStatus;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.*;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.ui.CreateNodesDialog;
+import org.testin.ui.createNodes.CreateNodesDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;

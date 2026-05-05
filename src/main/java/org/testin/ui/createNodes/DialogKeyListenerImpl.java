@@ -1,4 +1,4 @@
-package org.testin.ui;
+package org.testin.ui.createNodes;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBList;

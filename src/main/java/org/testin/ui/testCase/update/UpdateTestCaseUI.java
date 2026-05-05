@@ -1,4 +1,4 @@
-package org.testin.ui.TestCase.update;
+package org.testin.ui.testCase.update;
 
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -9,7 +9,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.ui.TestCase.*;
+import org.testin.ui.testCase.*;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;

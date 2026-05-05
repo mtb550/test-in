@@ -1,4 +1,4 @@
-package org.testin.ui.TestCase;
+package org.testin.ui.testCase;
 
 import org.testin.util.statusBar.StatusBarBase;
 

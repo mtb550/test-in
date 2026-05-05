@@ -1,4 +1,4 @@
-package org.testin.ui.TestCase;
+package org.testin.ui.testCase;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.ColoredListCellRenderer;
