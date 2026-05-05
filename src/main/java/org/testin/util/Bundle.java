@@ -7,13 +7,13 @@ import org.jetbrains.annotations.PropertyKey;
 
 import java.util.function.Supplier;
 
-public final class TestInBundle extends DynamicBundle {
-    public static final String BUNDLE = "messages";
+public final class Bundle extends DynamicBundle {
+    private static final String BUNDLE = "messages";
 
-    private static final TestInBundle INSTANCE = new TestInBundle();
+    private static final Bundle INSTANCE = new Bundle();
 
-    private TestInBundle() {
-        super(INSTANCE.getClass(), BUNDLE);
+    private Bundle() {
+        super(Bundle.class, BUNDLE);
     }
 
     @NotNull
@@ -24,5 +24,10 @@ public final class TestInBundle extends DynamicBundle {
     @NotNull
     public static Supplier<@Nls String> messagePointer(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, @NotNull Object... params) {
         return INSTANCE.getLazyMessage(key, params);
+    }
+
+    @NotNull
+    public static String getPluginName() {
+        return Bundle.message("testin.display.name");
     }
 }

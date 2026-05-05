@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.testin.pojo.CreateNodeMenu;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -34,4 +35,6 @@ public abstract class DirectoryDto {
 
     @JsonAlias("modified_by")
     private String modifiedBy;
+
+    public abstract CreateNodeMenu getMenu();
 }

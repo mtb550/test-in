@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
-import org.testin.actions.CreateProject;
+import org.testin.actions.CreateTestProject;
 import org.testin.pojo.Config;
 import org.testin.projectPanel.projectSelector.TestProjectSelector;
 import org.testin.projectPanel.tree.ProjectTree;
@@ -18,6 +18,7 @@ import org.testin.projectPanel.tree.TestProjectTreeBuilder;
 import org.testin.projectPanel.tree.TestRunTreeBuilder;
 import org.testin.projectPanel.versionSelector.VersionSelector;
 import org.testin.settings.AppSettingsConfigurable;
+import org.testin.util.Bundle;
 
 import java.awt.*;
 
@@ -108,7 +109,9 @@ public class ProjectPanel implements Disposable {
         StatusText emptyText = panel.getEmptyText();
 
         emptyText.clear();
-        emptyText.setText("Welcome to QC plugin", SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
+        emptyText.setText(String.format("Welcome to %s", Bundle.getPluginName()), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
+        emptyText.appendLine("");
+        emptyText.appendSecondaryText("The new awesome test management tool", StatusText.DEFAULT_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine("By", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("Muteb Almughyiri", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
@@ -128,7 +131,7 @@ public class ProjectPanel implements Disposable {
                     AllIcons.General.Add,
                     " Create your first test project",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> new CreateProject(this).execute()
+                    e -> new CreateTestProject(this).execute()
             );
 
         panel.revalidate();

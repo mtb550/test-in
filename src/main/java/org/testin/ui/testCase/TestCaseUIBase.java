@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public abstract class TestCaseUIBase {
-    protected final GenerateOrUpdateCodeCheckBox generateOrUpdateCodeCheckBox;
+    protected final GenerateOrUpdateCode generateOrUpdateCode;
     protected final DescriptionSection DescriptionSection;
     protected final ExpectedResultSection expectedResultSection;
     protected final PrioritySection prioritySection;
@@ -34,7 +34,7 @@ public abstract class TestCaseUIBase {
     private PropertyChangeListener focusListener;
 
     public TestCaseUIBase() {
-        this.generateOrUpdateCodeCheckBox = new GenerateOrUpdateCodeCheckBox(this);
+        this.generateOrUpdateCode = new GenerateOrUpdateCode(this);
         this.DescriptionSection = new DescriptionSection();
         this.expectedResultSection = new ExpectedResultSection();
         this.stepsSection = new StepsSection();
@@ -116,7 +116,7 @@ public abstract class TestCaseUIBase {
 
             String title = dto.getDescription();
             if (DescriptionSection.getWrapper().getParent() == null || !title.trim().isEmpty()) {
-                onSave.accept(dto, generateOrUpdateCodeCheckBox.isSelected());
+                onSave.accept(dto, generateOrUpdateCode.isSelected());
 
                 if (popupWrapper[0] != null)
                     popupWrapper[0].closeOk(null);

@@ -23,7 +23,7 @@ import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.projectSelector.RendererImpl;
 import org.testin.settings.service.ProjectPanelService;
-import org.testin.util.TestInBundle;
+import org.testin.util.Bundle;
 import org.testin.util.Tools;
 
 import javax.swing.*;
@@ -51,7 +51,7 @@ public class AppSettingsConfigurable implements Configurable {
 
     @Override
     public String getDisplayName() {
-        return TestInBundle.message("testin.display.name");
+        return Bundle.getPluginName();
     }
 
     @Nullable

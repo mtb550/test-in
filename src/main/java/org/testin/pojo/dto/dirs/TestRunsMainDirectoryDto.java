@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.testin.pojo.CreateNodeMenu;
 
 import java.nio.file.Path;
 
@@ -13,17 +14,22 @@ import java.nio.file.Path;
 @NoArgsConstructor
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class TestCasesDirectoryDto extends DirectoryDto {
+public class TestRunsMainDirectoryDto extends DirectoryDto {
     @Override
-    public TestCasesDirectoryDto setPath(Path path) {
+    public TestRunsMainDirectoryDto setPath(Path path) {
         super.setPath(path);
         return this;
     }
 
     @Override
-    public TestCasesDirectoryDto setName(String name) {
+    public TestRunsMainDirectoryDto setName(String name) {
         super.setName(name);
         return this;
+    }
+
+    @Override
+    public CreateNodeMenu getMenu() {
+        return CreateNodeMenu.TEST_RUNS_MAIN_DIR;
     }
 
 }

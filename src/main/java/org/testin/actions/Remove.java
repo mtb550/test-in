@@ -30,8 +30,8 @@ public class Remove extends DumbAwareAction {
     private boolean isRemovable(Object dir) {
         return dir instanceof DirectoryDto &&
                 !(dir instanceof TestProjectDirectoryDto) &&
-                !(dir instanceof TestCasesDirectoryDto) &&
-                !(dir instanceof TestRunsDirectoryDto);
+                !(dir instanceof TestCasesMainDirectoryDto) &&
+                !(dir instanceof TestRunsMainDirectoryDto);
     }
 
     @Override

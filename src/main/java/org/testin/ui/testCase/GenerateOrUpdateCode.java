@@ -7,11 +7,12 @@ import org.testin.ui.testCase.update.UpdateTestCaseUI;
 
 import java.awt.*;
 
-public class GenerateOrUpdateCodeCheckBox extends JBCheckBox {
+// todo, to put it in new package and separate each action in separate class (create project package, create test set , create method, update method
+public class GenerateOrUpdateCode extends JBCheckBox {
 
     public static final String PROP_KEY = "testin.CreateTestCase.GenerateCode";
 
-    public GenerateOrUpdateCodeCheckBox(final TestCaseUIBase ui) {
+    public GenerateOrUpdateCode(final TestCaseUIBase ui) {
         if (ui instanceof UpdateTestCaseUI) setToolTipText("Update automated test case");
         else setToolTipText("Create automated test case");
 

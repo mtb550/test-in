@@ -9,9 +9,9 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestCasesDirectoryDto;
+import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunsDirectoryDto;
+import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
@@ -44,7 +44,7 @@ public class Rename extends DumbAwareAction {
         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 
         if (!(node.getUserObject() instanceof DirectoryDto dir)) return;
-        if (dir instanceof TestCasesDirectoryDto || dir instanceof TestRunsDirectoryDto) return;
+        if (dir instanceof TestCasesMainDirectoryDto || dir instanceof TestRunsMainDirectoryDto) return;
 
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
         if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
@@ -81,8 +81,8 @@ public class Rename extends DumbAwareAction {
         boolean shouldEnable = (path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
                 node.getUserObject() instanceof DirectoryDto dir &&
-                !(dir instanceof TestCasesDirectoryDto) &&
-                !(dir instanceof TestRunsDirectoryDto)
+                !(dir instanceof TestCasesMainDirectoryDto) &&
+                !(dir instanceof TestRunsMainDirectoryDto)
         );
 
         e.getPresentation().setEnabled(shouldEnable);

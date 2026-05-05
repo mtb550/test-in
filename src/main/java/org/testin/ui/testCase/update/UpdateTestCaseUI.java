@@ -100,7 +100,7 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
                 .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
                 .setTitle("Update " + target.getName())
                 //.setTitleIcon()
-                .setSettingButtons(generateOrUpdateCodeCheckBox)
+                .setSettingButtons(generateOrUpdateCode)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)

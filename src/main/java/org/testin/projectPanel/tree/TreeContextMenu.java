@@ -21,7 +21,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         super("Tree Popup Menu", true);
 
         add(new Open(projectPanel, tree));
-        add(new CreateNode(projectPanel, tree));
+        add(new CreateTestNode(projectPanel, tree));
         addSeparator();
 
         add(createSubGroup("Actions", AllIcons.Actions.Edit,

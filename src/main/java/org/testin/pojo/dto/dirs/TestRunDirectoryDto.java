@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.testin.pojo.CreateNodeMenu;
 import org.testin.pojo.TestRunStatus;
 
 import java.nio.file.Path;
@@ -33,5 +34,10 @@ public class TestRunDirectoryDto extends DirectoryDto {
     public TestRunDirectoryDto setName(String name) {
         super.setName(name);
         return this;
+    }
+
+    @Override
+    public CreateNodeMenu getMenu() {
+        return CreateNodeMenu.TEST_RUN;
     }
 }

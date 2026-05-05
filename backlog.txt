@@ -325,6 +325,10 @@ how to make timer is accurate
 
 fix mac shortcuts.
 
+--------------
+new magicked features, copy or cut test cases from specific editor and paste it in another editor.
+--------------
+
 add new item in create test case ui: query or pre-condition.
 
 compatability with by charm, use option of plugin that make same release matched with by charm and IntelliJ.

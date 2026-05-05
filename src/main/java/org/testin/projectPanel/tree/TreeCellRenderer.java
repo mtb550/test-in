@@ -9,9 +9,9 @@ import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestCasesDirectoryDto;
+import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunsDirectoryDto;
+import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -66,9 +66,9 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
 
     private @NotNull SimpleTextAttributes getSimpleTextAttributes(final DefaultMutableTreeNode node, final DirectoryDto dir) {
         return switch (dir) {
-            case TestCasesDirectoryDto ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
+            case TestCasesMainDirectoryDto ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
 
-            case TestRunsDirectoryDto ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
+            case TestRunsMainDirectoryDto ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
 
             default -> (selectedNodes != null && selectedNodes.contains(node))
                     ? SimpleTextAttributes.GRAYED_ATTRIBUTES

@@ -8,11 +8,11 @@ import java.nio.file.Path;
 public class DirectoryMapper {
     public static TestProjectDirectoryDto testProjectNode(final Path path) {
         try {
-            TestCasesDirectoryDto tcd = new TestCasesDirectoryDto()
+            TestCasesMainDirectoryDto tcd = new TestCasesMainDirectoryDto()
                     .setPath(path.resolve("testCases"))
                     .setName("Test Cases");
 
-            TestRunsDirectoryDto trd = new TestRunsDirectoryDto()
+            TestRunsMainDirectoryDto trd = new TestRunsMainDirectoryDto()
                     .setPath(path.resolve("testRuns"))
                     .setName("Test Runs");
 
@@ -32,9 +32,9 @@ public class DirectoryMapper {
         }
     }
 
-    public static TestCasesDirectoryDto testCasesRootNode(Path path) {
+    public static TestCasesMainDirectoryDto testCasesRootNode(Path path) {
         try {
-            return new TestCasesDirectoryDto()
+            return new TestCasesMainDirectoryDto()
                     .setName(path.getFileName().toString())
                     .setPath(path);
 
@@ -46,9 +46,9 @@ public class DirectoryMapper {
         }
     }
 
-    public static TestRunsDirectoryDto testRunsRootNode(Path path) {
+    public static TestRunsMainDirectoryDto testRunsRootNode(Path path) {
         try {
-            return new TestRunsDirectoryDto()
+            return new TestRunsMainDirectoryDto()
                     .setName(path.getFileName().toString())
                     .setPath(path);
 

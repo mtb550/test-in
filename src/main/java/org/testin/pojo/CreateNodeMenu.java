@@ -18,18 +18,18 @@ public enum CreateNodeMenu {
             "set name.."
     ),
 
-    TEST_CASES_DIR(
+    TEST_CASES_MAIN_DIR(
             "Create Test Node",
             List.of(DirectoryType.TS, DirectoryType.TSP),
-            TestCasesDirectoryDto.class,
+            TestCasesMainDirectoryDto.class,
             DirectoryType.TCD,
             "set name.."
     ),
 
-    TEST_RUNS_DIR(
+    TEST_RUNS_MAIN_DIR(
             "Create Run Node",
             List.of(DirectoryType.TR, DirectoryType.TRP),
-            TestRunsDirectoryDto.class,
+            TestRunsMainDirectoryDto.class,
             DirectoryType.TRD,
             "set name.."
     ),
@@ -47,6 +47,22 @@ public enum CreateNodeMenu {
             List.of(DirectoryType.TR, DirectoryType.TRP),
             TestRunPackageDirectoryDto.class,
             DirectoryType.TRP,
+            "set name.."
+    ),
+
+    TEST_SET(
+            "Create Test Set",
+            List.of(),
+            TestSetDirectoryDto.class,
+            DirectoryType.TS,
+            "set name.."
+    ),
+
+    TEST_RUN(
+            "Create Test Run",
+            List.of(),
+            TestRunDirectoryDto.class,
+            DirectoryType.TR,
             "set name.."
     );
 

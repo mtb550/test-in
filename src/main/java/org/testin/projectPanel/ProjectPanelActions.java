@@ -13,7 +13,7 @@ public class ProjectPanelActions {
                 new ExpandAll(projectPanel),
                 new CollapseAll(projectPanel),
                 new Refresh(projectPanel),
-                new CreateProject(projectPanel)
+                new CreateTestProject(projectPanel)
         );
     }
 }
