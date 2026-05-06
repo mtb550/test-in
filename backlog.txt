@@ -323,7 +323,7 @@ make shortcut to set actual result, screenshot or exception (evidence, find anot
 how to make timer is accurate
 --------------
 
-fix mac shortcuts.
+fix mac shortcuts. check create test case and generate code on mac
 
 --------------
 new magicked features, copy or cut test cases from specific editor and paste it in another editor.
@@ -340,6 +340,6 @@ amazing feature: select multi test set then open together it in the editor.
 drag and drop for project panel to editor panel
 
 remain enhancements for create new node ui.
-add check box (create folder) in create new node
-add status bar to create new node shows: enter:save scape:cancel
-regex, no dot or special chars
+add status bar to create new node shows: enter:save scape:cancel.
+regex, no dot or special chars.
+apply check box once update test case.
