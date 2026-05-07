@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.testin"
-version = "2.0.1-SNAPSHOT"
+version = "2.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -77,7 +77,7 @@ dependencies {
 intellijPlatform {
     pluginConfiguration {
         id.set("org.testin")
-        name.set("Test in")
+        name.set("Testin")
         version.set(project.version.toString())
 
         vendor {
@@ -105,7 +105,8 @@ intellijPlatform {
     }
 
     publishing {
-        token.set(System.getenv("PUBLISH_TOKEN"))
+        token.set(System.getenv("JETBRAINS_TOKEN"))
+        channels.set(listOf("alpha"))
     }
 
     sandboxContainer.set(layout.projectDirectory.dir(".sandbox"))
