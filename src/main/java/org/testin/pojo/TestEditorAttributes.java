@@ -6,9 +6,7 @@ import org.testin.editorPanel.Shared;
 import org.testin.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -82,7 +80,7 @@ public enum TestEditorAttributes {
             "Group",
             true,
             true,
-            tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")), // تم إزالة Optional
+            tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList())
     ),
 
@@ -132,14 +130,16 @@ public enum TestEditorAttributes {
             "Created At",
             true,
             false,
-            tc -> tc.getCreatedAt().format(DateTimeFormatter.ofPattern("EEEE hh:mm a dd.MM.yyyy (z)", Locale.US)), null
+            tc -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
+            null
     ),
 
     UPDATE_AT(
             "Updated At",
             true,
             false,
-            tc -> tc.getUpdatedAt().format(DateTimeFormatter.ofPattern("EEEE hh:mm a dd.MM.yyyy (z)", Locale.US)), null
+            tc -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
+            null
     );
 
     private final String name;

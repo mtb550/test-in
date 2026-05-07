@@ -15,10 +15,12 @@ import java.util.Locale;
 
 
 public class Config {
+    public static final DateTimeFormatter EXCEL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    @Setter
+    public static final String DATE_FORMAT_PATTERN = "EEEE dd-MM-yyyy 'At' HH:mm:ss '['VV']'";
+
     @Getter
-    private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
+    private static final DateTimeFormatter dateFormatterPattern = DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN, Locale.US);
 
     @Setter
     @Getter
