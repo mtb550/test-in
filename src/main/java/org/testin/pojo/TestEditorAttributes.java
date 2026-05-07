@@ -6,7 +6,9 @@ import org.testin.editorPanel.Shared;
 import org.testin.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -94,6 +96,22 @@ public enum TestEditorAttributes {
 
     ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
 
+    MODULE(
+            "Module",
+            true,
+            false,
+            TestCaseDto::getModule,
+            null
+    ),
+
+    STATUS(
+            "Status",
+            true,
+            false,
+            TestCaseDto::getTempStatus,
+            null
+    ),
+
     CREATE_BY(
             "Created By",
             true,
@@ -114,32 +132,14 @@ public enum TestEditorAttributes {
             "Created At",
             true,
             false,
-            TestCaseDto::getFormattedCreatedAt,
-            null
+            tc -> tc.getCreatedAt().format(DateTimeFormatter.ofPattern("EEEE hh:mm a dd.MM.yyyy (z)", Locale.US)), null
     ),
 
     UPDATE_AT(
             "Updated At",
             true,
             false,
-            TestCaseDto::getFormattedUpdatedAt,
-            null
-    ),
-
-    MODULE(
-            "Module",
-            true,
-            false,
-            TestCaseDto::getModule,
-            null
-    ),
-
-    STATUS(
-            "Status",
-            true,
-            false,
-            TestCaseDto::getTempStatus,
-            null
+            tc -> tc.getUpdatedAt().format(DateTimeFormatter.ofPattern("EEEE hh:mm a dd.MM.yyyy (z)", Locale.US)), null
     );
 
     private final String name;

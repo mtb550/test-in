@@ -68,11 +68,11 @@ public class TreeContextMenu extends DefaultActionGroup {
                 "Generate Report",
                 AllIcons.ToolbarDecorator.Export,
                 List.of(
-                        new ReportHtml(tree),
-                        new ReportPdf(tree),
-                        new ReportExcel(tree),
-                        new ReportJson(tree),
-                        new ReportXml(tree)
+                        new GenerateReportHtml(tree),
+                        new GenerateReportPdf(tree),
+                        new GenerateReportXlsx(tree),
+                        new GenerateReportJson(tree),
+                        new GenerateReportXml(tree)
                 )
         ));
 

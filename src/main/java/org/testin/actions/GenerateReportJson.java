@@ -12,11 +12,11 @@ import org.testin.util.reports.TestRunReport;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 // TODO: implement save as to allow tester to specify save place
-public class ReportHtml extends DumbAwareAction {
+public class GenerateReportJson extends DumbAwareAction {
     private final SimpleTree tree;
 
-    public ReportHtml(final SimpleTree tree) {
-        super("As HTML", "Generate test run HTML report", AllIcons.FileTypes.Html);
+    public GenerateReportJson(final SimpleTree tree) {
+        super("As JSON", "Generate test run JSON report", AllIcons.FileTypes.Json);
         this.tree = tree;
     }
 
@@ -24,7 +24,7 @@ public class ReportHtml extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto tr) {
-            new TestRunReport(tr).build().asHtml();
+            new TestRunReport(tr).build().asJson();
         }
     }
 

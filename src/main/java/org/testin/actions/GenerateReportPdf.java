@@ -12,10 +12,10 @@ import org.testin.util.reports.TestRunReport;
 import javax.swing.tree.DefaultMutableTreeNode;
 
 // TODO: implement save as to allow tester to specify save place
-public class ReportPdf extends DumbAwareAction {
+public class GenerateReportPdf extends DumbAwareAction {
     private final SimpleTree tree;
 
-    public ReportPdf(final SimpleTree tree) {
+    public GenerateReportPdf(final SimpleTree tree) {
         super("As PDF", "Generate test run PDF report", AllIcons.Providers.Eclipse);
         this.tree = tree;
     }

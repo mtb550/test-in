@@ -34,8 +34,8 @@ public final class TestRunReport {
         processAndSave("PDF", ".pdf");
     }
 
-    public void asExcel() {
-        processAndSave("EXCEL", ".xlsx");
+    public void asXlsx() {
+        processAndSave("EXCEL (xlsx)", ".xlsx");
     }
 
     private void processAndSave(String format, String extension) {
@@ -58,14 +58,14 @@ public final class TestRunReport {
 
                 switch (format) {
                     case "HTML" -> {
-                        ///  to be implemented, put report file types in enum class
+                        ///  todo, to be implemented, put report file types in enum class
                         String reportHtml = new HtmlGenerator().generate(runData, detailsMap);
                         fileBytes = reportHtml.getBytes(StandardCharsets.UTF_8);
                     }
 
                     case "PDF" -> fileBytes = new PdfGenerator().generate(runData, detailsMap);
 
-                    case "EXCEL" -> fileBytes = new ExcelGenerator().generate(runData, detailsMap);
+                    case "EXCEL (xlsx)" -> fileBytes = new ExcelGenerator().generate(runData, detailsMap);
 
                     case null, default -> throw new UnsupportedOperationException("Unknown format: " + format);
                 }

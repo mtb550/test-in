@@ -10,9 +10,15 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 
 public class Config {
+
+    @Setter
+    @Getter
+    private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("EEEE dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
 
     @Setter
     @Getter
@@ -33,6 +39,7 @@ public class Config {
     public static ObjectMapper getMapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())
-                .enable(SerializationFeature.INDENT_OUTPUT);
+                .enable(SerializationFeature.INDENT_OUTPUT)
+                .setTimeZone(java.util.TimeZone.getDefault());
     }
 }
