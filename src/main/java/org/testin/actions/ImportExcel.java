@@ -38,41 +38,37 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ImportExcel extends DumbAwareAction {
-    private static final String EXCEL_INFO_MESSAGE =
-            """
-                    To ensure a successful import, your Excel file should contain the following column headers (case-insensitive):
-                    
-                     • Description
-                     • Expected Result
-                     • Steps
-                     • Group
-                     • Priority
-                     • Reference
-                     • Module
-                     • Status
-                     • Created By
-                     • Created At
-                     • Updated By
-                     • Updated At
-                    
-                    Note: Missing columns will safely default to empty values.""";
+    // todo, all patterns to be moved to Tools class.
+    private final static Pattern SANITIZE_PATTERN = Pattern.compile("[^a-zA-Z0-9 _]");
+    private final static Pattern STEP_MUSH_PATTERN = Pattern.compile(".*\\s\\d+[-.].*");
+    private final static Pattern STEP_LINE_PATTERN = Pattern.compile("(\\s)(?=\\d+[-.])");
+    private final static Pattern STEP_CLEAN_PATTERN = Pattern.compile("^\\d+[-.]\\s*");
 
-    private static final Pattern SANITIZE_PATTERN = Pattern.compile("[^a-zA-Z0-9 _]");
-    private static final Pattern STEP_MUSH_PATTERN = Pattern.compile(".*\\s\\d+[-.].*");
-    private static final Pattern STEP_LINE_PATTERN = Pattern.compile("(\\s)(?=\\d+[-.])");
-    private static final Pattern STEP_CLEAN_PATTERN = Pattern.compile("^\\d+[-.]\\s*");
+    private final List<String> IMPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
+            .filter(TestEditorAttributes::isImportValue)
+            .map(TestEditorAttributes::getName)
+            .toList();
+
+    private final String EXCEL_INFO_MESSAGE =
+            String.format("""
+                            To ensure a successful import, your Excel file should contain the following column headers (case-insensitive):
+                            
+                            %s
+                            
+                            Note: Missing columns will safely default to empty values.""",
+                    String.join("\n ", IMPORT_COLUMNS));
+
     private final SimpleTree tree;
 
-    public ImportExcel(SimpleTree tree) {
+    public ImportExcel(final SimpleTree tree) {
         super("From Excel", "Import test cases from excel", AllIcons.Providers.Microsoft);
         this.tree = tree;
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(@NotNull final AnActionEvent e) {
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
@@ -127,7 +123,7 @@ public class ImportExcel extends DumbAwareAction {
         }
     }
 
-    private void processWithFillo(String filePath, VirtualFile targetDirectory) {
+    private void processWithFillo(final String filePath, final VirtualFile targetDirectory) {
         File file = new File(filePath);
         if (!file.exists() || !file.canRead()) {
             Notifier.error("File Error", "Java cannot read this file!");
@@ -145,74 +141,47 @@ public class ImportExcel extends DumbAwareAction {
 
                 ObjectMapper mapper = Config.getMapper();
 
+                Connection connection = null;
+                Recordset recordset = null;
                 try {
-                    final String description = TestEditorAttributes.DESCRIPTION.getName();
-                    final String expectedResult = TestEditorAttributes.EXPECTED_RESULT.getName();
-                    final String steps = TestEditorAttributes.STEPS.getName();
-                    final String group = TestEditorAttributes.GROUP.getName();
-                    final String priority = TestEditorAttributes.PRIORITY.getName();
-                    final String reference = TestEditorAttributes.REFERENCE.getName();
-                    final String module = TestEditorAttributes.MODULE.getName();
-                    final String status = TestEditorAttributes.STATUS.getName();
-                    final String createdBy = TestEditorAttributes.CREATE_BY.getName();
-                    final String createdAt = TestEditorAttributes.CREATE_AT.getName();
-                    final String updatedBy = TestEditorAttributes.UPDATE_BY.getName();
-                    final String updatedAt = TestEditorAttributes.UPDATE_AT.getName();
                     // todo, implement order.
                     // todo, expected result is not arranged if it is multi lines. to be fixed.
                     // todo, if import, we need generate code context menu, to generate all in one click.
                     // todo, filter by module in status bar
 
-                    final List<String> columns = Stream.of(description, expectedResult, steps, group, priority, reference, module, status, createdBy, createdAt, updatedBy, updatedAt)
-                            .map(String::toLowerCase)
-                            .collect(Collectors.toList());
-
-                    Connection connection = fillo.getConnection(filePath); // todo, fetch sheet name dynamically (Sheet 1)
+                    connection = fillo.getConnection(filePath); // todo, fetch sheet name dynamically (Sheet 1)
                     String actualSheetName = connection.getMetaData().getTableNames().getFirst();
                     String query = "SELECT * FROM \"" + actualSheetName + "\"";
                     System.out.println(query);
-                    Recordset recordset = connection.executeQuery(query);
+                    recordset = connection.executeQuery(query);
 
                     indicator.setText("Mapping column headers...");
-                    Map<String, String> headerMap = buildCaseInsensitiveHeaderMap(recordset.getFieldNames(), columns);
-
+                    Map<String, String> headerMap = buildCaseInsensitiveHeaderMap(recordset.getFieldNames(), IMPORT_COLUMNS);
                     Map<String, String> filesToWrite = new LinkedHashMap<>();
                     int rowCount = 0;
 
                     indicator.setText("Parsing rows into JSON...");
 
                     while (recordset.next()) {
-                        if (indicator.isCanceled()) {
-                            break;
+                        if (indicator.isCanceled()) break;
+
+                        final TestCaseDto testCaseDto = new TestCaseDto().setId(UUID.randomUUID());
+
+                        for (TestEditorAttributes attr : TestEditorAttributes.values()) {
+                            if (attr.isImportValue()) {
+                                String rawValue = getFieldSafe(recordset, attr.getName(), headerMap);
+                                attr.getImportSetter().accept(ImportExcel.this, testCaseDto, rawValue);
+                            }
                         }
 
-                        final UUID generatedUuid = UUID.randomUUID();
-
-                        TestCaseDto testCaseDto = new TestCaseDto()
-                                .setId(generatedUuid)
-                                .setDescription(sanitizeDescription(getFieldSafe(recordset, description, headerMap)))
-                                .setExpectedResult(getFieldSafe(recordset, expectedResult, headerMap))
-                                .setSteps(parseStepsSafe(getFieldSafe(recordset, steps, headerMap)))
-                                .setGroup(parseGroupsSafe(getFieldSafe(recordset, group, headerMap)))
-                                .setPriority(parsePrioritySafe(getFieldSafe(recordset, priority, headerMap)))
-                                .setReference(getFieldSafe(recordset, reference, headerMap))
-                                .setModule(getFieldSafe(recordset, module, headerMap))
-                                .setStatus(getFieldSafe(recordset, status, headerMap))
-                                .setCreatedBy(getFieldSafe(recordset, createdBy, headerMap))
-                                .setCreatedAt(parseDateSafe(getFieldSafe(recordset, createdAt, headerMap)))
-                                .setUpdatedBy(getFieldSafe(recordset, updatedBy, headerMap))
-                                .setUpdatedAt(parseDateSafe(getFieldSafe(recordset, updatedAt, headerMap)));
-
-                        filesToWrite.put(generatedUuid + ".json", mapper.writeValueAsString(testCaseDto));
+                        filesToWrite.put(testCaseDto.getId() + ".json", mapper.writeValueAsString(testCaseDto));
                         rowCount++;
 
                         if (rowCount % 50 == 0) {
                             indicator.setText2("Parsed " + rowCount + " test cases...");
                         }
-                    }
 
-                    recordset.close();
-                    connection.close();
+                    }
 
                     if (indicator.isCanceled()) {
                         Notifier.warn("Import Cancelled", "Import was cancelled by the user.");
@@ -241,12 +210,15 @@ public class ImportExcel extends DumbAwareAction {
                                     "\n(Tip: Ensure the file is completely closed in Microsoft Excel and try again.)\n"
                                     + ex.getMessage())
                     );
+                } finally {
+                    if (recordset != null) recordset.close();
+                    if (connection != null) connection.close();
                 }
             }
         });
     }
 
-    private Map<String, String> buildCaseInsensitiveHeaderMap(List<String> actualExcelColumns, List<String> requestedColumns) {
+    private Map<String, String> buildCaseInsensitiveHeaderMap(final List<String> actualExcelColumns, final List<String> requestedColumns) {
         Map<String, String> map = new HashMap<>();
         for (String requested : requestedColumns) {
             actualExcelColumns.stream()
@@ -257,7 +229,7 @@ public class ImportExcel extends DumbAwareAction {
         return map;
     }
 
-    private String getFieldSafe(final Recordset recordset, final String requestedFieldName, Map<String, String> headerMap) {
+    private String getFieldSafe(final Recordset recordset, final String requestedFieldName, final Map<String, String> headerMap) {
         try {
             String exactMatchedColumn = headerMap.get(requestedFieldName.toLowerCase());
 
@@ -273,13 +245,14 @@ public class ImportExcel extends DumbAwareAction {
         }
     }
 
-    private String sanitizeDescription(String rawDesc) {
+    // todo, move all below to Tools class
+    public String sanitizeDescription(final String rawDesc) {
         if (rawDesc == null || rawDesc.isBlank()) return "EMPTY_DESCRIPTION";
         String cleaned = SANITIZE_PATTERN.matcher(rawDesc).replaceAll("").trim();
         return cleaned.isEmpty() ? "EMPTY_DESCRIPTION" : cleaned;
     }
 
-    private List<String> parseStepsSafe(String stepsRaw) {
+    public List<String> parseStepsSafe(final String stepsRaw) {
         if (stepsRaw == null || stepsRaw.isBlank()) {
             return new ArrayList<>();
         }
@@ -296,7 +269,7 @@ public class ImportExcel extends DumbAwareAction {
                 .collect(Collectors.toList());
     }
 
-    private Priority parsePrioritySafe(String priorityStr) {
+    public Priority parsePrioritySafe(final String priorityStr) {
         if (priorityStr == null || priorityStr.isBlank()) {
             return Priority.LOW;
         }
@@ -307,7 +280,7 @@ public class ImportExcel extends DumbAwareAction {
         }
     }
 
-    private ZonedDateTime parseDateSafe(String dateStr) {
+    public ZonedDateTime parseDateSafe(final String dateStr) {
         if (dateStr == null || dateStr.isBlank()) {
             return ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         }
@@ -318,7 +291,7 @@ public class ImportExcel extends DumbAwareAction {
         }
     }
 
-    private List<Group> parseGroupsSafe(final String rawGroups) {
+    public List<Group> parseGroupsSafe(final String rawGroups) {
         if (rawGroups == null || rawGroups.isBlank()) {
             return new ArrayList<>();
         }

@@ -23,8 +23,11 @@ public enum TestEditorAttributes {
             "ID",
             true,
             false,
+            false,
             tc -> String.valueOf(tc.getId()),
-            null
+            null,
+            (action, tc, v) -> {
+            }
     ),
 
     /// TODO:: added to tool bar details, to be shown but disabled
@@ -32,64 +35,82 @@ public enum TestEditorAttributes {
             "Description",
             true,
             true,
+            true,
             TestCaseDto::getDescription,
-            null
+            null,
+            (action, tc, v) -> tc.setDescription(action.sanitizeDescription(v))
     ),
 
     EXPECTED_RESULT(
             "Expected Result",
             true,
             true,
+            true,
             TestCaseDto::getExpectedResult,
-            null
+            null,
+            (action, tc, v) -> tc.setExpectedResult(v)
     ),
 
     STEPS(
             "Steps",
             true,
             true,
+            true,
             tc -> String.join(", ", tc.getSteps()),
-            null
+            null,
+            (action, tc, v) -> tc.setSteps(action.parseStepsSafe(v))
     ),
 
     PRIORITY(
             "Priority",
             true,
             true,
+            true,
             tc -> tc.getPriority().getName(),
-            tc -> List.of(Shared.createPriorityBadge(tc))
+            tc -> List.of(Shared.createPriorityBadge(tc)),
+            (action, tc, v) -> tc.setPriority(action.parsePrioritySafe(v))
     ),
 
     FCQN(
             "FCQN",
             true,
             false,
+            false,
             tc -> String.join(".", tc.getFqcn()),
-            null
+            null,
+            (action, tc, v) -> {
+            }
     ),
 
     REFERENCE(
             "Reference",
             true,
             false,
+            true,
             TestCaseDto::getReference,
-            null
+            null,
+            (action, tc, v) -> tc.setReference(v)
     ),
 
     GROUP(
             "Group",
             true,
             true,
+            true,
             tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
-            tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList())
+            tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList()),
+            (action, tc, v) -> tc.setGroup(action.parseGroupsSafe(v))
     ),
 
     PATH(
             "Path",
             true,
             false,
+            false,
             tc -> String.join(" > ", tc.getPath()),
-            null
+            null,
+            (action, tc, v) -> {
+            }
     ),
 
     ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
@@ -98,56 +119,69 @@ public enum TestEditorAttributes {
             "Module",
             true,
             false,
+            true,
             TestCaseDto::getModule,
-            null
+            null,
+            (action, tc, v) -> tc.setModule(v)
     ),
 
     STATUS(
             "Status",
             true,
             false,
+            true,
             TestCaseDto::getTempStatus,
-            null
+            null,
+            (action, tc, v) -> tc.setStatus(v)
     ),
 
     CREATE_BY(
             "Created By",
             true,
             false,
+            true,
             TestCaseDto::getCreatedBy,
-            null
+            null,
+            (action, tc, v) -> tc.setCreatedBy(v)
     ),
 
     UPDATE_BY(
             "Updated By",
             true,
             false,
+            true,
             TestCaseDto::getUpdatedBy,
-            null
+            null,
+            (action, tc, v) -> tc.setUpdatedBy(v)
     ),
 
     CREATE_AT(
             "Created At",
             true,
             false,
+            true,
             tc -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
-            null
+            null,
+            (action, tc, v) -> tc.setCreatedAt(action.parseDateSafe(v))
     ),
 
     UPDATE_AT(
             "Updated At",
             true,
             false,
+            true,
             tc -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
-            null
+            null,
+            (action, tc, v) -> tc.setUpdatedAt(action.parseDateSafe(v))
     );
 
     private final String name;
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
-
+    private final boolean importValue;
     private final Function<TestCaseDto, String> valueExtractor;
     private final Function<TestCaseDto, List<JComponent>> drawItem;
+    private final ImportSetter importSetter;
 
     public void applyToUI(final TestCaseDto tc, final List<JComponent> badges, final Map<String, String> details) {
         if (drawItem != null) badges.addAll(drawItem.apply(tc));
