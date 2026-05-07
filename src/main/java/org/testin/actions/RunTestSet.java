@@ -49,7 +49,7 @@ public class RunTestSet extends DumbAwareAction {
 
         if (userObject instanceof TestSetDirectoryDto ts) {
             System.out.println(this.getClass() + "directory file: " + ts.getPath().toFile());
-            String fqcn = Tools.fileToFqcn(ts.getPath().toFile());
+            String fqcn = Tools.fileToFqcn(ts.getPath().toFile());  // todo, deprecated as there is an new enhanced method, should change all calls to the new later.
             System.out.println(this.getClass() + "fqcn path: " + fqcn);
 
             if (!fqcn.trim().isEmpty()) {

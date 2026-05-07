@@ -12,7 +12,6 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testCase.*;
 import org.testin.util.KeyboardSet;
 import org.testin.util.autoGenerator.CodeGenerator;
-import org.testin.util.autoGenerator.GeneratorType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,8 +21,8 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
 
     private JBPopup popup;
 
-    public UpdateTestCaseUI(final TestCaseDto existingDto, final UpdateTestCaseFields targetField, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
-        super(GeneratorType.UPDATE_TEST_CASE);
+    public UpdateTestCaseUI(final TestCaseDto existingDto, final UpdateTestCaseFields selectedItem, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
+        super(selectedItem.getChangeType());
 
         IUIAction repackPopup = () -> {
             if (popup != null) {
@@ -38,7 +37,7 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
             }
         };
 
-        ICreateTestCaseSection targetSection = targetField.getSectionExtractor().apply(this);
+        ICreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
 
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
@@ -99,14 +98,14 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        statusBarSection.updateItems(targetField.getStatusBarItems());
+        statusBarSection.updateItems(selectedItem.getStatusBarItems());
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
         popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
-                .setTitle("Update " + targetField.getName())
+                .setTitle("Update " + selectedItem.getName())
                 .setSettingButtons(codeGenerator)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)

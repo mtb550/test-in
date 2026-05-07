@@ -5,6 +5,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
@@ -14,11 +16,8 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.ui.RemoveTestCaseDialog;
 import org.testin.util.KeyboardSet;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
-import java.util.Objects;
 
 public class RemoveTestCase extends DumbAwareAction {
     private final DirectoryDto dir;
@@ -66,20 +65,33 @@ public class RemoveTestCase extends DumbAwareAction {
             saveToFile(predecessor);
         }
 
+        VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dir.getPath().toFile());
+        if (dirVFile == null) return;
+
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
             TestCaseDto tc = selectedItems.get(i);
-            File file = new File(dir.getPath().toFile(), tc.getId() + ".json");
-            if (file.exists()) {
-                Files.delete(file.toPath());
+
+            VirtualFile targetFile = dirVFile.findChild(tc.getId() + ".json");
+            if (targetFile != null) {
+                targetFile.delete(this);
             }
+
             model.remove(model.getElementIndex(tc));
         }
-
-        LocalFileSystem.getInstance().refreshIoFiles(List.of(Objects.requireNonNull(dir.getPath().toFile().listFiles())));
     }
 
     private void saveToFile(TestCaseDto item) throws IOException {
-        File file = new File(dir.getPath().toFile(), item.getId() + ".json");
-        Config.getMapper().writeValue(file, item);
+        VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dir.getPath().toFile());
+        if (dirVFile == null) return;
+
+        String fileName = item.getId() + ".json";
+        VirtualFile targetFile = dirVFile.findChild(fileName);
+
+        if (targetFile == null) {
+            targetFile = dirVFile.createChildData(this, fileName);
+        }
+
+        String jsonContent = Config.getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(item);
+        VfsUtil.saveText(targetFile, jsonContent);
     }
 }

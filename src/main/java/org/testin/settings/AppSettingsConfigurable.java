@@ -1,12 +1,13 @@
 package org.testin.settings;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.JBCheckBox;
@@ -25,10 +26,11 @@ import org.testin.projectPanel.projectSelector.RendererImpl;
 import org.testin.settings.service.ProjectPanelService;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
+import org.testin.util.notifications.Notifier;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
@@ -105,32 +107,40 @@ public class AppSettingsConfigurable implements Configurable {
         DirectoryDto selected = (DirectoryDto) projectComboBox.getSelectedItem();
         if (selected == null) return;
 
-        File oldDir = selected.getPath().toFile();
+        Path oldPath = selected.getPath();
         String currentFileName = selected.getName();
 
-        if (oldDir.exists() && currentFileName.contains("_")) { // todo, to be removed _ , no need after move project status logic to .pr.
-            String baseName = currentFileName.substring(0, currentFileName.lastIndexOf("_")); // todo, no need for _
+        if (Files.exists(oldPath) && currentFileName.contains("_")) { // todo, to be removed _ , no need after move project status logic to .pr.
+            String baseName = currentFileName.substring(0, currentFileName.lastIndexOf("_"));
             String newName = baseName + "_" + newProjectStatus.name(); //todo, no need for _
 
-            File newDir = new File(oldDir.getParent(), newName);
-            if (oldDir.renameTo(newDir)) {
-                refreshProjectList();
+            ApplicationManager.getApplication().runWriteAction(() -> {
+                try {
+                    VirtualFile oldDirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(oldPath.toFile());
+                    if (oldDirVFile != null) {
+                        oldDirVFile.rename(this, newName);
 
-                for (int i = 0; i < testProjectList.getSize(); i++) {
-                    if (testProjectList.getElementAt(i).getPathName().equals(newName)) {
-                        projectComboBox.setSelectedIndex(i);
-                        break;
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            refreshProjectList();
+
+                            for (int i = 0; i < testProjectList.getSize(); i++) {
+                                if (testProjectList.getElementAt(i).getPathName().equals(newName)) {
+                                    projectComboBox.setSelectedIndex(i);
+                                    break;
+                                }
+                            }
+
+                            ProjectPanel panel = ProjectPanelService.getInstance(Config.getProject()).getPanel();
+                            if (panel != null) {
+                                new Refresh(panel).execute();
+                                System.out.println("ToolWindow refresh triggered successfully.");
+                            }
+                        });
                     }
+                } catch (IOException ex) {
+                    Notifier.error("Status Update Failed", "Could not rename project directory: " + ex.getMessage());
                 }
-
-                VfsUtil.markDirtyAndRefresh(false, true, true, newDir);
-
-                ProjectPanel panel = ProjectPanelService.getInstance(Config.getProject()).getPanel();
-                if (panel != null) {
-                    new Refresh(panel).execute();
-                    System.out.println("ToolWindow refresh triggered successfully.");
-                }
-            }
+            });
         }
     }
 

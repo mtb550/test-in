@@ -12,6 +12,7 @@ import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testCase.TestCaseUpdateMenu;
 import org.testin.util.KeyboardSet;
+import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.util.services.TestCasePersistService;
 import org.testin.viewPanel.ViewPanel;
@@ -60,23 +61,22 @@ public class UpdateTestCase extends DumbAwareAction {
                 }
 
                 if (codeGenerator != null && codeGenerator.isSelected()) {
-                    System.out.println("TRACE [UpdateTestCase]: Code generator is selected! Change Type received: " + codeGenerator.getTypeOfChange());
+                    System.out.println("TRACE [UpdateTestCase]: Code generator is selected! Change Type received: " + codeGenerator.getGeneratorType());
 
                     // todo, all if statements here to be moved to enum class
-                    if (codeGenerator.getTypeOfChange() == 1) {
+                    if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_Description) {
                         System.out.println("TRACE [UpdateTestCase]: Routing to UpdateTestCaseDescription()...");
                         //new UpdateTestCaseDescription().execute(Config.getProject(), updatedItems.getFirst().getFqcn(), updatedItems.getFirst());
                         return;
                     }
 
-                    if (codeGenerator.getTypeOfChange() == 2) {
+                    if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT) {
                         System.out.println("TRACE [UpdateTestCase]: Routing to Update Expected Results (Type 2)...");
                         return;
                     }
 
-                    if (codeGenerator.getTypeOfChange() == 3) {
+                    if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_STEPS) {
                         System.out.println("TRACE [UpdateTestCase]: Routing to Update Steps (Type 3)...");
-                        return;
                     }
 
 //                    CreateJavaMethodInClass generator = new CreateJavaMethodInClass();

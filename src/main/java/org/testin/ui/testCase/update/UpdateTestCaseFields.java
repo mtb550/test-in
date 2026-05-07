@@ -10,6 +10,7 @@ import org.testin.ui.testCase.TestCaseUIBase;
 import org.testin.ui.testCase.update.bulk.*;
 import org.testin.util.KeyboardSet;
 import org.testin.util.autoGenerator.CodeGenerator;
+import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.statusBar.IStatusBarItem;
 
 import javax.swing.*;
@@ -25,7 +26,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
-            0,
+            null,
             null,
             null
     ),
@@ -36,7 +37,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
-            0,
+            null,
             null,
             null
     ),
@@ -47,7 +48,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
-            0,
+            null,
             null,
             null
     ),
@@ -58,7 +59,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
-            0,
+            null,
             null,
             null
     ),
@@ -69,7 +70,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
-            0,
+            null,
             null,
             null
     ),
@@ -80,18 +81,18 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             AllIcons.Actions.Edit,
             new IStatusBarItem[]{SAVE},
             true,
-            1, // todo, change to separate enum and call it here, UpdateTestCaseChangeType.UpdateDescritption
+            GeneratorType.UPDATE_TEST_CASE_Description,
             (items, updatedItems) -> new DescriptionBulkSection().show(items, updatedItems),
             TestCaseUIBase::getDescriptionSection
     ),
 
-    EXPECTED(
+    EXPECTED_RESULT(
             "Expected Results",
             KeyboardSet.UpdateTestCaseExpected,
             AllIcons.General.InspectionsOK,
             new IStatusBarItem[]{SAVE},
             true,
-            2, // todo, change to separate enum and call it here, UpdateTestCaseChangeType.UpdateExpectedResult
+            GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT,
             (items, updatedItems) -> new ExpectedBulkSection().show(items, updatedItems),
             TestCaseUIBase::getExpectedResultSection
     ),
@@ -102,7 +103,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
-            0,
+            null,
             null,
             null
     ),
@@ -113,7 +114,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             AllIcons.Actions.ListFiles,
             new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
             true,
-            3, // todo, change to separate enum and call it here, UpdateTestCaseChangeType.UpdateSteps
+            GeneratorType.UPDATE_TEST_CASE_STEPS,
             (items, updatedItems) -> new StepsBulkSection().show(items, updatedItems),
             TestCaseUIBase::getStepsSection
     ),
@@ -124,7 +125,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
-            0,
+            null,
             null,
             null
     ),
@@ -135,7 +136,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             AllIcons.Nodes.Favorite,
             new IStatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
             true,
-            4,// todo, change to separate enum and call it here, UpdateTestCaseChangeType.UpdatePriority
+            GeneratorType.UPDATE_TEST_CASE_PRIORITY,
             (items, updatedItems) -> new PriorityBulkSection().show(items, updatedItems),
             TestCaseUIBase::getPrioritySection
     ),
@@ -146,7 +147,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             null,
             new IStatusBarItem[]{},
             false,
-            0,
+            null,
             null,
             null
     ),
@@ -157,7 +158,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             AllIcons.Nodes.Tag,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
-            5, // todo, change to separate enum and call it here, UpdateTestCaseChangeType.UpdateGroup
+            GeneratorType.UPDATE_TEST_CASE_GROUP,
             (items, updatedItems) -> new GroupBulkSection().show(items, updatedItems),
             TestCaseUIBase::getGroupSection
     );
@@ -168,11 +169,11 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     private final Icon icon;
     private final IStatusBarItem[] statusBarItems;
     private final boolean editMenuItem;
-    private final int changeType;
+    private final GeneratorType changeType;
     private final IBulkEditorAction bulkAction;
     private final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor;
 
-    UpdateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean editMenuItem, final int changeType, final IBulkEditorAction bulkAction, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean editMenuItem, final GeneratorType changeType, final IBulkEditorAction bulkAction, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = shortcut;
         this.customShortcutText = null;
@@ -184,7 +185,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
         this.sectionExtractor = sectionExtractor;
     }
 
-    UpdateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean editMenuItem, final int changeType, final IBulkEditorAction bulkAction, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean editMenuItem, final GeneratorType changeType, final IBulkEditorAction bulkAction, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;

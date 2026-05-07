@@ -12,7 +12,7 @@ public enum GeneratorType {
 
     CREATE_TEST_SET(
             "Create Test Set",
-            "Create Automation Test Set",
+            "Create Automation Test Class",
             new CreateTestSet()
     ),
 
@@ -24,13 +24,43 @@ public enum GeneratorType {
 
     CREATE_TEST_CASE(
             "Create Test Case",
-            "Create Automation Test Case",
+            "Create Automation Test Method",
             new CreateTestCase()
     ),
 
-    UPDATE_TEST_CASE(
+    UPDATE_TEST_CASE_Description(
             "Update Test Case",
-            "Update Automation Test Case",
+            "Update Automation Test Method Description & Name",
+            new UpdateTestCase()
+    ),
+
+    UPDATE_TEST_CASE_EXPECTED_RESULT(
+            "Update Test Case",
+            "Update Automation Test Method Expected Result",
+            new UpdateTestCase()
+    ),
+
+    UPDATE_TEST_CASE_STEPS(
+            "Update Test Case",
+            "Update Automation Test Method Steps",
+            new UpdateTestCase()
+    ),
+
+    UPDATE_TEST_CASE_GROUP(
+            "Update Test Case",
+            "Update Automation Test Method Group",
+            new UpdateTestCase()
+    ),
+
+    UPDATE_TEST_CASE_PRIORITY(
+            "Update Test Case",
+            "Update Automation Test Method Priority",
+            new UpdateTestCase()
+    ),
+
+    UPDATE_TEST_CASE_ORDER(
+            "Update Test Case",
+            "Update Automation Test Method Order",
             new UpdateTestCase()
     );
 

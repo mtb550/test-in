@@ -16,6 +16,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testCase.update.UpdateTestCaseFields;
 import org.testin.ui.testCase.update.UpdateTestCaseUI;
 import org.testin.util.autoGenerator.CodeGenerator;
+import org.testin.util.autoGenerator.GeneratorType;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -41,23 +42,25 @@ public class TestCaseUpdateMenu {
 
         showMenu(title, selectedItem -> {
 
-            int targetChangeType = selectedItem.getChangeType();
+            final GeneratorType targetChangeType = selectedItem.getChangeType();
             System.out.println("TRACE [TestCaseUpdateMenu]: Menu item selected -> " + selectedItem.getName() + " | changeType = " + targetChangeType);
 
             if (isSingle) {
                 new UpdateTestCaseUI(items.getFirst(), selectedItem, (tc, codeGenerator) -> {
+                    codeGenerator = new CodeGenerator(targetChangeType);
+                    codeGenerator.setGeneratorType(targetChangeType);
 
-                    codeGenerator.setTypeOfChange(targetChangeType);
-                    System.out.println("TRACE [TestCaseUpdateMenu]: Single Edit Save -> Injecting changeType " + codeGenerator.getTypeOfChange() + " into UI's CodeGenerator.");
-
+                    System.out.println("TRACE [TestCaseUpdateMenu]: Single Edit Save -> Injecting changeType " + codeGenerator.getGeneratorType() + " into UI's CodeGenerator.");
                     updatedItems.accept(items, codeGenerator);
 
                 }).show();
 
             } else {
                 selectedItem.getBulkAction().show(items, (list, codeGenerator) -> {
+                    codeGenerator = new CodeGenerator(targetChangeType);
+                    codeGenerator.setGeneratorType(targetChangeType);
 
-                    System.out.println("TRACE [TestCaseUpdateMenu]: Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + codeGenerator.getTypeOfChange());
+                    System.out.println("TRACE [TestCaseUpdateMenu]: Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + codeGenerator.getGeneratorType());
                     updatedItems.accept(list, codeGenerator);
                 });
             }

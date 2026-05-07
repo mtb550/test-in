@@ -14,11 +14,7 @@ public class CodeGenerator extends JBCheckBox {
 
     @Getter
     @Setter
-    private int change; // todo, here to put the type of update -> group or priority so you can assign the proper update class based on that
-
-    @Getter
-    @Setter
-    private int typeOfChange; // todo, here to put the type of update -> group or priority so you can assign the proper update class based on that
+    private GeneratorType generatorType;
 
     public CodeGenerator(final GeneratorType generatorType) {
         if (generatorType != null)
