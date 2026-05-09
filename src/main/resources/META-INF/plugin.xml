@@ -58,7 +58,7 @@
                 id="testin.tree"
                 factoryClass="org.testin.projectPanel.Main"
                 anchor="left"
-                icon="/icons/pluginIcon.svg"
+                icon="pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -67,7 +67,7 @@
                 id="testin.view"
                 factoryClass="org.testin.viewPanel.ViewToolWindowFactory"
                 anchor="right"
-                icon="/icons/pluginIcon.svg"
+                icon="pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />

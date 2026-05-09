@@ -210,6 +210,7 @@ public class ImportExcel extends DumbAwareAction {
                     indicator.setText("Mapping column headers...");
                     Map<String, String> headerMap = buildCaseInsensitiveHeaderMap(recordset.getFieldNames(), IMPORT_COLUMNS);
                     Map<String, String> filesToWrite = new LinkedHashMap<>();
+                    List<TestCaseDto> previewList = new ArrayList<>();
 
                     TestCaseDto previousTestCase = null;
                     int rowCount = 0;
@@ -227,6 +228,8 @@ public class ImportExcel extends DumbAwareAction {
                                 attr.getImportSetter().accept(ImportExcel.this, currentTestCase, rawValue);
                             }
                         }
+
+                        previewList.add(currentTestCase);
 
                         if (previousTestCase == null) currentTestCase.setIsHead(true);
                         else {
@@ -253,22 +256,32 @@ public class ImportExcel extends DumbAwareAction {
                         return;
                     }
 
-                    indicator.setText("Writing JSON files to disk...");
+                    indicator.setText("Waiting for user confirmation...");
                     indicator.setText2("");
 
-                    ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-                        for (Map.Entry<String, String> entry : filesToWrite.entrySet()) {
-                            try {
-                                VirtualFile newJsonFile = targetDirectory.createChildData(this, entry.getKey());
-                                newJsonFile.setBinaryContent(entry.getValue().getBytes(StandardCharsets.UTF_8));
-                            } catch (IOException ex) {
-                                System.err.println("Failed to write file: " + entry.getKey());
-                            }
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        ExcelPreviewDialog dialog = new ExcelPreviewDialog(Config.getProject(), previewList);
+
+                        if (dialog.showAndGet()) {
+
+                            ApplicationManager.getApplication().runWriteAction(() -> {
+                                for (Map.Entry<String, String> entry : filesToWrite.entrySet()) {
+                                    try {
+                                        VirtualFile newJsonFile = targetDirectory.createChildData(this, entry.getKey());
+                                        newJsonFile.setBinaryContent(entry.getValue().getBytes(StandardCharsets.UTF_8));
+                                    } catch (IOException ex) {
+                                        System.err.println("Failed to write file: " + entry.getKey());
+                                    }
+                                }
+                                Notifier.info("Import Complete", "Successfully imported " + filesToWrite.size() + " test cases.");
+                                targetDirectory.refresh(false, true);
+                                Tools.getInstance().closeThenOpenTestEditor(targetDirectory, ts);
+                            });
+
+                        } else {
+                            Notifier.info("Import Cancelled", "Import was cancelled from preview dialog.");
                         }
-                        Notifier.info("Import Complete", "Successfully imported " + filesToWrite.size() + " test cases.");
-                        targetDirectory.refresh(false, true);
-                        Tools.getInstance().closeThenOpenTestEditor(targetDirectory, ts);
-                    }));
+                    });
 
                 } catch (Exception ex) {
                     System.err.println("Import crashed: " + ex.getMessage());
