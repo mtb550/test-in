@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.testCaseEditor.TestEditor;
 import org.testin.editorPanel.testRunEditor.RunEditor;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
@@ -42,7 +41,7 @@ public class Open extends DumbAwareAction {
 
             System.out.println("Opening Test Set: " + pkg.getPath());
             if (pkg instanceof TestSetDirectoryDto ts)
-                TestEditor.open(ts);
+                Tools.getInstance().openTestEditor(ts);
 
             if (pkg instanceof TestRunDirectoryDto tr)
                 RunEditor.open(tr, projectPanel);

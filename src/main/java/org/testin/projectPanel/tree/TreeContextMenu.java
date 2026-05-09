@@ -46,9 +46,9 @@ public class TreeContextMenu extends DefaultActionGroup {
         ));
 
         add(createSubGroup("Import", AllIcons.ToolbarDecorator.Import,
-                List.of(new ImportCsv(),
+                List.of(new ImportCsv(tree),
                         new ImportExcel(tree),
-                        new ImportJson())
+                        new ImportJson(tree))
         ));
 
         add(createSubGroup("Integrate", AllIcons.Nodes.Related,

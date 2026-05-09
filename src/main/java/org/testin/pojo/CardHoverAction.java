@@ -37,12 +37,12 @@ public enum CardHoverAction {
     PENDING("Pending Status",
             new JBColor(new Color(128, 128, 128, 40), new Color(128, 128, 128, 60)),
             JBColor.GRAY
-    ),
+    );
 
-    UNTESTED("Untested Status", // todo, added by still not applied
+    /*UNTESTED("Untested Status", // todo, added by still not applied
             new JBColor(new Color(128, 128, 128, 40), new Color(128, 128, 128, 60)),
             JBColor.GRAY
-    );
+    );*/
 
     private final String tooltip;
     private final JBColor background;

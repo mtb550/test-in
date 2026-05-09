@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class RunEditor {
-
+    // todo, remove static & move to tools class (singleton)
     public static void open(final TestRunDirectoryDto tr, final ProjectPanel projectPanel) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {

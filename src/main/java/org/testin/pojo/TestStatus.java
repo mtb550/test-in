@@ -34,14 +34,14 @@ public enum TestStatus {
             " [Pending]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             CardHoverAction.PENDING
-    ),
+    );
 
-    UNTESTED(
+    /*UNTESTED(
             "808080", // todo, added by still not applied
             " [Untested]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             CardHoverAction.UNTESTED
-    );
+    );*/
 
     private final String hex;
     private final String displayText;

@@ -11,7 +11,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editorPanel.testCaseEditor.TestEditor;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
@@ -94,7 +93,7 @@ public class NavigationBar extends BaseDetails {
                             final TestSetDirectoryDto ts = new TestSetDirectoryDto();
                             ts.setPath(file.toPath());
                             ts.setName(file.getName());
-                            TestEditor.open(ts);
+                            Tools.getInstance().openTestEditor(ts);
                         } else {
                             ProjectView.getInstance(project).select(null, vf, true);
                         }

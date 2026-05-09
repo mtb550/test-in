@@ -377,4 +377,20 @@ public class ImportExcel extends DumbAwareAction {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        final TreePath path = tree.getSelectionPath();
+        final int selectionCount = tree.getSelectionCount();
+
+        if (selectionCount != 1 || path == null) {
+            e.getPresentation().setEnabled(false);
+            return;
+        }
+
+        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final Object userObject = selectedNode.getUserObject();
+
+        e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto);
+    }
 }

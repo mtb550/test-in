@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
-import org.testin.editorPanel.testCaseEditor.TestEditor;
+import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.dirs.DirectoryDto;
@@ -35,6 +35,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Tools {
@@ -508,11 +509,20 @@ public class Tools {
             }
 
             if (fileToOpen == null) {
-                TestEditor.open(ts);
+                openTestEditor(ts);
                 return;
             }
 
             editorManager.openFile(fileToOpen, true);
         });
+    }
+
+    public void openTestEditor(final TestSetDirectoryDto ts) {
+        final UnifiedVirtualFile newVirtualFile = new UnifiedVirtualFile(ts, new ArrayList<>());
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Optional.ofNullable(FileEditorManager.getInstance(Config.getProject()))
+                        .ifPresent(editorManager -> editorManager.openFile(newVirtualFile, true))
+        );
     }
 }

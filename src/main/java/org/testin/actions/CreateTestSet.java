@@ -1,7 +1,6 @@
 package org.testin.actions;
 
 import com.intellij.openapi.project.Project;
-import org.testin.editorPanel.testCaseEditor.TestEditor;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.NodeCreator;
 import org.testin.pojo.dto.dirs.DirectoryDto;
@@ -25,6 +24,6 @@ public class CreateTestSet implements NodeCreator {
         TreeUtilImpl.createNode(action.getTree(), parentNode, newTestSetDirectory);
 
         Tools.getInstance().createJavaClassInTestRoot(project, parentDir.getName(), name);
-        TestEditor.open(newTestSetDirectory);
+        Tools.getInstance().openTestEditor(newTestSetDirectory);
     }
 }
