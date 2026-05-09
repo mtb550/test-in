@@ -24,12 +24,14 @@ import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.util.Tools;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -57,7 +59,8 @@ public class ImportExcel extends DumbAwareAction {
                             
                             %s
                             
-                            Note: Missing columns will safely default to empty values.""",
+                            Note: Missing columns will safely default to empty values.
+                            You can also download a ready-to-use sample file using the button below.""",
                     String.join("\n ", IMPORT_COLUMNS));
 
     private final SimpleTree tree;
@@ -76,8 +79,8 @@ public class ImportExcel extends DumbAwareAction {
             return;
         }
 
-        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = parentNode.getUserObject();
+        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final Object userObject = parentNode.getUserObject();
 
         if (!(userObject instanceof TestSetDirectoryDto ts)) {
             Notifier.error("Import Error", "Please select a valid TS Directory.");
@@ -95,19 +98,23 @@ public class ImportExcel extends DumbAwareAction {
             return;
         }
 
-        int userChoice = Messages.showOkCancelDialog(
+        int userChoice = Messages.showDialog(
                 e.getProject(),
                 EXCEL_INFO_MESSAGE,
                 "Excel Import Requirements",
-                "Choose File...",
-                "Cancel",
+                new String[]{"Choose File...", "Download Sample", "Cancel"},
+                0,
                 Messages.getInformationIcon()
         );
 
-        if (userChoice != Messages.OK) {
-            return;
+        if (userChoice == 0) {
+            openFileChooserAndProcess(targetDirectory);
+        } else if (userChoice == 1) {
+            downloadSampleFile(e);
         }
+    }
 
+    private void openFileChooserAndProcess(VirtualFile targetDirectory) {
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withTitle("Select Spreadsheet File")
                 .withDescription("Please choose an .xls or .xlsx file")
@@ -121,6 +128,49 @@ public class ImportExcel extends DumbAwareAction {
         if (selectedFile != null) {
             processWithFillo(selectedFile.getPath(), targetDirectory);
         }
+    }
+
+    // todo, to be removed and use Tools.getTestSourceRoot
+    private void downloadSampleFile(AnActionEvent e) {
+        if (e.getProject() == null) return;
+
+        VirtualFile projectDir = LocalFileSystem.getInstance().findFileByPath(Objects.requireNonNull(e.getProject().getBasePath()));
+
+        if (projectDir == null) {
+            Notifier.error("Error", "Could not find the project directory.");
+            return;
+        }
+
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            try (InputStream in = getClass().getResourceAsStream("/files/import_sample.xls")) {
+
+                if (in == null) {
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Notifier.error("File Error", "Sample file not found inside the plugin resources!"));
+                    return;
+                }
+
+                byte[] bytes = in.readAllBytes();
+
+                VirtualFile newFile = projectDir.findChild("import_sample.xls");
+                if (newFile == null) {
+                    newFile = projectDir.createChildData(this, "import_sample.xls");
+                }
+
+                newFile.setBinaryContent(bytes);
+
+                final VirtualFile fileToOpen = newFile;
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    Tools.openWithAssociatedProgram(fileToOpen);
+                    Notifier.info("Sample Ready", "Sample file has been added to your project and opened in Excel.");
+                });
+
+            } catch (Exception ex) {
+                ApplicationManager.getApplication().invokeLater(() ->
+                        Notifier.error("Download Error", "Failed to save sample file: " + ex.getMessage()));
+            }
+        });
     }
 
     private void processWithFillo(final String filePath, final VirtualFile targetDirectory) {
@@ -144,7 +194,6 @@ public class ImportExcel extends DumbAwareAction {
                 Connection connection = null;
                 Recordset recordset = null;
                 try {
-                    // todo, implement order.
                     // todo, expected result is not arranged if it is multi lines. to be fixed.
                     // todo, if import, we need generate code context menu, to generate all in one click.
                     // todo, filter by module in status bar
@@ -158,6 +207,8 @@ public class ImportExcel extends DumbAwareAction {
                     indicator.setText("Mapping column headers...");
                     Map<String, String> headerMap = buildCaseInsensitiveHeaderMap(recordset.getFieldNames(), IMPORT_COLUMNS);
                     Map<String, String> filesToWrite = new LinkedHashMap<>();
+
+                    TestCaseDto previousTestCase = null;
                     int rowCount = 0;
 
                     indicator.setText("Parsing rows into JSON...");
@@ -165,16 +216,24 @@ public class ImportExcel extends DumbAwareAction {
                     while (recordset.next()) {
                         if (indicator.isCanceled()) break;
 
-                        final TestCaseDto testCaseDto = new TestCaseDto().setId(UUID.randomUUID());
+                        final TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
 
                         for (TestEditorAttributes attr : TestEditorAttributes.values()) {
                             if (attr.isImportValue()) {
                                 String rawValue = getFieldSafe(recordset, attr.getName(), headerMap);
-                                attr.getImportSetter().accept(ImportExcel.this, testCaseDto, rawValue);
+                                attr.getImportSetter().accept(ImportExcel.this, currentTestCase, rawValue);
                             }
                         }
 
-                        filesToWrite.put(testCaseDto.getId() + ".json", mapper.writeValueAsString(testCaseDto));
+                        if (previousTestCase == null) currentTestCase.setIsHead(true);
+                        else {
+                            currentTestCase.setIsHead(null);
+                            previousTestCase.setNext(currentTestCase.getId());
+                            filesToWrite.put(previousTestCase.getId() + ".json", mapper.writeValueAsString(previousTestCase));
+                        }
+                        currentTestCase.setNext(null);
+                        previousTestCase = currentTestCase;
+
                         rowCount++;
 
                         if (rowCount % 50 == 0) {
@@ -182,6 +241,9 @@ public class ImportExcel extends DumbAwareAction {
                         }
 
                     }
+
+                    if (previousTestCase != null && !indicator.isCanceled())
+                        filesToWrite.put(previousTestCase.getId() + ".json", mapper.writeValueAsString(previousTestCase));
 
                     if (indicator.isCanceled()) {
                         Notifier.warn("Import Cancelled", "Import was cancelled by the user.");
@@ -224,7 +286,7 @@ public class ImportExcel extends DumbAwareAction {
             actualExcelColumns.stream()
                     .filter(excelCol -> excelCol.equalsIgnoreCase(requested))
                     .findFirst()
-                    .ifPresent(actualCasing -> map.put(requested, actualCasing));
+                    .ifPresent(actualCasing -> map.put(requested.toLowerCase(), actualCasing));
         }
         return map;
     }

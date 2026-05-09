@@ -343,3 +343,6 @@ remain enhancements for create new node ui.
 add status bar to create new node shows: enter:save scape:cancel.
 regex, no dot or special chars.
 apply check box once update test case.
+
+
+add: update module to the update test case menu.

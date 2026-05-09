@@ -19,10 +19,13 @@ import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.settings.AppSettingsState;
+import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -443,6 +446,37 @@ public class Tools {
             }
         }
         return pascalCase.toString();
+    }
+
+    public static void openWithAssociatedProgram(VirtualFile virtualFile) {
+        if (virtualFile == null || !virtualFile.exists()) {
+            Notifier.error("Open Error", "The file does not exist.");
+            return;
+        }
+
+        File file = new File(virtualFile.getPath());
+
+        if (!Desktop.isDesktopSupported()) {
+            Notifier.error("System Error", "Desktop operations are not supported on this system.");
+            return;
+        }
+
+        Desktop desktop = Desktop.getDesktop();
+
+        if (!desktop.isSupported(Desktop.Action.OPEN)) {
+            Notifier.error("System Error", "The 'Open' action is not supported on this system.");
+            return;
+        }
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            try {
+                desktop.open(file);
+            } catch (IOException e) {
+                ApplicationManager.getApplication().invokeLater(() ->
+                        Notifier.error("Execution Error", "Failed to open the file: " + e.getMessage())
+                );
+            }
+        });
     }
 
 
