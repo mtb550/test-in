@@ -83,7 +83,7 @@ public class ImportExcel extends DumbAwareAction {
         final Object userObject = parentNode.getUserObject();
 
         if (!(userObject instanceof TestSetDirectoryDto ts)) {
-            Notifier.error("Import Error", "Please select a valid TS Directory.");
+            Notifier.error("Import Error", "Please select a valid Test Set Node.");
             return;
         }
 
@@ -108,25 +108,28 @@ public class ImportExcel extends DumbAwareAction {
         );
 
         if (userChoice == 0) {
-            openFileChooserAndProcess(targetDirectory);
+            openFileChooserAndProcess(targetDirectory, ts);
         } else if (userChoice == 1) {
             downloadSampleFile(e);
         }
     }
 
-    private void openFileChooserAndProcess(VirtualFile targetDirectory) {
+    private void openFileChooserAndProcess(final VirtualFile targetDirectory, final TestSetDirectoryDto ts) {
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withTitle("Select Spreadsheet File")
-                .withDescription("Please choose an .xls or .xlsx file")
-                .withFileFilter(virtualFile -> {
-                    String ext = virtualFile.getExtension();
-                    return "xlsx".equalsIgnoreCase(ext) || "xls".equalsIgnoreCase(ext);
-                });
+                .withDescription("Please choose an .xls file");
 
         final VirtualFile selectedFile = FileChooser.chooseFile(descriptor, Config.getProject(), null);
 
         if (selectedFile != null) {
-            processWithFillo(selectedFile.getPath(), targetDirectory);
+            if (!"xls".equalsIgnoreCase(selectedFile.getExtension())) {
+                ApplicationManager.getApplication().invokeLater(() -> Notifier.error("Invalid File Format",
+                        "Only '.xls' files are allowed.\n\n" +
+                                "You selected an '." + selectedFile.getExtension() + "' file.\n" +
+                                "Please save your Excel file as 'Excel 97-2003 Workbook (*.xls)' and try again."));
+                return;
+            }
+            processWithFillo(selectedFile.getPath(), targetDirectory, ts);
         }
     }
 
@@ -173,7 +176,7 @@ public class ImportExcel extends DumbAwareAction {
         });
     }
 
-    private void processWithFillo(final String filePath, final VirtualFile targetDirectory) {
+    private void processWithFillo(final String filePath, final VirtualFile targetDirectory, final TestSetDirectoryDto ts) {
         File file = new File(filePath);
         if (!file.exists() || !file.canRead()) {
             Notifier.error("File Error", "Java cannot read this file!");
@@ -263,6 +266,8 @@ public class ImportExcel extends DumbAwareAction {
                             }
                         }
                         Notifier.info("Import Complete", "Successfully imported " + filesToWrite.size() + " test cases.");
+                        targetDirectory.refresh(false, true);
+                        Tools.getInstance().closeThenOpenTestEditor(targetDirectory, ts);
                     }));
 
                 } catch (Exception ex) {

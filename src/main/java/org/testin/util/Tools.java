@@ -17,9 +17,11 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.jps.model.java.JavaSourceRootType;
+import org.testin.editorPanel.testCaseEditor.TestEditor;
 import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.settings.AppSettingsState;
 import org.testin.util.notifications.Notifier;
 
@@ -485,6 +487,32 @@ public class Tools {
                         Notifier.error("Execution Error", "Failed to open the file: " + e.getMessage())
                 );
             }
+        });
+    }
+
+    public void closeThenOpenTestEditor(final VirtualFile targetDirectory, final TestSetDirectoryDto ts) {
+        if (targetDirectory == null || ts == null) return;
+
+        final Project project = Config.getProject();
+        final FileEditorManager editorManager = FileEditorManager.getInstance(project);
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            VirtualFile fileToOpen = null;
+
+            for (VirtualFile openFile : editorManager.getOpenFiles()) {
+                if (openFile.getName().equals(targetDirectory.getName())) {
+                    fileToOpen = openFile;
+                    editorManager.closeFile(openFile);
+                    break;
+                }
+            }
+
+            if (fileToOpen == null) {
+                TestEditor.open(ts);
+                return;
+            }
+
+            editorManager.openFile(fileToOpen, true);
         });
     }
 }
