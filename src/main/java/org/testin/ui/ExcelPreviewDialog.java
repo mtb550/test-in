@@ -175,6 +175,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
             } catch (IllegalArgumentException ignored) {
             }
 
+            int tableTotalWidth = 0;
             for (int i = 0; i < table.getColumnCount(); i++) {
                 TableColumn col = table.getColumnModel().getColumn(i);
                 int maxWidth = 0;
@@ -193,9 +194,17 @@ public class ExcelPreviewDialog extends DialogWrapper {
                 }
 
                 maxWidth += 20;
-
                 col.setPreferredWidth(maxWidth);
+                tableTotalWidth += maxWidth;
             }
+
+            int tableTotalHeight = table.getRowHeight() * Math.max(3, table.getRowCount());
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+            table.setPreferredScrollableViewportSize(new Dimension(
+                    Math.min(tableTotalWidth, (int) (screenSize.width * 0.85)),
+                    Math.min(tableTotalHeight, (int) (screenSize.height * 0.70))
+            ));
 
             JBScrollPane scrollPane = new JBScrollPane(table);
             tabbedPane.addTab(sheetName, scrollPane);

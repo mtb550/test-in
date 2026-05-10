@@ -210,6 +210,10 @@ public class ImportExcel extends DumbAwareAction {
                     indicator.setText("Parsing rows into JSON...");
 
                     for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+
+                        if (workbook.isSheetHidden(i) || workbook.isSheetVeryHidden(i))
+                            continue;
+
                         Sheet sheet = workbook.getSheetAt(i);
                         String sheetName = sheet.getSheetName();
 
