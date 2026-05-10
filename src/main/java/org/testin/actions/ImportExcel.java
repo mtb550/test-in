@@ -25,7 +25,6 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.ui.ExcelPreviewDialog;
 import org.testin.util.Tools;
-import org.testin.util.TreeUtilImpl;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -324,25 +323,10 @@ public class ImportExcel extends DumbAwareAction {
                                     } else {
                                         int totalImported = 0;
                                         for (Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
-                                            String safeDirName = entry.getKey().replaceAll("[\\\\/:*?\"<>|]", "_");
+                                            String rawSheetName = entry.getKey();
                                             List<TestCaseDto> sheetCases = entry.getValue();
 
-                                            VirtualFile sheetDir = targetDirectory.findChild(safeDirName);
-                                            if (sheetDir == null) {
-
-                                                sheetDir = targetDirectory.createChildDirectory(this, safeDirName);
-
-                                                TestSetDirectoryDto newTsDto = new TestSetDirectoryDto()
-                                                        .setName(safeDirName)
-                                                        .setPath(selectedDirDto.getPath().resolve(safeDirName));
-
-                                                TreeUtilImpl.createNode(tree, parentNode, newTsDto);
-                                                Tools.getInstance().createJavaClassInTestRoot(Config.getProject(), selectedDirDto.getName(), safeDirName);
-                                            }
-
-                                            if (sheetDir.findChild(".ts") == null) {
-                                                sheetDir.createChildData(this, ".ts");
-                                            }
+                                            VirtualFile sheetDir = new CreateTestSet().inBackground(ImportExcel.this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
 
                                             TestCaseDto tail = findExistingTail(sheetDir, mapper);
                                             linkAndSaveTestCases(sheetDir, sheetCases, tail, mapper, ImportExcel.this);
