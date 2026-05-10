@@ -11,7 +11,11 @@ import org.testin.pojo.dto.TestCaseDto;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,12 +40,12 @@ public class ExcelPreviewDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JPanel panel = new JPanel(new BorderLayout(0, 10));
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setPreferredSize(new Dimension(900, 450));
 
         JBTabbedPane tabbedPane = new JBTabbedPane();
 
-        String[] columns = {"Import", "#", "Description", "Priority", "Expected Result", "Steps Count"};
+        String[] columns = {"", "#", "Description", "Priority", "Expected Result", "Steps Count"};
 
         for (Map.Entry<String, List<TestCaseDto>> entry : originalSheetsData.entrySet()) {
             String sheetName = entry.getKey();
@@ -94,36 +98,49 @@ public class ExcelPreviewDialog extends DialogWrapper {
             table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
             table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
-            table.getColumnModel().getColumn(0).setMaxWidth(60);
+            TableColumn importColumn = table.getColumnModel().getColumn(0);
+            importColumn.setMaxWidth(60);
+            importColumn.setMinWidth(60);
+
+            JCheckBox headerCheckbox = new JCheckBox();
+            headerCheckbox.setSelected(true);
+            headerCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
+            headerCheckbox.setToolTipText("Select All / Deselect All");
+
+            importColumn.setHeaderRenderer((t, value, isSelected, hasFocus, row, column) -> {
+
+                JTableHeader header = t.getTableHeader();
+                headerCheckbox.setBackground(header.getBackground());
+                headerCheckbox.setForeground(header.getForeground());
+                headerCheckbox.setFont(header.getFont());
+                headerCheckbox.setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+                return headerCheckbox;
+            });
+
+            table.getTableHeader().addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    int col = table.columnAtPoint(e.getPoint());
+                    if (col == 0) {
+                        boolean newState = !headerCheckbox.isSelected();
+                        headerCheckbox.setSelected(newState);
+
+                        for (int i = 0; i < model.getRowCount(); i++) {
+                            model.setValueAt(newState, i, 0);
+                        }
+
+                        table.getTableHeader().repaint();
+                    }
+                }
+            });
+
             table.getColumnModel().getColumn(1).setMaxWidth(50);
+
             JBScrollPane scrollPane = new JBScrollPane(table);
             tabbedPane.addTab(sheetName, scrollPane);
         }
 
         panel.add(tabbedPane, BorderLayout.CENTER);
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JButton toggleAllButton = new JButton("Toggle All Selections");
-        toggleAllButton.addActionListener(e -> {
-            Component selectedComponent = tabbedPane.getSelectedComponent();
-            if (selectedComponent instanceof JBScrollPane scrollPane) {
-                JViewport viewport = scrollPane.getViewport();
-                if (viewport.getView() instanceof JBTable table) {
-                    DefaultTableModel currentModel = (DefaultTableModel) table.getModel();
-                    boolean newState = true;
-
-                    if (currentModel.getRowCount() > 0) {
-                        newState = !((Boolean) currentModel.getValueAt(0, 0));
-                    }
-
-                    for (int i = 0; i < currentModel.getRowCount(); i++) {
-                        currentModel.setValueAt(newState, i, 0);
-                    }
-                }
-            }
-        });
-        bottomPanel.add(toggleAllButton);
-        panel.add(bottomPanel, BorderLayout.SOUTH);
 
         return panel;
     }

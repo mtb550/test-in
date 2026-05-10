@@ -300,7 +300,7 @@ public class ImportExcel extends DumbAwareAction {
                             List<TestCaseDto> selectedCasesToImport = dialog.getSelectedTestCases();
 
                             if (selectedCasesToImport.isEmpty()) {
-                                Notifier.getInstance().warn("No Selection", "No test cases were selected for import.");
+                                Notifier.getInstance().softShow("No Selection", "No test cases were selected for import.");
                                 return;
                             }
 
