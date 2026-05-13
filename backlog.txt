@@ -346,3 +346,5 @@ apply check box once update test case.
 
 
 add: update module to the update test case menu.
+
+test cases repository options: local server and connect via ssh, git source, ftp server, nosql db,
