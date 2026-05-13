@@ -123,7 +123,7 @@ public class ExportExcel extends DumbAwareAction {
                         }
 
                         while (workbook.getSheet(safeSheetName) != null) {
-                            safeSheetName = safeSheetName.substring(0, 28) + "..." ;
+                            safeSheetName = safeSheetName.substring(0, 28) + "...";
                         }
 
                         Sheet sheet = workbook.createSheet(safeSheetName);

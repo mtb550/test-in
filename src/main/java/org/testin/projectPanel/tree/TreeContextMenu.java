@@ -42,7 +42,7 @@ public class TreeContextMenu extends DefaultActionGroup {
                 List.of(new ExportCsv(),
                         new ExportHtml(),
                         new ExportExcel(tree),
-                        new ExportJson())
+                        new ExportJson(tree))
         ));
 
         add(createSubGroup("Import", AllIcons.ToolbarDecorator.Import,

@@ -31,6 +31,7 @@ public class TestCaseDto {
 
     @NonNull
     @Builder.Default
+    @JsonIgnore
     private List<String> path = new ArrayList<>();
 
     @NonNull
