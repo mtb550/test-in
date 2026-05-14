@@ -118,7 +118,14 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         if (this.metadata != null) {
             this.resultsMap = this.metadata.getResults().stream()
-                    .collect(Collectors.toMap(TestRunDto.TestRunItems::getTestCaseId, item -> item));
+                    .collect(Collectors.toMap(
+                            TestRunDto.TestRunItems::getTestCaseId,
+                            item -> item,
+                            (existingItem, duplicateItem) -> {
+                                System.err.println("In-memory duplicate safely ignored for ID: " + duplicateItem.getTestCaseId());
+                                return existingItem;
+                            }
+                    ));
         } else {
             this.resultsMap = new HashMap<>();
         }
@@ -443,7 +450,14 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         this.resultsMap.clear();
         if (this.metadata != null) {
             this.resultsMap.putAll(this.metadata.getResults().stream()
-                    .collect(Collectors.toMap(TestRunDto.TestRunItems::getTestCaseId, item -> item)));
+                    .collect(Collectors.toMap(
+                            TestRunDto.TestRunItems::getTestCaseId,
+                            item -> item,
+                            (existingItem, duplicateItem) -> {
+                                System.err.println("In-memory duplicate safely ignored for ID: " + duplicateItem.getTestCaseId());
+                                return existingItem;
+                            }
+                    )));
         }
 
         if (this.model != null) {
@@ -488,7 +502,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     public void refreshView() {
         final int total = currentTestCaseDtos.size();
         final int totalPages = getTotalPageCount();
-        currentPage = Math.max(1, Math.min(currentPage, totalPages));
+        currentPage = Math.clamp(currentPage, 1, totalPages);
 
         final int fromIndex = (currentPage - 1) * pageSize;
         final int toIndex = Math.min(fromIndex + pageSize, total);
@@ -570,8 +584,11 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         IEditorUI.super.dispose();
     }
 
+    @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
-        return list;
+        if (list != null) return list;
+        if (checklistTree != null) return checklistTree;
+        return mainPanel;
     }
 
     public @NotNull JComponent getComponent() {
