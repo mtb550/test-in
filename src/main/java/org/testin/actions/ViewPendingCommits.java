@@ -27,11 +27,11 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
-public class ViewCommits extends DumbAwareAction {
+public class ViewPendingCommits extends DumbAwareAction {
 
     private final SimpleTree tree;
 
-    public ViewCommits(SimpleTree tree) {
+    public ViewPendingCommits(SimpleTree tree) {
         super("View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
         this.tree = tree;
     }
@@ -80,7 +80,7 @@ public class ViewCommits extends DumbAwareAction {
                             return;
                         }
 
-                        PendingCommitsDialog dialog = new PendingCommitsDialog(Config.getProject(), changes);
+                        PendingCommitsDialog dialog = new PendingCommitsDialog(Config.getProject(), changes, repoPath);
                         if (dialog.showAndGet()) {
                             String commitMessage = Messages.showInputDialog(
                                     Config.getProject(),

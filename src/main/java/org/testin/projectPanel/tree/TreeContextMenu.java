@@ -51,16 +51,22 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new ImportJson(tree))
         ));
 
-        add(createSubGroup("Integrate", AllIcons.Nodes.Related,
+        // todo, to be removed, instead, in clone project in create new project, list those as options.
+        /*add(createSubGroup("Integrate", AllIcons.Nodes.Related,
                 List.of(new IntegrateTestRail(),
                         new IntegrateJira(),
                         new IntegrateAzure())
-        ));
+        ));*/
 
         addSeparator();
 
         add(new OpenOldVersions());
-        add(new ViewCommits(tree));
+        add(new Sync(tree, projectPanel));
+        add(new ViewPendingCommits(tree));
+        add(new CloneProject());
+
+        addSeparator();
+
         add(new TestRuns());
         addSeparator();
 
