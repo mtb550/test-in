@@ -64,6 +64,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(new Sync(tree, projectPanel));
         add(new ViewPendingCommits(tree));
         add(new CloneProject());
+        add(new TestLeadDashboard(tree));
 
         addSeparator();
 

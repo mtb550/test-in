@@ -24,4 +24,9 @@ public class GitCommandRunner {
             return output;
         }
     }
+
+    public static String getCurrentBranch(Path workingDirectory) throws Exception {
+        // Asks Git for the name of the active branch (e.g., "master" or "feature/login")
+        return execute(workingDirectory, "git", "rev-parse", "--abbrev-ref", "HEAD").trim();
+    }
 }

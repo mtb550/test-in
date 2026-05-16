@@ -8,13 +8,11 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
-import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.git.GitCommandRunner;
 import org.testin.util.notifications.Notifier;
 
@@ -23,15 +21,13 @@ import javax.swing.tree.TreePath;
 import java.io.File;
 import java.nio.file.Path;
 
-public class Sync extends DumbAwareAction {
+public class CreateBranch extends DumbAwareAction {
 
     private final SimpleTree tree;
-    private final ProjectPanel projectPanel;
 
-    public Sync(final SimpleTree tree, final ProjectPanel projectPanel) {
-        super("Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
+    public CreateBranch(SimpleTree tree) {
+        super("Create New Branch", "Create a new Git branch for your test cases", AllIcons.Vcs.Branch);
         this.tree = tree;
-        this.projectPanel = projectPanel;
     }
 
     @Override
@@ -39,56 +35,45 @@ public class Sync extends DumbAwareAction {
         Path repoPath = getActiveProjectPath();
 
         if (repoPath == null) {
-            Notifier.getInstance().error("Sync Error", "Could not determine the active project. Please select a project in the tree.");
+            Notifier.getInstance().error("Branch Error", "Could not determine the active project.");
             return;
         }
 
         File gitDir = new File(repoPath.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Notifier.getInstance().warn("Sync Error", "This project is not a Git repository. Initialize it first.");
+            Notifier.getInstance().warn("Branch Error", "This project is not a Git repository.");
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Syncing with remote", true) {
+        String branchName = Messages.showInputDialog(
+                Config.getProject(),
+                "Enter a name for the new branch (e.g., feature/login-tests):",
+                "Create New Branch",
+                AllIcons.Vcs.Branch,
+                "",
+                null
+        );
+
+        if (branchName == null || branchName.trim().isEmpty()) return;
+
+        // Sanitize branch name (replace spaces with hyphens)
+        final String safeBranchName = branchName.trim().replaceAll("\\s+", "-");
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Creating branch", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-
                 try {
-                    indicator.setText("Checking remote configuration...");
-                    String remoteUrl = "";
-                    try {
-                        remoteUrl = GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
-                    } catch (Exception ignored) {
-                    }
+                    // Create and checkout the new branch locally
+                    GitCommandRunner.execute(repoPath, "git", "checkout", "-b", safeBranchName);
 
-                    if (remoteUrl.isEmpty()) {
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                Notifier.getInstance().warn("Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
-                        );
-                        return;
-                    }
-
-                    indicator.setText("Pulling latest changes...");
-                    String currentBranch = GitCommandRunner.getCurrentBranch(repoPath);
-                    GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "--autostash", "origin", currentBranch);
-
-                    indicator.setText("Refreshing files...");
-                    VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile());
-                    if (vFile != null) {
-                        vFile.refresh(false, true);
-                    }
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        Notifier.getInstance().info("Sync Successful", "Your project is now up to date with the remote repository.");
-                        if (projectPanel != null) {
-                            projectPanel.setupMainLayout();
-                        }
-                    });
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Notifier.getInstance().info("Branch Created", "Switched to new branch: " + safeBranchName)
+                    );
 
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Sync Failed", "Could not pull changes:\n" + ex.getMessage())
+                            Notifier.getInstance().error("Branch Failed", "Could not create branch:\n" + ex.getMessage())
                     );
                 }
             }

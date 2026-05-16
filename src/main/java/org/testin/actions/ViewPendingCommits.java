@@ -1,6 +1,7 @@
 package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationGroupManager;
@@ -97,6 +98,30 @@ public class ViewPendingCommits extends DumbAwareAction {
                                     public void run(@NotNull ProgressIndicator commitIndicator) {
                                         commitIndicator.setIndeterminate(true);
                                         try {
+                                            // --- NEW: Auto-Branch Check ---
+                                            String currentBranch = org.testin.util.git.GitCommandRunner.getCurrentBranch(repoPath);
+                                            if (currentBranch.equals("master") || currentBranch.equals("main")) {
+                                                ApplicationManager.getApplication().invokeAndWait(() -> {
+                                                    String newBranch = Messages.showInputDialog(
+                                                            Config.getProject(),
+                                                            "You are currently on '" + currentBranch + "'.\nTo use Pull Requests, please enter a new branch name (e.g. feature/update-tests):",
+                                                            "Branch Required",
+                                                            AllIcons.Vcs.Branch,
+                                                            "",
+                                                            null
+                                                    );
+
+                                                    if (newBranch != null && !newBranch.trim().isEmpty()) {
+                                                        try {
+                                                            String safeBranch = newBranch.trim().replaceAll("\\s+", "-");
+                                                            org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "checkout", "-b", safeBranch);
+                                                        } catch (Exception ex) {
+                                                            Notifier.getInstance().error("Branch Error", "Failed to checkout new branch.");
+                                                        }
+                                                    }
+                                                });
+                                            }
+
                                             commitIndicator.setText("Staging files...");
                                             org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "add", ".");
 
@@ -231,9 +256,12 @@ public class ViewPendingCommits extends DumbAwareAction {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
+                    String currentBranch = org.testin.util.git.GitCommandRunner.getCurrentBranch(repoPath);
+
                     indicator.setText("Syncing with remote (Pull --rebase)...");
                     try {
-                        org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "origin", "master");
+                        org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "--autostash", "origin", currentBranch);
+
                     } catch (Exception pullEx) {
                         try {
                             org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "rebase", "--abort");
@@ -242,11 +270,53 @@ public class ViewPendingCommits extends DumbAwareAction {
                     }
 
                     indicator.setText("Pushing commits...");
-                    org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "push", "-u", "origin", "master");
+                    org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "push", "-u", "origin", currentBranch);
 
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().info("Push Successful", "Test cases were successfully pushed to the remote repository!")
-                    );
+                    // --- NEW: Generate Dynamic PR URL (Supports GitHub & Azure) ---
+                    String remoteUrl = org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        Notification notification = NotificationGroupManager.getInstance()
+                                .getNotificationGroup("testin.notifications")
+                                .createNotification(
+                                        "Push Successful",
+                                        "Pushed to branch '" + currentBranch + "'.",
+                                        NotificationType.INFORMATION
+                                );
+
+                        // Clean up URL (remove .git extension if present)
+                        String cleanUrl = remoteUrl;
+                        if (cleanUrl.endsWith(".git")) {
+                            cleanUrl = cleanUrl.substring(0, cleanUrl.length() - 4);
+                        }
+
+                        // Determine the correct PR URL based on the platform
+                        String prUrl = "";
+                        if (remoteUrl.contains("github.com")) {
+                            prUrl = cleanUrl + "/pull/new/" + currentBranch;
+                        } else if (remoteUrl.contains("dev.azure.com") || remoteUrl.contains("visualstudio.com")) {
+                            // Azure DevOps URL structure
+                            prUrl = cleanUrl + "/pullrequestcreate?sourceRef=" + currentBranch;
+                        }
+
+                        // Only show PR button if not on master AND we recognized the platform URL
+                        if (!currentBranch.equals("master") && !currentBranch.equals("main") && !prUrl.isEmpty()) {
+                            notification.setContent("Pushed to branch '" + currentBranch + "'. Would you like to create a Pull Request?");
+
+                            final String finalPrUrl = prUrl; // Must be final for the lambda
+
+                            notification.addAction(new NotificationAction("Create Pull Request") {
+                                @Override
+                                public void actionPerformed(@NotNull AnActionEvent event, @NotNull Notification notification) {
+                                    notification.expire();
+                                    // Open default web browser directly to the correct platform!
+                                    BrowserUtil.browse(finalPrUrl);
+                                }
+                            });
+                        }
+
+                        notification.notify(Config.getProject());
+                    });
 
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->

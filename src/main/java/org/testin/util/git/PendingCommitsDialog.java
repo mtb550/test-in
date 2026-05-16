@@ -24,6 +24,17 @@ public class PendingCommitsDialog extends DialogWrapper {
     private final List<TestCaseDiff> differences;
     private final Path repoRoot;
 
+    // New constructor for the Test Lead Dashboard
+    public PendingCommitsDialog(@Nullable Project project, List<TestCaseDiff> differences, Path repoRoot, String customTitle, String customOkText) {
+        super(project, true);
+        this.differences = differences;
+        this.repoRoot = repoRoot;
+        setTitle(customTitle);
+        setOKButtonText(customOkText);
+        setCancelButtonText("Cancel");
+        init();
+    }
+
     public PendingCommitsDialog(@Nullable Project project, List<TestCaseDiff> differences, Path repoRoot) {
         super(project, true);
         this.differences = differences;
