@@ -11,6 +11,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
+import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.git.GitCommandRunner;
 import org.testin.util.notifications.Notifier;
 
@@ -21,12 +22,14 @@ public class CloneProject extends DumbAwareAction {
     private final String gitUrl;
     private final String projectName;
     private final Path targetPath;
+    private final ProjectPanel projectPanel;
 
-    public CloneProject(String gitUrl, String projectName, Path targetPath) {
+    public CloneProject(String gitUrl, String projectName, Path targetPath, ProjectPanel projectPanel) {
         super("Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
         this.gitUrl = gitUrl;
         this.projectName = projectName;
         this.targetPath = targetPath;
+        this.projectPanel = projectPanel;
     }
 
     @Override
@@ -60,6 +63,7 @@ public class CloneProject extends DumbAwareAction {
                             vRoot.refresh(false, true);
                         }
                         Notifier.getInstance().info("Clone Successful", "Project '" + projectName + "' was cloned successfully.");
+                        new Refresh(projectPanel).execute();
                     });
 
                 } catch (Exception ex) {

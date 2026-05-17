@@ -62,7 +62,7 @@ public class CreateTestProject extends DumbAwareAction {
                 String gitUrl = name.trim();
                 String projectName = extractProjectNameFromUrl(gitUrl);
 
-                new CloneProject(gitUrl, projectName, Config.getTestinPath()).execute();
+                new CloneProject(gitUrl, projectName, Config.getTestinPath(), projectPanel).execute();
                 return;
             }
 

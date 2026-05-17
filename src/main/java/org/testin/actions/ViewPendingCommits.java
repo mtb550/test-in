@@ -12,7 +12,10 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
+import git4idea.checkin.GitUserNameNotDefinedDialog;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
@@ -26,6 +29,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 
 public class ViewPendingCommits extends DumbAwareAction {
@@ -93,51 +97,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                             );
 
                             if (commitMessage != null && !commitMessage.trim().isEmpty()) {
-                                ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Committing to local Git", false) {
-                                    @Override
-                                    public void run(@NotNull ProgressIndicator commitIndicator) {
-                                        commitIndicator.setIndeterminate(true);
-                                        try {
-                                            commitIndicator.setText("Staging files...");
-                                            GitCommandRunner.execute(repoPath, "git", "add", ".");
-
-                                            commitIndicator.setText("Committing files...");
-                                            GitCommandRunner.execute(repoPath, "git", "commit", "-m", commitMessage);
-
-                                            ApplicationManager.getApplication().invokeLater(() -> {
-                                                Notification notification = NotificationGroupManager.getInstance()
-                                                        .getNotificationGroup("testin.notifications")
-                                                        .createNotification(
-                                                                "Commit successful",
-                                                                "Changes committed locally. Would you like to push to the remote repository now?",
-                                                                NotificationType.INFORMATION
-                                                        );
-
-                                                notification.addAction(new NotificationAction("Push to Remote") {
-                                                    @Override
-                                                    public void actionPerformed(@NotNull AnActionEvent event, @NotNull Notification notification) {
-                                                        notification.expire();
-                                                        pushToRemote(repoPath);
-                                                    }
-                                                });
-
-                                                notification.notify(Config.getProject());
-                                            });
-
-                                        } catch (Exception ex) {
-                                            String errorMsg = ex.getMessage();
-                                            if (errorMsg != null && errorMsg.contains("Author identity unknown")) {
-                                                ApplicationManager.getApplication().invokeLater(() ->
-                                                        promptAndSetGitIdentity(repoPath)
-                                                );
-                                            } else {
-                                                ApplicationManager.getApplication().invokeLater(() ->
-                                                        Notifier.getInstance().error("Commit Failed", "Failed to commit changes:\n" + errorMsg)
-                                                );
-                                            }
-                                        }
-                                    }
-                                });
+                                performCommitWorkflow(repoPath, commitMessage.trim());
                             } else if (commitMessage != null) {
                                 Notifier.getInstance().warn("Commit Aborted", "A commit message is required.");
                             }
@@ -148,6 +108,54 @@ public class ViewPendingCommits extends DumbAwareAction {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Notifier.getInstance().error("Git Error", "Failed to calculate diffs: " + ex.getMessage())
                     );
+                }
+            }
+        });
+    }
+
+    private void performCommitWorkflow(Path repoPath, String commitMessage) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Committing to local Git", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator commitIndicator) {
+                commitIndicator.setIndeterminate(true);
+                try {
+                    commitIndicator.setText("Staging files...");
+                    GitCommandRunner.execute(repoPath, "git", "add", ".");
+
+                    commitIndicator.setText("Committing files...");
+                    GitCommandRunner.execute(repoPath, "git", "commit", "-m", commitMessage);
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        Notification notification = NotificationGroupManager.getInstance()
+                                .getNotificationGroup("testin.notifications")
+                                .createNotification(
+                                        "Commit successful",
+                                        "Changes committed locally. Would you like to push to the remote repository now?",
+                                        NotificationType.INFORMATION
+                                );
+
+                        notification.addAction(new NotificationAction("Push to Remote") {
+                            @Override
+                            public void actionPerformed(@NotNull AnActionEvent event, @NotNull Notification notification) {
+                                notification.expire();
+                                pushToRemote(repoPath);
+                            }
+                        });
+
+                        notification.notify(Config.getProject());
+                    });
+
+                } catch (Exception ex) {
+                    String errorMsg = ex.getMessage();
+                    if (errorMsg != null && errorMsg.contains("Author identity unknown")) {
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                promptAndSetGitIdentity(repoPath, commitMessage)
+                        );
+                    } else {
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Notifier.getInstance().error("Commit Failed", "Failed to commit changes:\n" + errorMsg)
+                        );
+                    }
                 }
             }
         });
@@ -265,42 +273,50 @@ public class ViewPendingCommits extends DumbAwareAction {
         });
     }
 
-    private void promptAndSetGitIdentity(Path repoPath) {
-        String name = Messages.showInputDialog(
-                Config.getProject(),
-                "Git needs your name to attribute your commits.\n\nPlease enter your full name (e.g., John Doe):",
-                "Set Git Identity (Name)",
-                AllIcons.General.User
-        );
+    private void promptAndSetGitIdentity(Path repoPath, String pendingCommitMessage) {
+        ApplicationManager.getApplication().invokeLater(() -> {
 
-        if (name == null || name.trim().isEmpty()) return;
+            VirtualFile vRepoPath = LocalFileSystem.getInstance().findFileByIoFile(repoPath.toFile());
+            if (vRepoPath == null) return;
 
-        String email = Messages.showInputDialog(
-                Config.getProject(),
-                "Git needs your email to attribute your commits.\n\nPlease enter your email address:",
-                "Set Git Identity (Email)",
-                AllIcons.CodeWithMe.CwmCamAvatarOn
-        );
+            GitUserNameNotDefinedDialog dialog = new GitUserNameNotDefinedDialog(
+                    Config.getProject(),
+                    Collections.singletonList(vRepoPath),
+                    Collections.singletonList(vRepoPath),
+                    Collections.emptyMap(),
+                    "Set Identity and Commit"
+            );
 
-        if (email == null || email.trim().isEmpty()) return;
+            if (dialog.showAndGet()) {
+                String name = dialog.getUserName();
+                String email = dialog.getUserEmail();
+                boolean setGlobally = dialog.isSetGlobalConfig();
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Configuring git identity", false) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-                try {
-                    // Set the identity for this specific repository
-                    GitCommandRunner.execute(repoPath, "git", "config", "user.name", name.trim());
-                    GitCommandRunner.execute(repoPath, "git", "config", "user.email", email.trim());
-
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().info("Git Identity Set", "Your Git identity has been updated. Please click 'View Pending Commits' to try committing again.")
-                    );
-                } catch (Exception ex) {
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Config Failed", "Failed to set Git identity:\n" + ex.getMessage())
-                    );
+                if (name.trim().isEmpty() || email.trim().isEmpty()) {
+                    Notifier.getInstance().warn("Missing Info", "Name and email are required to configure Git.");
+                    return;
                 }
+
+                ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Configuring git identity", false) {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        indicator.setIndeterminate(true);
+                        try {
+                            String scope = setGlobally ? "--global" : "--local";
+                            GitCommandRunner.execute(repoPath, "git", "config", scope, "user.name", name.trim());
+                            GitCommandRunner.execute(repoPath, "git", "config", scope, "user.email", email.trim());
+
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                Notifier.getInstance().info("Git Identity Set", "Identity configured successfully. Resuming commit...");
+                                performCommitWorkflow(repoPath, pendingCommitMessage);
+                            });
+                        } catch (Exception ex) {
+                            ApplicationManager.getApplication().invokeLater(() ->
+                                    Notifier.getInstance().error("Config Failed", "Failed to set Git identity:\n" + ex.getMessage())
+                            );
+                        }
+                    }
+                });
             }
         });
     }
