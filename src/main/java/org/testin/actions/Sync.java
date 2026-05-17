@@ -70,7 +70,7 @@ public class Sync extends DumbAwareAction {
                     }
 
                     indicator.setText("Pulling latest changes...");
-                    GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "origin", "master");
+                    GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "--autostash", "origin", "main");
 
                     indicator.setText("Refreshing files...");
                     VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile());

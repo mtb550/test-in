@@ -22,6 +22,7 @@ import java.nio.file.Path;
 public class CreateTestNode extends DumbAwareAction {
     @Getter
     private final ProjectPanel projectPanel;
+
     @Getter
     private final SimpleTree tree;
 
@@ -37,7 +38,7 @@ public class CreateTestNode extends DumbAwareAction {
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
         if (!(parentNode.getUserObject() instanceof DirectoryDto parentDir)) return;
 
@@ -45,10 +46,10 @@ public class CreateTestNode extends DumbAwareAction {
             if (name == null || name.isEmpty()) return;
 
             // todo, cover all regex -> dots, slashes ..etc
-            String processedName = name.replace("_", " ");
-            String javaPackageName = processedName.replace(" ", "").toLowerCase();
+            final String processedName = name.replace("_", " ");
+            final String javaPackageName = processedName.replace(" ", "").toLowerCase();
 
-            Path newDirPath = parentDir.getPath().resolve(name);
+            final Path newDirPath = parentDir.getPath().resolve(name);
 
             if (directoryType != null && directoryType.getAction() != null)
                 directoryType.getAction().execute(this, e.getProject(), name, parentNode, parentDir, newDirPath);
@@ -78,7 +79,6 @@ public class CreateTestNode extends DumbAwareAction {
                     System.out.println("no need to generate, Selected directory type: " + directoryType);
                 }
 
-
             }
 
         }).show();
@@ -86,14 +86,14 @@ public class CreateTestNode extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        TreePath path = tree.getSelectionPath();
+        final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
             e.getPresentation().setEnabled(false);
             return;
         }
 
-        DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
         if (!(parentNode.getUserObject() instanceof DirectoryDto parentDir)) {
             e.getPresentation().setEnabled(false);
@@ -107,4 +107,5 @@ public class CreateTestNode extends DumbAwareAction {
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
     }
+
 }

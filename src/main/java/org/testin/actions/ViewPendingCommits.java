@@ -16,6 +16,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
+import org.testin.util.git.GitCommandRunner;
 import org.testin.util.git.GitDiffProcessor;
 import org.testin.util.git.PendingCommitsDialog;
 import org.testin.util.git.TestCaseDiff;
@@ -98,10 +99,10 @@ public class ViewPendingCommits extends DumbAwareAction {
                                         commitIndicator.setIndeterminate(true);
                                         try {
                                             commitIndicator.setText("Staging files...");
-                                            org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "add", ".");
+                                            GitCommandRunner.execute(repoPath, "git", "add", ".");
 
                                             commitIndicator.setText("Committing files...");
-                                            org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "commit", "-m", commitMessage);
+                                            GitCommandRunner.execute(repoPath, "git", "commit", "-m", commitMessage);
 
                                             ApplicationManager.getApplication().invokeLater(() -> {
                                                 Notification notification = NotificationGroupManager.getInstance()
@@ -124,9 +125,16 @@ public class ViewPendingCommits extends DumbAwareAction {
                                             });
 
                                         } catch (Exception ex) {
-                                            ApplicationManager.getApplication().invokeLater(() ->
-                                                    Notifier.getInstance().error("Commit Failed", "Failed to commit changes:\n" + ex.getMessage())
-                                            );
+                                            String errorMsg = ex.getMessage();
+                                            if (errorMsg != null && errorMsg.contains("Author identity unknown")) {
+                                                ApplicationManager.getApplication().invokeLater(() ->
+                                                        promptAndSetGitIdentity(repoPath)
+                                                );
+                                            } else {
+                                                ApplicationManager.getApplication().invokeLater(() ->
+                                                        Notifier.getInstance().error("Commit Failed", "Failed to commit changes:\n" + errorMsg)
+                                                );
+                                            }
                                         }
                                     }
                                 });
@@ -171,7 +179,7 @@ public class ViewPendingCommits extends DumbAwareAction {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "init");
+                    GitCommandRunner.execute(repoPath, "git", "init");
 
                     ApplicationManager.getApplication().invokeLater(() ->
                             Notifier.getInstance().info("Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName())
@@ -188,7 +196,7 @@ public class ViewPendingCommits extends DumbAwareAction {
     private void pushToRemote(Path repoPath) {
         String remoteUrl = "";
         try {
-            remoteUrl = org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
+            remoteUrl = GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
         } catch (Exception ignored) {
         }
 
@@ -211,7 +219,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     try {
-                        org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "remote", "add", "origin", finalRemoteUrl);
+                        GitCommandRunner.execute(repoPath, "git", "remote", "add", "origin", finalRemoteUrl);
                         executeGitPush(repoPath);
                     } catch (Exception ex) {
                         ApplicationManager.getApplication().invokeLater(() ->
@@ -233,16 +241,16 @@ public class ViewPendingCommits extends DumbAwareAction {
                 try {
                     indicator.setText("Syncing with remote (Pull --rebase)...");
                     try {
-                        org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "origin", "master");
+                        GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "--autostash", "origin", "main");
                     } catch (Exception pullEx) {
                         try {
-                            org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "rebase", "--abort");
+                            GitCommandRunner.execute(repoPath, "git", "rebase", "--abort");
                         } catch (Exception ignored) {
                         }
                     }
 
                     indicator.setText("Pushing commits...");
-                    org.testin.util.git.GitCommandRunner.execute(repoPath, "git", "push", "-u", "origin", "master");
+                    GitCommandRunner.execute(repoPath, "git", "push", "-u", "origin", "main");
 
                     ApplicationManager.getApplication().invokeLater(() ->
                             Notifier.getInstance().info("Push Successful", "Test cases were successfully pushed to the remote repository!")
@@ -251,6 +259,46 @@ public class ViewPendingCommits extends DumbAwareAction {
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Notifier.getInstance().error("Push Failed", "Could not push to remote:\n" + ex.getMessage())
+                    );
+                }
+            }
+        });
+    }
+
+    private void promptAndSetGitIdentity(Path repoPath) {
+        String name = Messages.showInputDialog(
+                Config.getProject(),
+                "Git needs your name to attribute your commits.\n\nPlease enter your full name (e.g., John Doe):",
+                "Set Git Identity (Name)",
+                AllIcons.General.User
+        );
+
+        if (name == null || name.trim().isEmpty()) return;
+
+        String email = Messages.showInputDialog(
+                Config.getProject(),
+                "Git needs your email to attribute your commits.\n\nPlease enter your email address:",
+                "Set Git Identity (Email)",
+                AllIcons.CodeWithMe.CwmCamAvatarOn
+        );
+
+        if (email == null || email.trim().isEmpty()) return;
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Configuring git identity", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+                try {
+                    // Set the identity for this specific repository
+                    GitCommandRunner.execute(repoPath, "git", "config", "user.name", name.trim());
+                    GitCommandRunner.execute(repoPath, "git", "config", "user.email", email.trim());
+
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Notifier.getInstance().info("Git Identity Set", "Your Git identity has been updated. Please click 'View Pending Commits' to try committing again.")
+                    );
+                } catch (Exception ex) {
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Notifier.getInstance().error("Config Failed", "Failed to set Git identity:\n" + ex.getMessage())
                     );
                 }
             }

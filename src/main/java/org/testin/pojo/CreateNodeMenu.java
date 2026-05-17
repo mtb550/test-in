@@ -13,7 +13,7 @@ public enum CreateNodeMenu {
 
     TEST_PROJECT(
             "Create Project",
-            List.of(DirectoryType.TP),
+            List.of(DirectoryType.TP, DirectoryType.IMPORT_TP),
             TestProjectDirectoryDto.class,
             DirectoryType.TP,
             "set name..",

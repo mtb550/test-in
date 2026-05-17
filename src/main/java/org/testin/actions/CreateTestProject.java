@@ -28,10 +28,44 @@ public class CreateTestProject extends DumbAwareAction {
         this.projectPanel = projectPanel;
     }
 
+    private String extractProjectNameFromUrl(String gitUrl) {
+        String name = gitUrl;
+
+        // Remove trailing slash if present
+        if (name.endsWith("/")) {
+            name = name.substring(0, name.length() - 1);
+        }
+
+        // Remove .git extension if present
+        if (name.endsWith(".git")) {
+            name = name.substring(0, name.length() - 4);
+        }
+
+        // Find the last slash (works for https) or colon (works for ssh)
+        int lastSlashIndex = name.lastIndexOf('/');
+        int lastColonIndex = name.lastIndexOf(':');
+
+        int splitIndex = Math.max(lastSlashIndex, lastColonIndex);
+
+        if (splitIndex != -1 && splitIndex < name.length() - 1) {
+            return name.substring(splitIndex + 1);
+        }
+
+        return "ImportedTestProject"; // Fallback if URL is malformed
+    }
+
     public void execute() {
         new CreateNodesDialog(CreateNodeMenu.TEST_PROJECT, (name, directoryType, codeGenerator) -> {
-
             if (name == null || name.trim().isEmpty()) return;
+
+            if (directoryType == DirectoryType.IMPORT_TP) {
+                String gitUrl = name.trim();
+                String projectName = extractProjectNameFromUrl(gitUrl);
+
+                new CloneProject(gitUrl, projectName, Config.getTestinPath()).execute();
+                return;
+            }
+
 
             // todo, cover all regex -> dots, slashes ..etc
             String processedName = name.replace("_", " ");

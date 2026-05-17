@@ -82,6 +82,16 @@ public enum DirectoryType {
             TestRunDirectoryDto.class,
             ".tr",
             new CreateTestRun()
+    ),
+
+    IMPORT_TP(
+            "Import Project (Git)",
+            null,
+            null,
+            AllIcons.Vcs.Clone,
+            TestProjectDirectoryDto.class,
+            null,
+            null
     );
 
     private final String description;
