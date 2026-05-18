@@ -10,9 +10,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.createNodes.CreateNodesDialog;
 import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
 import org.testin.util.autoGenerator.GeneratorType;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -35,12 +37,12 @@ public class CreateTestNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        final DirectoryDto parentDir = Tools.getInstance().getCurrentSelectedDirectory(tree);
+
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
         final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-
-        if (!(parentNode.getUserObject() instanceof DirectoryDto parentDir)) return;
 
         new CreateNodesDialog(parentDir.getMenu(), (name, directoryType, codeGenerator) -> {
             if (name == null || name.isEmpty()) return;
@@ -86,16 +88,9 @@ public class CreateTestNode extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
+        DirectoryDto parentDir = Tools.getInstance().getCurrentSelectedDirectory(tree);
 
-        if (path == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-
-        if (!(parentNode.getUserObject() instanceof DirectoryDto parentDir)) {
+        if (parentDir == null || parentDir instanceof TestProjectDirectoryDto) {
             e.getPresentation().setEnabled(false);
             return;
         }

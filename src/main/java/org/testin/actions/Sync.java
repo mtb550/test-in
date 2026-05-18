@@ -115,7 +115,12 @@ public class Sync extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(tree.getModel().getRoot() != null);
+        final TreePath path = tree.getSelectionPath();
+        if (path == null) return;
+        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final Object userObject = selectedNode.getUserObject();
+
+        e.getPresentation().setEnabled(userObject instanceof TestProjectDirectoryDto);
     }
 
     @Override

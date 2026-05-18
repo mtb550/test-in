@@ -37,7 +37,7 @@ public class ProjectTree {
         this.mainTree = new SimpleTree(treeModel);
         this.scrollPane = new JBScrollPane(mainTree);
 
-        mainTree.setRootVisible(false);
+        mainTree.setRootVisible(true);
         mainTree.setShowsRootHandles(true);
         mainTree.setDragEnabled(true);
         mainTree.setDropMode(DropMode.ON_OR_INSERT);

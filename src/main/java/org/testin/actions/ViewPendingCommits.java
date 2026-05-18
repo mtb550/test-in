@@ -1,10 +1,6 @@
 package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationAction;
-import com.intellij.notification.NotificationGroupManager;
-import com.intellij.notification.NotificationType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -19,6 +15,7 @@ import git4idea.checkin.GitUserNameNotDefinedDialog;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
+import org.testin.util.Tools;
 import org.testin.util.git.GitCommandRunner;
 import org.testin.util.git.GitDiffProcessor;
 import org.testin.util.git.PendingCommitsDialog;
@@ -33,42 +30,36 @@ import java.util.Collections;
 import java.util.List;
 
 public class ViewPendingCommits extends DumbAwareAction {
-
     private final SimpleTree tree;
 
-    public ViewPendingCommits(SimpleTree tree) {
+    public ViewPendingCommits(final @NotNull SimpleTree tree) {
         super("View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
         this.tree = tree;
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        Path repoPath = getActiveProjectPath();
+    public void update(final @NotNull AnActionEvent e) {
+        final TreePath path = tree.getSelectionPath();
+        if (path == null) return;
+        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final Object userObject = selectedNode.getUserObject();
 
-        if (repoPath == null) {
-            Notifier.getInstance().error("Git Error", "Could not determine the active project. Please select a project in the tree.");
-            return;
-        }
+        e.getPresentation().setEnabled(userObject instanceof TestProjectDirectoryDto);
+    }
 
-        File gitDir = new File(repoPath.toFile(), ".git");
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        final Path path = Tools.getInstance().getProjectPath(tree);
+
+        File gitDir = new File(path.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Notification notification = NotificationGroupManager.getInstance()
-                    .getNotificationGroup("testin.notifications")
-                    .createNotification(
-                            "Git repository not found",
-                            "The selected project (" + repoPath.getFileName() + ") is not a Git repository.",
-                            NotificationType.WARNING
-                    );
+            Notifier.getInstance().warnWithAction(
+                    "Git repository not found",
+                    "The selected project (" + path.getFileName() + ") is not a Git repository.",
+                    "Initialize Git (git init)",
+                    () -> initializeGitRepository(path)
+            );
 
-            notification.addAction(new NotificationAction("Initialize Git (git init)") {
-                @Override
-                public void actionPerformed(@NotNull AnActionEvent event, @NotNull Notification notification) {
-                    notification.expire();
-                    initializeGitRepository(repoPath);
-                }
-            });
-
-            notification.notify(Config.getProject());
             return;
         }
 
@@ -77,7 +68,7 @@ public class ViewPendingCommits extends DumbAwareAction {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    List<TestCaseDiff> changes = GitDiffProcessor.getPendingChanges(repoPath);
+                    List<TestCaseDiff> changes = GitDiffProcessor.getPendingChanges(path);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (changes.isEmpty()) {
@@ -85,7 +76,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                             return;
                         }
 
-                        PendingCommitsDialog dialog = new PendingCommitsDialog(Config.getProject(), changes, repoPath);
+                        PendingCommitsDialog dialog = new PendingCommitsDialog(Config.getProject(), changes, path);
                         if (dialog.showAndGet()) {
                             String commitMessage = Messages.showInputDialog(
                                     Config.getProject(),
@@ -97,7 +88,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                             );
 
                             if (commitMessage != null && !commitMessage.trim().isEmpty()) {
-                                performCommitWorkflow(repoPath, commitMessage.trim());
+                                performCommitWorkflow(path, commitMessage.trim());
                             } else if (commitMessage != null) {
                                 Notifier.getInstance().warn("Commit Aborted", "A commit message is required.");
                             }
@@ -126,23 +117,12 @@ public class ViewPendingCommits extends DumbAwareAction {
                     GitCommandRunner.execute(repoPath, "git", "commit", "-m", commitMessage);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        Notification notification = NotificationGroupManager.getInstance()
-                                .getNotificationGroup("testin.notifications")
-                                .createNotification(
-                                        "Commit successful",
-                                        "Changes committed locally. Would you like to push to the remote repository now?",
-                                        NotificationType.INFORMATION
-                                );
-
-                        notification.addAction(new NotificationAction("Push to Remote") {
-                            @Override
-                            public void actionPerformed(@NotNull AnActionEvent event, @NotNull Notification notification) {
-                                notification.expire();
-                                pushToRemote(repoPath);
-                            }
-                        });
-
-                        notification.notify(Config.getProject());
+                        Notifier.getInstance().infoWithAction(
+                                "Commit successful",
+                                "Changes committed locally. Would you like to push to the remote repository now?",
+                                "Push to Remote",
+                                () -> pushToRemote(repoPath)
+                        );
                     });
 
                 } catch (Exception ex) {
@@ -159,26 +139,6 @@ public class ViewPendingCommits extends DumbAwareAction {
                 }
             }
         });
-    }
-
-    private Path getActiveProjectPath() {
-        TreePath selectionPath = tree.getSelectionPath();
-        if (selectionPath != null) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
-            while (node != null) {
-                if (node.getUserObject() instanceof TestProjectDirectoryDto prj) {
-                    return prj.getPath();
-                }
-                node = (DefaultMutableTreeNode) node.getParent();
-            }
-        }
-
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-        if (root != null && root.getUserObject() instanceof TestProjectDirectoryDto prj) {
-            return prj.getPath();
-        }
-
-        return null;
     }
 
     private void initializeGitRepository(Path repoPath) {

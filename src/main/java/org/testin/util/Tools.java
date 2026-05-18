@@ -12,6 +12,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +24,7 @@ import org.testin.pojo.DirectoryType;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.settings.AppSettingsState;
 import org.testin.util.notifications.Notifier;
@@ -56,6 +58,26 @@ public class Tools {
 
     public static Tools getInstance() {
         return INSTANCE;
+    }
+
+    public Path getProjectPath(final SimpleTree tree) {
+        final DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
+        if (root != null && root.getUserObject() instanceof TestProjectDirectoryDto dir)
+            return dir.getPath();
+        return null;
+    }
+
+    public DirectoryDto getCurrentSelectedDirectory(final SimpleTree tree) {
+        TreePath path = tree.getSelectionPath();
+        if (path == null) return null;
+
+        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+
+        if (parentNode.getUserObject() instanceof DirectoryDto parentDir) {
+            return parentDir;
+        }
+
+        return null;
     }
 
     @NotNull
