@@ -3,6 +3,7 @@ package org.testin.editorPanel.testRunEditor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.*;
 import com.intellij.ui.components.JBList;
@@ -43,6 +44,7 @@ import javax.swing.tree.TreeNode;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -336,7 +338,18 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Config.getMapper().writerWithDefaultPrettyPrinter().writeValue(new File(savePath.toFile(), fileName), run);
+                Files.createDirectories(savePath);
+                File newJsonFile = new File(savePath.toFile(), fileName);
+
+                Config.getMapper().writerWithDefaultPrettyPrinter().writeValue(newJsonFile, run);
+
+                Path trMarkerPath = savePath.resolve(".tr");
+                if (Files.notExists(trMarkerPath))
+                    Files.createFile(trMarkerPath);
+
+                VirtualFile virtualDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(savePath.toFile());
+                if (virtualDir != null)
+                    virtualDir.refresh(false, true);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     // todo, just update tree, no need to build tree again

@@ -127,7 +127,7 @@ public class Notifier {
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.INFORMATION);
 
-        notification.addAction(NotificationAction.createSimple("Open report", () -> BrowserUtil.browse(file)));
+        notification.addAction(NotificationAction.createSimple("Open report", () -> BrowserUtil.browse(file.toURI().toString())));
         NotificationAction copyAction = new NotificationAction("Copy path") {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
