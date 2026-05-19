@@ -49,7 +49,7 @@ public class ProjectPanel implements Disposable {
             JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
             topBar.add(testProjectSelector.getSelectedTestProject(), BorderLayout.NORTH);
 
-            branchSelector = new BranchSelector(testProjectSelector.getSelectedTestProject().getItem());
+            branchSelector = new BranchSelector(this, testProjectSelector.getSelectedTestProject().getItem());
             topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
 
             panel.add(topBar, BorderLayout.NORTH);
@@ -77,7 +77,7 @@ public class ProjectPanel implements Disposable {
             JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
             topBar.add(testProjectSelector.getSelectedTestProject(), BorderLayout.NORTH);
 
-            branchSelector = new BranchSelector(testProjectSelector.getSelectedTestProject().getItem());
+            branchSelector = new BranchSelector(this, testProjectSelector.getSelectedTestProject().getItem());
             topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
 
             panel.add(topBar, BorderLayout.NORTH);
@@ -93,14 +93,6 @@ public class ProjectPanel implements Disposable {
 
         panel.revalidate();
         panel.repaint();
-    }
-
-    public void init() {
-        //testProjectSelector.loadTestProjectList();
-        //testProjectSelector.init();
-        //testCaseTabController.init();
-        //testRunTabController.init();
-        //this = new ProjectPanel(Config.getProject());
     }
 
     public void showEmptyState() {
