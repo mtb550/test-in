@@ -30,26 +30,24 @@ public final class HtmlGenerator {
         html.append("<p><strong>Platform:</strong> ").append(tr.getPlatform()).append("</p>");
         html.append("<p><strong>Status:</strong> ").append(tr.getStatus().name()).append("</p>");
 
-        html.append("<div class='table-container'>")
-                .append("<table>")
-                .append("<tr>")
-                .append("<th>#</th>")
-                .append("<th>ID</th>")
-                .append("<th>Title</th>")
-                .append("<th>Status</th>")
-                .append("<th>Duration</th>")
-                .append("<th>Expected Result</th>")
-                .append("<th>Priority</th>")
-                .append("<th>Module</th>")
-                .append("<th>Groups</th>")
-                .append("<th>Created By</th>")
-                .append("<th>Updated By</th>")
-                .append("<th>Created At</th>")
-                .append("<th>Updated At</th>")
-                .append("<th>Reference</th>")
-                .append("<th>Steps</th>")
-                .append("<th>FQCN</th>")
-                .append("<th>Code</th>")
+        html.append("<div class='table-container'><table><tr>")
+                .append("<th id='col-seq'>#</th>")
+                .append("<th id='col-id'>ID</th>")
+                .append("<th id='col-title'>Title</th>")
+                .append("<th id='col-status'>Status</th>")
+                .append("<th id='col-duration'>Duration</th>")
+                .append("<th id='col-expected'>Expected Result</th>")
+                .append("<th id='col-priority'>Priority</th>")
+                .append("<th id='col-module'>Module</th>")
+                .append("<th id='col-groups'>Groups</th>")
+                .append("<th id='col-created-by'>Created By</th>")
+                .append("<th id='col-updated-by'>Updated By</th>")
+                .append("<th id='col-created-at'>Created At</th>")
+                .append("<th id='col-updated-at'>Updated At</th>")
+                .append("<th id='col-reference'>Reference</th>")
+                .append("<th id='col-steps'>Steps</th>")
+                .append("<th id='col-fqcn'>FQCN</th>")
+                .append("<th id='col-code'>Code</th>")
                 .append("</tr>");
 
         if (!tr.getResults().isEmpty()) {
@@ -71,25 +69,23 @@ public final class HtmlGenerator {
                 String fqcn = String.join("<br>", d.getFqcn());
 
                 html.append("<tr>")
-                        .append(wrap(String.valueOf(seq.getAndIncrement()), "40px"))
-                        .append(wrap(id == null ? "" : id.toString(), "250px"))
-                        .append(wrap(d.getDescription(), "500px"))
-                        .append("<td style='color:").append(colorHex)
-                        .append("; font-weight:bold;'><div class='cell-content' style='max-width:100px;'>")
-                        .append(statusText).append("</div></td>")
-                        .append(wrap(duration, "100px"))
-                        .append(wrap(d.getExpectedResult(), "500px"))
-                        .append(wrap(d.getPriority().name(), "80px"))
-                        .append(wrap(d.getModule(), "150px"))
-                        .append(wrap(groups, "150px"))
-                        .append(wrap(d.getCreatedBy(), "150px"))
-                        .append(wrap(d.getUpdatedBy(), "150px"))
-                        .append(wrap(createdAt, "250px"))
-                        .append(wrap(updatedAt, "250px"))
-                        .append(wrap(d.getReference(), "150px"))
-                        .append(wrap(steps, "300px"))
-                        .append(wrap(fqcn, "250px"))
-                        .append(wrap("<a href='#'>Navigate</a>", "80px"))
+                        .append(cell("col-seq", String.valueOf(seq.getAndIncrement()), "40px"))
+                        .append(cell("col-id", id == null ? "" : id.toString(), "250px"))
+                        .append(cell("col-title", d.getDescription(), "500px"))
+                        .append(statusCell(statusText, colorHex))
+                        .append(cell("col-duration", duration, "100px"))
+                        .append(cell("col-expected", d.getExpectedResult(), "500px"))
+                        .append(cell("col-priority", d.getPriority().name(), "80px"))
+                        .append(cell("col-module", d.getModule(), "150px"))
+                        .append(cell("col-groups", groups, "150px"))
+                        .append(cell("col-created-by", d.getCreatedBy(), "150px"))
+                        .append(cell("col-updated-by", d.getUpdatedBy(), "150px"))
+                        .append(cell("col-created-at", createdAt, "250px"))
+                        .append(cell("col-updated-at", updatedAt, "250px"))
+                        .append(cell("col-reference", d.getReference(), "150px"))
+                        .append(cell("col-steps", steps, "300px"))
+                        .append(cell("col-fqcn", fqcn, "250px"))
+                        .append(cell("col-code", "<a href='#'>Navigate</a>", "80px"))
                         .append("</tr>");
             });
         } else {
@@ -104,7 +100,15 @@ public final class HtmlGenerator {
         return html.toString();
     }
 
-    private String wrap(String content, String maxWidth) {
-        return "<td><div class='cell-content' style='max-width:" + maxWidth + ";'>" + content + "</div></td>";
+    private String statusCell(String statusText, String colorHex) {
+        return "<td id='col-status' style='color:" + colorHex + "; font-weight:bold;'>" +
+                "<div class='cell-content' style='max-width:100px;'>" + statusText + "</div>" +
+                "</td>";
+    }
+
+    private String cell(String colId, String content, String maxWidth) {
+        return "<td id='" + colId + "'>" +
+                "<div class='cell-content' style='max-width:" + maxWidth + ";'>" + content + "</div>" +
+                "</td>";
     }
 }
