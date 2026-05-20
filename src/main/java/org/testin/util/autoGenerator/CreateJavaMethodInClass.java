@@ -24,31 +24,20 @@ public class CreateJavaMethodInClass {
 
         ApplicationManager.getApplication().invokeLater(() -> WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () -> {
             try {
-                List<String> cleanedFqcn = sanitizeFqcn(rawFqcn);
+                List<String> cleanedFqcn = Tools.getInstance().sanitizeFqcn(rawFqcn);
                 if (cleanedFqcn.isEmpty()) return;
 
-                String targetMethodName = formatMethodName(tc.getDescription());
+                String targetMethodName = Tools.getInstance().formatMethodName(tc.getDescription());
                 String methodName;
                 String baseClassName;
                 List<String> packageList = new ArrayList<>(cleanedFqcn);
 
-                if (packageList.size() >= 2) {
-                    String last = packageList.getLast();
-                    String secondToLast = packageList.get(packageList.size() - 2);
-
-                    if (secondToLast.toLowerCase().endsWith("test") || last.equalsIgnoreCase(targetMethodName)) {
-                        methodName = packageList.removeLast();
-                        baseClassName = packageList.removeLast();
-                    } else if (last.toLowerCase().endsWith("test")) {
-                        methodName = targetMethodName;
-                        baseClassName = packageList.removeLast();
-                    } else {
-                        methodName = targetMethodName;
-                        baseClassName = packageList.removeLast();
-                    }
-                } else {
+                if (packageList.size() >= 2 && (packageList.get(packageList.size() - 2).toLowerCase().endsWith("test") || packageList.getLast().equalsIgnoreCase(targetMethodName))) {
+                    methodName = packageList.removeLast();
                     baseClassName = packageList.removeLast();
+                } else {
                     methodName = targetMethodName;
+                    baseClassName = packageList.removeLast();
                 }
 
                 String expectedClassName = Tools.getInstance().toPascalCase(baseClassName);
@@ -124,40 +113,6 @@ public class CreateJavaMethodInClass {
                 }
             }
         }
-    }
-
-    private List<String> sanitizeFqcn(List<String> rawFqcn) {
-        List<String> sanitized = new ArrayList<>();
-        for (String part : rawFqcn) {
-            if (part.contains("/") || part.contains("\\")) {
-                continue;
-            }
-            if (!part.equalsIgnoreCase("testCases")) {
-                sanitized.add(part.replace(" ", ""));
-            }
-        }
-        return sanitized;
-    }
-
-    private String formatMethodName(String description) {
-        if (description == null || description.isEmpty()) return "testMethod";
-
-        String[] words = description.split("[^a-zA-Z0-9]+");
-        StringBuilder methodName = new StringBuilder();
-
-        for (String word : words) {
-            if (word.isEmpty()) continue;
-
-            if (methodName.isEmpty()) {
-                methodName.append(word.toLowerCase());
-            } else {
-                methodName.append(word.substring(0, 1).toUpperCase());
-                if (word.length() > 1) {
-                    methodName.append(word.substring(1).toLowerCase());
-                }
-            }
-        }
-        return methodName.toString();
     }
 
     private void injectMethod(Project project, PsiClass targetClass, String methodName, TestCaseDto tc) {

@@ -625,4 +625,38 @@ public class Tools {
                 .collect(Collectors.toList());
     }
 
+    public List<String> sanitizeFqcn(final List<String> rawFqcn) {
+        List<String> sanitized = new ArrayList<>();
+        for (String part : rawFqcn) {
+            if (part.contains("/") || part.contains("\\")) {
+                continue;
+            }
+            if (!part.equalsIgnoreCase("testCases")) {
+                sanitized.add(part.replace(" ", ""));
+            }
+        }
+        return sanitized;
+    }
+
+    public String formatMethodName(final String description) {
+        if (description == null || description.isEmpty()) return "testMethod";
+
+        String[] words = description.split("[^a-zA-Z0-9]+");
+        StringBuilder methodName = new StringBuilder();
+
+        for (String word : words) {
+            if (word.isEmpty()) continue;
+
+            if (methodName.isEmpty()) {
+                methodName.append(word.toLowerCase());
+            } else {
+                methodName.append(word.substring(0, 1).toUpperCase());
+                if (word.length() > 1) {
+                    methodName.append(word.substring(1).toLowerCase());
+                }
+            }
+        }
+        return methodName.toString();
+    }
+
 }

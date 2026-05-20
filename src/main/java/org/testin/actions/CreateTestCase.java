@@ -71,7 +71,6 @@ public class CreateTestCase extends DumbAwareAction {
 
             if (startIndex != -1 && startIndex + 1 < logicalPath.size())
                 generatedFqcn = new ArrayList<>(logicalPath.subList(startIndex + 1, logicalPath.size()));
-
             else
                 generatedFqcn = new ArrayList<>(logicalPath);
 
@@ -84,7 +83,7 @@ public class CreateTestCase extends DumbAwareAction {
                 }
             }
 
-            String methodName = formatMethodName(newTc.getDescription());
+            String methodName = Tools.getInstance().formatMethodName(newTc.getDescription());
             generatedFqcn.add(methodName);
 
             newTc.setFqcn(generatedFqcn);
@@ -109,28 +108,6 @@ public class CreateTestCase extends DumbAwareAction {
             //if (tree != null && parentNode != null) TreeUtilImpl.createNode(tree, parentNode, newTc);
 
         }).show();
-    }
-
-    private static String formatMethodName(String description) {
-        if (description == null || description.isEmpty()) return "testMethod";
-
-        String[] words = description.split("[^a-zA-Z0-9]+");
-        StringBuilder methodName = new StringBuilder();
-
-        for (String word : words) {
-            if (word.isEmpty()) continue;
-
-            if (methodName.isEmpty())
-                methodName.append(word.toLowerCase());
-
-            else {
-                methodName.append(word.substring(0, 1).toUpperCase());
-                if (word.length() > 1)
-                    methodName.append(word.substring(1).toLowerCase());
-
-            }
-        }
-        return methodName.toString();
     }
 
     @Override

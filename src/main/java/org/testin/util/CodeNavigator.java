@@ -11,7 +11,6 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +27,7 @@ public class CodeNavigator {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
 
-                    List<String> cleanedFqcn = sanitizeFqcn(rawFqcn);
+                    List<String> cleanedFqcn = Tools.getInstance().sanitizeFqcn(rawFqcn);
 
                     if (cleanedFqcn.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
@@ -39,29 +38,14 @@ public class CodeNavigator {
 
                     String methodName;
                     String baseClassName;
+                    String targetMethodName = Tools.getInstance().formatMethodName(testCaseName);
 
-                    String targetMethodName = formatMethodName(testCaseName);
-
-                    if (cleanedFqcn.size() >= 2) {
-                        String last = cleanedFqcn.getLast();
-                        String secondToLast = cleanedFqcn.get(cleanedFqcn.size() - 2);
-
-                        if (secondToLast.toLowerCase().endsWith("test") || last.equalsIgnoreCase(targetMethodName)) {
-                            methodName = cleanedFqcn.remove(cleanedFqcn.size() - 1);
-                            baseClassName = cleanedFqcn.remove(cleanedFqcn.size() - 1);
-
-                        } else if (last.toLowerCase().endsWith("test")) {
-                            methodName = targetMethodName;
-                            baseClassName = cleanedFqcn.removeLast();
-
-                        } else {
-                            methodName = targetMethodName;
-                            baseClassName = cleanedFqcn.removeLast();
-                        }
-
-                    } else {
+                    if (cleanedFqcn.size() >= 2 && (cleanedFqcn.get(cleanedFqcn.size() - 2).toLowerCase().endsWith("test") || cleanedFqcn.getLast().equalsIgnoreCase(targetMethodName))) {
+                        methodName = cleanedFqcn.removeLast();
                         baseClassName = cleanedFqcn.removeLast();
+                    } else {
                         methodName = targetMethodName;
+                        baseClassName = cleanedFqcn.removeLast();
                     }
 
                     String expectedClassName = Tools.getInstance().toPascalCase(baseClassName);
@@ -89,11 +73,9 @@ public class CodeNavigator {
                         Navigatable targetElement = targetClass;
                         PsiMethod[] exactMethods = targetClass.findMethodsByName(methodName, false);
 
-                        if (exactMethods.length > 0)
+                        if (exactMethods.length > 0) {
                             targetElement = exactMethods[0];
-
-                        else {
-
+                        } else {
                             for (PsiMethod method : targetClass.getMethods()) {
                                 if (method.getName().equalsIgnoreCase(methodName)) {
                                     targetElement = method;
@@ -116,40 +98,5 @@ public class CodeNavigator {
                     }
                 })
         );
-    }
-
-    private List<String> sanitizeFqcn(List<String> rawFqcn) {
-        List<String> sanitized = new ArrayList<>();
-        for (String part : rawFqcn) {
-            if (part.contains("/") || part.contains("\\")) {
-                continue;
-            }
-            if (!part.equalsIgnoreCase("testCases")) {
-                sanitized.add(part.replace(" ", ""));
-            }
-        }
-        return sanitized;
-    }
-
-    private String formatMethodName(String description) {
-        if (description == null || description.isEmpty()) return "testMethod";
-
-        String[] words = description.split("[^a-zA-Z0-9]+");
-        StringBuilder methodName = new StringBuilder();
-
-        for (String word : words) {
-            if (word.isEmpty()) continue;
-
-            if (methodName.isEmpty()) {
-                methodName.append(word.toLowerCase());
-            } else {
-                methodName.append(word.substring(0, 1).toUpperCase());
-                if (word.length() > 1) {
-                    methodName.append(word.substring(1).toLowerCase());
-                }
-            }
-        }
-
-        return methodName.toString();
     }
 }
