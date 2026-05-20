@@ -720,6 +720,11 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onStartExecutionClicked() {
+        if (metadata != null && metadata.getStatus() != TestRunStatus.IN_PROGRESS) {
+            metadata.setStatus(TestRunStatus.IN_PROGRESS);
+            persistRunDataAsync();
+        }
+
         int startIndex = list.getSelectedIndex() != -1 ? list.getSelectedIndex() : 0;
 
         startTimerForIndex(startIndex);
