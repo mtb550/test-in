@@ -13,70 +13,26 @@ once click refresh button, keep selected project without change it to the fist.
 
 plan & implement delegation between leaders to leaders or leaders to members.
 
-fixes:
-add message that the loading tree in panel
-show buttons in test case editor tab like test run (run) and (view code)
+enable RemoveTestProject in the tree, add new action, active, deactive.
 
-create action: RemoveTestProject in testin setting
-
-zoom in, out by mouse and scroll. to allow user to control the size. in editor only.
-
-project panel tree shows the message (nothing to show) once startup on first run. try to change it
-to (loading)
-
-implement this in control panel tree:
-undoAction
-redoAction
+zoom in, out by mouse and scroll. to allow user to control the size. in editor. like use mouse wheel in the code.
 
 
-update copy and move , drag drop action to prevent copy same file twice in same folder. in project tree
-and prevent move test run to test case tree.
+implement the details in marker .pr .ts file like created time date by modified, number of test cases , open bugs
+details button on context menu and show in view panel.
 
-change color to gray once cut. in project panel
-
-add static execute method in CreateTestPackage and other methods that call actions direct
-
-make focus on test case tree once open plugin.
-
-add final @NotNull for all methods in project
-
-create the new ui same creation for delete tree node
-
-project activity status to be removed from folder name and use separate XML that has rules
-
-implement details in marker file like created time date by modified, number of test cases , open bugs
-
-add icons to the test case card in the bottom right corner once one click the test case card:
-run test method icon, navigate to code icon, ask AI icon
-
-view method code in details panel.
-
-update create new test case ui
+update fqcn by start from project not pc path.
 
 try to read the current root node for controller, no need to search again in test run.
 you need just a move to check box object
-
-build changes page to do the commit and push.
 
 enhance the test case editor panel
 
 enhance the test run editor panel
 
-enhance view panel. easy thing you can do it next step.
-
-make automation reference automatic & create class and packages in project root automatic
+enhance view panel.
 
 change test case and test run editor size by mouse wheel. or make the font control in testin setting
-
-customize test packages to: module, epic, feature
-
-fix disappear expected, id.etc. once drag and drop. and make sure toolbar checks are saved once close then open again
-
-add badge (un-sorted) if the test case not linked to the before one
-
-failed create test runs, error in path
-
-move editor ui classes to the util, ui package
 
 Summary of list listeners:
 MotionListener: Used for your beautiful hover icons (Run / Navigate). NO NEED
@@ -85,12 +41,6 @@ MouseAdapter (ClickCount==2): Used for Double-Click to open.
 ** PopupHandler: Replaces manual right-click math for context menus.
 ** Dynamic Tooltips: Quick peeks at data without clicking.
 
-change structure of test run to be same test set, folder and inside it will be the JSONs
-
-bug, after add new test case, it is not linked to the sorting.
-
-add shortcut, if click CTRL+C on the selected test case on editor, then copy test case title. DONE!!
-
 add popup menu in test case editor, group for copy, copy -> title, expected, steps, priority ...etc
 
 how to add official listener for status bar
@@ -98,8 +48,6 @@ how to add official listener for status bar
 make mouse released after update paging value the click enter
 
 return the code for bg color for navigate, run
-
-in code, build icon to move you to open the test case in view panel
 
 move all fonts to setting.
 
