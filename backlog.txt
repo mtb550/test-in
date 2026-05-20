@@ -1,13 +1,16 @@
-add new tool window (To Do or Notes) that stored tester temp content.
+add new tool window (To Do or Notes) that stored tester temp content. try to install ready plugin.
 
-implement all notifications.
+implement mail smtp notifications..
 
 implement class debugger
 
 implement method debugger
 
-persist session for test case explorer and test plan explorer. once open IntelliJ,
-explorer should show last opened hierarchy with focus in module.
+save open editors on workspace preferrences once close intellij.
+save selected project and hierarchy with selected focus.
+
+once click refresh button, keep selected project without change it to the fist.
+
 plan & implement delegation between leaders to leaders or leaders to members.
 
 fixes:
