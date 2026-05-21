@@ -33,7 +33,7 @@ public class NavigateToCode extends DumbAwareAction {
         Project project = Config.getProject();
         List<String> navFqcn = new ArrayList<>();
 
-        VirtualFile testRoot = Tools.getInstance().getMainSourceRoot(project);
+        VirtualFile testRoot = Tools.getInstance().getTestSourceRoot(project);
 
         if (testRoot != null) {
             navFqcn.add(testRoot.getPath());

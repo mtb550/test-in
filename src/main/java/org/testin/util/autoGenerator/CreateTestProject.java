@@ -24,7 +24,7 @@ public class CreateTestProject implements GeneratorAction {
 
                     String safePackageName = Tools.getInstance().toCamelCase(targetName);
 
-                    VirtualFile sourceRoot = Tools.getInstance().getMainSourceRoot(project);
+                    VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
 
                     if (sourceRoot != null) {
                         VirtualFile newPackage = VfsUtil.createDirectoryIfMissing(sourceRoot, safePackageName);

@@ -16,13 +16,13 @@ import java.nio.file.Path;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestCasesMainDirectoryDto extends DirectoryDto {
     @Override
-    public TestCasesMainDirectoryDto setPath(Path path) {
+    public TestCasesMainDirectoryDto setPath(final Path path) {
         super.setPath(path);
         return this;
     }
 
     @Override
-    public TestCasesMainDirectoryDto setName(String name) {
+    public TestCasesMainDirectoryDto setName(final String name) {
         super.setName(name);
         return this;
     }

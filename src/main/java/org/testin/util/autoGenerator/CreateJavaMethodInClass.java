@@ -58,7 +58,7 @@ public class CreateJavaMethodInClass {
                 PsiClass targetClass = psiFacade.findClass(fqcnString, scope);
 
                 if (targetClass == null) {
-                    VirtualFile sourceRoot = Tools.getInstance().getMainSourceRoot(project);
+                    VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
                     if (sourceRoot != null) {
                         String relativePath = String.join("/", packageList).toLowerCase();
                         VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, relativePath);
@@ -98,7 +98,7 @@ public class CreateJavaMethodInClass {
     }
 
     private void retryInjectPhysically(Project project, List<String> packageList, String className, String methodName, TestCaseDto tc) {
-        VirtualFile sourceRoot = Tools.getInstance().getMainSourceRoot(project);
+        VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
         if (sourceRoot == null) return;
 
         String relativePath = String.join("/", packageList).toLowerCase() + "/" + className + ".java";

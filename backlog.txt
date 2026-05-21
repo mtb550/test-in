@@ -6,7 +6,7 @@ implement class debugger
 
 implement method debugger
 
-save open editors on workspace preferrences once close intellij.
+save open editors on workspace preferences once close IntelliJ.
 save selected project and hierarchy with selected focus.
 
 once click refresh button, keep selected project without change it to the fist.

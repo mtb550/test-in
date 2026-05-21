@@ -42,7 +42,7 @@ public class CreateTestSet implements GeneratorAction {
         String finalClassName = className;
         WriteAction.run(() -> {
             try {
-                VirtualFile sourceRoot = Tools.getInstance().getMainSourceRoot(project);
+                VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
 
                 if (sourceRoot != null) {
                     String relativePath = basePackage.replace('.', '/');

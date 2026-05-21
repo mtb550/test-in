@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import org.testin.pojo.CreateNodeMenu;
 
 import java.nio.file.Path;
+import java.util.List;
 
 @Setter
 @Getter
@@ -15,6 +16,8 @@ import java.nio.file.Path;
 @Accessors(chain = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TestSetDirectoryDto extends DirectoryDto {
+    private List<String> fqcn;
+
     @Override
     public TestSetDirectoryDto setPath(Path path) {
         super.setPath(path);

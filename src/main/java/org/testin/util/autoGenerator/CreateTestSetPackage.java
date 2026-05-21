@@ -26,7 +26,7 @@ public class CreateTestSetPackage implements GeneratorAction {
 
         WriteAction.run(() -> {
             try {
-                VirtualFile sourceRoot = Tools.getInstance().getMainSourceRoot(project);
+                VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
 
                 if (sourceRoot != null) {
                     String relativePath = fullPackagePath.replace('.', '/');

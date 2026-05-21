@@ -1,11 +1,13 @@
 package org.testin.pojo;
 
 import org.testin.pojo.dto.dirs.*;
+import org.testin.util.Tools;
 import org.testin.util.notifications.Notifier;
 
 import java.nio.file.Path;
 
 public class DirectoryMapper {
+    // todo, why static!!
     public static TestProjectDirectoryDto testProjectNode(final Path path) {
         try {
             TestCasesMainDirectoryDto tcd = new TestCasesMainDirectoryDto()
@@ -18,7 +20,7 @@ public class DirectoryMapper {
                     .setPath(path.resolve(DirectoryType.TRD.getPathName()))
                     .setName(DirectoryType.TRD.getDisplayedName());
 
-            System.out.println("test run project path: " + tcd.getPath());
+            System.out.println("test run project path: " + trd.getPath());
 
             return new TestProjectDirectoryDto()
                     .setTestCasesDirectory(tcd)
@@ -96,7 +98,8 @@ public class DirectoryMapper {
         try {
             return new TestSetDirectoryDto()
                     .setName(path.getFileName().toString())
-                    .setPath(path);
+                    .setPath(path)
+                    .setFqcn(Tools.getInstance().getTestSetFqcn(path));
 
         } catch (Exception e) {
             Notifier.getInstance().error("Read Test Set Failed", "Failed to parse directory: " + path.getFileName());

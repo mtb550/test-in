@@ -35,6 +35,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -58,6 +59,121 @@ public class Tools {
 
     public static Tools getInstance() {
         return INSTANCE;
+    }
+
+    public String sanitizePackageName(String name) {
+        if (name == null || name.isEmpty()) return "pkg";
+
+        String cleanName = name.replaceAll("[^a-zA-Z0-9]", " ").trim();
+        String[] words = cleanName.split("\\s+");
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (word.isEmpty()) continue;
+
+            if (i == 0) {
+                sb.append(word.toLowerCase());
+            } else {
+                sb.append(Character.toUpperCase(word.charAt(0)))
+                        .append(word.substring(1).toLowerCase());
+            }
+        }
+
+        String result = sb.toString();
+
+        result = result.replaceFirst("^\\d+", "");
+
+        return result.isEmpty() ? "pkg" : result;
+    }
+
+    public String sanitizeClassName(String name) {
+        if (name == null || name.isEmpty()) return "DefaultTest";
+
+        String cleanName = name.replaceAll("[^a-zA-Z0-9]", " ").trim();
+        String[] words = cleanName.split("\\s+");
+
+        StringBuilder sb = new StringBuilder();
+        for (String word : words) {
+            if (word.isEmpty()) continue;
+            sb.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1).toLowerCase());
+        }
+
+        String result = sb.toString();
+        result = result.replaceFirst("^\\d+", "");
+
+        if (result.isEmpty()) result = "Default";
+
+        if (!result.toLowerCase().endsWith("test")) {
+            result += "Test";
+        } else if (!result.endsWith("Test")) {
+            result = result.substring(0, result.length() - 4) + "Test";
+        }
+
+        return result;
+    }
+
+    public List<String> getTestSetFqcn(Path path) {
+        List<String> rawParts = new ArrayList<>(getTestSourceRootFqcn());
+
+        Path basePath = Config.getTestinPath();
+
+        if (basePath == null) {
+            System.out.println("WARNING: Config.getTestinPath() is null!");
+            rawParts.add(path.getFileName().toString());
+        } else {
+            Path relativePath = basePath.relativize(path);
+            for (Path part : relativePath) {
+                String folderName = part.toString();
+
+                if (!folderName.equalsIgnoreCase("testCases")) {
+                    rawParts.add(folderName);
+                }
+            }
+        }
+
+        List<String> fqcn = new ArrayList<>();
+
+        for (int i = 0; i < rawParts.size(); i++) {
+            String rawName = rawParts.get(i);
+
+            if (i == rawParts.size() - 1) {
+                fqcn.add(sanitizeClassName(rawName));
+            } else {
+                fqcn.add(sanitizePackageName(rawName));
+            }
+        }
+
+        System.out.println("Generated FQCN for " + path.getFileName() + ": " + fqcn); // todo, to be removed later
+        return fqcn;
+    }
+
+    public List<String> getTestSourceRootFqcn() {
+        Project project = Config.getProject();
+        List<String> sourceRootFqcn = new ArrayList<>();
+
+        VirtualFile testSourceRoot = getTestSourceRoot(project);
+
+        if (testSourceRoot != null && project.getBasePath() != null) {
+            Path rootPath = Paths.get(testSourceRoot.getPath());
+            Path projectPath = Paths.get(project.getBasePath());
+
+            if (rootPath.startsWith(projectPath)) {
+                Path relativePath = projectPath.relativize(rootPath);
+
+                for (Path part : relativePath) {
+                    String folderName = part.toString();
+                    if (!folderName.isEmpty()) {
+                        sourceRootFqcn.add(folderName);
+                    }
+                }
+            } else {
+                sourceRootFqcn.add(testSourceRoot.getName());
+            }
+        }
+
+        return sourceRootFqcn;
     }
 
     public Path getProjectPath(final SimpleTree tree) {
@@ -142,7 +258,7 @@ public class Tools {
     }
 
     @Deprecated
-    public String fileToFqcn(final File file) {
+    public String fileToFqcn(final File file) { // todo, to be removed.
         if (file == null) return "";
 
         String path = file.getAbsolutePath().replace("\\", "/");
@@ -415,7 +531,7 @@ public class Tools {
         return content.toString();
     }
 
-    public @Nullable VirtualFile getMainSourceRoot(final @NotNull Project project) {
+    public @Nullable VirtualFile getTestSourceRoot(final @NotNull Project project) {
         Module[] modules = ModuleManager.getInstance(project).getModules();
 
         for (Module module : modules) {
