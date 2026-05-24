@@ -4,6 +4,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
+import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
 
@@ -11,15 +13,19 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class TreeTransferHandler extends TransferHandler {
-    private static final DataFlavor NODE_FLAVOR;
+    public static final DataFlavor NODE_FLAVOR;
 
     static {
         try {
@@ -34,18 +40,18 @@ public class TreeTransferHandler extends TransferHandler {
     private final Set<DefaultMutableTreeNode> selectedNodes;
     private Integer lastAction;
 
-    public TreeTransferHandler(SimpleTree tree, Set<DefaultMutableTreeNode> selectedNodes) {
+    public TreeTransferHandler(final SimpleTree tree, final Set<DefaultMutableTreeNode> selectedNodes) {
         this.tree = tree;
         this.selectedNodes = selectedNodes;
     }
 
     @Override
-    public int getSourceActions(JComponent c) {
+    public int getSourceActions(final JComponent c) {
         return COPY_OR_MOVE;
     }
 
     @Override
-    protected Transferable createTransferable(JComponent c) {
+    protected Transferable createTransferable(final JComponent c) {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null) return null;
 
@@ -57,7 +63,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    public boolean canImport(TransferSupport support) {
+    public boolean canImport(final TransferSupport support) {
         if (!support.isDataFlavorSupported(NODE_FLAVOR)) return false;
 
         if (support.isDrop()) {
@@ -68,12 +74,13 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    public boolean importData(TransferSupport support) {
+    public boolean importData(final TransferSupport support) {
         if (!canImport(support)) return false;
 
         try {
-            DefaultMutableTreeNode[] nodes = (DefaultMutableTreeNode[]) support.getTransferable().getTransferData(NODE_FLAVOR);
-            DefaultMutableTreeNode targetNode = support.isDrop()
+            final DefaultMutableTreeNode[] nodes = (DefaultMutableTreeNode[]) support.getTransferable().getTransferData(NODE_FLAVOR);
+
+            final DefaultMutableTreeNode targetNode = support.isDrop()
                     ? (DefaultMutableTreeNode) ((SimpleTree.DropLocation) support.getDropLocation()).getPath().getLastPathComponent()
                     : (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
 
@@ -89,6 +96,7 @@ public class TreeTransferHandler extends TransferHandler {
                     model.removeNodeFromParent(node);
                     persistMove(node, targetDir);
                     model.insertNodeInto(node, targetNode, targetNode.getChildCount());
+
                 } else {
                     DefaultMutableTreeNode clone = deepCloneNode(node, targetDir.getPath());
                     persistCopy((DirectoryDto) node.getUserObject(), targetDir);
@@ -104,7 +112,7 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    private DefaultMutableTreeNode deepCloneNode(DefaultMutableTreeNode node, Path newParentPath) {
+    private DefaultMutableTreeNode deepCloneNode(final DefaultMutableTreeNode node, final Path newParentPath) {
         Object userObject = node.getUserObject();
 
         if (!(userObject instanceof DirectoryDto dir)) {
@@ -126,6 +134,7 @@ public class TreeTransferHandler extends TransferHandler {
             }
 
             return clonedNode;
+
         } catch (Exception e) {
             System.err.println("Failed to deep clone node: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -133,8 +142,8 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    private void persistMove(DefaultMutableTreeNode movedNode, DirectoryDto targetDir) {
-        DirectoryDto sourceDir = (DirectoryDto) movedNode.getUserObject();
+    private void persistMove(final DefaultMutableTreeNode movedNode, final DirectoryDto targetDir) {
+        final DirectoryDto sourceDir = (DirectoryDto) movedNode.getUserObject();
 
         TreeUtilImpl.executeVfsAction(sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
             sourceVf.move(this, targetVf);
@@ -150,7 +159,7 @@ public class TreeTransferHandler extends TransferHandler {
         });
     }
 
-    private void persistCopy(DirectoryDto source, DirectoryDto target) {
+    private void persistCopy(final DirectoryDto source, final DirectoryDto target) {
         TreeUtilImpl.executeVfsAction(source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
             sourceVf.copy(this, targetVf, sourceVf.getName());
             System.out.println("Copied successfully to: " + target.getPath().resolve(source.getName()));
@@ -158,7 +167,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    protected void exportDone(JComponent source, Transferable data, int action) {
+    protected void exportDone(final JComponent source, final Transferable data, int action) {
         resetLastAction();
     }
 
@@ -169,7 +178,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    public void exportToClipboard(JComponent comp, java.awt.datatransfer.Clipboard clip, int action) throws IllegalStateException {
+    public void exportToClipboard(final JComponent comp, final Clipboard clip, final int action) throws IllegalStateException {
         super.exportToClipboard(comp, clip, action);
         this.lastAction = action;
 
@@ -188,18 +197,38 @@ public class TreeTransferHandler extends TransferHandler {
     private record NodesTransferable(DefaultMutableTreeNode[] nodes) implements Transferable {
         @Override
         public DataFlavor[] getTransferDataFlavors() {
-            return new DataFlavor[]{NODE_FLAVOR};
+            return new DataFlavor[]{NODE_FLAVOR, DataFlavor.javaFileListFlavor};
         }
 
         @Override
-        public boolean isDataFlavorSupported(DataFlavor flavor) {
-            return NODE_FLAVOR.equals(flavor);
+        public boolean isDataFlavorSupported(final DataFlavor flavor) {
+            return NODE_FLAVOR.equals(flavor) || DataFlavor.javaFileListFlavor.equals(flavor);
         }
 
         @Override
-        public @NotNull Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-            if (!isDataFlavorSupported(flavor)) throw new UnsupportedFlavorException(flavor);
-            return nodes;
+        public @NotNull Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
+            if (NODE_FLAVOR.equals(flavor)) {
+                return nodes;
+            }
+
+            if (DataFlavor.javaFileListFlavor.equals(flavor)) {
+                List<File> files = new ArrayList<>();
+                for (DefaultMutableTreeNode node : nodes) {
+                    if (node.getUserObject() instanceof DirectoryDto dirDto) {
+
+                        if (dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestRunDirectoryDto) {
+
+                            Path nioPath = dirDto.getPath();
+                            if (nioPath != null) {
+                                files.add(nioPath.toFile());
+                            }
+                        }
+                    }
+                }
+                return files;
+            }
+
+            throw new UnsupportedFlavorException(flavor);
         }
     }
 }

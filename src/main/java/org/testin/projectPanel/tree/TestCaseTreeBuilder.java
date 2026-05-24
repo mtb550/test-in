@@ -23,8 +23,10 @@ public class TestCaseTreeBuilder extends AbstractTreeBuilder {
     protected DirectoryDto mapPathToDirectory(final Path path, DirectoryDto parentDir) {
         if (Files.exists(path.resolve(DirectoryType.TSP.getMarker())))
             return DirectoryMapper.getInstance().testSetPackageNode(path, parentDir);
+
         if (Files.exists(path.resolve(DirectoryType.TS.getMarker())))
             return DirectoryMapper.getInstance().testSetNode(path, parentDir);
+
         return null;
     }
 }

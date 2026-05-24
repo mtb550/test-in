@@ -48,6 +48,9 @@
                 implementation="org.testin.editorPanel.UnifiedEditorProvider"
         />
 
+        <!-- Editor Drop Handler -->
+        <fileDropHandler implementation="org.testin.projectPanel.tree.TreeDropHandler"/>
+
         <!-- Services -->
         <applicationService
                 serviceImplementation="org.testin.settings.AppSettingsState"
@@ -58,7 +61,7 @@
                 id="testin.tree"
                 factoryClass="org.testin.projectPanel.Main"
                 anchor="left"
-                icon="/META-INF/pluginIcon.svg"
+                icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
@@ -67,7 +70,7 @@
                 id="testin.view"
                 factoryClass="org.testin.viewPanel.ViewToolWindowFactory"
                 anchor="right"
-                icon="/META-INF/pluginIcon.svg"
+                icon="/icons/pluginIcon.svg"
                 secondary="false"
                 doNotActivateOnStart="true"
         />
