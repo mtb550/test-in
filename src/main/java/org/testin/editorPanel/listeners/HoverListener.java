@@ -69,7 +69,7 @@ public class HoverListener extends MouseAdapter {
     }
 
     @Override
-    public void mouseClicked(final MouseEvent e) {
+    public void mousePressed(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
         if (index == -1) return;
 
@@ -90,7 +90,13 @@ public class HoverListener extends MouseAdapter {
                 try {
                     TestStatus status = TestStatus.valueOf(action.name());
                     if (ui instanceof RunEditorUI runUi) {
-                        runUi.handleManualStatusUpdate(tc, status);
+                        int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
+
+                        if (globalIndex == runUi.getCurrentlyExecutingIndex()) {
+                            runUi.updateStatusAndNext(status);
+                        } else {
+                            runUi.handleManualStatusUpdate(tc, status);
+                        }
                     }
                 } catch (IllegalArgumentException ex) {
                     System.out.println("Unknown action: " + action.name());

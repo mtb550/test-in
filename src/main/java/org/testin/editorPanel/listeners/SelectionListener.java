@@ -29,6 +29,8 @@ public class SelectionListener implements ListSelectionListener {
             final List<TestCaseDto> selected = list.getSelectedValuesList();
 
             if (selected != null && !selected.isEmpty()) {
+                list.ensureIndexIsVisible(list.getSelectedIndex());
+
                 Optional.ofNullable(ViewToolWindowFactory.getToolWindow())
                         .filter(ToolWindow::isVisible)
                         .map(tw -> ViewToolWindowFactory.getViewPanel())

@@ -8,9 +8,7 @@ import com.intellij.ui.components.JBList;
 import org.testin.actions.CreateTestCase;
 import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testRunEditor.RunEditorUI;
 import org.testin.pojo.Config;
-import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.viewPanel.ViewToolWindowFactory;
@@ -29,10 +27,8 @@ public class TestMouseListener extends MouseAdapter {
     private final EditorCM editorCM;
     private final DefaultActionGroup emptyMenu;
     private final Path path;
-    private final IEditorUI ui;
 
     public TestMouseListener(final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorCM editorCM) {
-        this.ui = ui;
         this.list = list;
         this.path = dir.getPath();
         this.model = model;
@@ -65,20 +61,6 @@ public class TestMouseListener extends MouseAdapter {
             } else {
                 list.clearSelection();
                 actionManager.createActionPopupMenu(place, emptyMenu).getComponent().show(e.getComponent(), e.getX(), e.getY());
-            }
-        }
-    }
-
-    public void mousePressed(MouseEvent e) {
-
-        if (ui instanceof RunEditorUI runUI) {
-            String hoveredAction = runUI.getHoveredIconAction();
-            if (hoveredAction != null) {
-                try {
-                    TestStatus status = TestStatus.valueOf(hoveredAction);
-                    runUI.updateStatusAndNext(status);
-                } catch (IllegalArgumentException ignored) {
-                }
             }
         }
     }

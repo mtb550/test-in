@@ -94,6 +94,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     private long currentTestStartTime;
 
+    @Getter
     private int currentlyExecutingIndex = -1;
 
     public RunEditorUI(final UnifiedVirtualFile vf) {
@@ -422,20 +423,38 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         return list != null ? list.getSelectedValuesList() : Collections.emptyList();
     }
 
-    private void startTimerForIndex(int index) {
-        if (index >= currentTestCases.size()) {
+    private void startTimerForIndex(final int globalIndex) {
+        if (globalIndex >= currentTestCases.size()) {
             stopExecution();
+            if (tr != null) {
+                tr.setStatus(TestRunStatus.COMPLETED);
+                persistRunDataAsync();
+            }
             return;
         }
 
-        currentlyExecutingIndex = index;
-        list.setSelectedIndex(index);
-        list.ensureIndexIsVisible(index);
+        currentlyExecutingIndex = globalIndex;
 
-        TestCaseDto currentTc = currentTestCases.get(index);
+        int expectedPage = (globalIndex / pageSize) + 1;
+        if (currentPage != expectedPage) {
+            currentPage = expectedPage;
+            refreshView();
+        }
+
+        int localIndex = globalIndex - ((currentPage - 1) * pageSize);
+
+        if (list != null) {
+            list.setSelectedIndex(localIndex);
+            list.ensureIndexIsVisible(localIndex);
+        }
+
+        TestCaseDto currentTc = currentTestCases.get(globalIndex);
         TestRunItems runItem = resultsMap.get(currentTc.getId());
 
-        if (runItem == null) return;
+        if (runItem == null) {
+            updateStatusAndNext(TestStatus.PENDING);
+            return;
+        }
 
         runItem.setDuration(Duration.ZERO);
         currentTestStartTime = System.currentTimeMillis();
@@ -446,7 +465,9 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
             long seconds = (System.currentTimeMillis() - currentTestStartTime) / 1000;
             runItem.setDuration(Duration.ofSeconds(seconds));
 
-            list.repaint();
+            if (list != null) {
+                list.repaint();
+            }
         });
         executionTimer.start();
     }
@@ -513,8 +534,6 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
             persistRunDataAsync();
         }
 
-        int startIndex = list.getSelectedIndex() != -1 ? list.getSelectedIndex() : 0;
-
-        startTimerForIndex(startIndex);
+        startTimerForIndex(0);
     }
 }
