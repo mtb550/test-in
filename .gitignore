@@ -1,7 +1,6 @@
 .gradle/
 .idea/
 .intellijPlatform/
-build/
-out/
+.run/
 .sandbox/
-.fastRequest/
+build/
