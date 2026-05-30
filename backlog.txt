@@ -275,6 +275,8 @@ drag and drop for test sets and test runs from project panel to editor panel (PE
 regex, no dot or special chars for create new node ui. (PENDING)
 apply check box once update test case. (PENDING) with unify methods for sanitize names for packages and classes
 
-build fast parallel indexer, to retrieve test cases easily, in test runs,
+major change, build fast parallel indexer, to retrieve test cases easily, in test runs,
 retrieve test cases faster and easier (first, restrict creating test run until commit the current changes).
 retrieve test cases easily and faster, as we read tree once in startup time.
+
+major change, move to tree async model, to manage update, remove, dispose and rename nodes automatic.
