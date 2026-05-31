@@ -8,6 +8,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testCaseEditor.TestEditorUI;
 import org.testin.pojo.Config;
@@ -25,11 +26,12 @@ import java.util.UUID;
 
 public class PasteTestCaseNode extends DumbAwareAction {
     private final IEditorUI editorUI;
+    private final EditorCM editorCM;
 
-    public PasteTestCaseNode(final IEditorUI editorUI, final JComponent component) {
+    public PasteTestCaseNode(final IEditorUI editorUI, final JComponent component, final EditorCM editorCM) {
         super("Paste Node", "Paste selected test cases from clipboard to the end of the list", AllIcons.Actions.MenuPaste);
         this.editorUI = editorUI;
-
+        this.editorCM = editorCM;
         this.registerCustomShortcutSet(KeyboardSet.PasteTestCaseNode.getCustomShortcut(), component);
     }
 
@@ -38,73 +40,69 @@ public class PasteTestCaseNode extends DumbAwareAction {
         System.out.println("[DEBUG] PasteNode: actionPerformed triggered.");
 
         List<TestCaseDto> pastedCases = getFromClipboard();
-        System.out.println("[DEBUG] PasteNode: Parsed " + pastedCases.size() + " test cases from clipboard.");
-
         if (pastedCases.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            System.out.println("[DEBUG] PasteNode: Inside invokeLater. Preparing to clone items.");
-            for (TestCaseDto tc : pastedCases) {
+            TestEditorUI ui = (editorUI instanceof TestEditorUI) ? (TestEditorUI) editorUI : null;
+            if (ui == null) return;
 
-                if (tc == null) {
-                    continue;
+            boolean isCut = editorCM.isCutAction();
+
+            for (TestCaseDto tc : pastedCases) {
+                if (tc == null) continue;
+
+                TestCaseDto clonedTc = cloneForPasting(tc, isCut);
+
+                if (ui.getVf() != null && ui.getVf().getTestSet() != null) {
+                    clonedTc.setPath(ui.getVf().getTestSet().getPath2());
                 }
 
-                TestCaseDto clonedTc = cloneForPasting(tc);
                 editorUI.getAllTestCases().add(clonedTc);
-                System.out.println("[DEBUG] PasteNode: Cloned and added new test case ID: " + clonedTc.getId());
             }
 
-            if (!(editorUI instanceof TestEditorUI ui)) {
-                System.out.println("[DEBUG] PasteNode: editorUI is not an instance of TestEditorUI. Aborting sequence save.");
-                return;
-            }
-
-            System.out.println("[DEBUG] PasteNode: Triggering sequence update and save...");
             ui.sortAndIdentifyUnsorted();
             ui.updateSequenceAndSaveAll();
 
-            System.out.println("Successfully pasted and saved " + pastedCases.size() + " test cases.");
+            if (isCut) {
+                editorCM.setCutAction(false);
+            }
+
+            System.out.println("Successfully pasted " + pastedCases.size() + " items. Was Cut? " + isCut);
         });
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // Left empty for testing functionality. Button will always be enabled.
+        // todo, to be implemented. left empty for testing functionality.
     }
 
     private List<TestCaseDto> getFromClipboard() {
-        System.out.println("[DEBUG] PasteNode: Reading clipboard contents...");
         Transferable contents = CopyPasteManager.getInstance().getContents();
-
         if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
-
-                System.out.println("[DEBUG] PasteNode: Parsing clipboard text with Jackson...");
                 ObjectMapper mapper = Config.getMapper();
-
                 return mapper.readValue(json, new TypeReference<>() {
                 });
-
             } catch (Exception ex) {
-                System.out.println("[DEBUG] PasteNode: Clipboard text is not a valid JSON TestCase array.");
                 System.err.println("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
             }
         }
-
         return Collections.emptyList();
     }
 
-    private TestCaseDto cloneForPasting(final TestCaseDto original) {
+    private TestCaseDto cloneForPasting(final TestCaseDto original, boolean isCut) {
         final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
         final TestCaseDto clonedTc = Config.getMapper().convertValue(original, TestCaseDto.class);
 
-        clonedTc.setId(UUID.randomUUID())
-                .setDescription(original.getDescription() + " (Copy)")
-                .setCreatedAt(now)
-                .setUpdatedAt(now);
+        if (isCut) {
+            clonedTc.setUpdatedAt(now);
+        } else {
+            clonedTc.setId(UUID.randomUUID())
+                    .setDescription(original.getDescription() + " (Copy)")
+                    .setCreatedAt(now)
+                    .setUpdatedAt(now);
+        }
 
         return clonedTc;
     }

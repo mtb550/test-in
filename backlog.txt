@@ -252,7 +252,8 @@ make shortcut to set actual result, screenshot or exception (evidence, find anot
 
 fix mac shortcuts. check create test case and generate code on mac
 
-new magicked features, copy or cut test cases from specific editor and paste it in another editor. (PENDING)
+(PENDING) new magicked features, copy or cut test cases from specific editor and paste it in another editor. (PENDING)
+(PENDING) pending: make cut nodes in gray, implement escape cut nodes to revert back
 
 CTRL+Z to revert back if change description for singe or bulk test cases
 
