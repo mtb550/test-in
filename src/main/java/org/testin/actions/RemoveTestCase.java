@@ -10,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editorPanel.EditorCM;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
@@ -17,6 +18,7 @@ import org.testin.ui.RemoveTestCaseDialog;
 import org.testin.util.KeyboardSet;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 
 public class RemoveTestCase extends DumbAwareAction {
@@ -24,7 +26,7 @@ public class RemoveTestCase extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
 
-    public RemoveTestCase(DirectoryDto dir, JBList<TestCaseDto> list, CollectionListModel<TestCaseDto> model) {
+    public RemoveTestCase(final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
         this.dir = dir;
         this.list = list;
@@ -33,11 +35,16 @@ public class RemoveTestCase extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(@NotNull final AnActionEvent e) {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        if (!RemoveTestCaseDialog.confirmDeleteAction(selectedItems)) return;
+        boolean isCutAndSelected = EditorCM.isGlobalCutAction() &&
+                selectedItems.stream().allMatch(tc -> EditorCM.getGlobalPendingCutIds().contains(tc.getId()));
+
+        if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(selectedItems)) {
+            return;
+        }
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
@@ -48,7 +55,7 @@ public class RemoveTestCase extends DumbAwareAction {
         });
     }
 
-    private void performDeletion(List<TestCaseDto> selectedItems) throws IOException {
+    private void performDeletion(final List<TestCaseDto> selectedItems) throws IOException {
         int firstIdx = model.getElementIndex(selectedItems.getFirst());
         int lastIdx = model.getElementIndex(selectedItems.getLast());
 
@@ -65,22 +72,30 @@ public class RemoveTestCase extends DumbAwareAction {
             saveToFile(predecessor);
         }
 
-        VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dir.getPath().toFile());
-        if (dirVFile == null) return;
+        deletePhysicalFiles(selectedItems, dir.getPath(), this);
 
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
-            TestCaseDto tc = selectedItems.get(i);
-
-            VirtualFile targetFile = dirVFile.findChild(tc.getId() + ".json");
-            if (targetFile != null) {
-                targetFile.delete(this);
-            }
-
-            model.remove(model.getElementIndex(tc));
+            model.remove(model.getElementIndex(selectedItems.get(i)));
         }
     }
 
-    private void saveToFile(TestCaseDto item) throws IOException {
+    public static void deletePhysicalFiles(final List<TestCaseDto> items, final Path dirPath, final Object requestor) {
+        VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dirPath.toFile());
+        if (dirVFile == null) return;
+
+        for (TestCaseDto tc : items) {
+            VirtualFile targetFile = dirVFile.findChild(tc.getId() + ".json");
+            if (targetFile != null) {
+                try {
+                    targetFile.delete(requestor);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    private void saveToFile(TestCaseDto item) {
         VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dir.getPath().toFile());
         if (dirVFile == null) return;
 
@@ -88,10 +103,16 @@ public class RemoveTestCase extends DumbAwareAction {
         VirtualFile targetFile = dirVFile.findChild(fileName);
 
         if (targetFile == null) {
-            targetFile = dirVFile.createChildData(this, fileName);
+            try {
+                targetFile = dirVFile.createChildData(this, fileName);
+                String jsonContent = Config.getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(item);
+                VfsUtil.saveText(targetFile, jsonContent);
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
-        String jsonContent = Config.getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(item);
-        VfsUtil.saveText(targetFile, jsonContent);
+
     }
 }

@@ -15,6 +15,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface IEditorUI extends Disposable {
+    UnifiedVirtualFile getVf();
+
     StatusBar getStatusBar();
 
     AbstractToolbarPanel getToolBar();

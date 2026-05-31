@@ -11,11 +11,19 @@ import org.testin.actions.*;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 
-public class EditorCM extends DefaultActionGroup {
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
+public class EditorCM extends DefaultActionGroup {
+    @Getter
+    private static final Set<UUID> globalPendingCutIds = new HashSet<>();
     @Getter
     @Setter
-    private boolean isCutAction = false;
+    private static boolean globalCutAction = false;
+    @Getter
+    @Setter
+    private static IEditorUI globalSourceEditorUI = null;
 
     public EditorCM(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
@@ -26,9 +34,9 @@ public class EditorCM extends DefaultActionGroup {
         addSeparator();
         add(new UpdateTestCase(ui, list, dir.getPath()));
         add(new CopyTestCase(list));
-        add(new CopyTestCaseNode(list, this));
-        add(new CutTestCaseNode(ui, list, this));
-        add(new PasteTestCaseNode(ui, list, this));
+        add(new CopyTestCaseNode(list));
+        add(new CutTestCaseNode(ui, list));
+        add(new PasteTestCaseNode(ui, list));
         add(new RemoveTestCase(dir, list, model));
         addSeparator();
         add(new GenerateTestCase(list));
@@ -39,8 +47,17 @@ public class EditorCM extends DefaultActionGroup {
         add(new PrevPageAction(ui, list));
     }
 
-    // todo, remove static, refactor to prevent duplicate
-    public static void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final EditorCM editorCM) {
+    public static void clearCutState() {
+        globalCutAction = false;
+        globalPendingCutIds.clear();
+
+        if (globalSourceEditorUI != null && globalSourceEditorUI.getPreferredFocusedComponent() != null)
+            globalSourceEditorUI.getPreferredFocusedComponent().repaint();
+
+        globalSourceEditorUI = null;
+    }
+
+    public void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final EditorCM editorCM) {
         new Escape(list);
         new OpenCM(list, editorCM);
         new CreateTestCase(ui, dir, list, model);

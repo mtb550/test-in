@@ -17,14 +17,11 @@ import java.util.List;
 
 public class CopyTestCaseNode extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
-    private final EditorCM editorCM;
 
-    public CopyTestCaseNode(final JBList<TestCaseDto> list, final EditorCM editorCM) {
+    public CopyTestCaseNode(final JBList<TestCaseDto> list) {
         super("Copy Node", "Copy selected test case(s) to clipboard", AllIcons.Actions.Copy);
         this.list = list;
-        this.editorCM = editorCM;
         this.registerCustomShortcutSet(KeyboardSet.CopyTestCaseNode.getCustomShortcut(), list);
-
     }
 
     @Override
@@ -33,7 +30,7 @@ public class CopyTestCaseNode extends DumbAwareAction {
 
         if (!selectedTestCases.isEmpty()) {
             try {
-                editorCM.setCutAction(false);
+                EditorCM.clearCutState();
 
                 ObjectMapper mapper = Config.getMapper();
                 String json = mapper.writeValueAsString(selectedTestCases);

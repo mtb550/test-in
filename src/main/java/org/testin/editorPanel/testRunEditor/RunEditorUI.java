@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
+    @Getter
     private final UnifiedVirtualFile vf;
 
     @Getter
@@ -129,7 +130,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         final TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getTestRun(), editorCM);
         list.addMouseListener(testMouseListener);
 
-        EditorCM.registerShortcuts(this, vf.getTestRun(), list, model, editorCM);
+        editorCM.registerShortcuts(this, vf.getTestRun(), list, model, editorCM);
 
         Path selectionPath = vf.getTestRun().getPath();
         list.addListSelectionListener(new SelectionListener(list, this, selectionPath));

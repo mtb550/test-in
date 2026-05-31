@@ -134,7 +134,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         list.setTransferHandler(new TransferListener(this));
         list.setCellRenderer(new TestListRenderer(this));
 
-        EditorCM.registerShortcuts(this, vf.getTestSet(), list, model, editorCM);
+        editorCM.registerShortcuts(this, vf.getTestSet(), list, model, editorCM);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         this.statusBar = new StatusBar();
