@@ -34,6 +34,22 @@ public class RemoveTestCase extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.DeletePackage.getCustomShortcut(), list);
     }
 
+    public static void deletePhysicalFiles(final List<TestCaseDto> items, final Path dirPath, final Object requestor) {
+        VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dirPath.toFile());
+        if (dirVFile == null) return;
+
+        for (TestCaseDto tc : items) {
+            VirtualFile targetFile = dirVFile.findChild(tc.getId() + ".json");
+            if (targetFile != null) {
+                try {
+                    targetFile.delete(requestor);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
@@ -76,22 +92,6 @@ public class RemoveTestCase extends DumbAwareAction {
 
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
             model.remove(model.getElementIndex(selectedItems.get(i)));
-        }
-    }
-
-    public static void deletePhysicalFiles(final List<TestCaseDto> items, final Path dirPath, final Object requestor) {
-        VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dirPath.toFile());
-        if (dirVFile == null) return;
-
-        for (TestCaseDto tc : items) {
-            VirtualFile targetFile = dirVFile.findChild(tc.getId() + ".json");
-            if (targetFile != null) {
-                try {
-                    targetFile.delete(requestor);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
         }
     }
 

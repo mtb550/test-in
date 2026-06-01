@@ -15,7 +15,6 @@ import java.util.List;
 public class TestCard extends BaseCard {
     private final List<JComponent> badges = new ArrayList<>();
     private final Map<String, String> details = new LinkedHashMap<>();
-
     private boolean isPendingCut = false;
 
     public TestCard() {

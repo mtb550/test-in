@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.FontSyncUtil;
 import org.testin.viewPanel.details.components.*;
 import org.testin.viewPanel.details.components.Module;
 
@@ -52,7 +53,7 @@ public class DetailsTab {
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
         final JLabel placeholder = new JLabel(PLACEHOLDER_TEXT);
         placeholder.setForeground(JBColor.GRAY);
-        placeholder.setFont(JBFont.label().deriveFont(20.0f));
+        placeholder.setFont(JBFont.label().deriveFont(FontSyncUtil.getBaseFontSize() + 5.0f));
         panel.add(placeholder, BorderLayout.NORTH);
     }
 

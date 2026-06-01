@@ -6,9 +6,11 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.FontSyncUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,7 +47,9 @@ public class Id extends BaseDetails {
             }
         };
 
-        idBadge.setFont(JBUI.Fonts.smallFont());
+        float badgeSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 3.0f);
+        idBadge.setFont(JBFont.label().deriveFont(Font.BOLD, badgeSize));
+
         idBadge.setForeground(FG_COLOR);
         idBadge.setBorder(JBUI.Borders.empty(BADGE_BORDER_V, BADGE_BORDER_H));
         idBadge.setOpaque(false);

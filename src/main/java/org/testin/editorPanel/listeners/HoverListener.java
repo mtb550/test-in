@@ -1,9 +1,7 @@
 package org.testin.editorPanel.listeners;
 
 import com.intellij.ui.components.JBList;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import org.testin.actions.NavigateToCode;
 import org.testin.actions.RunTestCase;
 import org.testin.editorPanel.IEditorUI;
@@ -33,13 +31,18 @@ public class HoverListener extends MouseAdapter {
     private CardHoverAction getActionAtPoint(final int index, final int xInCell, final int yInCell, final Rectangle bounds) {
         if (index == -1) return null;
 
-        if (yInCell <= JBUI.scale(45)) {
+        float baseSize = list.getFont().getSize2D();
+
+        final Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + 2.0f);
+        final FontMetrics fm = list.getFontMetrics(titleFont);
+
+        int dynamicYBound = fm.getHeight() + JBUI.scale(20);
+
+        if (yInCell <= dynamicYBound) {
             final TestCaseDto tc = list.getModel().getElementAt(index);
             final int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
             final String titleText = String.format(Locale.ENGLISH, "%d. %s", globalIndex + 1, tc.getDescription());
 
-            final Font titleFont = JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f);
-            final FontMetrics fm = list.getFontMetrics(titleFont);
             final int titleWidth = fm.stringWidth(titleText);
 
             final int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
@@ -52,7 +55,8 @@ public class HoverListener extends MouseAdapter {
         }
 
         if (ui instanceof RunEditorUI && list.isSelectedIndex(index)) {
-            final int actionWidth = JBUI.scale(ACTIONS_TOTAL_WIDTH);
+            float fontScaleMultiplier = baseSize / 15.0f;
+            final int actionWidth = (int) (JBUI.scale(ACTIONS_TOTAL_WIDTH) * fontScaleMultiplier);
             final int actionStartX = bounds.width - actionWidth;
 
             if (xInCell >= actionStartX && xInCell <= bounds.width) {

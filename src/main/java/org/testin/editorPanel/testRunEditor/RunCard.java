@@ -3,7 +3,6 @@ package org.testin.editorPanel.testRunEditor;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.testin.editorPanel.BaseCard;
 import org.testin.pojo.CardHoverAction;
@@ -48,6 +47,15 @@ public class RunCard extends BaseCard {
         actionPanel.setVisible(false);
         actionPanel.setBorder(JBUI.Borders.empty());
         this.add(actionPanel, BorderLayout.EAST);
+    }
+
+    @Override
+    public void applyListFont(final Font listFont) {
+        super.applyListFont(listFont);
+        float baseSize = listFont.getSize2D();
+        for (JBLabel btn : statusLabels.values()) {
+            btn.setFont(listFont.deriveFont(Font.BOLD, baseSize));
+        }
     }
 
     public void updateData(final int index, final TestCaseDto tc, final Set<?> activeDetails, final TestRunItems runItem) {
@@ -96,7 +104,6 @@ public class RunCard extends BaseCard {
         // method to create PASSED, FAILED, BLOCKED
         final JBLabel lbl = new JBLabel(text, SwingConstants.CENTER);
         lbl.setOpaque(false);
-        lbl.setFont(JBFont.regular().asBold());
         lbl.setBorder(JBUI.Borders.empty());
         return lbl;
     }

@@ -5,14 +5,13 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.FontSyncUtil;
 import org.testin.util.Tools;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class Title extends BaseDetails {
-
-    private static final float TITLE_FONT_SIZE = 26.0f;
 
     private static final int INSETS_TOP = 20;
     private static final int INSETS_LEFT = 16;
@@ -26,7 +25,10 @@ public class Title extends BaseDetails {
         final String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
         final JTextArea mainTitleArea = new JTextArea(finalValue);
-        mainTitleArea.setFont(JBFont.label().deriveFont(Font.BOLD, TITLE_FONT_SIZE));
+
+        float titleFontSize = FontSyncUtil.getBaseFontSize() + 11.0f;
+        mainTitleArea.setFont(JBFont.label().deriveFont(Font.BOLD, titleFontSize));
+
         mainTitleArea.setLineWrap(true);
         mainTitleArea.setWrapStyleWord(true);
         mainTitleArea.setOpaque(false);

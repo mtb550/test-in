@@ -35,6 +35,8 @@ public class TestListRenderer implements ListCellRenderer<TestCaseDto> {
                 JBUI.Borders.customLine(JBColor.blue, 1) :
                 JBUI.Borders.empty(1));
 
+        rendererCard.applyListFont(list.getFont());
+
         return rendererCard;
     }
 }

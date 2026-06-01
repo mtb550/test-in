@@ -25,6 +25,7 @@ import org.testin.pojo.*;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.ui.RunOpeningForm;
+import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.services.TestCaseCacheService;
 
@@ -108,6 +109,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         buildOpeningPanel();
         loadDataAsync();
+
+        FontSyncUtil.syncWithNativeEditor(list, this);
     }
 
     private void buildOpeningPanel() {

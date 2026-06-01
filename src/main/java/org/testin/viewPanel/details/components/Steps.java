@@ -23,7 +23,6 @@ public class Steps extends BaseDetails {
         if (steps.isEmpty() || steps.stream().allMatch(String::isBlank))
             return row;
 
-
         final JPanel stepsContainer = new JPanel();
         stepsContainer.setLayout(new BoxLayout(stepsContainer, BoxLayout.Y_AXIS));
         stepsContainer.setOpaque(false);
@@ -41,7 +40,7 @@ public class Steps extends BaseDetails {
 
     private JTextArea createStepComponent(final String text, final int marginBottom) {
         final JTextArea stepArea = new JTextArea(text);
-        stepArea.setFont(JBFont.label().deriveFont(Font.PLAIN, VALUE_FONT_SIZE));
+        stepArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
         stepArea.setLineWrap(true);
         stepArea.setWrapStyleWord(true);
         stepArea.setOpaque(false);

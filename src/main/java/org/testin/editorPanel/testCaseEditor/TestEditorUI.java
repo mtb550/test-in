@@ -31,6 +31,7 @@ import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.viewPanel.ViewPanel;
@@ -112,6 +113,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
+
+        FontSyncUtil.syncWithNativeEditor(list, this);
 
         final JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);

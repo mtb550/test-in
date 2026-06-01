@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.FontSyncUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,8 +16,6 @@ import java.awt.*;
 public abstract class BaseDetails {
 
     protected static final int LABEL_WIDTH = 255;
-    protected static final float LABEL_FONT_SIZE = 20.0f;
-    protected static final float VALUE_FONT_SIZE = 23.0f;
     private static final int LABEL_INSETS_TOP = 12;
     private static final int LABEL_INSETS_LEFT = 16;
     private static final int LABEL_INSETS_BOTTOM = 12;
@@ -26,6 +25,14 @@ public abstract class BaseDetails {
     private static final int VALUE_INSETS_BOTTOM = 12;
     private static final int VALUE_INSETS_RIGHT = 16;
 
+    protected float getLabelFontSize() {
+        return FontSyncUtil.getBaseFontSize() + 5.0f; // Roughly 20.0f default
+    }
+
+    protected float getValueFontSize() {
+        return FontSyncUtil.getBaseFontSize() + 8.0f; // Roughly 23.0f default
+    }
+
     public abstract int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow);
 
     protected int addRow(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final String labelText, @Nullable final String valueText, final int row) {
@@ -34,7 +41,7 @@ public abstract class BaseDetails {
             return row;
 
         final JTextArea valueArea = new JTextArea(valueText);
-        valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, VALUE_FONT_SIZE));
+        valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
         valueArea.setLineWrap(true);
         valueArea.setWrapStyleWord(true);
         valueArea.setOpaque(false);
@@ -57,7 +64,7 @@ public abstract class BaseDetails {
 
         final JBLabel label = new JBLabel(labelText);
         label.setForeground(JBColor.GRAY);
-        label.setFont(JBFont.label().deriveFont(Font.BOLD, LABEL_FONT_SIZE));
+        label.setFont(JBFont.label().deriveFont(Font.BOLD, getLabelFontSize()));
 
         final Dimension prefSize = label.getPreferredSize();
         label.setPreferredSize(new Dimension(LABEL_WIDTH, prefSize.height));

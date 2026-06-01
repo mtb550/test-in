@@ -9,6 +9,7 @@ import com.intellij.util.ui.UIUtil;
 import org.testin.pojo.CardHoverAction;
 import org.testin.pojo.Group;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.FontSyncUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -60,7 +61,10 @@ public class Shared {
             setOpaque(false);
             setBackground(bg);
             setForeground(JBColor.WHITE);
-            setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD));
+
+            float badgeSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 2.0f);
+            setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
+
             setBorder(JBUI.Borders.empty(2, 10));
         }
 

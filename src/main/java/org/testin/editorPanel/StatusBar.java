@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
+import org.testin.util.FontSyncUtil;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
@@ -41,18 +42,25 @@ public class StatusBar extends JBPanel<StatusBar> {
         clockTimer.start();
         updateClock();
 
-
-        setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0));
+        setBorder(JBUI.Borders.compound(
+                JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0),
+                JBUI.Borders.empty(4, 0)
+        ));
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
-        setPreferredSize(new Dimension(-1, JBUI.scale(28)));
 
-        statusLabel.setFont(JBUI.Fonts.smallFont());
+        float smallSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 2.0f);
+        Font dynamicSmallFont = JBUI.Fonts.smallFont().deriveFont(smallSize);
+
+        statusLabel.setFont(dynamicSmallFont);
         statusLabel.setForeground(UIUtil.getContextHelpForeground());
         statusLabel.setBorder(JBUI.Borders.emptyLeft(10));
 
-        syncLabel.setFont(JBUI.Fonts.smallFont());
+        syncLabel.setFont(dynamicSmallFont);
         syncLabel.setForeground(UIUtil.getInactiveTextColor());
         syncLabel.setBorder(JBUI.Borders.emptyRight(10));
+
+        currentPageLabel.setFont(dynamicSmallFont);
+        pageSizeField.setFont(dynamicSmallFont);
 
         final JPanel paginationPanel = new JBPanel<>(new FlowLayout(FlowLayout.CENTER, JBUI.scale(5), 0));
         paginationPanel.setOpaque(false);
@@ -60,10 +68,10 @@ public class StatusBar extends JBPanel<StatusBar> {
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
         pageSizeField.setToolTipText("Test cases per page");
 
-        ///makeCompact(firstButton);
-        makeCompact(prevButton);
-        makeCompact(nextButton);
-        ///makeCompact(lastButton);
+        ///makeCompact(firstButton, dynamicSmallFont);
+        makeCompact(prevButton, dynamicSmallFont);
+        makeCompact(nextButton, dynamicSmallFont);
+        ///makeCompact(lastButton, dynamicSmallFont);
 
         new HelpTooltip()
                 .setDescription("Previous page")
@@ -93,10 +101,10 @@ public class StatusBar extends JBPanel<StatusBar> {
         syncLabel.setText("System Time: " + currentTime);
     }
 
-    private void makeCompact(final JButton button) {
+    private void makeCompact(final JButton button, final Font font) {
         button.putClientProperty("ActionToolbar.smallVariant", true);
         button.setMargin(JBUI.insets(0, 4));
-        button.setFont(JBUI.Fonts.smallFont());
+        button.setFont(font);
         button.setFocusable(false);
     }
 
@@ -130,5 +138,4 @@ public class StatusBar extends JBPanel<StatusBar> {
             statusLabel.setText(String.format(Locale.ENGLISH, "0 of %d test cases", totalCount));
         }
     }
-
 }

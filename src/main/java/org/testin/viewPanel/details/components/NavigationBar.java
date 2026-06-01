@@ -16,6 +16,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Bundle;
 import org.testin.util.EditorUtil;
+import org.testin.util.FontSyncUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +32,6 @@ import java.util.Map;
 
 public class NavigationBar extends BaseDetails {
 
-    private static final float FONT_SIZE = 14f;
     private static final Color DEFAULT_TEXT_COLOR = Gray._120;
     private static final int SEPARATOR_BORDER_V = 0;
     private static final int SEPARATOR_BORDER_H = 6;
@@ -55,6 +55,8 @@ public class NavigationBar extends BaseDetails {
         final JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
+        float navFontSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 1.0f);
+
         if (currentPath != null) {
             final List<File> fileList = buildPathFileList(currentPath);
             for (int i = 0; i < fileList.size(); i++) {
@@ -64,7 +66,7 @@ public class NavigationBar extends BaseDetails {
                 final boolean isTestSet = (i == fileList.size() - 1);
 
                 final JBLabel folderLabel = new JBLabel(labelText);
-                folderLabel.setFont(JBUI.Fonts.label(FONT_SIZE));
+                folderLabel.setFont(JBUI.Fonts.label(navFontSize));
                 folderLabel.setForeground(DEFAULT_TEXT_COLOR);
                 folderLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 

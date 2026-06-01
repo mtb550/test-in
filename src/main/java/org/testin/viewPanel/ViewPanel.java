@@ -1,5 +1,6 @@
 package org.testin.viewPanel;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBPanel;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Config;
 import org.testin.pojo.ViewTab;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.FontSyncUtil;
 import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
 import org.testin.viewPanel.details.DetailsTab;
 import org.testin.viewPanel.history.HistoryTab;
@@ -19,7 +21,7 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.List;
 
-public class ViewPanel {
+public class ViewPanel implements Disposable {
     private final JBPanel<?> detailsTab;
     private final JBPanel<?> historyTab;
     private final JBPanel<?> openBugsTab;
@@ -39,6 +41,10 @@ public class ViewPanel {
         historyTab = new JBPanel<>(new BorderLayout());
         openBugsTab = new JBPanel<>(new BorderLayout());
 
+        FontSyncUtil.syncWithNativeEditor(detailsTab, this);
+        FontSyncUtil.syncWithNativeEditor(historyTab, this);
+        FontSyncUtil.syncWithNativeEditor(openBugsTab, this);
+
         detailsScrollPane = createScrollPane(detailsTab);
         historyScrollPane = createScrollPane(historyTab);
         openBugsScrollPane = createScrollPane(openBugsTab);
@@ -47,7 +53,7 @@ public class ViewPanel {
 
         refreshCurrentView();
 
-        Config.getProject().getMessageBus().connect().subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
+        Config.getProject().getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
             final TestCaseDto currentDto = getCurrentTestCaseDto();
 
             if (currentDto != null && testName.contains(currentDto.getDescription())) {
@@ -156,4 +162,10 @@ public class ViewPanel {
         detailsTab.requestFocusInWindow();
     }
 
+    @Override
+    public void dispose() {
+        detailsTab.removeAll();
+        historyTab.removeAll();
+        openBugsTab.removeAll();
+    }
 }

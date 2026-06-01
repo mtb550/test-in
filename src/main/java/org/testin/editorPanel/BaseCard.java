@@ -5,7 +5,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.panels.VerticalLayout;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
@@ -18,8 +17,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
-    protected static final int CARD_HEIGHT = 130;
-
     protected final JBLabel titleLabel = new JBLabel();
     protected final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
     protected final Map<String, JBLabel> attributeLabels = new HashMap<>();
@@ -34,9 +31,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     public BaseCard() {
         setLayout(new BorderLayout());
         setOpaque(true);
-        setMaximumSize(new Dimension(Integer.MAX_VALUE, JBUI.scale(CARD_HEIGHT)));
 
-        titleLabel.setFont(JBFont.label().deriveFont(Font.BOLD, UIUtil.getLabelFont().getSize() + 10.0f));
         titleLabel.setForeground(UIUtil.getLabelForeground());
 
         badgePanel.setOpaque(false);
@@ -58,6 +53,21 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         wrapper.addToCenter(content);
 
         add(wrapper, BorderLayout.CENTER);
+    }
+
+    public void applyListFont(final Font listFont) {
+        float baseSize = listFont.getSize2D();
+
+        titleLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + 2.0f));
+
+        for (JBLabel lbl : attributeLabels.values()) {
+            lbl.setFont(listFont.deriveFont(baseSize));
+        }
+
+        float badgeSize = Math.max(8.0f, baseSize - 2.0f);
+        for (Component c : badgePanel.getComponents()) {
+            c.setFont(listFont.deriveFont(Font.BOLD, badgeSize));
+        }
     }
 
     protected void updateUI(final int index, final String title, final List<JComponent> badges, final Map<String, String> details) {
@@ -104,7 +114,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
     private JBLabel createDetailLabel() {
         final JBLabel label = new JBLabel();
-        label.setFont(UIUtil.getLabelFont(UIUtil.FontSize.NORMAL));
         label.setForeground(UIUtil.getContextHelpForeground());
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         return label;
