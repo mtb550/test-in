@@ -3,6 +3,7 @@ package org.testin.util;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -24,8 +25,8 @@ public class EditorUtil {
         return INSTANCE;
     }
 
-    public boolean isEditorOpen(final String s) {
-        FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
+    public boolean isEditorOpen(final @NotNull Project project, final String s) {
+        FileEditorManager editorManager = FileEditorManager.getInstance(project);
         VirtualFile[] openFiles = editorManager.getOpenFiles();
 
         for (VirtualFile vf : openFiles) {
@@ -38,8 +39,8 @@ public class EditorUtil {
         return false;
     }
 
-    public void closeEditor(final String s) {
-        FileEditorManager editorManager = FileEditorManager.getInstance(Config.getProject());
+    public void closeEditor(final @NotNull Project project, final String s) {
+        FileEditorManager editorManager = FileEditorManager.getInstance(project);
         VirtualFile[] openFiles = editorManager.getOpenFiles();
 
         for (VirtualFile vf : openFiles) {
@@ -50,10 +51,8 @@ public class EditorUtil {
         }
     }
 
-    public void closeThenOpenEditor(final VirtualFile vf, final DirectoryDto dir) {
+    public void closeThenOpenEditor(final @NotNull Project project, final VirtualFile vf, final DirectoryDto dir) {
         if (vf == null || dir == null) return;
-
-        final Project project = Config.getProject();
         final FileEditorManager editorManager = FileEditorManager.getInstance(project);
 
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -81,7 +80,7 @@ public class EditorUtil {
         final UnifiedVirtualFile newVf = new UnifiedVirtualFile(dir, ft);
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Optional.ofNullable(FileEditorManager.getInstance(Config.getProject()))
+                Optional.ofNullable(FileEditorManager.getInstance(project))
                         .ifPresent(editorManager -> editorManager.openFile(newVf, true))
         );
     }

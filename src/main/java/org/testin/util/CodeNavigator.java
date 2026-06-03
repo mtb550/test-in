@@ -15,8 +15,7 @@ import java.util.List;
 
 public class CodeNavigator {
 
-    public void toCode(final @NotNull List<String> fqcn) {
-        final Project project = Config.getProject();
+    public void toCode(final @NotNull Project project, final @NotNull List<String> fqcn) {
         final String className = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final String methodName = fqcn.getLast();
 
@@ -48,7 +47,7 @@ public class CodeNavigator {
                         });
 
                     } else
-                        ApplicationManager.getApplication().invokeLater(() -> Notifier.getInstance().error("Navigation Error: ", "Class Not Found: " + className));
+                        ApplicationManager.getApplication().invokeLater(() -> Notifier.getInstance().error(project, "Navigation Error: ", "Class Not Found: " + className));
                 })
         );
     }
