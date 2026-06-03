@@ -7,8 +7,8 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.content.Content;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.pojo.Config;
 import org.testin.pojo.ViewTab;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.FontSyncUtil;
@@ -36,7 +36,10 @@ public class ViewPanel implements Disposable {
     @Getter
     private final ViewPagination page;
 
-    public ViewPanel() {
+    private final Project project;
+
+    public ViewPanel(final @NotNull Project project) {
+        this.project = project;
         detailsTab = new JBPanel<>(new BorderLayout());
         historyTab = new JBPanel<>(new BorderLayout());
         openBugsTab = new JBPanel<>(new BorderLayout());
@@ -53,7 +56,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        Config.getProject().getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
+        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
             final TestCaseDto currentDto = getCurrentTestCaseDto();
 
             if (currentDto != null && testName.contains(currentDto.getDescription())) {
@@ -94,11 +97,11 @@ public class ViewPanel implements Disposable {
     }
 
     public void show(final List<TestCaseDto> testCases, final Path path) {
-        this.show(Config.getProject(), testCases, path);
+        this.show(project, testCases, path);
     }
 
     public ViewPanel hide() {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow();
+        ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
         if (tw != null && tw.isVisible()) {
             tw.hide(null);
         }
@@ -110,7 +113,7 @@ public class ViewPanel implements Disposable {
     }
 
     private void selectContent(final ViewTab tab) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow();
+        ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
         if (tw == null) return;
 
         Content[] contents = tw.getContentManager().getContents();
@@ -123,7 +126,7 @@ public class ViewPanel implements Disposable {
     }
 
     public void hide(final TestCaseDto testCaseDtoToMatch) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow();
+        ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
         if (tw == null || !tw.isVisible()) return;
 
         TestCaseDto currentlyShown = this.getCurrentTestCaseDto();

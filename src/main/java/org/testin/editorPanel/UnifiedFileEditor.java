@@ -2,6 +2,7 @@ package org.testin.editorPanel;
 
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorState;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,10 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     private final IEditorUI ui;
     private final UnifiedVirtualFile vf;
 
-    public UnifiedFileEditor(final UnifiedVirtualFile vf, final IEditorUI ui) {
+    private final Project project;
+
+    public UnifiedFileEditor(final @NotNull Project project, final UnifiedVirtualFile vf, final IEditorUI ui) {
+        this.project = project;
         this.vf = vf;
         this.ui = ui;
     }
@@ -75,7 +79,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     public void selectNotify() {
         final List<TestCaseDto> selected = ui.getSelectedTestCases();
 
-        Optional.ofNullable(ViewToolWindowFactory.getToolWindow())
+        Optional.ofNullable(ViewToolWindowFactory.getToolWindow(project))
                 .map(tw -> ViewToolWindowFactory.getViewPanel())
                 .ifPresent(viewer -> {
 

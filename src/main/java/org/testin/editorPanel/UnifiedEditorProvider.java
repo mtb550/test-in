@@ -32,7 +32,7 @@ public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
             else
                 throw new IllegalArgumentException("Unknown FileType: " + unifiedFile.getFileType());
 
-            return new UnifiedFileEditor(unifiedFile, ui);
+            return new UnifiedFileEditor(project, unifiedFile, ui);
         }
 
         throw new IllegalArgumentException("Unsupported virtual file type: " + file.getClass().getName());

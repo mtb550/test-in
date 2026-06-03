@@ -1,5 +1,6 @@
 package org.testin.editorPanel.listeners;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import org.testin.editorPanel.IEditorUI;
@@ -17,7 +18,10 @@ public class SelectionListener implements ListSelectionListener {
     private final IEditorUI ui;
     private final Path path;
 
-    public SelectionListener(final JBList<TestCaseDto> list, final IEditorUI ui, final Path path) {
+    private final Project project;
+
+    public SelectionListener(final @NotNull Project project, final JBList<TestCaseDto> list, final IEditorUI ui, final Path path) {
+        this.project = project;
         this.list = list;
         this.ui = ui;
         this.path = path;
@@ -31,7 +35,7 @@ public class SelectionListener implements ListSelectionListener {
             if (selected != null && !selected.isEmpty()) {
                 list.ensureIndexIsVisible(list.getSelectedIndex());
 
-                Optional.ofNullable(ViewToolWindowFactory.getToolWindow())
+                Optional.ofNullable(ViewToolWindowFactory.getToolWindow(project))
                         .filter(ToolWindow::isVisible)
                         .map(tw -> ViewToolWindowFactory.getViewPanel())
                         .ifPresent(viewer -> viewer.show(selected, path));

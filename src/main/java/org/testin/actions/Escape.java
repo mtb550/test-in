@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -55,7 +56,7 @@ public class Escape extends DumbAwareAction {
 
             CopyPasteManager.getInstance().setContents(new StringSelection(""));
 
-            ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow();
+            ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow(e.getProject());
 
             if (toolWindow != null && toolWindow.isVisible()) {
                 toolWindow.hide(null);

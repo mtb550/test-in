@@ -58,7 +58,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
                 StartupActivity.execute(project);
             }
 
-            viewPanel = new ViewPanel();
+            viewPanel = new ViewPanel(project);
 
             ContentFactory contentFactory = ContentFactory.getInstance();
 
