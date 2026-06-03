@@ -1,6 +1,5 @@
 package org.testin.pojo;
 
-import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -27,12 +26,5 @@ public class Config {
     @Getter
     @Nullable
     private static Path automationPath = null;
-
-    @Setter
-    @Getter
-    @NotNull
-    @Deprecated
-    // todo, to be removed as we can get the project from toolwindow class e.getProject()
-    private static Project project;
 
 }

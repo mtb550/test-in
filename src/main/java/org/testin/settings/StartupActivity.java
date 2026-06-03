@@ -22,8 +22,6 @@ public class StartupActivity implements ProjectActivity {
 
         Log.info("StartupActivity.execute()");
 
-        Config.setProject(project); // todo, to be removed as we can get the project from toolWindowManager
-
         AppSettingsState settings = AppSettingsState.getInstance();
 
         Path testinPath = null;
@@ -56,7 +54,7 @@ public class StartupActivity implements ProjectActivity {
         Log.info("testin Path: " + testinPath);
         Log.info("automation Path: " + automationPath);
 
-        TestCaseExecutionTracker.initGlobalListener(Config.getProject());
+        TestCaseExecutionTracker.initGlobalListener(project);
     }
 
     @Override
