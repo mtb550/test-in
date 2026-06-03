@@ -17,20 +17,20 @@ public enum RunStatus {
             "IDLE",
             AllIcons.RunConfigurations.TestState.Run,
             "Run Test Case",
-            (tc, list) -> new RunTestCase(list).execute(tc)
+            (tc, list) -> new RunTestCase(list).execute(Config.getProject(), tc)
     ),
 
     PASSED(
             "PASSED",
             AllIcons.RunConfigurations.TestPassed,
             "Run Test Case",
-            (tc, list) -> new RunTestCase(list).execute(tc)
+            (tc, list) -> new RunTestCase(list).execute(Config.getProject(), tc)
     ),
 
     FAILED("FAILED",
             AllIcons.RunConfigurations.TestFailed,
             "Run Test Case",
-            (tc, list) -> new RunTestCase(list).execute(tc)
+            (tc, list) -> new RunTestCase(list).execute(Config.getProject(), tc)
     ),
 
     RUNNING(

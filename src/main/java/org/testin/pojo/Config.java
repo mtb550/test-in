@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-
 public class Config {
     public static final DateTimeFormatter EXCEL_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -32,6 +31,7 @@ public class Config {
     @Setter
     @Getter
     @NotNull
+    @Deprecated
     // todo, to be removed as we can get the project from toolwindow class e.getProject()
     private static Project project;
 

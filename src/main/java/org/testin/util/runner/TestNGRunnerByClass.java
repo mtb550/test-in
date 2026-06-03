@@ -4,9 +4,6 @@ import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.executors.DefaultRunExecutor;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -19,12 +16,12 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
-import org.testin.pojo.Config;
+import org.jetbrains.annotations.NotNull;
+import org.testin.util.logger.Log;
 
 public class TestNGRunnerByClass {
 
-    public static void runTestClass(String fqcn) {
-        final Project project = Config.getProject();
+    public static void runTestClass(final @NotNull Project project, final @NotNull String fqcn) {
 
         if (DumbService.isDumb(project)) {
             DumbService.getInstance(project).showDumbModeNotification(
@@ -33,6 +30,8 @@ public class TestNGRunnerByClass {
             return;
         }
 
+        Log.info("[RUNNER] Running test class: " + fqcn);
+
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 ApplicationManager.getApplication().runReadAction(() -> {
@@ -40,46 +39,36 @@ public class TestNGRunnerByClass {
                     PsiClass targetClass = JavaPsiFacade.getInstance(project)
                             .findClass(fqcn, GlobalSearchScope.projectScope(project));
 
-                    Module module = null;
-                    if (targetClass != null) {
-                        module = ModuleUtilCore.findModuleForPsiElement(targetClass);
-                    }
-
-                    final Module finalModule = module;
+                    final String finalFqcn = targetClass != null ? targetClass.getQualifiedName() : fqcn;
+                    final Module finalModule = targetClass != null ? ModuleUtilCore.findModuleForPsiElement(targetClass) : null;
 
                     ApplicationManager.getApplication().invokeLater(() -> {
 
                         RunManager runManager = RunManager.getInstance(project);
                         TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
-                        String simpleClassName = fqcn.substring(fqcn.lastIndexOf('.') + 1);
+                        String simpleClassName = finalFqcn.substring(finalFqcn.lastIndexOf('.') + 1);
 
                         RunnerAndConfigurationSettings settings = runManager.findConfigurationByName(simpleClassName);
 
                         if (settings == null) {
                             settings = runManager.createConfiguration(simpleClassName, configType.getConfigurationFactories()[0]);
                             runManager.addConfiguration(settings);
-                            runManager.setTemporaryConfiguration(settings);
                         }
 
                         TestNGConfiguration configuration = (TestNGConfiguration) settings.getConfiguration();
                         configuration.getPersistantData().TEST_OBJECT = TestType.CLASS.getType();
-                        configuration.getPersistantData().MAIN_CLASS_NAME = fqcn; // Forces the updated path!
+                        configuration.getPersistantData().MAIN_CLASS_NAME = finalFqcn;
                         configuration.getPersistantData().getPatterns().clear();
 
                         if (finalModule != null) {
                             configuration.setModule(finalModule);
                         }
 
+                        runManager.setTemporaryConfiguration(settings);
                         runManager.setSelectedConfiguration(settings);
 
-                        Notification notification = new Notification(
-                                "Print",
-                                "Starting test class",
-                                "Running: " + simpleClassName,
-                                NotificationType.INFORMATION
-                        );
-                        Notifications.Bus.notify(notification, project);
+                        Log.info("[RUNNER] Setting TEST_OBJECT=" + TestType.CLASS.getType() + ", MAIN_CLASS=" + finalFqcn + ", simpleClass=" + simpleClassName);
 
                         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
                     });

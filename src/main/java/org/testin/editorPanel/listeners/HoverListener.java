@@ -7,6 +7,7 @@ import org.testin.actions.RunTestCase;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testRunEditor.RunEditorUI;
 import org.testin.pojo.CardHoverAction;
+import org.testin.pojo.Config;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.logger.Log;
@@ -90,7 +91,7 @@ public class HoverListener extends MouseAdapter {
             if (action == CardHoverAction.NAVIGATE) {
                 new NavigateToCode(list).execute(tc);
             } else if (action == CardHoverAction.RUN) {
-                new RunTestCase(list).execute(tc);
+                new RunTestCase(list).execute(Config.getProject(), tc);
             } else {
                 try {
                     TestStatus status = TestStatus.valueOf(action.name());

@@ -48,13 +48,12 @@ public class RunTestSet extends DumbAwareAction {
 
         if (userObject instanceof TestSetDirectoryDto ts) {
             Log.info(this.getClass() + "directory file: " + ts.getPath().toFile());
-            //String fqcn = Tools.getInstance().fileToFqcn(ts.getPath().toFile());  // todo, deprecated as there is an new enhanced method, should change all calls to the new later.
-            String fqcn = ""; //todo, to be updated
+            String fqcn = String.join(".", ts.getFqcn());
             Log.info(this.getClass() + "fqcn path: " + fqcn);
 
             if (!fqcn.trim().isEmpty()) {
                 Log.info("fqcn: " + fqcn);
-                TestNGRunnerByClass.runTestClass(fqcn);
+                TestNGRunnerByClass.runTestClass(e.getProject(), fqcn);
             } else {
                 Notifier.getInstance().error("Run Failed", "Could not parse class name from file path: " + ts.getPath().toFile().getName());
             }

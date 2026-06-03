@@ -4,11 +4,11 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
-import org.testin.util.Tools;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestNGRunnerByMethod;
 
@@ -23,25 +23,25 @@ public class RunTestCase extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.RunTestCase.getCustomShortcut(), list);
     }
 
-    public void execute(final @NotNull List<TestCaseDto> testCases) {
+    public void execute(final @NotNull Project project, final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
 
         for (TestCaseDto tc : testCases) {
             if (tc == null || "RUNNING".equals(tc.getTempStatus())) continue;
 
             Notifier.getInstance().softShow("Running Test Case: ", tc.getDescription());
-            TestNGRunnerByMethod.runTestMethod(tc.getFqcn(), Tools.getInstance().toCamelCase(tc.getDescription()));
+            TestNGRunnerByMethod.runTestMethod(project, tc.getFqcn());
         }
     }
 
-    public void execute(final @NotNull TestCaseDto tc) {
-        execute(List.of(tc));
+    public void execute(final @NotNull Project project, final @NotNull TestCaseDto tc) {
+        execute(project, List.of(tc));
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         List<TestCaseDto> selectedValues = list.getSelectedValuesList();
-        execute(selectedValues);
+        execute(e.getProject(), selectedValues);
     }
 
     @Override
