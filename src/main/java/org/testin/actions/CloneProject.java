@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.Config;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.GitCommandRunner;
 import org.testin.util.notifications.Notifier;
