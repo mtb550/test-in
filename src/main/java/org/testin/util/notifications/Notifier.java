@@ -4,6 +4,7 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -13,7 +14,6 @@ import com.intellij.ui.awt.RelativePoint;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,10 +28,10 @@ public class Notifier {
         return INSTANCE;
     }
 
-    public void softShow(@NotNull final String title, @NotNull final String message) {
+    public void softShow(@NotNull final Project project, @NotNull final String title, @NotNull final String message) {
 
         SwingUtilities.invokeLater(() -> {
-            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(Config.getProject());
+            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(project);
             if (ideFrame == null || ideFrame.getStatusBar() == null) return;
 
             final JComponent statusBarComponent = ideFrame.getStatusBar().getComponent();
@@ -52,10 +52,10 @@ public class Notifier {
         });
     }
 
-    public void softShow(@NotNull final String message) {
+    public void softShow(@NotNull final Project project, @NotNull final String message) {
 
         SwingUtilities.invokeLater(() -> {
-            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(Config.getProject());
+            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(project);
             if (ideFrame == null || ideFrame.getStatusBar() == null) return;
 
             final JComponent statusBarComponent = ideFrame.getStatusBar().getComponent();
@@ -76,58 +76,58 @@ public class Notifier {
         });
     }
 
-    public void info(final @NotNull String message) {
+    public void info(final @NotNull Project project, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(message, NotificationType.INFORMATION)
-                .notify(Config.getProject());
+                .notify(project);
     }
 
-    public void warn(final @NotNull String message) {
+    public void warn(final @NotNull Project project, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(message, NotificationType.WARNING)
-                .notify(Config.getProject());
+                .notify(project);
     }
 
-    public void error(final @NotNull String message) {
+    public void error(final @NotNull Project project, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(message, NotificationType.ERROR)
-                .notify(Config.getProject());
+                .notify(project);
     }
 
-    public void info(final @NotNull String title, final @NotNull String message) {
+    public void info(final @NotNull Project project, final @NotNull String title, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.INFORMATION)
-                .notify(Config.getProject());
+                .notify(project);
     }
 
-    public void warn(final @NotNull String title, final @NotNull String message) {
+    public void warn(final @NotNull Project project, final @NotNull String title, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.WARNING)
-                .notify(Config.getProject());
+                .notify(project);
     }
 
-    public void error(final @NotNull String title, final @NotNull String message) {
+    public void error(final @NotNull Project project, final @NotNull String title, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.ERROR)
-                .notify(Config.getProject());
+                .notify(project);
     }
 
-    public void warnWithAction(final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {
+    public void warnWithAction(final @NotNull Project project, final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {
         final Notification notification = NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.WARNING);
 
         notification.addAction(NotificationAction.createSimple(actionName, action));
-        notification.notify(Config.getProject());
+        notification.notify(project);
     }
 
-    public Notification infoWithActions(final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
+    public Notification infoWithActions(final @NotNull Project project, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
         final Notification notification = NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.INFORMATION);
@@ -136,7 +136,7 @@ public class Notifier {
             notification.addAction(action);
         }
 
-        notification.notify(Config.getProject());
+        notification.notify(project);
         return notification;
     }
 }
