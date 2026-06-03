@@ -1,6 +1,7 @@
 package org.testin.projectPanel.tree;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
@@ -14,12 +15,14 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public abstract class AbstractTreeBuilder {
+    protected final Project project;
     protected final ProjectPanel projectPanel;
 
     @Getter
     protected DefaultMutableTreeNode rootNode;
 
-    public AbstractTreeBuilder(final ProjectPanel projectPanel) {
+    public AbstractTreeBuilder(final @NotNull Project project, final ProjectPanel projectPanel) {
+        this.project = project;
         this.projectPanel = projectPanel;
         this.rootNode = new DefaultMutableTreeNode("loading..");
     }

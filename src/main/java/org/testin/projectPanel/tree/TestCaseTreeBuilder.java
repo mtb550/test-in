@@ -1,7 +1,9 @@
 package org.testin.projectPanel.tree;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import org.testin.pojo.DirectoryMapper;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.DirectoryDto;
@@ -13,8 +15,8 @@ import java.nio.file.Path;
 
 public class TestCaseTreeBuilder extends AbstractTreeBuilder {
 
-    public TestCaseTreeBuilder(final ProjectPanel projectPanel) {
-        super(projectPanel);
+    public TestCaseTreeBuilder(final @NotNull Project project, final ProjectPanel projectPanel) {
+        super(project, projectPanel);
     }
 
     public void buildTree(final TestProjectDirectoryDto selectedTestProjectDirectory) {

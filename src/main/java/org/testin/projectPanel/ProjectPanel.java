@@ -41,9 +41,9 @@ public class ProjectPanel implements Disposable {
         Log.info("ProjectPanel.ProjectPanel()");
 
         testProjectSelector = new TestProjectSelector(this);
-        testProjectTreeBuilder = new TestProjectTreeBuilder(this);
-        testCaseTreeBuilder = new TestCaseTreeBuilder(this);
-        testRunTreeBuilder = new TestRunTreeBuilder(this);
+        testProjectTreeBuilder = new TestProjectTreeBuilder(project, this);
+        testCaseTreeBuilder = new TestCaseTreeBuilder(project, this);
+        testRunTreeBuilder = new TestRunTreeBuilder(project, this);
 
         setupMainLayout();
 
