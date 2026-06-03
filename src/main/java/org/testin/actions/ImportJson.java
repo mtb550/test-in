@@ -73,10 +73,10 @@ public class ImportJson extends DumbAwareAction {
             return;
         }
 
-        openFileChooserAndProcess(targetDirectory, dirDto, parentNode);
+        openFileChooserAndProcess(project, targetDirectory, dirDto, parentNode);
     }
 
-    private void openFileChooserAndProcess(final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
+    private void openFileChooserAndProcess(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withTitle("Select JSON File")
                 .withDescription("Please choose an exported .json file");
@@ -93,11 +93,11 @@ public class ImportJson extends DumbAwareAction {
                                 "Please select a valid JSON file and try again."));
                 return;
             }
-            processWithJson(selectedFile.getPath(), targetDirectory, selectedDirDto, parentNode);
+            processWithJson(project, selectedFile.getPath(), targetDirectory, selectedDirDto, parentNode);
         }
     }
 
-    private void processWithJson(final String filePath, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
+    private void processWithJson(final @NotNull Project project, final String filePath, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
         File file = new File(filePath);
         if (!file.exists() || !file.canRead()) {
             Notifier.getInstance().error(project, "File Error", "Java cannot read this file!");
@@ -115,7 +115,7 @@ public class ImportJson extends DumbAwareAction {
 
                 if (rawData == null) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Failed to parse JSON file. It may be corrupted or incorrectly formatted.")
+                            Notifier.getInstance().error(project, "Failed to parse JSON file. It may be corrupted or incorrectly formatted.")
                     );
                     return;
                 }
@@ -175,7 +175,7 @@ public class ImportJson extends DumbAwareAction {
                                         String rawGroupName = entry.getKey();
                                         List<TestCaseDto> groupCases = entry.getValue();
 
-                                        VirtualFile groupDir = new CreateTestSet().inBackground(ImportJson.this, targetDirectory, selectedDirDto, parentNode, tree, rawGroupName);
+                                        VirtualFile groupDir = new CreateTestSet().inBackground(project, ImportJson.this, targetDirectory, selectedDirDto, parentNode, tree, rawGroupName);
 
                                         TestCaseDto tail = findExistingTail(groupDir);
                                         linkAndSaveTestCases(groupDir, groupCases, tail, ImportJson.this);

@@ -337,7 +337,7 @@ public class ImportExcel extends DumbAwareAction {
                                         String rawSheetName = entry.getKey();
                                         List<TestCaseDto> sheetCases = entry.getValue();
 
-                                        VirtualFile sheetDir = new CreateTestSet().inBackground(ImportExcel.this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
+                                        VirtualFile sheetDir = new CreateTestSet().inBackground(project, ImportExcel.this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
 
                                         TestCaseDto tail = findExistingTail(sheetDir);
                                         linkAndSaveTestCases(sheetDir, sheetCases, tail, ImportExcel.this);

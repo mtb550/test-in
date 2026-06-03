@@ -41,7 +41,7 @@ public class CreateTestSet implements NodeCreator {
         return ts;
     }
 
-    public VirtualFile inBackground(final Object requestor, final VirtualFile targetDirectory, final DirectoryDto parentDirDto, final DefaultMutableTreeNode parentNode, final SimpleTree tree, final String name) throws IOException {
+    public VirtualFile inBackground(final @NotNull Project project, final Object requestor, final VirtualFile targetDirectory, final DirectoryDto parentDirDto, final DefaultMutableTreeNode parentNode, final SimpleTree tree, final String name) throws IOException {
         String safeDirName = name.replaceAll("[\\\\/:*?\"<>|]", "_");
 
         VirtualFile sheetDir = targetDirectory.findChild(safeDirName);
