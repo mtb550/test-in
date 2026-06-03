@@ -58,7 +58,7 @@ public class CreateTestRun implements NodeCreator {
                 dialogBuilder.setOkOperation(() -> {
                     dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
 
-                    tr = DirectoryMapper.getInstance().testRunNode(newDirPath, parentDir);
+                    tr = DirectoryMapper.getInstance().testRunNode(project, newDirPath, parentDir);
                     saveSelectedToJSON(form, name, root, newDirPath, action.getProjectPanel(), tr);
                 });
 
@@ -103,13 +103,13 @@ public class CreateTestRun implements NodeCreator {
 
     private Object resolveDirectoryObject(final Path folder, final DirectoryDto parentDir) {
         if (Files.exists(folder.resolve(DirectoryType.TSP.getMarker())))
-            return DirectoryMapper.getInstance().testSetPackageNode(folder, parentDir);
+            return DirectoryMapper.getInstance().testSetPackageNode(project, folder, parentDir);
 
         if (Files.exists(folder.resolve(DirectoryType.TS.getMarker())))
-            return DirectoryMapper.getInstance().testSetNode(folder, parentDir);
+            return DirectoryMapper.getInstance().testSetNode(project, folder, parentDir);
 
         if (Files.exists(folder.resolve(DirectoryType.TCD.getMarker())))
-            return DirectoryMapper.getInstance().testCasesRootNode(folder, parentDir);
+            return DirectoryMapper.getInstance().testCasesRootNode(project, folder, parentDir);
 
         throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + parentDir.getClass().getSimpleName());
     }

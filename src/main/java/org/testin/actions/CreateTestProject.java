@@ -59,7 +59,7 @@ public class CreateTestProject extends DumbAwareAction {
                 return;
             }
 
-            TestProjectDirectoryDto newTp = DirectoryMapper.getInstance().testProjectNode(tpPath);
+            TestProjectDirectoryDto newTp = DirectoryMapper.getInstance().testProjectNode(project, tpPath);
 
             if (newTp == null) {
                 Notifier.getInstance().error(project, "Creation Failed", "Could not map test project directory in memory.");

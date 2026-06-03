@@ -15,7 +15,7 @@ public class CreateTestRunPackage implements NodeCreator {
 
     @Override
     public DirectoryDto execute(final CreateTestNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
-        TestRunPackageDirectoryDto tr = DirectoryMapper.getInstance().testRunPackageNode(newDirPath, parentDir);
+        TestRunPackageDirectoryDto tr = DirectoryMapper.getInstance().testRunPackageNode(project, newDirPath, parentDir);
 
         TreeUtilImpl.createVf(project, this, parentDir.getPath(), name);
         TreeUtilImpl.createNode(action.getTree(), parentNode, tr);

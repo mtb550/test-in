@@ -17,7 +17,7 @@ public class TestProjectTreeBuilder extends AbstractTreeBuilder {
     @Override
     protected DirectoryDto mapPathToDirectory(final Path path, final DirectoryDto parentDir) {
         if (Files.exists(path.resolve(DirectoryType.TP.getMarker()))) {
-            return DirectoryMapper.getInstance().testProjectNode(path);
+            return DirectoryMapper.getInstance().testProjectNode(project, path);
         }
 
         return null;

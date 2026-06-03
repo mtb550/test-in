@@ -1,7 +1,9 @@
 package org.testin.pojo;
 
+import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.*;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
@@ -20,7 +22,7 @@ public class DirectoryMapper {
         return INSTANCE;
     }
 
-    public TestProjectDirectoryDto testProjectNode(final Path path) { // todo, path is Testin path , no need to pass the path here.
+    public TestProjectDirectoryDto testProjectNode(final @NotNull Project project, final Path path) { // todo, path is Testin path , no need to pass the path here.
         final String fileName = path.getFileName().toString();
         try {
             final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
@@ -57,14 +59,14 @@ public class DirectoryMapper {
             return tp;
 
         } catch (Exception e) {
-            Notifier.getInstance().error("Read Test Project Failed", "Skipping invalid format: " + fileName);
+            Notifier.getInstance().error(project, "Read Test Project Failed", "Skipping invalid format: " + fileName);
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
 
-    public TestCasesMainDirectoryDto testCasesRootNode(final Path path, final DirectoryDto parent) {
+    public TestCasesMainDirectoryDto testCasesRootNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto
@@ -80,14 +82,14 @@ public class DirectoryMapper {
             return tcd;
 
         } catch (Exception e) {
-            Notifier.getInstance().error("Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
+            Notifier.getInstance().error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
 
-    public TestRunsMainDirectoryDto testRunsRootNode(final Path path, final DirectoryDto parent) {
+    public TestRunsMainDirectoryDto testRunsRootNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestRunsMainDirectoryDto trd = TestRunsMainDirectoryDto
@@ -103,14 +105,14 @@ public class DirectoryMapper {
             return trd;
 
         } catch (Exception e) {
-            Notifier.getInstance().error("Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
+            Notifier.getInstance().error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
 
-    public TestSetPackageDirectoryDto testSetPackageNode(final Path path, final DirectoryDto parent) {
+    public TestSetPackageDirectoryDto testSetPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestSetPackageDirectoryDto testSetPackageDirectoryDto = TestSetPackageDirectoryDto
@@ -126,14 +128,14 @@ public class DirectoryMapper {
             return testSetPackageDirectoryDto;
 
         } catch (Exception e) {
-            Notifier.getInstance().error("Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
+            Notifier.getInstance().error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
 
-    public TestRunPackageDirectoryDto testRunPackageNode(final Path path, final DirectoryDto parent) {
+    public TestRunPackageDirectoryDto testRunPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestRunPackageDirectoryDto testRunPackageDirectoryDto = TestRunPackageDirectoryDto
@@ -149,14 +151,14 @@ public class DirectoryMapper {
             return testRunPackageDirectoryDto;
 
         } catch (Exception e) {
-            Notifier.getInstance().error("Read Test Run Package Failed", "Failed to parse directory: " + path.getFileName());
+            Notifier.getInstance().error(project, "Read Test Run Package Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
 
-    public TestSetDirectoryDto testSetNode(final Path path, final DirectoryDto parent) {
+    public TestSetDirectoryDto testSetNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             Log.info("retrieve the test set directory: " + fileName);
@@ -173,14 +175,14 @@ public class DirectoryMapper {
             return testSetDirectoryDto;
 
         } catch (Exception e) {
-            Notifier.getInstance().error("Read Test Set Failed", "Failed to parse directory: " + path.getFileName());
+            Notifier.getInstance().error(project, "Read Test Set Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
 
-    public TestRunDirectoryDto testRunNode(final Path path, final DirectoryDto parent) {
+    public TestRunDirectoryDto testRunNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestRunDirectoryDto testRunDirectoryDto = TestRunDirectoryDto
@@ -196,7 +198,7 @@ public class DirectoryMapper {
             return testRunDirectoryDto;
 
         } catch (Exception e) {
-            Notifier.getInstance().error("Read Test Run Failed", "Failed to parse directory: " + path.getFileName());
+            Notifier.getInstance().error(project, "Read Test Run Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             return null;

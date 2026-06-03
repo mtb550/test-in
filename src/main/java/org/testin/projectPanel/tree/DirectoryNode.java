@@ -65,16 +65,16 @@ public class DirectoryNode extends SimpleNode {
 
     private DirectoryDto mapPathToDirectory(Path path) {
         if (Files.exists(path.resolve(DirectoryType.TSP.getMarker())))
-            return DirectoryMapper.getInstance().testSetPackageNode(path, directoryDto);
+            return DirectoryMapper.getInstance().testSetPackageNode(project, path, directoryDto);
 
         if (Files.exists(path.resolve(DirectoryType.TS.getMarker())))
-            return DirectoryMapper.getInstance().testSetNode(path, directoryDto);
+            return DirectoryMapper.getInstance().testSetNode(project, path, directoryDto);
 
         if (Files.exists(path.resolve(DirectoryType.TRP.getMarker())))
-            return DirectoryMapper.getInstance().testRunPackageNode(path, directoryDto);
+            return DirectoryMapper.getInstance().testRunPackageNode(project, path, directoryDto);
 
         if (Files.exists(path.resolve(DirectoryType.TR.getMarker())))
-            return DirectoryMapper.getInstance().testRunNode(path, directoryDto);
+            return DirectoryMapper.getInstance().testRunNode(project, path, directoryDto);
 
         return null;
     }

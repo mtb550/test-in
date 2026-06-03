@@ -33,10 +33,10 @@ public class TestCaseTreeBuilder extends AbstractTreeBuilder {
     @Override
     protected DirectoryDto mapPathToDirectory(final Path path, DirectoryDto parentDir) {
         if (Files.exists(path.resolve(DirectoryType.TSP.getMarker())))
-            return DirectoryMapper.getInstance().testSetPackageNode(path, parentDir);
+            return DirectoryMapper.getInstance().testSetPackageNode(project, path, parentDir);
 
         if (Files.exists(path.resolve(DirectoryType.TS.getMarker())))
-            return DirectoryMapper.getInstance().testSetNode(path, parentDir);
+            return DirectoryMapper.getInstance().testSetNode(project, path, parentDir);
 
         return null;
     }
