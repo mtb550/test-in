@@ -64,7 +64,7 @@ public class Remove extends DumbAwareAction {
                 if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
                     EditorUtil.getInstance().closeEditor(e.getProject(), pkg.getName());
 
-                TreeUtilImpl.removeVf(this, pkg.getPath());
+                TreeUtilImpl.removeVf(project, this, pkg.getPath());
                 TreeUtilImpl.removeNode(node, tree);
                 VirtualFileManager.getInstance().syncRefresh();
             }

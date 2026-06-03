@@ -2,6 +2,7 @@ package org.testin.util;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -15,22 +16,22 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class TreeUtilImpl {
-    public static void executeVfsAction(final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
+    public static void executeVfsAction(final @NotNull Project project, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
                 if (vf != null) {
                     operation.execute(vf);
                 } else {
-                    Notifier.getInstance().error("Could not find path on disk:\n" + path, errorTitle);
+                    Notifier.getInstance().error(project, "Could not find path on disk:\n" + path, errorTitle);
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error("Operation failed: " + ex.getMessage(), errorTitle);
+                Notifier.getInstance().error(project, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
     }
 
-    public static void executeVfsAction(final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
+    public static void executeVfsAction(final @NotNull Project project, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
@@ -39,10 +40,10 @@ public class TreeUtilImpl {
                 if (sourceVf != null && targetVf != null) {
                     operation.execute(sourceVf, targetVf);
                 } else {
-                    Notifier.getInstance().error("Could not find source or target path on disk.", errorTitle);
+                    Notifier.getInstance().error(project, "Could not find source or target path on disk.", errorTitle);
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error("Operation failed: " + ex.getMessage(), errorTitle);
+                Notifier.getInstance().error(project, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
     }
@@ -65,7 +66,7 @@ public class TreeUtilImpl {
         });
     }
 
-    public static void createVf(final Object requester, final Path parentPath, final String folderName) {
+    public static void createVf(final @NotNull Project project, final Object requester, final Path parentPath, final String folderName) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
@@ -73,12 +74,12 @@ public class TreeUtilImpl {
                     parentVf.createChildDirectory(requester, folderName);
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error("Could not create directory: " + ex.getMessage(), "Error");
+                Notifier.getInstance().error(project, "Could not create directory: " + ex.getMessage(), "Error");
             }
         }));
     }
 
-    public static void createDataVf(final Object requester, final Path parentPath, final String fileName) {
+    public static void createDataVf(final @NotNull Project project, final Object requester, final Path parentPath, final String fileName) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
@@ -89,12 +90,12 @@ public class TreeUtilImpl {
                     }
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error("Could not create marker file: " + ex.getMessage(), "Error");
+                Notifier.getInstance().error(project, "Could not create marker file: " + ex.getMessage(), "Error");
             }
         }));
     }
 
-    public static void removeVf(final Object requester, final Path path) {
+    public static void removeVf(final @NotNull Project project, final Object requester, final Path path) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
@@ -102,7 +103,7 @@ public class TreeUtilImpl {
                     vf.delete(requester);
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error("Could not delete file: " + ex.getMessage(), "Error");
+                Notifier.getInstance().error(project, "Could not delete file: " + ex.getMessage(), "Error");
             }
         }));
     }

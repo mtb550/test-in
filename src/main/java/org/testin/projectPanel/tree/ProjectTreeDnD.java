@@ -149,7 +149,7 @@ public class ProjectTreeDnD {
         }
 
         private void persistMove(DirectoryDto sourceDir, DirectoryDto targetDir) {
-            TreeUtilImpl.executeVfsAction(sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
+            TreeUtilImpl.executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
                 sourceVf.move(this, targetVf);
                 Path oldPath = sourceDir.getPath();
                 Path newPath = targetDir.getPath().resolve(sourceDir.getName());
@@ -159,7 +159,7 @@ public class ProjectTreeDnD {
         }
 
         private void persistCopy(DirectoryDto source, DirectoryDto target) {
-            TreeUtilImpl.executeVfsAction(source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
+            TreeUtilImpl.executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
                 sourceVf.copy(this, targetVf, sourceVf.getName());
                 Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
             });

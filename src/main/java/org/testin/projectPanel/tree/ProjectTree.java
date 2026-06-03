@@ -25,7 +25,8 @@ public class ProjectTree {
     private final TreeTransferHandler transferHandler;
     private final TreeContextMenu treeContextMenu;
 
-    public ProjectTree(ProjectPanel projectPanel) {
+    public ProjectTree(final @NotNull Project project, final ProjectPanel projectPanel) {
+        this.project = project;
         this.projectPanel = projectPanel;
 
         TestProjectDirectoryDto testProjectDirectory = null;
@@ -49,7 +50,7 @@ public class ProjectTree {
 
         mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
 
-        this.transferHandler = new TreeTransferHandler(mainTree, sharedCutNodes);
+        this.transferHandler = new TreeTransferHandler(project, mainTree, sharedCutNodes);
         mainTree.setTransferHandler(transferHandler);
 
         treeContextMenu = new TreeContextMenu(projectPanel, mainTree);

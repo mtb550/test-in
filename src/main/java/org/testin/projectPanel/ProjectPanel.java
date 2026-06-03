@@ -62,12 +62,12 @@ public class ProjectPanel implements Disposable {
             JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
             topBar.add(testProjectSelector.getSelectedTestProject(), BorderLayout.NORTH);
 
-            branchSelector = new BranchSelector(this, testProjectSelector.getSelectedTestProject().getItem());
+            branchSelector = new BranchSelector(project, this, testProjectSelector.getSelectedTestProject().getItem());
             topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
 
             panel.add(topBar, BorderLayout.NORTH);
 
-            projectTree = new ProjectTree(this);
+            projectTree = new ProjectTree(project, this);
             panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         } else {

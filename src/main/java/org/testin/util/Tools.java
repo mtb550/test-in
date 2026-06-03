@@ -8,6 +8,7 @@ import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
+import org.jetbrains.annotations.NotNull;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -211,23 +212,23 @@ public class Tools {
         return pascalCase.toString();
     }
 
-    public void openWithAssociatedProgram(VirtualFile virtualFile) {
+    public void openWithAssociatedProgram(final @NotNull Project project, final VirtualFile virtualFile) {
         if (virtualFile == null || !virtualFile.exists()) {
-            Notifier.getInstance().error("Open Error", "The file does not exist.");
+            Notifier.getInstance().error(project, "Open Error", "The file does not exist.");
             return;
         }
 
         File file = new File(virtualFile.getPath());
 
         if (!Desktop.isDesktopSupported()) {
-            Notifier.getInstance().error("System Error", "Desktop operations are not supported on this system.");
+            Notifier.getInstance().error(project, "System Error", "Desktop operations are not supported on this system.");
             return;
         }
 
         Desktop desktop = Desktop.getDesktop();
 
         if (!desktop.isSupported(Desktop.Action.OPEN)) {
-            Notifier.getInstance().error("System Error", "The 'Open' action is not supported on this system.");
+            Notifier.getInstance().error(project, "System Error", "The 'Open' action is not supported on this system.");
             return;
         }
 
@@ -236,7 +237,7 @@ public class Tools {
                 desktop.open(file);
             } catch (IOException e) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Notifier.getInstance().error("Execution Error", "Failed to open the file: " + e.getMessage())
+                        Notifier.getInstance().error(project, "Execution Error", "Failed to open the file: " + e.getMessage())
                 );
             }
         });

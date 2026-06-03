@@ -20,11 +20,13 @@ import java.util.List;
 
 public class PendingCommitsDialog extends DialogWrapper {
 
+    private final Project project;
     private final List<TestCaseDiff> differences;
     private final Path repoRoot;
 
     public PendingCommitsDialog(@Nullable Project project, List<TestCaseDiff> differences, Path repoRoot) {
         super(project, true);
+        this.project = project;
         this.differences = differences;
         this.repoRoot = repoRoot;
         setTitle("Pending Test Case Changes");
@@ -134,7 +136,7 @@ public class PendingCommitsDialog extends DialogWrapper {
                 model.removeRow(selectedRow);
             }
         } catch (Exception ex) {
-            Notifier.getInstance().error("Revert Failed", "Could not revert change: " + ex.getMessage());
+            Notifier.getInstance().error(project, "Revert Failed", "Could not revert change: " + ex.getMessage());
         }
     }
 }

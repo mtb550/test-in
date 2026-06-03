@@ -47,7 +47,7 @@ public class CreateTestProject extends DumbAwareAction {
             if (directoryType == DirectoryType.IMPORT_TP) {
                 String gitUrl = name.trim();
                 String projectName = extractProjectNameFromUrl(gitUrl);
-                new CloneProject(gitUrl, projectName, projectPanel).execute();
+                new CloneProject(gitUrl, projectName, projectPanel).execute(project);
                 return;
             }
 
@@ -66,7 +66,7 @@ public class CreateTestProject extends DumbAwareAction {
                 return;
             }
 
-            TreeUtilImpl.executeVfsAction(Config.getTestinPath(), "IO Error", vf -> {
+            TreeUtilImpl.executeVfsAction(project, Config.getTestinPath(), "IO Error", vf -> {
 
                 if (vf.findChild(tpName) != null) {
                     Notifier.getInstance().error(project, "Creation Failed", "The directory '" + tpName + "' already exists in the IDE's Virtual File System.");

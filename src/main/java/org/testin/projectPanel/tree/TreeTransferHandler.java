@@ -1,5 +1,6 @@
 package org.testin.projectPanel.tree;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 public class TreeTransferHandler extends TransferHandler {
+    private final Project project;
     public static final DataFlavor NODE_FLAVOR;
 
     static {
@@ -41,7 +43,8 @@ public class TreeTransferHandler extends TransferHandler {
     private final Set<DefaultMutableTreeNode> selectedNodes;
     private Integer lastAction;
 
-    public TreeTransferHandler(final SimpleTree tree, final Set<DefaultMutableTreeNode> selectedNodes) {
+    public TreeTransferHandler(final @NotNull Project project, final SimpleTree tree, final Set<DefaultMutableTreeNode> selectedNodes) {
+        this.project = project;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
     }
@@ -146,7 +149,7 @@ public class TreeTransferHandler extends TransferHandler {
     private void persistMove(final DefaultMutableTreeNode movedNode, final DirectoryDto targetDir) {
         final DirectoryDto sourceDir = (DirectoryDto) movedNode.getUserObject();
 
-        TreeUtilImpl.executeVfsAction(sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
+        TreeUtilImpl.executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
             sourceVf.move(this, targetVf);
 
             Path oldPath = sourceDir.getPath();
@@ -161,7 +164,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private void persistCopy(final DirectoryDto source, final DirectoryDto target) {
-        TreeUtilImpl.executeVfsAction(source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
+        TreeUtilImpl.executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
             sourceVf.copy(this, targetVf, sourceVf.getName());
             Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
         });

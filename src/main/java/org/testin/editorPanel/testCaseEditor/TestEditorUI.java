@@ -176,7 +176,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
             @Override
             public void onLoadComplete(final List<TestCaseDto> allItems) {
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(allItems);
+                    final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(project, allItems);
                     TestCaseCacheService.getInstance(project).load(result.sortedList());
 
                     ApplicationManager.getApplication().invokeLater(() -> {
@@ -399,7 +399,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         if (allTestCases.isEmpty()) return;
 
         synchronized (allTestCases) {
-            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(new ArrayList<>(allTestCases));
+            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(project, new ArrayList<>(allTestCases));
 
             this.allTestCases.clear();
             this.allTestCases.addAll(result.sortedList());

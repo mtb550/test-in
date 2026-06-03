@@ -31,8 +31,8 @@ public class CreateTestSet implements NodeCreator {
     public DirectoryDto execute(final CreateTestNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         TestSetDirectoryDto ts = DirectoryMapper.getInstance().testSetNode(newDirPath, parentDir);
 
-        TreeUtilImpl.createVf(this, parentDir.getPath(), ts.getName());
-        TreeUtilImpl.createDataVf(this, newDirPath, DirectoryType.TS.getMarker());
+        TreeUtilImpl.createVf(project, this, parentDir.getPath(), ts.getName());
+        TreeUtilImpl.createDataVf(project, this, newDirPath, DirectoryType.TS.getMarker());
         TreeUtilImpl.createNode(action.getTree(), parentNode, ts);
 
         createJavaClassInTestRoot(project, parentDir.getName(), name);

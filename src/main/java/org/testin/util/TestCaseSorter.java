@@ -1,13 +1,15 @@
 package org.testin.util;
 
 import com.google.common.collect.Maps;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.notifications.Notifier;
 
 import java.util.*;
 
 public class TestCaseSorter {
-    public static SortResult sortTestCases(final List<TestCaseDto> unsortedList) {
+    public static SortResult sortTestCases(final @NotNull Project project, final List<TestCaseDto> unsortedList) {
         if (unsortedList == null || unsortedList.isEmpty()) {
             return new SortResult(new ArrayList<>(), new HashSet<>());
         }
@@ -27,7 +29,7 @@ public class TestCaseSorter {
         final Set<UUID> unsortedIds = new HashSet<>();
 
         if (head == null) {
-            Notifier.getInstance().warn("Warning", "No Head found in test cases.");
+            Notifier.getInstance().warn(project, "Warning", "No Head found in test cases.");
             unsortedList.forEach(tc -> unsortedIds.add(tc.getId()));
             return new SortResult(unsortedList, unsortedIds);
         }

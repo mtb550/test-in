@@ -195,7 +195,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     @Override
                     public void onLoadComplete(final List<TestCaseDto> allItems) {
                         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                            final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(allItems).sortedList();
+                            final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(project, allItems).sortedList();
                             TestCaseCacheService.getInstance(project).load(sorted);
 
                             ApplicationManager.getApplication().invokeLater(() -> {
