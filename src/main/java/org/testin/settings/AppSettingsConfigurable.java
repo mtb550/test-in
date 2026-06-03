@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -46,11 +47,10 @@ public class AppSettingsConfigurable implements Configurable {
 
     private final TextFieldWithBrowseButton rootTestinPathField = new TextFieldWithBrowseButton();
     private final JBTextField rootAutomationPathField = new JBTextField();
-
     private final DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList = new DefaultComboBoxModel<>();
     private final ComboBox<TestProjectDirectoryDto> projectComboBox = new ComboBox<>(testProjectList);
-
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
+    private final ComboBox<String> logLevelComboBox = new ComboBox<>(Arrays.stream(Log.Level.values()).map(Log.Level::name).toArray(String[]::new));
 
     private final JButton openFolderBtn = new JButton("Open");
     private final JButton activateBtn = new JButton("Activate");
@@ -137,6 +137,8 @@ public class AppSettingsConfigurable implements Configurable {
                 .addComponent(buttonPanel)
                 .addVerticalGap(5)
                 .addComponent(readModeCheckBox)
+                .addVerticalGap(5)
+                .addLabeledComponent("Log level: ", logLevelComboBox)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
@@ -229,6 +231,7 @@ public class AppSettingsConfigurable implements Configurable {
         boolean modified = !rootTestinPathField.getText().equals(settings.rootTestinPath);
         modified |= !rootAutomationPathField.getText().equals(settings.rootAutomationPath);
         modified |= readModeCheckBox.isSelected() != settings.readMode;
+        modified |= !logLevelComboBox.getSelectedItem().equals(settings.logLevel);
         return modified;
     }
 
@@ -239,6 +242,9 @@ public class AppSettingsConfigurable implements Configurable {
         settings.rootTestinPath = rootTestinPathField.getText();
         settings.rootAutomationPath = rootAutomationPathField.getText();
         settings.readMode = readModeCheckBox.isSelected();
+
+        settings.logLevel = (String) logLevelComboBox.getSelectedItem();
+        Log.setLogLevel(Log.Level.valueOf(settings.logLevel));
 
         if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty())
             Config.setTestinPath(Path.of(settings.rootTestinPath));
@@ -272,6 +278,8 @@ public class AppSettingsConfigurable implements Configurable {
         }
 
         readModeCheckBox.setSelected(settings.readMode);
+
+        logLevelComboBox.setSelectedItem(settings.logLevel);
 
         updateOpenFolderBtnState();
         refreshProjectList();

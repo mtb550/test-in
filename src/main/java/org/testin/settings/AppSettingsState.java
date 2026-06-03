@@ -17,6 +17,7 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public String rootTestinPath = "";
     public String rootAutomationPath = "";
     public boolean readMode = false;
+    public String logLevel = Log.Level.INFO.name();
 
     public static AppSettingsState getInstance() {
         Log.info("AppSettingsState.getInstance()");
