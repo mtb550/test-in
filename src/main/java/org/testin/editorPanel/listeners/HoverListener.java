@@ -22,10 +22,12 @@ import static org.testin.editorPanel.testRunEditor.RunCard.ACTIONS_TOTAL_WIDTH;
 
 public class HoverListener extends MouseAdapter {
 
+    private final Project project;
     private final JBList<TestCaseDto> list;
     private final IEditorUI ui;
 
-    public HoverListener(final JBList<TestCaseDto> list, final IEditorUI ui) {
+    public HoverListener(final @NotNull Project project, final JBList<TestCaseDto> list, final IEditorUI ui) {
+        this.project = project;
         this.list = list;
         this.ui = ui;
     }

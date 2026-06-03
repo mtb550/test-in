@@ -36,7 +36,7 @@ public class ProjectTreeDnD {
     public static void install(@NotNull SimpleTree tree, @NotNull Project project, @NotNull StructureTreeModel<?> structureModel) {
         DnDManager manager = DnDManager.getInstance();
         manager.registerSource(new TreeSource(tree), tree);
-        manager.registerTarget(new TreeTarget(tree, structureModel), tree);
+        manager.registerTarget(new TreeTarget(project, tree, structureModel), tree);
     }
 
     private static DirectoryNode extractNode(TreePath path) {
@@ -106,7 +106,7 @@ public class ProjectTreeDnD {
         }
     }
 
-    private record TreeTarget(SimpleTree tree, StructureTreeModel<?> structureModel) implements DnDTarget {
+    private record TreeTarget(Project project, SimpleTree tree, StructureTreeModel<?> structureModel) implements DnDTarget {
 
         @Override
         public boolean update(DnDEvent event) {

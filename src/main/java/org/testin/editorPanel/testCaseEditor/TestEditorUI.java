@@ -136,7 +136,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         this.model.addListDataListener(syncListener);
 
         final EditorCM editorCM = new EditorCM(this, vf.getTestSet(), list, model);
-        final TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getTestSet(), editorCM);
+        final TestMouseListener testMouseListener = new TestMouseListener(project, this, list, model, vf.getTestSet(), editorCM);
         list.addMouseListener(testMouseListener);
 
         list.setTransferHandler(new TransferListener(this));
@@ -150,7 +150,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         StatusBarListener.attach(this);
         list.addListSelectionListener(new SelectionListener(project, list, this, vf.getTestSet().getPath()));
 
-        final HoverListener hoverListener = new HoverListener(list, this);
+        final HoverListener hoverListener = new HoverListener(project, list, this);
         list.addMouseListener(hoverListener);
         list.addMouseMotionListener(hoverListener);
 

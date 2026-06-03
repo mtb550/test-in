@@ -22,13 +22,15 @@ import java.util.Optional;
 
 // todo, it is used for test and run but name is TestMouseListener, isolate the logic of run in separate class.
 public class TestMouseListener extends MouseAdapter {
+    private final Project project;
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
     private final EditorCM editorCM;
     private final DefaultActionGroup emptyMenu;
     private final Path path;
 
-    public TestMouseListener(final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorCM editorCM) {
+    public TestMouseListener(final @NotNull Project project, final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorCM editorCM) {
+        this.project = project;
         this.list = list;
         this.path = dir.getPath();
         this.model = model;
@@ -44,7 +46,7 @@ public class TestMouseListener extends MouseAdapter {
 
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
             if (isClickOnItem) {
-                Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(Config.getProject(), List.of(selected), path));
+                Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(project, List.of(selected), path));
             }
             return;
         }

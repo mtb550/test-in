@@ -38,6 +38,7 @@ public class Remove extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
+        final Project project = e.getProject();
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null || paths.length == 0) return;
 

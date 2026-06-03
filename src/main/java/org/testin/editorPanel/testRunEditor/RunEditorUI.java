@@ -130,12 +130,12 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         list.setCellRenderer(new RunListRenderer(this));
 
-        final HoverListener hoverListener = new HoverListener(list, this);
+        final HoverListener hoverListener = new HoverListener(project, list, this);
         list.addMouseListener(hoverListener);
         list.addMouseMotionListener(hoverListener);
 
         final EditorCM editorCM = new EditorCM(this, vf.getTestRun(), list, model);
-        final TestMouseListener testMouseListener = new TestMouseListener(this, list, model, vf.getTestRun(), editorCM);
+        final TestMouseListener testMouseListener = new TestMouseListener(project, this, list, model, vf.getTestRun(), editorCM);
         list.addMouseListener(testMouseListener);
 
         editorCM.registerShortcuts(this, vf.getTestRun(), list, model, editorCM);
