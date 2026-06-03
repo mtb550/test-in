@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,14 +21,15 @@ public class NavigateToCode extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.NavigateToCode.getCustomShortcut(), list);
     }
 
-    public void execute(final TestCaseDto tc) {
+    public void execute(final @NotNull Project project, final TestCaseDto tc) {
         if (tc == null || tc.getFqcn().isEmpty()) return;
-        new CodeNavigator().toCode(tc.getFqcn());
+        new CodeNavigator().toCode(project, tc.getFqcn());
     }
 
     @Override
     public void actionPerformed(@Nullable AnActionEvent e) {
-        execute(list.getSelectedValue());
+        if (e == null) return;
+        execute(e.getProject(), list.getSelectedValue());
     }
 
     @Override

@@ -44,9 +44,11 @@ public class NavigationBar extends BaseDetails {
     private static final int GBC_INSETS_BOTTOM = 0;
     private static final int GBC_INSETS_RIGHT = 16;
 
+    private final Project project;
     private final Path currentPath;
 
-    public NavigationBar(@Nullable final Path currentPath) {
+    public NavigationBar(@Nullable final Project project, @Nullable final Path currentPath) {
+        this.project = project;
         this.currentPath = currentPath;
     }
 
@@ -60,7 +62,7 @@ public class NavigationBar extends BaseDetails {
         if (currentPath != null) {
             final List<File> fileList = buildPathFileList(currentPath);
             for (int i = 0; i < fileList.size(); i++) {
-                final Project project = Config.getProject();
+
                 final File file = fileList.get(i);
                 final String labelText = (i == 0) ? project.getName() : file.getName();
                 final boolean isTestSet = (i == fileList.size() - 1);
@@ -89,14 +91,14 @@ public class NavigationBar extends BaseDetails {
                         if (vf == null) return;
 
                         if (isTestSet) {
-                            if (EditorUtil.getInstance().isEditorOpen(file.getName())) {
+                            if (EditorUtil.getInstance().isEditorOpen(project, file.getName())) {
                                 return;
                             }
 
                             final TestSetDirectoryDto ts = new TestSetDirectoryDto();
                             ts.setPath(file.toPath()); // todo, why set path here?
                             ts.setName(file.getName()); // todo, why set name here ?
-                            EditorUtil.getInstance().openEditor(ts);
+                            EditorUtil.getInstance().openEditor(project, ts);
                         } else {
                             ProjectView.getInstance(project).select(null, vf, true);
                         }
@@ -128,7 +130,7 @@ public class NavigationBar extends BaseDetails {
     @NotNull
     private List<File> buildPathFileList(@NotNull final Path path) {
         final List<File> fileList = new ArrayList<>();
-        final String projectName = Config.getProject().getName();
+        final String projectName = project.getName();
         File currentDir = path.toFile();
 
         while (currentDir != null) {

@@ -328,7 +328,7 @@ public class ImportExcel extends DumbAwareAction {
 
                                     linkAndSaveTestCases(targetDirectory, flatList, tail, ImportExcel.this);
 
-                                    EditorUtil.getInstance().closeThenOpenEditor(targetDirectory, ts);
+                                    EditorUtil.getInstance().closeThenOpenEditor(project, targetDirectory, ts);
                                     Notifier.getInstance().info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
                                 } else {

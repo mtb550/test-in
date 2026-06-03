@@ -24,10 +24,10 @@ public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
             final IEditorUI ui;
 
             if (unifiedFile.getFileType() == FileType.TEST_RUN)
-                ui = new RunEditorUI(unifiedFile);
+                ui = new RunEditorUI(project, unifiedFile);
 
             else if (unifiedFile.getFileType() == FileType.TEST_CASE)
-                ui = new TestEditorUI(unifiedFile);
+                ui = new TestEditorUI(project, unifiedFile);
 
             else
                 throw new IllegalArgumentException("Unknown FileType: " + unifiedFile.getFileType());

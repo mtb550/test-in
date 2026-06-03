@@ -44,9 +44,9 @@ public class ViewPanel implements Disposable {
         historyTab = new JBPanel<>(new BorderLayout());
         openBugsTab = new JBPanel<>(new BorderLayout());
 
-        FontSyncUtil.syncWithNativeEditor(detailsTab, this);
-        FontSyncUtil.syncWithNativeEditor(historyTab, this);
-        FontSyncUtil.syncWithNativeEditor(openBugsTab, this);
+        FontSyncUtil.syncWithNativeEditor(project, detailsTab, this);
+        FontSyncUtil.syncWithNativeEditor(project, historyTab, this);
+        FontSyncUtil.syncWithNativeEditor(project, openBugsTab, this);
 
         detailsScrollPane = createScrollPane(detailsTab);
         historyScrollPane = createScrollPane(historyTab);
@@ -147,7 +147,7 @@ public class ViewPanel implements Disposable {
         TestCaseDto currentTestCaseDto = this.getCurrentTestCaseDto();
         Path currentPath = this.page.getCurrentPath();
 
-        DetailsTab.load(detailsTab, currentTestCaseDto, currentPath);
+        DetailsTab.load(project, detailsTab, currentTestCaseDto, currentPath);
         HistoryTab.load(historyTab);
         OpenBugsTab.load(openBugsTab);
 

@@ -3,6 +3,7 @@ package org.testin.editorPanel.testCaseEditor;
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
@@ -49,6 +50,8 @@ import java.util.stream.Collectors;
 
 public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
+    private final Project project;
+    @Getter
     private final UnifiedVirtualFile vf;
 
     private final JBPanel<?> mainPanel;
@@ -92,7 +95,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     @Setter
     private int hoveredIndex = -1;
 
-    public TestEditorUI(final @NotNull UnifiedVirtualFile vf) {
+    public TestEditorUI(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf) {
+        this.project = project;
         this.vf = vf;
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -115,7 +119,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
 
-        FontSyncUtil.syncWithNativeEditor(list, this);
+        FontSyncUtil.syncWithNativeEditor(project, list, this);
 
         final JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);
@@ -144,7 +148,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
-        list.addListSelectionListener(new SelectionListener(list, this, vf.getTestSet().getPath()));
+        list.addListSelectionListener(new SelectionListener(project, list, this, vf.getTestSet().getPath()));
 
         final HoverListener hoverListener = new HoverListener(list, this);
         list.addMouseListener(hoverListener);
@@ -173,7 +177,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
             public void onLoadComplete(final List<TestCaseDto> allItems) {
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
                     final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(allItems);
-                    TestCaseCacheService.getInstance(Config.getProject()).load(result.sortedList());
+                    TestCaseCacheService.getInstance(project).load(result.sortedList());
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         allTestCases.clear();
@@ -290,7 +294,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        CreateTestCase.execute(this, vf.getTestSet(), list, model);
+        CreateTestCase.execute(project, this, vf.getTestSet(), list, model);
     }
 
     @Override

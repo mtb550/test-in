@@ -48,6 +48,8 @@ import java.util.stream.Collectors;
 public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Getter
+    private final Project project;
+    @Getter
     private final UnifiedVirtualFile vf;
 
     @Getter
@@ -100,7 +102,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
     private int currentlyExecutingIndex = -1;
 
-    public RunEditorUI(final UnifiedVirtualFile vf) {
+    public RunEditorUI(final @NotNull Project project, final UnifiedVirtualFile vf) {
+        this.project = project;
         this.vf = vf;
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -111,7 +114,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         buildOpeningPanel();
         loadDataAsync();
 
-        FontSyncUtil.syncWithNativeEditor(list, this);
+        FontSyncUtil.syncWithNativeEditor(project, list, this);
     }
 
     private void buildOpeningPanel() {
@@ -137,7 +140,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         editorCM.registerShortcuts(this, vf.getTestRun(), list, model, editorCM);
 
         Path selectionPath = vf.getTestRun().getPath();
-        list.addListSelectionListener(new SelectionListener(list, this, selectionPath));
+        list.addListSelectionListener(new SelectionListener(project, list, this, selectionPath));
 
         refreshView();
     }
@@ -192,7 +195,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     public void onLoadComplete(final List<TestCaseDto> allItems) {
                         ApplicationManager.getApplication().executeOnPooledThread(() -> {
                             final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(allItems).sortedList();
-                            TestCaseCacheService.getInstance(Config.getProject()).load(sorted);
+                            TestCaseCacheService.getInstance(project).load(sorted);
 
                             ApplicationManager.getApplication().invokeLater(() -> {
                                 allTestCases.clear();

@@ -1,7 +1,9 @@
 package org.testin.viewPanel.details;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBPanel;
+import org.jetbrains.annotations.NotNull;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
@@ -24,7 +26,7 @@ public class DetailsTab {
     private static final double WEIGHT_X = 1.0;
     private static final double SPACER_WEIGHT_Y = 1.0;
 
-    public static void load(@NotNull final JBPanel<?> detailsTab, @Nullable final TestCaseDto dto, @Nullable final Path currentPath) {
+    public static void load(final @NotNull Project project, @NotNull final JBPanel<?> detailsTab, @Nullable final TestCaseDto dto, @Nullable final Path currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
@@ -71,7 +73,7 @@ public class DetailsTab {
     private static int setupFixedRows(final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final Path currentPath) {
         int row = 0;
 
-        row = new NavigationBar(currentPath).render(panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new NavigationBar(project, currentPath).render(panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Id().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Title().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new ActionIcons().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
