@@ -7,10 +7,10 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.GitCommandRunner;
 import org.testin.util.notifications.Notifier;
@@ -28,19 +28,22 @@ public class CloneProject extends DumbAwareAction {
         this.projectPanel = projectPanel;
     }
 
+    private Project project;
+
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
-        execute();
+        execute(e.getProject());
     }
 
-    public void execute() {
+    public void execute(final Project project) {
+        this.project = project;
 
         if (gitUrl == null || gitUrl.trim().isEmpty() || projectName == null || projectName.trim().isEmpty()) {
-            Notifier.getInstance().error("Clone Error", "Missing parameters for cloning the project.");
+            Notifier.getInstance().error(project, "Clone Error", "Missing parameters for cloning the project.");
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Cloning repository", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Cloning repository", false) {
             @Override
             public void run(@NotNull final ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -54,13 +57,13 @@ public class CloneProject extends DumbAwareAction {
                         if (vRoot != null) {
                             vRoot.refresh(false, true);
                         }
-                        Notifier.getInstance().info("Clone Successful", "Project '" + projectName + "' was cloned successfully.");
+                        Notifier.getInstance().info(project, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
                         new Refresh(projectPanel).execute();
                     });
 
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Clone Failed", "Could not clone repository:\n" + ex.getMessage())
+                            Notifier.getInstance().error(project, "Clone Failed", "Could not clone repository:\n" + ex.getMessage())
                     );
                 }
             }
