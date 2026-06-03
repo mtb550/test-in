@@ -10,7 +10,6 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.settings.StartupActivity;
 import org.testin.util.logger.Log;
@@ -27,10 +26,6 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     public static ToolWindow getToolWindow(final Project project) {
         if (project == null) return null;
         return ToolWindowManager.getInstance(project).getToolWindow("testin.view");
-    }
-
-    public static ToolWindow getToolWindow() {
-        return getToolWindow(Config.getProject());
     }
 
     public static void showPanel(final Project project, final List<TestCaseDto> testCases, final Path path, final Consumer<ViewPanel> onReadyAction) {
