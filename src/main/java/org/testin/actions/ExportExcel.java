@@ -87,11 +87,11 @@ public class ExportExcel extends DumbAwareAction {
 
         if (wrapper != null) {
             File destFile = wrapper.getFile();
-            processExportWithPoi(destFile, targetDirectory, dirDto);
+            processExportWithPoi(project, destFile, targetDirectory, dirDto);
         }
     }
 
-    private void processExportWithPoi(final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
+    private void processExportWithPoi(final @NotNull Project project, final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
