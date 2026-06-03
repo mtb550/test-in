@@ -10,7 +10,6 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testCaseEditor.TestEditorUI;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.ui.testCase.CreateTestCaseUI;
@@ -42,19 +41,17 @@ public class CreateTestCase extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getCustomShortcut(), list);
     }
 
-    public static void execute(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
-        performCreation(ui, dir, list, model);
+    public static void execute(final @NotNull Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+        performCreation(project, ui, dir, list, model);
     }
 
-    private static void performCreation(final @NotNull IEditorUI ui, final @NotNull DirectoryDto pDir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    private static void performCreation(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull DirectoryDto pDir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         new CreateTestCaseUI((newTc, codeGenerator) -> {
             final boolean isEmpty = model.isEmpty();
             newTc.setIsHead(isEmpty);
 
             final TestCaseDto lastTc = isEmpty ? null : model.getElementAt(model.getSize() - 1);
             if (lastTc != null) lastTc.setNext(newTc.getId());
-
-            final Project project = Config.getProject();
 
             List<String> generatedFqcn = new ArrayList<>(pDir.getFqcn());
 
@@ -76,7 +73,7 @@ public class CreateTestCase extends DumbAwareAction {
             TestCaseCacheService.getInstance(project).addNewItems(affectedNodes);
 
             TestCasePersistService.getInstance(project).persist(pDir.getPath(), affectedNodes);
-            Notifier.getInstance().softShow("Created..");
+            Notifier.getInstance().softShow(project, "Created..");
 
             if (codeGenerator != null && codeGenerator.isSelected()) {
                 GeneratorType.CREATE_TEST_CASE.getAction().execute(newTc, newTc.getFqcn());
@@ -89,7 +86,8 @@ public class CreateTestCase extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        performCreation(ui, dir, list, model);
+        final Project project = e.getProject();
+        performCreation(project, ui, dir, list, model);
     }
 
     @Override
