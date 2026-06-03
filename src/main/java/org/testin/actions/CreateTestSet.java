@@ -58,7 +58,7 @@ public class CreateTestSet implements NodeCreator {
                     .build();
 
             TreeUtilImpl.createNode(tree, parentNode, newTsDto);
-            createJavaClassInTestRoot(Config.getProject(), parentDirDto.getName(), safeDirName);
+            createJavaClassInTestRoot(project, parentDirDto.getName(), safeDirName);
         }
 
         if (sheetDir.findChild(DirectoryType.TS.getMarker()) == null) {

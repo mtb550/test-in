@@ -102,13 +102,13 @@ public class ImportExcel extends DumbAwareAction {
         );
 
         if (userChoice == 0) {
-            openFileChooserAndProcess(targetDirectory, dirDto, parentNode);
+            openFileChooserAndProcess(project, targetDirectory, dirDto, parentNode);
         } else if (userChoice == 1) {
-            downloadSampleFile(e);
+            downloadSampleFile(project, e);
         }
     }
 
-    private void openFileChooserAndProcess(final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
+    private void openFileChooserAndProcess(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withTitle("Select Spreadsheet File")
                 .withDescription("Please choose an .xls or .xlsx file");
@@ -125,11 +125,11 @@ public class ImportExcel extends DumbAwareAction {
                                 "Please select a valid Excel file and try again."));
                 return;
             }
-            processWithPoi(selectedFile.getPath(), targetDirectory, selectedDirDto, parentNode);
+            processWithPoi(project, selectedFile.getPath(), targetDirectory, selectedDirDto, parentNode);
         }
     }
 
-    private void downloadSampleFile(AnActionEvent e) {
+    private void downloadSampleFile(final @NotNull Project project, final AnActionEvent e) {
         if (e.getProject() == null) return;
 
         VirtualFile projectDir = LocalFileSystem.getInstance().findFileByPath(Objects.requireNonNull(e.getProject().getBasePath()));
@@ -172,7 +172,7 @@ public class ImportExcel extends DumbAwareAction {
         });
     }
 
-    private void processWithPoi(final String filePath, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
+    private void processWithPoi(final @NotNull Project project, final String filePath, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
         File file = new File(filePath);
         if (!file.exists() || !file.canRead()) {
             Notifier.getInstance().error(project, "File Error", "Java cannot read this file!");
@@ -285,7 +285,7 @@ public class ImportExcel extends DumbAwareAction {
                     Log.error("Exception: " + ex.getMessage());
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Failed to import data: " +
+                            Notifier.getInstance().error(project, "Failed to import data: " +
                                     "\n(Tip: Ensure the file is completely closed in Microsoft Excel and try again.)\n"
                                     + ex.getMessage())
                     );

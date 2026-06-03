@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +45,8 @@ public class CreateTestNode extends DumbAwareAction {
 
         final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        new CreateNodesDialog(parentDir.getMenu(), (name, directoryType, codeGenerator) -> {
+        final Project project = e.getProject();
+        new CreateNodesDialog(project, parentDir.getMenu(), (name, directoryType, codeGenerator) -> {
 
             if (name == null || name.isEmpty()) return;
             DirectoryDto dir = null;

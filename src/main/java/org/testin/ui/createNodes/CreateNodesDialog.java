@@ -1,5 +1,6 @@
 package org.testin.ui.createNodes;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -30,8 +31,9 @@ public class CreateNodesDialog {
     private final JBList<DirectoryType> list;
     private final JBPopup popup;
     private final CodeGenerator codeGenerator;
+    private final Project project;
 
-    public CreateNodesDialog(final CreateNodeMenu menu, final TriConsumer<String, DirectoryType, CodeGenerator> onSelected) {
+    public CreateNodesDialog(final @NotNull Project project, final CreateNodeMenu menu, final TriConsumer<String, DirectoryType, CodeGenerator> onSelected) {
         textField = new ExtendableTextField();
 
         textField.setFont(fieldFont);
@@ -54,6 +56,7 @@ public class CreateNodesDialog {
 
         mainPanel.add(textField, BorderLayout.NORTH);
 
+        this.project = project;
         this.codeGenerator = new CodeGenerator(menu.getGeneratorType());
 
         JPanel listWrapper = new JPanel(new BorderLayout());
@@ -95,7 +98,7 @@ public class CreateNodesDialog {
     }
 
     public void show() {
-        popup.showCenteredInCurrentWindow(Config.getProject());
+        popup.showCenteredInCurrentWindow(project);
         SwingUtilities.invokeLater(() -> {
             textField.revalidate();
             textField.repaint();

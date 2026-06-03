@@ -80,11 +80,11 @@ public class ExportJson extends DumbAwareAction {
 
         if (wrapper != null) {
             File destFile = wrapper.getFile();
-            processExportWithJson(destFile, targetDirectory, dirDto);
+            processExportWithJson(project, destFile, targetDirectory, dirDto);
         }
     }
 
-    private void processExportWithJson(final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
+    private void processExportWithJson(final @NotNull Project project, final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
@@ -97,7 +97,7 @@ public class ExportJson extends DumbAwareAction {
 
                 if (directoryData.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().warn("Export Empty", "No valid test cases found to export in the selected directory."));
+                            Notifier.getInstance().warn(project, "Export Empty", "No valid test cases found to export in the selected directory."));
                     return;
                 }
 
@@ -108,14 +108,14 @@ public class ExportJson extends DumbAwareAction {
                     Files.write(destFile.toPath(), jsonBytes);
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().info("Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
+                            Notifier.getInstance().info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
 
                 } catch (Exception ex) {
                     Log.error("Export crashed: " + ex.getMessage());
                     Log.error("Exception: " + ex.getMessage());
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Export Failed", "Failed to save the JSON file:\n" + ex.getMessage()));
+                            Notifier.getInstance().error(project, "Export Failed", "Failed to save the JSON file:\n" + ex.getMessage()));
                 }
             }
         });
