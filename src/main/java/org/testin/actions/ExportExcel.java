@@ -11,6 +11,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
@@ -18,7 +19,6 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
@@ -51,10 +51,11 @@ public class ExportExcel extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
+        final Project project = e.getProject();
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Notifier.getInstance().error("Export Error", "Please select a directory in the Project Panel tree.");
+            Notifier.getInstance().error(project, "Export Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -63,7 +64,7 @@ public class ExportExcel extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Notifier.getInstance().error("Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Notifier.getInstance().error(project, "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
@@ -74,12 +75,12 @@ public class ExportExcel extends DumbAwareAction {
         }
 
         if (targetDirectory == null) {
-            Notifier.getInstance().error("Export Error", "The selected path in the Project Panel is invalid.");
+            Notifier.getInstance().error(project, "Export Error", "The selected path in the Project Panel is invalid.");
             return;
         }
 
         FileSaverDescriptor descriptor = new FileSaverDescriptor("Export Excel", "Save test cases as an Excel file", "xlsx");
-        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, Config.getProject());
+        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, project);
 
         String defaultFileName = targetDirectory.getName() + "_Export.xlsx";
         VirtualFileWrapper wrapper = dialog.save((VirtualFile) null, defaultFileName);
@@ -91,7 +92,7 @@ public class ExportExcel extends DumbAwareAction {
     }
 
     private void processExportWithPoi(final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Exporting test cases", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project), "Exporting test cases", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -103,7 +104,7 @@ public class ExportExcel extends DumbAwareAction {
 
                 if (sheetsData.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().warn("Export Empty", "No valid test cases found to export in the selected directory."));
+                            Notifier.getInstance().warn(project, "Export Empty", "No valid test cases found to export in the selected directory."));
                     return;
                 }
 
@@ -158,14 +159,14 @@ public class ExportExcel extends DumbAwareAction {
                     }
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().info("Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
+                            Notifier.getInstance().info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
 
                 } catch (Exception ex) {
                     Log.error("Export crashed: " + ex.getMessage());
                     Log.error("Exception: " + ex.getMessage());
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Export Failed", "Failed to save the Excel file:\n" + ex.getMessage()));
+                            Notifier.getInstance().error(project, "Export Failed", "Failed to save the Excel file:\n" + ex.getMessage()));
                 }
             }
         });
