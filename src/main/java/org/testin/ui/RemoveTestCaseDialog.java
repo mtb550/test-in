@@ -1,7 +1,8 @@
 package org.testin.ui;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageDialogBuilder;
-import org.testin.pojo.Config;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class RemoveTestCaseDialog {
 
-    public static boolean confirmDeleteAction(List<TestCaseDto> selected) {
+    public static boolean confirmDeleteAction(final @NotNull Project project, final List<TestCaseDto> selected) {
         if (selected == null || selected.isEmpty()) return false;
 
         final String title = selected.size() == 1 ? "Delete Test Case" : "Delete Test Cases";
@@ -29,6 +30,6 @@ public class RemoveTestCaseDialog {
                 .yesText("Delete")
                 .noText("Cancel")
                 .asWarning()
-                .ask(Config.getProject());
+                .ask(project);
     }
 }

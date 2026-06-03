@@ -2,8 +2,10 @@ package org.testin.ui;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.actions.ShowSettingsUtilImpl;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
+import org.jetbrains.annotations.NotNull;
 import com.intellij.ui.awt.RelativePoint;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -19,7 +21,7 @@ public class ZoomIndicator {
     private static JBPopup currentPopup;
     private static Timer hideTimer;
 
-    public static void show(final JComponent parent, float currentSize) {
+    public static void show(final @NotNull Project project, final JComponent parent, float currentSize) {
         if (currentPopup != null && !currentPopup.isDisposed()) currentPopup.cancel();
 
         JBPanel<?> panel = new JBPanel<>();
@@ -36,8 +38,8 @@ public class ZoomIndicator {
             @Override
             public void mouseClicked(final MouseEvent e) {
                 if (currentPopup != null) currentPopup.cancel();
-                if (!Config.getProject().isDisposed()) {
-                    ShowSettingsUtilImpl.showSettingsDialog(Config.getProject(), "preferences.editor", "Change font size");
+                if (!project.isDisposed()) {
+                    ShowSettingsUtilImpl.showSettingsDialog(project, "preferences.editor", "Change font size");
                 }
             }
         });

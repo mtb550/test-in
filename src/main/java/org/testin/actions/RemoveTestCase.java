@@ -59,7 +59,7 @@ public class RemoveTestCase extends DumbAwareAction {
         boolean isCutAndSelected = EditorCM.isGlobalCutAction() &&
                 selectedItems.stream().allMatch(tc -> EditorCM.getGlobalPendingCutIds().contains(tc.getId()));
 
-        if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(selectedItems)) {
+        if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(e.getProject(), selectedItems)) {
             return;
         }
 
