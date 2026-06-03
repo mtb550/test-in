@@ -4,11 +4,11 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testCaseEditor.TestEditorUI;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testCase.TestCaseUpdateMenu;
 import org.testin.util.KeyboardSet;
@@ -46,8 +46,8 @@ public class UpdateTestCase extends DumbAwareAction {
 
         new TestCaseUpdateMenu(selectedItems, (updatedItems, codeGenerator) -> {
 
-            TestCaseCacheService.getInstance(Config.getProject()).addNewItems(updatedItems);
-            TestCasePersistService.getInstance(Config.getProject()).persist(path, updatedItems);
+            TestCaseCacheService.getInstance(project).addNewItems(updatedItems);
+            TestCasePersistService.getInstance(project).persist(path, updatedItems);
             Notifier.getInstance().softShow("Updated..");
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -69,7 +69,7 @@ public class UpdateTestCase extends DumbAwareAction {
                     // todo, all if statements here to be moved to enum class
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_DESCRIPTION) {
                         Log.info("TRACE [UpdateTestCase]: Routing to UpdateTestCaseDescription()...");
-                        //new UpdateTestCaseDescription().execute(Config.getProject(), updatedItems.getFirst().getFqcn(), updatedItems.getFirst());
+                        //new UpdateTestCaseDescription().execute(project, updatedItems.getFirst().getFqcn(), updatedItems.getFirst());
                         return;
                     }
 
@@ -94,7 +94,7 @@ public class UpdateTestCase extends DumbAwareAction {
 
 //                    CreateJavaMethodInClass generator = new CreateJavaMethodInClass();
 //                    for (TestCaseDto tc : updatedItems) {
-//                        generator.execute(Config.getProject(), tc.getFqcn(), tc);
+//                        generator.execute(project, tc.getFqcn(), tc);
 //                    }
                 } else {
                     Log.info("TRACE [UpdateTestCase]: Code generator is NOT selected or is null.");

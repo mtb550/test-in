@@ -9,13 +9,13 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import git4idea.checkin.GitUserNameNotDefinedDialog;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.util.*;
 import org.testin.util.notifications.Notifier;
@@ -62,7 +62,7 @@ public class ViewPendingCommits extends DumbAwareAction {
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Scanning for changes", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Scanning for changes", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -75,10 +75,10 @@ public class ViewPendingCommits extends DumbAwareAction {
                             return;
                         }
 
-                        PendingCommitsDialog dialog = new PendingCommitsDialog(Config.getProject(), changes, path);
+                        PendingCommitsDialog dialog = new PendingCommitsDialog(project, changes, path);
                         if (dialog.showAndGet()) {
                             String commitMessage = Messages.showInputDialog(
-                                    Config.getProject(),
+                                    project,
                                     "Enter a message for this commit:",
                                     "Commit Test Cases",
                                     Messages.getQuestionIcon(),
@@ -104,7 +104,7 @@ public class ViewPendingCommits extends DumbAwareAction {
     }
 
     private void performCommitWorkflow(final Path repoPath, final String commitMessage) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Committing to local Git", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Committing to local Git", false) {
             @Override
             public void run(@NotNull ProgressIndicator commitIndicator) {
                 commitIndicator.setIndeterminate(true);
@@ -145,7 +145,7 @@ public class ViewPendingCommits extends DumbAwareAction {
     }
 
     private void initializeGitRepository(final Path repoPath) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Initializing git repository", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Initializing git repository", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -183,7 +183,7 @@ public class ViewPendingCommits extends DumbAwareAction {
 
         if (remoteUrl.isEmpty()) {
             remoteUrl = com.intellij.openapi.ui.Messages.showInputDialog(
-                    Config.getProject(),
+                    project,
                     "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
                     "Configure Remote",
                     com.intellij.openapi.ui.Messages.getQuestionIcon()
@@ -196,7 +196,7 @@ public class ViewPendingCommits extends DumbAwareAction {
 
             final String finalRemoteUrl = remoteUrl.trim();
 
-            ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Configuring remote", false) {
+            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Configuring remote", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     try {
@@ -215,7 +215,7 @@ public class ViewPendingCommits extends DumbAwareAction {
     }
 
     private void executeGitPush(final Path repoPath) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Pushing to Remote", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Pushing to Remote", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -263,7 +263,7 @@ public class ViewPendingCommits extends DumbAwareAction {
             if (vRepoPath == null) return;
 
             GitUserNameNotDefinedDialog dialog = new GitUserNameNotDefinedDialog(
-                    Config.getProject(),
+                    project,
                     Collections.singletonList(vRepoPath),
                     Collections.singletonList(vRepoPath),
                     Collections.emptyMap(),
@@ -280,7 +280,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                     return;
                 }
 
-                ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Configuring git identity", false) {
+                ProgressManager.getInstance().run(new Task.Backgroundable(project, "Configuring git identity", false) {
                     @Override
                     public void run(@NotNull ProgressIndicator indicator) {
                         indicator.setIndeterminate(true);

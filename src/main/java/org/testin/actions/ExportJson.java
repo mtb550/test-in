@@ -11,12 +11,12 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
@@ -44,10 +44,11 @@ public class ExportJson extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
+        final Project project = e.getProject();
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Notifier.getInstance().error("Export Error", "Please select a directory in the Project Panel tree.");
+            Notifier.getInstance().error(project, "Export Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -56,7 +57,7 @@ public class ExportJson extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Notifier.getInstance().error("Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Notifier.getInstance().error(project, "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
@@ -67,12 +68,12 @@ public class ExportJson extends DumbAwareAction {
         }
 
         if (targetDirectory == null) {
-            Notifier.getInstance().error("Export Error", "The selected path in the Project Panel is invalid.");
+            Notifier.getInstance().error(project, "Export Error", "The selected path in the Project Panel is invalid.");
             return;
         }
 
         FileSaverDescriptor descriptor = new FileSaverDescriptor("Export JSON", "Save test cases as a JSON file", "json");
-        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, Config.getProject());
+        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, project);
 
         String defaultFileName = targetDirectory.getName() + "_Export.json";
         VirtualFileWrapper wrapper = dialog.save((VirtualFile) null, defaultFileName);
@@ -84,7 +85,7 @@ public class ExportJson extends DumbAwareAction {
     }
 
     private void processExportWithJson(final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Exporting test cases", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
