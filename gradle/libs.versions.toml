@@ -1,0 +1,22 @@
+[versions]
+lombok = "1.18.44"
+jackson = "2.21.2"
+restAssured = "6.0.0"
+commonsIo = "2.21.0"
+testng = "7.12.0"
+iText = "9.6.0"
+fastexcel = "0.20.0"
+poi = "5.5.1"
+
+[libraries]
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+json-path = { module = "io.rest-assured:json-path", version.ref = "restAssured" }
+commons-io = { module = "commons-io:commons-io", version.ref = "commonsIo" }
+testng = { module = "org.testng:testng", version.ref = "testng" }
+iText-kernel = { module = "com.itextpdf:kernel", version.ref = "iText" }
+iText-layout = { module = "com.itextpdf:layout", version.ref = "iText" }
+fastexcel = { module = "org.dhatim:fastexcel", version.ref = "fastexcel" }
+poi = { module = "org.apache.poi:poi", version.ref = "poi" }
+poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "poi" }

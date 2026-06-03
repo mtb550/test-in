@@ -39,43 +39,28 @@ dependencies {
         testFramework(TestFrameworkType.Platform)
     }
 
-    // Source: https://mvnrepository.com/artifact/org.projectlombok/lombok
-    val lombokVersion = "1.18.44"
-    implementation("org.projectlombok:lombok:$lombokVersion")
-    compileOnly("org.projectlombok:lombok:$lombokVersion")
-    annotationProcessor("org.projectlombok:lombok:$lombokVersion")
-    testCompileOnly("org.projectlombok:lombok:$lombokVersion")
-    testAnnotationProcessor("org.projectlombok:lombok:$lombokVersion")
+    implementation(libs.lombok)
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+    testCompileOnly(libs.lombok)
+    testAnnotationProcessor(libs.lombok)
 
-    // Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    // Source: https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310
-    val jacksonVersion = "2.21.2"
-    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jacksonVersion")
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.datatype.jsr310)
 
-    // Source: https://mvnrepository.com/artifact/io.rest-assured/json-path
-    implementation("io.rest-assured:json-path:6.0.0")
+    implementation(libs.json.path)
 
-    // Source: https://mvnrepository.com/artifact/commons-io/commons-io
-    implementation("commons-io:commons-io:2.21.0")
+    implementation(libs.commons.io)
 
-    // Source: https://mvnrepository.com/artifact/org.testng/testng
-    testImplementation("org.testng:testng:7.12.0")
+    testImplementation(libs.testng)
 
-    // Source: https://mvnrepository.com/artifact/com.itextpdf/kernel
-    // Source: https://mvnrepository.com/artifact/com.itextpdf/layout
-    val iTextVersion = "9.6.0"
-    implementation("com.itextpdf:kernel:$iTextVersion")
-    implementation("com.itextpdf:layout:$iTextVersion")
+    implementation(libs.iText.kernel)
+    implementation(libs.iText.layout)
 
-    // Source: https://mvnrepository.com/artifact/org.dhatim/fastexcel
-    implementation("org.dhatim:fastexcel:0.20.0")
+    implementation(libs.fastexcel)
 
-    // Source: https://mvnrepository.com/artifact/org.apache.poi/poi
-    // Source: https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
-    val poiVersion = "5.5.1"
-    implementation("org.apache.poi:poi:$poiVersion")
-    implementation("org.apache.poi:poi-ooxml:$poiVersion")
+    implementation(libs.poi)
+    implementation(libs.poi.ooxml)
 }
 
 intellijPlatform {
