@@ -52,7 +52,7 @@ public class Rename extends DumbAwareAction {
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
         if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
 
-        EditorUtil.getInstance().closeEditor(dir.getName());
+        EditorUtil.getInstance().closeEditor(e.getProject(), dir.getName());
 
         Path oldPath = dir.getPath();
         Path newPath = oldPath.getParent().resolve(newName);
