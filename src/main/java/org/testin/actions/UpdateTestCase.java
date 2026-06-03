@@ -39,6 +39,7 @@ public class UpdateTestCase extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        final Project project = e.getProject();
         if (list == null) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
@@ -48,7 +49,7 @@ public class UpdateTestCase extends DumbAwareAction {
 
             TestCaseCacheService.getInstance(project).addNewItems(updatedItems);
             TestCasePersistService.getInstance(project).persist(path, updatedItems);
-            Notifier.getInstance().softShow("Updated..");
+            Notifier.getInstance().softShow(project, "Updated..");
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 list.repaint();

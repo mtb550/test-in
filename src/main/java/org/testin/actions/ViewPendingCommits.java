@@ -48,11 +48,12 @@ public class ViewPendingCommits extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        final Project project = e.getProject();
         final Path path = Tools.getInstance().getProjectPath(tree);
 
         File gitDir = new File(path.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Notifier.getInstance().warnWithAction(
+            Notifier.getInstance().warnWithAction(project, 
                     "Git repository not found",
                     "The selected project (" + path.getFileName() + ") is not a Git repository.",
                     "Initialize Git (git init)",
@@ -71,7 +72,7 @@ public class ViewPendingCommits extends DumbAwareAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (changes.isEmpty()) {
-                            Notifier.getInstance().info("No Changes", "Your test cases are up to date in this project.");
+                            Notifier.getInstance().info(project, "No Changes", "Your test cases are up to date in this project.");
                             return;
                         }
 
@@ -89,14 +90,14 @@ public class ViewPendingCommits extends DumbAwareAction {
                             if (commitMessage != null && !commitMessage.trim().isEmpty()) {
                                 performCommitWorkflow(path, commitMessage.trim());
                             } else if (commitMessage != null) {
-                                Notifier.getInstance().warn("Commit Aborted", "A commit message is required.");
+                                Notifier.getInstance().warn(project, "Commit Aborted", "A commit message is required.");
                             }
                         }
                     });
 
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Git Error", "Failed to calculate diffs: " + ex.getMessage())
+                            Notifier.getInstance().error(project, "Git Error", "Failed to calculate diffs: " + ex.getMessage())
                     );
                 }
             }
@@ -201,7 +202,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                 public void run(@NotNull ProgressIndicator indicator) {
                     try {
                         GitCommandRunner.execute(repoPath, "git", "remote", "add", "origin", finalRemoteUrl);
-                        executeGitPush(repoPath);
+                        executeGitPush(project, repoPath);
                     } catch (Exception ex) {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Notifier.getInstance().error("Git Error", "Failed to add remote: " + ex.getMessage())
@@ -210,11 +211,11 @@ public class ViewPendingCommits extends DumbAwareAction {
                 }
             });
         } else {
-            executeGitPush(repoPath);
+            executeGitPush(project, repoPath);
         }
     }
 
-    private void executeGitPush(final Path repoPath) {
+    private void executeGitPush(final @NotNull Project project, final Path repoPath) {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Pushing to Remote", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
