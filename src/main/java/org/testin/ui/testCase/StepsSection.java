@@ -67,8 +67,8 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     public void addStepField(final String text, final TestCaseUIBase.IUIAction repackAction) {
-        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getSteps(), CreateTestCaseFields.STEPS.getIcon());
-        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(Config.getProject(), provider, false, text != null ? text : "");
+        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getSteps(), CreateTestCaseFields.STEPS.getIcon());
+        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(project, provider, false, text != null ? text : "");
 
         stepField.setFont(fieldFont);
         stepField.setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (stepFields.size() + 1));

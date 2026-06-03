@@ -28,7 +28,7 @@ public class CreateTestMethod implements GeneratorAction {
             return;
         }
 
-        final Project project = Config.getProject();
+        final Project project = project;
 
         final String methodName = fqcn.getLast();
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));

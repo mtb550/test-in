@@ -186,7 +186,7 @@ public class AppSettingsConfigurable implements Configurable {
                                 }
                             }
 
-                            ProjectPanel panel = ProjectPanelService.getInstance(Config.getProject()).getPanel();
+                            ProjectPanel panel = ProjectPanelService.getInstance(project).getPanel();
                             if (panel != null) {
                                 new Refresh(panel).execute();
                                 Log.info("ToolWindow refresh triggered successfully.");
@@ -256,7 +256,7 @@ public class AppSettingsConfigurable implements Configurable {
         else
             Config.setAutomationPath(null);
 
-        ProjectPanel panel = ProjectPanelService.getInstance(Config.getProject()).getPanel();
+        ProjectPanel panel = ProjectPanelService.getInstance(project).getPanel();
         if (panel != null) {
             new Refresh(panel).execute();
             Log.info("ToolWindow refresh triggered successfully.");
@@ -268,7 +268,7 @@ public class AppSettingsConfigurable implements Configurable {
         AppSettingsState settings = AppSettingsState.getInstance();
         rootTestinPathField.setText(settings.rootTestinPath != null ? settings.rootTestinPath : "");
 
-        Project project = Config.getProject();
+        Project project = project;
         VirtualFile mainSourceRoot = Tools.getInstance().getTestSourceRoot(project);
 
         if (mainSourceRoot != null) {

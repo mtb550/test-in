@@ -73,7 +73,7 @@ public class TestCaseUpdateMenu {
         JBList<UpdateTestCaseFields> list = buildMenuList(fields);
         JBPopup popup = buildPopup(title, list);
         registerShortcuts(list, popup, onSelection);
-        popup.showCenteredInCurrentWindow(Config.getProject());
+        popup.showCenteredInCurrentWindow(project);
     }
 
     @NotNull

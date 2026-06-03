@@ -131,7 +131,7 @@ public class CreateTestCaseUI extends TestCaseUIBase {
 
     public void show() {
         if (popup != null) {
-            popup.showCenteredInCurrentWindow(Config.getProject());
+            popup.showCenteredInCurrentWindow(project);
         }
     }
 }

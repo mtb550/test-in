@@ -22,7 +22,7 @@ public class TestinCheckinHandlerFactory extends CheckinHandlerFactory {
                         });
 
                 if (containsManagedFiles) {
-                    Notifier.getInstance().error("Commits to 'testin' paths are disabled. These are managed by automation.", "Commit Blocked");
+                    Notifier.getInstance().error(project, "Commits to 'testin' paths are disabled. These are managed by automation.", "Commit Blocked");
                     return ReturnResult.CANCEL;
                 }
 

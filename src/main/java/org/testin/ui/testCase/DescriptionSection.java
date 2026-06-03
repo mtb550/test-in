@@ -21,7 +21,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     private final JPanel wrapper;
 
     public DescriptionSection() {
-        this.titleField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
+        this.titleField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
         this.titleField.setFont(fieldFont);
         this.titleField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());
         this.titleField.setShowPlaceholderWhenFocused(true);

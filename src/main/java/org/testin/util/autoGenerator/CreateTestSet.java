@@ -26,7 +26,7 @@ public class CreateTestSet implements GeneratorAction {
 
         WriteAction.run(() -> {
             try {
-                VirtualFile testSourceRoot = Tools.getInstance().getTestSourceRoot(Config.getProject());
+                VirtualFile testSourceRoot = Tools.getInstance().getTestSourceRoot(project);
 
                 if (testSourceRoot != null) {
                     VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, path.replace(".", "/"));

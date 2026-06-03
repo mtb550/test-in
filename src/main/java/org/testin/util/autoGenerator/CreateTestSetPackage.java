@@ -19,7 +19,7 @@ public class CreateTestSetPackage implements GeneratorAction {
     public void execute(final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
         WriteAction.run(() -> {
             try {
-                VirtualFile testSourceRoot = Tools.getInstance().getTestSourceRoot(Config.getProject());
+                VirtualFile testSourceRoot = Tools.getInstance().getTestSourceRoot(project);
 
                 if (testSourceRoot != null) {
                     VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));

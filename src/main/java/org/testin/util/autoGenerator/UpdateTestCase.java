@@ -15,7 +15,7 @@ public class UpdateTestCase implements GeneratorAction {
     @Override
     public void execute(final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
         ApplicationManager.getApplication().invokeLater(() ->
-                WriteCommandAction.runWriteCommandAction(Config.getProject(), "Create Test Method", null, () -> {
+                WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () -> {
                     try {
 
                     } catch (Exception ex) {

@@ -48,7 +48,7 @@ public abstract class JsonSplitBulkSection {
     protected abstract void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges);
 
     public void show(final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
-        Project project = Config.getProject();
+        Project project = project;
 
         StringBuilder leftSb = new StringBuilder();
         StringBuilder rightSb = new StringBuilder();

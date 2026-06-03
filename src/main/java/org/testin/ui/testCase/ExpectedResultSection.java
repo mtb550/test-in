@@ -19,7 +19,7 @@ public class ExpectedResultSection implements ICreateTestCaseSection {
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ExpectedResultSection() {
-        this.expectedResultField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), false, "");
+        this.expectedResultField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), false, "");
         this.expectedResultField.setFont(fieldFont);
         this.expectedResultField.setPlaceholder(CreateTestCaseFields.EXPECTED_RESULT.getPlaceholder());
         this.expectedResultField.setShowPlaceholderWhenFocused(true);

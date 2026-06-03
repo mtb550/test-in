@@ -22,7 +22,7 @@ public class CreateTestProject implements GeneratorAction {
             try {
                 WriteAction.run(() -> {
 
-                    VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(Config.getProject());
+                    VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
 
                     if (sourceRoot != null) {
                         VirtualFile vf = VfsUtil.createDirectoryIfMissing(sourceRoot, fqcn.getFirst());

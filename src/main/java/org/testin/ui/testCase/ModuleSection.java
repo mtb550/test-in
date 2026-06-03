@@ -19,7 +19,7 @@ public class ModuleSection implements ICreateTestCaseSection {
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ModuleSection() {
-        this.moduleField = new TextFieldWithAutoCompletion<>(Config.getProject(), new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(Config.getProject()).getModules(), CreateTestCaseFields.MODULE.getIcon()), false, "");
+        this.moduleField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getModules(), CreateTestCaseFields.MODULE.getIcon()), false, "");
         this.moduleField.setFont(fieldFont);
         this.moduleField.setPlaceholder(CreateTestCaseFields.MODULE.getPlaceholder());
         this.moduleField.setShowPlaceholderWhenFocused(true);
