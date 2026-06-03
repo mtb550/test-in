@@ -27,6 +27,7 @@ import java.awt.*;
 @Getter
 @Service(Service.Level.PROJECT)
 public class ProjectPanel implements Disposable {
+    private final Project project;
     private final JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
     private final TestProjectSelector testProjectSelector;
     private final TestProjectTreeBuilder testProjectTreeBuilder;
@@ -36,6 +37,7 @@ public class ProjectPanel implements Disposable {
     private ProjectTree projectTree;
 
     public ProjectPanel(Project project) {
+        this.project = project;
         Log.info("ProjectPanel.ProjectPanel()");
 
         testProjectSelector = new TestProjectSelector(this);
@@ -97,7 +99,7 @@ public class ProjectPanel implements Disposable {
                     AllIcons.General.Settings,
                     "Configure Testin settings",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> ShowSettingsUtil.getInstance().showSettingsDialog(Config.getProject(), AppSettingsConfigurable.class)
+                    e -> ShowSettingsUtil.getInstance().showSettingsDialog(project, AppSettingsConfigurable.class)
             );
 
         else
@@ -105,7 +107,7 @@ public class ProjectPanel implements Disposable {
                     AllIcons.General.Add,
                     " Create your first test project",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> new CreateTestProject(this).execute()
+                    e -> new CreateTestProject(this).execute(project)
             );
 
         panel.revalidate();

@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
@@ -22,6 +23,7 @@ import java.util.List;
 public class BranchSelector {
     private final boolean showRemote = false;
 
+    private final Project project;
     private final ProjectPanel projectPanel;
     private final ComboBox<String> comboBox;
     private final DefaultComboBoxModel<String> model;
@@ -31,7 +33,8 @@ public class BranchSelector {
 
     private boolean isUpdating = false;
 
-    public BranchSelector(final ProjectPanel projectPanel, final TestProjectDirectoryDto testProjectDirectory) {
+    public BranchSelector(final @NotNull Project project, final ProjectPanel projectPanel, final TestProjectDirectoryDto testProjectDirectory) {
+        this.project = project;
         this.projectPanel = projectPanel;
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
@@ -92,7 +95,7 @@ public class BranchSelector {
     private void checkoutBranchAndRefreshTree(final String targetBranch) {
         if (projectPath == null) return;
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Checking out branch: " + targetBranch, false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Checking out branch: " + targetBranch, false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -119,7 +122,7 @@ public class BranchSelector {
                             isUpdating = false;
                         }
 
-                        Notifier.getInstance().error("Git Checkout Failed", "Could not checkout " + targetBranch + ". Do you have uncommitted changes?\n" + ex.getMessage());
+                        Notifier.getInstance().error(project, "Git Checkout Failed", "Could not checkout " + targetBranch + ". Do you have uncommitted changes?\n" + ex.getMessage());
                     });
                 }
             }
@@ -127,7 +130,7 @@ public class BranchSelector {
     }
 
     private void loadGitBranches() {
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Fetching Git branches", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Fetching Git branches", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -176,7 +179,7 @@ public class BranchSelector {
                         } finally {
                             isUpdating = false;
                         }
-                        Notifier.getInstance().error("Git Error", "Failed to load branches: " + ex.getMessage());
+                        Notifier.getInstance().error(project, "Git Error", "Failed to load branches: " + ex.getMessage());
                     });
                 }
             }

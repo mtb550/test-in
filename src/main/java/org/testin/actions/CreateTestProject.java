@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.*;
@@ -39,8 +40,8 @@ public class CreateTestProject extends DumbAwareAction {
         return "ImportedTestProject";
     }
 
-    public void execute() {
-        new CreateNodesDialog(CreateNodeMenu.TEST_PROJECT, (name, directoryType, codeGenerator) -> {
+    public void execute(final @NotNull Project project) {
+        new CreateNodesDialog(project, CreateNodeMenu.TEST_PROJECT, (name, directoryType, codeGenerator) -> {
             if (name == null || name.trim().isEmpty()) return;
 
             if (directoryType == DirectoryType.IMPORT_TP) {
@@ -54,21 +55,21 @@ public class CreateTestProject extends DumbAwareAction {
             final Path tpPath = Config.getTestinPath().resolve(tpName);
 
             if (Files.exists(tpPath)) {
-                Notifier.getInstance().error("Creation Failed", "A test project named '" + tpName + "' already exists.");
+                Notifier.getInstance().error(project, "Creation Failed", "A test project named '" + tpName + "' already exists.");
                 return;
             }
 
             TestProjectDirectoryDto newTp = DirectoryMapper.getInstance().testProjectNode(tpPath);
 
             if (newTp == null) {
-                Notifier.getInstance().error("Creation Failed", "Could not map test project directory in memory.");
+                Notifier.getInstance().error(project, "Creation Failed", "Could not map test project directory in memory.");
                 return;
             }
 
             TreeUtilImpl.executeVfsAction(Config.getTestinPath(), "IO Error", vf -> {
 
                 if (vf.findChild(tpName) != null) {
-                    Notifier.getInstance().error("Creation Failed", "The directory '" + tpName + "' already exists in the IDE's Virtual File System.");
+                    Notifier.getInstance().error(project, "Creation Failed", "The directory '" + tpName + "' already exists in the IDE's Virtual File System.");
                     return;
                 }
 
@@ -102,7 +103,7 @@ public class CreateTestProject extends DumbAwareAction {
                 projectDir.refresh(false, true);
                 projectPanel.getTestProjectSelector().addTestProject(newTp);
 
-                Notifier.getInstance().info("New Test Project", String.format("Test Project %s has been added", name));
+                Notifier.getInstance().info(project, "New Test Project", String.format("Test Project %s has been added", name));
 
                 if (codeGenerator.isSelected()) {
                     GeneratorType.CREATE_TEST_PROJECT.getAction().execute(null, newTp.getFqcn());
@@ -114,7 +115,7 @@ public class CreateTestProject extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        execute();
+        execute(e.getProject());
     }
 
     @Override
