@@ -28,6 +28,7 @@ import org.testin.projectPanel.projectSelector.RendererImpl;
 import org.testin.settings.service.ProjectPanelService;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.*;
@@ -186,7 +187,7 @@ public class AppSettingsConfigurable implements Configurable {
                             ProjectPanel panel = ProjectPanelService.getInstance(Config.getProject()).getPanel();
                             if (panel != null) {
                                 new Refresh(panel).execute();
-                                System.out.println("ToolWindow refresh triggered successfully.");
+                                Log.info("ToolWindow refresh triggered successfully.");
                             }
                         });
                     }
@@ -217,8 +218,8 @@ public class AppSettingsConfigurable implements Configurable {
                 }
             }
         } catch (Exception e) {
-            System.err.println("Failed to refresh project list: " + e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error("Failed to refresh project list: " + e.getMessage());
+            Log.error("Exception: " + e.getMessage());
         }
     }
 
@@ -252,7 +253,7 @@ public class AppSettingsConfigurable implements Configurable {
         ProjectPanel panel = ProjectPanelService.getInstance(Config.getProject()).getPanel();
         if (panel != null) {
             new Refresh(panel).execute();
-            System.out.println("ToolWindow refresh triggered successfully.");
+            Log.info("ToolWindow refresh triggered successfully.");
         }
     }
 

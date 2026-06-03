@@ -27,6 +27,7 @@ import org.testin.ui.ExcelPreviewDialog;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -279,8 +280,8 @@ public class ImportExcel extends DumbAwareAction {
                     }
 
                 } catch (Exception ex) {
-                    System.err.println("Import crashed: " + ex.getMessage());
-                    ex.printStackTrace(System.err);
+                    Log.error("Import crashed: " + ex.getMessage());
+                    Log.error("Exception: " + ex.getMessage());
 
                     ApplicationManager.getApplication().invokeLater(() ->
                             Notifier.getInstance().error("Failed to import data: " +
@@ -347,7 +348,7 @@ public class ImportExcel extends DumbAwareAction {
                                 targetDirectory.refresh(false, true);
 
                             } catch (IOException ex) {
-                                System.err.println("Failed to write files: " + ex.getMessage());
+                                Log.error("Failed to write files: " + ex.getMessage());
                             }
                         });
 

@@ -268,9 +268,13 @@ major change, move to tree async model, to manage update, remove, dispose and re
 update gradle file to use toml
 https://docs.gradle.org/current/userguide/version_catalogs.html
 
-fix pi report issues. & implement IntelliJ logger
+fix pi report issues.
+
+set debug mode in setting, build ui.
 
 // todo, to be removed as we can get the project from toolwindow class e.getProject()
 private static Project project;
 
 move Mapper class to be static with getInstance()
+
+update run test set to run the method or class.

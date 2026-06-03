@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.testin.pojo.dto.dirs.*;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 
 import java.nio.file.Path;
@@ -52,13 +53,13 @@ public class DirectoryMapper {
             tp.setTestCasesDirectory(tcd);
             tp.setTestRunsDirectory(trd);
 
-            System.out.println("retrieve the project directory: " + tp);
+            Log.info("retrieve the project directory: " + tp);
             return tp;
 
         } catch (Exception e) {
             Notifier.getInstance().error("Read Test Project Failed", "Skipping invalid format: " + fileName);
-            System.err.println(e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error(e.getMessage());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -75,13 +76,13 @@ public class DirectoryMapper {
                     .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
                     .build();
 
-            System.out.println("retrieve the test cases main directory: " + tcd);
+            Log.info("retrieve the test cases main directory: " + tcd);
             return tcd;
 
         } catch (Exception e) {
             Notifier.getInstance().error("Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
-            System.err.println(e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error(e.getMessage());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -98,13 +99,13 @@ public class DirectoryMapper {
                     .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
                     .build();
 
-            System.out.println("retrieve the test runs main directory: " + trd);
+            Log.info("retrieve the test runs main directory: " + trd);
             return trd;
 
         } catch (Exception e) {
             Notifier.getInstance().error("Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
-            System.err.println(e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error(e.getMessage());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -121,13 +122,13 @@ public class DirectoryMapper {
                     .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
                     .build();
 
-            System.out.println("retrieve the test set package directory: " + testSetPackageDirectoryDto);
+            Log.info("retrieve the test set package directory: " + testSetPackageDirectoryDto);
             return testSetPackageDirectoryDto;
 
         } catch (Exception e) {
             Notifier.getInstance().error("Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
-            System.err.println(e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error(e.getMessage());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -144,13 +145,13 @@ public class DirectoryMapper {
                     .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
                     .build();
 
-            System.out.println("retrieve the test run package directory: " + testRunPackageDirectoryDto);
+            Log.info("retrieve the test run package directory: " + testRunPackageDirectoryDto);
             return testRunPackageDirectoryDto;
 
         } catch (Exception e) {
             Notifier.getInstance().error("Read Test Run Package Failed", "Failed to parse directory: " + path.getFileName());
-            System.err.println(e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error(e.getMessage());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -158,7 +159,7 @@ public class DirectoryMapper {
     public TestSetDirectoryDto testSetNode(final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
-            System.out.println("retrieve the test set directory: " + fileName);
+            Log.info("retrieve the test set directory: " + fileName);
             TestSetDirectoryDto testSetDirectoryDto = TestSetDirectoryDto
                     .builder()
                     .name(fileName)
@@ -168,13 +169,13 @@ public class DirectoryMapper {
                     .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
                     .build();
 
-            System.out.println("retrieve the test set directory: " + testSetDirectoryDto);
+            Log.info("retrieve the test set directory: " + testSetDirectoryDto);
             return testSetDirectoryDto;
 
         } catch (Exception e) {
             Notifier.getInstance().error("Read Test Set Failed", "Failed to parse directory: " + path.getFileName());
-            System.err.println(e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error(e.getMessage());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -191,13 +192,13 @@ public class DirectoryMapper {
                     .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
                     .build();
 
-            System.out.println("retrieve the test run directory: " + testRunDirectoryDto);
+            Log.info("retrieve the test run directory: " + testRunDirectoryDto);
             return testRunDirectoryDto;
 
         } catch (Exception e) {
             Notifier.getInstance().error("Read Test Run Failed", "Failed to parse directory: " + path.getFileName());
-            System.err.println(e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error(e.getMessage());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }

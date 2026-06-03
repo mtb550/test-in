@@ -13,6 +13,7 @@ import org.testin.ui.createNodes.CreateNodesDialog;
 import org.testin.util.Mapper;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.GeneratorType;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 
 import java.io.IOException;
@@ -87,7 +88,7 @@ public class CreateTestProject extends DumbAwareAction {
                     newTp.setMarker(marker);
 
                 } catch (IOException ex) {
-                    System.err.println("Failed to write JSON to .tp file: " + ex.getMessage());
+                    Log.error("Failed to write JSON to .tp file: " + ex.getMessage());
                 }
 
                 String tcdName = newTp.getTestCasesDirectory().getPath().getFileName().toString();

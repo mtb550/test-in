@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.testin.pojo.RunEditorAttributes;
+import org.testin.util.logger.Log;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,7 +37,7 @@ public class RunDetailsPopup extends AbstractButton implements IToolbarItem {
                     try {
                         selectedDetails.add(RunEditorAttributes.valueOf(s));
                     } catch (IllegalArgumentException ignored) {
-                        System.err.println("Invalid run editor attributes: " + s);
+                        Log.error("Invalid run editor attributes: " + s);
                     }
                 });
 

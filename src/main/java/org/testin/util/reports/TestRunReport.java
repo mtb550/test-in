@@ -15,6 +15,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 
 import java.awt.datatransfer.StringSelection;
@@ -115,7 +116,7 @@ public final class TestRunReport {
 
             } catch (Exception e) {
                 Notifier.getInstance().error("Report Error", "Failed to generate " + format.name() + " report: " + e.getMessage());
-                e.printStackTrace(System.err);
+                Log.error("Exception: " + e.getMessage());
             }
         });
     }
@@ -157,7 +158,7 @@ public final class TestRunReport {
                             }
                         });
             } catch (Exception e) {
-                System.err.println("Failed to load details from path " + dirPath + ": " + e.getMessage());
+                Log.error("Failed to load details from path " + dirPath + ": " + e.getMessage());
             }
         }
         return detailsMap;

@@ -23,6 +23,7 @@ import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -109,8 +110,8 @@ public class ExportJson extends DumbAwareAction {
                             Notifier.getInstance().info("Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
 
                 } catch (Exception ex) {
-                    System.err.println("Export crashed: " + ex.getMessage());
-                    ex.printStackTrace(System.err);
+                    Log.error("Export crashed: " + ex.getMessage());
+                    Log.error("Exception: " + ex.getMessage());
 
                     ApplicationManager.getApplication().invokeLater(() ->
                             Notifier.getInstance().error("Export Failed", "Failed to save the JSON file:\n" + ex.getMessage()));

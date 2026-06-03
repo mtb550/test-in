@@ -8,6 +8,7 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -136,8 +137,8 @@ public class TreeTransferHandler extends TransferHandler {
             return clonedNode;
 
         } catch (Exception e) {
-            System.err.println("Failed to deep clone node: " + e.getMessage());
-            e.printStackTrace(System.err);
+            Log.error("Failed to deep clone node: " + e.getMessage());
+            Log.error("Exception: " + e.getMessage());
             return new DefaultMutableTreeNode(userObject);
         }
     }
@@ -155,14 +156,14 @@ public class TreeTransferHandler extends TransferHandler {
 
             Tools.getInstance().updateChildrenPathsRecursive(movedNode, oldPath, newPath);
 
-            System.out.println("Moved successfully to: " + newPath);
+            Log.info("Moved successfully to: " + newPath);
         });
     }
 
     private void persistCopy(final DirectoryDto source, final DirectoryDto target) {
         TreeUtilImpl.executeVfsAction(source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
             sourceVf.copy(this, targetVf, sourceVf.getName());
-            System.out.println("Copied successfully to: " + target.getPath().resolve(source.getName()));
+            Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
         });
     }
 

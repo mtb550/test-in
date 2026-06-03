@@ -7,6 +7,7 @@ import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.util.logger.Log;
 
 @State(
         name = "testin.settings.AppSettingsState",
@@ -18,7 +19,7 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public boolean readMode = false;
 
     public static AppSettingsState getInstance() {
-        System.out.println("AppSettingsState.getInstance()");
+        Log.info("AppSettingsState.getInstance()");
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
     }
 
@@ -30,7 +31,7 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     @Override
     public void loadState(@NotNull AppSettingsState state) {
-        System.out.println("AppSettingsState.loadState()");
+        Log.info("AppSettingsState.loadState()");
         XmlSerializerUtil.copyBean(state, this);
     }
 }

@@ -12,6 +12,7 @@ import org.testin.editorPanel.EditorCM;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.projectPanel.tree.TreeTransferHandler;
 import org.testin.util.KeyboardSet;
+import org.testin.util.logger.Log;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.awt.datatransfer.StringSelection;
@@ -43,7 +44,7 @@ public class Escape extends DumbAwareAction {
             transferHandler.getSelectedNodes().clear();
             transferHandler.resetLastAction();
             tree.repaint();
-            System.out.println("Clipboard/Cut state cleared via ESC.");
+            Log.info("Clipboard/Cut state cleared via ESC.");
             return;
         }
 

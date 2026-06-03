@@ -16,6 +16,7 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.ui.RemoveTestCaseDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -66,7 +67,7 @@ public class RemoveTestCase extends DumbAwareAction {
             try {
                 performDeletion(selectedItems);
             } catch (IOException ex) {
-                ex.printStackTrace(System.err);
+                Log.error("Exception: " + ex.getMessage());
             }
         });
     }

@@ -7,6 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestNGRunnerByClass;
 
@@ -46,13 +47,13 @@ public class RunTestSet extends DumbAwareAction {
         Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
 
         if (userObject instanceof TestSetDirectoryDto ts) {
-            System.out.println(this.getClass() + "directory file: " + ts.getPath().toFile());
+            Log.info(this.getClass() + "directory file: " + ts.getPath().toFile());
             //String fqcn = Tools.getInstance().fileToFqcn(ts.getPath().toFile());  // todo, deprecated as there is an new enhanced method, should change all calls to the new later.
             String fqcn = ""; //todo, to be updated
-            System.out.println(this.getClass() + "fqcn path: " + fqcn);
+            Log.info(this.getClass() + "fqcn path: " + fqcn);
 
             if (!fqcn.trim().isEmpty()) {
-                System.out.println("fqcn: " + fqcn);
+                Log.info("fqcn: " + fqcn);
                 TestNGRunnerByClass.runTestClass(fqcn);
             } else {
                 Notifier.getInstance().error("Run Failed", "Could not parse class name from file path: " + ts.getPath().toFile().getName());

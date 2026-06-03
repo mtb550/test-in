@@ -7,6 +7,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,8 +70,8 @@ public class RunSessionCache {
                 final Path dirPath = Tools.getInstance().buildLocalPathFromList(pathSegments);
 
                 if (dirPath == null || !Files.exists(dirPath) || targetIds.isEmpty()) {
-                    System.err.println("[WARNING] directory path not found: " + dirPath);
-                    System.err.println("[WARNING] path not found: " + pathSegments);
+                    Log.warn("[WARNING] directory path not found: " + dirPath);
+                    Log.error("[WARNING] path not found: " + pathSegments);
                     continue;
                 }
 
@@ -98,9 +99,9 @@ public class RunSessionCache {
                                 }
                             });
                 } catch (final Exception ex) {
-                    System.err.println("Unable to read test case file: " + dirPath.toAbsolutePath());
-                    ex.printStackTrace(System.err);
-                    if (!isDisposed) System.err.println("Failed to load cases from: " + dirPath);
+                    Log.error("Unable to read test case file: " + dirPath.toAbsolutePath());
+                    Log.error("Exception: " + ex.getMessage());
+                    if (!isDisposed) Log.error("Failed to load cases from: " + dirPath);
                 }
             }
 

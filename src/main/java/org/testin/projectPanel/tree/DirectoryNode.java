@@ -13,6 +13,7 @@ import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.util.logger.Log;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,7 +57,7 @@ public class DirectoryNode extends SimpleNode {
                         .filter(Objects::nonNull)
                         .forEachOrdered(childDto -> children.add(new DirectoryNode(myProject, childDto, projectPanel)));
             } catch (Exception e) {
-                System.err.println("Failed to read directory for tree: " + e.getMessage());
+                Log.error("Failed to read directory for tree: " + e.getMessage());
             }
         }
         return children.toArray(new SimpleNode[0]);

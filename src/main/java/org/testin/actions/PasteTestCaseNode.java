@@ -13,6 +13,7 @@ import org.testin.editorPanel.testCaseEditor.TestEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -98,7 +99,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
                 return parsedList != null ? parsedList : Collections.emptyList();
 
             } catch (Exception ex) {
-                System.err.println("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
+                Log.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
             }
         }
         return Collections.emptyList();

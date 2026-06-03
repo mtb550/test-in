@@ -3,6 +3,7 @@ package org.testin.util;
 import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ContentRevision;
+import org.testin.util.logger.Log;
 
 public class ContentExtractor {
     public static void printJsonChanges(Change change) {
@@ -27,13 +28,13 @@ public class ContentExtractor {
                     ? change.getAfterRevision().getContent()
                     : "[Deleted]";
 
-            System.out.println("File: " + path);
-            System.out.println("--- OLD CONTENT ---\n" + oldContent);
-            System.out.println("--- NEW CONTENT ---\n" + newContent);
-            System.out.println("-------------------");
+            Log.info("File: " + path);
+            Log.info("--- OLD CONTENT ---\n" + oldContent);
+            Log.info("--- NEW CONTENT ---\n" + newContent);
+            Log.info("-------------------");
 
         } catch (VcsException e) {
-            System.err.println("Error reading VCS content: " + e.getMessage());
+            Log.error("Error reading VCS content: " + e.getMessage());
         }
     }
 }

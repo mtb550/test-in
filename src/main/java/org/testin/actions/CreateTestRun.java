@@ -17,6 +17,7 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.RunCreationForm;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Files;
@@ -88,14 +89,14 @@ public class CreateTestRun implements NodeCreator {
                                 node.add(new DefaultMutableTreeNode(tc));
 
                             } catch (final Exception e1) {
-                                System.out.println("Failed to parse " + child);
-                                e1.printStackTrace(System.err);
+                                Log.info("Failed to parse " + child);
+                                Log.error("Exception: " + e1.getMessage());
                             }
                         }
                     });
 
         } catch (final Exception e2) {
-            e2.printStackTrace(System.err);
+            Log.error("Exception: " + e2.getMessage());
         }
         return node;
     }
@@ -165,7 +166,7 @@ public class CreateTestRun implements NodeCreator {
 
                 });
             } catch (final Exception e) {
-                e.printStackTrace(System.err);
+                Log.error("Exception: " + e.getMessage());
             }
         });
     }

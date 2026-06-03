@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.settings.StartupActivity;
+import org.testin.util.logger.Log;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -55,7 +56,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
-        System.out.println("ViewToolWindowFactory.createToolWindowContent()");
+        Log.info("ViewToolWindowFactory.createToolWindowContent()");
 
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!project.isDisposed()) {

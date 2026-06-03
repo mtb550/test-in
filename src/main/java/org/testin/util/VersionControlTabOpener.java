@@ -6,6 +6,7 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import org.testin.util.logger.Log;
 
 import java.util.Collection;
 
@@ -15,10 +16,10 @@ public class VersionControlTabOpener {
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
         Collection<Change> allChanges = changeListManager.getAllChanges();
 
-        System.out.println("Files with changes:");
+        Log.info("Files with changes:");
         for (Change change : allChanges) {
             if (change.getVirtualFile() != null) {
-                System.out.println(change.getVirtualFile().getPath());
+                Log.info(change.getVirtualFile().getPath());
             }
         }
 
@@ -27,7 +28,7 @@ public class VersionControlTabOpener {
 
             if (commitWindow != null) {
                 commitWindow.activate(() -> {
-                    System.out.println("Commit tab is now visible.");
+                    Log.info("Commit tab is now visible.");
                 }, true);
             } else {
                 ToolWindow vcsWindow = ToolWindowManager.getInstance(project).getToolWindow("Version Control");

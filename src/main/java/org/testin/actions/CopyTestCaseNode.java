@@ -10,6 +10,7 @@ import org.testin.editorPanel.EditorCM;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
@@ -35,7 +36,7 @@ public class CopyTestCaseNode extends DumbAwareAction {
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
             } catch (Exception ex) {
-                ex.printStackTrace(System.err);
+                Log.error("Exception: " + ex.getMessage());
             }
         }
     }

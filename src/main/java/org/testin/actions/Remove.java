@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.*;
 import org.testin.util.EditorUtil;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.logger.Log;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -67,7 +68,7 @@ public class Remove extends DumbAwareAction {
                 TreeUtilImpl.removeNode(node, tree);
                 VirtualFileManager.getInstance().syncRefresh();
             }
-            System.out.println("Removed " + nodesToRemove.size() + " nodes.");
+            Log.info("Removed " + nodesToRemove.size() + " nodes.");
         }
     }
 

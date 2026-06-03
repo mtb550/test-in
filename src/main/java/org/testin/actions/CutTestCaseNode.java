@@ -11,6 +11,7 @@ import org.testin.editorPanel.IEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
@@ -28,10 +29,10 @@ public class CutTestCaseNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        System.out.println("[DEBUG] CutTestCaseNode: actionPerformed triggered.");
+        Log.debug("[DEBUG] CutTestCaseNode: actionPerformed triggered.");
 
         List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
-        System.out.println("[DEBUG] CutTestCaseNode: Selected items count = " + selectedTestCases.size());
+        Log.info("[DEBUG] CutTestCaseNode: Selected items count = " + selectedTestCases.size());
 
         if (!selectedTestCases.isEmpty()) {
             try {
@@ -47,7 +48,7 @@ public class CutTestCaseNode extends DumbAwareAction {
                 list.repaint();
 
             } catch (Exception ex) {
-                ex.printStackTrace(System.err);
+                Log.error("Exception: " + ex.getMessage());
             }
         }
     }

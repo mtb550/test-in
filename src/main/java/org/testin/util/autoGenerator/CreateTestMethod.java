@@ -14,16 +14,17 @@ import org.testin.pojo.Config;
 import org.testin.pojo.Group;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 
 import java.util.List;
 
 public class CreateTestMethod implements GeneratorAction {
 
     public void execute(final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
-        System.out.println("Creating Test Case for: " + fqcn);
+        Log.info("Creating Test Case for: " + fqcn);
 
         if (fqcn.size() < 2) {
-            System.err.println("[ERROR] FQCN list is too short to generate a method.");
+            Log.error("[ERROR] FQCN list is too short to generate a method.");
             return;
         }
 
@@ -35,8 +36,8 @@ public class CreateTestMethod implements GeneratorAction {
         final List<String> packageList = fqcn.subList(0, fqcn.size() - 2);
         final String packageName = String.join(".", packageList);
 
-        System.out.println("Class Path: " + path);
-        System.out.println("MethodName: " + methodName);
+        Log.info("Class Path: " + path);
+        Log.info("MethodName: " + methodName);
 
         ApplicationManager.getApplication().invokeLater(() ->
                 WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () -> {
@@ -81,7 +82,7 @@ public class CreateTestMethod implements GeneratorAction {
                         }
 
                     } catch (Exception ex) {
-                        System.err.println("[ERROR] Failed to inject Java method: " + ex.getMessage());
+                        Log.error("[ERROR] Failed to inject Java method: " + ex.getMessage());
                     }
                 }));
     }
@@ -159,9 +160,9 @@ public class CreateTestMethod implements GeneratorAction {
 
             CodeStyleManager.getInstance(project).reformat(addedElement);
 
-            System.out.println("[TRACE] Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
+            Log.info("[TRACE] Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
         } else {
-            System.out.println("[WARNING] Method already exists: " + methodName);
+            Log.info("[WARNING] Method already exists: " + methodName);
         }
     }
 }

@@ -9,6 +9,7 @@ import org.testin.editorPanel.testRunEditor.RunEditorUI;
 import org.testin.pojo.CardHoverAction;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.logger.Log;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -103,7 +104,7 @@ public class HoverListener extends MouseAdapter {
                         }
                     }
                 } catch (IllegalArgumentException ex) {
-                    System.out.println("Unknown action: " + action.name());
+                    Log.info("Unknown action: " + action.name());
                 }
             }
 

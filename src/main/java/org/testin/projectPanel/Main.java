@@ -11,12 +11,13 @@ import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.settings.StartupActivity;
 import org.testin.settings.service.ProjectPanelService;
+import org.testin.util.logger.Log;
 
 public class Main implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
-        System.out.println("ToolWindowFactory.createToolWindowContent()");
+        Log.info("ToolWindowFactory.createToolWindowContent()");
 
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!project.isDisposed()) {

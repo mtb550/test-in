@@ -19,6 +19,7 @@ import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryType;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class TestNGRunnerByMethod {
                     }
 
                     String fqcnString = String.join(".", packageList).toLowerCase() + "." + expectedClassName;
-                    System.out.println("[RUNNER] Running Test with Cleaned FQCN: " + fqcnString);
+                    Log.info("[RUNNER] Running Test with Cleaned FQCN: " + fqcnString);
 
                     PsiClass targetClass = JavaPsiFacade.getInstance(project)
                             .findClass(fqcnString, GlobalSearchScope.projectScope(project));

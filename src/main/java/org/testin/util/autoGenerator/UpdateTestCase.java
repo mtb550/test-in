@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.logger.Log;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class UpdateTestCase implements GeneratorAction {
                     try {
 
                     } catch (Exception ex) {
-                        System.err.println("[ERROR] Failed to inject Java method: " + ex.getMessage());
+                        Log.error("[ERROR] Failed to inject Java method: " + ex.getMessage());
                     }
                 }));
     }

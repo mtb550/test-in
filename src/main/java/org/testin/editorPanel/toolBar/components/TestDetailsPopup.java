@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.testin.pojo.TestEditorAttributes;
+import org.testin.util.logger.Log;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -36,7 +37,7 @@ public class TestDetailsPopup extends AbstractButton implements IToolbarItem {
                     try {
                         selectedDetails.add(TestEditorAttributes.valueOf(s));
                     } catch (IllegalArgumentException ignored) {
-                        System.err.println("Invalid test editor attributes: " + s);
+                        Log.error("Invalid test editor attributes: " + s);
                     }
                 });
 

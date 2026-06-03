@@ -20,6 +20,7 @@ import org.testin.projectPanel.tree.TestRunTreeBuilder;
 import org.testin.projectPanel.versionSelector.BranchSelector;
 import org.testin.settings.AppSettingsConfigurable;
 import org.testin.util.Bundle;
+import org.testin.util.logger.Log;
 
 import java.awt.*;
 
@@ -35,7 +36,7 @@ public class ProjectPanel implements Disposable {
     private ProjectTree projectTree;
 
     public ProjectPanel(Project project) {
-        System.out.println("ProjectPanel.ProjectPanel()");
+        Log.info("ProjectPanel.ProjectPanel()");
 
         testProjectSelector = new TestProjectSelector(this);
         testProjectTreeBuilder = new TestProjectTreeBuilder(this);
@@ -53,7 +54,7 @@ public class ProjectPanel implements Disposable {
         boolean status = testProjectSelector.init();
 
         if (status) {
-            System.out.println("ProjectPanel(). projects found");
+            Log.info("ProjectPanel(). projects found");
 
             panel.setLayout(new BorderLayout());
             JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
@@ -68,7 +69,7 @@ public class ProjectPanel implements Disposable {
             panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         } else {
-            System.out.println("ProjectPanel(). not projects found");
+            Log.info("ProjectPanel(). not projects found");
             showEmptyState();
         }
 

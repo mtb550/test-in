@@ -11,6 +11,7 @@ import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
+import org.testin.util.logger.Log;
 
 import java.util.Optional;
 
@@ -87,9 +88,9 @@ public class EditorUtil {
 
     public void openEditorIfNotOpen(final DirectoryDto dir) {
         if (isEditorOpen(dir.getName())) {
-            System.out.println("Editor already open, focusing: " + dir.getName());
+            Log.info("Editor already open, focusing: " + dir.getName());
         } else {
-            System.out.println("Opening Editor: " + dir.getPath());
+            Log.info("Opening Editor: " + dir.getPath());
             openEditor(dir);
         }
     }

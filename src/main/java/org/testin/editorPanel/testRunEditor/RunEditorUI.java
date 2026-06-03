@@ -28,6 +28,7 @@ import org.testin.ui.RunOpeningForm;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.Mapper;
 import org.testin.util.TestCaseSorter;
+import org.testin.util.logger.Log;
 import org.testin.util.services.TestCaseCacheService;
 
 import javax.swing.*;
@@ -163,7 +164,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     this.resultsMap.putAll(newResults);
                 }
             } catch (Exception e) {
-                System.err.println("Failed to load Test Run data from disk: " + e.getMessage());
+                Log.error("Failed to load Test Run data from disk: " + e.getMessage());
             }
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -522,7 +523,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                 Files.write(jsonFilePath, jsonBytes);
 
             } catch (Exception e) {
-                System.err.println("Failed to persist test run data: " + e.getMessage());
+                Log.error("Failed to persist test run data: " + e.getMessage());
             }
         });
     }

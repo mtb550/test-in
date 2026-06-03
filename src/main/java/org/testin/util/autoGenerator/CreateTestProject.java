@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 
 import java.util.List;
 
@@ -27,14 +28,14 @@ public class CreateTestProject implements GeneratorAction {
                         VirtualFile vf = VfsUtil.createDirectoryIfMissing(sourceRoot, fqcn.getFirst());
 
                         if (vf != null) {
-                            System.out.println("[TRACE] Successfully created project package inside Source Root: " + vf.getPath());
+                            Log.debug("[TRACE] Successfully created project package inside Source Root: " + vf.getPath());
                         }
                     } else {
-                        System.err.println("[WARNING] No Source Root found in the project. Please mark a directory as 'Sources Root'.");
+                        Log.warn("[WARNING] No Source Root found in the project. Please mark a directory as 'Sources Root'.");
                     }
                 });
             } catch (Exception ex) {
-                System.err.println("[ERROR] Failed to create project package: " + ex.getMessage());
+                Log.error("[ERROR] Failed to create project package: " + ex.getMessage());
             }
 
         }));

@@ -5,6 +5,7 @@ import com.intellij.ui.components.JBList;
 import org.testin.editorPanel.testCaseEditor.TestEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
+import org.testin.util.logger.Log;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -59,7 +60,7 @@ public class KeyListener extends KeyAdapter {
                             /// TODO: same tree class, any crud on tree should be from the unified class TreeUtilImpl
                             Files.deleteIfExists(dirPath.resolve(tc.getId() + ".json"));
                         } catch (final Exception ex) {
-                            System.err.println("Failed to delete test case JSON: " + tc.getId());
+                            Log.error("Failed to delete test case JSON: " + tc.getId());
                         }
                     });
 

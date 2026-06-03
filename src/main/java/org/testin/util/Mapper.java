@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.logger.Log;
 
 import java.io.File;
 import java.io.InputStream;
@@ -22,8 +23,8 @@ public class Mapper {
             return mapper.readValue(src, valueType);
 
         } catch (Exception e) {
-            System.err.println("Failed to read file path " + src + ". to class " + valueType.getSimpleName());
-            e.printStackTrace(System.err);
+            Log.error("Failed to read file path " + src + ". to class " + valueType.getSimpleName());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -33,8 +34,8 @@ public class Mapper {
             return mapper.readValue(src, valueTypeRef);
 
         } catch (Exception e) {
-            System.err.println("Failed to read file path " + src + " to TypeReference");
-            e.printStackTrace(System.err);
+            Log.error("Failed to read file path " + src + " to TypeReference");
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -44,7 +45,7 @@ public class Mapper {
             return mapper.readValue(content, valueType);
 
         } catch (Exception e) {
-            System.err.println("Failed to parse JSON string to class " + valueType.getSimpleName());
+            Log.error("Failed to parse JSON string to class " + valueType.getSimpleName());
             return null;
         }
     }
@@ -54,8 +55,8 @@ public class Mapper {
             return mapper.readValue(src, valueType);
 
         } catch (Exception e) {
-            System.err.println("Failed to read InputStream to class " + valueType.getSimpleName());
-            e.printStackTrace(System.err);
+            Log.error("Failed to read InputStream to class " + valueType.getSimpleName());
+            Log.error("Exception: " + e.getMessage());
             return null;
         }
     }
@@ -65,7 +66,7 @@ public class Mapper {
             return mapper.readValue(content, valueTypeRef);
 
         } catch (Exception e) {
-            System.err.println("Failed to parse JSON string to TypeReference.");
+            Log.error("Failed to parse JSON string to TypeReference.");
             return null;
         }
     }
@@ -75,8 +76,8 @@ public class Mapper {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(value);
 
         } catch (Exception e) {
-            System.err.println("Failed to serialize object to bytes: " + value.getClass().getSimpleName());
-            e.printStackTrace(System.err);
+            Log.error("Failed to serialize object to bytes: " + value.getClass().getSimpleName());
+            Log.error("Exception: " + e.getMessage());
             return new byte[0];
         }
     }
@@ -86,7 +87,7 @@ public class Mapper {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
 
         } catch (Exception e) {
-            System.err.println("Failed to serialize object to string: " + value.getClass().getSimpleName());
+            Log.error("Failed to serialize object to string: " + value.getClass().getSimpleName());
             return "";
         }
     }
@@ -96,7 +97,7 @@ public class Mapper {
             return mapper.convertValue(fromValue, toValueType);
 
         } catch (Exception e) {
-            System.err.println("Failed to convert value to class " + toValueType.getSimpleName());
+            Log.error("Failed to convert value to class " + toValueType.getSimpleName());
             return null;
         }
     }

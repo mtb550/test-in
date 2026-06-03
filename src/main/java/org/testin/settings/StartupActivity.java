@@ -7,6 +7,7 @@ import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Config;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestCaseExecutionTracker;
 
@@ -16,7 +17,10 @@ import java.util.Optional;
 public class StartupActivity implements ProjectActivity {
 
     public static void execute(@NotNull Project project) {
-        System.out.println("StartupActivity.execute()");
+        Log.setProject(project);
+        Log.setLogLevel(Log.Level.DEBUG);
+
+        Log.info("StartupActivity.execute()");
 
         Config.setProject(project); // todo, to be removed as we can get the project from toolWindowManager
 
@@ -49,8 +53,8 @@ public class StartupActivity implements ProjectActivity {
 
         Config.setAutomationPath(automationPath);
 
-        System.out.println("testin Path: " + testinPath);
-        System.out.println("automation Path: " + automationPath);
+        Log.info("testin Path: " + testinPath);
+        Log.info("automation Path: " + automationPath);
 
         TestCaseExecutionTracker.initGlobalListener(Config.getProject());
     }

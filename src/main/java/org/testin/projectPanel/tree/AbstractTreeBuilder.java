@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.util.logger.Log;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Files;
@@ -36,8 +37,8 @@ public abstract class AbstractTreeBuilder {
                             .forEachOrdered(dir -> localRoot.add(buildNodeRecursive(dir)));
 
                 } catch (Exception e) {
-                    System.err.println("Failed to read directory: " + e.getMessage());
-                    e.printStackTrace(System.err);
+                    Log.error("Failed to read directory: " + e.getMessage());
+                    Log.error("Exception: " + e.getMessage());
                 }
             }
 
@@ -61,8 +62,8 @@ public abstract class AbstractTreeBuilder {
                         .forEachOrdered(childDir -> node.add(buildNodeRecursive(childDir)));
 
             } catch (Exception e) {
-                System.err.println("Failed to read directory recursively: " + currentPath);
-                e.printStackTrace(System.err);
+                Log.error("Failed to read directory recursively: " + currentPath);
+                Log.error("Exception: " + e.getMessage());
             }
         }
         return node;

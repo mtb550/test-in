@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 
 import java.io.IOException;
 import java.util.List;
@@ -22,14 +23,14 @@ public class CreateTestSetPackage implements GeneratorAction {
 
                 if (testSourceRoot != null) {
                     VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));
-                    System.out.println("Package created physically at: " + vf.getPath());
+                    Log.info("Package created physically at: " + vf.getPath());
 
                 } else {
-                    System.out.println("Could not find Main Source Root in the project modules.");
+                    Log.info("Could not find Main Source Root in the project modules.");
                 }
 
             } catch (IOException ex) {
-                System.out.println("Error creating package: " + ex.getMessage());
+                Log.info("Error creating package: " + ex.getMessage());
             }
         });
     }

@@ -8,12 +8,13 @@ import com.intellij.openapi.project.Project;
 import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
+import org.testin.util.logger.Log;
 
 public class TestNGRunnerBySuite {
     public static void runTestSuite(final Project project, final String suiteFilePath) {
         /// add notifier here
         if (suiteFilePath == null || suiteFilePath.trim().isEmpty()) {
-            System.err.println("Suite file path is invalid.");
+            Log.error("Suite file path is invalid.");
             return;
         }
 

@@ -17,6 +17,7 @@ import org.testin.ui.testCase.update.UpdateTestCaseFields;
 import org.testin.ui.testCase.update.UpdateTestCaseUI;
 import org.testin.util.autoGenerator.CodeGenerator;
 import org.testin.util.autoGenerator.GeneratorType;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -43,14 +44,14 @@ public class TestCaseUpdateMenu {
         showMenu(title, selectedItem -> {
 
             final GeneratorType targetChangeType = selectedItem.getChangeType();
-            System.out.println("TRACE [TestCaseUpdateMenu]: Menu item selected -> " + selectedItem.getName() + " | changeType = " + targetChangeType);
+            Log.info("TRACE [TestCaseUpdateMenu]: Menu item selected -> " + selectedItem.getName() + " | changeType = " + targetChangeType);
 
             if (isSingle) {
                 new UpdateTestCaseUI(items.getFirst(), selectedItem, (tc, codeGenerator) -> {
                     codeGenerator = new CodeGenerator(targetChangeType);
                     codeGenerator.setGeneratorType(targetChangeType);
 
-                    System.out.println("TRACE [TestCaseUpdateMenu]: Single Edit Save -> Injecting changeType " + codeGenerator.getGeneratorType() + " into UI's CodeGenerator.");
+                    Log.info("TRACE [TestCaseUpdateMenu]: Single Edit Save -> Injecting changeType " + codeGenerator.getGeneratorType() + " into UI's CodeGenerator.");
                     updatedItems.accept(items, codeGenerator);
 
                 }).show();
@@ -60,7 +61,7 @@ public class TestCaseUpdateMenu {
                     codeGenerator = new CodeGenerator(targetChangeType);
                     codeGenerator.setGeneratorType(targetChangeType);
 
-                    System.out.println("TRACE [TestCaseUpdateMenu]: Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + codeGenerator.getGeneratorType());
+                    Log.info("TRACE [TestCaseUpdateMenu]: Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + codeGenerator.getGeneratorType());
                     updatedItems.accept(list, codeGenerator);
                 });
             }

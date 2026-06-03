@@ -24,6 +24,7 @@ import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.ui.ExcelPreviewDialog;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -185,7 +186,7 @@ public class ImportJson extends DumbAwareAction {
                                 targetDirectory.refresh(false, true);
 
                             } catch (IOException ex) {
-                                System.err.println("Failed to write files: " + ex.getMessage());
+                                Log.error("Failed to write files: " + ex.getMessage());
                             }
                         });
 

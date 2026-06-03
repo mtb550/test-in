@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import lombok.Setter;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -69,8 +70,8 @@ public class TestSessionCache {
                                     }
                                 }
                             } catch (final Exception ex) {
-                                System.err.println("Unable to read test case file: " + filePath.toAbsolutePath());
-                                ex.printStackTrace(System.err);
+                                Log.error("Unable to read test case file: " + filePath.toAbsolutePath());
+                                Log.error("Exception: " + ex.getMessage());
                             }
                         });
 
@@ -79,7 +80,8 @@ public class TestSessionCache {
                 }
 
             } catch (final Exception e) {
-                if (!isDisposed) e.printStackTrace(System.out);
+                if (!isDisposed)
+                    Log.error("Exception: " + e.getMessage());
             }
 
             notifyLoadComplete();

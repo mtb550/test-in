@@ -2,6 +2,7 @@ package org.testin.projectPanel.projectSelector;
 
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -27,7 +28,7 @@ public class ListenerImpl implements ActionListener {
                 lastSelected = selected;
 
                 if (projectPanel.getTestProjectSelector() != null) {
-                    System.out.println("Selection changed to: " + selected.getName());
+                    Log.info("Selection changed to: " + selected.getName());
                     projectPanel.getTestProjectSelector().filterByTestProject(selected);
                 }
             }

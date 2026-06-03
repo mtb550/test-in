@@ -10,6 +10,7 @@ import org.testin.pojo.DirectoryType;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -40,12 +41,12 @@ public class TestProjectSelector {
     }
 
     public boolean init() {
-        System.out.println("TestProjectSelector.init()");
+        Log.info("TestProjectSelector.init()");
         return loadTestProjectList();
     }
 
     public boolean loadTestProjectList() {
-        System.out.println("TestProjectSelector.loadTestProjectList()");
+        Log.info("TestProjectSelector.loadTestProjectList()");
 
         testProjectList.removeAllElements();
 
@@ -58,19 +59,19 @@ public class TestProjectSelector {
                 paths.filter(Files::isDirectory)
                         .filter(path -> !path.getFileName().toString().startsWith("."))
                         .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
-                        .peek(path -> System.out.println(path.getFileName().toString()))
+                        .peek(path -> Log.info(path.getFileName().toString()))
                         .map(DirectoryMapper.getInstance()::testProjectNode)
                         .filter(Objects::nonNull)
                         .forEach(testProjectList::addElement);
 
             } catch (Exception e) {
-                System.err.println("Error reading directory: " + e.getMessage());
-                e.printStackTrace(System.err);
+                Log.error("Error reading directory: " + e.getMessage());
+                Log.error("Exception: " + e.getMessage());
             }
         }
 
         if (!Files.exists(root) || testProjectList.getSize() == 0) {
-            System.out.println("no projects. " + Files.exists(root) + " , " + testProjectList.getSize());
+            Log.info("no projects. " + Files.exists(root) + " , " + testProjectList.getSize());
             projectPanel.showEmptyState();
             selectedTestProject.setEnabled(false);
             return false;
@@ -83,7 +84,7 @@ public class TestProjectSelector {
     }
 
     public void addTestProject(final TestProjectDirectoryDto newTestTestProjectDirectory) {
-        System.out.println("TestProjectSelector.addTestProject()");
+        Log.info("TestProjectSelector.addTestProject()");
         if (!selectedTestProject.isEnabled()) {
             projectPanel.showEmptyState();
         }
@@ -129,7 +130,7 @@ public class TestProjectSelector {
     }
 
     public void filterByTestProject(final TestProjectDirectoryDto testProjectDirectory) {
-        System.out.println("Panel.filterByProject(): " + testProjectDirectory.getName());
+        Log.info("Panel.filterByProject(): " + testProjectDirectory.getName());
 
         if (testProjectDirectory.getMarker().getStatus() == ProjectStatus.ACTIVE) {
             projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());

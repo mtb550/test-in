@@ -12,6 +12,7 @@ import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -58,7 +59,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             }
 
         } catch (Exception e) {
-            System.err.println("Error rendering tree node: " + e.getMessage());
+            Log.error("Error rendering tree node: " + e.getMessage());
             setIcon(AllIcons.General.Error);
             append(value != null ? value.toString() : "Error", SimpleTextAttributes.ERROR_ATTRIBUTES);
         }
@@ -94,7 +95,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                         }
 
                     } catch (Exception e) {
-                        System.err.println("Failed to load status for " + runDir.getName() + ": " + e.getMessage());
+                        Log.error("Failed to load status for " + runDir.getName() + ": " + e.getMessage());
                     }
                 });
             }

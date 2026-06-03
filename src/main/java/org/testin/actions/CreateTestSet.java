@@ -17,6 +17,7 @@ import org.testin.settings.AppSettingsState;
 import org.testin.util.EditorUtil;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.logger.Log;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -114,17 +115,17 @@ public class CreateTestSet implements NodeCreator {
                                     String classContent = buildClassContent(fullPackageDeclaration, safeClassName);
                                     VfsUtil.saveText(newClassFile, classContent);
 
-                                    System.out.println("[TRACE] Successfully created Java class: " + newClassFile.getPath());
+                                    Log.debug("[TRACE] Successfully created Java class: " + newClassFile.getPath());
 
                                 } else {
-                                    System.out.println("[WARNING] Java class already exists: " + fileName);
+                                    Log.warn("[WARNING] Java class already exists: " + fileName);
                                 }
                             }
                         } else {
-                            System.out.println("[WARNING] No Test Source Root found in the project.");
+                            Log.info("[WARNING] No Test Source Root found in the project.");
                         }
                     } catch (Exception ex) {
-                        System.err.println("[ERROR] Failed to create Java class: " + ex.getMessage());
+                        Log.error("[ERROR] Failed to create Java class: " + ex.getMessage());
                     }
                 }));
     }

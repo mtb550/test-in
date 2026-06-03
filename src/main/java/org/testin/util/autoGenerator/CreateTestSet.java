@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +22,7 @@ public class CreateTestSet implements GeneratorAction {
         final String className = fqcn.getLast();
         final String fileName = className + ".java";
 
-        System.out.println("Ready to generate Test Class: " + className + " in package: " + fqcn);
+        Log.info("Ready to generate Test Class: " + className + " in package: " + fqcn);
 
         WriteAction.run(() -> {
             try {
@@ -42,17 +43,17 @@ public class CreateTestSet implements GeneratorAction {
                                     "}\n";
 
                             VfsUtil.saveText(javaFile, fileContent);
-                            System.out.println("Test Class created physically at: " + javaFile.getPath());
+                            Log.info("Test Class created physically at: " + javaFile.getPath());
                         } else {
-                            System.out.println("File already exists: " + existingFile.getPath());
+                            Log.info("File already exists: " + existingFile.getPath());
                         }
                     }
                 } else {
-                    System.out.println("Could not find Main Source Root in the project modules.");
+                    Log.info("Could not find Main Source Root in the project modules.");
                 }
 
             } catch (IOException ex) {
-                System.out.println("Error creating test class: " + ex.getMessage());
+                Log.info("Error creating test class: " + ex.getMessage());
             }
         });
     }

@@ -8,6 +8,7 @@ import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.logger.Log;
 
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -153,14 +154,14 @@ public class ProjectTreeDnD {
                 Path oldPath = sourceDir.getPath();
                 Path newPath = targetDir.getPath().resolve(sourceDir.getName());
                 sourceDir.setPath(newPath);
-                System.out.println("Moved successfully to: " + newPath);
+                Log.info("Moved successfully to: " + newPath);
             });
         }
 
         private void persistCopy(DirectoryDto source, DirectoryDto target) {
             TreeUtilImpl.executeVfsAction(source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
                 sourceVf.copy(this, targetVf, sourceVf.getName());
-                System.out.println("Copied successfully to: " + target.getPath().resolve(source.getName()));
+                Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
             });
         }
     }

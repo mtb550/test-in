@@ -17,6 +17,7 @@ import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.logger.Log;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -71,7 +72,7 @@ public class Rename extends DumbAwareAction {
                 projectPanel.getTestProjectSelector().loadTestProjectList();
             }
 
-            System.out.println("Success! Renamed to: " + newName);
+            Log.info("Success! Renamed to: " + newName);
         });
     }
 
