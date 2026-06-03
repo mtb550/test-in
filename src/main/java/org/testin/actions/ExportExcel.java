@@ -1,6 +1,5 @@
 package org.testin.actions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -26,6 +25,7 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.util.Mapper;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -172,18 +172,15 @@ public class ExportExcel extends DumbAwareAction {
 
     private Map<String, List<TestCaseDto>> gatherData(VirtualFile targetDirectory, DirectoryDto dirDto) {
         Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
-        ObjectMapper mapper = Config.getMapper();
 
         if (dirDto instanceof TestSetDirectoryDto) {
-
-            allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(targetDirectory, mapper));
+            allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(targetDirectory));
         } else {
-
             VirtualFile[] children = targetDirectory.getChildren();
             if (children != null) {
                 for (VirtualFile child : children) {
                     if (child.isDirectory()) {
-                        List<TestCaseDto> tcs = loadTestCasesInOrder(child, mapper);
+                        List<TestCaseDto> tcs = loadTestCasesInOrder(child);
                         if (!tcs.isEmpty()) {
                             allSheets.put(child.getName(), tcs);
                         }
@@ -194,7 +191,7 @@ public class ExportExcel extends DumbAwareAction {
         return allSheets;
     }
 
-    private List<TestCaseDto> loadTestCasesInOrder(final VirtualFile dir, final ObjectMapper mapper) {
+    private List<TestCaseDto> loadTestCasesInOrder(final VirtualFile dir) {
         Map<UUID, TestCaseDto> tcMap = new HashMap<>();
         TestCaseDto head = null;
 
@@ -204,10 +201,14 @@ public class ExportExcel extends DumbAwareAction {
         for (VirtualFile file : files) {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
-                    TestCaseDto tc = mapper.readValue(is, TestCaseDto.class);
-                    tcMap.put(tc.getId(), tc);
-                    if (Boolean.TRUE.equals(tc.getIsHead())) {
-                        head = tc;
+
+                    TestCaseDto tc = Mapper.readValue(is, TestCaseDto.class);
+
+                    if (tc != null) {
+                        tcMap.put(tc.getId(), tc);
+                        if (Boolean.TRUE.equals(tc.getIsHead())) {
+                            head = tc;
+                        }
                     }
                 } catch (Exception ignored) {
                 }

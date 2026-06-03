@@ -1,7 +1,5 @@
 package org.testin.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 
 import java.nio.file.Path;
@@ -13,7 +11,6 @@ public class GitDiffProcessor {
 
     public static List<TestCaseDiff> getPendingChanges(Path repoRoot) throws Exception {
         List<TestCaseDiff> allChanges = new ArrayList<>();
-        ObjectMapper mapper = Config.getMapper();
 
         String statusOutput = GitCommandRunner.execute(repoRoot, "git", "status", "--porcelain", "-uall");
 
@@ -39,7 +36,7 @@ public class GitDiffProcessor {
             Path relativePath = Path.of(relativePathStr);
 
             if (statusCode.contains("A") || statusCode.contains("?")) {
-                TestCaseDto newDto = mapper.readValue(absolutePath.toFile(), TestCaseDto.class);
+                TestCaseDto newDto = Mapper.readValue(absolutePath.toFile(), TestCaseDto.class);
                 allChanges.add(new TestCaseDiff(
                         newDto.getId().toString(),
                         relativePath,
@@ -50,12 +47,12 @@ public class GitDiffProcessor {
                 ));
 
             } else if (statusCode.contains("M")) {
-                TestCaseDto newDto = mapper.readValue(absolutePath.toFile(), TestCaseDto.class);
+                TestCaseDto newDto = Mapper.readValue(absolutePath.toFile(), TestCaseDto.class);
 
                 String gitPath = relativePathStr.replace("\\", "/");
                 String oldJsonString = GitCommandRunner.execute(repoRoot, "git", "show", "HEAD:" + gitPath);
 
-                TestCaseDto oldDto = mapper.readValue(oldJsonString, TestCaseDto.class);
+                TestCaseDto oldDto = Mapper.readValue(oldJsonString, TestCaseDto.class);
 
                 List<TestCaseDiff.FieldChange> fieldChanges = compareFields(oldDto, newDto);
                 if (!fieldChanges.isEmpty()) {

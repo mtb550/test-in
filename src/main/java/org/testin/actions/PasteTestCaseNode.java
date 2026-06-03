@@ -1,7 +1,6 @@
 package org.testin.actions;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -11,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testCaseEditor.TestEditorUI;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
+import org.testin.util.Mapper;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -66,6 +65,8 @@ public class PasteTestCaseNode extends DumbAwareAction {
                 if (tc == null) continue;
 
                 TestCaseDto clonedTc = cloneForPasting(tc, isCut);
+                if (clonedTc == null) continue;
+
                 if (destUI.getVf() != null && destUI.getVf().getTestSet() != null) {
                     clonedTc.setPath(destUI.getVf().getTestSet().getPath2());
                 }
@@ -91,9 +92,11 @@ public class PasteTestCaseNode extends DumbAwareAction {
         if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
-                ObjectMapper mapper = Config.getMapper();
-                return mapper.readValue(json, new TypeReference<>() {
+
+                List<TestCaseDto> parsedList = Mapper.readValue(json, new TypeReference<List<TestCaseDto>>() {
                 });
+                return parsedList != null ? parsedList : Collections.emptyList();
+
             } catch (Exception ex) {
                 System.err.println("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
             }
@@ -103,15 +106,18 @@ public class PasteTestCaseNode extends DumbAwareAction {
 
     private TestCaseDto cloneForPasting(final TestCaseDto original, final boolean isCut) {
         final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        final TestCaseDto clonedTc = Config.getMapper().convertValue(original, TestCaseDto.class);
 
-        if (isCut) {
-            clonedTc.setUpdatedAt(now);
-        } else {
-            clonedTc.setId(UUID.randomUUID())
-                    .setDescription(original.getDescription() + " (Copy)")
-                    .setCreatedAt(now)
-                    .setUpdatedAt(now);
+        final TestCaseDto clonedTc = Mapper.convertValue(original, TestCaseDto.class);
+
+        if (clonedTc != null) {
+            if (isCut) {
+                clonedTc.setUpdatedAt(now);
+            } else {
+                clonedTc.setId(UUID.randomUUID())
+                        .setDescription(original.getDescription() + " (Copy)")
+                        .setCreatedAt(now)
+                        .setUpdatedAt(now);
+            }
         }
 
         return clonedTc;

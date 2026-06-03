@@ -1,7 +1,5 @@
 package org.testin.actions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -24,12 +22,14 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.util.Mapper;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.*;
 
 public class ExportJson extends DumbAwareAction {
@@ -102,8 +102,8 @@ public class ExportJson extends DumbAwareAction {
                 indicator.setText("Generating JSON file...");
 
                 try {
-                    ObjectWriter writer = Config.getMapper().writerWithDefaultPrettyPrinter();
-                    writer.writeValue(destFile, directoryData);
+                    byte[] jsonBytes = Mapper.writeValueAsBytes(directoryData);
+                    Files.write(destFile.toPath(), jsonBytes);
 
                     ApplicationManager.getApplication().invokeLater(() ->
                             Notifier.getInstance().info("Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
@@ -121,16 +121,15 @@ public class ExportJson extends DumbAwareAction {
 
     private Map<String, List<TestCaseDto>> gatherData(VirtualFile targetDirectory, DirectoryDto dirDto) {
         Map<String, List<TestCaseDto>> allSets = new LinkedHashMap<>();
-        ObjectMapper mapper = Config.getMapper();
 
         if (dirDto instanceof TestSetDirectoryDto) {
-            allSets.put(targetDirectory.getName(), loadTestCasesInOrder(targetDirectory, mapper));
+            allSets.put(targetDirectory.getName(), loadTestCasesInOrder(targetDirectory));
         } else {
             VirtualFile[] children = targetDirectory.getChildren();
             if (children != null) {
                 for (VirtualFile child : children) {
                     if (child.isDirectory()) {
-                        List<TestCaseDto> tcs = loadTestCasesInOrder(child, mapper);
+                        List<TestCaseDto> tcs = loadTestCasesInOrder(child);
                         if (!tcs.isEmpty()) {
                             allSets.put(child.getName(), tcs);
                         }
@@ -141,7 +140,7 @@ public class ExportJson extends DumbAwareAction {
         return allSets;
     }
 
-    private List<TestCaseDto> loadTestCasesInOrder(final VirtualFile dir, final ObjectMapper mapper) {
+    private List<TestCaseDto> loadTestCasesInOrder(final VirtualFile dir) {
         Map<UUID, TestCaseDto> tcMap = new HashMap<>();
         TestCaseDto head = null;
 
@@ -151,10 +150,15 @@ public class ExportJson extends DumbAwareAction {
         for (VirtualFile file : files) {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
-                    TestCaseDto tc = mapper.readValue(is, TestCaseDto.class);
-                    tcMap.put(tc.getId(), tc);
-                    if (Boolean.TRUE.equals(tc.getIsHead())) {
-                        head = tc;
+
+                    // Use the new centralized Mapper (InputStream overload)
+                    TestCaseDto tc = Mapper.readValue(is, TestCaseDto.class);
+
+                    if (tc != null) {
+                        tcMap.put(tc.getId(), tc);
+                        if (Boolean.TRUE.equals(tc.getIsHead())) {
+                            head = tc;
+                        }
                     }
                 } catch (Exception ignored) {
                 }

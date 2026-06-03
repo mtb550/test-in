@@ -13,6 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.Mapper;
 import org.testin.util.notifications.Notifier;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
@@ -59,10 +60,6 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
     private void openViewPanel(Project project, String targetId) {
         Path rootPath = Config.getTestinPath();
-        if (rootPath == null) {
-            Notifier.getInstance().error("Config Error", "Testin path is not configured.");
-            return;
-        }
 
         System.out.println("[GUTTER TRACE] Root path: " + rootPath);
         System.out.println("[GUTTER TRACE] Searching for UUID: " + targetId);
@@ -88,11 +85,10 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
                 System.out.println("[GUTTER TRACE] Found file: " + foundFile.getAbsolutePath());
 
-                TestCaseDto dto = Config.getMapper().readValue(foundFile, TestCaseDto.class);
+                TestCaseDto dto = Mapper.readValue(foundFile, TestCaseDto.class);
                 Path parentPath = foundFile.getParentFile().toPath();
 
-                ApplicationManager.getApplication().invokeLater(() ->
-                        ViewToolWindowFactory.showPanel(project, List.of(dto), parentPath));
+                ApplicationManager.getApplication().invokeLater(() -> ViewToolWindowFactory.showPanel(project, List.of(dto), parentPath));
 
             } catch (Exception ex) {
                 System.err.println("[GUTTER TRACE] IO Error: " + ex.getMessage());

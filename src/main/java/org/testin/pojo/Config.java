@@ -1,8 +1,5 @@
 package org.testin.pojo;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,15 +32,7 @@ public class Config {
     @Setter
     @Getter
     @NotNull
-    private static Project project; // todo, to be removed as we can get the project from toolwindow class e.getProject()
+    // todo, to be removed as we can get the project from toolwindow class e.getProject()
+    private static Project project;
 
-
-    // todo, to be removed, call Mapper class instead
-    @Deprecated
-    public static ObjectMapper getMapper() {
-        return new ObjectMapper()
-                .registerModule(new JavaTimeModule())
-                .enable(SerializationFeature.INDENT_OUTPUT)
-                .setTimeZone(java.util.TimeZone.getDefault());
-    }
 }

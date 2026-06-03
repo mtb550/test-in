@@ -2,10 +2,10 @@ package org.testin.editorPanel.testRunEditor;
 
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Setter;
-import org.testin.pojo.Config;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
+import org.testin.util.Mapper;
 import org.testin.util.Tools;
 
 import java.nio.file.Files;
@@ -83,7 +83,7 @@ public class RunSessionCache {
                                 if (isDisposed) return;
 
                                 try {
-                                    final TestCaseDto tc = Config.getMapper().readValue(filePath.toFile(), TestCaseDto.class);
+                                    final TestCaseDto tc = Mapper.readValue(filePath.toFile(), TestCaseDto.class);
                                     if (tc != null && idsToFind.contains(tc.getId())) {
                                         loadedItems.add(tc);
                                         batch.add(tc);

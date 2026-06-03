@@ -32,6 +32,7 @@ import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.FontSyncUtil;
+import org.testin.util.Mapper;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.viewPanel.ViewPanel;
@@ -40,7 +41,7 @@ import org.testin.viewPanel.ViewToolWindowFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
-import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
@@ -223,8 +224,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
 
                 try {
-                    Config.getMapper().writerWithDefaultPrettyPrinter()
-                            .writeValue(new File(dirPath.toFile(), current.getId() + ".json"), current);
+                    final byte[] jsonBytes = Mapper.writeValueAsBytes(current);
+                    Files.write(dirPath.resolve(current.getId() + ".json"), jsonBytes);
                 } catch (final Exception ignored) {
                 }
             }

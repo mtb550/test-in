@@ -16,9 +16,9 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.RunCreationForm;
 import org.testin.util.EditorUtil;
+import org.testin.util.Mapper;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -84,7 +84,7 @@ public class CreateTestRun implements NodeCreator {
 
                         } else if (child.toString().endsWith(".json")) {
                             try {
-                                final TestCaseDto tc = Config.getMapper().readValue(child.toFile(), TestCaseDto.class);
+                                final TestCaseDto tc = Mapper.readValue(child.toFile(), TestCaseDto.class);
                                 node.add(new DefaultMutableTreeNode(tc));
 
                             } catch (final Exception e1) {
@@ -146,9 +146,10 @@ public class CreateTestRun implements NodeCreator {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Files.createDirectories(savePath);
-                File newJsonFile = new File(savePath.toFile(), fileName);
+                Path newJsonPath = savePath.resolve(fileName);
 
-                Config.getMapper().writerWithDefaultPrettyPrinter().writeValue(newJsonFile, run);
+                byte[] jsonBytes = Mapper.writeValueAsBytes(run);
+                Files.write(newJsonPath, jsonBytes);
 
                 Path trMarkerPath = savePath.resolve(DirectoryType.TR.getMarker());
                 if (Files.notExists(trMarkerPath))

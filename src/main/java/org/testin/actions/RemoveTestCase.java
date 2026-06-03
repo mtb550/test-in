@@ -11,11 +11,11 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.EditorCM;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.ui.RemoveTestCaseDialog;
 import org.testin.util.KeyboardSet;
+import org.testin.util.Mapper;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -102,19 +102,16 @@ public class RemoveTestCase extends DumbAwareAction {
         String fileName = item.getId() + ".json";
         VirtualFile targetFile = dirVFile.findChild(fileName);
 
-        if (targetFile == null) {
-            try {
+        try {
+            if (targetFile == null) {
                 targetFile = dirVFile.createChildData(this, fileName);
-
-                // todo, use writeValueAsBytes(value) instead of writeValueAsString(value)
-                String jsonContent = Config.getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(item);
-                VfsUtil.saveText(targetFile, jsonContent);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             }
+
+            String jsonContent = Mapper.writeValueAsString(item);
+            VfsUtil.saveText(targetFile, jsonContent);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-
     }
 }

@@ -2,8 +2,8 @@ package org.testin.editorPanel.testCaseEditor;
 
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Setter;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.Mapper;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,7 +54,7 @@ public class TestSessionCache {
                             if (isDisposed) return;
 
                             try {
-                                final TestCaseDto tc = Config.getMapper().readValue(filePath.toFile(), TestCaseDto.class);
+                                final TestCaseDto tc = Mapper.readValue(filePath.toFile(), TestCaseDto.class);
                                 if (tc != null) {
                                     loadedItems.add(tc);
                                     batch.add(tc);

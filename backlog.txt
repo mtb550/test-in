@@ -264,3 +264,13 @@ retrieve test cases easily and faster, as we read tree once in startup time.
 test run items will be @jsonIgnore as the JSON should have the ids only then get the objects from cache.
 
 major change, move to tree async model, to manage update, remove, dispose and rename nodes automatic.
+
+update gradle file to use toml
+https://docs.gradle.org/current/userguide/version_catalogs.html
+
+fix pi report issues. & implement IntelliJ logger
+
+// todo, to be removed as we can get the project from toolwindow class e.getProject()
+private static Project project;
+
+move Mapper class to be static with getInstance()

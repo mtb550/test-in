@@ -5,13 +5,13 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
+import org.testin.util.Mapper;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -88,7 +88,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                         Path jsonFile = runDir.getPath().resolve(runDir.getName() + ".json");
 
                         if (Files.exists(jsonFile)) {
-                            TestRunDto dto = Config.getMapper().readValue(jsonFile.toFile(), TestRunDto.class);
+                            TestRunDto dto = Mapper.readValue(jsonFile.toFile(), TestRunDto.class);
                             runDir.setRunStatus(dto.getStatus());
                             ApplicationManager.getApplication().invokeLater(tree::repaint);
                         }

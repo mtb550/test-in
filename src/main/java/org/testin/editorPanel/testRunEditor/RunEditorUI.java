@@ -26,6 +26,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.ui.RunOpeningForm;
 import org.testin.util.FontSyncUtil;
+import org.testin.util.Mapper;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.services.TestCaseCacheService;
 
@@ -33,7 +34,6 @@ import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.MouseListener;
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -149,7 +149,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     Path jsonFilePath = dirPath.resolve(vf.getTestRun().getName() + ".json");
 
                     if (Files.exists(jsonFilePath)) {
-                        this.tr = Config.getMapper().readValue(jsonFilePath.toFile(), TestRunDto.class);
+                        this.tr = Mapper.readValue(jsonFilePath.toFile(), TestRunDto.class);
                     }
                 }
 
@@ -516,8 +516,11 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = vf.getTestRun().getPath();
-                File jsonFile = new File(dirPath.toFile(), tr.getRunName());
-                Config.getMapper().writerWithDefaultPrettyPrinter().writeValue(jsonFile, tr);
+                Path jsonFilePath = dirPath.resolve(tr.getRunName());
+
+                byte[] jsonBytes = Mapper.writeValueAsBytes(tr);
+                Files.write(jsonFilePath, jsonBytes);
+
             } catch (Exception e) {
                 System.err.println("Failed to persist test run data: " + e.getMessage());
             }

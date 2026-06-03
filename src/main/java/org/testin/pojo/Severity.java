@@ -3,7 +3,7 @@ package org.testin.pojo;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public enum Sevirity {
+public enum Severity {
     BLOCKER,
     MAJOR,
     MINOR,

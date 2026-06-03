@@ -1,7 +1,6 @@
 package org.testin.actions;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -24,6 +23,7 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.ui.ExcelPreviewDialog;
 import org.testin.util.EditorUtil;
+import org.testin.util.Mapper;
 import org.testin.util.notifications.Notifier;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -31,7 +31,6 @@ import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ImportJson extends DumbAwareAction {
@@ -109,18 +108,12 @@ public class ImportJson extends DumbAwareAction {
                 indicator.setIndeterminate(true);
                 indicator.setText("Parsing JSON file...");
 
-                ObjectMapper mapper = Config.getMapper();
-                Map<String, List<TestCaseDto>> rawData;
+                Map<String, List<TestCaseDto>> rawData = Mapper.readValue(file, new TypeReference<Map<String, List<TestCaseDto>>>() {
+                });
 
-                try {
-                    rawData = mapper.readValue(file, new TypeReference<>() {
-                    });
-                } catch (Exception ex) {
-                    System.err.println("JSON Import crashed: " + ex.getMessage());
-                    ex.printStackTrace(System.err);
-
+                if (rawData == null) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Failed to parse JSON file:\n" + ex.getMessage())
+                            Notifier.getInstance().error("Failed to parse JSON file. It may be corrupted or incorrectly formatted.")
                     );
                     return;
                 }
@@ -165,11 +158,11 @@ public class ImportJson extends DumbAwareAction {
                         ApplicationManager.getApplication().runWriteAction(() -> {
                             try {
                                 if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                                    TestCaseDto tail = findExistingTail(targetDirectory, mapper);
+                                    TestCaseDto tail = findExistingTail(targetDirectory);
                                     List<TestCaseDto> flatList = new ArrayList<>();
                                     selectedCasesByGroup.values().forEach(flatList::addAll);
 
-                                    linkAndSaveTestCases(targetDirectory, flatList, tail, mapper, ImportJson.this);
+                                    linkAndSaveTestCases(targetDirectory, flatList, tail, ImportJson.this);
 
                                     EditorUtil.getInstance().closeThenOpenEditor(targetDirectory, ts);
                                     Notifier.getInstance().info("Import Complete", "Successfully imported " + flatList.size() + " test cases.");
@@ -182,8 +175,8 @@ public class ImportJson extends DumbAwareAction {
 
                                         VirtualFile groupDir = new CreateTestSet().inBackground(ImportJson.this, targetDirectory, selectedDirDto, parentNode, tree, rawGroupName);
 
-                                        TestCaseDto tail = findExistingTail(groupDir, mapper);
-                                        linkAndSaveTestCases(groupDir, groupCases, tail, mapper, ImportJson.this);
+                                        TestCaseDto tail = findExistingTail(groupDir);
+                                        linkAndSaveTestCases(groupDir, groupCases, tail, ImportJson.this);
                                         totalImported += groupCases.size();
                                     }
                                     Notifier.getInstance().info("Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
@@ -204,7 +197,7 @@ public class ImportJson extends DumbAwareAction {
         });
     }
 
-    private void linkAndSaveTestCases(final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final ObjectMapper mapper, final Object requestor) throws IOException {
+    private void linkAndSaveTestCases(final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final Object requestor) throws IOException {
         TestCaseDto previousNode = existingTail;
 
         for (TestCaseDto currentTestCase : testCases) {
@@ -221,25 +214,25 @@ public class ImportJson extends DumbAwareAction {
         if (existingTail != null) {
             VirtualFile tailFile = dir.findChild(existingTail.getId() + ".json");
             if (tailFile != null) {
-                tailFile.setBinaryContent(mapper.writeValueAsString(existingTail).getBytes(StandardCharsets.UTF_8));
+                tailFile.setBinaryContent(Mapper.writeValueAsBytes(existingTail));
             }
         }
 
         for (TestCaseDto tc : testCases) {
             VirtualFile newJsonFile = dir.createChildData(requestor, tc.getId() + ".json");
-            newJsonFile.setBinaryContent(mapper.writeValueAsString(tc).getBytes(StandardCharsets.UTF_8));
+            newJsonFile.setBinaryContent(Mapper.writeValueAsBytes(tc));
         }
     }
 
-    private TestCaseDto findExistingTail(final VirtualFile directory, final ObjectMapper mapper) {
+    private TestCaseDto findExistingTail(final VirtualFile directory) {
         if (directory == null) return null;
         VirtualFile[] children = directory.getChildren();
         if (children != null) {
             for (VirtualFile child : children) {
                 if (!child.isDirectory() && child.getName().endsWith(".json")) {
                     try (InputStream is = child.getInputStream()) {
-                        TestCaseDto tc = mapper.readValue(is, TestCaseDto.class);
-                        if (tc.getNext() == null) {
+                        TestCaseDto tc = Mapper.readValue(is, TestCaseDto.class);
+                        if (tc != null && tc.getNext() == null) {
                             return tc;
                         }
                     } catch (Exception ignored) {

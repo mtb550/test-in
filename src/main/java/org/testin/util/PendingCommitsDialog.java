@@ -1,12 +1,10 @@
 package org.testin.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nullable;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.notifications.Notifier;
 
@@ -16,6 +14,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -117,19 +116,20 @@ public class PendingCommitsDialog extends DialogWrapper {
                     model.removeRow(selectedRow);
                 }
             } else if (diff.type() == TestCaseDiff.DiffType.MODIFIED) {
-                ObjectMapper mapper = Config.getMapper();
-                TestCaseDto currentDto = mapper.readValue(jsonFile, TestCaseDto.class);
+                TestCaseDto currentDto = Mapper.readValue(jsonFile, TestCaseDto.class);
+
+                if (currentDto == null) return;
+
                 TestCaseDto oldDto = diff.oldState();
 
-                // Revert the specific field
                 switch (fieldName) {
                     case "Description" -> currentDto.setDescription(oldDto.getDescription());
                     case "Expected Result" -> currentDto.setExpectedResult(oldDto.getExpectedResult());
                     case "Priority" -> currentDto.setPriority(oldDto.getPriority());
                 }
 
-                // Save back to disk safely
-                mapper.writerWithDefaultPrettyPrinter().writeValue(jsonFile, currentDto);
+                byte[] jsonBytes = Mapper.writeValueAsBytes(currentDto);
+                Files.write(jsonFile.toPath(), jsonBytes);
 
                 model.removeRow(selectedRow);
             }

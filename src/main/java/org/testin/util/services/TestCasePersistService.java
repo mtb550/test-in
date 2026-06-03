@@ -6,11 +6,10 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.Service.Level;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nullable;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.Mapper;
 import org.testin.util.notifications.Notifier;
 
 import java.io.IOException;
@@ -44,9 +43,8 @@ public final class TestCasePersistService implements Disposable {
                         targetFile = dirVFile.createChildData(this, fileName);
                     }
 
-                    // todo, use writeValueAsBytes(value) instead of writeValueAsString(value)
-                    String jsonContent = Config.getMapper().writerWithDefaultPrettyPrinter().writeValueAsString(tc);
-                    VfsUtil.saveText(targetFile, jsonContent);
+                    byte[] jsonBytes = Mapper.writeValueAsBytes(tc);
+                    targetFile.setBinaryContent(jsonBytes);
                 }
 
             } catch (IOException e) {

@@ -1,6 +1,5 @@
 package org.testin.actions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -26,6 +25,7 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.ui.ExcelPreviewDialog;
 import org.testin.util.EditorUtil;
+import org.testin.util.Mapper;
 import org.testin.util.Tools;
 import org.testin.util.notifications.Notifier;
 
@@ -35,7 +35,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ImportExcel extends DumbAwareAction {
@@ -184,7 +183,6 @@ public class ImportExcel extends DumbAwareAction {
                 indicator.setIndeterminate(true);
                 indicator.setText("Connecting to Excel file...");
 
-                ObjectMapper mapper = Config.getMapper();
                 Map<String, List<TestCaseDto>> allSheetsData = new LinkedHashMap<>();
 
                 try (InputStream fis = new FileInputStream(file);
@@ -197,8 +195,8 @@ public class ImportExcel extends DumbAwareAction {
                         for (VirtualFile child : existingChildren) {
                             if (!child.isDirectory() && child.getName().endsWith(".json")) {
                                 try (InputStream is = child.getInputStream()) {
-                                    TestCaseDto tc = mapper.readValue(is, TestCaseDto.class);
-                                    if (tc.getNext() == null) {
+                                    TestCaseDto tc = Mapper.readValue(is, TestCaseDto.class);
+                                    if (tc != null && tc.getNext() == null) {
                                         break;
                                     }
                                 } catch (Exception ignored) {
@@ -322,11 +320,11 @@ public class ImportExcel extends DumbAwareAction {
                         ApplicationManager.getApplication().runWriteAction(() -> {
                             try {
                                 if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                                    TestCaseDto tail = findExistingTail(targetDirectory, mapper);
+                                    TestCaseDto tail = findExistingTail(targetDirectory);
                                     List<TestCaseDto> flatList = new ArrayList<>();
                                     selectedCasesBySheet.values().forEach(flatList::addAll);
 
-                                    linkAndSaveTestCases(targetDirectory, flatList, tail, mapper, ImportExcel.this);
+                                    linkAndSaveTestCases(targetDirectory, flatList, tail, ImportExcel.this);
 
                                     EditorUtil.getInstance().closeThenOpenEditor(targetDirectory, ts);
                                     Notifier.getInstance().info("Import Complete", "Successfully imported " + flatList.size() + " test cases.");
@@ -339,8 +337,8 @@ public class ImportExcel extends DumbAwareAction {
 
                                         VirtualFile sheetDir = new CreateTestSet().inBackground(ImportExcel.this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
 
-                                        TestCaseDto tail = findExistingTail(sheetDir, mapper);
-                                        linkAndSaveTestCases(sheetDir, sheetCases, tail, mapper, ImportExcel.this);
+                                        TestCaseDto tail = findExistingTail(sheetDir);
+                                        linkAndSaveTestCases(sheetDir, sheetCases, tail, ImportExcel.this);
                                         totalImported += sheetCases.size();
                                     }
                                     Notifier.getInstance().info("Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
@@ -361,7 +359,7 @@ public class ImportExcel extends DumbAwareAction {
         });
     }
 
-    private void linkAndSaveTestCases(final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final ObjectMapper mapper, final Object requestor) throws IOException {
+    private void linkAndSaveTestCases(final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final Object requestor) throws IOException {
         TestCaseDto previousNode = existingTail;
 
         for (TestCaseDto currentTestCase : testCases) {
@@ -378,25 +376,25 @@ public class ImportExcel extends DumbAwareAction {
         if (existingTail != null) {
             VirtualFile tailFile = dir.findChild(existingTail.getId() + ".json");
             if (tailFile != null) {
-                tailFile.setBinaryContent(mapper.writeValueAsString(existingTail).getBytes(StandardCharsets.UTF_8));
+                tailFile.setBinaryContent(Mapper.writeValueAsBytes(existingTail));
             }
         }
 
         for (TestCaseDto tc : testCases) {
             VirtualFile newJsonFile = dir.createChildData(requestor, tc.getId() + ".json");
-            newJsonFile.setBinaryContent(mapper.writeValueAsString(tc).getBytes(StandardCharsets.UTF_8));
+            newJsonFile.setBinaryContent(Mapper.writeValueAsBytes(tc));
         }
     }
 
-    private TestCaseDto findExistingTail(final VirtualFile directory, final ObjectMapper mapper) {
+    private TestCaseDto findExistingTail(final VirtualFile directory) {
         if (directory == null) return null;
         VirtualFile[] children = directory.getChildren();
         if (children != null) {
             for (VirtualFile child : children) {
                 if (!child.isDirectory() && child.getName().endsWith(".json")) {
                     try (InputStream is = child.getInputStream()) {
-                        TestCaseDto tc = mapper.readValue(is, TestCaseDto.class);
-                        if (tc.getNext() == null) {
+                        TestCaseDto tc = Mapper.readValue(is, TestCaseDto.class);
+                        if (tc != null && tc.getNext() == null) {
                             return tc;
                         }
                     } catch (Exception ignored) {
