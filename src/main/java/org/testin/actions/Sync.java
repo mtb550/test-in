@@ -8,11 +8,11 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.GitCommandRunner;
@@ -36,20 +36,21 @@ public class Sync extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
         Path repoPath = getActiveProjectPath();
 
         if (repoPath == null) {
-            Notifier.getInstance().error("Sync Error", "Could not determine the active project. Please select a project in the tree.");
+            Notifier.getInstance().error(project, "Sync Error", "Could not determine the active project. Please select a project in the tree.");
             return;
         }
 
         File gitDir = new File(repoPath.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Notifier.getInstance().warn("Sync Error", "This project is not a Git repository. Initialize it first.");
+            Notifier.getInstance().warn(project, "Sync Error", "This project is not a Git repository. Initialize it first.");
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(Config.getProject(), "Syncing with remote", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Syncing with remote", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -64,7 +65,7 @@ public class Sync extends DumbAwareAction {
 
                     if (remoteUrl.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Notifier.getInstance().warn("Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
+                                Notifier.getInstance().warn(project, "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
                         );
                         return;
                     }
@@ -79,7 +80,7 @@ public class Sync extends DumbAwareAction {
                     }
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        Notifier.getInstance().info("Sync Successful", "Your project is now up to date with the remote repository.");
+                        Notifier.getInstance().info(project, "Sync Successful", "Your project is now up to date with the remote repository.");
                         if (projectPanel != null) {
                             projectPanel.setupMainLayout();
                         }
@@ -87,7 +88,7 @@ public class Sync extends DumbAwareAction {
 
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error("Sync Failed", "Could not pull changes:\n" + ex.getMessage())
+                            Notifier.getInstance().error(project, "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
                     );
                 }
             }
