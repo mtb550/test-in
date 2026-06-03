@@ -1,7 +1,9 @@
 package org.testin.editorPanel.listeners;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
 import org.testin.actions.NavigateToCode;
 import org.testin.actions.RunTestCase;
 import org.testin.editorPanel.IEditorUI;
