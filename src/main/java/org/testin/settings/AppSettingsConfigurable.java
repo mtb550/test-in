@@ -16,6 +16,7 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.Refresh;
 import org.testin.pojo.Config;
@@ -45,6 +46,7 @@ import java.util.stream.Stream;
 
 public class AppSettingsConfigurable implements Configurable {
 
+    private Project project;
     private final TextFieldWithBrowseButton rootTestinPathField = new TextFieldWithBrowseButton();
     private final JBTextField rootAutomationPathField = new JBTextField();
     private final DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList = new DefaultComboBoxModel<>();
@@ -99,7 +101,7 @@ public class AppSettingsConfigurable implements Configurable {
             try {
                 Desktop.getDesktop().open(new File(rootTestinPathField.getText()));
             } catch (Exception ex) {
-                Notifier.getInstance().error("Error", "Could not open folder: " + ex.getMessage());
+                Notifier.getInstance().error(getProject(), "Error", "Could not open folder: " + ex.getMessage());
             }
         });
 
@@ -186,7 +188,7 @@ public class AppSettingsConfigurable implements Configurable {
                                 }
                             }
 
-                            ProjectPanel panel = ProjectPanelService.getInstance(project).getPanel();
+                            ProjectPanel panel = ProjectPanelService.getInstance(getProject()).getPanel();
                             if (panel != null) {
                                 new Refresh(panel).execute();
                                 Log.info("ToolWindow refresh triggered successfully.");
@@ -194,7 +196,7 @@ public class AppSettingsConfigurable implements Configurable {
                         });
                     }
                 } catch (IOException ex) {
-                    Notifier.getInstance().error("Status Update Failed", "Could not rename project directory: " + ex.getMessage());
+                    Notifier.getInstance().error(getProject(), "Status Update Failed", "Could not rename project directory: " + ex.getMessage());
                 }
             });
         }
