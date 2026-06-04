@@ -15,6 +15,8 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
@@ -39,6 +41,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 public abstract class JsonSplitBulkSection {
+    protected Project project;
+
     protected abstract void applyValues(final List<TestCaseDto> items, final List<String> newValues);
 
     protected abstract String getPopupTitle();
@@ -47,8 +51,8 @@ public abstract class JsonSplitBulkSection {
 
     protected abstract void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges);
 
-    public void show(final @NotNull Project project, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
-
+    public void show(final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
+        this.project = getProject();
         StringBuilder leftSb = new StringBuilder();
         StringBuilder rightSb = new StringBuilder();
         List<int[]> rightEditableRanges = new ArrayList<>();
@@ -422,6 +426,15 @@ public abstract class JsonSplitBulkSection {
         ), rightEditor.getContentComponent());
 
         popup.showCenteredInCurrentWindow(project);
+    }
+
+    private static @NotNull Project getProject() {
+        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        if (openProjects.length > 0) {
+            return openProjects[0];
+        }
+        throw new IllegalStateException("No open project found");
+    }
     }
 
     private int getNearestValidOffset(final int offset, final List<RangeMarker> markers) {

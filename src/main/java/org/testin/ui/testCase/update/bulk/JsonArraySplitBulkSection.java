@@ -15,7 +15,9 @@ import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.popup.JBPopup;
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
@@ -39,6 +41,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 public abstract class JsonArraySplitBulkSection {
+    protected Project project;
+
     protected abstract void applyValues(final List<TestCaseDto> items, final List<List<String>> newValues);
 
     protected abstract String getPopupTitle();
@@ -47,8 +51,8 @@ public abstract class JsonArraySplitBulkSection {
 
     protected abstract List<List<String>> extractOriginalValues(final List<TestCaseDto> items);
 
-    public void show(final @NotNull Project project, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
-
+    public void show(final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
+        this.project = getProject();
         List<List<String>> originalValues = new ArrayList<>();
         List<List<String>> activeValues = new ArrayList<>();
 
@@ -467,6 +471,15 @@ public abstract class JsonArraySplitBulkSection {
 
         renderUI.accept(0, 0);
         popup.showCenteredInCurrentWindow(project);
+    }
+
+    private static @NotNull Project getProject() {
+        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        if (openProjects.length > 0) {
+            return openProjects[0];
+        }
+        throw new IllegalStateException("No open project found");
+    }
     }
 
     private void navigate(final int direction, Editor editor, final List<ItemMarker> markers) {
