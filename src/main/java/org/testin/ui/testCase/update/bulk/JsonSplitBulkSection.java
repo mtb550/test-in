@@ -435,7 +435,6 @@ public abstract class JsonSplitBulkSection {
         }
         throw new IllegalStateException("No open project found");
     }
-    }
 
     private int getNearestValidOffset(final int offset, final List<RangeMarker> markers) {
         int minDistance = Integer.MAX_VALUE;

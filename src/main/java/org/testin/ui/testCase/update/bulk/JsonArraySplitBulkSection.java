@@ -480,7 +480,6 @@ public abstract class JsonArraySplitBulkSection {
         }
         throw new IllegalStateException("No open project found");
     }
-    }
 
     private void navigate(final int direction, Editor editor, final List<ItemMarker> markers) {
         editor.getCaretModel().removeSecondaryCarets();
