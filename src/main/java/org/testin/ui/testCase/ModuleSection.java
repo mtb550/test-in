@@ -1,5 +1,6 @@
 package org.testin.ui.testCase;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
