@@ -59,18 +59,18 @@ public class DetailsTab {
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
-    private static void renderStoneLayout(final JBPanel<?> panel, final TestCaseDto dto, final Path currentPath) {
+    private static void renderStoneLayout(final @NotNull Project project, final JBPanel<?> panel, final TestCaseDto dto, final Path currentPath) {
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = WEIGHT_X;
 
-        final int row = setupFixedRows(panel, gbc, dto, currentPath);
+        final int row = setupFixedRows(project, panel, gbc, dto, currentPath);
         addVerticalSpacer(panel, row);
     }
 
-    private static int setupFixedRows(final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final Path currentPath) {
+    private static int setupFixedRows(final @NotNull Project project, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final Path currentPath) {
         int row = 0;
 
         row = new NavigationBar(project, currentPath).render(panel, (GridBagConstraints) gbc.clone(), dto, row);

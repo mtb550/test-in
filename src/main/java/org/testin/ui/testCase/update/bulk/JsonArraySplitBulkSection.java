@@ -47,8 +47,7 @@ public abstract class JsonArraySplitBulkSection {
 
     protected abstract List<List<String>> extractOriginalValues(final List<TestCaseDto> items);
 
-    public void show(final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
-        Project project = project;
+    public void show(final @NotNull Project project, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
 
         List<List<String>> originalValues = new ArrayList<>();
         List<List<String>> activeValues = new ArrayList<>();

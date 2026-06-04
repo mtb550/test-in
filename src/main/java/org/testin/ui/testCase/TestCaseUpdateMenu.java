@@ -60,7 +60,7 @@ public class TestCaseUpdateMenu {
                 }).show();
 
             } else {
-                selectedItem.getBulkAction().show(items, (list, codeGenerator) -> {
+                selectedItem.getBulkAction().show(project, items, (list, codeGenerator) -> {
                     codeGenerator = new CodeGenerator(targetChangeType);
                     codeGenerator.setGeneratorType(targetChangeType);
 
