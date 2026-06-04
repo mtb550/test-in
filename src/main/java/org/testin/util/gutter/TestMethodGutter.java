@@ -79,7 +79,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 if (foundFile == null) {
                     Log.error("[GUTTER TRACE] File not found in external path: " + targetId + ".json");
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().warn("Not Found", "No JSON file found in external path for ID: " + targetId)
+                            Notifier.getInstance().warn(project, "Not Found", "No JSON file found in external path for ID: " + targetId)
                     );
                     return;
                 }
@@ -94,7 +94,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
             } catch (Exception ex) {
                 Log.error("[GUTTER TRACE] IO Error: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Notifier.getInstance().error("Error", "Could not read JSON file: " + ex.getMessage())
+                        Notifier.getInstance().error(project, "Error", "Could not read JSON file: " + ex.getMessage())
                 );
             }
         });

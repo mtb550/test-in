@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StepsSection implements ICreateTestCaseSection {
+    private final Project project;
     @Getter
     private final List<TextFieldWithAutoCompletion<String>> stepFields;
     private final JPanel stepsContainer;
@@ -31,6 +32,7 @@ public class StepsSection implements ICreateTestCaseSection {
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public StepsSection(final @NotNull Project project) {
+        this.project = project;
         this.stepFields = new ArrayList<>();
 
         this.stepsContainer = new JPanel();
