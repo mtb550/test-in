@@ -2,11 +2,11 @@ package org.testin.projectPanel.tree;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.project.Project;
-import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.treeStructure.SimpleTree;
+import org.jetbrains.annotations.NotNull;
 import org.testin.actions.Open;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 

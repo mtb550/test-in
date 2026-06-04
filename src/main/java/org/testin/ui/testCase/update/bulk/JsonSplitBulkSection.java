@@ -16,7 +16,6 @@ import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
-import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
@@ -28,7 +27,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.autoGenerator.CodeGenerator;
 
@@ -42,6 +40,14 @@ import java.util.function.BiConsumer;
 
 public abstract class JsonSplitBulkSection {
     protected Project project;
+
+    private static @NotNull Project getProject() {
+        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        if (openProjects.length > 0) {
+            return openProjects[0];
+        }
+        throw new IllegalStateException("No open project found");
+    }
 
     protected abstract void applyValues(final List<TestCaseDto> items, final List<String> newValues);
 
@@ -426,14 +432,6 @@ public abstract class JsonSplitBulkSection {
         ), rightEditor.getContentComponent());
 
         popup.showCenteredInCurrentWindow(project);
-    }
-
-    private static @NotNull Project getProject() {
-        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-        if (openProjects.length > 0) {
-            return openProjects[0];
-        }
-        throw new IllegalStateException("No open project found");
     }
 
     private int getNearestValidOffset(final int offset, final List<RangeMarker> markers) {

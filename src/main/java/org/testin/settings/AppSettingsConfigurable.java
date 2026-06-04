@@ -47,19 +47,18 @@ import java.util.stream.Stream;
 
 public class AppSettingsConfigurable implements Configurable {
 
-    private Project project;
     private final TextFieldWithBrowseButton rootTestinPathField = new TextFieldWithBrowseButton();
     private final JBTextField rootAutomationPathField = new JBTextField();
     private final DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList = new DefaultComboBoxModel<>();
     private final ComboBox<TestProjectDirectoryDto> projectComboBox = new ComboBox<>(testProjectList);
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
     private final ComboBox<String> logLevelComboBox = new ComboBox<>(Arrays.stream(Log.Level.values()).map(Log.Level::name).toArray(String[]::new));
-
     private final JButton openFolderBtn = new JButton("Open");
     private final JButton activateBtn = new JButton("Activate");
     private final JButton deactivateBtn = new JButton("Deactivate");
     private final JButton archiveBtn = new JButton("Archive");
     private final JButton renameBtn = new JButton("Rename");
+    private Project project;
 
     @Override
     public String getDisplayName() {

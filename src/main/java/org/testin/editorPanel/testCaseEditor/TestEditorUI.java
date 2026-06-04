@@ -27,7 +27,6 @@ import org.testin.editorPanel.toolBar.TestToolBar;
 import org.testin.editorPanel.toolBar.components.FilterPopup;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
 import org.testin.editorPanel.toolBar.components.TestDetailsPopup;
-import org.testin.pojo.Config;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;

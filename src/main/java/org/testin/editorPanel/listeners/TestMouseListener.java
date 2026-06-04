@@ -1,16 +1,15 @@
 package org.testin.editorPanel.listeners;
 
 import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
+import org.jetbrains.annotations.NotNull;
 import org.testin.actions.CreateTestCase;
 import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.viewPanel.ViewToolWindowFactory;

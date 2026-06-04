@@ -16,12 +16,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ActionIcons extends BaseDetails {
-    private final Project project;
-
-    public ActionIcons(final @NotNull Project project) {
-        this.project = project;
-    }
-
     final float BASE_SCALE = 1.3f;
     final float HOVER_SCALE = 1.8f;
     final int STRUT_WIDTH = 8;
@@ -31,6 +25,11 @@ public class ActionIcons extends BaseDetails {
     final int INSETS_RIGHT = 16;
     final String NAVIGATE_TOOLTIP = "Navigate to Code";
     final Icon navIconRaw = AllIcons.Nodes.Class;
+    private final Project project;
+
+    public ActionIcons(final @NotNull Project project) {
+        this.project = project;
+    }
 
     @Override
     public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {

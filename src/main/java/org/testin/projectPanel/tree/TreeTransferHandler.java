@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 public class TreeTransferHandler extends TransferHandler {
-    private final Project project;
     public static final DataFlavor NODE_FLAVOR;
 
     static {
@@ -38,6 +37,7 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
+    private final Project project;
     private final SimpleTree tree;
     @Getter
     private final Set<DefaultMutableTreeNode> selectedNodes;

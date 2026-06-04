@@ -106,7 +106,8 @@ public class ProjectTreeDnD {
         }
     }
 
-    private record TreeTarget(Project project, SimpleTree tree, StructureTreeModel<?> structureModel) implements DnDTarget {
+    private record TreeTarget(Project project, SimpleTree tree,
+                              StructureTreeModel<?> structureModel) implements DnDTarget {
 
         @Override
         public boolean update(DnDEvent event) {

@@ -9,7 +9,6 @@ import org.testin.actions.RunTestCase;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testRunEditor.RunEditorUI;
 import org.testin.pojo.CardHoverAction;
-import org.testin.pojo.Config;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.logger.Log;

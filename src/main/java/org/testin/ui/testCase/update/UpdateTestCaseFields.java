@@ -2,7 +2,6 @@ package org.testin.ui.testCase.update;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;

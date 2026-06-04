@@ -2,7 +2,6 @@ package org.testin.ui.createNodes;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
-import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.components.JBList;
@@ -12,7 +11,7 @@ import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.TriConsumer;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
-import org.testin.pojo.Config;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.CreateNodeMenu;
 import org.testin.pojo.DirectoryType;
 import org.testin.util.autoGenerator.CodeGenerator;

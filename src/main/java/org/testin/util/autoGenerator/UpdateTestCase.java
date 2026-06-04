@@ -2,10 +2,9 @@ package org.testin.util.autoGenerator;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.pojo.Config;
-import com.intellij.openapi.project.Project;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.logger.Log;
 

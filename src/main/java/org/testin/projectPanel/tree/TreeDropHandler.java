@@ -18,6 +18,14 @@ import java.awt.datatransfer.Transferable;
 
 public class TreeDropHandler implements FileDropHandler {
 
+    private static @NotNull Project getProject() {
+        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        if (openProjects.length > 0) {
+            return openProjects[0];
+        }
+        throw new IllegalStateException("No open project found");
+    }
+
     @Override
     public @Nullable Object handleDrop(final @NotNull FileDropEvent event, final @NotNull Continuation<? super Boolean> continuation) {
         final Transferable transferable = event.getTransferable();
@@ -52,13 +60,5 @@ public class TreeDropHandler implements FileDropHandler {
             Log.error("Exception: " + e.getMessage());
             return false;
         }
-    }
-
-    private static @NotNull Project getProject() {
-        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-        if (openProjects.length > 0) {
-            return openProjects[0];
-        }
-        throw new IllegalStateException("No open project found");
     }
 }

@@ -3,7 +3,6 @@ package org.testin.viewPanel.details;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBPanel;
-import org.jetbrains.annotations.NotNull;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;

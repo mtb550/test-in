@@ -2,8 +2,8 @@ package org.testin.projectPanel.tree;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import org.testin.pojo.DirectoryMapper;
 import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.DirectoryDto;

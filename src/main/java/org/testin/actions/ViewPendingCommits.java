@@ -53,7 +53,7 @@ public class ViewPendingCommits extends DumbAwareAction {
 
         File gitDir = new File(path.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Notifier.getInstance().warnWithAction(project, 
+            Notifier.getInstance().warnWithAction(project,
                     "Git repository not found",
                     "The selected project (" + path.getFileName() + ") is not a Git repository.",
                     "Initialize Git (git init)",

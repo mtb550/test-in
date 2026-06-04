@@ -5,9 +5,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.actions.RunTestCase;
 import org.testin.pojo.dto.TestCaseDto;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.function.BiConsumer;
@@ -19,20 +19,23 @@ public enum RunStatus {
             "IDLE",
             AllIcons.RunConfigurations.TestState.Run,
             "Run Test Case",
-            (tc, list) -> {}
+            (tc, list) -> {
+            }
     ),
 
     PASSED(
             "PASSED",
             AllIcons.RunConfigurations.TestPassed,
             "Run Test Case",
-            (tc, list) -> {}
+            (tc, list) -> {
+            }
     ),
 
     FAILED("FAILED",
             AllIcons.RunConfigurations.TestFailed,
             "Run Test Case",
-            (tc, list) -> {}
+            (tc, list) -> {
+            }
     ),
 
     RUNNING(

@@ -7,7 +7,6 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.NodeCreator;
