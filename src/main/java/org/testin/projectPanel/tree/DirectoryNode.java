@@ -25,11 +25,13 @@ import java.util.stream.Stream;
 
 public class DirectoryNode extends SimpleNode {
 
+    private final Project project;
     private final DirectoryDto directoryDto;
     private final ProjectPanel projectPanel;
 
     public DirectoryNode(Project project, DirectoryDto directoryDto, ProjectPanel projectPanel) {
         super(project);
+        this.project = project;
         this.directoryDto = directoryDto;
         this.projectPanel = projectPanel;
     }

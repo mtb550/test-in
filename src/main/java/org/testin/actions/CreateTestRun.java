@@ -31,10 +31,12 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class CreateTestRun implements NodeCreator {
+    private Project project;
     private TestRunDirectoryDto tr;
 
     @Override
     public DirectoryDto execute(final CreateTestNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+        this.project = project;
         final TestProjectDirectoryDto tp = action.getProjectPanel().getTestProjectSelector().getSelectedTestProject().getItem();
 
         final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();

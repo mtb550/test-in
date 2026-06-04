@@ -19,6 +19,7 @@ import java.util.Set;
 
 @Getter
 public class ProjectTree {
+    private final Project project;
     private final ProjectPanel projectPanel;
     private final JBScrollPane scrollPane;
     private final DefaultMutableTreeNode mainRoot;

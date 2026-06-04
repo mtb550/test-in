@@ -1,7 +1,9 @@
 package org.testin.projectPanel.projectSelector;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.treeStructure.SimpleTree;
+import org.jetbrains.annotations.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.testin.pojo.Config;
@@ -20,6 +22,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class TestProjectSelector {
+    private final Project project;
     private final ProjectPanel projectPanel;
 
     @Getter
@@ -30,7 +33,8 @@ public class TestProjectSelector {
     @Setter
     private ComboBox<TestProjectDirectoryDto> selectedTestProject;
 
-    public TestProjectSelector(final ProjectPanel projectPanel) {
+    public TestProjectSelector(final @NotNull Project project, final ProjectPanel projectPanel) {
+        this.project = project;
         this.projectPanel = projectPanel;
         testProjectList = new DefaultComboBoxModel<>();
         selectedTestProject = new ComboBox<>(testProjectList);
@@ -60,7 +64,7 @@ public class TestProjectSelector {
                         .filter(path -> !path.getFileName().toString().startsWith("."))
                         .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
                         .peek(path -> Log.info(path.getFileName().toString()))
-                        .map(DirectoryMapper.getInstance()::testProjectNode)
+                        .map(path -> DirectoryMapper.getInstance().testProjectNode(project, path))
                         .filter(Objects::nonNull)
                         .forEach(testProjectList::addElement);
 
