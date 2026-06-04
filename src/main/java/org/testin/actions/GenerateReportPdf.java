@@ -24,7 +24,7 @@ public class GenerateReportPdf extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto tr) {
-            new TestRunReport(tr).build().asPdf();
+            new TestRunReport(project, tr).build().asPdf();
         }
     }
 

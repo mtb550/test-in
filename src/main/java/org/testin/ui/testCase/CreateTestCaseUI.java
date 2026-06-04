@@ -20,10 +20,12 @@ import java.util.function.BiConsumer;
 
 public class CreateTestCaseUI extends TestCaseUIBase {
 
+    private final Project project;
     private JBPopup popup;
 
     public CreateTestCaseUI(final @NotNull Project project, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
         super(project, GeneratorType.CREATE_TEST_CASE);
+        this.project = project;
 
         final TestCaseDto dto = new TestCaseDto();
 

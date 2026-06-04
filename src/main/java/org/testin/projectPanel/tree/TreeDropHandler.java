@@ -41,6 +41,7 @@ public class TreeDropHandler implements FileDropHandler {
 
                     if (node.getUserObject() instanceof TestRunDirectoryDto tr) {
                         Log.info("dragged Test Run: " + tr.getName());
+                        Project project = getProject();
                         EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
                     }
                 }

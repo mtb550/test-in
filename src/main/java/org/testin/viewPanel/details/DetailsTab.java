@@ -76,7 +76,7 @@ public class DetailsTab {
         row = new NavigationBar(project, currentPath).render(panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Id().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Title().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new ActionIcons().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new ActionIcons(project).render(panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Badges().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new ExpectedResult().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Steps().render(panel, (GridBagConstraints) gbc.clone(), dto, row);

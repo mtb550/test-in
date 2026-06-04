@@ -20,10 +20,12 @@ import java.util.function.BiConsumer;
 
 public class UpdateTestCaseUI extends TestCaseUIBase {
 
+    private final Project project;
     private JBPopup popup;
 
     public UpdateTestCaseUI(final @NotNull Project project, final TestCaseDto existingDto, final UpdateTestCaseFields selectedItem, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
         super(project, selectedItem.getChangeType());
+        this.project = project;
 
         IUIAction repackPopup = () -> {
             if (popup != null) {

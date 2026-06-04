@@ -2,6 +2,7 @@ package org.testin.util.reports;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
+import com.intellij.openapi.project.Project;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -28,9 +29,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 public final class TestRunReport {
+    private final Project project;
     private final TestRunDirectoryDto tr;
 
-    public TestRunReport(final TestRunDirectoryDto tr) {
+    public TestRunReport(final @NotNull Project project, final TestRunDirectoryDto tr) {
+        this.project = project;
         this.tr = tr;
     }
 
@@ -66,7 +69,7 @@ public final class TestRunReport {
                 File jsonFile = dirPath.resolve(folderName + ".json").toFile();
 
                 if (!jsonFile.exists() || !jsonFile.isFile()) {
-                    Notifier.getInstance().error("Report Error", "JSON data file not found: " + jsonFile.getAbsolutePath());
+                    Notifier.getInstance().error(project, "Report Error", "JSON data file not found: " + jsonFile.getAbsolutePath());
                     return;
                 }
 
@@ -115,7 +118,7 @@ public final class TestRunReport {
                 );
 
             } catch (Exception e) {
-                Notifier.getInstance().error("Report Error", "Failed to generate " + format.name() + " report: " + e.getMessage());
+                Notifier.getInstance().error(project, "Report Error", "Failed to generate " + format.name() + " report: " + e.getMessage());
                 Log.error("Exception: " + e.getMessage());
             }
         });

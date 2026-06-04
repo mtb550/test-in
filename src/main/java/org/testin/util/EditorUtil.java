@@ -67,7 +67,7 @@ public class EditorUtil {
             }
 
             if (targetVf == null) {
-                openEditor(dir);
+                openEditor(project, dir);
                 return;
             }
 

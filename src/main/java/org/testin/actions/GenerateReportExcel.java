@@ -24,7 +24,7 @@ public class GenerateReportExcel extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto tr) {
-            new TestRunReport(tr).build().asExcel();
+            new TestRunReport(project, tr).build().asExcel();
         }
     }
 

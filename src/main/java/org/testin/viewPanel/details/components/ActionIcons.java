@@ -1,6 +1,7 @@
 package org.testin.viewPanel.details.components;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
@@ -15,6 +16,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ActionIcons extends BaseDetails {
+    private final Project project;
+
+    public ActionIcons(final @NotNull Project project) {
+        this.project = project;
+    }
 
     final float BASE_SCALE = 1.3f;
     final float HOVER_SCALE = 1.8f;
@@ -56,7 +62,7 @@ public class ActionIcons extends BaseDetails {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                new NavigateToCode(null).execute(dto);
+                new NavigateToCode(null).execute(project, dto);
             }
         });
 
@@ -87,7 +93,7 @@ public class ActionIcons extends BaseDetails {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                currentStatus.executeAction(dto, null);
+                currentStatus.executeAction(project, dto, null);
             }
         });
 

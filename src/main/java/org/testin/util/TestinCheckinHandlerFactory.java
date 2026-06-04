@@ -1,5 +1,6 @@
 package org.testin.util;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vcs.CheckinProjectPanel;
 import com.intellij.openapi.vcs.changes.CommitContext;
 import com.intellij.openapi.vcs.checkin.CheckinHandler;
@@ -22,6 +23,7 @@ public class TestinCheckinHandlerFactory extends CheckinHandlerFactory {
                         });
 
                 if (containsManagedFiles) {
+                    Project project = panel.getProject();
                     Notifier.getInstance().error(project, "Commits to 'testin' paths are disabled. These are managed by automation.", "Commit Blocked");
                     return ReturnResult.CANCEL;
                 }

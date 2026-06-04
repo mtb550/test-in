@@ -18,6 +18,12 @@ import java.util.List;
 
 @Service(Level.PROJECT)
 public final class TestCasePersistService implements Disposable {
+    private final Project project;
+
+    public TestCasePersistService(final @NotNull Project project) {
+        this.project = project;
+    }
+
     public static TestCasePersistService getInstance(final Project project) {
         return project.getService(TestCasePersistService.class);
     }
@@ -29,7 +35,7 @@ public final class TestCasePersistService implements Disposable {
             try {
                 VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
                 if (dirVFile == null) {
-                    Notifier.getInstance().error("Save Error", "Could not resolve directory: " + path);
+                    Notifier.getInstance().error(project, "Save Error", "Could not resolve directory: " + path);
                     return;
                 }
 
@@ -48,7 +54,7 @@ public final class TestCasePersistService implements Disposable {
                 }
 
             } catch (IOException e) {
-                Notifier.getInstance().error("Save Error", "Failed to persist data: " + e.getMessage());
+                Notifier.getInstance().error(project, "Save Error", "Failed to persist data: " + e.getMessage());
             }
         }));
     }
