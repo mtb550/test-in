@@ -3,6 +3,8 @@ package org.testin.projectPanel.tree;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.FileDropEvent;
 import com.intellij.openapi.editor.FileDropHandler;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,15 +34,25 @@ public class TreeDropHandler implements FileDropHandler {
 
                     if (node.getUserObject() instanceof TestSetDirectoryDto ts) {
                         Log.info("dragged Test set: " + ts.getName());
-                        EditorUtil.getInstance().openEditorIfNotOpen(ts);
+                        Project project = getProject();
+                        EditorUtil.getInstance().openEditorIfNotOpen(project, ts);
                         continue;
                     }
 
                     if (node.getUserObject() instanceof TestRunDirectoryDto tr) {
                         Log.info("dragged Test Run: " + tr.getName());
-                        EditorUtil.getInstance().openEditorIfNotOpen(tr);
+                        EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
                     }
                 }
+    }
+
+    private static @NotNull Project getProject() {
+        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+        if (openProjects.length > 0) {
+            return openProjects[0];
+        }
+        throw new IllegalStateException("No open project found");
+    }
             });
             return true;
 

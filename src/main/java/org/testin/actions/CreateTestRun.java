@@ -164,7 +164,7 @@ public class CreateTestRun implements NodeCreator {
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     projectPanel.getTestRunTreeBuilder().buildTree(projectPanel.getTestProjectSelector().getSelectedTestProject().getItem());
-                    EditorUtil.getInstance().openEditorIfNotOpen(tr);
+                    EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
 
                 });
             } catch (final Exception e) {

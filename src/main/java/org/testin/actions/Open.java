@@ -2,6 +2,7 @@ package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -26,7 +27,7 @@ public class Open extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), tree);
     }
 
-    public void execute() {
+    public void execute(final @NotNull Project project) {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null) return;
 
@@ -38,13 +39,13 @@ public class Open extends DumbAwareAction {
 
             if (directoryDto instanceof TestSetDirectoryDto ts) {
                 Log.info("open test set: " + ts.getPath());
-                EditorUtil.getInstance().openEditorIfNotOpen(ts);
+                EditorUtil.getInstance().openEditorIfNotOpen(project, ts);
                 continue;
             }
 
             if (directoryDto instanceof TestRunDirectoryDto tr) {
                 Log.info("open test run: " + tr.getPath());
-                EditorUtil.getInstance().openEditorIfNotOpen(tr);
+                EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
             }
 
         }
@@ -52,7 +53,7 @@ public class Open extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        execute();
+        execute(e.getProject());
     }
 
     @Override

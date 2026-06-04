@@ -75,7 +75,7 @@ public class EditorUtil {
         });
     }
 
-    public void openEditor(final DirectoryDto dir) {
+    public void openEditor(final @NotNull Project project, final DirectoryDto dir) {
         final FileType ft = dir instanceof TestRunDirectoryDto ? FileType.TEST_RUN : FileType.TEST_CASE;
         final UnifiedVirtualFile newVf = new UnifiedVirtualFile(dir, ft);
 
@@ -85,12 +85,12 @@ public class EditorUtil {
         );
     }
 
-    public void openEditorIfNotOpen(final DirectoryDto dir) {
-        if (isEditorOpen(dir.getName())) {
+    public void openEditorIfNotOpen(final @NotNull Project project, final DirectoryDto dir) {
+        if (isEditorOpen(project, dir.getName())) {
             Log.info("Editor already open, focusing: " + dir.getName());
         } else {
             Log.info("Opening Editor: " + dir.getPath());
-            openEditor(dir);
+            openEditor(project, dir);
         }
     }
 }

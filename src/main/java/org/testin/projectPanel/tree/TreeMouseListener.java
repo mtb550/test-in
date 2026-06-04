@@ -2,6 +2,8 @@ package org.testin.projectPanel.tree;
 
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -15,10 +17,12 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class TreeMouseListener extends PopupHandler {
+    private final Project project;
     private final SimpleTree tree;
     private final TreeContextMenu treeContextMenu;
 
-    public TreeMouseListener(final SimpleTree tree, final TreeContextMenu treeContextMenu) {
+    public TreeMouseListener(final @NotNull Project project, final SimpleTree tree, final TreeContextMenu treeContextMenu) {
+        this.project = project;
         this.tree = tree;
         this.treeContextMenu = treeContextMenu;
     }
@@ -48,7 +52,7 @@ public class TreeMouseListener extends PopupHandler {
             return;
 
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-            new Open(tree).execute();
+            new Open(tree).execute(project);
             e.consume();
         }
     }

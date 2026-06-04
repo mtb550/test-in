@@ -36,7 +36,7 @@ public class CreateTestSet implements NodeCreator {
         TreeUtilImpl.createNode(action.getTree(), parentNode, ts);
 
         createJavaClassInTestRoot(project, parentDir.getName(), name);
-        EditorUtil.getInstance().openEditor(ts);
+        EditorUtil.getInstance().openEditor(project, ts);
 
         return ts;
     }
