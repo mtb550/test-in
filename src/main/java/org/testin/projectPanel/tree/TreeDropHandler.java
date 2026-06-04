@@ -44,6 +44,13 @@ public class TreeDropHandler implements FileDropHandler {
                         EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
                     }
                 }
+            });
+            return true;
+
+        } catch (Exception e) {
+            Log.error("Exception: " + e.getMessage());
+            return false;
+        }
     }
 
     private static @NotNull Project getProject() {
@@ -52,13 +59,5 @@ public class TreeDropHandler implements FileDropHandler {
             return openProjects[0];
         }
         throw new IllegalStateException("No open project found");
-    }
-            });
-            return true;
-
-        } catch (Exception e) {
-            Log.error("Exception: " + e.getMessage());
-            return false;
-        }
     }
 }
