@@ -3,6 +3,7 @@ package org.testin.editorPanel.testRunEditor;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
@@ -115,6 +116,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         buildOpeningPanel();
         loadDataAsync();
 
+        Disposer.register(project, this);
         FontSyncUtil.syncWithNativeEditor(project, list, this);
     }
 

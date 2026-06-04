@@ -4,6 +4,7 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
@@ -118,6 +119,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
 
+        Disposer.register(project, this);
         FontSyncUtil.syncWithNativeEditor(project, list, this);
 
         final JBScrollPane scrollPane = new JBScrollPane(list);

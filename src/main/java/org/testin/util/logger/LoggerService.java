@@ -23,7 +23,7 @@ public final class LoggerService implements Disposable {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private volatile boolean isRunning = true;
 
-    private volatile Log.Level currentLogLevel = Log.Level.INFO;
+    private volatile Log.Level currentLogLevel = Log.Level.DISABLED;
 
     private Thread writerThread;
 
@@ -80,7 +80,7 @@ public final class LoggerService implements Disposable {
 
     public void log(@NotNull Log.Level level, @NotNull String callerClass, @NotNull String message) {
 
-        if (!isRunning || level.priority < currentLogLevel.priority) return;
+        if (!isRunning || currentLogLevel == Log.Level.DISABLED || level.priority < currentLogLevel.priority) return;
 
         String formattedMessage = "[" + LocalDateTime.now().format(formatter) + "] " +
                 "[" + level.paddedName + "] " +
@@ -96,6 +96,14 @@ public final class LoggerService implements Disposable {
         isRunning = false;
         if (writerThread != null) {
             writerThread.interrupt();
+        }
+        // Clear log file on application close
+        try {
+            Path logFile = getLogFile();
+            if (logFile != null && Files.exists(logFile)) {
+                Files.delete(logFile);
+            }
+        } catch (Exception ignored) {
         }
     }
 }

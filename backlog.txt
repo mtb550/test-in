@@ -267,9 +267,6 @@ major change, move to tree async model, to manage update, remove, dispose and re
 
 fix pi report issues.
 
-// todo, to be removed as we can get the project from toolwindow class e.getProject()
-private static Project project;
-
 move Mapper class to be static with getInstance()
 
 update run test set to run the method or class.

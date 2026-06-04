@@ -67,6 +67,7 @@ public final class Log {
     }
 
     public enum Level {
+        DISABLED(-1, "OFF"),
         DEBUG(0, "DEBUG"),
         INFO(1, "INFO "),
         WARN(2, "WARN "),
