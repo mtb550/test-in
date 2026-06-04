@@ -106,7 +106,7 @@ public class CreateTestProject extends DumbAwareAction {
                 Notifier.getInstance().info(project, "New Test Project", String.format("Test Project %s has been added", name));
 
                 if (codeGenerator.isSelected()) {
-                    GeneratorType.CREATE_TEST_PROJECT.getAction().execute(null, newTp.getFqcn());
+                    GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, null, newTp.getFqcn());
                 }
             });
         }

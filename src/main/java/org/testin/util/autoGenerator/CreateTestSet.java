@@ -6,6 +6,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Config;
+import com.intellij.openapi.project.Project;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
@@ -16,7 +17,7 @@ import java.util.List;
 public class CreateTestSet implements GeneratorAction {
 
     @Override
-    public void execute(final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
+    public void execute(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
 
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final String className = fqcn.getLast();

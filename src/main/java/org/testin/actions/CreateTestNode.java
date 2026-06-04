@@ -61,12 +61,12 @@ public class CreateTestNode extends DumbAwareAction {
             if (codeGenerator != null && codeGenerator.isSelected() && directoryType != null && directoryType.getAction() != null) {
 
                 if (directoryType == DirectoryType.TSP) {
-                    GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(null, dir.getFqcn());
+                    GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(project, null, dir.getFqcn());
                     return;
                 }
 
                 if (directoryType == DirectoryType.TS) {
-                    GeneratorType.CREATE_TEST_SET.getAction().execute(null, dir.getFqcn());
+                    GeneratorType.CREATE_TEST_SET.getAction().execute(project, null, dir.getFqcn());
                 }
 
             }
