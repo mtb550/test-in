@@ -3,6 +3,7 @@ package org.testin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -24,6 +25,7 @@ public class GenerateReportXml extends DumbAwareAction {
     public void actionPerformed(@NotNull AnActionEvent e) {
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto tr) {
+            final Project project = e.getProject();
             new TestRunReport(project, tr).build().asXml();
         }
     }

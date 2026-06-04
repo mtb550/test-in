@@ -37,7 +37,7 @@ public class DetailsTab {
             final JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
             contentPanel.setOpaque(false);
 
-            renderStoneLayout(contentPanel, dto, currentPath);
+            renderStoneLayout(project, contentPanel, dto, currentPath);
 
             final JBScrollPane scrollPane = new JBScrollPane(contentPanel);
             scrollPane.setBorder(null);

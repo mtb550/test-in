@@ -110,7 +110,7 @@ public final class TestRunReport {
                 };
                 copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
 
-                Notifier.getInstance().infoWithActions(
+                Notifier.getInstance().infoWithActions(project,
                         format.name() + " Report Generated",
                         "Saved successfully: " + reportFile.getName(),
                         openAction,
