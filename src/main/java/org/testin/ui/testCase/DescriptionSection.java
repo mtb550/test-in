@@ -1,11 +1,13 @@
 package org.testin.ui.testCase;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
@@ -20,7 +22,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     private final TextFieldWithAutoCompletion<String> titleField;
     private final JPanel wrapper;
 
-    public DescriptionSection() {
+    public DescriptionSection(final @NotNull Project project) {
         this.titleField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
         this.titleField.setFont(fieldFont);
         this.titleField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());

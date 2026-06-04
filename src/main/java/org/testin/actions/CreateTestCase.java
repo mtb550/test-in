@@ -46,7 +46,7 @@ public class CreateTestCase extends DumbAwareAction {
     }
 
     private static void performCreation(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull DirectoryDto pDir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
-        new CreateTestCaseUI((newTc, codeGenerator) -> {
+        new CreateTestCaseUI(project, (newTc, codeGenerator) -> {
             final boolean isEmpty = model.isEmpty();
             newTc.setIsHead(isEmpty);
 

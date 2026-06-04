@@ -4,6 +4,7 @@ import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
@@ -18,7 +19,7 @@ public class ModuleSection implements ICreateTestCaseSection {
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
-    public ModuleSection() {
+    public ModuleSection(final @NotNull Project project) {
         this.moduleField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getModules(), CreateTestCaseFields.MODULE.getIcon()), false, "");
         this.moduleField.setFont(fieldFont);
         this.moduleField.setPlaceholder(CreateTestCaseFields.MODULE.getPlaceholder());

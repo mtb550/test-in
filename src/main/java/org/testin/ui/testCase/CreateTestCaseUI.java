@@ -1,5 +1,6 @@
 package org.testin.ui.testCase;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
@@ -21,8 +22,8 @@ public class CreateTestCaseUI extends TestCaseUIBase {
 
     private JBPopup popup;
 
-    public CreateTestCaseUI(final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
-        super(GeneratorType.CREATE_TEST_CASE);
+    public CreateTestCaseUI(final @NotNull Project project, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
+        super(project, GeneratorType.CREATE_TEST_CASE);
 
         final TestCaseDto dto = new TestCaseDto();
 

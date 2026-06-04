@@ -2,6 +2,7 @@ package org.testin.ui.testCase;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonShortcuts;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -29,10 +30,12 @@ import java.util.function.Consumer;
 
 public class TestCaseUpdateMenu {
 
+    private final Project project;
     private final List<TestCaseDto> items;
     private final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems;
 
-    public TestCaseUpdateMenu(final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
+    public TestCaseUpdateMenu(final @NotNull Project project, final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
+        this.project = project;
         this.items = items;
         this.updatedItems = updatedItems;
     }
@@ -47,7 +50,7 @@ public class TestCaseUpdateMenu {
             Log.info("TRACE [TestCaseUpdateMenu]: Menu item selected -> " + selectedItem.getName() + " | changeType = " + targetChangeType);
 
             if (isSingle) {
-                new UpdateTestCaseUI(items.getFirst(), selectedItem, (tc, codeGenerator) -> {
+                new UpdateTestCaseUI(project, items.getFirst(), selectedItem, (tc, codeGenerator) -> {
                     codeGenerator = new CodeGenerator(targetChangeType);
                     codeGenerator.setGeneratorType(targetChangeType);
 

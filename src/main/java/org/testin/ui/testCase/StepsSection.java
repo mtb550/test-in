@@ -9,6 +9,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
@@ -28,7 +29,7 @@ public class StepsSection implements ICreateTestCaseSection {
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
-    public StepsSection() {
+    public StepsSection(final @NotNull Project project) {
         this.stepFields = new ArrayList<>();
 
         this.stepsContainer = new JPanel();

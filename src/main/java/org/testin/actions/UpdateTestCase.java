@@ -45,7 +45,7 @@ public class UpdateTestCase extends DumbAwareAction {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        new TestCaseUpdateMenu(selectedItems, (updatedItems, codeGenerator) -> {
+        new TestCaseUpdateMenu(project, selectedItems, (updatedItems, codeGenerator) -> {
 
             TestCaseCacheService.getInstance(project).addNewItems(updatedItems);
             TestCasePersistService.getInstance(project).persist(path, updatedItems);

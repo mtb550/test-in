@@ -1,5 +1,6 @@
 package org.testin.ui.testCase.update;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
@@ -21,8 +22,8 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
 
     private JBPopup popup;
 
-    public UpdateTestCaseUI(final TestCaseDto existingDto, final UpdateTestCaseFields selectedItem, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
-        super(selectedItem.getChangeType());
+    public UpdateTestCaseUI(final @NotNull Project project, final TestCaseDto existingDto, final UpdateTestCaseFields selectedItem, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
+        super(project, selectedItem.getChangeType());
 
         IUIAction repackPopup = () -> {
             if (popup != null) {

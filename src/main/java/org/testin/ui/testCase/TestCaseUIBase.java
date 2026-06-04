@@ -2,6 +2,7 @@ package org.testin.ui.testCase;
 
 import com.intellij.codeInsight.lookup.LookupManager;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -38,14 +39,14 @@ public abstract class TestCaseUIBase {
     protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
-    public TestCaseUIBase(final @NotNull GeneratorType generatorType) {
+    public TestCaseUIBase(final @NotNull Project project, final @NotNull GeneratorType generatorType) {
         this.codeGenerator = new CodeGenerator(generatorType);
-        this.DescriptionSection = new DescriptionSection();
-        this.expectedResultSection = new ExpectedResultSection();
-        this.moduleSection = new ModuleSection();
+        this.DescriptionSection = new DescriptionSection(project);
+        this.expectedResultSection = new ExpectedResultSection(project);
+        this.moduleSection = new ModuleSection(project);
         this.testDataSection = new TestDataSection();
         this.preConditionsSection = new PreConditionsSection();
-        this.stepsSection = new StepsSection();
+        this.stepsSection = new StepsSection(project);
         this.prioritySection = new PrioritySection();
         this.groupSection = new GroupSection();
         this.statusBarSection = new StatusBarSection();
