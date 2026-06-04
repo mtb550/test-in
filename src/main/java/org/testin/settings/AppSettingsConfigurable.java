@@ -213,7 +213,7 @@ public class AppSettingsConfigurable implements Configurable {
                 try (Stream<Path> paths = Files.list(rootPath)) {
                     paths.filter(Files::isDirectory)
                             //.filter(path -> path.getFileName().toString().startsWith("PR_"))
-                            .map(DirectoryMapper.getInstance()::testProjectNode)
+                            .map(path -> DirectoryMapper.getInstance().testProjectNode(getProject(), path))
                             .filter(Objects::nonNull)
                             .forEach(testProjectList::addElement);
 
@@ -256,11 +256,23 @@ public class AppSettingsConfigurable implements Configurable {
         else
             Config.setAutomationPath(null);
 
-        ProjectPanel panel = ProjectPanelService.getInstance(project).getPanel();
+        ProjectPanel panel = ProjectPanelService.getInstance(getProject()).getPanel();
         if (panel != null) {
             new Refresh(panel).execute();
             Log.info("ToolWindow refresh triggered successfully.");
         }
+    }
+
+    private @NotNull Project getProject() {
+        if (project == null) {
+            Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
+            if (openProjects.length > 0) {
+                project = openProjects[0];
+            } else {
+                throw new IllegalStateException("No open project found");
+            }
+        }
+        return project;
     }
 
     @Override
@@ -268,8 +280,7 @@ public class AppSettingsConfigurable implements Configurable {
         AppSettingsState settings = AppSettingsState.getInstance();
         rootTestinPathField.setText(settings.rootTestinPath != null ? settings.rootTestinPath : "");
 
-        Project project = project;
-        VirtualFile mainSourceRoot = Tools.getInstance().getTestSourceRoot(project);
+        VirtualFile mainSourceRoot = Tools.getInstance().getTestSourceRoot(getProject());
 
         if (mainSourceRoot != null) {
             rootAutomationPathField.setText(mainSourceRoot.getPath());
