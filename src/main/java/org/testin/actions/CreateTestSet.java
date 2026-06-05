@@ -17,6 +17,7 @@ import org.testin.util.EditorUtil;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -28,7 +29,7 @@ public class CreateTestSet implements NodeCreator {
 
     @Override
     public DirectoryDto execute(final CreateTestNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
-        TestSetDirectoryDto ts = DirectoryMapper.getInstance().testSetNode(project, newDirPath, parentDir);
+        TestSetDirectoryDto ts = Services.getInstance(project, DirectoryMapper.class).testSetNode(project, newDirPath, parentDir);
 
         TreeUtilImpl.createVf(project, this, parentDir.getPath(), ts.getName());
         TreeUtilImpl.createDataVf(project, this, newDirPath, DirectoryType.TS.getMarker());

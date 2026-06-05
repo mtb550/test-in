@@ -18,6 +18,7 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
@@ -73,7 +74,7 @@ public final class TestRunReport {
                     return;
                 }
 
-                TestRunDto runData = Mapper.readValue(jsonFile, TestRunDto.class);
+                TestRunDto runData = Services.getInstance(project, Mapper.class).readValue(jsonFile, TestRunDto.class);
 
                 Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(runData);
 
@@ -153,7 +154,7 @@ public final class TestRunReport {
                         .parallel()
                         .forEach(p -> {
                             try {
-                                TestCaseDto tc = Mapper.readValue(p.toFile(), TestCaseDto.class);
+                                TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(p.toFile(), TestCaseDto.class);
                                 if (idsToFind.contains(tc.getId())) {
                                     detailsMap.put(tc.getId(), tc);
                                 }

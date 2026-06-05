@@ -10,7 +10,6 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.settings.StartupActivity;
-import org.testin.settings.service.ProjectPanelService;
 import org.testin.util.logger.Log;
 
 public class Main implements ToolWindowFactory, DumbAware {
@@ -27,8 +26,6 @@ public class Main implements ToolWindowFactory, DumbAware {
             ProjectPanel projectPanel = new ProjectPanel(project);
 
             toolWindow.setTitleActions(ProjectPanelActions.create(projectPanel));
-
-            ProjectPanelService.getInstance(project).setPanel(projectPanel);
 
             Content content = ContentFactory.getInstance().createContent(projectPanel.getPanel(), null, false);
             Disposer.register(content, projectPanel);

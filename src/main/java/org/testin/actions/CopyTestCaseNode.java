@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.EditorCM;
@@ -11,6 +12,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
@@ -26,13 +28,14 @@ public class CopyTestCaseNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        final Project project = e.getProject();
         List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
 
         if (!selectedTestCases.isEmpty()) {
             try {
                 EditorCM.clearCutState();
 
-                String json = Mapper.writeValueAsString(selectedTestCases);
+                String json = Services.getInstance(project, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
             } catch (Exception ex) {

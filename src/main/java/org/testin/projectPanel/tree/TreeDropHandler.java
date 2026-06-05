@@ -4,7 +4,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.FileDropEvent;
 import com.intellij.openapi.editor.FileDropHandler;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,16 +17,9 @@ import java.awt.datatransfer.Transferable;
 
 public class TreeDropHandler implements FileDropHandler {
 
-    private static @NotNull Project getProject() {
-        Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-        if (openProjects.length > 0) {
-            return openProjects[0];
-        }
-        throw new IllegalStateException("No open project found");
-    }
-
     @Override
     public @Nullable Object handleDrop(final @NotNull FileDropEvent event, final @NotNull Continuation<? super Boolean> continuation) {
+        final Project project = event.getProject();
         final Transferable transferable = event.getTransferable();
 
         if (!transferable.isDataFlavorSupported(TreeTransferHandler.NODE_FLAVOR)) {
@@ -42,14 +34,13 @@ public class TreeDropHandler implements FileDropHandler {
 
                     if (node.getUserObject() instanceof TestSetDirectoryDto ts) {
                         Log.info("dragged Test set: " + ts.getName());
-                        Project project = getProject();
+
                         EditorUtil.getInstance().openEditorIfNotOpen(project, ts);
                         continue;
                     }
 
                     if (node.getUserObject() instanceof TestRunDirectoryDto tr) {
                         Log.info("dragged Test Run: " + tr.getName());
-                        Project project = getProject();
                         EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
                     }
                 }

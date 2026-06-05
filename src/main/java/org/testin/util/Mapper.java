@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.intellij.openapi.components.Service;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.logger.Log;
 
@@ -11,14 +14,15 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.TimeZone;
 
-public class Mapper {
-
-    private static final ObjectMapper mapper = new ObjectMapper()
+@Service(Service.Level.PROJECT)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class Mapper {
+    private final ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .enable(SerializationFeature.INDENT_OUTPUT)
             .setTimeZone(TimeZone.getDefault());
 
-    public static <T> T readValue(final @NotNull File src, final @NotNull Class<T> valueType) {
+    public <T> T readValue(final @NotNull File src, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(src, valueType);
 
@@ -29,7 +33,7 @@ public class Mapper {
         }
     }
 
-    public static <T> T readValue(final @NotNull File src, final @NotNull TypeReference<T> valueTypeRef) {
+    public <T> T readValue(final @NotNull File src, final @NotNull TypeReference<T> valueTypeRef) {
         try {
             return mapper.readValue(src, valueTypeRef);
 
@@ -40,7 +44,7 @@ public class Mapper {
         }
     }
 
-    public static <T> T readValue(final @NotNull String content, final @NotNull Class<T> valueType) {
+    public <T> T readValue(final @NotNull String content, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(content, valueType);
 
@@ -50,7 +54,7 @@ public class Mapper {
         }
     }
 
-    public static <T> T readValue(final @NotNull InputStream src, final @NotNull Class<T> valueType) {
+    public <T> T readValue(final @NotNull InputStream src, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(src, valueType);
 
@@ -61,7 +65,7 @@ public class Mapper {
         }
     }
 
-    public static <T> T readValue(final @NotNull String content, final @NotNull TypeReference<T> valueTypeRef) {
+    public <T> T readValue(final @NotNull String content, final @NotNull TypeReference<T> valueTypeRef) {
         try {
             return mapper.readValue(content, valueTypeRef);
 
@@ -71,7 +75,7 @@ public class Mapper {
         }
     }
 
-    public static byte[] writeValueAsBytes(final @NotNull Object value) {
+    public byte[] writeValueAsBytes(final @NotNull Object value) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(value);
 
@@ -82,7 +86,7 @@ public class Mapper {
         }
     }
 
-    public static String writeValueAsString(final @NotNull Object value) {
+    public String writeValueAsString(final @NotNull Object value) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
 
@@ -92,7 +96,7 @@ public class Mapper {
         }
     }
 
-    public static <T> T convertValue(final @NotNull Object fromValue, final @NotNull Class<T> toValueType) {
+    public <T> T convertValue(final @NotNull Object fromValue, final @NotNull Class<T> toValueType) {
         try {
             return mapper.convertValue(fromValue, toValueType);
 

@@ -7,6 +7,7 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -118,7 +119,7 @@ public class PendingCommitsDialog extends DialogWrapper {
                     model.removeRow(selectedRow);
                 }
             } else if (diff.type() == TestCaseDiff.DiffType.MODIFIED) {
-                TestCaseDto currentDto = Mapper.readValue(jsonFile, TestCaseDto.class);
+                TestCaseDto currentDto = Services.getInstance(project, Mapper.class).readValue(jsonFile, TestCaseDto.class);
 
                 if (currentDto == null) return;
 
@@ -130,7 +131,7 @@ public class PendingCommitsDialog extends DialogWrapper {
                     case "Priority" -> currentDto.setPriority(oldDto.getPriority());
                 }
 
-                byte[] jsonBytes = Mapper.writeValueAsBytes(currentDto);
+                byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(currentDto);
                 Files.write(jsonFile.toPath(), jsonBytes);
 
                 model.removeRow(selectedRow);

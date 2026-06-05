@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
@@ -14,6 +15,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -36,7 +38,8 @@ public class PasteTestCaseNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        List<TestCaseDto> pastedCases = getFromClipboard();
+        final Project project = e.getProject();
+        List<TestCaseDto> pastedCases = getFromClipboard(project);
         if (pastedCases.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -65,7 +68,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
             for (TestCaseDto tc : pastedCases) {
                 if (tc == null) continue;
 
-                TestCaseDto clonedTc = cloneForPasting(tc, isCut);
+                TestCaseDto clonedTc = cloneForPasting(project, tc, isCut);
                 if (clonedTc == null) continue;
 
                 if (destUI.getVf() != null && destUI.getVf().getTestSet() != null) {
@@ -88,13 +91,13 @@ public class PasteTestCaseNode extends DumbAwareAction {
         // todo, to be implemented. left empty for testing functionality.
     }
 
-    private List<TestCaseDto> getFromClipboard() {
+    private List<TestCaseDto> getFromClipboard(final @NotNull Project project) {
         Transferable contents = CopyPasteManager.getInstance().getContents();
         if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
 
-                List<TestCaseDto> parsedList = Mapper.readValue(json, new TypeReference<List<TestCaseDto>>() {
+                List<TestCaseDto> parsedList = Services.getInstance(project, Mapper.class).readValue(json, new TypeReference<List<TestCaseDto>>() {
                 });
                 return parsedList != null ? parsedList : Collections.emptyList();
 
@@ -105,10 +108,10 @@ public class PasteTestCaseNode extends DumbAwareAction {
         return Collections.emptyList();
     }
 
-    private TestCaseDto cloneForPasting(final TestCaseDto original, final boolean isCut) {
+    private TestCaseDto cloneForPasting(final @NotNull Project project, final TestCaseDto original, final boolean isCut) {
         final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-        final TestCaseDto clonedTc = Mapper.convertValue(original, TestCaseDto.class);
+        final TestCaseDto clonedTc = Services.getInstance(project, Mapper.class).convertValue(original, TestCaseDto.class);
 
         if (clonedTc != null) {
             if (isCut) {

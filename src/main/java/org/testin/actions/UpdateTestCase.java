@@ -15,6 +15,7 @@ import org.testin.util.KeyboardSet;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.util.services.TestCasePersistService;
 import org.testin.viewPanel.ViewPanel;
@@ -48,7 +49,7 @@ public class UpdateTestCase extends DumbAwareAction {
         new TestCaseUpdateMenu(project, selectedItems, (updatedItems, codeGenerator) -> {
 
             TestCaseCacheService.getInstance(project).addNewItems(updatedItems);
-            TestCasePersistService.getInstance(project).persist(path, updatedItems);
+            Services.getInstance(project, TestCasePersistService.class).persist(path, updatedItems);
             Notifier.getInstance().softShow(project, "Updated..");
 
             ApplicationManager.getApplication().invokeLater(() -> {

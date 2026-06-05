@@ -25,10 +25,6 @@ public final class TestCasePersistService implements Disposable {
         this.project = project;
     }
 
-    public static TestCasePersistService getInstance(final Project project) {
-        return project.getService(TestCasePersistService.class);
-    }
-
     public void persist(final Path path, final @Nullable List<TestCaseDto> tcs) {
         if (path == null || tcs == null || tcs.isEmpty()) return;
 
@@ -50,7 +46,7 @@ public final class TestCasePersistService implements Disposable {
                         targetFile = dirVFile.createChildData(this, fileName);
                     }
 
-                    byte[] jsonBytes = Mapper.writeValueAsBytes(tc);
+                    byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(tc);
                     targetFile.setBinaryContent(jsonBytes);
                 }
 

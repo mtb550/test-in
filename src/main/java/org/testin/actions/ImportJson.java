@@ -26,6 +26,7 @@ import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -45,7 +46,7 @@ public class ImportJson extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
-        final Project project = e.getProject();
+        final @NotNull Project project = e.getProject();
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
@@ -110,7 +111,7 @@ public class ImportJson extends DumbAwareAction {
                 indicator.setIndeterminate(true);
                 indicator.setText("Parsing JSON file...");
 
-                Map<String, List<TestCaseDto>> rawData = Mapper.readValue(file, new TypeReference<Map<String, List<TestCaseDto>>>() {
+                Map<String, List<TestCaseDto>> rawData = Services.getInstance(project, Mapper.class).readValue(file, new TypeReference<Map<String, List<TestCaseDto>>>() {
                 });
 
                 if (rawData == null) {
@@ -160,11 +161,11 @@ public class ImportJson extends DumbAwareAction {
                         ApplicationManager.getApplication().runWriteAction(() -> {
                             try {
                                 if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                                    TestCaseDto tail = findExistingTail(targetDirectory);
+                                    TestCaseDto tail = findExistingTail(project, targetDirectory);
                                     List<TestCaseDto> flatList = new ArrayList<>();
                                     selectedCasesByGroup.values().forEach(flatList::addAll);
 
-                                    linkAndSaveTestCases(targetDirectory, flatList, tail, ImportJson.this);
+                                    linkAndSaveTestCases(project, targetDirectory, flatList, tail, ImportJson.this);
 
                                     EditorUtil.getInstance().closeThenOpenEditor(project, targetDirectory, ts);
                                     Notifier.getInstance().info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
@@ -177,8 +178,8 @@ public class ImportJson extends DumbAwareAction {
 
                                         VirtualFile groupDir = new CreateTestSet().inBackground(project, ImportJson.this, targetDirectory, selectedDirDto, parentNode, tree, rawGroupName);
 
-                                        TestCaseDto tail = findExistingTail(groupDir);
-                                        linkAndSaveTestCases(groupDir, groupCases, tail, ImportJson.this);
+                                        TestCaseDto tail = findExistingTail(project, groupDir);
+                                        linkAndSaveTestCases(project, groupDir, groupCases, tail, ImportJson.this);
                                         totalImported += groupCases.size();
                                     }
                                     Notifier.getInstance().info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
@@ -199,7 +200,7 @@ public class ImportJson extends DumbAwareAction {
         });
     }
 
-    private void linkAndSaveTestCases(final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final Object requestor) throws IOException {
+    private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final Object requestor) throws IOException {
         TestCaseDto previousNode = existingTail;
 
         for (TestCaseDto currentTestCase : testCases) {
@@ -216,24 +217,24 @@ public class ImportJson extends DumbAwareAction {
         if (existingTail != null) {
             VirtualFile tailFile = dir.findChild(existingTail.getId() + ".json");
             if (tailFile != null) {
-                tailFile.setBinaryContent(Mapper.writeValueAsBytes(existingTail));
+                tailFile.setBinaryContent(Services.getInstance(project, Mapper.class).writeValueAsBytes(existingTail));
             }
         }
 
         for (TestCaseDto tc : testCases) {
             VirtualFile newJsonFile = dir.createChildData(requestor, tc.getId() + ".json");
-            newJsonFile.setBinaryContent(Mapper.writeValueAsBytes(tc));
+            newJsonFile.setBinaryContent(Services.getInstance(project, Mapper.class).writeValueAsBytes(tc));
         }
     }
 
-    private TestCaseDto findExistingTail(final VirtualFile directory) {
+    private TestCaseDto findExistingTail(final @NotNull Project project, final VirtualFile directory) {
         if (directory == null) return null;
         VirtualFile[] children = directory.getChildren();
         if (children != null) {
             for (VirtualFile child : children) {
                 if (!child.isDirectory() && child.getName().endsWith(".json")) {
                     try (InputStream is = child.getInputStream()) {
-                        TestCaseDto tc = Mapper.readValue(is, TestCaseDto.class);
+                        TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(is, TestCaseDto.class);
                         if (tc != null && tc.getNext() == null) {
                             return tc;
                         }

@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,6 +18,7 @@ import org.testin.ui.RemoveTestCaseDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -26,9 +28,11 @@ public class RemoveTestCase extends DumbAwareAction {
     private final DirectoryDto dir;
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
+    private final Project project;
 
-    public RemoveTestCase(final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public RemoveTestCase(final Project project, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
+        this.project = project;
         this.dir = dir;
         this.list = list;
         this.model = model;
@@ -108,7 +112,7 @@ public class RemoveTestCase extends DumbAwareAction {
                 targetFile = dirVFile.createChildData(this, fileName);
             }
 
-            String jsonContent = Mapper.writeValueAsString(item);
+            String jsonContent = Services.getInstance(project, Mapper.class).writeValueAsString(item);
             VfsUtil.saveText(targetFile, jsonContent);
 
         } catch (IOException e) {

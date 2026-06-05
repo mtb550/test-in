@@ -59,9 +59,10 @@ public class TestCaseUpdateMenu {
                 }).show();
 
             } else {
-                selectedItem.getBulkAction().show(items, (list, codeGenerator) -> {
+                selectedItem.getBulkAction().show(project, items, (list, codeGenerator) -> {
                     codeGenerator = new CodeGenerator(targetChangeType);
                     codeGenerator.setGeneratorType(targetChangeType);
+
 
                     Log.info("TRACE [TestCaseUpdateMenu]: Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + codeGenerator.getGeneratorType());
                     updatedItems.accept(list, codeGenerator);

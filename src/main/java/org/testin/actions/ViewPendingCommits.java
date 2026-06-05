@@ -68,7 +68,7 @@ public class ViewPendingCommits extends DumbAwareAction {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    List<TestCaseDiff> changes = GitDiffProcessor.getPendingChanges(path);
+                    List<TestCaseDiff> changes = GitDiffProcessor.getPendingChanges(project, path);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (changes.isEmpty()) {

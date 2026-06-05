@@ -14,6 +14,7 @@ import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -67,16 +68,16 @@ public class DirectoryNode extends SimpleNode {
 
     private DirectoryDto mapPathToDirectory(Path path) {
         if (Files.exists(path.resolve(DirectoryType.TSP.getMarker())))
-            return DirectoryMapper.getInstance().testSetPackageNode(project, path, directoryDto);
+            return Services.getInstance(project, DirectoryMapper.class).testSetPackageNode(project, path, directoryDto);
 
         if (Files.exists(path.resolve(DirectoryType.TS.getMarker())))
-            return DirectoryMapper.getInstance().testSetNode(project, path, directoryDto);
+            return Services.getInstance(project, DirectoryMapper.class).testSetNode(project, path, directoryDto);
 
         if (Files.exists(path.resolve(DirectoryType.TRP.getMarker())))
-            return DirectoryMapper.getInstance().testRunPackageNode(project, path, directoryDto);
+            return Services.getInstance(project, DirectoryMapper.class).testRunPackageNode(project, path, directoryDto);
 
         if (Files.exists(path.resolve(DirectoryType.TR.getMarker())))
-            return DirectoryMapper.getInstance().testRunNode(project, path, directoryDto);
+            return Services.getInstance(project, DirectoryMapper.class).testRunNode(project, path, directoryDto);
 
         return null;
     }

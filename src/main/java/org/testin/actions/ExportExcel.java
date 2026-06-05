@@ -28,6 +28,7 @@ import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -98,7 +99,7 @@ public class ExportExcel extends DumbAwareAction {
                 indicator.setIndeterminate(true);
                 indicator.setText("Gathering test cases...");
 
-                Map<String, List<TestCaseDto>> sheetsData = gatherData(targetDirectory, selectedDirDto);
+                Map<String, List<TestCaseDto>> sheetsData = gatherData(project, targetDirectory, selectedDirDto);
 
                 if (indicator.isCanceled()) return;
 
@@ -172,17 +173,17 @@ public class ExportExcel extends DumbAwareAction {
         });
     }
 
-    private Map<String, List<TestCaseDto>> gatherData(VirtualFile targetDirectory, DirectoryDto dirDto) {
+    private Map<String, List<TestCaseDto>> gatherData(final @NotNull Project project, VirtualFile targetDirectory, DirectoryDto dirDto) {
         Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
 
         if (dirDto instanceof TestSetDirectoryDto) {
-            allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(targetDirectory));
+            allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(project, targetDirectory));
         } else {
             VirtualFile[] children = targetDirectory.getChildren();
             if (children != null) {
                 for (VirtualFile child : children) {
                     if (child.isDirectory()) {
-                        List<TestCaseDto> tcs = loadTestCasesInOrder(child);
+                        List<TestCaseDto> tcs = loadTestCasesInOrder(project, child);
                         if (!tcs.isEmpty()) {
                             allSheets.put(child.getName(), tcs);
                         }
@@ -193,7 +194,7 @@ public class ExportExcel extends DumbAwareAction {
         return allSheets;
     }
 
-    private List<TestCaseDto> loadTestCasesInOrder(final VirtualFile dir) {
+    private List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project project, final VirtualFile dir) {
         Map<UUID, TestCaseDto> tcMap = new HashMap<>();
         TestCaseDto head = null;
 
@@ -204,7 +205,7 @@ public class ExportExcel extends DumbAwareAction {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
 
-                    TestCaseDto tc = Mapper.readValue(is, TestCaseDto.class);
+                    TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(is, TestCaseDto.class);
 
                     if (tc != null) {
                         tcMap.put(tc.getId(), tc);

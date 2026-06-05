@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.actions.CreateTestProject;
 import org.testin.pojo.Config;
 import org.testin.projectPanel.projectSelector.TestProjectSelector;
@@ -26,7 +27,7 @@ import java.awt.*;
 
 @Getter
 @Service(Service.Level.PROJECT)
-public class ProjectPanel implements Disposable {
+public final class ProjectPanel implements Disposable {
     private final Project project;
     private final JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
     private final TestProjectSelector testProjectSelector;
@@ -36,7 +37,7 @@ public class ProjectPanel implements Disposable {
     private BranchSelector branchSelector;
     private ProjectTree projectTree;
 
-    public ProjectPanel(Project project) {
+    public ProjectPanel(final @NotNull Project project) {
         this.project = project;
         Log.info("ProjectPanel.ProjectPanel()");
 

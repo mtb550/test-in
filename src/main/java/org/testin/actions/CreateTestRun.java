@@ -18,6 +18,7 @@ import org.testin.ui.RunCreationForm;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Files;
@@ -60,7 +61,7 @@ public class CreateTestRun implements NodeCreator {
                 dialogBuilder.setOkOperation(() -> {
                     dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
 
-                    tr = DirectoryMapper.getInstance().testRunNode(project, newDirPath, parentDir);
+                    tr = Services.getInstance(project, DirectoryMapper.class).testRunNode(project, newDirPath, parentDir);
                     saveSelectedToJSON(form, name, root, newDirPath, action.getProjectPanel(), tr);
                 });
 
@@ -87,7 +88,7 @@ public class CreateTestRun implements NodeCreator {
 
                         } else if (child.toString().endsWith(".json")) {
                             try {
-                                final TestCaseDto tc = Mapper.readValue(child.toFile(), TestCaseDto.class);
+                                final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(child.toFile(), TestCaseDto.class);
                                 node.add(new DefaultMutableTreeNode(tc));
 
                             } catch (final Exception e1) {
@@ -105,13 +106,13 @@ public class CreateTestRun implements NodeCreator {
 
     private Object resolveDirectoryObject(final Path folder, final DirectoryDto parentDir) {
         if (Files.exists(folder.resolve(DirectoryType.TSP.getMarker())))
-            return DirectoryMapper.getInstance().testSetPackageNode(project, folder, parentDir);
+            return Services.getInstance(project, DirectoryMapper.class).testSetPackageNode(project, folder, parentDir);
 
         if (Files.exists(folder.resolve(DirectoryType.TS.getMarker())))
-            return DirectoryMapper.getInstance().testSetNode(project, folder, parentDir);
+            return Services.getInstance(project, DirectoryMapper.class).testSetNode(project, folder, parentDir);
 
         if (Files.exists(folder.resolve(DirectoryType.TCD.getMarker())))
-            return DirectoryMapper.getInstance().testCasesRootNode(project, folder, parentDir);
+            return Services.getInstance(project, DirectoryMapper.class).testCasesRootNode(project, folder, parentDir);
 
         throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + parentDir.getClass().getSimpleName());
     }
@@ -151,7 +152,7 @@ public class CreateTestRun implements NodeCreator {
                 Files.createDirectories(savePath);
                 Path newJsonPath = savePath.resolve(fileName);
 
-                byte[] jsonBytes = Mapper.writeValueAsBytes(run);
+                byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(run);
                 Files.write(newJsonPath, jsonBytes);
 
                 Path trMarkerPath = savePath.resolve(DirectoryType.TR.getMarker());

@@ -2,6 +2,7 @@ package org.testin.projectPanel.tree;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -23,8 +25,10 @@ import java.util.Set;
 
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
     private final Set<DefaultMutableTreeNode> selectedNodes;
+    private final Project project;
 
-    public TreeCellRenderer(final Set<DefaultMutableTreeNode> selectedNodes) {
+    public TreeCellRenderer(final @NotNull Project project, final Set<DefaultMutableTreeNode> selectedNodes) {
+        this.project = project;
         this.selectedNodes = selectedNodes;
     }
 
@@ -42,7 +46,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                     setIcon(type != null ? type.getIcon() : AllIcons.Nodes.Folder);
                     append(dir.getName(), getSimpleTextAttributes(node, dir));
                     append(" ");
-                    statusTag(dir, tree);
+                    statusTag(project, dir, tree);
                     // todo, here test set tag.
                 }
 
@@ -77,7 +81,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
         };
     }
 
-    private void statusTag(final DirectoryDto dir, final JTree tree) {
+    private void statusTag(final @NotNull Project project, final DirectoryDto dir, final JTree tree) {
         // todo, why dont move all test run configs in .tr and make the json for the added test cases ?
         if (dir instanceof TestRunDirectoryDto runDir) {
             if (runDir.getRunStatus() != null) {
@@ -89,7 +93,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                         Path jsonFile = runDir.getPath().resolve(runDir.getName() + ".json");
 
                         if (Files.exists(jsonFile)) {
-                            TestRunDto dto = Mapper.readValue(jsonFile.toFile(), TestRunDto.class);
+                            TestRunDto dto = Services.getInstance(project, Mapper.class).readValue(jsonFile.toFile(), TestRunDto.class);
                             runDir.setRunStatus(dto.getStatus());
                             ApplicationManager.getApplication().invokeLater(tree::repaint);
                         }

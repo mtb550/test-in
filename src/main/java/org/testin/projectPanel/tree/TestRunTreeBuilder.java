@@ -9,6 +9,7 @@ import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.util.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,10 +36,10 @@ public class TestRunTreeBuilder extends AbstractTreeBuilder {
     @Override
     protected DirectoryDto mapPathToDirectory(final Path path, final DirectoryDto parentDir) {
         if (Files.exists(path.resolve(DirectoryType.TRP.getMarker())))
-            return DirectoryMapper.getInstance().testRunPackageNode(project, path, parentDir);
+            return Services.getInstance(project, DirectoryMapper.class).testRunPackageNode(project, path, parentDir);
 
         if (Files.exists(path.resolve(DirectoryType.TR.getMarker())))
-            return DirectoryMapper.getInstance().testRunNode(project, path, parentDir);
+            return Services.getInstance(project, DirectoryMapper.class).testRunNode(project, path, parentDir);
 
         return null;
     }

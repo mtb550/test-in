@@ -13,6 +13,7 @@ import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -64,7 +65,7 @@ public class TestProjectSelector {
                         .filter(path -> !path.getFileName().toString().startsWith("."))
                         .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
                         .peek(path -> Log.info(path.getFileName().toString()))
-                        .map(path -> DirectoryMapper.getInstance().testProjectNode(project, path))
+                        .map(path -> Services.getInstance(project, DirectoryMapper.class).testProjectNode(project, path))
                         .filter(Objects::nonNull)
                         .forEach(testProjectList::addElement);
 

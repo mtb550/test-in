@@ -16,6 +16,7 @@ import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -59,7 +60,7 @@ public class CreateTestProject extends DumbAwareAction {
                 return;
             }
 
-            TestProjectDirectoryDto newTp = DirectoryMapper.getInstance().testProjectNode(project, tpPath);
+            TestProjectDirectoryDto newTp = Services.getInstance(project, DirectoryMapper.class).testProjectNode(project, tpPath);
 
             if (newTp == null) {
                 Notifier.getInstance().error(project, "Creation Failed", "Could not map test project directory in memory.");
@@ -83,7 +84,7 @@ public class CreateTestProject extends DumbAwareAction {
                         .build();
 
                 try {
-                    byte[] jsonContent = Mapper.writeValueAsBytes(marker);
+                    byte[] jsonContent = Services.getInstance(project, Mapper.class).writeValueAsBytes(marker);
                     tpFile.setBinaryContent(jsonContent);
 
                     newTp.setMarker(marker);

@@ -1,10 +1,13 @@
 package org.testin.editorPanel.testCaseEditor;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +16,7 @@ import java.util.stream.Stream;
 
 public class TestSessionCache {
 
+    private final Project project;
     private final Path directoryPath;
 
     private final List<TestCaseDto> loadedItems = Collections.synchronizedList(new ArrayList<>());
@@ -24,7 +28,8 @@ public class TestSessionCache {
 
     private volatile boolean isDisposed = false;
 
-    public TestSessionCache(final Path directoryPath) {
+    public TestSessionCache(final @NotNull Project project, final Path directoryPath) {
+        this.project = project;
         this.directoryPath = directoryPath;
     }
 
@@ -55,7 +60,7 @@ public class TestSessionCache {
                             if (isDisposed) return;
 
                             try {
-                                final TestCaseDto tc = Mapper.readValue(filePath.toFile(), TestCaseDto.class);
+                                final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(filePath.toFile(), TestCaseDto.class);
                                 if (tc != null) {
                                     loadedItems.add(tc);
                                     batch.add(tc);

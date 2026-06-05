@@ -16,6 +16,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.io.File;
@@ -86,7 +87,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
                 Log.info("[GUTTER TRACE] Found file: " + foundFile.getAbsolutePath());
 
-                TestCaseDto dto = Mapper.readValue(foundFile, TestCaseDto.class);
+                TestCaseDto dto = Services.getInstance(project, Mapper.class).readValue(foundFile, TestCaseDto.class);
                 Path parentPath = foundFile.getParentFile().toPath();
 
                 ApplicationManager.getApplication().invokeLater(() -> ViewToolWindowFactory.showPanel(project, List.of(dto), parentPath));

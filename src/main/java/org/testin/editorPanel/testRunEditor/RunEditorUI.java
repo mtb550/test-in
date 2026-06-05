@@ -31,6 +31,7 @@ import org.testin.util.FontSyncUtil;
 import org.testin.util.Mapper;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 
 import javax.swing.*;
@@ -136,7 +137,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         list.addMouseListener(hoverListener);
         list.addMouseMotionListener(hoverListener);
 
-        final EditorCM editorCM = new EditorCM(this, vf.getTestRun(), list, model);
+        final EditorCM editorCM = new EditorCM(project, this, vf.getTestRun(), list, model);
         final TestMouseListener testMouseListener = new TestMouseListener(project, this, list, model, vf.getTestRun(), editorCM);
         list.addMouseListener(testMouseListener);
 
@@ -156,7 +157,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     Path jsonFilePath = dirPath.resolve(vf.getTestRun().getName() + ".json");
 
                     if (Files.exists(jsonFilePath)) {
-                        this.tr = Mapper.readValue(jsonFilePath.toFile(), TestRunDto.class);
+                        this.tr = Services.getInstance(project, Mapper.class).readValue(jsonFilePath.toFile(), TestRunDto.class);
                     }
                 }
 
@@ -220,7 +221,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     }
                 });
 
-                sessionCache.startLoadingAsync();
+                sessionCache.startLoadingAsync(project);
             });
         });
     }
@@ -525,7 +526,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                 Path dirPath = vf.getTestRun().getPath();
                 Path jsonFilePath = dirPath.resolve(tr.getRunName());
 
-                byte[] jsonBytes = Mapper.writeValueAsBytes(tr);
+                byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(tr);
                 Files.write(jsonFilePath, jsonBytes);
 
             } catch (Exception e) {

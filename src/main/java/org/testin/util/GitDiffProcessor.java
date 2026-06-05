@@ -1,6 +1,9 @@
 package org.testin.util;
 
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.services.Services;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -9,7 +12,7 @@ import java.util.Objects;
 
 public class GitDiffProcessor {
 
-    public static List<TestCaseDiff> getPendingChanges(Path repoRoot) throws Exception {
+    public static List<TestCaseDiff> getPendingChanges(final @NotNull Project project, Path repoRoot) throws Exception {
         List<TestCaseDiff> allChanges = new ArrayList<>();
 
         String statusOutput = GitCommandRunner.execute(repoRoot, "git", "status", "--porcelain", "-uall");
@@ -36,7 +39,7 @@ public class GitDiffProcessor {
             Path relativePath = Path.of(relativePathStr);
 
             if (statusCode.contains("A") || statusCode.contains("?")) {
-                TestCaseDto newDto = Mapper.readValue(absolutePath.toFile(), TestCaseDto.class);
+                TestCaseDto newDto = Services.getInstance(project, Mapper.class).readValue(absolutePath.toFile(), TestCaseDto.class);
                 allChanges.add(new TestCaseDiff(
                         newDto.getId().toString(),
                         relativePath,
@@ -47,12 +50,12 @@ public class GitDiffProcessor {
                 ));
 
             } else if (statusCode.contains("M")) {
-                TestCaseDto newDto = Mapper.readValue(absolutePath.toFile(), TestCaseDto.class);
+                TestCaseDto newDto = Services.getInstance(project, Mapper.class).readValue(absolutePath.toFile(), TestCaseDto.class);
 
                 String gitPath = relativePathStr.replace("\\", "/");
                 String oldJsonString = GitCommandRunner.execute(repoRoot, "git", "show", "HEAD:" + gitPath);
 
-                TestCaseDto oldDto = Mapper.readValue(oldJsonString, TestCaseDto.class);
+                TestCaseDto oldDto = Services.getInstance(project, Mapper.class).readValue(oldJsonString, TestCaseDto.class);
 
                 List<TestCaseDiff.FieldChange> fieldChanges = compareFields(oldDto, newDto);
                 if (!fieldChanges.isEmpty()) {

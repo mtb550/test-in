@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Services {
 
-    public static <T> T getClass(final @NotNull Project project, @NotNull Class<T> serviceClass) {
-        return project.getService(serviceClass);
+    public static <T> T getInstance(final @NotNull Project project, final @NotNull Class<T> clazz) {
+        return project.getService(clazz);
     }
 
 }

@@ -17,6 +17,7 @@ import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.util.services.TestCasePersistService;
 
@@ -72,7 +73,7 @@ public class CreateTestCase extends DumbAwareAction {
             final List<TestCaseDto> affectedNodes = Stream.of(newTc, lastTc).filter(Objects::nonNull).toList();
             TestCaseCacheService.getInstance(project).addNewItems(affectedNodes);
 
-            TestCasePersistService.getInstance(project).persist(pDir.getPath(), affectedNodes);
+            Services.getInstance(project, TestCasePersistService.class).persist(pDir.getPath(), affectedNodes);
             Notifier.getInstance().softShow(project, "Created..");
 
             if (codeGenerator != null && codeGenerator.isSelected()) {

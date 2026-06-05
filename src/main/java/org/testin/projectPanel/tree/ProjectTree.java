@@ -51,7 +51,7 @@ public class ProjectTree {
 
         updateNodes();
 
-        mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
+        mainTree.setCellRenderer(new TreeCellRenderer(project, sharedCutNodes));
 
         this.transferHandler = new TreeTransferHandler(project, mainTree, sharedCutNodes);
         mainTree.setTransferHandler(transferHandler);

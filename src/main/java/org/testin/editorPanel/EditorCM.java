@@ -2,6 +2,7 @@ package org.testin.editorPanel;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import lombok.Getter;
@@ -24,9 +25,11 @@ public class EditorCM extends DefaultActionGroup {
     @Getter
     @Setter
     private static IEditorUI globalSourceEditorUI = null;
+    private final Project project;
 
-    public EditorCM(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public EditorCM(final Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
+        this.project = project;
 
         add(new CreateTestCase(ui, dir, list, model));
         add(new ViewDetails(list, dir.getPath()));
@@ -37,7 +40,7 @@ public class EditorCM extends DefaultActionGroup {
         add(new CopyTestCaseNode(list));
         add(new CutTestCaseNode(ui, list));
         add(new PasteTestCaseNode(ui, list));
-        add(new RemoveTestCase(dir, list, model));
+        add(new RemoveTestCase(project, dir, list, model));
         addSeparator();
         add(new GenerateTestCase(list));
         add(new RunTestCase(list));
@@ -62,7 +65,7 @@ public class EditorCM extends DefaultActionGroup {
         new OpenCM(list, editorCM);
         new CreateTestCase(ui, dir, list, model);
         new UpdateTestCase(ui, list, dir.getPath());
-        new RemoveTestCase(dir, list, model);
+        new RemoveTestCase(project, dir, list, model);
         new OpenTestCaseDetails(list, dir.getPath());
         new CloseTestCaseDetails(list);
         new CopyTestCaseDescription(list);

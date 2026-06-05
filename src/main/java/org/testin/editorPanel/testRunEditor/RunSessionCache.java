@@ -1,13 +1,16 @@
 package org.testin.editorPanel.testRunEditor;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,7 +49,7 @@ public class RunSessionCache {
         listener = null;
     }
 
-    public void startLoadingAsync() {
+    public void startLoadingAsync(final @NotNull Project project) {
         if (tr == null || tr.getResults().isEmpty()) {
             notifyLoadComplete(Collections.emptyList());
             return;
@@ -84,7 +87,7 @@ public class RunSessionCache {
                                 if (isDisposed) return;
 
                                 try {
-                                    final TestCaseDto tc = Mapper.readValue(filePath.toFile(), TestCaseDto.class);
+                                    final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(filePath.toFile(), TestCaseDto.class);
                                     if (tc != null && idsToFind.contains(tc.getId())) {
                                         loadedItems.add(tc);
                                         batch.add(tc);

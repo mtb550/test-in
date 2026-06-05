@@ -1,5 +1,6 @@
 package org.testin.pojo;
 
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -9,20 +10,15 @@ import org.testin.util.Mapper;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.nio.file.Path;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DirectoryMapper {
-
-    private static final DirectoryMapper INSTANCE = new DirectoryMapper();
-
-    public static DirectoryMapper getInstance() {
-        return INSTANCE;
-    }
-
-    public TestProjectDirectoryDto testProjectNode(final @NotNull Project project, final Path path) { // todo, path is Testin path , no need to pass the path here.
+@Service(Service.Level.PROJECT)
+public final class DirectoryMapper {
+    public TestProjectDirectoryDto testProjectNode(final @NotNull Project project, final Path path) {
         final String fileName = path.getFileName().toString();
         try {
             final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
@@ -31,10 +27,9 @@ public class DirectoryMapper {
                     .pathName(fileName)
                     .fqcn(List.of(Tools.getInstance().sanitizePackageName(fileName)))
                     .path2(Tools.getInstance().buildPath2(null, fileName))
-                    .marker(Mapper.readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class))
+                    .marker(Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class))
                     .build();
 
-            // todo, to be removed. call testCasesRootNode instead.
             TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto.builder()
                     .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
                     .name(DirectoryType.TCD.getDisplayedName())
@@ -43,7 +38,6 @@ public class DirectoryMapper {
                     .path2(Tools.getInstance().buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
                     .build();
 
-            // todo, to be removed. call testRunsRootNode instead.
             TestRunsMainDirectoryDto trd = TestRunsMainDirectoryDto.builder()
                     .path(path.resolve(DirectoryType.TRD.getDisplayedName()))
                     .name(DirectoryType.TRD.getDisplayedName())
@@ -62,6 +56,7 @@ public class DirectoryMapper {
             Notifier.getInstance().error(project, "Read Test Project Failed", "Skipping invalid format: " + fileName);
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
+            e.printStackTrace(System.err);
             return null;
         }
     }

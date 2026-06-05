@@ -2,6 +2,7 @@ package org.testin.ui.testCase.update;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
@@ -82,7 +83,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_DESCRIPTION,
-            (items, updatedItems) -> new DescriptionBulkSection().show(items, updatedItems),
+            (project, items, updatedItems) -> new DescriptionBulkSection().show(project, items, updatedItems),
             TestCaseUIBase::getDescriptionSection
     ),
 
@@ -93,7 +94,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT,
-            (items, updatedItems) -> new ExpectedResultBulkSection().show(items, updatedItems),
+            (project, items, updatedItems) -> new ExpectedResultBulkSection().show(project, items, updatedItems),
             TestCaseUIBase::getExpectedResultSection
     ),
 
@@ -104,7 +105,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_MODULE,
-            (items, updatedItems) -> new ModuleBulkSection().show(items, updatedItems),
+            (project, items, updatedItems) -> new ModuleBulkSection().show(project, items, updatedItems),
             TestCaseUIBase::getModuleSection
     ),
 
@@ -115,7 +116,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_TEST_DATA,
-            (items, updatedItems) -> new TestDataBulkSection().show(items, updatedItems),
+            (project, items, updatedItems) -> new TestDataBulkSection().show(project, items, updatedItems),
             TestCaseUIBase::getTestDataSection
     ),
 
@@ -126,7 +127,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_PRE_CONDITIONS,
-            (items, updatedItems) -> new PreConditionsBulkSection().show(items, updatedItems),
+            (project, items, updatedItems) -> new PreConditionsBulkSection().show(project, items, updatedItems),
             TestCaseUIBase::getPreConditionsSection
     ),
 
@@ -148,7 +149,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
             true,
             GeneratorType.UPDATE_TEST_CASE_STEPS,
-            (items, updatedItems) -> new StepsBulkSection().show(items, updatedItems),
+            (project, items, updatedItems) -> new StepsBulkSection().show(project, items, updatedItems),
             TestCaseUIBase::getStepsSection
     ),
 
@@ -170,7 +171,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
             true,
             GeneratorType.UPDATE_TEST_CASE_PRIORITY,
-            (items, updatedItems) -> new PriorityBulkSection().show(items, updatedItems),
+            (project, items, updatedItems) -> new PriorityBulkSection().show(project, items, updatedItems),
             TestCaseUIBase::getPrioritySection
     ),
 
@@ -192,7 +193,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
             GeneratorType.UPDATE_TEST_CASE_GROUP,
-            (items, updatedItems) -> new GroupBulkSection().show(items, updatedItems),
+            (project, items, updatedItems) -> new GroupBulkSection().show(project, items, updatedItems),
             TestCaseUIBase::getGroupSection
     );
 
@@ -250,6 +251,6 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     }
 
     public interface IBulkEditorAction {
-        void show(final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems);
+        void show(final @NotNull Project project, final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems);
     }
 }

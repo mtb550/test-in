@@ -35,6 +35,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.Mapper;
 import org.testin.util.TestCaseSorter;
+import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
@@ -136,7 +137,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         this.syncListener.setOnUpdateCallback(this::onDataSynced);
         this.model.addListDataListener(syncListener);
 
-        final EditorCM editorCM = new EditorCM(this, vf.getTestSet(), list, model);
+        final EditorCM editorCM = new EditorCM(project, this, vf.getTestSet(), list, model);
         final TestMouseListener testMouseListener = new TestMouseListener(project, this, list, model, vf.getTestSet(), editorCM);
         list.addMouseListener(testMouseListener);
 
@@ -161,7 +162,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     private void loadDataAsync() {
-        this.sessionCache = new TestSessionCache(vf.getTestSet().getPath());
+        this.sessionCache = new TestSessionCache(project, vf.getTestSet().getPath());
 
         sessionCache.setListener(new TestSessionCache.ICacheListener() {
 
@@ -229,7 +230,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
 
                 try {
-                    final byte[] jsonBytes = Mapper.writeValueAsBytes(current);
+                    final byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(current);
                     Files.write(dirPath.resolve(current.getId() + ".json"), jsonBytes);
                 } catch (final Exception ignored) {
                 }

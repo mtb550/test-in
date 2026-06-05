@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -27,11 +26,11 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.projectSelector.RendererImpl;
-import org.testin.settings.service.ProjectPanelService;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -101,7 +100,7 @@ public class AppSettingsConfigurable implements Configurable {
             try {
                 Desktop.getDesktop().open(new File(rootTestinPathField.getText()));
             } catch (Exception ex) {
-                Notifier.getInstance().error(getProject(), "Error", "Could not open folder: " + ex.getMessage());
+                Notifier.getInstance().error(project, "Error", "Could not open folder: " + ex.getMessage());
             }
         });
 
@@ -114,9 +113,9 @@ public class AppSettingsConfigurable implements Configurable {
 
         projectComboBox.setRenderer(new RendererImpl());
 
-        activateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.ACTIVE));
-        deactivateBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.INACTIVE));
-        archiveBtn.addActionListener(e -> updateProjectStatus(ProjectStatus.ARCHIVED));
+        activateBtn.addActionListener(e -> updateProjectStatus(project, ProjectStatus.ACTIVE));
+        deactivateBtn.addActionListener(e -> updateProjectStatus(project, ProjectStatus.INACTIVE));
+        archiveBtn.addActionListener(e -> updateProjectStatus(project, ProjectStatus.ARCHIVED));
         //renameBtn.addActionListener(e -> new Rename().actionPerformed(ProjectStatus.AR));
 
         refreshProjectList();
@@ -161,7 +160,7 @@ public class AppSettingsConfigurable implements Configurable {
     }
 
     @Deprecated(forRemoval = true, since = "after remove status from name, this method logic should be moved to .pr with remove split and _")
-    private void updateProjectStatus(ProjectStatus newProjectStatus) {
+    private void updateProjectStatus(final @NotNull Project project, ProjectStatus newProjectStatus) {
         DirectoryDto selected = (DirectoryDto) projectComboBox.getSelectedItem();
         if (selected == null) return;
 
@@ -188,7 +187,7 @@ public class AppSettingsConfigurable implements Configurable {
                                 }
                             }
 
-                            ProjectPanel panel = ProjectPanelService.getInstance(getProject()).getPanel();
+                            ProjectPanel panel = Services.getInstance(project, ProjectPanel.class);
                             if (panel != null) {
                                 new Refresh(panel).execute();
                                 Log.info("ToolWindow refresh triggered successfully.");
@@ -196,7 +195,7 @@ public class AppSettingsConfigurable implements Configurable {
                         });
                     }
                 } catch (IOException ex) {
-                    Notifier.getInstance().error(getProject(), "Status Update Failed", "Could not rename project directory: " + ex.getMessage());
+                    Notifier.getInstance().error(project, "Status Update Failed", "Could not rename project directory: " + ex.getMessage());
                 }
             });
         }
@@ -215,7 +214,7 @@ public class AppSettingsConfigurable implements Configurable {
                 try (Stream<Path> paths = Files.list(rootPath)) {
                     paths.filter(Files::isDirectory)
                             //.filter(path -> path.getFileName().toString().startsWith("PR_"))
-                            .map(path -> DirectoryMapper.getInstance().testProjectNode(getProject(), path))
+                            .map(path -> Services.getInstance(project, DirectoryMapper.class).testProjectNode(project, path))
                             .filter(Objects::nonNull)
                             .forEach(testProjectList::addElement);
 
@@ -258,23 +257,11 @@ public class AppSettingsConfigurable implements Configurable {
         else
             Config.setAutomationPath(null);
 
-        ProjectPanel panel = ProjectPanelService.getInstance(getProject()).getPanel();
+        ProjectPanel panel = Services.getInstance(project, ProjectPanel.class);
         if (panel != null) {
             new Refresh(panel).execute();
             Log.info("ToolWindow refresh triggered successfully.");
         }
-    }
-
-    private @NotNull Project getProject() {
-        if (project == null) {
-            Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
-            if (openProjects.length > 0) {
-                project = openProjects[0];
-            } else {
-                throw new IllegalStateException("No open project found");
-            }
-        }
-        return project;
     }
 
     @Override
@@ -282,7 +269,7 @@ public class AppSettingsConfigurable implements Configurable {
         AppSettingsState settings = AppSettingsState.getInstance();
         rootTestinPathField.setText(settings.rootTestinPath != null ? settings.rootTestinPath : "");
 
-        VirtualFile mainSourceRoot = Tools.getInstance().getTestSourceRoot(getProject());
+        VirtualFile mainSourceRoot = Tools.getInstance().getTestSourceRoot(project);
 
         if (mainSourceRoot != null) {
             rootAutomationPathField.setText(mainSourceRoot.getPath());
