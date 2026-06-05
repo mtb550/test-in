@@ -38,9 +38,11 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+//@Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Tools {
 
+    // todo, to be removed
     private static final Tools INSTANCE = new Tools();
 
     private final Pattern SANITIZE_PATTERN = Pattern.compile("[^a-zA-Z0-9 _]");
@@ -48,7 +50,7 @@ public class Tools {
     private final Pattern STEP_LINE_PATTERN = Pattern.compile("(\\s)(?=\\d+[-.])");
     private final Pattern STEP_CLEAN_PATTERN = Pattern.compile("^\\d+[-.]\\s*");
 
-
+    // todo, to be removed and use Services class
     public static Tools getInstance() {
         return INSTANCE;
     }

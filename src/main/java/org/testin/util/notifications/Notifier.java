@@ -18,12 +18,15 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 
+//@Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Notifier {
 
+    // todo, to be removed
     private static final Notifier INSTANCE = new Notifier();
     private final String GROUP_ID = "testin.notifications";
 
+    // todo, to be removed and use Services class
     public static Notifier getInstance() {
         return INSTANCE;
     }

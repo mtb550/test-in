@@ -3,7 +3,6 @@ package org.testin.util.services;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
-import com.intellij.openapi.components.Service.Level;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,7 +16,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-@Service(Level.PROJECT)
+@Service(Service.Level.PROJECT)
 public final class TestCasePersistService implements Disposable {
     private final Project project;
 
