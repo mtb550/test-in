@@ -31,6 +31,10 @@ public final class Log {
         if (service != null) service.setLogLevel(level);
     }
 
+    public static void trace(@NotNull final String message) {
+        log(Level.TRACE, WALKER.getCallerClass().getSimpleName(), message);
+    }
+
     public static void debug(@NotNull final String message) {
         log(Level.DEBUG, WALKER.getCallerClass().getSimpleName(), message);
     }
@@ -45,6 +49,10 @@ public final class Log {
 
     public static void error(@NotNull final String message) {
         log(Level.ERROR, WALKER.getCallerClass().getSimpleName(), message);
+    }
+
+    public static void fatal(@NotNull final String message) {
+        log(Level.FATAL, WALKER.getCallerClass().getSimpleName(), message);
     }
 
     private static void log(final Level level, final String callerClass, final String message) {
@@ -67,11 +75,13 @@ public final class Log {
     }
 
     public enum Level {
-        DISABLED(-1, "OFF"),
-        DEBUG(0, "DEBUG"),
-        INFO(1, "INFO "),
-        WARN(2, "WARN "),
-        ERROR(3, "ERROR");
+        DISABLED(-1, "OFF  "),
+        TRACE(0, "TRACE"),
+        DEBUG(1, "DEBUG"),
+        INFO(2, "INFO "),
+        WARN(3, "WARN "),
+        ERROR(4, "ERROR"),
+        FATAL(5, "FATAL");
 
         public final int priority;
         public final String paddedName;
