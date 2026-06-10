@@ -17,7 +17,7 @@ public class TestToolBar extends AbstractToolbarPanel {
                 new CreateTestCaseBtn(getCallbacks()::onToolBarCreateTestCaseClicked),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
                 new TestDetailsPopup(getCallbacks()::onToolBarDetailsSelectionChanged),
-                new FilterPopup(getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules)
+                new FilterPopup(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules)
         );
     }
 }

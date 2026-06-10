@@ -11,14 +11,12 @@ import org.testin.pojo.*;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.createNodes.CreateNodesDialog;
-import org.testin.util.Mapper;
+import org.testin.util.FilesUtil;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.GeneratorType;
-import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -60,7 +58,7 @@ public class CreateTestProject extends DumbAwareAction {
                 return;
             }
 
-            TestProjectDirectoryDto newTp = Services.getInstance(project, DirectoryMapper.class).testProjectNode(project, tpPath);
+            TestProjectDirectoryDto newTp = Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, tpPath);
 
             if (newTp == null) {
                 Notifier.getInstance().error(project, "Creation Failed", "Could not map test project directory in memory.");
@@ -83,15 +81,9 @@ public class CreateTestProject extends DumbAwareAction {
                         .createdBy(System.getProperty("user.name", ""))
                         .build();
 
-                try {
-                    byte[] jsonContent = Services.getInstance(project, Mapper.class).writeValueAsBytes(marker);
-                    tpFile.setBinaryContent(jsonContent);
+                Services.getInstance(project, FilesUtil.class).write2(project, tpFile, marker);
+                newTp.setMarker(marker);
 
-                    newTp.setMarker(marker);
-
-                } catch (IOException ex) {
-                    Log.error("Failed to write JSON to .tp file: " + ex.getMessage());
-                }
 
                 String tcdName = newTp.getTestCasesDirectory().getPath().getFileName().toString();
                 VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);

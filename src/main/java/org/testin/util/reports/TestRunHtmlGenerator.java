@@ -7,6 +7,7 @@ import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
+import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Tools;
 
 import java.time.Duration;
@@ -17,9 +18,9 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public final class HtmlGenerator {
+public final class TestRunHtmlGenerator {
 
-    public String generate(final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public String generate(final @NotNull TestRunDirectoryDto trdir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         StringBuilder html = new StringBuilder();
 
         html.append("<html><head><style>")
@@ -32,7 +33,7 @@ public final class HtmlGenerator {
 
         html.append("<h2>Test Run Report: ").append(tr.getRunName().replace(".json", "")).append("</h2>");
         html.append("<p><strong>Platform:</strong> ").append(tr.getPlatform()).append("</p>");
-        html.append("<p><strong>Status:</strong> ").append(tr.getStatus().name()).append("</p>");
+        html.append("<p><strong>Status:</strong> ").append(trdir.getMarker().getStatus().name()).append("</p>");
 
         html.append("<div class='table-container'><table><tr>")
                 .append("<th class='col-seq'>#</th>")

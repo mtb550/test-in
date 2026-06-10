@@ -80,8 +80,8 @@ public enum TestEditorAttributes {
     FQCN(
             "FQCN",
             "FQCN:",
-            false,
-            false,
+            true,
+            true,
             false,
             tc -> String.join(" > ", tc.getFqcn()),
             null,

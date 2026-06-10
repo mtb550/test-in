@@ -82,11 +82,14 @@ public final class TestRunReport {
 
                 switch (format) {
                     case HTML -> {
-                        String reportHtml = new HtmlGenerator().generate(runData, detailsMap);
+                        String reportHtml = new TestRunHtmlGenerator().generate(tr, runData, detailsMap);
                         fileBytes = reportHtml.getBytes(StandardCharsets.UTF_8);
                     }
-                    case PDF -> fileBytes = new PdfGenerator().generate(runData, detailsMap);
-                    case EXCEL -> fileBytes = new ExcelGenerator().generate(runData, detailsMap);
+
+                    case PDF -> fileBytes = new TestRunPdfGenerator().generate(tr, runData, detailsMap);
+
+                    case EXCEL -> fileBytes = new TestRunExcelGenerator().generate(tr, runData, detailsMap);
+
                     default -> throw new UnsupportedOperationException("Unknown format: " + format.name());
                 }
 

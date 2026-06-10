@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.jspecify.annotations.NonNull;
 import org.testin.pojo.CreateNodeMenu;
 
 @Setter
@@ -14,7 +15,7 @@ import org.testin.pojo.CreateNodeMenu;
 @ToString(callSuper = true)
 public class TestRunsMainDirectoryDto extends DirectoryDto {
     @Override
-    public CreateNodeMenu getMenu() {
+    public @NonNull CreateNodeMenu getMenu() {
         return CreateNodeMenu.TEST_RUNS_MAIN_DIR;
     }
 

@@ -28,8 +28,8 @@ import java.util.Arrays;
 public class CreateTestSet implements NodeCreator {
 
     @Override
-    public DirectoryDto execute(final CreateTestNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
-        TestSetDirectoryDto ts = Services.getInstance(project, DirectoryMapper.class).testSetNode(project, newDirPath, parentDir);
+    public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+        TestSetDirectoryDto ts = Services.getInstance(project, DirectoryMapper.class).readTestSetNode(project, newDirPath, parentDir);
 
         TreeUtilImpl.createVf(project, this, parentDir.getPath(), ts.getName());
         TreeUtilImpl.createDataVf(project, this, newDirPath, DirectoryType.TS.getMarker());

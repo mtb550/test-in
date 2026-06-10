@@ -2,6 +2,8 @@ package org.testin.pojo.dto.dirs;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.testin.pojo.CreateNodeMenu;
 import org.testin.pojo.TestProjectMarker;
 
@@ -17,12 +19,13 @@ public class TestProjectDirectoryDto extends DirectoryDto {
 
     private TestRunsMainDirectoryDto testRunsDirectory;
 
+    @NotNull
     private String pathName;
 
     private TestProjectMarker marker;
 
     @Override
-    public CreateNodeMenu getMenu() {
+    public @NonNull CreateNodeMenu getMenu() {
         return CreateNodeMenu.TEST_PROJECT;
     }
 

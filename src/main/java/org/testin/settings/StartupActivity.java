@@ -1,5 +1,6 @@
 package org.testin.settings;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
@@ -18,23 +19,34 @@ public class StartupActivity implements ProjectActivity {
 
     public static void execute(@NotNull Project project) {
         Log.setProject(project);
-        Log.setLogLevel(Log.Level.DEBUG);
-
-        Log.info("StartupActivity.execute()");
 
         AppSettingsState settings = AppSettingsState.getInstance();
 
+        if (settings.rootTestinPath == null || settings.rootTestinPath.isEmpty()) {
+            Log.info("First run detected — saving default settings to testinSettings.xml");
+            settings.logLevel = Log.Level.INFO.name();
+        }
+
+        Log.setLogLevel(Log.Level.valueOf(settings.logLevel));
+
+        Log.info("StartupActivity.execute()");
+
         Path testinPath = null;
 
-        if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty())
+        if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty()) {
             testinPath = Path.of(settings.rootTestinPath);
-        else
-            Notifier.getInstance().warnWithAction(project,
-                    "Testin Setup Required",
-                    "Please configure the Root Testin Folder to enable test management features.",
-                    "Open Settings",
-                    () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, AppSettingsConfigurable.class)
-            );
+        } else {
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (!project.isDisposed()) {
+                    Notifier.getInstance().warnWithAction(project,
+                            "Testin Setup Required",
+                            "Please configure the Root Testin Folder to enable test management features.",
+                            "Open Settings",
+                            () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, AppSettingsConfigurable.class)
+                    );
+                }
+            });
+        }
 
         Config.setTestinPath(testinPath);
 
@@ -59,7 +71,6 @@ public class StartupActivity implements ProjectActivity {
 
     @Override
     public @Nullable Object execute(@NotNull Project project, @NotNull Continuation<? super kotlin.Unit> continuation) {
-
         execute(project);
         return kotlin.Unit.INSTANCE;
     }

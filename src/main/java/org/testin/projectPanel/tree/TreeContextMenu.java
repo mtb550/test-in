@@ -21,7 +21,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         super("Tree Popup Menu", true);
 
         add(new Open(tree));
-        add(new CreateTestNode(projectPanel, tree));
+        add(new CreateTreeNode(projectPanel, tree));
         addSeparator();
 
         add(createSubGroup("Actions", AllIcons.Actions.Edit,
@@ -65,8 +65,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(new ViewPendingCommits(tree));
 
         addSeparator();
-
-        add(new TestRuns());
+        add(new SetTestRunStatus(tree));
         addSeparator();
 
         add(createSubGroup(

@@ -267,4 +267,12 @@ major change, move to tree async model, to manage update, remove, dispose and re
 
 fix pi report issues.
 
-final is before @notNull or not? which correct? update all project based on that.
+final is before @notNull or not? which is correct? update all project based on that.
+
+update the buttons: PASSED, FAILED.etc. remove it and use a context buttons and shortcuts. make button double height.
+
+in test run, I want to highlight the running test case, by add a new badge (Active) or change the description color for current running.
+
+implement actual result in test run.
+
+persist test case run status.

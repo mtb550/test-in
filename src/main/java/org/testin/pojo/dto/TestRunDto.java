@@ -8,7 +8,6 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.TestRunItems;
-import org.testin.pojo.TestRunStatus;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -23,6 +22,7 @@ import java.util.List;
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
+// todo, put uuid for eac test run.
 public class TestRunDto {
 
     @NotNull
@@ -48,10 +48,6 @@ public class TestRunDto {
     @NotNull
     @Builder.Default
     private String deviceType = "";
-
-    @NotNull
-    @Builder.Default
-    private TestRunStatus status = TestRunStatus.CREATED;
 
     @NotNull
     @Builder.Default

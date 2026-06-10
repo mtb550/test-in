@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
+import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Tools;
 
 import java.io.ByteArrayOutputStream;
@@ -24,9 +25,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class PdfGenerator {
+public final class TestRunPdfGenerator {
 
-    public byte[] generate(final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) throws Exception {
+    public byte[] generate(final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) throws Exception {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
             PdfWriter writer = new PdfWriter(baos);
@@ -45,7 +46,7 @@ public final class PdfGenerator {
             document.add(header);
 
             document.add(new Paragraph("Platform: " + tr.getPlatform()));
-            document.add(new Paragraph("Status: " + tr.getStatus().name()).setMarginBottom(20));
+            document.add(new Paragraph("Status: " + trDir.getMarker().getStatus().name()).setMarginBottom(20));
 
             Table table = new Table(UnitValue.createPercentArray(new float[]{10, 50, 20, 20})).useAllAvailableWidth();
 

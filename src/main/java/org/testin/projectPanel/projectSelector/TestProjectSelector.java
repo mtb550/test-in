@@ -65,7 +65,7 @@ public class TestProjectSelector {
                         .filter(path -> !path.getFileName().toString().startsWith("."))
                         .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
                         .peek(path -> Log.info(path.getFileName().toString()))
-                        .map(path -> Services.getInstance(project, DirectoryMapper.class).testProjectNode(project, path))
+                        .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
                         .filter(Objects::nonNull)
                         .forEach(testProjectList::addElement);
 
@@ -134,10 +134,10 @@ public class TestProjectSelector {
         tree.repaint();
     }
 
-    public void filterByTestProject(final TestProjectDirectoryDto testProjectDirectory) {
-        Log.info("Panel.filterByProject(): " + testProjectDirectory.getName());
+    public void filterByTestProject(final TestProjectDirectoryDto tpDir) {
+        Log.info("Panel.filterByProject(): " + tpDir.getName());
 
-        if (testProjectDirectory.getMarker().getStatus() == ProjectStatus.ACTIVE) {
+        if (tpDir.getMarker().getStatus() == ProjectStatus.ACTIVE) {
             projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
             projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
         } else {
@@ -147,7 +147,7 @@ public class TestProjectSelector {
         }
 
         if (projectPanel.getBranchSelector() != null) {
-            projectPanel.getBranchSelector().updateProject(testProjectDirectory);
+            projectPanel.getBranchSelector().updateProject(tpDir);
         }
     }
 

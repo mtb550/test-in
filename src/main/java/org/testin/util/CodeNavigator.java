@@ -8,6 +8,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public class CodeNavigator {
     public void toCode(final @NotNull Project project, final @NotNull List<String> fqcn) {
         final String className = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final String methodName = fqcn.getLast();
+
+        Log.trace("navigate to method, className: " + className + ", methodName: " + methodName);
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {

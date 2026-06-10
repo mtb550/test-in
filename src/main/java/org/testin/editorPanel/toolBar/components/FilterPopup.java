@@ -11,9 +11,12 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.editorPanel.testRunEditor.RunEditorUI;
+import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
+import org.testin.pojo.TestStatus;
 import org.testin.util.IconManager;
 
 import java.util.*;
@@ -28,14 +31,21 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
 
     @Getter
     private final Set<String> selectedModule = new HashSet<>();
+
+    @Getter
+    private final Set<TestStatus> selectedStatus = new HashSet<>();
+
     private final Supplier<Set<String>> availableModulesSupplier;
 
     private final DefaultActionGroup cachedActionGroup;
 
     private final Runnable onToolBarFilterReset;
 
-    public FilterPopup(final Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final Supplier<Set<String>> availableModulesSupplier) {
+    private final IToolBar callbacks;
+
+    public FilterPopup(final IToolBar callbacks, final Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final Supplier<Set<String>> availableModulesSupplier) {
         super("Filter", AllIcons.General.Filter);
+        this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;
 
         this.availableModulesSupplier = availableModulesSupplier;
@@ -47,7 +57,7 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
     }
 
     public void updateToolBarFilterState() {
-        int activeFiltersCount = selectedPriority.size() + selectedGroup.size() + selectedModule.size();
+        int activeFiltersCount = selectedPriority.size() + selectedGroup.size() + selectedModule.size() + selectedStatus.size();
         if (activeFiltersCount == 0) {
             setText(null);
             setToolTipText("Filter");
@@ -63,6 +73,7 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
         selectedPriority.clear();
         selectedGroup.clear();
         selectedModule.clear();
+        selectedStatus.clear();
         updateToolBarFilterState();
         if (onToolBarFilterReset != null) {
             onToolBarFilterReset.run();
@@ -75,7 +86,7 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
         filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
             @Override
             public void update(@NotNull AnActionEvent e) {
-                boolean hasActiveFilters = !selectedPriority.isEmpty() || !selectedGroup.isEmpty() || !selectedModule.isEmpty();
+                boolean hasActiveFilters = !selectedPriority.isEmpty() || !selectedGroup.isEmpty() || !selectedModule.isEmpty() || !selectedStatus.isEmpty();
                 e.getPresentation().setEnabledAndVisible(hasActiveFilters);
             }
 
@@ -189,6 +200,36 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
             }
         };
         filterResetBtn.add(filterModuleMenu);
+
+        if (callbacks instanceof RunEditorUI) {
+            DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
+            Arrays.stream(TestStatus.values()).forEach(s ->
+                    filterStatusMenu.add(new DumbAwareToggleAction(s.name()) {
+                        @Override
+                        public boolean isSelected(@NotNull AnActionEvent e) {
+                            return selectedStatus.contains(s);
+                        }
+
+                        @Override
+                        public void setSelected(@NotNull AnActionEvent e, boolean state) {
+                            if (state) {
+                                selectedStatus.add(s);
+                            } else {
+                                selectedStatus.remove(s);
+                            }
+                            updateToolBarFilterState();
+                            if (onToolBarFilterSelectedChanged != null) {
+                                onToolBarFilterSelectedChanged.run();
+                            }
+                        }
+
+                        @Override
+                        public @NotNull ActionUpdateThread getActionUpdateThread() {
+                            return ActionUpdateThread.BGT;
+                        }
+                    }));
+            filterResetBtn.add(filterStatusMenu);
+        }
 
         return filterResetBtn;
     }

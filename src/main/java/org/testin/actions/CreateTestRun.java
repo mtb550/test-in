@@ -16,6 +16,7 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.RunCreationForm;
 import org.testin.util.EditorUtil;
+import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
@@ -23,8 +24,6 @@ import org.testin.util.services.Services;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +35,7 @@ public class CreateTestRun implements NodeCreator {
     private TestRunDirectoryDto tr;
 
     @Override
-    public DirectoryDto execute(final CreateTestNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+    public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         this.project = project;
         final TestProjectDirectoryDto tp = action.getProjectPanel().getTestProjectSelector().getSelectedTestProject().getItem();
 
@@ -61,7 +60,7 @@ public class CreateTestRun implements NodeCreator {
                 dialogBuilder.setOkOperation(() -> {
                     dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
 
-                    tr = Services.getInstance(project, DirectoryMapper.class).testRunNode(project, newDirPath, parentDir);
+                    tr = Services.getInstance(project, DirectoryMapper.class).readTestRunNode(project, newDirPath, parentDir);
                     saveSelectedToJSON(form, name, root, newDirPath, action.getProjectPanel(), tr);
                 });
 
@@ -106,13 +105,13 @@ public class CreateTestRun implements NodeCreator {
 
     private Object resolveDirectoryObject(final Path folder, final DirectoryDto parentDir) {
         if (Files.exists(folder.resolve(DirectoryType.TSP.getMarker())))
-            return Services.getInstance(project, DirectoryMapper.class).testSetPackageNode(project, folder, parentDir);
+            return Services.getInstance(project, DirectoryMapper.class).readTestSetPackageNode(project, folder, parentDir);
 
         if (Files.exists(folder.resolve(DirectoryType.TS.getMarker())))
-            return Services.getInstance(project, DirectoryMapper.class).testSetNode(project, folder, parentDir);
+            return Services.getInstance(project, DirectoryMapper.class).readTestSetNode(project, folder, parentDir);
 
         if (Files.exists(folder.resolve(DirectoryType.TCD.getMarker())))
-            return Services.getInstance(project, DirectoryMapper.class).testCasesRootNode(project, folder, parentDir);
+            return Services.getInstance(project, DirectoryMapper.class).readTestCasesRootNode(project, folder, parentDir);
 
         throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + parentDir.getClass().getSimpleName());
     }
@@ -124,7 +123,7 @@ public class CreateTestRun implements NodeCreator {
             item.setStatus(TestStatus.PENDING);
 
             if (node.getParent() instanceof DefaultMutableTreeNode pNode && pNode.getUserObject() instanceof DirectoryDto dir) {
-                item.setPath(dir.getPath2() != null ? new ArrayList<>(dir.getPath2()) : new ArrayList<>());
+                item.setPath(new ArrayList<>(dir.getPath2()));
             }
             items.add(item);
         }
@@ -139,38 +138,34 @@ public class CreateTestRun implements NodeCreator {
         form.populateConfiguration(run);
 
         final String fileName = runName + ".json";
-        run.setRunName(fileName);
-        run.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        run.setStatus(TestRunStatus.CREATED);
 
         final List<TestRunItems> items = new ArrayList<>();
         collectCheckedItems(root, items);
         run.setResults(items);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                Files.createDirectories(savePath);
-                Path newJsonPath = savePath.resolve(fileName);
+            Services.getInstance(project, FilesUtil.class).createDirectories(savePath);
+            Services.getInstance(project, FilesUtil.class).write(project, savePath.resolve(fileName), run);
 
-                byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(run);
-                Files.write(newJsonPath, jsonBytes);
+            Path trMarkerPath = savePath.resolve(DirectoryType.TR.getMarker());
+            TestRunMarker marker = TestRunMarker.builder()
+                    .status(TestRunStatus.CREATED)
+                    .createdBy(System.getProperty("user.name", ""))
+                    .build();
 
-                Path trMarkerPath = savePath.resolve(DirectoryType.TR.getMarker());
-                if (Files.notExists(trMarkerPath))
-                    Files.createFile(trMarkerPath);
+            Services.getInstance(project, FilesUtil.class).write(project, trMarkerPath, marker);
+            tr.setMarker(marker);
 
-                VirtualFile virtualDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(savePath.toFile());
-                if (virtualDir != null)
-                    virtualDir.refresh(false, true);
+            VirtualFile virtualDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(savePath.toFile());
+            if (virtualDir != null)
+                virtualDir.refresh(false, true);
 
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    projectPanel.getTestRunTreeBuilder().buildTree(projectPanel.getTestProjectSelector().getSelectedTestProject().getItem());
-                    EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
+            ApplicationManager.getApplication().invokeLater(() -> {
+                projectPanel.getTestRunTreeBuilder().buildTree(projectPanel.getTestProjectSelector().getSelectedTestProject().getItem());
+                EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
 
-                });
-            } catch (final Exception e) {
-                Log.error("Exception: " + e.getMessage());
-            }
+            });
+
         });
     }
 

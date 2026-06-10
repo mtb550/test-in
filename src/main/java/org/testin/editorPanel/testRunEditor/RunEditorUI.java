@@ -23,13 +23,12 @@ import org.testin.editorPanel.toolBar.RunToolBar;
 import org.testin.editorPanel.toolBar.components.FilterPopup;
 import org.testin.editorPanel.toolBar.components.RunDetailsPopup;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
+import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.pojo.*;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.ui.RunOpeningForm;
-import org.testin.util.FontSyncUtil;
-import org.testin.util.Mapper;
-import org.testin.util.TestCaseSorter;
+import org.testin.util.*;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
@@ -53,7 +52,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
     private final Project project;
     @Getter
-    private final UnifiedVirtualFile vf;
+    private final UnifiedVirtualFile vf; // todo, no need, get the dto here and remove it.
 
     @Getter
     private final List<TestCaseDto> allTestCases;
@@ -66,7 +65,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     CheckboxTree checklistTree;
 
-    TestRunDto tr;
+    @Getter
+    TestRunDto tr; //todo, change to testRun
 
     private RunSessionCache sessionCache;
 
@@ -169,6 +169,13 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                                     (existingItem, duplicateItem) -> existingItem
                             ));
                     this.resultsMap.putAll(newResults);
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        StartExecutionBtn startBtn = toolBar.getToolbarItem(StartExecutionBtn.class);
+                        if (startBtn != null) {
+                            startBtn.updateEnabledState();
+                        }
+                    });
                 }
             } catch (Exception e) {
                 Log.error("Failed to load Test Run data from disk: " + e.getMessage());
@@ -189,8 +196,36 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                         currentTestCases.addAll(items);
                         items.forEach(item -> {
                             final TestRunItems runItem = resultsMap.get(item.getId());
-                            if (runItem != null)
+                            if (runItem != null) {
                                 runItem.setTc(item);
+
+                                // todo, this code to be removed, no need, use a method that returns the fqcn
+                                if (item.getFqcn().isEmpty()) {
+                                    List<String> pathSegments = runItem.getPath();
+                                    List<String> baseFqcn = new ArrayList<>();
+                                    int testCasesIdx = -1;
+                                    for (int i = 0; i < pathSegments.size(); i++) {
+                                        if (pathSegments.get(i).equals("Test Cases")) {
+                                            testCasesIdx = i;
+                                            break;
+                                        }
+                                    }
+                                    if (testCasesIdx != -1) {
+                                        for (int i = 0; i < pathSegments.size(); i++) {
+                                            String seg = pathSegments.get(i);
+                                            if (i < testCasesIdx) {
+                                                baseFqcn.add(Tools.getInstance().sanitizePackageName(seg));
+                                            } else if (i > testCasesIdx && i < pathSegments.size() - 1) {
+                                                baseFqcn.add(Tools.getInstance().sanitizePackageName(seg));
+                                            } else if (i == pathSegments.size() - 1) {
+                                                baseFqcn.add(Tools.getInstance().sanitizeClassName(seg));
+                                            }
+                                        }
+                                        baseFqcn.add(Tools.getInstance().sanitizeMethodName(item.getDescription()));
+                                        item.setFqcn(baseFqcn);
+                                    }
+                                }
+                            }
                         });
                         refreshView();
                     }
@@ -358,6 +393,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
         final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
         final Set<String> moduleFilter = filterPopup != null ? filterPopup.getSelectedModule() : Collections.emptySet();
+        final Set<TestStatus> statusFilter = filterPopup != null ? filterPopup.getSelectedStatus() : Collections.emptySet();
 
         if (allTestCases.isEmpty()) {
             return Collections.emptyList();
@@ -371,7 +407,15 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                         final boolean matchesGroup = groupFilter.isEmpty() || (groupFilter.contains(Group.UNASSIGNED) && tc.getGroup().isEmpty()) || (tc.getGroup().stream().anyMatch(groupFilter::contains));
                         final boolean matchesModule = moduleFilter.isEmpty() || moduleFilter.contains(tc.getModule());
 
-                        return matchesSearch && matchesGroup && matchesPriority && matchesModule;
+                        boolean matchesStatus = statusFilter.isEmpty();
+                        if (!matchesStatus) {
+                            TestRunItems runItem = resultsMap.get(tc.getId());
+                            if (runItem != null) {
+                                matchesStatus = statusFilter.contains(runItem.getStatus());
+                            }
+                        }
+
+                        return matchesSearch && matchesGroup && matchesPriority && matchesModule && matchesStatus;
                     })
                     .collect(Collectors.toList());
         }
@@ -435,13 +479,12 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         return list != null ? list.getSelectedValuesList() : Collections.emptyList();
     }
 
-    private void startTimerForIndex(final int globalIndex) {
+    public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
             stopExecution();
-            if (tr != null) {
-                tr.setStatus(TestRunStatus.COMPLETED);
-                persistRunDataAsync();
-            }
+            vf.getTestRun().getMarker().setStatus(TestRunStatus.COMPLETED);
+            persistRunDataAsync();
+
             return;
         }
 
@@ -526,8 +569,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                 Path dirPath = vf.getTestRun().getPath();
                 Path jsonFilePath = dirPath.resolve(tr.getRunName());
 
-                byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(tr);
-                Files.write(jsonFilePath, jsonBytes);
+                Services.getInstance(project, FilesUtil.class).write(project, jsonFilePath, tr);
 
             } catch (Exception e) {
                 Log.error("Failed to persist test run data: " + e.getMessage());
@@ -535,7 +577,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         });
     }
 
-    private void stopExecution() {
+    public void stopExecution() {
         if (executionTimer != null) {
             executionTimer.stop();
         }
@@ -544,8 +586,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onStartExecutionClicked() {
-        if (tr != null && tr.getStatus() != TestRunStatus.IN_PROGRESS) {
-            tr.setStatus(TestRunStatus.IN_PROGRESS);
+        if (tr != null && vf.getTestRun().getMarker().getStatus() != TestRunStatus.IN_PROGRESS) {
+            vf.getTestRun().getMarker().setStatus(TestRunStatus.IN_PROGRESS);
             persistRunDataAsync();
         }
 

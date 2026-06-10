@@ -1,6 +1,7 @@
 package org.testin.pojo.dto.dirs;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.testin.pojo.Config;
@@ -18,29 +19,47 @@ import java.util.List;
 @SuperBuilder
 @ToString()
 public abstract class DirectoryDto {
-    private String name;
+    @NonNull
+    @Builder.Default
+    private String name = "";
 
-    private Path path;
+    @NonNull
+    @Builder.Default
+    private Path path = Path.of("");
 
-    private ArrayList<String> path2;
+    @NonNull
+    @Builder.Default
+    private ArrayList<String> path2 = new ArrayList<>();
 
-    private List<String> fqcn;
+    @NonNull
+    @JsonIgnore
+    @Builder.Default
+    private List<String> fqcn = new ArrayList<>();
 
     @ToString.Exclude
     private DirectoryDto parent;
 
+    @NonNull
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-    private String createdBy;
+    @NonNull
+    @Builder.Default
+    private String createdBy = "";
 
+    @NonNull
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime modifiedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
+    @NonNull
+    @Builder.Default
+    private String modifiedBy = "";
 
-    private String modifiedBy;
+    // todo, all dtos should has marker then apply.
+    //private Marker marker;
 
+    @NonNull
     public abstract CreateNodeMenu getMenu();
 }

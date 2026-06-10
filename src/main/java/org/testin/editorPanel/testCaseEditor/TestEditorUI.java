@@ -32,9 +32,10 @@ import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.FilesUtil;
 import org.testin.util.FontSyncUtil;
-import org.testin.util.Mapper;
 import org.testin.util.TestCaseSorter;
+import org.testin.util.Tools;
 import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.viewPanel.ViewPanel;
@@ -43,7 +44,6 @@ import org.testin.viewPanel.ViewToolWindowFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
@@ -172,6 +172,11 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 currentTestCases.addAll(items);
                 items.forEach(item -> unsortedIds.add(item.getId()));
                 items.forEach(item -> item.setPath(vf.getTestSet().getPath2()));
+                items.forEach(item -> {
+                    List<String> baseFqcn = new ArrayList<>(vf.getTestSet().getFqcn());
+                    baseFqcn.add(Tools.getInstance().sanitizeMethodName(item.getDescription()));
+                    item.setFqcn(baseFqcn);
+                });
                 refreshView();
             }
 
@@ -189,6 +194,18 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
                         unsortedIds.clear();
                         unsortedIds.addAll(result.unsortedIds());
+
+                        List<String> baseFqcn = vf.getTestSet().getFqcn();
+                        allTestCases.forEach(item -> {
+                            List<String> itemFqcn = new ArrayList<>(baseFqcn);
+                            itemFqcn.add(Tools.getInstance().sanitizeMethodName(item.getDescription()));
+                            item.setFqcn(itemFqcn);
+                        });
+                        currentTestCases.forEach(item -> {
+                            List<String> itemFqcn = new ArrayList<>(baseFqcn);
+                            itemFqcn.add(Tools.getInstance().sanitizeMethodName(item.getDescription()));
+                            item.setFqcn(itemFqcn);
+                        });
 
                         if (list != null) {
                             list.setPaintBusy(false);
@@ -229,12 +246,9 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 current.setIsHead(i == 0);
                 current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
 
-                try {
-                    final byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(current);
-                    Files.write(dirPath.resolve(current.getId() + ".json"), jsonBytes);
-                } catch (final Exception ignored) {
-                }
+                Services.getInstance(project, FilesUtil.class).write(project, dirPath.resolve(current.getId() + ".json"), current);
             }
+
             ApplicationManager.getApplication().invokeLater(this::refreshView);
         });
     }

@@ -15,7 +15,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -127,13 +126,13 @@ public class PendingCommitsDialog extends DialogWrapper {
 
                 switch (fieldName) {
                     case "Description" -> currentDto.setDescription(oldDto.getDescription());
+
                     case "Expected Result" -> currentDto.setExpectedResult(oldDto.getExpectedResult());
+
                     case "Priority" -> currentDto.setPriority(oldDto.getPriority());
                 }
 
-                byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(currentDto);
-                Files.write(jsonFile.toPath(), jsonBytes);
-
+                Services.getInstance(project, FilesUtil.class).write(project, jsonFile.toPath(), currentDto);
                 model.removeRow(selectedRow);
             }
         } catch (Exception ex) {

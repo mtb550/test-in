@@ -6,6 +6,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.NavigateToCode;
 import org.testin.actions.RunTestCase;
+import org.testin.actions.SetStatus;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testRunEditor.RunEditorUI;
 import org.testin.pojo.CardHoverAction;
@@ -92,23 +93,28 @@ public class HoverListener extends MouseAdapter {
             final TestCaseDto tc = list.getModel().getElementAt(index);
 
             if (action == CardHoverAction.NAVIGATE) {
+                Log.trace("navigate action, tc: " + tc.getDescription());
                 new NavigateToCode(list).execute(project, tc);
+
             } else if (action == CardHoverAction.RUN) {
+                Log.trace("run action, tc: " + tc.getDescription());
                 new RunTestCase(list).execute(project, tc);
+
             } else {
                 try {
                     TestStatus status = TestStatus.valueOf(action.name());
                     if (ui instanceof RunEditorUI runUi) {
                         int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
 
+                        SetStatus setStatus = new SetStatus(ui, list);
                         if (globalIndex == runUi.getCurrentlyExecutingIndex()) {
-                            runUi.updateStatusAndNext(status);
+                            setStatus.executeNext(project, status);
                         } else {
-                            runUi.handleManualStatusUpdate(tc, status);
+                            setStatus.executeManual(project, tc, status);
                         }
                     }
                 } catch (IllegalArgumentException ex) {
-                    Log.info("Unknown action: " + action.name());
+                    Log.trace("Unknown action: " + action.name());
                 }
             }
 

@@ -1,26 +1,45 @@
 package org.testin.pojo.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
 
 @Data
 @ToString()
-// todo, use @SuperBuilder
+@SuperBuilder
 public class VersionDto {
-    private int id;
+    @NotNull
+    @Builder.Default
+    private Integer id = -1;
 
-    private double version;
+    @NotNull
+    @Builder.Default
+    private Double version = -1.0;
 
-    private String created_at;
+    @NotNull
+    @Builder.Default
+    private String created_at = "";
 
-    private String created_by;
+    @NotNull
+    @Builder.Default
+    private String created_by = "";
 
-    private String valid_from;
+    @NotNull
+    @Builder.Default
+    private String valid_from = "";
 
-    private String valid_to;
+    @NotNull
+    @Builder.Default
+    private String valid_to = "";
 
-    private int project_id;
+    @NotNull
+    @Builder.Default
+    private Integer project_id = -1;
 
-    private int latest;
+    @NotNull
+    @Builder.Default
+    private Integer latest = -1;
 
 }

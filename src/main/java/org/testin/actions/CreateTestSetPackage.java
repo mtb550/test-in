@@ -15,8 +15,8 @@ import java.nio.file.Path;
 public class CreateTestSetPackage implements NodeCreator {
 
     @Override
-    public DirectoryDto execute(final CreateTestNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
-        TestSetPackageDirectoryDto tsp = Services.getInstance(project, DirectoryMapper.class).testSetPackageNode(project, newDirPath, parentDir);
+    public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+        TestSetPackageDirectoryDto tsp = Services.getInstance(project, DirectoryMapper.class).readTestSetPackageNode(project, newDirPath, parentDir);
 
         TreeUtilImpl.createVf(project, this, parentDir.getPath(), name);
         TreeUtilImpl.createNode(action.getTree(), parentNode, tsp);

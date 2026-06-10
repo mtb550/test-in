@@ -23,7 +23,6 @@ import java.util.UUID;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
-// todo, use @SuperBuilder
 public class TestCaseDto {
 
     private UUID next;
@@ -61,6 +60,7 @@ public class TestCaseDto {
 
     @NonNull
     @Builder.Default
+    @JsonIgnore
     private List<String> fqcn = new ArrayList<>();
 
     @NonNull

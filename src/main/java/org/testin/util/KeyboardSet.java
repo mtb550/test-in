@@ -61,7 +61,13 @@ public enum KeyboardSet {
     PriorityMedium(KeyEvent.VK_M, 0),
     PriorityLow(KeyEvent.VK_L, 0),
     AutoComplete(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK),
-    SelectGroup(KeyEvent.VK_SPACE, 0);
+    SelectGroup(KeyEvent.VK_SPACE, 0),
+    SetStatusPassed(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
+    SetStatusFailed(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK),
+    SetStatusBlocked(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK),
+    StatusAssigned(KeyEvent.VK_1, 0),
+    StatusCompleted(KeyEvent.VK_2, 0),
+    StatusClosed(KeyEvent.VK_3, 0);
 
     private final int keyCode;
     private final int modifiers;

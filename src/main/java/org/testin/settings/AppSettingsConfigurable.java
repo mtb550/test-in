@@ -213,8 +213,7 @@ public class AppSettingsConfigurable implements Configurable {
             if (Files.exists(rootPath) && Files.isDirectory(rootPath)) {
                 try (Stream<Path> paths = Files.list(rootPath)) {
                     paths.filter(Files::isDirectory)
-                            //.filter(path -> path.getFileName().toString().startsWith("PR_"))
-                            .map(path -> Services.getInstance(project, DirectoryMapper.class).testProjectNode(project, path))
+                            .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
                             .filter(Objects::nonNull)
                             .forEach(testProjectList::addElement);
 
@@ -238,7 +237,7 @@ public class AppSettingsConfigurable implements Configurable {
 
     @Override
     public void apply() {
-        AppSettingsState settings = AppSettingsState.getInstance();
+        final AppSettingsState settings = AppSettingsState.getInstance();
 
         settings.rootTestinPath = rootTestinPathField.getText();
         settings.rootAutomationPath = rootAutomationPathField.getText();
@@ -249,11 +248,13 @@ public class AppSettingsConfigurable implements Configurable {
 
         if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty())
             Config.setTestinPath(Path.of(settings.rootTestinPath));
+
         else
             Config.setTestinPath(Path.of(""));
 
         if (settings.rootAutomationPath != null && !settings.rootAutomationPath.trim().isEmpty())
             Config.setAutomationPath(Path.of(settings.rootAutomationPath));
+
         else
             Config.setAutomationPath(null);
 

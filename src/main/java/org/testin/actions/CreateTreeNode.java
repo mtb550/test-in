@@ -22,14 +22,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
-public class CreateTestNode extends DumbAwareAction {
+public class CreateTreeNode extends DumbAwareAction {
     @Getter
     private final ProjectPanel projectPanel;
 
     @Getter
     private final SimpleTree tree;
 
-    public CreateTestNode(final ProjectPanel projectPanel, final SimpleTree tree) {
+    public CreateTreeNode(final ProjectPanel projectPanel, final SimpleTree tree) {
         super("Create", "Create new node", AllIcons.General.Add);
         this.projectPanel = projectPanel;
         this.tree = tree;

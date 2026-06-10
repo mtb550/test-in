@@ -1,6 +1,8 @@
 package org.testin.editorPanel;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
@@ -32,6 +34,14 @@ public class EditorCM extends DefaultActionGroup {
         this.project = project;
 
         add(new CreateTestCase(ui, dir, list, model));
+        DefaultActionGroup statusGroup = new DefaultActionGroup("Set Status", true);
+
+        statusGroup.getTemplatePresentation().setIcon(AllIcons.General.Filter);
+        // todo, no need for loop
+        for (AnAction a : new SetTestCaseRunStatus(ui, list).getStatusActions()) { // todo, to be refactored.
+            statusGroup.add(a);
+        }
+        add(statusGroup);
         add(new ViewDetails(list, dir.getPath()));
         add(new StartExecution(ui.getToolBar().getCallbacks()));
         addSeparator();
@@ -71,6 +81,7 @@ public class EditorCM extends DefaultActionGroup {
         new CopyTestCaseDescription(list);
         new NextPageAction(ui, list);
         new PrevPageAction(ui, list);
+
     }
 
     @Override

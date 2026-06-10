@@ -46,14 +46,14 @@ public class TestCaseUpdateMenu {
         showMenu(title, selectedItem -> {
 
             final GeneratorType targetChangeType = selectedItem.getChangeType();
-            Log.info("TRACE [TestCaseUpdateMenu]: Menu item selected -> " + selectedItem.getName() + " | changeType = " + targetChangeType);
+            Log.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + targetChangeType);
 
             if (isSingle) {
                 new UpdateTestCaseUI(project, items.getFirst(), selectedItem, (tc, codeGenerator) -> {
                     codeGenerator = new CodeGenerator(targetChangeType);
                     codeGenerator.setGeneratorType(targetChangeType);
 
-                    Log.info("TRACE [TestCaseUpdateMenu]: Single Edit Save -> Injecting changeType " + codeGenerator.getGeneratorType() + " into UI's CodeGenerator.");
+                    Log.trace("Single Edit Save -> Injecting changeType " + codeGenerator.getGeneratorType() + " into UI's CodeGenerator.");
                     updatedItems.accept(items, codeGenerator);
 
                 }).show();
@@ -64,7 +64,7 @@ public class TestCaseUpdateMenu {
                     codeGenerator.setGeneratorType(targetChangeType);
 
 
-                    Log.info("TRACE [TestCaseUpdateMenu]: Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + codeGenerator.getGeneratorType());
+                    Log.trace("Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + codeGenerator.getGeneratorType());
                     updatedItems.accept(list, codeGenerator);
                 });
             }

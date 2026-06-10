@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 public class TestSessionCache {
 
     private final Project project;
+
     private final Path directoryPath;
 
     private final List<TestCaseDto> loadedItems = Collections.synchronizedList(new ArrayList<>());

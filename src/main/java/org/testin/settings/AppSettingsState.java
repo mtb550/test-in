@@ -20,7 +20,7 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
     public String logLevel = Log.Level.INFO.name();
 
     public static AppSettingsState getInstance() {
-        Log.info("AppSettingsState.getInstance()");
+        Log.trace("AppSettingsState.getInstance()");
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
     }
 
@@ -32,7 +32,7 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     @Override
     public void loadState(@NotNull AppSettingsState state) {
-        Log.info("AppSettingsState.loadState()");
+        Log.trace("AppSettingsState.loadState()");
         XmlSerializerUtil.copyBean(state, this);
     }
 }

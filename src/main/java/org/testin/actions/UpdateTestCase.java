@@ -9,6 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testCaseEditor.TestEditorUI;
+import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testCase.TestCaseUpdateMenu;
 import org.testin.util.KeyboardSet;
@@ -23,6 +24,7 @@ import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UpdateTestCase extends DumbAwareAction {
 
@@ -41,16 +43,23 @@ public class UpdateTestCase extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final Project project = e.getProject();
-        if (list == null) return;
+        if (list == null || project == null) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
+
+        Log.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
         new TestCaseUpdateMenu(project, selectedItems, (updatedItems, codeGenerator) -> {
 
             TestCaseCacheService.getInstance(project).addNewItems(updatedItems);
             Services.getInstance(project, TestCasePersistService.class).persist(path, updatedItems);
+
             Notifier.getInstance().softShow(project, "Updated..");
+
+            if (ui instanceof IToolBar) {
+                ((IToolBar) ui).onToolBarFilterSelectionChanged();
+            }
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 list.repaint();
@@ -66,32 +75,32 @@ public class UpdateTestCase extends DumbAwareAction {
                 }
 
                 if (codeGenerator != null && codeGenerator.isSelected()) {
-                    Log.info("TRACE [UpdateTestCase]: Code generator is selected! Change Type received: " + codeGenerator.getGeneratorType());
+                    Log.trace("[UpdateTestCase]: Code generator is selected! Change Type received: " + codeGenerator.getGeneratorType());
 
                     // todo, all if statements here to be moved to enum class
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_DESCRIPTION) {
-                        Log.info("TRACE [UpdateTestCase]: Routing to UpdateTestCaseDescription()...");
+                        Log.trace("[UpdateTestCase]: Routing to UpdateTestCaseDescription()...");
                         //new UpdateTestCaseDescription().execute(project, updatedItems.getFirst().getFqcn(), updatedItems.getFirst());
                         return;
                     }
 
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT) {
-                        Log.info("TRACE [UpdateTestCase]: Routing to Update Expected Results (Type 2)...");
+                        Log.trace("[UpdateTestCase]: Routing to Update Expected Results (Type 2)...");
                         return;
                     }
 
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_GROUP) {
-                        Log.info("TRACE [UpdateTestCase]: Routing to Update Group (Type 2)...");
+                        Log.trace("[UpdateTestCase]: Routing to Update Group (Type 2)...");
                         return;
                     }
 
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_MODULE) {
-                        Log.info("TRACE [UpdateTestCase]: Routing to Update Module (Type 2)...");
+                        Log.trace("[UpdateTestCase]: Routing to Update Module (Type 2)...");
                         return;
                     }
 
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_STEPS) {
-                        Log.info("TRACE [UpdateTestCase]: Routing to Update Steps (Type 3)...");
+                        Log.trace("[UpdateTestCase]: Routing to Update Steps (Type 3)...");
                     }
 
 //                    CreateJavaMethodInClass generator = new CreateJavaMethodInClass();
@@ -99,7 +108,7 @@ public class UpdateTestCase extends DumbAwareAction {
 //                        generator.execute(project, tc.getFqcn(), tc);
 //                    }
                 } else {
-                    Log.info("TRACE [UpdateTestCase]: Code generator is NOT selected or is null.");
+                    Log.trace("[UpdateTestCase]: Code generator is NOT selected or is null.");
                 }
 
             });

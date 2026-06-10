@@ -22,8 +22,8 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
-import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -31,7 +31,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.*;
 
 public class ExportJson extends DumbAwareAction {
@@ -104,20 +103,10 @@ public class ExportJson extends DumbAwareAction {
 
                 indicator.setText("Generating JSON file...");
 
-                try {
-                    byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(directoryData);
-                    Files.write(destFile.toPath(), jsonBytes);
+                Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), directoryData);
 
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
-
-                } catch (Exception ex) {
-                    Log.error("Export crashed: " + ex.getMessage());
-                    Log.error("Exception: " + ex.getMessage());
-
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "Export Failed", "Failed to save the JSON file:\n" + ex.getMessage()));
-                }
+                ApplicationManager.getApplication().invokeLater(() ->
+                        Notifier.getInstance().info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
             }
         });
     }
