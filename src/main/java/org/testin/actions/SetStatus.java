@@ -85,7 +85,7 @@ public class SetStatus {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Path dirPath = runUi.getVf().getTestRun().getPath();
-            Path jsonFilePath = dirPath.resolve(runUi.getTr().getRunName());
+            Path jsonFilePath = dirPath.resolve(runUi.getVf().getTestRun().getName() + ".json");
 
             Services.getInstance(runUi.getProject(), FilesUtil.class).write(runUi.getProject(), jsonFilePath, runUi.getTr());
         });

@@ -142,30 +142,38 @@ public class SetTestCaseRunStatus extends DumbAwareAction {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        for (TestCaseDto tc : selectedItems) {
-            TestRunItems item = runUi.getResultsMap().get(tc.getId());
-            if (item != null) {
-                item.setStatus(status);
-                item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        // Handle single selection the same way the removed buttons did
+        if (selectedItems.size() == 1) {
+            TestCaseDto tc = selectedItems.getFirst();
+            int globalIndex = runUi.getCurrentTestCases().indexOf(tc);
+            if (globalIndex == runUi.getCurrentlyExecutingIndex()) {
+                // Same logic as old button click on currently executing test
+                new SetStatus(ui, list).executeNext(runUi.getProject(), status);
+            } else {
+                new SetStatus(ui, list).executeManual(runUi.getProject(), tc, status);
+            }
+        } else {
+            // Batch: set status on all selected items without advancing
+            for (TestCaseDto tc : selectedItems) {
+                TestRunItems item = runUi.getResultsMap().get(tc.getId());
+                if (item != null) {
+                    item.setStatus(status);
+                    item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-                // Stop execution if this is the currently executing test
-                int tcIndex = runUi.getCurrentTestCases().indexOf(tc);
-                if (tcIndex != -1 && tcIndex == runUi.getCurrentlyExecutingIndex()) {
-                    runUi.stopExecution();
+                    int tcIndex = runUi.getCurrentTestCases().indexOf(tc);
+                    if (tcIndex != -1 && tcIndex == runUi.getCurrentlyExecutingIndex()) {
+                        runUi.stopExecution();
+                    }
                 }
             }
+
+            persistRunDataAsync(runUi);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                list.repaint();
+                ((IToolBar) ui).onToolBarFilterSelectionChanged();
+            });
         }
-
-        Log.trace("[SetTestCaseStatus]: Status set to " + status + " for " + selectedItems.size() + " test cases");
-
-        // Persist
-        persistRunDataAsync(runUi);
-
-        // Re-apply filter
-        ApplicationManager.getApplication().invokeLater(() -> {
-            list.repaint();
-            ((IToolBar) ui).onToolBarFilterSelectionChanged();
-        });
     }
 
     private void persistRunDataAsync(final @NotNull RunEditorUI runUi) {
@@ -174,7 +182,7 @@ public class SetTestCaseRunStatus extends DumbAwareAction {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = runUi.getVf().getTestRun().getPath();
-                Path jsonFilePath = dirPath.resolve(runUi.getTr().getRunName());
+                Path jsonFilePath = dirPath.resolve(runUi.getVf().getTestRun().getName() + ".json");
 
                 Services.getInstance(runUi.getProject(), FilesUtil.class).write(runUi.getProject(), jsonFilePath, runUi.getTr());
 

@@ -567,7 +567,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = vf.getTestRun().getPath();
-                Path jsonFilePath = dirPath.resolve(tr.getRunName());
+                Path jsonFilePath = dirPath.resolve(vf.getTestRun().getName() + ".json");
 
                 Services.getInstance(project, FilesUtil.class).write(project, jsonFilePath, tr);
 

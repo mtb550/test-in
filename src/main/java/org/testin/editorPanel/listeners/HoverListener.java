@@ -6,11 +6,8 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.NavigateToCode;
 import org.testin.actions.RunTestCase;
-import org.testin.actions.SetStatus;
 import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testRunEditor.RunEditorUI;
 import org.testin.pojo.CardHoverAction;
-import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.logger.Log;
 
@@ -19,8 +16,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Locale;
 import java.util.Optional;
-
-import static org.testin.editorPanel.testRunEditor.RunCard.ACTIONS_TOTAL_WIDTH;
 
 public class HoverListener extends MouseAdapter {
 
@@ -60,21 +55,6 @@ public class HoverListener extends MouseAdapter {
             if (xInCell > runStartX && xInCell <= runEndX) return CardHoverAction.RUN;
         }
 
-        if (ui instanceof RunEditorUI && list.isSelectedIndex(index)) {
-            float fontScaleMultiplier = baseSize / 15.0f;
-            final int actionWidth = (int) (JBUI.scale(ACTIONS_TOTAL_WIDTH) * fontScaleMultiplier);
-            final int actionStartX = bounds.width - actionWidth;
-
-            if (xInCell >= actionStartX && xInCell <= bounds.width) {
-                final int relativeX = xInCell - actionStartX;
-                final int chunk = actionWidth / 3;
-
-                if (relativeX < chunk) return CardHoverAction.PASSED;
-                if (relativeX < chunk * 2) return CardHoverAction.FAILED;
-                return CardHoverAction.BLOCKED;
-            }
-        }
-
         return null;
     }
 
@@ -99,23 +79,6 @@ public class HoverListener extends MouseAdapter {
             } else if (action == CardHoverAction.RUN) {
                 Log.trace("run action, tc: " + tc.getDescription());
                 new RunTestCase(list).execute(project, tc);
-
-            } else {
-                try {
-                    TestStatus status = TestStatus.valueOf(action.name());
-                    if (ui instanceof RunEditorUI runUi) {
-                        int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
-
-                        SetStatus setStatus = new SetStatus(ui, list);
-                        if (globalIndex == runUi.getCurrentlyExecutingIndex()) {
-                            setStatus.executeNext(project, status);
-                        } else {
-                            setStatus.executeManual(project, tc, status);
-                        }
-                    }
-                } catch (IllegalArgumentException ex) {
-                    Log.trace("Unknown action: " + action.name());
-                }
             }
 
             e.consume();
