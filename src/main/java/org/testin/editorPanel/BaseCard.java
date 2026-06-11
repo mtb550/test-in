@@ -8,18 +8,17 @@ import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import org.testin.pojo.RunEditorAttributes;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
-    protected final JBLabel titleLabel = new JBLabel();
+    protected final JBLabel descriptionLabel = new JBLabel();
     protected final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
-    protected final Map<String, JBLabel> attributeLabels = new HashMap<>();
+    protected final Map<RunEditorAttributes, JBLabel> attributeLabels = new HashMap<>();
 
     protected final JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final BorderLayoutPanel wrapper = new BorderLayoutPanel();
@@ -32,7 +31,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         setLayout(new BorderLayout());
         setOpaque(true);
 
-        titleLabel.setForeground(UIUtil.getLabelForeground());
+        descriptionLabel.setForeground(UIUtil.getLabelForeground());
 
         badgePanel.setOpaque(false);
         badgePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -41,7 +40,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         titleLine.setLayout(new BoxLayout(titleLine, BoxLayout.X_AXIS));
         titleLine.setOpaque(false);
         titleLine.setAlignmentX(Component.LEFT_ALIGNMENT);
-        titleLine.add(titleLabel);
+        titleLine.add(descriptionLabel);
 
         content.setOpaque(false);
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -58,7 +57,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     public void applyListFont(final Font listFont) {
         float baseSize = listFont.getSize2D();
 
-        titleLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + 2.0f));
+        descriptionLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + 3.0f));
 
         for (JBLabel lbl : attributeLabels.values()) {
             lbl.setFont(listFont.deriveFont(baseSize));
@@ -71,7 +70,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     }
 
     protected void updateUI(final int index, final String title, final List<JComponent> badges, final Map<String, String> details) {
-        titleLabel.setText(String.format(Locale.ENGLISH, "%d. %s", index + 1, title));
+        descriptionLabel.setText(String.format(Locale.ENGLISH, "%d. %s", index + 1, title));
 
         final Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
         setBackground(currentRowColor);
@@ -82,13 +81,21 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 
-        details.forEach((key, value) -> {
-            JBLabel lbl = attributeLabels.computeIfAbsent(key, k -> {
+        details.forEach((attrName, value) -> {
+            RunEditorAttributes attr = Arrays.stream(RunEditorAttributes.values())
+                    .filter(a -> a.getName().equals(attrName))
+                    .findFirst()
+                    .orElse(null);
+
+            if (attr == null) return;
+
+            JBLabel lbl = attributeLabels.computeIfAbsent(attr, k -> {
                 JBLabel newLbl = createDetailLabel();
                 content.add(newLbl);
                 return newLbl;
             });
-            lbl.setText(key + ": " + value);
+
+            lbl.setText(attrName + ": " + value);
             lbl.setVisible(true);
         });
 
@@ -106,9 +113,9 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
         if (isRowHovered) {
-            final FontMetrics fm = titleLabel.getFontMetrics(titleLabel.getFont());
-            final int titleWidth = fm.stringWidth(titleLabel.getText());
-            Shared.drawTitleActionIcons(this, g, titleWidth, JBUI.scale(12), hoveredAction);
+            final FontMetrics fm = descriptionLabel.getFontMetrics(descriptionLabel.getFont());
+            final int titleWidth = fm.stringWidth(descriptionLabel.getText());
+            Shared.drawDescriptionActionIcons(this, g, titleWidth, JBUI.scale(12), hoveredAction);
         }
     }
 

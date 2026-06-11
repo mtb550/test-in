@@ -18,30 +18,30 @@ import java.awt.*;
 public class DescriptionSection implements ICreateTestCaseSection {
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
-    private final TextFieldWithAutoCompletion<String> titleField;
+    private final TextFieldWithAutoCompletion<String> descriptionField;
     private final JPanel wrapper;
 
     public DescriptionSection(final @NotNull Project project) {
-        this.titleField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
-        this.titleField.setFont(fieldFont);
-        this.titleField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());
-        this.titleField.setShowPlaceholderWhenFocused(true);
-        this.titleField.setBorder(JBUI.Borders.empty(10));
+        this.descriptionField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
+        this.descriptionField.setFont(fieldFont);
+        this.descriptionField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());
+        this.descriptionField.setShowPlaceholderWhenFocused(true);
+        this.descriptionField.setBorder(JBUI.Borders.empty(10));
 
         this.wrapper = new JPanel(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(CreateTestCaseFields.DESCRIPTION.getIcon()), BorderLayout.WEST);
-        this.wrapper.add(this.titleField, BorderLayout.CENTER);
+        this.wrapper.add(this.descriptionField, BorderLayout.CENTER);
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
     public void setError(final boolean error) {
         if (error) {
-            titleField.setForeground(JBColor.RED);
-            titleField.requestFocus();
+            descriptionField.setForeground(JBColor.RED);
+            descriptionField.requestFocus();
         } else
-            titleField.setBackground(UIUtil.getTextFieldBackground());
-        titleField.repaint();
+            descriptionField.setBackground(UIUtil.getTextFieldBackground());
+        descriptionField.repaint();
     }
 
     @Override
@@ -53,13 +53,13 @@ public class DescriptionSection implements ICreateTestCaseSection {
     public void showSection(final JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
-        titleField.requestFocus();
+        descriptionField.requestFocus();
     }
 
     @Override
     public void applyTo(final TestCaseDto dto) {
-        if (wrapper.getParent() != null && titleField.isEnabled())
-            dto.setDescription(titleField.getText().trim());
+        if (wrapper.getParent() != null && descriptionField.isEnabled())
+            dto.setDescription(descriptionField.getText().trim());
     }
 
     @Override
@@ -72,16 +72,16 @@ public class DescriptionSection implements ICreateTestCaseSection {
 
     @Override
     public JComponent getFocusComponent() {
-        return titleField;
+        return descriptionField;
     }
 
     @Override
     public void setEditable(final boolean editable) {
-        titleField.setEnabled(editable);
+        descriptionField.setEnabled(editable);
     }
 
     @Override
     public void fillData(final TestCaseDto dto, final TestCaseUIBase.IUIAction repackAction) {
-        titleField.setText(dto.getDescription());
+        descriptionField.setText(dto.getDescription());
     }
 }

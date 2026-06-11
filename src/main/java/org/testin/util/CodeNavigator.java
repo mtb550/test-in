@@ -1,6 +1,8 @@
 package org.testin.util;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.DumbService;
+import com.intellij.openapi.project.IndexNotReadyException;
 import com.intellij.openapi.project.Project;
 import com.intellij.pom.Navigatable;
 import com.intellij.psi.JavaPsiFacade;
@@ -21,35 +23,47 @@ public class CodeNavigator {
 
         Log.trace("navigate to method, className: " + className + ", methodName: " + methodName);
 
+        if (DumbService.isDumb(project)) {
+            Log.trace("dumb mode detected, deferring navigation");
+            DumbService.getInstance(project).runWhenSmart(() -> toCode(project, fqcn));
+            return;
+        }
+
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
+                    try {
+                        final PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.projectScope(project));
 
-                    final PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.projectScope(project));
+                        if (targetClass != null) {
+                            Navigatable targetElement = targetClass;
 
-                    if (targetClass != null) {
-                        Navigatable targetElement = targetClass;
+                            final PsiMethod[] exactMethods = targetClass.findMethodsByName(methodName, false);
 
-                        final PsiMethod[] exactMethods = targetClass.findMethodsByName(methodName, false);
+                            if (exactMethods.length > 0)
+                                targetElement = exactMethods[0];
 
-                        if (exactMethods.length > 0)
-                            targetElement = exactMethods[0];
-
-                        else
-                            for (PsiMethod method : targetClass.getMethods()) {
-                                if (method.getName().equalsIgnoreCase(methodName)) {
-                                    targetElement = method;
-                                    break;
+                            else
+                                for (PsiMethod method : targetClass.getMethods()) {
+                                    if (method.getName().equalsIgnoreCase(methodName)) {
+                                        targetElement = method;
+                                        break;
+                                    }
                                 }
-                            }
 
-                        final Navigatable finalTarget = targetElement;
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            if (finalTarget.canNavigate())
-                                finalTarget.navigate(true);
-                        });
+                            final Navigatable finalTarget = targetElement;
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                if (finalTarget.canNavigate())
+                                    finalTarget.navigate(true);
+                            });
 
-                    } else
-                        ApplicationManager.getApplication().invokeLater(() -> Notifier.getInstance().error(project, "Navigation Error: ", "Class Not Found: " + className));
+                        } else
+                            ApplicationManager.getApplication().invokeLater(() -> Notifier.getInstance().error(project, "Navigation Error: ", "Class Not Found: " + className));
+
+                    } catch (final IndexNotReadyException e) {
+                        Log.trace("index not ready, deferring navigation");
+                        Notifier.getInstance().softShow(project, "index not ready, deferring navigation");
+                        DumbService.getInstance(project).runWhenSmart(() -> toCode(project, fqcn));
+                    }
                 })
         );
     }

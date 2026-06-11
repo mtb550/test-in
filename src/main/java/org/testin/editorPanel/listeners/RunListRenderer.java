@@ -25,7 +25,7 @@ public class RunListRenderer implements ListCellRenderer<TestCaseDto> {
         TestRunItems runItem;
         runItem = ui.getResultsMap().get(tc.getId());
 
-        rendererCard.updateData(globalIndex, tc, ui.getSelectedDetails(), runItem);
+        rendererCard.updateData(globalIndex, ui.getSelectedDetails(), runItem);
 
         final boolean isRowHovered = (index == ui.getHoveredIndex());
         final String hover = isRowHovered ? ui.getHoveredIconAction() : null;

@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service(Service.Level.PROJECT)
 public final class TestCaseCacheService implements Disposable {
-    private final Set<String> titles = ConcurrentHashMap.newKeySet();
+    private final Set<String> descriptions = ConcurrentHashMap.newKeySet();
     private final Set<String> expectedResults = ConcurrentHashMap.newKeySet();
     private final Set<String> modules = ConcurrentHashMap.newKeySet();
     private final Set<String> steps = ConcurrentHashMap.newKeySet();
@@ -26,7 +26,7 @@ public final class TestCaseCacheService implements Disposable {
     }
 
     public Set<String> getDescription() {
-        return Collections.unmodifiableSet(titles);
+        return Collections.unmodifiableSet(descriptions);
     }
 
     public Set<String> getExpectedResults() {
@@ -42,7 +42,7 @@ public final class TestCaseCacheService implements Disposable {
     }
 
     public void addDescription(final String t) {
-        if (t != null && !t.trim().isEmpty()) titles.add(t.trim());
+        if (t != null && !t.trim().isEmpty()) descriptions.add(t.trim());
     }
 
     public void addExpectedResult(final String e) {
@@ -82,7 +82,7 @@ public final class TestCaseCacheService implements Disposable {
 
     @Override
     public void dispose() {
-        titles.clear();
+        descriptions.clear();
         expectedResults.clear();
         modules.clear();
         steps.clear();

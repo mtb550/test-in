@@ -28,7 +28,7 @@ public class Shared {
         return new RoundedBadge(group.getName(), JBColor.darkGray);
     }
 
-    public static void drawTitleActionIcons(final Component c, final Graphics g, final int titleWidth, final int y, final String hoveredAction) {
+    public static void drawDescriptionActionIcons(final Component c, final Graphics g, final int titleWidth, final int y, final String hoveredAction) {
         final int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
 
         final Icon navIcon = AllIcons.Nodes.Class;
