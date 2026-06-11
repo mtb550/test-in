@@ -51,13 +51,6 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new ImportJson(tree))
         ));
 
-        // todo, to be removed, instead, in clone project in create new project, list those as options.
-        /*add(createSubGroup("Integrate", AllIcons.Nodes.Related,
-                List.of(new IntegrateTestRail(),
-                        new IntegrateJira(),
-                        new IntegrateAzure())
-        ));*/
-
         addSeparator();
 
         add(new OpenOldVersions());
@@ -88,17 +81,6 @@ public class TreeContextMenu extends DefaultActionGroup {
 
     }
 
-    // TODO: to be removed in all context menus. the below is the new that use list.of()
-    private DefaultActionGroup createSubGroup(final String title, final Icon icon, final AnAction... actions) {
-        DefaultActionGroup group = new DefaultActionGroup(title, true);
-        group.getTemplatePresentation().setIcon(icon);
-        for (AnAction action : actions) {
-            group.add(action);
-        }
-        return group;
-    }
-
-    // TODO: move it to abstract parent class and put it in util, then make any context menu use it
     private DefaultActionGroup createSubGroup(final String title, final Icon icon, final List<? extends DumbAwareAction> actions) {
         DefaultActionGroup group = new DefaultActionGroup(title, true);
         group.getTemplatePresentation().setIcon(icon);

@@ -13,8 +13,6 @@ plan & implement delegation between leaders to leaders or leaders to members.
 
 enable RemoveTestProject in the tree, add new action, active, deactive.
 
-zoom in, out by mouse and scroll. to allow user to control the size. in editor. like use mouse wheel in the code.
-
 implement the details in marker .pr .ts file like created time date by modified, number of test cases , open bugs
 details button on context menu and show in view panel.
 
@@ -54,15 +52,9 @@ add toolbar item, show (passed, failed, blocked)
 
 add dictionary to correct test cases titles
 
-add pre-condition test case attribute (or query or test data)
-
-generate reports. (in progress)
-
 drag and drop for test runs, multi
 
 add dashboards and result in charts for each test run. right click details the show in view panel.
-
-auto complete steps. (in progress)
 
 grid view editor.
 
@@ -91,8 +83,6 @@ update creating test case ui.
 extend space of pagination text field value to show 3 digits clearly.
 
 add a button once hover on label, show copy button and accept CTRL+C
-
-change test case dto id value form string to UUID, big change, to be implemented in last sprint.
 
 make test case dto configurable.
 
@@ -275,4 +265,11 @@ in test run, I want to highlight the running test case, by add a new badge (Acti
 
 implement actual result in test run.
 
-persist test case run status.
+enhance editor context menu for test editor to be shown if no list item selected with disabled buttons.
+allow only create test case.
+
+if change test run to completed then change pending test cases to untested automatic.
+
+remove GitHub project and recreate it with new history.
+
+

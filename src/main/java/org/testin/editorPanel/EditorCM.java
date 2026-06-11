@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
@@ -14,7 +15,9 @@ import org.testin.actions.*;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 
+import javax.swing.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,14 +37,15 @@ public class EditorCM extends DefaultActionGroup {
         this.project = project;
 
         add(new CreateTestCase(ui, dir, list, model));
-        DefaultActionGroup statusGroup = new DefaultActionGroup("Set Status", true);
-
-        statusGroup.getTemplatePresentation().setIcon(AllIcons.General.Filter);
-        // todo, no need for loop
-        for (AnAction a : new SetTestCaseRunStatus(ui, list).getStatusActions()) { // todo, to be refactored.
-            statusGroup.add(a);
-        }
-        add(statusGroup);
+        add(createSubGroup("Set Status", AllIcons.General.Filter,
+                List.of(
+                        new SetStatusPassed(ui, list),
+                        new SetStatusFailed(ui, list),
+                        new SetStatusBlocked(ui, list),
+                        new SetStatusPending(ui, list),
+                        new SetStatusUntested(ui, list)
+                )
+        ));
         add(new ViewDetails(list, dir.getPath()));
         add(new StartExecution(ui.getToolBar().getCallbacks()));
         addSeparator();
@@ -68,6 +72,14 @@ public class EditorCM extends DefaultActionGroup {
             globalSourceEditorUI.getPreferredFocusedComponent().repaint();
 
         globalSourceEditorUI = null;
+    }
+
+    private DefaultActionGroup createSubGroup(final String title, final Icon icon, final List<? extends DumbAwareAction> actions) {
+        DefaultActionGroup group = new DefaultActionGroup(title, true);
+        group.getTemplatePresentation().setIcon(icon);
+        for (AnAction action : actions)
+            group.add(action);
+        return group;
     }
 
     public void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final EditorCM editorCM) {
