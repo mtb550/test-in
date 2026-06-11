@@ -1,8 +1,11 @@
 package org.testin.util.services;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testRunEditor.RunEditorUI;
@@ -19,9 +22,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Service(Service.Level.PROJECT)
 public final class RunStatusService {
 
-    public static void executeNext(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+    public void executeNext(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditorUI runUi)) return;
 
         int executingIndex = runUi.getCurrentlyExecutingIndex();
@@ -37,7 +42,7 @@ public final class RunStatusService {
 
         Log.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
-        persistRunDataAsync(runUi);
+        persistRunDataAsync(project, runUi);
         triggerFilterRefresh(ui, list);
 
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -49,7 +54,7 @@ public final class RunStatusService {
         });
     }
 
-    public static void executeManual(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
+    public void executeManual(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditorUI runUi)) return;
 
         TestRunItems item = runUi.getResultsMap().get(tc.getId());
@@ -65,11 +70,11 @@ public final class RunStatusService {
 
         Log.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
-        persistRunDataAsync(runUi);
+        persistRunDataAsync(project, runUi);
         triggerFilterRefresh(ui, null);
     }
 
-    public static void applyStatus(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+    public void applyStatus(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditorUI runUi)) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
@@ -97,26 +102,26 @@ public final class RunStatusService {
                 }
             }
 
-            persistRunDataAsync(runUi);
+            persistRunDataAsync(project, runUi);
             triggerFilterRefresh(ui, list);
         }
     }
 
-    private static void persistRunDataAsync(final @NotNull RunEditorUI runUi) {
+    private void persistRunDataAsync(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
         if (runUi.getTr() == null || runUi.getVf().getTestRun() == null) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = runUi.getVf().getTestRun().getPath();
                 Path jsonFilePath = dirPath.resolve(runUi.getVf().getTestRun().getName() + ".json");
-                Services.getInstance(runUi.getProject(), FilesUtil.class).write(runUi.getProject(), jsonFilePath, runUi.getTr());
+                Services.getInstance(project, FilesUtil.class).write(project, jsonFilePath, runUi.getTr());
             } catch (Exception e) {
                 Log.error("Failed to persist test run data: " + e.getMessage());
             }
         });
     }
 
-    private static void triggerFilterRefresh(final @NotNull IEditorUI ui, final JBList<TestCaseDto> list) {
+    private void triggerFilterRefresh(final @NotNull IEditorUI ui, final JBList<TestCaseDto> list) {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (list != null) {
                 list.repaint();
