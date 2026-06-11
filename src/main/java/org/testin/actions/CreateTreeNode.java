@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +16,7 @@ import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -38,15 +38,16 @@ public class CreateTreeNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final DirectoryDto parentDir = Tools.getInstance().getCurrentSelectedDirectory(tree);
+        if (e.getProject() == null) return;
 
-        TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+        final DirectoryDto parentDir = Services.getInstance(e.getProject(), Tools.class).getCurrentSelectedDirectory(tree);
+        final TreePath path = tree.getSelectionPath();
+
+        if (path == null || parentDir == null) return;
 
         final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        final Project project = e.getProject();
-        new CreateNodesDialog(project, parentDir.getMenu(), (name, directoryType, codeGenerator) -> {
+        new CreateNodesDialog(e.getProject(), parentDir.getMenu(), (name, directoryType, codeGenerator) -> {
 
             if (name == null || name.isEmpty()) return;
             DirectoryDto dir = null;
@@ -61,12 +62,12 @@ public class CreateTreeNode extends DumbAwareAction {
             if (codeGenerator != null && codeGenerator.isSelected() && directoryType != null && directoryType.getAction() != null) {
 
                 if (directoryType == DirectoryType.TSP) {
-                    GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(project, null, dir.getFqcn());
+                    GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(e.getProject(), null, dir.getFqcn());
                     return;
                 }
 
                 if (directoryType == DirectoryType.TS) {
-                    GeneratorType.CREATE_TEST_SET.getAction().execute(project, null, dir.getFqcn());
+                    GeneratorType.CREATE_TEST_SET.getAction().execute(e.getProject(), null, dir.getFqcn());
                 }
 
             }
@@ -76,7 +77,9 @@ public class CreateTreeNode extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        DirectoryDto parentDir = Tools.getInstance().getCurrentSelectedDirectory(tree);
+        if (e.getProject() == null) return;
+
+        DirectoryDto parentDir = Services.getInstance(e.getProject(), Tools.class).getCurrentSelectedDirectory(tree);
 
         if (parentDir == null || parentDir instanceof TestProjectDirectoryDto) {
             e.getPresentation().setEnabled(false);

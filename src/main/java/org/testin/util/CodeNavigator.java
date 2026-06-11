@@ -12,6 +12,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.util.List;
 
@@ -57,11 +58,11 @@ public class CodeNavigator {
                             });
 
                         } else
-                            ApplicationManager.getApplication().invokeLater(() -> Notifier.getInstance().error(project, "Navigation Error: ", "Class Not Found: " + className));
+                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Navigation Error: ", "Class Not Found: " + className));
 
                     } catch (final IndexNotReadyException e) {
                         Log.trace("index not ready, deferring navigation");
-                        Notifier.getInstance().softShow(project, "index not ready, deferring navigation");
+                        Services.getInstance(project, Notifier.class).softShow(project, "index not ready, deferring navigation");
                         DumbService.getInstance(project).runWhenSmart(() -> toCode(project, fqcn));
                     }
                 })

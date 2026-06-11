@@ -106,7 +106,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
                                 TestEditorAttributes currentAttr = importAttributes.get(col - 2);
                                 TestCaseDto tc = testCases.get(row);
 
-                                currentAttr.getImportSetter().accept(tc, updatedValue);
+                                currentAttr.getImportSetter().accept(project, tc, updatedValue);
 
                                 String formattedValue = currentAttr.getValueExtractor().apply(tc);
                                 model.setValueAt(formattedValue, row, col);

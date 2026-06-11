@@ -25,8 +25,8 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .pathName(fileName)
-                    .fqcn(List.of(Tools.getInstance().sanitizePackageName(fileName)))
-                    .path2(Tools.getInstance().buildPath2(null, fileName))
+                    .fqcn(List.of(Services.getInstance(project, Tools.class).sanitizePackageName(fileName)))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(null, fileName))
                     .marker(Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class))
                     .build();
 
@@ -35,7 +35,7 @@ public final class DirectoryMapper {
                     .name(DirectoryType.TCD.getDisplayedName())
                     .fqcn(tp.getFqcn())
                     .parent(tp)
-                    .path2(Tools.getInstance().buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
                     .build();
 
             TestRunsMainDirectoryDto trd = TestRunsMainDirectoryDto.builder()
@@ -43,7 +43,7 @@ public final class DirectoryMapper {
                     .name(DirectoryType.TRD.getDisplayedName())
                     .fqcn(tp.getFqcn())
                     .parent(tp)
-                    .path2(Tools.getInstance().buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
                     .build();
 
             tp.setTestCasesDirectory(tcd);
@@ -53,7 +53,7 @@ public final class DirectoryMapper {
             return tp;
 
         } catch (Exception e) {
-            Notifier.getInstance().error(project, "Read Test Project Failed", "Skipping invalid format: " + fileName);
+            Services.getInstance(project, Notifier.class).error(project, "Read Test Project Failed", "Skipping invalid format: " + fileName);
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -70,14 +70,14 @@ public final class DirectoryMapper {
                     .path(path)
                     .parent(parent)
                     .fqcn(parent.getFqcn())
-                    .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
             Log.info("retrieve the test cases main directory: " + tcd);
             return tcd;
 
         } catch (Exception e) {
-            Notifier.getInstance().error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
+            Services.getInstance(project, Notifier.class).error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -94,14 +94,14 @@ public final class DirectoryMapper {
                     .path(path)
                     .parent(parent)
                     .fqcn((parent.getFqcn()))
-                    .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
             Log.info("retrieve the test runs main directory: " + trd);
             return trd;
 
         } catch (Exception e) {
-            Notifier.getInstance().error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
+            Services.getInstance(project, Notifier.class).error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -117,15 +117,15 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(Tools.getInstance().appendFqcn(parent.getFqcn(), fileName, DirectoryType.TSP))
-                    .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
+                    .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TSP))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
             Log.info("retrieve the test set package directory: " + testSetPackageDirectoryDto);
             return testSetPackageDirectoryDto;
 
         } catch (Exception e) {
-            Notifier.getInstance().error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
+            Services.getInstance(project, Notifier.class).error(project, "Read Test Case Package Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -141,15 +141,15 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(Tools.getInstance().appendFqcn(parent.getFqcn(), fileName, DirectoryType.TRP))
-                    .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
+                    .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TRP))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
             Log.info("retrieve the test run package directory: " + testRunPackageDirectoryDto);
             return testRunPackageDirectoryDto;
 
         } catch (Exception e) {
-            Notifier.getInstance().error(project, "Read Test Run Package Failed", "Failed to parse directory: " + path.getFileName());
+            Services.getInstance(project, Notifier.class).error(project, "Read Test Run Package Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -166,15 +166,15 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(Tools.getInstance().appendFqcn(parent.getFqcn(), fileName, DirectoryType.TS))
-                    .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
+                    .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TS))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
             Log.info("retrieve the test set directory: " + testSetDirectoryDto);
             return testSetDirectoryDto;
 
         } catch (Exception e) {
-            Notifier.getInstance().error(project, "Read Test Set Failed", "Failed to parse directory: " + path.getFileName());
+            Services.getInstance(project, Notifier.class).error(project, "Read Test Set Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             e.printStackTrace(System.err);
@@ -190,8 +190,8 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(Tools.getInstance().appendFqcn(parent.getFqcn(), fileName, DirectoryType.TR))
-                    .path2(Tools.getInstance().buildPath2(parent.getPath2(), fileName))
+                    .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TR))
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .marker(Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TR.getMarker()).toFile(), TestRunMarker.class))
                     .build();
 
@@ -199,7 +199,7 @@ public final class DirectoryMapper {
             return testRunDirectoryDto;
 
         } catch (Exception e) {
-            Notifier.getInstance().error(project, "Read Test Run Failed", "Failed to parse directory: " + path.getFileName());
+            Services.getInstance(project, Notifier.class).error(project, "Read Test Run Failed", "Failed to parse directory: " + path.getFileName());
             Log.error(e.getMessage());
             Log.error("Exception: " + e.getMessage());
             e.printStackTrace(System.err);

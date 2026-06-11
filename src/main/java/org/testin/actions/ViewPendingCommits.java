@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.util.*;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -49,11 +50,11 @@ public class ViewPendingCommits extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final Project project = e.getProject();
-        final Path path = Tools.getInstance().getProjectPath(tree);
+        final Path path = Services.getInstance(project, Tools.class).getProjectPath(tree);
 
         File gitDir = new File(path.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Notifier.getInstance().warnWithAction(project,
+            Services.getInstance(project, Notifier.class).warnWithAction(project,
                     "Git repository not found",
                     "The selected project (" + path.getFileName() + ") is not a Git repository.",
                     "Initialize Git (git init)",
@@ -72,7 +73,7 @@ public class ViewPendingCommits extends DumbAwareAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (changes.isEmpty()) {
-                            Notifier.getInstance().info(project, "No Changes", "Your test cases are up to date in this project.");
+                            Services.getInstance(project, Notifier.class).info(project, "No Changes", "Your test cases are up to date in this project.");
                             return;
                         }
 
@@ -90,14 +91,14 @@ public class ViewPendingCommits extends DumbAwareAction {
                             if (commitMessage != null && !commitMessage.trim().isEmpty()) {
                                 performCommitWorkflow(project, path, commitMessage.trim());
                             } else if (commitMessage != null) {
-                                Notifier.getInstance().warn(project, "Commit Aborted", "A commit message is required.");
+                                Services.getInstance(project, Notifier.class).warn(project, "Commit Aborted", "A commit message is required.");
                             }
                         }
                     });
 
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "Git Error", "Failed to calculate diffs: " + ex.getMessage())
+                            Services.getInstance(project, Notifier.class).error(project, "Git Error", "Failed to calculate diffs: " + ex.getMessage())
                     );
                 }
             }
@@ -122,7 +123,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                                 () -> pushToRemote(project, repoPath)
                         );
 
-                        pushNotification = Notifier.getInstance().infoWithActions(
+                        pushNotification = Services.getInstance(project, Notifier.class).infoWithActions(
                                 project,
                                 "Commit successful",
                                 "Changes committed locally. Would you like to push to the remote repository now?",
@@ -138,7 +139,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                         );
                     } else {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Notifier.getInstance().error(project, "Commit Failed", "Failed to commit changes:\n" + errorMsg)
+                                Services.getInstance(project, Notifier.class).error(project, "Commit Failed", "Failed to commit changes:\n" + errorMsg)
                         );
                     }
                 }
@@ -165,11 +166,11 @@ public class ViewPendingCommits extends DumbAwareAction {
                     }
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().info(project, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName())
+                            Services.getInstance(project, Notifier.class).info(project, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName())
                     );
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage())
+                            Services.getInstance(project, Notifier.class).error(project, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage())
                     );
                 }
             }
@@ -192,7 +193,7 @@ public class ViewPendingCommits extends DumbAwareAction {
             );
 
             if (remoteUrl == null || remoteUrl.trim().isEmpty()) {
-                Notifier.getInstance().warn(project, "Push Aborted", "A remote URL is required to push.");
+                Services.getInstance(project, Notifier.class).warn(project, "Push Aborted", "A remote URL is required to push.");
                 return;
             }
 
@@ -206,7 +207,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                         executeGitPush(project, repoPath);
                     } catch (Exception ex) {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Notifier.getInstance().error(project, "Git Error", "Failed to add remote: " + ex.getMessage())
+                                Services.getInstance(project, Notifier.class).error(project, "Git Error", "Failed to add remote: " + ex.getMessage())
                         );
                     }
                 }
@@ -246,12 +247,12 @@ public class ViewPendingCommits extends DumbAwareAction {
                             pushNotification = null;
                         }
 
-                        Notifier.getInstance().info(project, "Push Successful", "Test cases were successfully pushed to the remote repository!");
+                        Services.getInstance(project, Notifier.class).info(project, "Push Successful", "Test cases were successfully pushed to the remote repository!");
                     });
 
                 } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "Push Failed", "Could not push to remote:\n" + ex.getMessage())
+                            Services.getInstance(project, Notifier.class).error(project, "Push Failed", "Could not push to remote:\n" + ex.getMessage())
                     );
                 }
             }
@@ -278,7 +279,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                 boolean setGlobally = dialog.isSetGlobalConfig();
 
                 if (name.trim().isEmpty() || email.trim().isEmpty()) {
-                    Notifier.getInstance().warn(project, "Missing Info", "Name and email are required to configure Git.");
+                    Services.getInstance(project, Notifier.class).warn(project, "Missing Info", "Name and email are required to configure Git.");
                     return;
                 }
 
@@ -292,12 +293,12 @@ public class ViewPendingCommits extends DumbAwareAction {
                             GitCommandRunner.execute(repoPath, "git", "config", scope, "user.email", email.trim());
 
                             ApplicationManager.getApplication().invokeLater(() -> {
-                                Notifier.getInstance().info(project, "Git Identity Set", "Identity configured successfully. Resuming commit...");
+                                Services.getInstance(project, Notifier.class).info(project, "Git Identity Set", "Identity configured successfully. Resuming commit...");
                                 performCommitWorkflow(project, repoPath, pendingCommitMessage);
                             });
                         } catch (Exception ex) {
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Notifier.getInstance().error(project, "Config Failed", "Failed to set Git identity:\n" + ex.getMessage())
+                                    Services.getInstance(project, Notifier.class).error(project, "Config Failed", "Failed to set Git identity:\n" + ex.getMessage())
                             );
                         }
                     }

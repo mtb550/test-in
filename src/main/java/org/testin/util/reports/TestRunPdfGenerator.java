@@ -1,5 +1,6 @@
 package org.testin.util.reports;
 
+import com.intellij.openapi.project.Project;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
@@ -19,6 +20,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Tools;
+import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
@@ -27,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TestRunPdfGenerator {
 
-    public byte[] generate(final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) throws Exception {
+    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) throws Exception {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
             PdfWriter writer = new PdfWriter(baos);
@@ -86,8 +88,8 @@ public final class TestRunPdfGenerator {
                     );
                     table.addCell(statusCell);
 
-                    String duration = Tools.getInstance().getFormattedDuration(result.getDuration());
-                    table.addCell(new Cell().add(new Paragraph(duration != null ? duration : "N/A")));
+                    String duration = Services.getInstance(project, Tools.class).getFormattedDuration(result.getDuration());
+                    table.addCell(new Cell().add(new Paragraph(duration)));
                 });
             } else {
                 Cell emptyCell = new Cell(1, 4).add(new Paragraph("No test results found."))

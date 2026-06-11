@@ -10,6 +10,7 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -157,7 +158,7 @@ public class TreeTransferHandler extends TransferHandler {
 
             sourceDir.setPath(newPath);
 
-            Tools.getInstance().updateChildrenPathsRecursive(movedNode, oldPath, newPath);
+            Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(movedNode, oldPath, newPath);
 
             Log.info("Moved successfully to: " + newPath);
         });
@@ -223,9 +224,7 @@ public class TreeTransferHandler extends TransferHandler {
                         if (dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestRunDirectoryDto) {
 
                             Path nioPath = dirDto.getPath();
-                            if (nioPath != null) {
-                                files.add(nioPath.toFile());
-                            }
+                            files.add(nioPath.toFile());
                         }
                     }
                 }

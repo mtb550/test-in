@@ -11,8 +11,8 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.settings.Setting;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
@@ -61,7 +61,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
     }
 
     private void openViewPanel(Project project, String targetId) {
-        Path rootPath = Config.getTestinPath();
+        Path rootPath = Services.getInstance(project, Setting.class).getTestinPath();
 
         Log.info("[GUTTER TRACE] Root path: " + rootPath);
         Log.info("[GUTTER TRACE] Searching for UUID: " + targetId);
@@ -80,7 +80,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 if (foundFile == null) {
                     Log.error("[GUTTER TRACE] File not found in external path: " + targetId + ".json");
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().warn(project, "Not Found", "No JSON file found in external path for ID: " + targetId)
+                            Services.getInstance(project, Notifier.class).warn(project, "Not Found", "No JSON file found in external path for ID: " + targetId)
                     );
                     return;
                 }
@@ -88,14 +88,15 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 Log.info("[GUTTER TRACE] Found file: " + foundFile.getAbsolutePath());
 
                 TestCaseDto dto = Services.getInstance(project, Mapper.class).readValue(foundFile, TestCaseDto.class);
-                Path parentPath = foundFile.getParentFile().toPath();
 
+                if (dto == null) return;
+                Path parentPath = foundFile.getParentFile().toPath();
                 ApplicationManager.getApplication().invokeLater(() -> ViewToolWindowFactory.showPanel(project, List.of(dto), parentPath));
 
             } catch (Exception ex) {
                 Log.error("[GUTTER TRACE] IO Error: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Notifier.getInstance().error(project, "Error", "Could not read JSON file: " + ex.getMessage())
+                        Services.getInstance(project, Notifier.class).error(project, "Error", "Could not read JSON file: " + ex.getMessage())
                 );
             }
         });

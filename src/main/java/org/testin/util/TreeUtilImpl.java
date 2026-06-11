@@ -9,6 +9,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -23,10 +24,10 @@ public class TreeUtilImpl {
                 if (vf != null) {
                     operation.execute(vf);
                 } else {
-                    Notifier.getInstance().error(project, "Could not find path on disk:\n" + path, errorTitle);
+                    Services.getInstance(project, Notifier.class).error(project, "Could not find path on disk:\n" + path, errorTitle);
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error(project, "Operation failed: " + ex.getMessage(), errorTitle);
+                Services.getInstance(project, Notifier.class).error(project, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
     }
@@ -40,10 +41,10 @@ public class TreeUtilImpl {
                 if (sourceVf != null && targetVf != null) {
                     operation.execute(sourceVf, targetVf);
                 } else {
-                    Notifier.getInstance().error(project, "Could not find source or target path on disk.", errorTitle);
+                    Services.getInstance(project, Notifier.class).error(project, "Could not find source or target path on disk.", errorTitle);
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error(project, "Operation failed: " + ex.getMessage(), errorTitle);
+                Services.getInstance(project, Notifier.class).error(project, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
     }
@@ -74,7 +75,7 @@ public class TreeUtilImpl {
                     parentVf.createChildDirectory(requester, folderName);
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error(project, "Could not create directory: " + ex.getMessage(), "Error");
+                Services.getInstance(project, Notifier.class).error(project, "Could not create directory: " + ex.getMessage(), "Error");
             }
         }));
     }
@@ -90,7 +91,7 @@ public class TreeUtilImpl {
                     }
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error(project, "Could not create marker file: " + ex.getMessage(), "Error");
+                Services.getInstance(project, Notifier.class).error(project, "Could not create marker file: " + ex.getMessage(), "Error");
             }
         }));
     }
@@ -103,7 +104,7 @@ public class TreeUtilImpl {
                     vf.delete(requester);
                 }
             } catch (IOException ex) {
-                Notifier.getInstance().error(project, "Could not delete file: " + ex.getMessage(), "Error");
+                Services.getInstance(project, Notifier.class).error(project, "Could not delete file: " + ex.getMessage(), "Error");
             }
         }));
     }

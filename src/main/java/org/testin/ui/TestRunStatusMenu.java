@@ -35,7 +35,7 @@ public class TestRunStatusMenu {
     public void show() {
         TestRunStatus[] statuses = TestRunStatus.values();
         JBList<TestRunStatus> list = buildMenuList(statuses);
-        JBPopup popup = buildPopup("Set Test Run Status", list);
+        JBPopup popup = buildPopup(list);
 
         registerShortcuts(list, popup, onStatusSelected);
 
@@ -65,10 +65,10 @@ public class TestRunStatusMenu {
         };
     }
 
-    private JBPopup buildPopup(final String title, final JBList<TestRunStatus> list) {
+    private JBPopup buildPopup(final JBList<TestRunStatus> list) {
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(list), list)
-                .setTitle(title)
+                .setTitle("Set Test Run Status")
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(true)
                 .setMovable(false)

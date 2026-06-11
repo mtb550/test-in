@@ -46,11 +46,11 @@ public class ImportJson extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
-        final @NotNull Project project = e.getProject();
+        if (e.getProject() == null) return;
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Notifier.getInstance().error(project, "Import Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Import Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -59,7 +59,7 @@ public class ImportJson extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Notifier.getInstance().error(project, "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
@@ -70,11 +70,11 @@ public class ImportJson extends DumbAwareAction {
         }
 
         if (targetDirectory == null) {
-            Notifier.getInstance().error(project, "Import Error", "The selected path in the Project Panel is invalid.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Import Error", "The selected path in the Project Panel is invalid.");
             return;
         }
 
-        openFileChooserAndProcess(project, targetDirectory, dirDto, parentNode);
+        openFileChooserAndProcess(e.getProject(), targetDirectory, dirDto, parentNode);
     }
 
     private void openFileChooserAndProcess(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
@@ -88,7 +88,7 @@ public class ImportJson extends DumbAwareAction {
             String extension = selectedFile.getExtension();
 
             if (extension == null || !extension.equalsIgnoreCase("json")) {
-                ApplicationManager.getApplication().invokeLater(() -> Notifier.getInstance().error(project, "Invalid File Format",
+                ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Invalid File Format",
                         "Only JSON files (.json) are allowed.\n\n" +
                                 "You selected an '." + extension + "' file.\n" +
                                 "Please select a valid JSON file and try again."));
@@ -101,7 +101,7 @@ public class ImportJson extends DumbAwareAction {
     private void processWithJson(final @NotNull Project project, final String filePath, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
         File file = new File(filePath);
         if (!file.exists() || !file.canRead()) {
-            Notifier.getInstance().error(project, "File Error", "Java cannot read this file!");
+            Services.getInstance(project, Notifier.class).error(project, "File Error", "Java cannot read this file!");
             return;
         }
 
@@ -116,7 +116,7 @@ public class ImportJson extends DumbAwareAction {
 
                 if (rawData == null) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "Failed to parse JSON file. It may be corrupted or incorrectly formatted.")
+                            Services.getInstance(project, Notifier.class).error(project, "Failed to parse JSON file. It may be corrupted or incorrectly formatted.")
                     );
                     return;
                 }
@@ -139,7 +139,7 @@ public class ImportJson extends DumbAwareAction {
 
                 if (sanitizedData.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().warn(project, "No Data", "No valid test cases found in the JSON file.")
+                            Services.getInstance(project, Notifier.class).warn(project, "No Data", "No valid test cases found in the JSON file.")
                     );
                     return;
                 }
@@ -154,7 +154,7 @@ public class ImportJson extends DumbAwareAction {
                         Map<String, List<TestCaseDto>> selectedCasesByGroup = dialog.getSelectedTestCasesBySheet();
 
                         if (selectedCasesByGroup.isEmpty()) {
-                            Notifier.getInstance().softShow(project, "No Selection", "No test cases were selected for import.");
+                            Services.getInstance(project, Notifier.class).softShow(project, "No Selection", "No test cases were selected for import.");
                             return;
                         }
 
@@ -167,8 +167,8 @@ public class ImportJson extends DumbAwareAction {
 
                                     linkAndSaveTestCases(project, targetDirectory, flatList, tail, ImportJson.this);
 
-                                    EditorUtil.getInstance().closeThenOpenEditor(project, targetDirectory, ts);
-                                    Notifier.getInstance().info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
+                                    Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
+                                    Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
                                 } else {
                                     int totalImported = 0;
@@ -182,7 +182,7 @@ public class ImportJson extends DumbAwareAction {
                                         linkAndSaveTestCases(project, groupDir, groupCases, tail, ImportJson.this);
                                         totalImported += groupCases.size();
                                     }
-                                    Notifier.getInstance().info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
+                                    Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
                                 }
 
                                 targetDirectory.refresh(false, true);
@@ -193,7 +193,7 @@ public class ImportJson extends DumbAwareAction {
                         });
 
                     } else {
-                        Notifier.getInstance().softShow(project, "Import Cancelled", "Import was cancelled from preview dialog.");
+                        Services.getInstance(project, Notifier.class).softShow(project, "Import Cancelled", "Import was cancelled from preview dialog.");
                     }
                 });
             }

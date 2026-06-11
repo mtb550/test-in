@@ -16,6 +16,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Mapper;
+import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
@@ -70,7 +71,7 @@ public final class TestRunReport {
                 File jsonFile = dirPath.resolve(folderName + ".json").toFile();
 
                 if (!jsonFile.exists() || !jsonFile.isFile()) {
-                    Notifier.getInstance().error(project, "Report Error", "JSON data file not found: " + jsonFile.getAbsolutePath());
+                    Services.getInstance(project, Notifier.class).error(project, "Report Error", "JSON data file not found: " + jsonFile.getAbsolutePath());
                     return;
                 }
 
@@ -82,13 +83,13 @@ public final class TestRunReport {
 
                 switch (format) {
                     case HTML -> {
-                        String reportHtml = new TestRunHtmlGenerator().generate(tr, runData, detailsMap);
+                        String reportHtml = new TestRunHtmlGenerator().generate(project, tr, runData, detailsMap);
                         fileBytes = reportHtml.getBytes(StandardCharsets.UTF_8);
                     }
 
-                    case PDF -> fileBytes = new TestRunPdfGenerator().generate(tr, runData, detailsMap);
+                    case PDF -> fileBytes = new TestRunPdfGenerator().generate(project, tr, runData, detailsMap);
 
-                    case EXCEL -> fileBytes = new TestRunExcelGenerator().generate(tr, runData, detailsMap);
+                    case EXCEL -> fileBytes = new TestRunExcelGenerator().generate(project, tr, runData, detailsMap);
 
                     default -> throw new UnsupportedOperationException("Unknown format: " + format.name());
                 }
@@ -114,7 +115,7 @@ public final class TestRunReport {
                 };
                 copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
 
-                Notifier.getInstance().infoWithActions(project,
+                Services.getInstance(project, Notifier.class).infoWithActions(project,
                         format.name() + " Report Generated",
                         "Saved successfully: " + reportFile.getName(),
                         openAction,
@@ -122,7 +123,7 @@ public final class TestRunReport {
                 );
 
             } catch (Exception e) {
-                Notifier.getInstance().error(project, "Report Error", "Failed to generate " + format.name() + " report: " + e.getMessage());
+                Services.getInstance(project, Notifier.class).error(project, "Report Error", "Failed to generate " + format.name() + " report: " + e.getMessage());
                 Log.error("Exception: " + e.getMessage());
             }
         });
@@ -142,7 +143,7 @@ public final class TestRunReport {
 
         for (Map.Entry<List<String>, List<UUID>> entry : pathMap.entrySet()) {
 
-            Path dirPath = org.testin.util.Tools.getInstance().buildLocalPathFromList(entry.getKey());
+            Path dirPath = Services.getInstance(project, Tools.class).buildLocalPathFromList(project, entry.getKey());
             List<UUID> targetIds = entry.getValue();
 
             if (dirPath == null || !Files.exists(dirPath) || targetIds.isEmpty()) {

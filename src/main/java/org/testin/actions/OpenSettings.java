@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
-import org.testin.settings.AppSettingsConfigurable;
+import org.testin.settings.Setting;
 
 public class OpenSettings extends DumbAwareAction {
 
@@ -16,7 +16,7 @@ public class OpenSettings extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), AppSettingsConfigurable.class);
+        ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), Setting.class);
     }
 
     @Override

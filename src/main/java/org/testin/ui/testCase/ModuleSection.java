@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
+import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 
 import javax.swing.*;
@@ -20,7 +21,7 @@ public class ModuleSection implements ICreateTestCaseSection {
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ModuleSection(final @NotNull Project project) {
-        this.moduleField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getModules(), CreateTestCaseFields.MODULE.getIcon()), false, "");
+        this.moduleField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(project, TestCaseCacheService.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), false, "");
         this.moduleField.setFont(fieldFont);
         this.moduleField.setPlaceholder(CreateTestCaseFields.MODULE.getPlaceholder());
         this.moduleField.setShowPlaceholderWhenFocused(true);

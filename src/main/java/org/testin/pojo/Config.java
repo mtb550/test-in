@@ -1,11 +1,7 @@
 package org.testin.pojo;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -16,15 +12,5 @@ public class Config {
 
     @Getter
     private static final DateTimeFormatter dateFormatterPattern = DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN, Locale.US);
-
-    @Setter
-    @Getter
-    @NotNull
-    private static Path testinPath = Path.of("");
-
-    @Setter
-    @Getter
-    @Nullable
-    private static Path automationPath = null;
 
 }

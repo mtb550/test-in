@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.*;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.settings.Setting;
 import org.testin.ui.createNodes.CreateNodesDialog;
 import org.testin.util.FilesUtil;
 import org.testin.util.TreeUtilImpl;
@@ -51,24 +52,24 @@ public class CreateTestProject extends DumbAwareAction {
             }
 
             final String tpName = name.trim();
-            final Path tpPath = Config.getTestinPath().resolve(tpName);
+            final Path tpPath = Services.getInstance(project, Setting.class).getTestinPath().resolve(tpName);
 
             if (Files.exists(tpPath)) {
-                Notifier.getInstance().error(project, "Creation Failed", "A test project named '" + tpName + "' already exists.");
+                Services.getInstance(project, Notifier.class).error(project, "Creation Failed", "A test project named '" + tpName + "' already exists.");
                 return;
             }
 
             TestProjectDirectoryDto newTp = Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, tpPath);
 
             if (newTp == null) {
-                Notifier.getInstance().error(project, "Creation Failed", "Could not map test project directory in memory.");
+                Services.getInstance(project, Notifier.class).error(project, "Creation Failed", "Could not map test project directory in memory.");
                 return;
             }
 
-            TreeUtilImpl.executeVfsAction(project, Config.getTestinPath(), "IO Error", vf -> {
+            TreeUtilImpl.executeVfsAction(project, Services.getInstance(project, Setting.class).getTestinPath(), "IO Error", vf -> {
 
                 if (vf.findChild(tpName) != null) {
-                    Notifier.getInstance().error(project, "Creation Failed", "The directory '" + tpName + "' already exists in the IDE's Virtual File System.");
+                    Services.getInstance(project, Notifier.class).error(project, "Creation Failed", "The directory '" + tpName + "' already exists in the IDE's Virtual File System.");
                     return;
                 }
 
@@ -96,7 +97,7 @@ public class CreateTestProject extends DumbAwareAction {
                 projectDir.refresh(false, true);
                 projectPanel.getTestProjectSelector().addTestProject(newTp);
 
-                Notifier.getInstance().info(project, "New Test Project", String.format("Test Project %s has been added", name));
+                Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", name));
 
                 if (codeGenerator.isSelected()) {
                     GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, null, newTp.getFqcn());
@@ -108,12 +109,13 @@ public class CreateTestProject extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
         execute(e.getProject());
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null || Config.getTestinPath().toString().isEmpty())
+        if (e.getProject() == null || Services.getInstance(e.getProject(), Setting.class).getTestinPath().toString().isEmpty())
             e.getPresentation().setEnabled(false);
     }
 

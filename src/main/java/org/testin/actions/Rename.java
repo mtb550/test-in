@@ -7,7 +7,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
@@ -18,6 +17,7 @@ import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -38,8 +38,8 @@ public class Rename extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@Nullable AnActionEvent e) {
-        if (tree == null) return;
+    public void actionPerformed(@NotNull AnActionEvent e) {
+        if (tree == null || e.getProject() == null) return;
 
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
@@ -52,7 +52,7 @@ public class Rename extends DumbAwareAction {
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
         if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
 
-        EditorUtil.getInstance().closeEditor(e.getProject(), dir.getName());
+        Services.getInstance(e.getProject(), EditorUtil.class).closeEditor(e.getProject(), dir.getName());
 
         Path oldPath = dir.getPath();
         Path newPath = oldPath.getParent().resolve(newName);
@@ -65,7 +65,7 @@ public class Rename extends DumbAwareAction {
             dir.setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
             dir.setModifiedBy("Muteb almughyiri");
 
-            Tools.getInstance().updateChildrenPathsRecursive(node, oldPath, newPath);
+            Services.getInstance(e.getProject(), Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
             if (dir instanceof TestProjectDirectoryDto && projectPanel.getTestProjectSelector() != null) {

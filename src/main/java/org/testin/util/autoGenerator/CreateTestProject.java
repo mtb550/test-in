@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class CreateTestProject implements GeneratorAction {
             try {
                 WriteAction.run(() -> {
 
-                    VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
+                    VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
 
                     if (sourceRoot != null) {
                         VirtualFile vf = VfsUtil.createDirectoryIfMissing(sourceRoot, fqcn.getFirst());

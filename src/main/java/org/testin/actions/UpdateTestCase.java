@@ -52,10 +52,10 @@ public class UpdateTestCase extends DumbAwareAction {
 
         new TestCaseUpdateMenu(project, selectedItems, (updatedItems, codeGenerator) -> {
 
-            TestCaseCacheService.getInstance(project).addNewItems(updatedItems);
+            Services.getInstance(project, TestCaseCacheService.class).addNewItems(updatedItems);
             Services.getInstance(project, TestCasePersistService.class).persist(path, updatedItems);
 
-            Notifier.getInstance().softShow(project, "Updated..");
+            Services.getInstance(project, Notifier.class).softShow(project, "Updated..");
 
             if (ui instanceof IToolBar) {
                 ((IToolBar) ui).onToolBarFilterSelectionChanged();

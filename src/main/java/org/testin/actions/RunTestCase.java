@@ -11,6 +11,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestNGRunnerByMethod;
+import org.testin.util.services.Services;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public class RunTestCase extends DumbAwareAction {
         for (TestCaseDto tc : testCases) {
             if (tc == null || "RUNNING".equals(tc.getTempStatus())) continue;
 
-            Notifier.getInstance().softShow(project, "Running Test Case: ", tc.getDescription());
+            Services.getInstance(project, Notifier.class).softShow(project, "Running Test Case: ", tc.getDescription());
             TestNGRunnerByMethod.runTestMethod(project, tc.getFqcn());
         }
     }
@@ -40,6 +41,8 @@ public class RunTestCase extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
+
         List<TestCaseDto> selectedValues = list.getSelectedValuesList();
         execute(e.getProject(), selectedValues);
     }

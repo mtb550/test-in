@@ -1,5 +1,7 @@
 package org.testin.viewPanel.details.components;
 
+import com.intellij.openapi.project.Project;
+
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
@@ -7,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.Tools;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,9 +22,9 @@ public class Title extends BaseDetails {
     private static final int INSETS_RIGHT = 16;
 
     @Override
-    public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
+    public int render(@NotNull final Project project, @NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
 
-        final String titleText = Tools.getInstance().format(dto.getDescription());
+        final String titleText = Services.getInstance(project, Tools.class).format(dto.getDescription());
         final String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
         final JTextArea mainTitleArea = new JTextArea(finalValue);

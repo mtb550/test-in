@@ -31,7 +31,7 @@ public final class TestCasePersistService implements Disposable {
             try {
                 VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
                 if (dirVFile == null) {
-                    Notifier.getInstance().error(project, "Save Error", "Could not resolve directory: " + path);
+                    Services.getInstance(project, Notifier.class).error(project, "Save Error", "Could not resolve directory: " + path);
                     return;
                 }
 
@@ -50,7 +50,7 @@ public final class TestCasePersistService implements Disposable {
                 }
 
             } catch (IOException e) {
-                Notifier.getInstance().error(project, "Save Error", "Failed to persist data: " + e.getMessage());
+                Services.getInstance(project, Notifier.class).error(project, "Save Error", "Failed to persist data: " + e.getMessage());
             }
         }));
     }

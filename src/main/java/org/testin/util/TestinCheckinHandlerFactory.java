@@ -7,6 +7,7 @@ import com.intellij.openapi.vcs.checkin.CheckinHandler;
 import com.intellij.openapi.vcs.checkin.CheckinHandlerFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 public class TestinCheckinHandlerFactory extends CheckinHandlerFactory {
     @Override
@@ -24,7 +25,7 @@ public class TestinCheckinHandlerFactory extends CheckinHandlerFactory {
 
                 if (containsManagedFiles) {
                     Project project = panel.getProject();
-                    Notifier.getInstance().error(project, "Commits to 'testin' paths are disabled. These are managed by automation.", "Commit Blocked");
+                    Services.getInstance(project, Notifier.class).error(project, "Commits to 'testin' paths are disabled. These are managed by automation.", "Commit Blocked");
                     return ReturnResult.CANCEL;
                 }
 

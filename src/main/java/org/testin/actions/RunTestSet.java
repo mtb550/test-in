@@ -10,6 +10,7 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestNGRunnerByClass;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -42,7 +43,7 @@ public class RunTestSet extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+        if (e.getProject() == null || path == null) return;
 
         Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
 
@@ -55,7 +56,7 @@ public class RunTestSet extends DumbAwareAction {
                 Log.info("fqcn: " + fqcn);
                 TestNGRunnerByClass.runTestClass(e.getProject(), fqcn);
             } else {
-                Notifier.getInstance().error(e.getProject(), "Run Failed", "Could not parse class name from file path: " + ts.getPath().toFile().getName());
+                Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Run Failed", "Could not parse class name from file path: " + ts.getPath().toFile().getName());
             }
         }
     }

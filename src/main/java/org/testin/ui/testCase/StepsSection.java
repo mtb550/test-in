@@ -12,6 +12,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
+import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 
 import javax.swing.*;
@@ -69,7 +70,7 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     public void addStepField(final String text, final TestCaseUIBase.IUIAction repackAction) {
-        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getSteps(), CreateTestCaseFields.STEPS.getIcon());
+        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(project, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
         TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(project, provider, false, text != null ? text : "");
 
         stepField.setFont(fieldFont);

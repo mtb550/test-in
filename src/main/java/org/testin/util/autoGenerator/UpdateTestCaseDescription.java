@@ -12,6 +12,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class UpdateTestCaseDescription {
 
                     List<String> packageList = new ArrayList<>(cleanedFqcn);
                     String baseClassName = packageList.removeLast();
-                    String expectedClassName = Tools.getInstance().toPascalCase(baseClassName);
+                    String expectedClassName = Services.getInstance(project, Tools.class).toPascalCase(baseClassName);
 
                     if (expectedClassName.toLowerCase().endsWith("test")) {
                         if (expectedClassName.endsWith("test")) {
@@ -69,7 +70,7 @@ public class UpdateTestCaseDescription {
                                     PsiAnnotationMemberValue newDesc = factory.createExpressionFromText("\"" + tc.getDescription() + "\"", null);
                                     targetAnnotation.setDeclaredAttributeValue("description", newDesc);
 
-                                    String newMethodName = Tools.getInstance().toCamelCase(tc.getDescription());
+                                    String newMethodName = Services.getInstance(project, Tools.class).toCamelCase(tc.getDescription());
                                     if (!targetMethod.getName().equals(newMethodName)) {
                                         targetMethod.setName(newMethodName);
                                     }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.testin.editorPanel.Shared;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.util.List;
@@ -28,7 +29,7 @@ public enum TestEditorAttributes {
             false,
             tc -> String.valueOf(tc.getId()),
             null,
-            (tc, v) -> {
+            (project, tc, v) -> {
             }
     ),
 
@@ -41,7 +42,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getDescription,
             null,
-            (tc, v) -> tc.setDescription(Tools.getInstance().sanitizeDescription(v))
+            (project, tc, v) -> tc.setDescription(Services.getInstance(project, Tools.class).sanitizeDescription(v))
     ),
 
     EXPECTED_RESULT(
@@ -52,7 +53,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getExpectedResult,
             null,
-            TestCaseDto::setExpectedResult
+            (project, tc, v) -> tc.setExpectedResult(v)
     ),
 
     STEPS(
@@ -63,7 +64,7 @@ public enum TestEditorAttributes {
             true,
             tc -> String.join(", ", tc.getSteps()),
             null,
-            (tc, v) -> tc.setSteps(Tools.getInstance().parseStepsSafe(v))
+            (project, tc, v) -> tc.setSteps(Services.getInstance(project, Tools.class).parseStepsSafe(v))
     ),
 
     PRIORITY(
@@ -74,7 +75,7 @@ public enum TestEditorAttributes {
             true,
             tc -> tc.getPriority().getName(),
             tc -> List.of(Shared.createPriorityBadge(tc)),
-            (tc, v) -> tc.setPriority(Tools.getInstance().parsePrioritySafe(v))
+            (project, tc, v) -> tc.setPriority(Services.getInstance(project, Tools.class).parsePrioritySafe(v))
     ),
 
     FQCN(
@@ -85,7 +86,7 @@ public enum TestEditorAttributes {
             false,
             tc -> String.join(" > ", tc.getFqcn()),
             null,
-            (tc, v) -> {
+            (project, tc, v) -> {
             }
     ),
 
@@ -97,7 +98,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getReference,
             null,
-            TestCaseDto::setReference
+            (project, tc, v) -> tc.setReference(v)
     ),
 
     TEST_DATA(
@@ -108,7 +109,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getTestData,
             null,
-            TestCaseDto::setTestData
+            (project, tc, v) -> tc.setTestData(v)
     ),
 
     PRE_CONDITIONS(
@@ -119,7 +120,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getPreConditions,
             null,
-            TestCaseDto::setPreConditions
+            (project, tc, v) -> tc.setPreConditions(v)
     ),
 
     GROUP(
@@ -130,7 +131,7 @@ public enum TestEditorAttributes {
             true,
             tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList()),
-            (tc, v) -> tc.setGroup(Tools.getInstance().parseGroupsSafe(v))
+            (project, tc, v) -> tc.setGroup(Services.getInstance(project, Tools.class).parseGroupsSafe(v))
     ),
 
     PATH(
@@ -141,7 +142,7 @@ public enum TestEditorAttributes {
             false,
             tc -> String.join(" > ", tc.getPath()),
             null,
-            (tc, v) -> {
+            (project, tc, v) -> {
             }
     ),
 
@@ -155,7 +156,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getModule,
             null,
-            TestCaseDto::setModule
+            (project, tc, v) -> tc.setModule(v)
     ),
 
     STATUS(
@@ -166,7 +167,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getTempStatus,
             null,
-            TestCaseDto::setStatus
+            (project, tc, v) -> tc.setStatus(v)
     ),
 
     CREATE_BY(
@@ -177,7 +178,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getCreatedBy,
             null,
-            TestCaseDto::setCreatedBy
+            (project, tc, v) -> tc.setCreatedBy(v)
     ),
 
     UPDATE_BY(
@@ -188,7 +189,7 @@ public enum TestEditorAttributes {
             true,
             TestCaseDto::getUpdatedBy,
             null,
-            TestCaseDto::setUpdatedBy
+            (project, tc, v) -> tc.setUpdatedBy(v)
     ),
 
     CREATE_AT(
@@ -199,7 +200,7 @@ public enum TestEditorAttributes {
             true,
             tc -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
             null,
-            (tc, v) -> tc.setCreatedAt(Tools.getInstance().parseDateSafe(v))
+            (project, tc, v) -> tc.setCreatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
     ),
 
     UPDATE_AT(
@@ -210,7 +211,7 @@ public enum TestEditorAttributes {
             true,
             tc -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
             null,
-            (tc, v) -> tc.setUpdatedAt(Tools.getInstance().parseDateSafe(v))
+            (project, tc, v) -> tc.setUpdatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
     );
 
     private final String name;

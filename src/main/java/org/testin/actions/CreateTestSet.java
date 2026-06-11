@@ -30,13 +30,14 @@ public class CreateTestSet implements NodeCreator {
     @Override
     public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         TestSetDirectoryDto ts = Services.getInstance(project, DirectoryMapper.class).readTestSetNode(project, newDirPath, parentDir);
+        if (ts == null) return null;
 
         TreeUtilImpl.createVf(project, this, parentDir.getPath(), ts.getName());
         TreeUtilImpl.createDataVf(project, this, newDirPath, DirectoryType.TS.getMarker());
         TreeUtilImpl.createNode(action.getTree(), parentNode, ts);
 
         createJavaClassInTestRoot(project, parentDir.getName(), name);
-        EditorUtil.getInstance().openEditor(project, ts);
+        Services.getInstance(project, EditorUtil.class).openEditor(project, ts);
 
         return ts;
     }
@@ -89,9 +90,9 @@ public class CreateTestSet implements NodeCreator {
                         if (testRoot != null) {
                             String basePath = AppSettingsState.getInstance().rootAutomationPath;
 
-                            String safePackageName = !packageName.isEmpty() ? Tools.getInstance().toCamelCase(packageName) : "";
+                            String safePackageName = !packageName.isEmpty() ? Services.getInstance(project, Tools.class).toCamelCase(packageName) : "";
 
-                            String safeCamelClass = Tools.getInstance().toCamelCase(className);
+                            String safeCamelClass = Services.getInstance(project, Tools.class).toCamelCase(className);
                             String safeClassName = safeCamelClass.substring(0, 1).toUpperCase() + safeCamelClass.substring(1);
                             safeClassName += "Test";
 

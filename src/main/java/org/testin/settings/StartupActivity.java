@@ -7,10 +7,10 @@ import com.intellij.openapi.startup.ProjectActivity;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.pojo.Config;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestCaseExecutionTracker;
+import org.testin.util.services.Services;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -38,17 +38,17 @@ public class StartupActivity implements ProjectActivity {
         } else {
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (!project.isDisposed()) {
-                    Notifier.getInstance().warnWithAction(project,
+                    Services.getInstance(project, Notifier.class).warnWithAction(project,
                             "Testin Setup Required",
                             "Please configure the Root Testin Folder to enable test management features.",
                             "Open Settings",
-                            () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, AppSettingsConfigurable.class)
+                            () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, Setting.class)
                     );
                 }
             });
         }
 
-        Config.setTestinPath(testinPath);
+        Services.getInstance(project, Setting.class).setTestinPath(testinPath);
 
         Path automationPath = null;
 
@@ -61,7 +61,7 @@ public class StartupActivity implements ProjectActivity {
                     .orElse(null);
         }
 
-        Config.setAutomationPath(automationPath);
+        Services.getInstance(project, Setting.class).setAutomationPath(automationPath);
 
         Log.info("testin Path: " + testinPath);
         Log.info("automation Path: " + automationPath);

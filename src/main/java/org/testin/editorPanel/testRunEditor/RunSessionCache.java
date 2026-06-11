@@ -70,7 +70,7 @@ public class RunSessionCache {
                 final List<String> pathSegments = entry.getKey();
                 final List<UUID> targetIds = entry.getValue();
 
-                final Path dirPath = Tools.getInstance().buildLocalPathFromList(pathSegments);
+                final Path dirPath = Services.getInstance(project, Tools.class).buildLocalPathFromList(project, pathSegments);
 
                 if (dirPath == null || !Files.exists(dirPath) || targetIds.isEmpty()) {
                     Log.warn("[WARNING] directory path not found: " + dirPath);

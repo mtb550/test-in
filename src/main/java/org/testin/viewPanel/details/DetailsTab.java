@@ -72,22 +72,22 @@ public class DetailsTab {
     private static int setupFixedRows(final @NotNull Project project, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final Path currentPath) {
         int row = 0;
 
-        row = new NavigationBar(project, currentPath).render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Id().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Title().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new ActionIcons(project).render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Badges().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new ExpectedResult().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Steps().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new PreConditions().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new TestData().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        //row = new Fqcn().render(panel, (GridBagConstraints) gbc.clone(), dto, row); // todo, commented-001
-        row = new Reference().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Module().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new CreatedBy().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new UpdatedBy().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new CreatedAt().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new UpdatedAt().render(panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new NavigationBar(project, currentPath).render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Id().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Title().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new ActionIcons(project).render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Badges().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new ExpectedResult().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Steps().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new PreConditions().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new TestData().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        //row = new Fqcn().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row); // todo, commented-001
+        row = new Reference().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Module().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new CreatedBy().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new UpdatedBy().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new CreatedAt().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new UpdatedAt().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
 
         return row;
     }

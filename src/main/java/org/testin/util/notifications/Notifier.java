@@ -4,6 +4,7 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
 import com.intellij.openapi.ui.popup.Balloon;
@@ -18,19 +19,11 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.awt.*;
 
-// todo, use Services class
-//@Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Notifier {
+@Service(Service.Level.PROJECT)
+public final class Notifier {
 
-    // todo, to be removed
-    private static final Notifier INSTANCE = new Notifier();
     private final String GROUP_ID = "testin.notifications";
-
-    // todo, to be removed and use Services class
-    public static Notifier getInstance() {
-        return INSTANCE;
-    }
 
     public void softShow(@NotNull final Project project, @NotNull final String title, @NotNull final String message) {
 

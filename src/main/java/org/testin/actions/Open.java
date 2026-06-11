@@ -13,6 +13,7 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -39,13 +40,13 @@ public class Open extends DumbAwareAction {
 
             if (directoryDto instanceof TestSetDirectoryDto ts) {
                 Log.info("open test set: " + ts.getPath());
-                EditorUtil.getInstance().openEditorIfNotOpen(project, ts);
+                Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, ts);
                 continue;
             }
 
             if (directoryDto instanceof TestRunDirectoryDto tr) {
                 Log.info("open test run: " + tr.getPath());
-                EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
+                Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, tr);
             }
 
         }
@@ -53,6 +54,7 @@ public class Open extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
         execute(e.getProject());
     }
 

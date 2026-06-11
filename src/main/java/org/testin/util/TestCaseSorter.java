@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.util.*;
 
@@ -29,7 +30,7 @@ public class TestCaseSorter {
         final Set<UUID> unsortedIds = new HashSet<>();
 
         if (head == null) {
-            Notifier.getInstance().softShow(project, "Warning", "No Head found in test cases.");
+            Services.getInstance(project, Notifier.class).softShow(project, "Warning", "No Head found in test cases.");
             unsortedList.forEach(tc -> unsortedIds.add(tc.getId()));
             return new SortResult(unsortedList, unsortedIds);
         }

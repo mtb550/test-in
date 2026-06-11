@@ -14,6 +14,7 @@ import org.testin.pojo.Group;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class CreateTestMethod implements GeneratorAction {
                         PsiClass targetClass = psiFacade.findClass(path, scope);
 
                         if (targetClass == null) {
-                            VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
+                            VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
                             if (sourceRoot != null) {
                                 String relativePath = String.join("/", packageList).toLowerCase();
                                 VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, relativePath);
@@ -86,7 +87,7 @@ public class CreateTestMethod implements GeneratorAction {
 
     // todo, move to tools class
     private void retryInjectPhysically(Project project, List<String> packageList, String className, String methodName, TestCaseDto tc) {
-        VirtualFile sourceRoot = Tools.getInstance().getTestSourceRoot(project);
+        VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
         if (sourceRoot == null) return;
 
         String relativePath = String.join("/", packageList).toLowerCase() + "/" + className + ".java";

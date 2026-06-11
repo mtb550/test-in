@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,7 +20,7 @@ public class CreateTestSetPackage implements GeneratorAction {
     public void execute(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
         WriteAction.run(() -> {
             try {
-                VirtualFile testSourceRoot = Tools.getInstance().getTestSourceRoot(project);
+                VirtualFile testSourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
 
                 if (testSourceRoot != null) {
                     VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));

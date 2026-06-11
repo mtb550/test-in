@@ -52,11 +52,11 @@ public class ExportExcel extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
-        final Project project = e.getProject();
+        if (e.getProject() == null) return;
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Notifier.getInstance().error(project, "Export Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -65,7 +65,7 @@ public class ExportExcel extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Notifier.getInstance().error(project, "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
@@ -76,19 +76,19 @@ public class ExportExcel extends DumbAwareAction {
         }
 
         if (targetDirectory == null) {
-            Notifier.getInstance().error(project, "Export Error", "The selected path in the Project Panel is invalid.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "The selected path in the Project Panel is invalid.");
             return;
         }
 
         FileSaverDescriptor descriptor = new FileSaverDescriptor("Export Excel", "Save test cases as an Excel file", "xlsx");
-        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, project);
+        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, e.getProject());
 
         String defaultFileName = targetDirectory.getName() + "_Export.xlsx";
         VirtualFileWrapper wrapper = dialog.save((VirtualFile) null, defaultFileName);
 
         if (wrapper != null) {
             File destFile = wrapper.getFile();
-            processExportWithPoi(project, destFile, targetDirectory, dirDto);
+            processExportWithPoi(e.getProject(), destFile, targetDirectory, dirDto);
         }
     }
 
@@ -105,7 +105,7 @@ public class ExportExcel extends DumbAwareAction {
 
                 if (sheetsData.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().warn(project, "Export Empty", "No valid test cases found to export in the selected directory."));
+                            Services.getInstance(project, Notifier.class).warn(project, "Export Empty", "No valid test cases found to export in the selected directory."));
                     return;
                 }
 
@@ -160,14 +160,14 @@ public class ExportExcel extends DumbAwareAction {
                     }
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
+                            Services.getInstance(project, Notifier.class).info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
 
                 } catch (Exception ex) {
                     Log.error("Export crashed: " + ex.getMessage());
                     Log.error("Exception: " + ex.getMessage());
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "Export Failed", "Failed to save the Excel file:\n" + ex.getMessage()));
+                            Services.getInstance(project, Notifier.class).error(project, "Export Failed", "Failed to save the Excel file:\n" + ex.getMessage()));
                 }
             }
         });

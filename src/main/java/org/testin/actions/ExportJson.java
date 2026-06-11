@@ -44,11 +44,11 @@ public class ExportJson extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
-        final Project project = e.getProject();
+        if (e.getProject() == null) return;
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Notifier.getInstance().error(project, "Export Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -57,7 +57,7 @@ public class ExportJson extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Notifier.getInstance().error(project, "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
@@ -68,19 +68,19 @@ public class ExportJson extends DumbAwareAction {
         }
 
         if (targetDirectory == null) {
-            Notifier.getInstance().error(project, "Export Error", "The selected path in the Project Panel is invalid.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "The selected path in the Project Panel is invalid.");
             return;
         }
 
         FileSaverDescriptor descriptor = new FileSaverDescriptor("Export JSON", "Save test cases as a JSON file", "json");
-        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, project);
+        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, e.getProject());
 
         String defaultFileName = targetDirectory.getName() + "_Export.json";
         VirtualFileWrapper wrapper = dialog.save((VirtualFile) null, defaultFileName);
 
         if (wrapper != null) {
             File destFile = wrapper.getFile();
-            processExportWithJson(project, destFile, targetDirectory, dirDto);
+            processExportWithJson(e.getProject(), destFile, targetDirectory, dirDto);
         }
     }
 
@@ -97,7 +97,7 @@ public class ExportJson extends DumbAwareAction {
 
                 if (directoryData.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().warn(project, "Export Empty", "No valid test cases found to export in the selected directory."));
+                            Services.getInstance(project, Notifier.class).warn(project, "Export Empty", "No valid test cases found to export in the selected directory."));
                     return;
                 }
 
@@ -106,7 +106,7 @@ public class ExportJson extends DumbAwareAction {
                 Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), directoryData);
 
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Notifier.getInstance().info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
+                        Services.getInstance(project, Notifier.class).info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
             }
         });
     }

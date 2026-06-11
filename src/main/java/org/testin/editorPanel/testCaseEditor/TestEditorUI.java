@@ -174,7 +174,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 items.forEach(item -> item.setPath(vf.getTestSet().getPath2()));
                 items.forEach(item -> {
                     List<String> baseFqcn = new ArrayList<>(vf.getTestSet().getFqcn());
-                    baseFqcn.add(Tools.getInstance().sanitizeMethodName(item.getDescription()));
+                    baseFqcn.add(Services.getInstance(project, Tools.class).sanitizeMethodName(item.getDescription()));
                     item.setFqcn(baseFqcn);
                 });
                 refreshView();
@@ -184,7 +184,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
             public void onLoadComplete(final List<TestCaseDto> allItems) {
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
                     final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(project, allItems);
-                    TestCaseCacheService.getInstance(project).load(result.sortedList());
+                    Services.getInstance(project, TestCaseCacheService.class).load(result.sortedList());
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         allTestCases.clear();
@@ -198,12 +198,12 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                         List<String> baseFqcn = vf.getTestSet().getFqcn();
                         allTestCases.forEach(item -> {
                             List<String> itemFqcn = new ArrayList<>(baseFqcn);
-                            itemFqcn.add(Tools.getInstance().sanitizeMethodName(item.getDescription()));
+                            itemFqcn.add(Services.getInstance(project, Tools.class).sanitizeMethodName(item.getDescription()));
                             item.setFqcn(itemFqcn);
                         });
                         currentTestCases.forEach(item -> {
                             List<String> itemFqcn = new ArrayList<>(baseFqcn);
-                            itemFqcn.add(Tools.getInstance().sanitizeMethodName(item.getDescription()));
+                            itemFqcn.add(Services.getInstance(project, Tools.class).sanitizeMethodName(item.getDescription()));
                             item.setFqcn(itemFqcn);
                         });
 

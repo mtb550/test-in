@@ -1,6 +1,7 @@
 package org.testin.util;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -16,13 +17,8 @@ import org.testin.util.logger.Log;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class EditorUtil {
-
-    private static final EditorUtil INSTANCE = new EditorUtil();
-
-    public static EditorUtil getInstance() {
-        return INSTANCE;
-    }
+@Service(Service.Level.PROJECT)
+public final class EditorUtil {
 
     public boolean isEditorOpen(final @NotNull Project project, final String s) {
         FileEditorManager editorManager = FileEditorManager.getInstance(project);

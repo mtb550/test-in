@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -13,6 +12,7 @@ import org.testin.pojo.dto.dirs.*;
 import org.testin.util.EditorUtil;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -39,7 +39,7 @@ public class Remove extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
-        final Project project = e.getProject();
+        if (e.getProject() == null) return;
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null || paths.length == 0) return;
 
@@ -64,9 +64,9 @@ public class Remove extends DumbAwareAction {
                 DirectoryDto pkg = (DirectoryDto) node.getUserObject();
 
                 if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
-                    EditorUtil.getInstance().closeEditor(e.getProject(), pkg.getName());
+                    Services.getInstance(e.getProject(), EditorUtil.class).closeEditor(e.getProject(), pkg.getName());
 
-                TreeUtilImpl.removeVf(project, this, pkg.getPath());
+                TreeUtilImpl.removeVf(e.getProject(), this, pkg.getPath());
                 TreeUtilImpl.removeNode(node, tree);
                 VirtualFileManager.getInstance().syncRefresh();
             }

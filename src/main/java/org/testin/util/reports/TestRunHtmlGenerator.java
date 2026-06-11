@@ -1,5 +1,6 @@
 package org.testin.util.reports;
 
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
 import org.testin.pojo.RunEditorAttributes;
@@ -9,6 +10,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Tools;
+import org.testin.util.services.Services;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 
 public final class TestRunHtmlGenerator {
 
-    public String generate(final @NotNull TestRunDirectoryDto trdir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public String generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trdir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         StringBuilder html = new StringBuilder();
 
         html.append("<html><head><style>")
@@ -67,7 +69,7 @@ public final class TestRunHtmlGenerator {
                         .append(cell("col-id", id.toString(), "250px"))
                         .append(descriptionCell(d.getDescription()))
                         .append(statusCell(result.getStatus()))
-                        .append(durationCell(result.getDuration()))
+                        .append(durationCell(project, result.getDuration()))
                         .append(cell("col-expected", d.getExpectedResult(), "500px"))
                         .append(cell("col-priority", d.getPriority().name(), "80px"))
                         .append(cell("col-module", d.getModule(), "150px"))
@@ -113,8 +115,8 @@ public final class TestRunHtmlGenerator {
                 "</td>";
     }
 
-    private String durationCell(final Duration duration) {
-        String formatted = Tools.getInstance().getFormattedDuration(duration);
+    private String durationCell(final @NotNull Project project, final Duration duration) {
+        String formatted = Services.getInstance(project, Tools.class).getFormattedDuration(duration);
         return cell("col-duration", formatted, "100px");
     }
 

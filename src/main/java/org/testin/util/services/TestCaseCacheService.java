@@ -3,7 +3,6 @@ package org.testin.util.services;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
-import com.intellij.openapi.project.Project;
 import org.testin.pojo.dto.TestCaseDto;
 
 import java.util.Collections;
@@ -15,15 +14,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service(Service.Level.PROJECT)
 public final class TestCaseCacheService implements Disposable {
+
     private final Set<String> descriptions = ConcurrentHashMap.newKeySet();
     private final Set<String> expectedResults = ConcurrentHashMap.newKeySet();
     private final Set<String> modules = ConcurrentHashMap.newKeySet();
     private final Set<String> steps = ConcurrentHashMap.newKeySet();
-
-    // todo, to be removed and use Services class
-    public static TestCaseCacheService getInstance(final Project project) {
-        return project.getService(TestCaseCacheService.class);
-    }
 
     public Set<String> getDescription() {
         return Collections.unmodifiableSet(descriptions);

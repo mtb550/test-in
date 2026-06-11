@@ -24,7 +24,7 @@ public final class FilesUtil {
             Files.write(path, jsonBytes);
 
         } catch (IOException e) {
-            Notifier.getInstance().error(project, "unable to write content: " + e.getMessage());
+            Services.getInstance(project, Notifier.class).error(project, "unable to write content: " + e.getMessage());
             Log.error("unable to write content: " + e.getMessage());
             Log.error("path" + path);
             e.printStackTrace(System.err);
@@ -37,7 +37,7 @@ public final class FilesUtil {
             vf.setBinaryContent(jsonContent);
 
         } catch (IOException e) {
-            Notifier.getInstance().error(project, "unable to write content: " + e.getMessage());
+            Services.getInstance(project, Notifier.class).error(project, "unable to write content: " + e.getMessage());
             Log.error("unable to write content: " + e.getMessage());
             Log.error("vf: " + vf.getPath());
             e.printStackTrace(System.err);

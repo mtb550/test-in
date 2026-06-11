@@ -10,6 +10,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
+import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     private final JPanel wrapper;
 
     public DescriptionSection(final @NotNull Project project) {
-        this.descriptionField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(TestCaseCacheService.getInstance(project).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
+        this.descriptionField = new TextFieldWithAutoCompletion<>(project, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(project, TestCaseCacheService.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
         this.descriptionField.setFont(fieldFont);
         this.descriptionField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());
         this.descriptionField.setShowPlaceholderWhenFocused(true);

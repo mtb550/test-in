@@ -58,11 +58,11 @@ public class CreateTestCase extends DumbAwareAction {
 
             if (!generatedFqcn.isEmpty()) {
                 int lastIdx = generatedFqcn.size() - 1;
-                String className = Tools.getInstance().sanitizeClassName(generatedFqcn.get(lastIdx));
+                String className = Services.getInstance(project, Tools.class).sanitizeClassName(generatedFqcn.get(lastIdx));
                 generatedFqcn.set(lastIdx, className);
             }
 
-            String methodName = Tools.getInstance().sanitizeMethodName(newTc.getDescription());
+            String methodName = Services.getInstance(project, Tools.class).sanitizeMethodName(newTc.getDescription());
             generatedFqcn.add(methodName);
 
             newTc.setFqcn(generatedFqcn);
@@ -71,10 +71,10 @@ public class CreateTestCase extends DumbAwareAction {
             ui.appendNewTestCase(newTc);
 
             final List<TestCaseDto> affectedNodes = Stream.of(newTc, lastTc).filter(Objects::nonNull).toList();
-            TestCaseCacheService.getInstance(project).addNewItems(affectedNodes);
+            Services.getInstance(project, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             Services.getInstance(project, TestCasePersistService.class).persist(pDir.getPath(), affectedNodes);
-            Notifier.getInstance().softShow(project, "Created..");
+            Services.getInstance(project, Notifier.class).softShow(project, "Created..");
 
             if (codeGenerator != null && codeGenerator.isSelected()) {
                 GeneratorType.CREATE_TEST_CASE.getAction().execute(project, newTc, newTc.getFqcn());
@@ -88,6 +88,8 @@ public class CreateTestCase extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final Project project = e.getProject();
+        if (e.getProject() == null) return;
+
         performCreation(project, ui, dir, list, model);
     }
 

@@ -11,6 +11,7 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.EditorUtil;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.datatransfer.Transferable;
@@ -35,13 +36,13 @@ public class TreeDropHandler implements FileDropHandler {
                     if (node.getUserObject() instanceof TestSetDirectoryDto ts) {
                         Log.info("dragged Test set: " + ts.getName());
 
-                        EditorUtil.getInstance().openEditorIfNotOpen(project, ts);
+                        Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, ts);
                         continue;
                     }
 
                     if (node.getUserObject() instanceof TestRunDirectoryDto tr) {
                         Log.info("dragged Test Run: " + tr.getName());
-                        EditorUtil.getInstance().openEditorIfNotOpen(project, tr);
+                        Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, tr);
                     }
                 }
             });

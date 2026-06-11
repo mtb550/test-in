@@ -136,7 +136,7 @@ public class PendingCommitsDialog extends DialogWrapper {
                 model.removeRow(selectedRow);
             }
         } catch (Exception ex) {
-            Notifier.getInstance().error(project, "Revert Failed", "Could not revert change: " + ex.getMessage());
+            Services.getInstance(project, Notifier.class).error(project, "Revert Failed", "Could not revert change: " + ex.getMessage());
         }
     }
 }

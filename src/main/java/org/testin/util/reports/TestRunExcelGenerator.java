@@ -1,5 +1,6 @@
 package org.testin.util.reports;
 
+import com.intellij.openapi.project.Project;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,7 @@ import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
+import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Map;
@@ -16,7 +18,7 @@ import java.util.UUID;
 
 public final class TestRunExcelGenerator {
 
-    public byte[] generate(final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) throws Exception {
+    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) throws Exception {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
             Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
@@ -59,7 +61,7 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 2, statusEnum.name());
                 ws.style(row, 2).fontColor(statusEnum.getHex()).bold().set();
 
-                String formattedDuration = Tools.getInstance().getFormattedDuration(result.getDuration());
+                String formattedDuration = Services.getInstance(project, Tools.class).getFormattedDuration(result.getDuration());
                 ws.value(row, 3, formattedDuration);
 
                 ws.value(row, 4, expectedResult);

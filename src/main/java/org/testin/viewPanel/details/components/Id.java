@@ -2,6 +2,7 @@ package org.testin.viewPanel.details.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
@@ -34,7 +35,7 @@ public class Id extends BaseDetails {
     private static final int INSETS_RIGHT = 16;
 
     @Override
-    public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
+    public int render(@NotNull final Project project, @NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
         JBLabel idBadge = new JBLabel(dto.getId().toString()) {
             @Override
             protected void paintComponent(Graphics g) {

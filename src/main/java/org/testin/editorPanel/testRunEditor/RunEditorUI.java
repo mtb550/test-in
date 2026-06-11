@@ -214,14 +214,14 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                                         for (int i = 0; i < pathSegments.size(); i++) {
                                             String seg = pathSegments.get(i);
                                             if (i < testCasesIdx) {
-                                                baseFqcn.add(Tools.getInstance().sanitizePackageName(seg));
+                                                baseFqcn.add(Services.getInstance(project, Tools.class).sanitizePackageName(seg));
                                             } else if (i > testCasesIdx && i < pathSegments.size() - 1) {
-                                                baseFqcn.add(Tools.getInstance().sanitizePackageName(seg));
+                                                baseFqcn.add(Services.getInstance(project, Tools.class).sanitizePackageName(seg));
                                             } else if (i == pathSegments.size() - 1) {
-                                                baseFqcn.add(Tools.getInstance().sanitizeClassName(seg));
+                                                baseFqcn.add(Services.getInstance(project, Tools.class).sanitizeClassName(seg));
                                             }
                                         }
-                                        baseFqcn.add(Tools.getInstance().sanitizeMethodName(item.getDescription()));
+                                        baseFqcn.add(Services.getInstance(project, Tools.class).sanitizeMethodName(item.getDescription()));
                                         item.setFqcn(baseFqcn);
                                     }
                                 }
@@ -234,7 +234,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     public void onLoadComplete(final List<TestCaseDto> allItems) {
                         ApplicationManager.getApplication().executeOnPooledThread(() -> {
                             final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(project, allItems).sortedList();
-                            TestCaseCacheService.getInstance(project).load(sorted);
+                            Services.getInstance(project, TestCaseCacheService.class).load(sorted);
 
                             ApplicationManager.getApplication().invokeLater(() -> {
                                 allTestCases.clear();

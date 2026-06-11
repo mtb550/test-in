@@ -65,11 +65,11 @@ public class ImportExcel extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull final AnActionEvent e) {
-        final Project project = e.getProject();
+        if (e.getProject() == null) return;
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Notifier.getInstance().error(project, "Import Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Import Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -78,7 +78,7 @@ public class ImportExcel extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Notifier.getInstance().error(project, "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
@@ -89,7 +89,7 @@ public class ImportExcel extends DumbAwareAction {
         }
 
         if (targetDirectory == null) {
-            Notifier.getInstance().error(project, "Import Error", "The selected path in the Project Panel is invalid.");
+            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Import Error", "The selected path in the Project Panel is invalid.");
             return;
         }
 
@@ -103,9 +103,9 @@ public class ImportExcel extends DumbAwareAction {
         );
 
         if (userChoice == 0) {
-            openFileChooserAndProcess(project, targetDirectory, dirDto, parentNode);
+            openFileChooserAndProcess(e.getProject(), targetDirectory, dirDto, parentNode);
         } else if (userChoice == 1) {
-            downloadSampleFile(project, e);
+            downloadSampleFile(e.getProject(), e);
         }
     }
 
@@ -120,7 +120,7 @@ public class ImportExcel extends DumbAwareAction {
             String extension = selectedFile.getExtension();
 
             if (extension == null || (!extension.equalsIgnoreCase("xls") && !extension.equalsIgnoreCase("xlsx"))) {
-                ApplicationManager.getApplication().invokeLater(() -> Notifier.getInstance().error(project, "Invalid File Format",
+                ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Invalid File Format",
                         "Only Excel files (.xls, .xlsx) are allowed.\n\n" +
                                 "You selected an '." + extension + "' file.\n" +
                                 "Please select a valid Excel file and try again."));
@@ -136,7 +136,7 @@ public class ImportExcel extends DumbAwareAction {
         VirtualFile projectDir = LocalFileSystem.getInstance().findFileByPath(Objects.requireNonNull(e.getProject().getBasePath()));
 
         if (projectDir == null) {
-            Notifier.getInstance().error(project, "Error", "Could not find the project directory.");
+            Services.getInstance(project, Notifier.class).error(project, "Error", "Could not find the project directory.");
             return;
         }
 
@@ -146,7 +146,7 @@ public class ImportExcel extends DumbAwareAction {
 
                 if (in == null) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "File Error", "Sample file not found inside the plugin resources!"));
+                            Services.getInstance(project, Notifier.class).error(project, "File Error", "Sample file not found inside the plugin resources!"));
                     return;
                 }
 
@@ -162,13 +162,13 @@ public class ImportExcel extends DumbAwareAction {
                 final VirtualFile fileToOpen = newFile;
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    Tools.getInstance().openWithAssociatedProgram(project, fileToOpen);
-                    Notifier.getInstance().info(project, "Sample Ready", "Sample file has been added to your project and opened in Excel.");
+                    Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, fileToOpen);
+                    Services.getInstance(project, Notifier.class).info(project, "Sample Ready", "Sample file has been added to your project and opened in Excel.");
                 });
 
             } catch (Exception ex) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Notifier.getInstance().error(project, "Download Error", "Failed to save sample file: " + ex.getMessage()));
+                        Services.getInstance(project, Notifier.class).error(project, "Download Error", "Failed to save sample file: " + ex.getMessage()));
             }
         });
     }
@@ -176,7 +176,7 @@ public class ImportExcel extends DumbAwareAction {
     private void processWithPoi(final @NotNull Project project, final String filePath, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
         File file = new File(filePath);
         if (!file.exists() || !file.canRead()) {
-            Notifier.getInstance().error(project, "File Error", "Java cannot read this file!");
+            Services.getInstance(project, Notifier.class).error(project, "File Error", "Java cannot read this file!");
             return;
         }
 
@@ -264,7 +264,7 @@ public class ImportExcel extends DumbAwareAction {
                                         Cell dataCell = row.getCell(colIndex);
                                         rawValue = dataFormatter.formatCellValue(dataCell).trim();
                                     }
-                                    attr.getImportSetter().accept(currentTestCase, rawValue);
+                                    attr.getImportSetter().accept(project, currentTestCase, rawValue);
                                 }
                             }
 
@@ -286,7 +286,7 @@ public class ImportExcel extends DumbAwareAction {
                     Log.error("Exception: " + ex.getMessage());
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "Failed to import data: " +
+                            Services.getInstance(project, Notifier.class).error(project, "Failed to import data: " +
                                     "\n(Tip: Ensure the file is completely closed in Microsoft Excel and try again.)\n"
                                     + ex.getMessage())
                     );
@@ -294,13 +294,13 @@ public class ImportExcel extends DumbAwareAction {
                 }
 
                 if (indicator.isCanceled()) {
-                    Notifier.getInstance().softShow(project, "Import Cancelled", "Import was cancelled by you.");
+                    Services.getInstance(project, Notifier.class).softShow(project, "Import Cancelled", "Import was cancelled by you.");
                     return;
                 }
 
                 if (allSheetsData.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().warn(project, "No Data", "No valid test cases found in the Excel file.")
+                            Services.getInstance(project, Notifier.class).warn(project, "No Data", "No valid test cases found in the Excel file.")
                     );
                     return;
                 }
@@ -316,7 +316,7 @@ public class ImportExcel extends DumbAwareAction {
                         Map<String, List<TestCaseDto>> selectedCasesBySheet = dialog.getSelectedTestCasesBySheet();
 
                         if (selectedCasesBySheet.isEmpty()) {
-                            Notifier.getInstance().softShow(project, "No Selection", "No test cases were selected for import.");
+                            Services.getInstance(project, Notifier.class).softShow(project, "No Selection", "No test cases were selected for import.");
                             return;
                         }
 
@@ -329,8 +329,8 @@ public class ImportExcel extends DumbAwareAction {
 
                                     linkAndSaveTestCases(project, targetDirectory, flatList, tail, ImportExcel.this);
 
-                                    EditorUtil.getInstance().closeThenOpenEditor(project, targetDirectory, ts);
-                                    Notifier.getInstance().info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
+                                    Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
+                                    Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
                                 } else {
                                     int totalImported = 0;
@@ -344,7 +344,7 @@ public class ImportExcel extends DumbAwareAction {
                                         linkAndSaveTestCases(project, sheetDir, sheetCases, tail, ImportExcel.this);
                                         totalImported += sheetCases.size();
                                     }
-                                    Notifier.getInstance().info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
+                                    Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
                                 }
 
                                 targetDirectory.refresh(false, true);
@@ -355,7 +355,7 @@ public class ImportExcel extends DumbAwareAction {
                         });
 
                     } else {
-                        Notifier.getInstance().softShow(project, "Import Cancelled", "Import was cancelled from preview dialog.");
+                        Services.getInstance(project, Notifier.class).softShow(project, "Import Cancelled", "Import was cancelled from preview dialog.");
                     }
                 });
             }

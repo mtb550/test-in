@@ -11,17 +11,17 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.settings.Setting;
 import org.testin.util.GitCommandRunner;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 public class CloneProject extends DumbAwareAction {
 
     private final String gitUrl;
     private final String projectName;
     private final ProjectPanel projectPanel;
-    private Project project;
 
     public CloneProject(final String gitUrl, final String projectName, final ProjectPanel projectPanel) {
         super("Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
@@ -36,10 +36,9 @@ public class CloneProject extends DumbAwareAction {
     }
 
     public void execute(final Project project) {
-        this.project = project;
 
         if (gitUrl == null || gitUrl.trim().isEmpty() || projectName == null || projectName.trim().isEmpty()) {
-            Notifier.getInstance().error(project, "Clone Error", "Missing parameters for cloning the project.");
+            Services.getInstance(project, Notifier.class).error(project, "Clone Error", "Missing parameters for cloning the project.");
             return;
         }
 
@@ -50,20 +49,20 @@ public class CloneProject extends DumbAwareAction {
                 indicator.setText("Cloning into " + projectName + "...");
 
                 try {
-                    GitCommandRunner.execute(Config.getTestinPath(), "git", "clone", gitUrl, projectName);
+                    GitCommandRunner.execute(Services.getInstance(project, Setting.class).getTestinPath(), "git", "clone", gitUrl, projectName);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        VirtualFile vRoot = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Config.getTestinPath().toFile());
+                        VirtualFile vRoot = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Services.getInstance(project, Setting.class).getTestinPath().toFile());
                         if (vRoot != null) {
                             vRoot.refresh(false, true);
                         }
-                        Notifier.getInstance().info(project, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
+                        Services.getInstance(project, Notifier.class).info(project, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
                         new Refresh(projectPanel).execute();
                     });
 
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Notifier.getInstance().error(project, "Clone Failed", "Could not clone repository:\n" + ex.getMessage())
+                            Services.getInstance(project, Notifier.class).error(project, "Clone Failed", "Could not clone repository:\n" + ex.getMessage())
                     );
                 }
             }

@@ -16,6 +16,7 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Bundle;
 import org.testin.util.EditorUtil;
 import org.testin.util.FontSyncUtil;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,7 +53,7 @@ public class NavigationBar extends BaseDetails {
     }
 
     @Override
-    public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
+    public int render(@NotNull final Project project, @NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
         final JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
@@ -90,14 +91,14 @@ public class NavigationBar extends BaseDetails {
                         if (vf == null) return;
 
                         if (isTestSet) {
-                            if (EditorUtil.getInstance().isEditorOpen(project, file.getName())) {
+                            if (Services.getInstance(project, EditorUtil.class).isEditorOpen(project, file.getName())) {
                                 return;
                             }
 
                             final TestSetDirectoryDto ts = new TestSetDirectoryDto();
                             ts.setPath(file.toPath()); // todo, why set path here?
                             ts.setName(file.getName()); // todo, why set name here ?
-                            EditorUtil.getInstance().openEditor(project, ts);
+                            Services.getInstance(project, EditorUtil.class).openEditor(project, ts);
                         } else {
                             ProjectView.getInstance(project).select(null, vf, true);
                         }

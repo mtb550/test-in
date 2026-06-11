@@ -6,12 +6,12 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.settings.Setting;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
@@ -55,7 +55,7 @@ public class TestProjectSelector {
 
         testProjectList.removeAllElements();
 
-        final Path root = Config.getTestinPath();
+        final Path root = Services.getInstance(project, Setting.class).getTestinPath();
 
         if (Files.exists(root) && Files.isDirectory(root)) {
 

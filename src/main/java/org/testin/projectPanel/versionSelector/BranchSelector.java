@@ -11,6 +11,7 @@ import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.GitCommandRunner;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -121,7 +122,7 @@ public class BranchSelector {
                             isUpdating = false;
                         }
 
-                        Notifier.getInstance().error(project, "Git Checkout Failed", "Could not checkout " + targetBranch + ". Do you have uncommitted changes?\n" + ex.getMessage());
+                        Services.getInstance(project, Notifier.class).error(project, "Git Checkout Failed", "Could not checkout " + targetBranch + ". Do you have uncommitted changes?\n" + ex.getMessage());
                     });
                 }
             }
@@ -178,7 +179,7 @@ public class BranchSelector {
                         } finally {
                             isUpdating = false;
                         }
-                        Notifier.getInstance().error(project, "Git Error", "Failed to load branches: " + ex.getMessage());
+                        Services.getInstance(project, Notifier.class).error(project, "Git Error", "Failed to load branches: " + ex.getMessage());
                     });
                 }
             }

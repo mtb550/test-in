@@ -1,7 +1,6 @@
 package org.testin.projectPanel.tree;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
@@ -19,10 +18,8 @@ import java.util.Set;
 
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
     private final Set<DefaultMutableTreeNode> selectedNodes;
-    private final Project project;
 
-    public TreeCellRenderer(final @NotNull Project project, final Set<DefaultMutableTreeNode> selectedNodes) {
-        this.project = project;
+    public TreeCellRenderer(final Set<DefaultMutableTreeNode> selectedNodes) {
         this.selectedNodes = selectedNodes;
     }
 

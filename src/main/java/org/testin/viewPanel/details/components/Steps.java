@@ -1,5 +1,7 @@
 package org.testin.viewPanel.details.components;
 
+import com.intellij.openapi.project.Project;
+
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
@@ -7,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,7 +19,7 @@ public class Steps extends BaseDetails {
     private static final int MARGIN_BOTTOM_PER_STEP = 8;
 
     @Override
-    public int render(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int row) {
+    public int render(@NotNull final Project project, @NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int row) {
 
         final List<String> steps = dto.getSteps();
 
@@ -30,7 +33,7 @@ public class Steps extends BaseDetails {
         for (int i = 0; i < steps.size(); i++) {
             if (steps.get(i).isBlank()) continue;
 
-            final String stepText = (i + 1) + "- " + Tools.getInstance().format(steps.get(i));
+            final String stepText = (i + 1) + "- " + Services.getInstance(project, Tools.class).format(steps.get(i));
             final int marginBottom = (i == steps.size() - 1) ? 0 : MARGIN_BOTTOM_PER_STEP;
             stepsContainer.add(createStepComponent(stepText, marginBottom));
         }

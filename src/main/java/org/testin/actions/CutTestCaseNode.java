@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.EditorCM;
@@ -31,7 +30,7 @@ public class CutTestCaseNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
+        if (e.getProject() == null) return;
         Log.debug("[DEBUG] CutTestCaseNode: actionPerformed triggered.");
 
         List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
@@ -45,7 +44,7 @@ public class CutTestCaseNode extends DumbAwareAction {
                 selectedTestCases.forEach(tc -> EditorCM.getGlobalPendingCutIds().add(tc.getId()));
                 EditorCM.setGlobalSourceEditorUI(editorUI);
 
-                String json = Services.getInstance(project, Mapper.class).writeValueAsString(selectedTestCases);
+                String json = Services.getInstance(e.getProject(), Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
                 list.repaint();

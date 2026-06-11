@@ -2,6 +2,7 @@ package org.testin.settings;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
@@ -16,10 +17,11 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.Refresh;
-import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.DirectoryDto;
@@ -44,7 +46,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class AppSettingsConfigurable implements Configurable {
+@Service(Service.Level.PROJECT)
+public final class Setting implements Configurable {
 
     private final TextFieldWithBrowseButton rootTestinPathField = new TextFieldWithBrowseButton();
     private final JBTextField rootAutomationPathField = new JBTextField();
@@ -57,7 +60,21 @@ public class AppSettingsConfigurable implements Configurable {
     private final JButton deactivateBtn = new JButton("Deactivate");
     private final JButton archiveBtn = new JButton("Archive");
     private final JButton renameBtn = new JButton("Rename");
-    private Project project;
+    private final Project project;
+
+    @Getter
+    @Setter
+    @NotNull
+    private Path testinPath;
+
+    @Getter
+    @Setter
+    //@NotNull
+    private Path automationPath;
+
+    public Setting(Project project) {
+        this.project = project;
+    }
 
     @Override
     public String getDisplayName() {
@@ -100,7 +117,7 @@ public class AppSettingsConfigurable implements Configurable {
             try {
                 Desktop.getDesktop().open(new File(rootTestinPathField.getText()));
             } catch (Exception ex) {
-                Notifier.getInstance().error(project, "Error", "Could not open folder: " + ex.getMessage());
+                Services.getInstance(project, Notifier.class).error(project, "Error", "Could not open folder: " + ex.getMessage());
             }
         });
 
@@ -195,7 +212,7 @@ public class AppSettingsConfigurable implements Configurable {
                         });
                     }
                 } catch (IOException ex) {
-                    Notifier.getInstance().error(project, "Status Update Failed", "Could not rename project directory: " + ex.getMessage());
+                    Services.getInstance(project, Notifier.class).error(project, "Status Update Failed", "Could not rename project directory: " + ex.getMessage());
                 }
             });
         }
@@ -247,16 +264,16 @@ public class AppSettingsConfigurable implements Configurable {
         Log.setLogLevel(Log.Level.valueOf(settings.logLevel));
 
         if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty())
-            Config.setTestinPath(Path.of(settings.rootTestinPath));
+            setTestinPath(Path.of(settings.rootTestinPath));
 
         else
-            Config.setTestinPath(Path.of(""));
+            setTestinPath(Path.of(""));
 
         if (settings.rootAutomationPath != null && !settings.rootAutomationPath.trim().isEmpty())
-            Config.setAutomationPath(Path.of(settings.rootAutomationPath));
+            setAutomationPath(Path.of(settings.rootAutomationPath));
 
         else
-            Config.setAutomationPath(null);
+            setAutomationPath(null);
 
         ProjectPanel panel = Services.getInstance(project, ProjectPanel.class);
         if (panel != null) {
@@ -270,7 +287,7 @@ public class AppSettingsConfigurable implements Configurable {
         AppSettingsState settings = AppSettingsState.getInstance();
         rootTestinPathField.setText(settings.rootTestinPath != null ? settings.rootTestinPath : "");
 
-        VirtualFile mainSourceRoot = Tools.getInstance().getTestSourceRoot(project);
+        VirtualFile mainSourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
 
         if (mainSourceRoot != null) {
             rootAutomationPathField.setText(mainSourceRoot.getPath());

@@ -1,6 +1,7 @@
 package org.testin.util;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -19,8 +20,10 @@ import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
+import org.testin.settings.Setting;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -38,22 +41,14 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-//@Service(Service.Level.PROJECT)
+@Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class Tools {
-
-    // todo, to be removed
-    private static final Tools INSTANCE = new Tools();
+public final class Tools {
 
     private final Pattern SANITIZE_PATTERN = Pattern.compile("[^a-zA-Z0-9 _]");
     private final Pattern STEP_MUSH_PATTERN = Pattern.compile(".*\\s\\d+[-.].*");
     private final Pattern STEP_LINE_PATTERN = Pattern.compile("(\\s)(?=\\d+[-.])");
     private final Pattern STEP_CLEAN_PATTERN = Pattern.compile("^\\d+[-.]\\s*");
-
-    // todo, to be removed and use Services class
-    public static Tools getInstance() {
-        return INSTANCE;
-    }
 
     public String sanitizePackageName(final @NotNull String name) {
         String removeKeyword = name.replace("-test-cases", "");
@@ -215,21 +210,21 @@ public class Tools {
 
     public void openWithAssociatedProgram(final @NotNull Project project, final VirtualFile virtualFile) {
         if (virtualFile == null || !virtualFile.exists()) {
-            Notifier.getInstance().error(project, "Open Error", "The file does not exist.");
+            Services.getInstance(project, Notifier.class).error(project, "Open Error", "The file does not exist.");
             return;
         }
 
         File file = new File(virtualFile.getPath());
 
         if (!Desktop.isDesktopSupported()) {
-            Notifier.getInstance().error(project, "System Error", "Desktop operations are not supported on this system.");
+            Services.getInstance(project, Notifier.class).error(project, "System Error", "Desktop operations are not supported on this system.");
             return;
         }
 
         Desktop desktop = Desktop.getDesktop();
 
         if (!desktop.isSupported(Desktop.Action.OPEN)) {
-            Notifier.getInstance().error(project, "System Error", "The 'Open' action is not supported on this system.");
+            Services.getInstance(project, Notifier.class).error(project, "System Error", "The 'Open' action is not supported on this system.");
             return;
         }
 
@@ -238,7 +233,7 @@ public class Tools {
                 desktop.open(file);
             } catch (IOException e) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Notifier.getInstance().error(project, "Execution Error", "Failed to open the file: " + e.getMessage())
+                        Services.getInstance(project, Notifier.class).error(project, "Execution Error", "Failed to open the file: " + e.getMessage())
                 );
             }
         });
@@ -339,8 +334,8 @@ public class Tools {
         return newPath;
     }
 
-    public Path buildLocalPathFromList(final List<String> pathSegments) {
-        Path currentPath = Path.of(Config.getTestinPath().toString());
+    public Path buildLocalPathFromList(final @NotNull Project project, final List<String> pathSegments) {
+        Path currentPath = Path.of(Services.getInstance(project, Setting.class).getTestinPath().toString());
 
         if (pathSegments != null && !pathSegments.isEmpty()) {
             for (String segment : pathSegments) {
