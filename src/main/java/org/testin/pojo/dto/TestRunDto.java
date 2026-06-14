@@ -22,7 +22,7 @@ import java.util.List;
 @SuperBuilder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
-// todo, put uuid for eac test run.
+// todo, put uuid for each test run.
 public class TestRunDto {
 
     @NotNull
