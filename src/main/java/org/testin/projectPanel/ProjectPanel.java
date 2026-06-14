@@ -19,6 +19,7 @@ import org.testin.projectPanel.tree.TestProjectTreeBuilder;
 import org.testin.projectPanel.tree.TestRunTreeBuilder;
 import org.testin.projectPanel.versionSelector.BranchSelector;
 import org.testin.settings.Setting;
+import org.testin.settings.SettingsConfigurable;
 import org.testin.util.Bundle;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
@@ -100,13 +101,13 @@ public final class ProjectPanel implements Disposable {
                     AllIcons.General.Settings,
                     "Configure Testin settings",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> ShowSettingsUtil.getInstance().showSettingsDialog(project, Setting.class)
+                    e -> ShowSettingsUtil.getInstance().showSettingsDialog(project, SettingsConfigurable.class)
             );
 
         else
             emptyText.appendLine(
                     AllIcons.General.Add,
-                    " Create your first test project",
+                    "Create your first test project",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
                     e -> new CreateTestProject(this).execute(project)
             );

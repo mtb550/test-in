@@ -2,25 +2,26 @@ package org.testin.settings;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.util.logger.Log;
 
 @State(
         name = "testin.settings.AppSettingsState",
         storages = @Storage("testinSettings.xml")
 )
-public class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
+@Service(Service.Level.APP)
+public final class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
+
     public String rootTestinPath = "";
     public String rootAutomationPath = "";
     public boolean readMode = false;
-    public String logLevel = Log.Level.INFO.name();
+    public String logLevel = "INFO";
 
     public static AppSettingsState getInstance() {
-        Log.trace("AppSettingsState.getInstance()");
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
     }
 
@@ -32,7 +33,6 @@ public class AppSettingsState implements PersistentStateComponent<AppSettingsSta
 
     @Override
     public void loadState(@NotNull AppSettingsState state) {
-        Log.trace("AppSettingsState.loadState()");
         XmlSerializerUtil.copyBean(state, this);
     }
 }

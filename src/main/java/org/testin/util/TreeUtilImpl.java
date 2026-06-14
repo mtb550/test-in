@@ -16,6 +16,7 @@ import javax.swing.tree.DefaultTreeModel;
 import java.io.IOException;
 import java.nio.file.Path;
 
+// todo, remove static and use @Service
 public class TreeUtilImpl {
     public static void executeVfsAction(final @NotNull Project project, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
@@ -63,7 +64,16 @@ public class TreeUtilImpl {
     public static void removeNode(DefaultMutableTreeNode node, final SimpleTree tree) {
         ApplicationManager.getApplication().invokeLater(() -> {
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-            model.removeNodeFromParent(node);
+            if (node.getParent() != null) {
+                model.removeNodeFromParent(node);
+            }
+        });
+    }
+
+    public static void removeRootNode(final SimpleTree tree) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+            model.setRoot(null);
         });
     }
 

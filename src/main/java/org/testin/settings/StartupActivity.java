@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestCaseExecutionTracker;
@@ -15,7 +15,7 @@ import org.testin.util.services.Services;
 import java.nio.file.Path;
 import java.util.Optional;
 
-public class StartupActivity implements ProjectActivity {
+public final class StartupActivity implements ProjectActivity {
 
     public static void execute(@NotNull Project project) {
         Log.setProject(project);
@@ -42,7 +42,7 @@ public class StartupActivity implements ProjectActivity {
                             "Testin Setup Required",
                             "Please configure the Root Testin Folder to enable test management features.",
                             "Open Settings",
-                            () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, Setting.class)
+                            () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, SettingsConfigurable.class)
                     );
                 }
             });
@@ -70,7 +70,7 @@ public class StartupActivity implements ProjectActivity {
     }
 
     @Override
-    public @Nullable Object execute(@NotNull Project project, @NotNull Continuation<? super kotlin.Unit> continuation) {
+    public @NonNull Object execute(@NotNull Project project, @NotNull Continuation<? super kotlin.Unit> continuation) {
         execute(project);
         return kotlin.Unit.INSTANCE;
     }

@@ -86,8 +86,8 @@
 
         <!-- Settings -->
         <applicationConfigurable
-                instance="org.testin.settings.Setting"
-                id="org.testin.settings.Setting"
+                instance="org.testin.settings.SettingsConfigurable"
+                id="org.testin.settings.SettingsConfigurable"
                 key="testin.display.name"
                 bundle="messages"
                 groupId="tools"

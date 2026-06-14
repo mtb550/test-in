@@ -4,11 +4,13 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.*;
+import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.EditorUtil;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.logger.Log;
@@ -23,72 +25,77 @@ import static org.testin.util.KeyboardSet.DeletePackage;
 
 public class Remove extends DumbAwareAction {
     private final SimpleTree tree;
+    private final ProjectPanel projectPanel;
 
-    public Remove(final SimpleTree tree) {
+    public Remove(final SimpleTree tree, final ProjectPanel projectPanel) {
         super("Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.tree = tree;
+        this.projectPanel = projectPanel;
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
 
     private boolean isRemovable(final Object dir) {
         return dir instanceof DirectoryDto &&
-                !(dir instanceof TestProjectDirectoryDto) &&
                 !(dir instanceof TestCasesMainDirectoryDto) &&
                 !(dir instanceof TestRunsMainDirectoryDto);
     }
 
-    @Override
-    public void actionPerformed(@NotNull final AnActionEvent e) {
-        if (e.getProject() == null) return;
-        TreePath[] paths = tree.getSelectionPaths();
-        if (paths == null || paths.length == 0) return;
-
-        List<DefaultMutableTreeNode> nodesToRemove = Arrays.stream(paths)
+    private List<DefaultMutableTreeNode> getRemovableNodes(final TreePath[] paths) {
+        return Arrays.stream(paths)
                 .map(TreePath::getLastPathComponent)
                 .filter(DefaultMutableTreeNode.class::isInstance)
                 .map(DefaultMutableTreeNode.class::cast)
                 .filter(node -> isRemovable(node.getUserObject()))
                 .toList();
+    }
 
+    @Override
+    public void actionPerformed(@NotNull final AnActionEvent e) {
+        Project project = e.getProject();
+        if (project == null) return;
+
+        TreePath[] paths = tree.getSelectionPaths();
+        if (paths == null || paths.length == 0) return;
+
+        List<DefaultMutableTreeNode> nodesToRemove = getRemovableNodes(paths);
         if (nodesToRemove.isEmpty()) return;
 
-        String message = nodesToRemove.size() == 1
-                ? "Are you sure you want to remove '" + ((DirectoryDto) nodesToRemove.getFirst().getUserObject()).getName() + "'?"
-                : "Are you sure you want to remove these " + nodesToRemove.size() + " items?";
+        String msg = nodesToRemove.size() == 1
+                ? "Remove '" + ((DirectoryDto) nodesToRemove.getFirst().getUserObject()).getName() + "'?"
+                : "Remove these " + nodesToRemove.size() + " items?";
 
-        int confirm = Messages.showYesNoDialog(message, "Confirm Removing", Messages.getQuestionIcon());
+        if (Messages.showYesNoDialog(msg, "Confirm Removing", Messages.getQuestionIcon()) != Messages.YES)
+            return;
 
-        if (confirm == Messages.YES) {
+        for (DefaultMutableTreeNode node : nodesToRemove) {
+            DirectoryDto pkg = (DirectoryDto) node.getUserObject();
 
-            for (DefaultMutableTreeNode node : nodesToRemove) {
-                DirectoryDto pkg = (DirectoryDto) node.getUserObject();
+            if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
+                Services.getInstance(project, EditorUtil.class).closeEditor(project, pkg.getName());
 
-                if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
-                    Services.getInstance(e.getProject(), EditorUtil.class).closeEditor(e.getProject(), pkg.getName());
+            TreeUtilImpl.removeVf(project, this, pkg.getPath());
 
-                TreeUtilImpl.removeVf(e.getProject(), this, pkg.getPath());
+            if (node.getParent() != null)
                 TreeUtilImpl.removeNode(node, tree);
-                VirtualFileManager.getInstance().syncRefresh();
+            else {
+                TreeUtilImpl.removeRootNode(tree);
+                new Refresh(projectPanel).execute();
             }
-            Log.info("Removed " + nodesToRemove.size() + " nodes.");
         }
+
+        VirtualFileManager.getInstance().syncRefresh();
+        Log.info("Removed " + nodesToRemove.size() + " node(s).");
     }
 
     @Override
     public void update(@NotNull final AnActionEvent e) {
         TreePath[] paths = tree.getSelectionPaths();
-
-        boolean canRemove = paths != null && Arrays.stream(paths)
-                .map(TreePath::getLastPathComponent)
-                .filter(DefaultMutableTreeNode.class::isInstance)
-                .map(node -> ((DefaultMutableTreeNode) node).getUserObject())
-                .anyMatch(this::isRemovable);
-
-        e.getPresentation().setEnabled(canRemove);
+        boolean enabled = paths != null && !getRemovableNodes(paths).isEmpty();
+        e.getPresentation().setEnabled(enabled);
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.EDT;
+        return ActionUpdateThread.BGT;
     }
 }

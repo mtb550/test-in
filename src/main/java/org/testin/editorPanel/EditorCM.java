@@ -24,12 +24,15 @@ import java.util.UUID;
 public class EditorCM extends DefaultActionGroup {
     @Getter
     private static final Set<UUID> globalPendingCutIds = new HashSet<>();
+
     @Getter
     @Setter
     private static boolean globalCutAction = false;
+
     @Getter
     @Setter
     private static IEditorUI globalSourceEditorUI = null;
+
     private final Project project;
 
     public EditorCM(final Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {

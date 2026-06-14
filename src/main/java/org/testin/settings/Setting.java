@@ -1,305 +1,56 @@
 package org.testin.settings;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.ComboBox;
-import com.intellij.openapi.ui.TextComponentAccessor;
-import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.IconLoader;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.TitledSeparator;
-import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBLabel;
-import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ui.FormBuilder;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.Refresh;
-import org.testin.pojo.DirectoryMapper;
-import org.testin.pojo.ProjectStatus;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
-import org.testin.projectPanel.ProjectPanel;
-import org.testin.projectPanel.projectSelector.RendererImpl;
-import org.testin.util.Bundle;
-import org.testin.util.Tools;
-import org.testin.util.logger.Log;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 @Service(Service.Level.PROJECT)
-public final class Setting implements Configurable {
+public final class Setting {
 
-    private final TextFieldWithBrowseButton rootTestinPathField = new TextFieldWithBrowseButton();
-    private final JBTextField rootAutomationPathField = new JBTextField();
-    private final DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList = new DefaultComboBoxModel<>();
-    private final ComboBox<TestProjectDirectoryDto> projectComboBox = new ComboBox<>(testProjectList);
-    private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
-    private final ComboBox<String> logLevelComboBox = new ComboBox<>(Arrays.stream(Log.Level.values()).map(Log.Level::name).toArray(String[]::new));
-    private final JButton openFolderBtn = new JButton("Open");
-    private final JButton activateBtn = new JButton("Activate");
-    private final JButton deactivateBtn = new JButton("Deactivate");
-    private final JButton archiveBtn = new JButton("Archive");
-    private final JButton renameBtn = new JButton("Rename");
     private final Project project;
-
-    @Getter
-    @Setter
-    @NotNull
-    private Path testinPath;
-
-    @Getter
-    @Setter
-    //@NotNull
-    private Path automationPath;
 
     public Setting(Project project) {
         this.project = project;
     }
 
-    @Override
-    public String getDisplayName() {
-        return Bundle.getPluginName();
+    @NotNull
+    public Path getTestinPath() {
+        String path = AppSettingsState.getInstance().rootTestinPath;
+        return path != null && !path.trim().isEmpty() ? Path.of(path.trim()) : Path.of("");
+    }
+
+    public void setTestinPath(@Nullable final Path path) {
+        AppSettingsState settings = AppSettingsState.getInstance();
+        settings.rootTestinPath = path != null ? path.toString() : "";
     }
 
     @Nullable
-    @Override
-    public JComponent createComponent() {
-        ((JBTextField) rootTestinPathField.getTextField()).getEmptyText().setText("Example -> c:\\users\\{username}\\documents\\testin");
-        rootTestinPathField.addBrowseFolderListener(
-                null,
-                FileChooserDescriptorFactory.createSingleFolderDescriptor()
-                        .withTitle("Select Root Folder")
-                        .withDescription("Choose the directory where your test projects are stored"),
-                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-        );
-
-        rootTestinPathField.getTextField().getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                updateOpenFolderBtnState();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                updateOpenFolderBtnState();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                updateOpenFolderBtnState();
-            }
-        });
-
-        openFolderBtn.setIcon(AllIcons.Actions.MenuOpen);
-        openFolderBtn.setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Actions.MenuOpen));
-        openFolderBtn.setEnabled(false);
-        openFolderBtn.addActionListener(e -> {
-            try {
-                Desktop.getDesktop().open(new File(rootTestinPathField.getText()));
-            } catch (Exception ex) {
-                Services.getInstance(project, Notifier.class).error(project, "Error", "Could not open folder: " + ex.getMessage());
-            }
-        });
-
-        JPanel pathPanel = new JPanel(new BorderLayout(5, 0));
-        pathPanel.add(rootTestinPathField, BorderLayout.CENTER);
-        pathPanel.add(openFolderBtn, BorderLayout.EAST);
-
-        rootAutomationPathField.setEnabled(false);
-        rootAutomationPathField.setToolTipText("Automatically detected base package path for your automation framework");
-
-        projectComboBox.setRenderer(new RendererImpl());
-
-        activateBtn.addActionListener(e -> updateProjectStatus(project, ProjectStatus.ACTIVE));
-        deactivateBtn.addActionListener(e -> updateProjectStatus(project, ProjectStatus.INACTIVE));
-        archiveBtn.addActionListener(e -> updateProjectStatus(project, ProjectStatus.ARCHIVED));
-        //renameBtn.addActionListener(e -> new Rename().actionPerformed(ProjectStatus.AR));
-
-        refreshProjectList();
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        buttonPanel.add(activateBtn);
-        buttonPanel.add(new Box.Filler(new Dimension(5, 0), new Dimension(5, 0), new Dimension(5, 0)));
-        buttonPanel.add(deactivateBtn);
-        buttonPanel.add(new Box.Filler(new Dimension(5, 0), new Dimension(5, 0), new Dimension(5, 0)));
-        buttonPanel.add(archiveBtn);
-        buttonPanel.add(new Box.Filler(new Dimension(5, 0), new Dimension(5, 0), new Dimension(5, 0)));
-        buttonPanel.add(renameBtn);
-
-        return FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("Root testin folder: "), pathPanel, 1, false)
-                .addLabeledComponent(new JBLabel("Root Automation folder: "), rootAutomationPathField, 1, false)
-                .addVerticalGap(10)
-                .addComponent(new TitledSeparator("Project Management"))
-                .addLabeledComponent("Select test project: ", projectComboBox)
-                .addComponent(buttonPanel)
-                .addVerticalGap(5)
-                .addComponent(readModeCheckBox)
-                .addVerticalGap(5)
-                .addLabeledComponent("Log level: ", logLevelComboBox)
-                .addComponentFillVertically(new JPanel(), 0)
-                .getPanel();
+    public Path getAutomationPath() {
+        String path = AppSettingsState.getInstance().rootAutomationPath;
+        return path != null && !path.trim().isEmpty() ? Path.of(path.trim()) : null;
     }
 
-    private void updateOpenFolderBtnState() {
-        String pathStr = rootTestinPathField.getText();
-        if (pathStr.trim().isEmpty()) {
-            openFolderBtn.setEnabled(false);
-            return;
-        }
-
-        try {
-            Path path = Path.of(pathStr);
-            openFolderBtn.setEnabled(Files.exists(path) && Files.isDirectory(path));
-        } catch (Exception ex) {
-            openFolderBtn.setEnabled(false);
-        }
-    }
-
-    @Deprecated(forRemoval = true, since = "after remove status from name, this method logic should be moved to .pr with remove split and _")
-    private void updateProjectStatus(final @NotNull Project project, ProjectStatus newProjectStatus) {
-        DirectoryDto selected = (DirectoryDto) projectComboBox.getSelectedItem();
-        if (selected == null) return;
-
-        Path oldPath = selected.getPath();
-        String currentFileName = selected.getName();
-
-        if (Files.exists(oldPath) && currentFileName.contains("_")) { // todo, to be removed _ , no need after move project status logic to .pr.
-            String baseName = currentFileName.substring(0, currentFileName.lastIndexOf("_"));
-            String newName = baseName + "_" + newProjectStatus.name(); //todo, no need for _
-
-            ApplicationManager.getApplication().runWriteAction(() -> {
-                try {
-                    VirtualFile oldDirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(oldPath.toFile());
-                    if (oldDirVFile != null) {
-                        oldDirVFile.rename(this, newName);
-
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            refreshProjectList();
-
-                            for (int i = 0; i < testProjectList.getSize(); i++) {
-                                if (testProjectList.getElementAt(i).getPathName().equals(newName)) {
-                                    projectComboBox.setSelectedIndex(i);
-                                    break;
-                                }
-                            }
-
-                            ProjectPanel panel = Services.getInstance(project, ProjectPanel.class);
-                            if (panel != null) {
-                                new Refresh(panel).execute();
-                                Log.info("ToolWindow refresh triggered successfully.");
-                            }
-                        });
-                    }
-                } catch (IOException ex) {
-                    Services.getInstance(project, Notifier.class).error(project, "Status Update Failed", "Could not rename project directory: " + ex.getMessage());
-                }
-            });
-        }
-    }
-
-    private void refreshProjectList() {
-        testProjectList.removeAllElements();
-
-        String pathStr = rootTestinPathField.getText();
-        if (pathStr.trim().isEmpty()) return;
-
-        try {
-            Path rootPath = Path.of(pathStr);
-
-            if (Files.exists(rootPath) && Files.isDirectory(rootPath)) {
-                try (Stream<Path> paths = Files.list(rootPath)) {
-                    paths.filter(Files::isDirectory)
-                            .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
-                            .filter(Objects::nonNull)
-                            .forEach(testProjectList::addElement);
-
-                }
-            }
-        } catch (Exception e) {
-            Log.error("Failed to refresh project list: " + e.getMessage());
-            Log.error("Exception: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public boolean isModified() {
+    public void setAutomationPath(@Nullable final Path path) {
         AppSettingsState settings = AppSettingsState.getInstance();
-        boolean modified = !rootTestinPathField.getText().equals(settings.rootTestinPath);
-        modified |= !rootAutomationPathField.getText().equals(settings.rootAutomationPath);
-        modified |= readModeCheckBox.isSelected() != settings.readMode;
-        modified |= !logLevelComboBox.getSelectedItem().equals(settings.logLevel);
-        return modified;
+        settings.rootAutomationPath = path != null ? path.toString() : "";
     }
 
-    @Override
-    public void apply() {
-        final AppSettingsState settings = AppSettingsState.getInstance();
-
-        settings.rootTestinPath = rootTestinPathField.getText();
-        settings.rootAutomationPath = rootAutomationPathField.getText();
-        settings.readMode = readModeCheckBox.isSelected();
-
-        settings.logLevel = (String) logLevelComboBox.getSelectedItem();
-        Log.setLogLevel(Log.Level.valueOf(settings.logLevel));
-
-        if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty())
-            setTestinPath(Path.of(settings.rootTestinPath));
-
-        else
-            setTestinPath(Path.of(""));
-
-        if (settings.rootAutomationPath != null && !settings.rootAutomationPath.trim().isEmpty())
-            setAutomationPath(Path.of(settings.rootAutomationPath));
-
-        else
-            setAutomationPath(null);
-
-        ProjectPanel panel = Services.getInstance(project, ProjectPanel.class);
-        if (panel != null) {
-            new Refresh(panel).execute();
-            Log.info("ToolWindow refresh triggered successfully.");
-        }
+    public boolean isReadMode() {
+        return AppSettingsState.getInstance().readMode;
     }
 
-    @Override
-    public void reset() {
-        AppSettingsState settings = AppSettingsState.getInstance();
-        rootTestinPathField.setText(settings.rootTestinPath != null ? settings.rootTestinPath : "");
+    public void setReadMode(final boolean readMode) {
+        AppSettingsState.getInstance().readMode = readMode;
+    }
 
-        VirtualFile mainSourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
+    public String getLogLevel() {
+        return AppSettingsState.getInstance().logLevel;
+    }
 
-        if (mainSourceRoot != null) {
-            rootAutomationPathField.setText(mainSourceRoot.getPath());
-        } else {
-            rootAutomationPathField.setText(settings.rootAutomationPath != null ? settings.rootAutomationPath : "No source root detected");
-        }
-
-        readModeCheckBox.setSelected(settings.readMode);
-
-        logLevelComboBox.setSelectedItem(settings.logLevel);
-
-        updateOpenFolderBtnState();
-        refreshProjectList();
+    public void setLogLevel(final String logLevel) {
+        AppSettingsState.getInstance().logLevel = logLevel;
     }
 }

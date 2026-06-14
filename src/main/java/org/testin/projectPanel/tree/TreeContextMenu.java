@@ -27,7 +27,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(createSubGroup("Actions", AllIcons.Actions.Edit,
                 List.of(new UndoNode(tree),
                         new RedoNode(tree),
-                        new Remove(tree),
+                        new Remove(tree, projectPanel),
                         new Rename(projectPanel, tree),
                         new CopyNode(tree),
                         new CutNode(tree),

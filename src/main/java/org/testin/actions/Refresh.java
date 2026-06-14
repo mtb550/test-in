@@ -10,7 +10,7 @@ import org.testin.projectPanel.ProjectPanel;
 public class Refresh extends DumbAwareAction {
     private final ProjectPanel projectPanel;
 
-    public Refresh(ProjectPanel projectPanel) {
+    public Refresh(final ProjectPanel projectPanel) {
         super("Refresh", "Reload tree", AllIcons.Actions.Refresh);
         this.projectPanel = projectPanel;
     }
