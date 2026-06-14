@@ -140,6 +140,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         final EditorCM editorCM = new EditorCM(project, this, vf.getTestSet(), list, model);
         final TestMouseListener testMouseListener = new TestMouseListener(project, this, list, model, vf.getTestSet(), editorCM);
         list.addMouseListener(testMouseListener);
+        list.addMouseWheelListener(testMouseListener);
 
         list.setTransferHandler(new TransferListener(this));
         list.setCellRenderer(new TestListRenderer(this));

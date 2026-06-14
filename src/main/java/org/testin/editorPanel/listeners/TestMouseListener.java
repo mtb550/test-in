@@ -15,13 +15,14 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-// todo, it is used for test and run but name is TestMouseListener, isolate the logic of run in separate class.
 public class TestMouseListener extends MouseAdapter {
     private final Project project;
     private final JBList<TestCaseDto> list;
@@ -46,9 +47,9 @@ public class TestMouseListener extends MouseAdapter {
         final boolean isClickOnItem = index >= 0 && list.getCellBounds(index, index).contains(e.getPoint());
 
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
-            if (isClickOnItem) {
+            if (isClickOnItem)
                 Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(project, List.of(selected), path));
-            }
+
             return;
         }
 
@@ -57,14 +58,39 @@ public class TestMouseListener extends MouseAdapter {
             final String place = ActionPlaces.TOOLWINDOW_POPUP;
 
             if (isClickOnItem) {
-                if (!list.isSelectedIndex(index)) {
+                if (!list.isSelectedIndex(index))
                     list.setSelectedIndex(index);
-                }
+
                 actionManager.createActionPopupMenu(place, editorCM).getComponent().show(e.getComponent(), e.getX(), e.getY());
+
             } else {
                 list.clearSelection();
                 actionManager.createActionPopupMenu(place, emptyMenu).getComponent().show(e.getComponent(), e.getX(), e.getY());
             }
         }
+    }
+
+    @Override
+    public void mouseWheelMoved(final MouseWheelEvent e) {
+        if (e.isControlDown() || e.isMetaDown()) return;
+
+        final JScrollPane scrollPane = getScrollPane(e.getComponent());
+
+        if (scrollPane != null && e.getComponent() != scrollPane) {
+            final MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
+            scrollPane.dispatchEvent(clonedEvent);
+            e.consume();
+        }
+    }
+
+    private JScrollPane getScrollPane(final Component component) {
+        Component current = component;
+        while (current != null) {
+            if (current instanceof JScrollPane)
+                return (JScrollPane) current;
+
+            current = current.getParent();
+        }
+        return null;
     }
 }

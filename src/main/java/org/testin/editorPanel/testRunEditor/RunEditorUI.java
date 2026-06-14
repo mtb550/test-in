@@ -140,6 +140,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         final EditorCM editorCM = new EditorCM(project, this, vf.getTestRun(), list, model);
         final TestMouseListener testMouseListener = new TestMouseListener(project, this, list, model, vf.getTestRun(), editorCM);
         list.addMouseListener(testMouseListener);
+        list.addMouseWheelListener(testMouseListener);
 
         editorCM.registerShortcuts(this, vf.getTestRun(), list, model, editorCM);
 
