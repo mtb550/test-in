@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class HistoryTab {
-    public static void load(@NotNull JBPanel<?> historyTab) {
+    public void load(@NotNull JBPanel<?> historyTab) {
         historyTab.removeAll();
         DefaultListModel<String> model = new DefaultListModel<>();
 

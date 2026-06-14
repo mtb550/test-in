@@ -5,6 +5,7 @@ import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.Project;
@@ -14,14 +15,18 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.logger.Log;
 
 import java.util.List;
 
-public class TestNGRunnerByMethod {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Service(Service.Level.PROJECT)
+public final class TestNGRunnerByMethod {
 
-    public static void runTestMethod(final @NotNull Project project, final @NotNull List<String> rawFqcn) {
+    public void runTestMethod(final @NotNull Project project, final @NotNull List<String> rawFqcn) {
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {

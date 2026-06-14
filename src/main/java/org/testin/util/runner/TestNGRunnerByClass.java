@@ -5,6 +5,7 @@ import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.DumbService;
@@ -16,12 +17,16 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.logger.Log;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Service(Service.Level.PROJECT)
 public class TestNGRunnerByClass {
 
-    public static void runTestClass(final @NotNull Project project, final @NotNull String fqcn) {
+    public void runTestClass(final @NotNull Project project, final @NotNull String fqcn) {
 
         if (DumbService.isDumb(project)) {
             DumbService.getInstance(project).showDumbModeNotification(

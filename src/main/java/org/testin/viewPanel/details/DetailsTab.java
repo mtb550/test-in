@@ -19,13 +19,13 @@ import java.nio.file.Path;
 
 public class DetailsTab {
 
-    private static final int SCROLL_UNIT_INCREMENT = 16;
-    private static final String PLACEHOLDER_TEXT = "Select a test case to view details";
-    private static final int INSETS_DEFAULT = 5;
-    private static final double WEIGHT_X = 1.0;
-    private static final double SPACER_WEIGHT_Y = 1.0;
+    final int SCROLL_UNIT_INCREMENT = 16;
+    final String PLACEHOLDER_TEXT = "Select a test case to view details";
+    final int INSETS_DEFAULT = 5;
+    final double WEIGHT_X = 1.0;
+    final double SPACER_WEIGHT_Y = 1.0;
 
-    public static void load(final @NotNull Project project, @NotNull final JBPanel<?> detailsTab, @Nullable final TestCaseDto dto, @Nullable final Path currentPath) {
+    public void load(final @NotNull Project project, @NotNull final JBPanel<?> detailsTab, @Nullable final TestCaseDto dto, @Nullable final Path currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
@@ -49,7 +49,7 @@ public class DetailsTab {
         detailsTab.repaint();
     }
 
-    private static void renderPlaceholder(@NotNull final JBPanel<?> panel) {
+    private void renderPlaceholder(@NotNull final JBPanel<?> panel) {
         panel.setLayout(new BorderLayout());
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
         final JLabel placeholder = new JLabel(PLACEHOLDER_TEXT);
@@ -58,7 +58,7 @@ public class DetailsTab {
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
-    private static void renderStoneLayout(final @NotNull Project project, final JBPanel<?> panel, final TestCaseDto dto, final Path currentPath) {
+    private void renderStoneLayout(final @NotNull Project project, final JBPanel<?> panel, final TestCaseDto dto, final Path currentPath) {
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -69,7 +69,7 @@ public class DetailsTab {
         addVerticalSpacer(panel, row);
     }
 
-    private static int setupFixedRows(final @NotNull Project project, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final Path currentPath) {
+    private int setupFixedRows(final @NotNull Project project, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final Path currentPath) {
         int row = 0;
 
         row = new NavigationBar(project, currentPath).render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
@@ -92,7 +92,7 @@ public class DetailsTab {
         return row;
     }
 
-    private static void addVerticalSpacer(final JBPanel<?> panel, final int lastRow) {
+    private void addVerticalSpacer(final JBPanel<?> panel, final int lastRow) {
         final GridBagConstraints spacerGbc = new GridBagConstraints();
         spacerGbc.gridy = lastRow;
         spacerGbc.weighty = SPACER_WEIGHT_Y;

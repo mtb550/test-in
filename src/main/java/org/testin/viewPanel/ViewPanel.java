@@ -147,9 +147,9 @@ public class ViewPanel implements Disposable {
         TestCaseDto currentTestCaseDto = this.getCurrentTestCaseDto();
         Path currentPath = this.page.getCurrentPath();
 
-        DetailsTab.load(project, detailsTab, currentTestCaseDto, currentPath);
-        HistoryTab.load(historyTab);
-        OpenBugsTab.load(openBugsTab);
+        new DetailsTab().load(project, detailsTab, currentTestCaseDto, currentPath);
+        new HistoryTab().load(historyTab);
+        new OpenBugsTab().load(openBugsTab);
 
         detailsTab.revalidate();
         detailsTab.repaint();

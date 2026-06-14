@@ -54,7 +54,7 @@ public class RunTestSet extends DumbAwareAction {
 
             if (!fqcn.trim().isEmpty()) {
                 Log.info("fqcn: " + fqcn);
-                TestNGRunnerByClass.runTestClass(e.getProject(), fqcn);
+                Services.getInstance(e.getProject(), TestNGRunnerByClass.class).runTestClass(e.getProject(), fqcn);
             } else {
                 Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Run Failed", "Could not parse class name from file path: " + ts.getPath().toFile().getName());
             }
