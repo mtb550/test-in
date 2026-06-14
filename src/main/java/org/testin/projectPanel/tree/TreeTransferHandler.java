@@ -150,7 +150,7 @@ public class TreeTransferHandler extends TransferHandler {
     private void persistMove(final DefaultMutableTreeNode movedNode, final DirectoryDto targetDir) {
         final DirectoryDto sourceDir = (DirectoryDto) movedNode.getUserObject();
 
-        TreeUtilImpl.executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
+        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
             sourceVf.move(this, targetVf);
 
             Path oldPath = sourceDir.getPath();
@@ -165,7 +165,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private void persistCopy(final DirectoryDto source, final DirectoryDto target) {
-        TreeUtilImpl.executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
+        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
             sourceVf.copy(this, targetVf, sourceVf.getName());
             Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
         });

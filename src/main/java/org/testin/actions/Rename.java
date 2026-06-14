@@ -57,7 +57,7 @@ public class Rename extends DumbAwareAction {
         Path oldPath = dir.getPath();
         Path newPath = oldPath.getParent().resolve(newName);
 
-        TreeUtilImpl.executeVfsAction(e.getProject(), oldPath, "Rename Failed", vf -> {
+        Services.getInstance(e.getProject(), TreeUtilImpl.class).executeVfsAction(e.getProject(), oldPath, "Rename Failed", vf -> {
             vf.rename(this, newName);
 
             dir.setName(newName);

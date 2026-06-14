@@ -66,7 +66,7 @@ public class CreateTestProject extends DumbAwareAction {
                 return;
             }
 
-            TreeUtilImpl.executeVfsAction(project, Services.getInstance(project, Setting.class).getTestinPath(), "IO Error", vf -> {
+            Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, Services.getInstance(project, Setting.class).getTestinPath(), "IO Error", vf -> {
 
                 if (vf.findChild(tpName) != null) {
                     Services.getInstance(project, Notifier.class).error(project, "Creation Failed", "The directory '" + tpName + "' already exists in the IDE's Virtual File System.");

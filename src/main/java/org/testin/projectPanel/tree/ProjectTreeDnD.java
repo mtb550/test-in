@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -70,9 +71,7 @@ public class ProjectTreeDnD {
             if (DataFlavor.javaFileListFlavor.equals(flavor)) {
                 List<File> files = new ArrayList<>();
                 for (DirectoryDto dto : dtos) {
-                    if (dto.getPath() != null) {
-                        files.add(dto.getPath().toFile());
-                    }
+                    files.add(dto.getPath().toFile());
                 }
                 return files;
             }
@@ -150,9 +149,8 @@ public class ProjectTreeDnD {
         }
 
         private void persistMove(DirectoryDto sourceDir, DirectoryDto targetDir) {
-            TreeUtilImpl.executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
+            Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
                 sourceVf.move(this, targetVf);
-                Path oldPath = sourceDir.getPath();
                 Path newPath = targetDir.getPath().resolve(sourceDir.getName());
                 sourceDir.setPath(newPath);
                 Log.info("Moved successfully to: " + newPath);
@@ -160,7 +158,7 @@ public class ProjectTreeDnD {
         }
 
         private void persistCopy(DirectoryDto source, DirectoryDto target) {
-            TreeUtilImpl.executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
+            Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
                 sourceVf.copy(this, targetVf, sourceVf.getName());
                 Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
             });

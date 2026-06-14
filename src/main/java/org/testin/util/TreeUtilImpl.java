@@ -2,11 +2,14 @@ package org.testin.util;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
@@ -16,9 +19,11 @@ import javax.swing.tree.DefaultTreeModel;
 import java.io.IOException;
 import java.nio.file.Path;
 
-// todo, remove static and use @Service
-public class TreeUtilImpl {
-    public static void executeVfsAction(final @NotNull Project project, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@Service(Service.Level.PROJECT)
+public final class TreeUtilImpl {
+
+    public void executeVfsAction(final @NotNull Project project, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
@@ -33,7 +38,7 @@ public class TreeUtilImpl {
         }));
     }
 
-    public static void executeVfsAction(final @NotNull Project project, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
+    public void executeVfsAction(final @NotNull Project project, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
@@ -50,7 +55,7 @@ public class TreeUtilImpl {
         }));
     }
 
-    public static void createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object newTestPackage) {
+    public void createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object newTestPackage) {
         DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newTestPackage);
 
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -58,10 +63,9 @@ public class TreeUtilImpl {
             model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
             TreeUtil.selectNode(tree, newNode);
         });
-
     }
 
-    public static void removeNode(DefaultMutableTreeNode node, final SimpleTree tree) {
+    public void removeNode(final DefaultMutableTreeNode node, final SimpleTree tree) {
         ApplicationManager.getApplication().invokeLater(() -> {
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
             if (node.getParent() != null) {
@@ -70,14 +74,14 @@ public class TreeUtilImpl {
         });
     }
 
-    public static void removeRootNode(final SimpleTree tree) {
+    public void removeRootNode(final SimpleTree tree) {
         ApplicationManager.getApplication().invokeLater(() -> {
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
             model.setRoot(null);
         });
     }
 
-    public static void createVf(final @NotNull Project project, final Object requester, final Path parentPath, final String folderName) {
+    public void createVf(final @NotNull Project project, final Object requester, final Path parentPath, final String folderName) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
@@ -90,7 +94,7 @@ public class TreeUtilImpl {
         }));
     }
 
-    public static void createDataVf(final @NotNull Project project, final Object requester, final Path parentPath, final String fileName) {
+    public void createDataVf(final @NotNull Project project, final Object requester, final Path parentPath, final String fileName) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
@@ -106,7 +110,7 @@ public class TreeUtilImpl {
         }));
     }
 
-    public static void removeVf(final @NotNull Project project, final Object requester, final Path path) {
+    public void removeVf(final @NotNull Project project, final Object requester, final Path path) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());

@@ -32,9 +32,10 @@ public class CreateTestSet implements NodeCreator {
         TestSetDirectoryDto ts = Services.getInstance(project, DirectoryMapper.class).readTestSetNode(project, newDirPath, parentDir);
         if (ts == null) return null;
 
-        TreeUtilImpl.createVf(project, this, parentDir.getPath(), ts.getName());
-        TreeUtilImpl.createDataVf(project, this, newDirPath, DirectoryType.TS.getMarker());
-        TreeUtilImpl.createNode(action.getTree(), parentNode, ts);
+        TreeUtilImpl util = Services.getInstance(project, TreeUtilImpl.class);
+        util.createVf(project, this, parentDir.getPath(), ts.getName());
+        util.createDataVf(project, this, newDirPath, DirectoryType.TS.getMarker());
+        util.createNode(action.getTree(), parentNode, ts);
 
         createJavaClassInTestRoot(project, parentDir.getName(), name);
         Services.getInstance(project, EditorUtil.class).openEditor(project, ts);
@@ -58,7 +59,7 @@ public class CreateTestSet implements NodeCreator {
                     .path(parentDirDto.getPath().resolve(safeDirName))
                     .build();
 
-            TreeUtilImpl.createNode(tree, parentNode, newTsDto);
+            Services.getInstance(project, TreeUtilImpl.class).createNode(tree, parentNode, newTsDto);
             createJavaClassInTestRoot(project, parentDirDto.getName(), safeDirName);
         }
 

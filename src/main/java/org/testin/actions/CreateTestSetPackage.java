@@ -18,9 +18,10 @@ public class CreateTestSetPackage implements NodeCreator {
     public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         TestSetPackageDirectoryDto tsp = Services.getInstance(project, DirectoryMapper.class).readTestSetPackageNode(project, newDirPath, parentDir);
 
-        TreeUtilImpl.createVf(project, this, parentDir.getPath(), name);
-        TreeUtilImpl.createNode(action.getTree(), parentNode, tsp);
-        TreeUtilImpl.createDataVf(project, this, newDirPath, DirectoryType.TSP.getMarker());
+        TreeUtilImpl util = Services.getInstance(project, TreeUtilImpl.class);
+        util.createVf(project, this, parentDir.getPath(), name);
+        util.createNode(action.getTree(), parentNode, tsp);
+        util.createDataVf(project, this, newDirPath, DirectoryType.TSP.getMarker());
 
         return tsp;
     }
