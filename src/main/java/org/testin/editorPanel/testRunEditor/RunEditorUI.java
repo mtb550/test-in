@@ -16,7 +16,10 @@ import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;
-import org.testin.editorPanel.listeners.*;
+import org.testin.editorPanel.listeners.MouseListenerImpl;
+import org.testin.editorPanel.listeners.RunListRenderer;
+import org.testin.editorPanel.listeners.SelectionListener;
+import org.testin.editorPanel.listeners.StatusBarListener;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.RunToolBar;
@@ -133,14 +136,12 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         list.setCellRenderer(new RunListRenderer(this));
 
-        final HoverListener hoverListener = new HoverListener(project, list, this);
-        list.addMouseListener(hoverListener);
-        list.addMouseMotionListener(hoverListener);
-
         final EditorCM editorCM = new EditorCM(project, this, vf.getTestRun(), list, model);
-        final TestMouseListener testMouseListener = new TestMouseListener(project, this, list, model, vf.getTestRun(), editorCM);
-        list.addMouseListener(testMouseListener);
-        list.addMouseWheelListener(testMouseListener);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, vf.getTestRun(), editorCM);
+
+        list.addMouseListener(mouseListenerImpl);
+        list.addMouseWheelListener(mouseListenerImpl);
+        list.addMouseMotionListener(mouseListenerImpl);
 
         editorCM.registerShortcuts(this, vf.getTestRun(), list, model, editorCM);
 
