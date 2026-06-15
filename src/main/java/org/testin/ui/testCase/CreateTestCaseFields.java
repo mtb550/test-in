@@ -1,6 +1,8 @@
 package org.testin.ui.testCase;
 
 import com.intellij.icons.AllIcons;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.testin.util.KeyboardSet;
 import org.testin.util.statusBar.IStatusBarItem;
@@ -9,10 +11,12 @@ import javax.swing.*;
 import java.util.function.Function;
 
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum CreateTestCaseFields implements IStatusBarItem {
     DESCRIPTION_SHORTCUT(
             "Description",
             KeyboardSet.CreateTestCaseDescription,
+            null,
             null,
             new IStatusBarItem[]{},
             false,
@@ -24,6 +28,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             "Expected Result",
             KeyboardSet.CreateTestCaseExpectedResult,
             null,
+            null,
             new IStatusBarItem[]{},
             false,
             null,
@@ -33,6 +38,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     STEPS_SHORTCUT(
             "Steps",
             KeyboardSet.CreateTestCaseAddStep,
+            null,
             null,
             new IStatusBarItem[]{},
             false,
@@ -44,6 +50,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             "Priority",
             KeyboardSet.CreateTestCasePriority,
             null,
+            null,
             new IStatusBarItem[]{},
             false,
             null,
@@ -53,6 +60,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     GROUP_SHORTCUT(
             "Groups",
             KeyboardSet.CreateTestCaseGroup,
+            null,
             null,
             new IStatusBarItem[]{},
             false,
@@ -64,6 +72,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             "Save",
             KeyboardSet.Enter,
             null,
+            null,
             new IStatusBarItem[]{},
             false,
             null,
@@ -73,6 +82,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     ADD_STEP(
             "Add Step",
             KeyboardSet.CreateTestCaseAddStep,
+            null,
             null,
             new IStatusBarItem[]{},
             false,
@@ -84,6 +94,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             "Remove Step",
             KeyboardSet.CreateTestCaseRemoveStep,
             null,
+            null,
             new IStatusBarItem[]{},
             false,
             null,
@@ -92,6 +103,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     AUTO_COMPLETE(
             "Auto Complete",
+            null,
             KeyboardSet.AutoComplete.getShortcutText(),
             null,
             new IStatusBarItem[]{},
@@ -102,6 +114,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     SET_PRIORITY(
             "Set Priority",
+            null,
             KeyboardSet.PriorityHigh.getShortcutText() + " / " + KeyboardSet.PriorityMedium.getShortcutText() + " / " + KeyboardSet.PriorityLow.getShortcutText(),
             null,
             new IStatusBarItem[]{},
@@ -112,6 +125,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     NAVIGATE_TAB(
             "Navigate",
+            null,
             KeyboardSet.TabNext.getShortcutText() + " / " + KeyboardSet.TabPrevious.getShortcutText(),
             null,
             new IStatusBarItem[]{},
@@ -122,6 +136,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     NAVIGATE_ARROWS(
             "Navigate Priority",
+            null,
             KeyboardSet.ArrowUp.getShortcutText() + " / " + KeyboardSet.ArrowDown.getShortcutText(),
             null,
             new IStatusBarItem[]{},
@@ -133,6 +148,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     DESCRIPTION(
             "Description",
             KeyboardSet.CreateTestCaseDescription,
+            null,
             AllIcons.Actions.Edit,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, DESCRIPTION_SHORTCUT, EXPECTED_RESULT_SHORTCUT, STEPS_SHORTCUT, PRIORITY_SHORTCUT, GROUP_SHORTCUT},
             true,
@@ -143,6 +159,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     EXPECTED_RESULT(
             "Expected Results",
             KeyboardSet.CreateTestCaseExpectedResult,
+            null,
             AllIcons.General.InspectionsOK,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
@@ -153,6 +170,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     MODULE(
             "Module",
             KeyboardSet.CreateTestCaseModule,
+            null,
             AllIcons.General.ContextHelp,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
@@ -163,6 +181,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     TEST_DATA(
             "Test Data",
             KeyboardSet.CreateTestCaseTestData,
+            null,
             AllIcons.Nodes.DataTables,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
@@ -173,6 +192,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     PRE_CONDITIONS(
             "Pre Conditions",
             KeyboardSet.CreateTestCasePreConditions,
+            null,
             AllIcons.Actions.StepOut,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
@@ -183,6 +203,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     STEPS(
             "Steps",
             KeyboardSet.CreateTestCaseAddStep,
+            null,
             AllIcons.Actions.ListFiles,
             new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
             true,
@@ -193,6 +214,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     PRIORITY(
             "Priority",
             KeyboardSet.CreateTestCasePriority,
+            null,
             AllIcons.Nodes.Favorite,
             new IStatusBarItem[]{SAVE, SET_PRIORITY, NAVIGATE_ARROWS},
             true,
@@ -204,6 +226,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             "Select / Unselect Group",
             KeyboardSet.SelectGroup,
             null,
+            null,
             new IStatusBarItem[]{},
             false,
             null,
@@ -213,6 +236,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     GROUP(
             "Group",
             KeyboardSet.CreateTestCaseGroup,
+            null,
             AllIcons.Nodes.Tag,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
@@ -229,35 +253,12 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     private final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor;
     private final String placeholder;
 
-    ///  todo, remove constructors and use lombok @AllArgsConstructors
-    CreateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor, final String placeholder) {
-        this.name = name;
-        this.shortcut = shortcut;
-        this.customShortcutText = null;
-        this.icon = icon;
-        this.statusBarItems = statusBarItems;
-        this.createMenuItem = createMenuItem;
-        this.sectionExtractor = sectionExtractor;
-        this.placeholder = placeholder;
-    }
-
-    ///  todo, remove constructors and use lombok @AllArgsConstructors
-    CreateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean createMenuItem, final Function<TestCaseUIBase, ICreateTestCaseSection> sectionExtractor, final String placeholder) {
-        this.name = name;
-        this.shortcut = null;
-        this.customShortcutText = customShortcutText;
-        this.icon = icon;
-        this.statusBarItems = statusBarItems;
-        this.createMenuItem = createMenuItem;
-        this.sectionExtractor = sectionExtractor;
-        this.placeholder = placeholder;
-    }
-
+    // todo, to be removed.
     @Override
     public String getShortcutText() {
-        if (customShortcutText != null) {
+        if (customShortcutText != null)
             return customShortcutText;
-        }
+
         return shortcut != null ? shortcut.getShortcutText() : "";
     }
 }

@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import org.testin.pojo.Config;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
+import org.testin.pojo.TestCaseStatus;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -48,7 +49,7 @@ public class TestCaseDto {
 
     @NonNull
     @Builder.Default
-    private String status = ""; // todo, to be update to fetch from enum class (Test Case Status)
+    private TestCaseStatus status = TestCaseStatus.PENDING;
 
     @NonNull
     @Builder.Default

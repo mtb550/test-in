@@ -8,17 +8,18 @@ import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
-import org.testin.pojo.RunEditorAttributes;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final JBLabel descriptionLabel = new JBLabel();
     protected final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
-    protected final Map<RunEditorAttributes, JBLabel> attributeLabels = new HashMap<>();
+    protected final Map<String, JBLabel> attributeLabels = new HashMap<>();
 
     protected final JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final BorderLayoutPanel wrapper = new BorderLayoutPanel();
@@ -82,14 +83,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 
         details.forEach((attrName, value) -> {
-            RunEditorAttributes attr = Arrays.stream(RunEditorAttributes.values())
-                    .filter(a -> a.getName().equals(attrName))
-                    .findFirst()
-                    .orElse(null);
-
-            if (attr == null) return;
-
-            JBLabel lbl = attributeLabels.computeIfAbsent(attr, k -> {
+            JBLabel lbl = attributeLabels.computeIfAbsent(attrName, k -> {
                 JBLabel newLbl = createDetailLabel();
                 content.add(newLbl);
                 return newLbl;

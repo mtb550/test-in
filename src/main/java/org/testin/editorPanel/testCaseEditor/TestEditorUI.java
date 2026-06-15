@@ -227,6 +227,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         refreshView();
     }
 
+    @Override
     public void updateSequenceAndSaveAll() {
         currentTestCases.clear();
         currentTestCases.addAll(getFilteredList());
@@ -252,6 +253,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         });
     }
 
+    @Override
     public void selectTestCase(final TestCaseDto tc) {
         if (tc == null) return;
 

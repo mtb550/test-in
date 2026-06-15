@@ -165,9 +165,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            TestCaseDto::getTempStatus,
+            tc -> tc.getStatus().getDisplayText(),
             null,
-            (project, tc, v) -> tc.setStatus(v)
+            (project, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v))
     ),
 
     CREATE_BY(

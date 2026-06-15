@@ -35,7 +35,7 @@ public class RunCard extends BaseCard {
         updateUI(index, RunEditorAttributes.DESCRIPTION.getValueExtractor().apply(runItem), badges, details);
 
         if (runItem != null) {
-            final JBLabel statusLabel = attributeLabels.get(RunEditorAttributes.RUN_STATUS);
+            final JBLabel statusLabel = attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName());
 
             if (statusLabel != null) {
                 statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 public class TestDetailsPopup extends AbstractButton implements IToolbarItem {
 
-    private static final String KEY_DETAILS = "testin.selectedDetails.test.v1";
+    private static final String KEY_DETAILS = "testin.selectedDetails.test.v2";
 
     private static final String DEFAULT_DETAILS = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isStandardToolBarOption)

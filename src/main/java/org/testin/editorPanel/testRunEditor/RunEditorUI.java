@@ -324,7 +324,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         loadDataAsync();
     }
 
-    public Set<?> getSelectedDetails() {
+    @Override
+    public Set<RunEditorAttributes> getSelectedDetails() {
         AbstractToolbarPanel baseToolBar = getToolBar();
         if (baseToolBar != null) {
             RunDetailsPopup popup = baseToolBar.getToolbarItem(RunDetailsPopup.class);

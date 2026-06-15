@@ -88,7 +88,7 @@ public class CreateTestCase extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final Project project = e.getProject();
-        if (e.getProject() == null) return;
+        if (project == null) return;
 
         performCreation(project, ui, dir, list, model);
     }

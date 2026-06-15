@@ -33,6 +33,7 @@ public final class Log {
 
     public static void trace(@NotNull final String message) {
         log(Level.TRACE, WALKER.getCallerClass().getSimpleName(), message);
+        //System.out.println(WALKER.getCallerClass().getSimpleName() + " " + message);
     }
 
     public static void debug(@NotNull final String message) {
