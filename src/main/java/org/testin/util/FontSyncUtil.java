@@ -1,6 +1,7 @@
 package org.testin.util;
 
 import com.intellij.ide.IdeEventQueue;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
@@ -30,7 +31,7 @@ public class FontSyncUtil {
         ApplicationManager.getApplication().getMessageBus().connect(parentDisposable)
                 .subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) scheme -> updateComponentFontSize(component));
 
-        setupGlobalJavaEditorWatcher(project);
+        setupGlobalJavaEditorWatcher(project, parentDisposable);
 
         component.addMouseWheelListener(e -> {
             if (e.isControlDown() || e.isMetaDown()) {
@@ -40,18 +41,18 @@ public class FontSyncUtil {
         });
     }
 
-    private static void setupGlobalJavaEditorWatcher(final @NotNull Project project) {
+    private static void setupGlobalJavaEditorWatcher(final @NotNull Project project, final Disposable parentDisposable) {
         if (isGlobalWatcherActive) return;
         isGlobalWatcherActive = true;
 
-        IdeEventQueue.getInstance().addDispatcher(event -> {
+        IdeEventQueue.getInstance().addPostprocessor(event -> {
             if (event instanceof MouseWheelEvent e && (e.isControlDown() || e.isMetaDown())) {
                 Timer timer = new Timer(50, evt -> syncJavaEditorToGlobal(project));
                 timer.setRepeats(false);
                 timer.start();
             }
             return false;
-        }, ApplicationManager.getApplication());
+        }, parentDisposable);
     }
 
     private static void syncJavaEditorToGlobal(final @NotNull Project project) {
