@@ -2,6 +2,7 @@ package org.testin.editorPanel.toolBar.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
+import com.intellij.openapi.util.text.HtmlChunk;
 import org.testin.util.KeyboardSet;
 
 public class CreateTestCaseBtn extends AbstractButton implements IToolbarItem {
@@ -11,7 +12,7 @@ public class CreateTestCaseBtn extends AbstractButton implements IToolbarItem {
 
         new HelpTooltip()
                 // todo, deprecated
-                .setDescription("Create test case")
+                .setDescription(HtmlChunk.text("Create test case"))
                 .setShortcut(KeyboardSet.CreateTestCase.getShortcut())
                 .installOn(this);
 

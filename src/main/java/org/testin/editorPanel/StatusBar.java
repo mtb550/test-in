@@ -1,6 +1,7 @@
 package org.testin.editorPanel;
 
 import com.intellij.ide.HelpTooltip;
+import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -74,12 +75,12 @@ public class StatusBar extends JBPanel<StatusBar> {
         ///makeCompact(lastButton, dynamicSmallFont);
 
         new HelpTooltip()
-                .setDescription("Previous page")
+                .setDescription(HtmlChunk.text("Previous page"))
                 .setShortcut(KeyboardSet.PreviousTestCase.getShortcutText())
                 .installOn(prevButton);
 
         new HelpTooltip()
-                .setDescription("Next page")
+                .setDescription(HtmlChunk.text("Next page"))
                 .setShortcut(KeyboardSet.NextTestCase.getShortcutText())
                 .installOn(nextButton);
 

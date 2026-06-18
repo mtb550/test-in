@@ -15,7 +15,7 @@ public enum TestStatus {
             " [Passed]",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GREEN),
             CardHoverAction.PASSED,
-            JBColor.GREEN.darker()
+            JBColor.GREEN
 
     ),
 
@@ -32,7 +32,7 @@ public enum TestStatus {
             " [Blocked]",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.ORANGE),
             CardHoverAction.BLOCKED,
-            JBColor.ORANGE.darker()
+            JBColor.ORANGE
     ),
 
     PENDING(
@@ -48,7 +48,7 @@ public enum TestStatus {
             " [Untested]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             CardHoverAction.UNTESTED,
-            JBColor.GRAY.darker()
+            JBColor.GRAY.brighter()
     );
 
     private final String hex;
