@@ -164,7 +164,7 @@ public enum TestEditorAttributes {
             "Status:",
             true,
             false,
-            true,
+            false,
             tc -> tc.getStatus().getDisplayText(),
             null,
             (project, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v))

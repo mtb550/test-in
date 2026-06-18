@@ -5,23 +5,49 @@
     <!-- ================================================================== -->
     <id>org.testin</id>
     <name>Testin</name>
-    <version>2.4.1-SNAPSHOT</version>
+    <version>2.4.2-SNAPSHOT</version>
     <vendor email="mtb550@gmail.com" url="https://github.com/mtb550/test-in">Muteb Almughyiri</vendor>
     <resource-bundle>messages</resource-bundle>
     <description><![CDATA[
-        <b>test in</b> — a QC management plugin for IntelliJ-based IDEs.<br/><br/>
-        Browse test projects, manage test cases, track test runs, and integrate
-        with git version control — all from within your IDE.
-    ]]></description>
+    <b>Testin</b> — A powerful, lightweight Quality Control (QC) and test case management engine built directly into the IntelliJ Platform. Manage your test cases and test runs natively alongside your code — no extra tools, no context switching.<br/><br/>
+
+    Designed for quality engineers, developers, and teams using Git, Test In replaces heavy external test management systems with a fast, local-first workflow within a familiar interface.<br/><br/>
+
+    <b>✨ Key Highlights:</b>
+    <ul>
+        <li><b>📂 Test Project Tree:</b> Browse test projects, test sets, and test runs in a clear hierarchical tree in your left sidebar. Drag, drop, rename, copy, and paste items exactly like local files.</li>
+        <li><b>✍️ Test Case Editor:</b> Create and edit test cases with rich attributes (steps, expected results, priority, group, module, pre-conditions, and test data). Navigate large suites effortlessly with built-in search, filtering, and pagination.</li>
+        <li><b>🏃 Test Run Manager:</b> Track live execution results (Passed, Failed, Blocked, Untested, Pending), monitor test duration with automated timers, and record execution notes step-by-step.</li>
+        <li><b>📊 View Panel:</b> A dedicated right-side panel showing full test case details, structural metadata, and change history at a glance.</li>
+        <li><b>🧪 Code Integration & Gutter Icons:</b> Execute test cases directly via TestNG by class, method, or suite. Native gutter icons in your Java files let you jump straight to code definitions or run tests in one click.</li>
+        <li><b>📥 One-Click HTML Reporting & Export:</b> Generate and view clean, comprehensive HTML execution reports instantly. Supports importing and exporting configurations using Excel (.xls), CSV, or JSON.</li>
+        <li><b>🔗 Git & Platform Integrations:</b> Track which commit each test run belongs to and map changes using IntelliJ's native Git tools. Designed for seamless roadmapped workflows syncing with Jira, Azure DevOps, and TestRail.</li>
+        <li><b>🔧 Global Configuration:</b> Fine-tune your testing ecosystem, root test folders, automation paths, read-only constraints, and logger levels from a unified settings window.</li>
+    </ul>
+
+    <b>📋 Compatibility & Privacy:</b>
+    <ul>
+        <li><b>Local-First Privacy:</b> Zero telemetry, zero data collection, and zero code exfiltration. Your test data stays completely local on your machine.</li>
+        <li><b>IDE Support:</b> Fully compatible with IntelliJ IDEA, PyCharm, GoLand, WebStorm, and other IntelliJ-based variants (build 251+). Requires Java, Git4Idea, and TestNG-J plugin modules.</li>
+    </ul>
+]]></description>
+
     <change-notes><![CDATA[
-        <b>2.0.0</b>
-        <ul>
-            <li>Initial release</li>
-            <li>Test case editor with filtering, search, and pagination</li>
-            <li>Test run creation and opening editor</li>
-            <li>Settings page for global configuration</li>
-        </ul>
-    ]]></change-notes>
+    <b>2.4.1</b>
+    <ul>
+        <li><b>Instant HTML Reporting:</b> Added a one-click action to instantly generate and view clean, formatted HTML execution reports right from the toolbar.</li>
+        <li><b>Native Event Migration:</b> Migrated background watchers to the verifier-safe postprocessor API to ensure full architectural compatibility with IntelliJ 2025.1+ and 2026 EAP editions.</li>
+        <li><b>Performance Refactoring:</b> Optimized list rendering cycles by caching custom row boundaries and styling components, cutting down memory allocation overhead.</li>
+    </ul>
+    <br/>
+    <b>2.0.0</b>
+    <ul>
+        <li><b>Initial Architecture Release:</b> Introduced the core Test Project Tree sidebar navigation and dynamic, in-memory collection handlers.</li>
+        <li>Added the interactive Test Case Editor with pagination, background async loaders, and text query filtering.</li>
+        <li>Introduced the Test Run Manager tracking live test item execution state, manual status overrides, and runtime duration counters.</li>
+        <li>Integrated global application setting configurations under the IDE Tools menu group.</li>
+    </ul>
+]]></change-notes>
 
     <!-- ================================================================== -->
     <!-- Compatibility                                                        -->
