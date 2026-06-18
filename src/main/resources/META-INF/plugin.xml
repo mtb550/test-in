@@ -28,7 +28,7 @@
     <b>📋 Compatibility & Privacy:</b>
     <ul>
         <li><b>Local-First Privacy:</b> Zero telemetry, zero data collection, and zero code exfiltration. Your test data stays completely local on your machine.</li>
-        <li><b>IDE Support:</b> Fully compatible with IntelliJ IDEA, PyCharm, GoLand, WebStorm, and other IntelliJ-based variants (build 251+). Requires Java, Git4Idea, and TestNG-J plugin modules.</li>
+        <li><b>IDE Support:</b> Fully compatible with IntelliJ IDEA, PyCharm, GoLand, WebStorm, and other IntelliJ-based variants (build 261+). Requires Java, Git4Idea, and TestNG-J plugin modules.</li>
     </ul>
 ]]></description>
 
@@ -52,7 +52,7 @@
     <!-- ================================================================== -->
     <!-- Compatibility                                                        -->
     <!-- ================================================================== -->
-    <idea-version since-build="251"/>
+    <idea-version since-build="261"/>
 
     <!-- ================================================================== -->
     <!-- Dependencies                                                         -->

@@ -76,7 +76,7 @@ intellijPlatform {
         }
 
         ideaVersion {
-            sinceBuild.set("251")
+            sinceBuild.set("261")
             untilBuild.set(null as String?)
         }
     }

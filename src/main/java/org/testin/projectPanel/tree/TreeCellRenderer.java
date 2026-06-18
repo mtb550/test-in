@@ -37,7 +37,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                     setIcon(type != null ? type.getIcon() : AllIcons.Nodes.Folder);
                     append(dir.getName(), getSimpleTextAttributes(node, dir));
                     append(" ");
-                    append(dir instanceof TestRunDirectoryDto trDir ? trDir.getMarker().getStatus().name() : "", SimpleTextAttributes.GRAY_ATTRIBUTES);
+                    append(dir instanceof TestRunDirectoryDto trDir ? trDir.getMarker().getStatus().getLabel() : "", SimpleTextAttributes.GRAY_ATTRIBUTES);
                 }
 
                 case DefaultMutableTreeNode node -> {
