@@ -272,4 +272,4 @@ if change test run to completed then change pending test cases to untested autom
 
 remove GitHub project and recreate it with new history.
 
-
+build detail ui form in view panel for tree node.
