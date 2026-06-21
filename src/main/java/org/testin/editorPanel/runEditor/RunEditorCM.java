@@ -1,6 +1,5 @@
 package org.testin.editorPanel.runEditor;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -41,13 +40,11 @@ public class RunEditorCM extends EditorContextMenu {
         super("Editor Context Menu", true);
         this.project = project;
 
-        add(createSubGroup("Set Status", AllIcons.General.Filter,
-                List.of(
-                        new SetStatusPassed(ui, list),
-                        new SetStatusFailed(ui, list),
-                        new SetStatusBlocked(ui, list)
-                )
-        ));
+        add(new SetStatusPassed(ui, list));
+        add(new SetStatusFailed(ui, list));
+        add(new SetStatusBlocked(ui, list));
+        addSeparator();
+
         add(new ViewDetails(list, dir.getPath()));
         add(new StartExecution(ui.getToolBar().getCallbacks()));
         addSeparator();
