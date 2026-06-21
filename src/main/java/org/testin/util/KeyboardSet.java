@@ -63,6 +63,7 @@ public enum KeyboardSet {
     PriorityLow(KeyEvent.VK_L, 0),
     AutoComplete(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK),
     SelectGroup(KeyEvent.VK_SPACE, 0),
+    SetStatus(KeyEvent.VK_S, 0),
     SetStatusPassed(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
     SetStatusFailed(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK),
     SetStatusBlocked(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK),

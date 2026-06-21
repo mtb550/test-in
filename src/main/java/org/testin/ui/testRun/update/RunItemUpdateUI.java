@@ -80,7 +80,7 @@ public class RunItemUpdateUI {
 
             boolean isTarget = (section == targetSection);
 
-            if (isTarget || section instanceof ActualResultSection) {
+            if (isTarget) {
                 section.showSection(slot);
                 contentPanel.add(slot);
             }

@@ -47,37 +47,45 @@ public class ActualResultUI {
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 
-        JPanel contentPanel = new JPanel(new BorderLayout());
-        contentPanel.setOpaque(false);
-        contentPanel.add(section.getWrapper(), BorderLayout.NORTH);
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setBorder(JBUI.Borders.empty(12));
 
-        JBScrollPane scrollPane = new JBScrollPane(contentPanel);
+        JPanel slot = new JPanel(new BorderLayout());
+        slot.setOpaque(false);
+        section.showSection(slot);
+        contentPanel.add(slot);
+
+        JPanel anchorPanel = new JPanel(new BorderLayout());
+        anchorPanel.setOpaque(false);
+        anchorPanel.add(contentPanel, BorderLayout.NORTH);
+
+        JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(mainPanel, section.getActualResultField())
+                .createComponentPopupBuilder(mainPanel, section.getFocusComponent())
                 .setTitle("Set Actual Result")
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)
-                .setMovable(true)
-                .setResizable(true)
+                .setMovable(false)
+                .setResizable(false)
                 .addListener(new JBPopupListener() {
                     @Override
                     public void onClosed(@NotNull LightweightWindowEvent event) {
-                        // apply changes on close
                         section.applyTo(runItem);
                     }
                 })
                 .createPopup();
 
-        // Register Enter shortcut to save and close
+        // Register Enter shortcut
         registerEnterShortcut(mainPanel);
     }
 

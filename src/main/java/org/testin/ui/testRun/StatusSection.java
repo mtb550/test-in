@@ -14,28 +14,22 @@ import java.awt.*;
 
 public class StatusSection implements RunItemEditSection {
 
-    private static final float FONT_SIZE_OFFSET = 4f;
+    final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     @Getter
     private final JComboBox<TestStatus> statusCombo;
-
     private final JPanel wrapper;
 
     public StatusSection() {
         this.statusCombo = new JComboBox<>(TestStatus.values());
-        this.statusCombo.setFont(JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + FONT_SIZE_OFFSET));
+        this.statusCombo.setFont(fieldFont);
         this.statusCombo.setBorder(JBUI.Borders.empty(10));
 
-        this.wrapper = buildPanel();
-    }
-
-    private JPanel buildPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(false);
-        panel.add(createIconPanel(AllIcons.General.Filter), BorderLayout.WEST);
-        panel.add(statusCombo, BorderLayout.CENTER);
-        panel.setBorder(JBUI.Borders.emptyTop(8));
-        return panel;
+        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper.setOpaque(false);
+        this.wrapper.add(createIconPanel(AllIcons.General.Filter), BorderLayout.WEST);
+        this.wrapper.add(statusCombo, BorderLayout.CENTER);
+        this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
     @Override
@@ -68,5 +62,15 @@ public class StatusSection implements RunItemEditSection {
     @Override
     public JComponent getFocusComponent() {
         return statusCombo;
+    }
+
+    @Override
+    public JPanel createIconPanel(final Icon icon) {
+        JPanel iconPanel = new JPanel(new GridBagLayout());
+        iconPanel.setOpaque(false);
+        JLabel iconLabel = new JLabel(icon);
+        iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
+        iconPanel.add(iconLabel);
+        return iconPanel;
     }
 }

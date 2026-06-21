@@ -22,7 +22,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
 
     ACTUAL_RESULT(
             "Actual Result",
-            KeyboardSet.UpdateTestCaseExpectedResult,
+            KeyboardSet.SetActualResult,
             AllIcons.Actions.Copy,
             new IStatusBarItem[]{SAVE},
             true,
@@ -31,7 +31,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
 
     STATUS(
             "Status",
-            KeyboardSet.UpdateTestCasePriority,
+            KeyboardSet.SetStatus,
             AllIcons.General.Filter,
             new IStatusBarItem[]{SAVE},
             true,

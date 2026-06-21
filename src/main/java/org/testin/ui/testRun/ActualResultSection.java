@@ -15,27 +15,25 @@ import java.awt.*;
 
 public class ActualResultSection implements RunItemEditSection {
 
-    private static final float FIELD_FONT_SIZE_OFFSET = 4f;
-    private static final float LABEL_FONT_SIZE_OFFSET = 2f;
+    final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
+    final Font labelFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     @Getter
     private final JBTextField actualResultField;
-
-    @Getter
     private final JPanel wrapper;
     private final JBLabel descriptionLabel;
     private final JBLabel expectedResultLabel;
 
     public ActualResultSection() {
         this.actualResultField = new JBTextField();
-        this.actualResultField.setFont(JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + FIELD_FONT_SIZE_OFFSET));
+        this.actualResultField.setFont(fieldFont);
         this.actualResultField.setBorder(JBUI.Borders.empty(10));
 
         this.descriptionLabel = new JBLabel();
-        this.descriptionLabel.setFont(JBFont.regular().deriveFont(Font.BOLD, JBUI.Fonts.label().getSize2D() + LABEL_FONT_SIZE_OFFSET));
+        this.descriptionLabel.setFont(labelFont);
 
         this.expectedResultLabel = new JBLabel();
-        this.expectedResultLabel.setFont(JBFont.regular().deriveFont(Font.PLAIN, JBUI.Fonts.label().getSize2D() + LABEL_FONT_SIZE_OFFSET));
+        this.expectedResultLabel.setFont(labelFont);
 
         this.wrapper = buildPanel();
     }
@@ -82,15 +80,8 @@ public class ActualResultSection implements RunItemEditSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestRunItems runItem) {
-        descriptionLabel.setText("Description: " + runItem.getTc().getDescription());
-        expectedResultLabel.setText("Expected Result: " + runItem.getTc().getExpectedResult());
-        actualResultField.setText(runItem.getActualResult());
-    }
-
-    @Override
-    public void applyTo(final @NotNull TestRunItems runItem) {
-        runItem.setActualResult(actualResultField.getText().trim());
+    public JPanel getWrapper() {
+        return wrapper;
     }
 
     @Override
@@ -101,10 +92,25 @@ public class ActualResultSection implements RunItemEditSection {
     }
 
     @Override
+    public void fillData(final @NotNull TestRunItems runItem) {
+        descriptionLabel.setText(runItem.getTc().getDescription());
+        expectedResultLabel.setText(runItem.getTc().getExpectedResult());
+        actualResultField.setText(runItem.getActualResult());
+    }
+
+    @Override
+    public void applyTo(final @NotNull TestRunItems runItem) {
+        if (wrapper.getParent() != null) {
+            runItem.setActualResult(actualResultField.getText().trim());
+        }
+    }
+
+    @Override
     public JComponent getFocusComponent() {
         return actualResultField;
     }
 
+    @Override
     public JPanel createIconPanel(final Icon icon) {
         JPanel iconPanel = new JPanel(new GridBagLayout());
         iconPanel.setOpaque(false);
