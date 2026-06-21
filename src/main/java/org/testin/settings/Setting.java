@@ -22,7 +22,7 @@ public final class Setting {
         return path != null && !path.trim().isEmpty() ? Path.of(path.trim()) : Path.of("");
     }
 
-    public void setTestinPath(@Nullable final Path path) {
+    public void setTestinPath(final @Nullable Path path) {
         AppSettingsState settings = AppSettingsState.getInstance();
         settings.rootTestinPath = path != null ? path.toString() : "";
     }
@@ -33,7 +33,7 @@ public final class Setting {
         return path != null && !path.trim().isEmpty() ? Path.of(path.trim()) : null;
     }
 
-    public void setAutomationPath(@Nullable final Path path) {
+    public void setAutomationPath(final @Nullable Path path) {
         AppSettingsState settings = AppSettingsState.getInstance();
         settings.rootAutomationPath = path != null ? path.toString() : "";
     }

@@ -25,7 +25,7 @@ public final class Notifier {
 
     private final String GROUP_ID = "testin.notifications";
 
-    public void softShow(@NotNull final Project project, @NotNull final String title, @NotNull final String message) {
+    public void softShow(final @NotNull Project project, final @NotNull String title, final @NotNull String message) {
 
         SwingUtilities.invokeLater(() -> {
             IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(project);
@@ -49,7 +49,7 @@ public final class Notifier {
         });
     }
 
-    public void softShow(@NotNull final Project project, @NotNull final String message) {
+    public void softShow(final @NotNull Project project, final @NotNull String message) {
 
         SwingUtilities.invokeLater(() -> {
             IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(project);

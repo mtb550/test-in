@@ -25,7 +25,7 @@ public class DetailsTab {
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
 
-    public void load(final @NotNull Project project, @NotNull final JBPanel<?> detailsTab, @Nullable final TestCaseDto dto, @Nullable final Path currentPath) {
+    public void load(final @NotNull Project project, final @NotNull JBPanel<?> detailsTab, final @Nullable TestCaseDto dto, final @Nullable Path currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
@@ -49,7 +49,7 @@ public class DetailsTab {
         detailsTab.repaint();
     }
 
-    private void renderPlaceholder(@NotNull final JBPanel<?> panel) {
+    private void renderPlaceholder(final @NotNull JBPanel<?> panel) {
         panel.setLayout(new BorderLayout());
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
         final JLabel placeholder = new JLabel(PLACEHOLDER_TEXT);

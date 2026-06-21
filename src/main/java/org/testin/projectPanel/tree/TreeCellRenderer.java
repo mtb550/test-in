@@ -24,7 +24,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
     }
 
     @Override
-    public void customizeCellRenderer(@NotNull final JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+    public void customizeCellRenderer(final @NotNull JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {
             switch (value) {
                 case DefaultMutableTreeNode node when node.getUserObject() instanceof DirectoryDto dir -> {

@@ -31,7 +31,7 @@ public class CloneProject extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull final AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         execute(e.getProject());
     }
 
@@ -44,7 +44,7 @@ public class CloneProject extends DumbAwareAction {
 
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Cloning repository", false) {
             @Override
-            public void run(@NotNull final ProgressIndicator indicator) {
+            public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 indicator.setText("Cloning into " + projectName + "...");
 

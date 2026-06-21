@@ -56,7 +56,7 @@ public class RemoveTestCase extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull final AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 

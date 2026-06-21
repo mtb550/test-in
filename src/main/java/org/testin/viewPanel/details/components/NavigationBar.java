@@ -47,13 +47,13 @@ public class NavigationBar extends BaseDetails {
     private final Project project;
     private final Path currentPath;
 
-    public NavigationBar(@Nullable final Project project, @Nullable final Path currentPath) {
+    public NavigationBar(final @Nullable Project project, final @Nullable Path currentPath) {
         this.project = project;
         this.currentPath = currentPath;
     }
 
     @Override
-    public int render(@NotNull final Project project, @NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
+    public int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
@@ -128,7 +128,7 @@ public class NavigationBar extends BaseDetails {
     }
 
     @NotNull
-    private List<File> buildPathFileList(@NotNull final Path path) {
+    private List<File> buildPathFileList(final @NotNull Path path) {
         final List<File> fileList = new ArrayList<>();
         final String projectName = project.getName();
         File currentDir = path.toFile();
@@ -147,7 +147,7 @@ public class NavigationBar extends BaseDetails {
         return fileList;
     }
 
-    private void setUnderline(@NotNull final JLabel label, final boolean underline) {
+    private void setUnderline(final @NotNull JLabel label, final boolean underline) {
         final Font font = label.getFont();
         final Map<TextAttribute, Object> attributes = new HashMap<>(font.getAttributes());
         attributes.put(TextAttribute.UNDERLINE, underline ? TextAttribute.UNDERLINE_ON : -1);

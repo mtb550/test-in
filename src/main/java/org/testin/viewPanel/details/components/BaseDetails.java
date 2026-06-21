@@ -34,9 +34,9 @@ public abstract class BaseDetails {
         return FontSyncUtil.getBaseFontSize() + 8.0f; // Roughly 23.0f default
     }
 
-    public abstract int render(@NotNull final Project project, @NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow);
+    public abstract int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);
 
-    protected int addRow(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final String labelText, @Nullable final String valueText, final int row) {
+    protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @Nullable String valueText, final int row) {
 
         if (valueText == null || valueText.trim().isEmpty())
             return row;
@@ -52,7 +52,7 @@ public abstract class BaseDetails {
         return addRow(panel, gbc, labelText, valueArea, row);
     }
 
-    protected int addRow(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final String labelText, @NotNull final JComponent valueComponent, final int row) {
+    protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull JComponent valueComponent, final int row) {
 
         gbc.gridy = row;
         gbc.gridwidth = 1;

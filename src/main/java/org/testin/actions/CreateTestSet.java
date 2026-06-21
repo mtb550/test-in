@@ -76,7 +76,7 @@ public class CreateTestSet implements NodeCreator {
         return sheetDir;
     }
 
-    public void createJavaClassInTestRoot(@NotNull final Project project, @NotNull final String packageName, @NotNull final String className) {
+    public void createJavaClassInTestRoot(final @NotNull Project project, final @NotNull String packageName, final @NotNull String className) {
 
         ApplicationManager.getApplication().invokeLater(() ->
                 ApplicationManager.getApplication().runWriteAction(() -> {

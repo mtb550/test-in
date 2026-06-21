@@ -10,15 +10,15 @@ import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
 
 public class TestCaseExecutionTracker {
 
-    public static void initGlobalListener(@NotNull final Project project) {
+    public static void initGlobalListener(final @NotNull Project project) {
         project.getMessageBus().connect(project).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
             @Override
-            public void onTestStarted(@NotNull final SMTestProxy test) {
+            public void onTestStarted(final @NotNull SMTestProxy test) {
                 broadcastStatusChange(project, test.getPresentableName().toLowerCase(), "RUNNING", null);
             }
 
             @Override
-            public void onTestFinished(@NotNull final SMTestProxy test) {
+            public void onTestFinished(final @NotNull SMTestProxy test) {
                 String testName = test.getPresentableName().toLowerCase();
 
                 if (test.isPassed())
@@ -33,7 +33,7 @@ public class TestCaseExecutionTracker {
         });
     }
 
-    private static void broadcastStatusChange(final @NotNull Project project, @NotNull final String testName, @NotNull final String status, final String error) {
+    private static void broadcastStatusChange(final @NotNull Project project, final @NotNull String testName, final @NotNull String status, final String error) {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!project.isDisposed()) {
                 project.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(testName, status, error);

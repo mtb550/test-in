@@ -50,7 +50,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     }
 
     @Override
-    public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
+    public void createToolWindowContent(final @NotNull Project project, final @NotNull ToolWindow toolWindow) {
         Log.info("ViewToolWindowFactory.createToolWindowContent()");
 
         ApplicationManager.getApplication().invokeLater(() -> {

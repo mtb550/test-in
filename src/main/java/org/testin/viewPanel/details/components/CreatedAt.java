@@ -13,7 +13,7 @@ import java.awt.*;
 public class CreatedAt extends BaseDetails {
 
     @Override
-    public int render(@NotNull final Project project, @NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc, @NotNull final TestCaseDto dto, final int currentRow) {
+    public int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         return addRow(panel, gbc, TestEditorAttributes.CREATE_AT.getName2(), dto.getCreatedAt().format(Config.getDateFormatterPattern()), currentRow);
     }
 }

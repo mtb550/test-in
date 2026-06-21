@@ -33,7 +33,7 @@ public class MarkerDetailsView {
     private static final int INSETS_RIGHT = 8;
     private static final int VALUE_INSETS_RIGHT = 16;
 
-    public static void show(@NotNull final Project project, @NotNull final DirectoryDto dto) {
+    public static void show(final @NotNull Project project, final @NotNull DirectoryDto dto) {
         JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
         panel.setOpaque(false);
         panel.setBorder(JBUI.Borders.empty(10));
@@ -93,8 +93,8 @@ public class MarkerDetailsView {
         popup.showCenteredInCurrentWindow(project);
     }
 
-    private static int addRow(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc,
-                              @NotNull final String labelText, @NotNull final String valueText, final int row) {
+    private static int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,
+                              final @NotNull String labelText, final @NotNull String valueText, final int row) {
         if (valueText.trim().isEmpty())
             return row;
 
@@ -109,8 +109,7 @@ public class MarkerDetailsView {
         return addRow(panel, gbc, labelText, valueArea, row);
     }
 
-    private static int addRow(@NotNull final JBPanel<?> panel, @NotNull final GridBagConstraints gbc,
-                              @NotNull final String labelText, @NotNull final JComponent valueComponent, final int row) {
+    private static int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull JComponent valueComponent, final int row) {
         gbc.gridy = row;
         gbc.gridwidth = 1;
 

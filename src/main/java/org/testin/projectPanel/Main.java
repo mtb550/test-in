@@ -15,7 +15,7 @@ import org.testin.util.logger.Log;
 public class Main implements ToolWindowFactory, DumbAware {
 
     @Override
-    public void createToolWindowContent(@NotNull final Project project, @NotNull final ToolWindow toolWindow) {
+    public void createToolWindowContent(final @NotNull Project project, final @NotNull ToolWindow toolWindow) {
         Log.info("ToolWindowFactory.createToolWindowContent()");
 
         ApplicationManager.getApplication().invokeLater(() -> {

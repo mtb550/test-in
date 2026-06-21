@@ -23,12 +23,12 @@ public class PreviousTestCase extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull final AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         if (controller != null) controller.goPrevious();
     }
 
     @Override
-    public void update(@NotNull final AnActionEvent e) {
+    public void update(final @NotNull AnActionEvent e) {
         e.getPresentation().setEnabled(controller != null && controller.hasPrevious());
     }
 

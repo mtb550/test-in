@@ -32,7 +32,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
             .filter(TestEditorAttributes::isImportValue)
             .toList();
 
-    public ExcelPreviewDialog(@Nullable final Project project, final Map<String, List<TestCaseDto>> sheetsData) {
+    public ExcelPreviewDialog(final @Nullable Project project, final Map<String, List<TestCaseDto>> sheetsData) {
         super(project, true);
         this.project = project;
         this.originalSheetsData = sheetsData;

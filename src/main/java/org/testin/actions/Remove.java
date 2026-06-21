@@ -50,7 +50,7 @@ public class Remove extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull final AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         Project project = e.getProject();
         if (project == null) return;
 
@@ -89,7 +89,7 @@ public class Remove extends DumbAwareAction {
     }
 
     @Override
-    public void update(@NotNull final AnActionEvent e) {
+    public void update(final @NotNull AnActionEvent e) {
         TreePath[] paths = tree.getSelectionPaths();
         boolean enabled = paths != null && !getRemovableNodes(paths).isEmpty();
         e.getPresentation().setEnabled(enabled);

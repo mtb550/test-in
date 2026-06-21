@@ -22,37 +22,37 @@ public final class Log {
         return project;
     }
 
-    public static void setProject(@NotNull final Project project) {
+    public static void setProject(final @NotNull Project project) {
         Log.project = project;
     }
 
-    public static void setLogLevel(@NotNull final Level level) {
+    public static void setLogLevel(final @NotNull Level level) {
         LoggerService service = getService();
         if (service != null) service.setLogLevel(level);
     }
 
-    public static void trace(@NotNull final String message) {
+    public static void trace(final @NotNull String message) {
         log(Level.TRACE, WALKER.getCallerClass().getSimpleName(), message);
         //System.out.println(WALKER.getCallerClass().getSimpleName() + " " + message);
     }
 
-    public static void debug(@NotNull final String message) {
+    public static void debug(final @NotNull String message) {
         log(Level.DEBUG, WALKER.getCallerClass().getSimpleName(), message);
     }
 
-    public static void info(@NotNull final String message) {
+    public static void info(final @NotNull String message) {
         log(Level.INFO, WALKER.getCallerClass().getSimpleName(), message);
     }
 
-    public static void warn(@NotNull final String message) {
+    public static void warn(final @NotNull String message) {
         log(Level.WARN, WALKER.getCallerClass().getSimpleName(), message);
     }
 
-    public static void error(@NotNull final String message) {
+    public static void error(final @NotNull String message) {
         log(Level.ERROR, WALKER.getCallerClass().getSimpleName(), message);
     }
 
-    public static void fatal(@NotNull final String message) {
+    public static void fatal(final @NotNull String message) {
         log(Level.FATAL, WALKER.getCallerClass().getSimpleName(), message);
     }
 

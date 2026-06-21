@@ -43,7 +43,7 @@ public class ExportJson extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull final AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
         final TreePath path = tree.getSelectionPath();
 

@@ -94,12 +94,12 @@ public abstract class TestCaseUIBase {
     public void registerShortcut(final JComponent component, final CustomShortcutSet shortcutSet, final IUIAction action) {
         new DumbAwareAction() {
             @Override
-            public void actionPerformed(@NotNull final AnActionEvent e) {
+            public void actionPerformed(final @NotNull AnActionEvent e) {
                 action.execute();
             }
 
             @Override
-            public void update(@NotNull final AnActionEvent e) {
+            public void update(final @NotNull AnActionEvent e) {
                 if (e.getProject() != null && LookupManager.getInstance(e.getProject()).getActiveLookup() != null) {
                     e.getPresentation().setEnabled(false);
                     return;

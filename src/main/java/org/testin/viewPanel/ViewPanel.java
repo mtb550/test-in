@@ -138,7 +138,7 @@ public class ViewPanel implements Disposable {
         }
     }
 
-    public void updateList(@Nullable final List<TestCaseDto> testCases, @Nullable final Path path) {
+    public void updateList(final @Nullable List<TestCaseDto> testCases, final @Nullable Path path) {
         this.page.updateList(testCases, path);
         this.refreshCurrentView();
     }

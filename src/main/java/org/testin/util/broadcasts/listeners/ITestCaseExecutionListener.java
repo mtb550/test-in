@@ -7,6 +7,6 @@ public interface ITestCaseExecutionListener {
 
     Topic<ITestCaseExecutionListener> TOPIC = Topic.create("RunTestCaseNotification", ITestCaseExecutionListener.class);
 
-    void onStatusChanged(@NotNull final String testName, @NotNull final String status, final String error);
+    void onStatusChanged(final @NotNull String testName, final @NotNull String status, final String error);
 
 }

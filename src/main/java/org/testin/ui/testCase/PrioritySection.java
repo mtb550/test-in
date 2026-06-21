@@ -33,7 +33,7 @@ public class PrioritySection implements ICreateTestCaseSection {
 
         this.priority.setRenderer(new ColoredListCellRenderer<>() {
             @Override
-            protected void customizeCellRenderer(@NotNull final JList<? extends Priority> list, final Priority value, final int index, final boolean selected, final boolean hasFocus) {
+            protected void customizeCellRenderer(final @NotNull JList<? extends Priority> list, final Priority value, final int index, final boolean selected, final boolean hasFocus) {
                 if (value != null) {
                     setIcon(IconManager.createIcon(value.getColor()));
                     append(" Priority:  ");

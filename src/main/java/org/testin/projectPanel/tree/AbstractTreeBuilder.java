@@ -54,7 +54,7 @@ public abstract class AbstractTreeBuilder {
         });
     }
 
-    private DefaultMutableTreeNode buildNodeRecursive(@NotNull final DirectoryDto currentDir) {
+    private DefaultMutableTreeNode buildNodeRecursive(final @NotNull DirectoryDto currentDir) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(currentDir);
         Path currentPath = currentDir.getPath();
 

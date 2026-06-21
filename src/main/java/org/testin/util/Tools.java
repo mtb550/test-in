@@ -134,7 +134,7 @@ public final class Tools {
     }
 
     @NotNull
-    public String format(@Nullable final String text) {
+    public String format(final @Nullable String text) {
         if (StringUtil.isEmptyOrSpaces(text)) return "";
         String s = text.trim();
         return StringUtil.capitalize(s) + ".";
