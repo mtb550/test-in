@@ -1,9 +1,11 @@
-package org.testin.pojo;
+package org.testin.pojo.markers;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.testin.pojo.Config;
+import org.testin.pojo.ProjectStatus;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;

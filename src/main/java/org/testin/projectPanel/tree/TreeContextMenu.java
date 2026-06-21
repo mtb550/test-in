@@ -73,6 +73,8 @@ public class TreeContextMenu extends DefaultActionGroup {
                 )
         ));
 
+        add(new ShowNodeDetails(tree));
+
     }
 
     public static void registerShortcuts(final SimpleTree tree, final TreeTransferHandler transferHandler, final TreeContextMenu treeContextMenu) {

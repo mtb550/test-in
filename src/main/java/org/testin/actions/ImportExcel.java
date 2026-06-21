@@ -284,7 +284,7 @@ public class ImportExcel extends DumbAwareAction {
                 } catch (Exception ex) {
                     Log.error("Import crashed: " + ex.getMessage());
                     Log.error("Exception: " + ex.getMessage());
-                     Services.getInstance(project, Notifier.class).error(project, "Failed to import data: (Tip: Ensure the file is completely closed in Microsoft Excel and try again.)");
+                    Services.getInstance(project, Notifier.class).error(project, "Failed to import data: (Tip: Ensure the file is completely closed in Microsoft Excel and try again.)");
                     return;
                 }
 
