@@ -44,6 +44,9 @@ public class RunEditorCM extends EditorContextMenu {
         add(new SetStatusFailed(ui, list));
         add(new SetStatusBlocked(ui, list));
         addSeparator();
+        add(new SetActualResult(ui, list));
+        add(new UpdateRunItem(ui, list));
+        addSeparator();
 
         add(new ViewDetails(list, dir.getPath()));
         add(new StartExecution(ui.getToolBar().getCallbacks()));

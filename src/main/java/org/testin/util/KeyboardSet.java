@@ -22,6 +22,7 @@ public enum KeyboardSet {
     Enter(KeyEvent.VK_ENTER, 0),
     OpenContextMenu(KeyEvent.VK_CONTEXT_MENU, 0),
     UpdateTestCase(KeyEvent.VK_F2, 0),
+    UpdateTestRunItem(KeyEvent.VK_F2, 0),
     RunTestCase(KeyEvent.VK_F5, 0),
     NavigateToCode(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK),
     GenerateTestCase(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK),
@@ -67,7 +68,8 @@ public enum KeyboardSet {
     SetStatusBlocked(KeyEvent.VK_B, InputEvent.CTRL_DOWN_MASK),
     StatusAssigned(KeyEvent.VK_1, 0),
     StatusCompleted(KeyEvent.VK_2, 0),
-    StatusClosed(KeyEvent.VK_3, 0);
+    StatusClosed(KeyEvent.VK_3, 0),
+    SetActualResult(KeyEvent.VK_A, 0);
 
     private final int keyCode;
     private final int modifiers;
