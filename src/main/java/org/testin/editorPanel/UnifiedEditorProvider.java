@@ -7,8 +7,8 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.testCaseEditor.TestEditorUI;
-import org.testin.editorPanel.testRunEditor.RunEditorUI;
+import org.testin.editorPanel.runEditor.RunEditorUI;
+import org.testin.editorPanel.testEditor.TestEditorUI;
 
 public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
 

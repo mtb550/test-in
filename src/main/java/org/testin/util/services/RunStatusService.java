@@ -8,7 +8,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testRunEditor.RunEditorUI;
+import org.testin.editorPanel.runEditor.RunEditorUI;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.TestStatus;

@@ -1,4 +1,4 @@
-package org.testin.editorPanel.testRunEditor;
+package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;

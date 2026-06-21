@@ -2,7 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.ui.CollectionListModel;
 import lombok.Setter;
-import org.testin.editorPanel.testCaseEditor.TestEditorUI;
+import org.testin.editorPanel.testEditor.TestEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 
 import javax.swing.*;

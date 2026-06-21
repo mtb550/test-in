@@ -1,4 +1,4 @@
-package org.testin.editorPanel.testRunEditor;
+package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
@@ -13,7 +13,6 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.ChangeTestRunStatus;
-import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;
@@ -137,14 +136,14 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         list.setCellRenderer(new RunListRenderer(this));
 
-        final EditorCM editorCM = new EditorCM(project, this, vf.getTestRun(), list, model);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, vf.getTestRun(), editorCM);
+        final RunEditorCM runEditorCM = new RunEditorCM(project, this, vf.getTestRun(), list, model);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, vf.getTestRun(), runEditorCM);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
         list.addMouseMotionListener(mouseListenerImpl);
 
-        editorCM.registerShortcuts(this, vf.getTestRun(), list, model, editorCM);
+        runEditorCM.registerShortcuts(this, vf.getTestRun(), list, model, runEditorCM);
 
         Path selectionPath = vf.getTestRun().getPath();
         list.addListSelectionListener(new SelectionListener(project, list, this, selectionPath));

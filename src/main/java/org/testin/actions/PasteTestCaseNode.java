@@ -8,9 +8,9 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testCaseEditor.TestEditorUI;
+import org.testin.editorPanel.testEditor.TestEditorCM;
+import org.testin.editorPanel.testEditor.TestEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
@@ -46,13 +46,13 @@ public class PasteTestCaseNode extends DumbAwareAction {
             TestEditorUI destUI = (editorUI instanceof TestEditorUI) ? (TestEditorUI) editorUI : null;
             if (destUI == null) return;
 
-            boolean isCut = EditorCM.isGlobalCutAction();
-            IEditorUI sourceUI = EditorCM.getGlobalSourceEditorUI();
+            boolean isCut = TestEditorCM.isGlobalCutAction();
+            IEditorUI sourceUI = TestEditorCM.getGlobalSourceEditorUI();
 
             if (isCut && sourceUI != null) {
 
                 List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
-                        .filter(tc -> EditorCM.getGlobalPendingCutIds().contains(tc.getId()))
+                        .filter(tc -> TestEditorCM.getGlobalPendingCutIds().contains(tc.getId()))
                         .collect(Collectors.toList());
 
                 ApplicationManager.getApplication().runWriteAction(() ->
@@ -81,7 +81,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
             destUI.updateSequenceAndSaveAll();
 
             if (isCut) {
-                EditorCM.clearCutState();
+                TestEditorCM.clearCutState();
             }
         });
     }

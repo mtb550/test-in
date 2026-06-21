@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.CreateTestCase;
 import org.testin.actions.NavigateToCode;
 import org.testin.actions.RunTestCase;
-import org.testin.editorPanel.EditorCM;
+import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.pojo.CardHoverAction;
 import org.testin.pojo.dto.TestCaseDto;
@@ -33,18 +33,18 @@ public class MouseListenerImpl extends MouseAdapter {
     private final Project project;
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
-    private final EditorCM editorCM;
+    private final EditorContextMenu editorCm;
     private final DefaultActionGroup emptyMenu;
     private final Path path;
     private final IEditorUI ui;
 
-    public MouseListenerImpl(final @NotNull Project project, final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorCM editorCM) {
+    public MouseListenerImpl(final @NotNull Project project, final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorContextMenu editorCm) {
         this.project = project;
         this.ui = ui;
         this.list = list;
         this.path = dir.getPath();
         this.model = model;
-        this.editorCM = editorCM;
+        this.editorCm = editorCm;
         this.emptyMenu = new DefaultActionGroup();
         this.emptyMenu.add(new CreateTestCase(ui, dir, list, model));
     }
@@ -69,7 +69,7 @@ public class MouseListenerImpl extends MouseAdapter {
                 if (!list.isSelectedIndex(index)) {
                     list.setSelectedIndex(index);
                 }
-                actionManager.createActionPopupMenu(place, editorCM).getComponent().show(e.getComponent(), e.getX(), e.getY());
+                actionManager.createActionPopupMenu(place, editorCm).getComponent().show(e.getComponent(), e.getX(), e.getY());
 
             } else {
                 list.clearSelection();

@@ -8,7 +8,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.EditorCM;
+import org.testin.editorPanel.testEditor.TestEditorCM;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.projectPanel.tree.TreeTransferHandler;
 import org.testin.util.KeyboardSet;
@@ -49,8 +49,8 @@ public class Escape extends DumbAwareAction {
         }
 
         if (list != null) {
-            if (EditorCM.isGlobalCutAction()) {
-                EditorCM.clearCutState();
+            if (TestEditorCM.isGlobalCutAction()) {
+                TestEditorCM.clearCutState();
             }
 
             CopyPasteManager.getInstance().setContents(new StringSelection(""));

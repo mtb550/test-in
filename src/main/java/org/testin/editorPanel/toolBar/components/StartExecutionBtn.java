@@ -2,7 +2,7 @@ package org.testin.editorPanel.toolBar.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
-import org.testin.editorPanel.testRunEditor.RunEditorUI;
+import org.testin.editorPanel.runEditor.RunEditorUI;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.TestRunStatus;
 

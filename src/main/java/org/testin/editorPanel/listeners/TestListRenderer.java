@@ -1,7 +1,7 @@
 package org.testin.editorPanel.listeners;
 
 import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testCaseEditor.TestCard;
+import org.testin.editorPanel.testEditor.TestCard;
 import org.testin.pojo.dto.TestCaseDto;
 
 import javax.swing.*;

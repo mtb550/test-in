@@ -9,7 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testRunEditor.RunEditorUI;
+import org.testin.editorPanel.runEditor.RunEditorUI;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.TestRunMarker;

@@ -1,7 +1,7 @@
 package org.testin.editorPanel.listeners;
 
-import org.testin.editorPanel.testRunEditor.RunCard;
-import org.testin.editorPanel.testRunEditor.RunEditorUI;
+import org.testin.editorPanel.runEditor.RunCard;
+import org.testin.editorPanel.runEditor.RunEditorUI;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 

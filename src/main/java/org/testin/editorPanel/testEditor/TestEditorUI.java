@@ -1,4 +1,4 @@
-package org.testin.editorPanel.testCaseEditor;
+package org.testin.editorPanel.testEditor;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
@@ -17,7 +17,6 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.CreateTestCase;
-import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;
@@ -137,8 +136,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         this.syncListener.setOnUpdateCallback(this::onDataSynced);
         this.model.addListDataListener(syncListener);
 
-        final EditorCM editorCM = new EditorCM(project, this, vf.getTestSet(), list, model);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, vf.getTestSet(), editorCM);
+        final TestEditorCM testEditorCM = new TestEditorCM(project, this, vf.getTestSet(), list, model);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, vf.getTestSet(), testEditorCM);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
@@ -147,7 +146,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         list.setTransferHandler(new TransferListener(this));
         list.setCellRenderer(new TestListRenderer(this));
 
-        editorCM.registerShortcuts(this, vf.getTestSet(), list, model, editorCM);
+        testEditorCM.registerShortcuts(this, vf.getTestSet(), list, model, testEditorCM);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
 
         this.statusBar = new StatusBar();

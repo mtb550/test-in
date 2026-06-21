@@ -9,7 +9,7 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testCaseEditor.TestEditorUI;
+import org.testin.editorPanel.testEditor.TestEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.ui.testCase.CreateTestCaseUI;

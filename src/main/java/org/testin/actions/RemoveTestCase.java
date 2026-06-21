@@ -11,7 +11,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.EditorCM;
+import org.testin.editorPanel.testEditor.TestEditorCM;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.ui.RemoveTestCaseDialog;
@@ -60,8 +60,8 @@ public class RemoveTestCase extends DumbAwareAction {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        boolean isCutAndSelected = EditorCM.isGlobalCutAction() &&
-                selectedItems.stream().allMatch(tc -> EditorCM.getGlobalPendingCutIds().contains(tc.getId()));
+        boolean isCutAndSelected = TestEditorCM.isGlobalCutAction() &&
+                selectedItems.stream().allMatch(tc -> TestEditorCM.getGlobalPendingCutIds().contains(tc.getId()));
 
         if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(e.getProject(), selectedItems)) {
             return;

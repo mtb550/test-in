@@ -1,6 +1,5 @@
-package org.testin.editorPanel;
+package org.testin.editorPanel.testEditor;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -12,6 +11,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
+import org.testin.editorPanel.EditorContextMenu;
+import org.testin.editorPanel.IEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class EditorCM extends DefaultActionGroup {
+public class TestEditorCM extends EditorContextMenu {
     @Getter
     private static final Set<UUID> globalPendingCutIds = new HashSet<>();
 
@@ -35,22 +36,12 @@ public class EditorCM extends DefaultActionGroup {
 
     private final Project project;
 
-    public EditorCM(final Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public TestEditorCM(final Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
         this.project = project;
 
         add(new CreateTestCase(ui, dir, list, model));
-        add(createSubGroup("Set Status", AllIcons.General.Filter,
-                List.of(
-                        new SetStatusPassed(ui, list),
-                        new SetStatusFailed(ui, list),
-                        new SetStatusBlocked(ui, list),
-                        new SetStatusPending(ui, list),
-                        new SetStatusUntested(ui, list)
-                )
-        ));
         add(new ViewDetails(list, dir.getPath()));
-        add(new StartExecution(ui.getToolBar().getCallbacks()));
         addSeparator();
         add(new UpdateTestCase(ui, list, dir.getPath()));
         add(new CopyTestCase(list));
@@ -85,9 +76,9 @@ public class EditorCM extends DefaultActionGroup {
         return group;
     }
 
-    public void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final EditorCM editorCM) {
+    public void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final TestEditorCM testEditorCM) {
         new Escape(list);
-        new OpenCM(list, editorCM);
+        new OpenCM(list, testEditorCM);
         new CreateTestCase(ui, dir, list, model);
         new UpdateTestCase(ui, list, dir.getPath());
         new RemoveTestCase(project, dir, list, model);

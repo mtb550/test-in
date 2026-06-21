@@ -1,8 +1,7 @@
-package org.testin.editorPanel.testCaseEditor;
+package org.testin.editorPanel.testEditor;
 
 import com.intellij.ui.JBColor;
 import org.testin.editorPanel.BaseCard;
-import org.testin.editorPanel.EditorCM;
 import org.testin.editorPanel.Shared;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
@@ -25,7 +24,7 @@ public class TestCard extends BaseCard {
         badges.clear();
         details.clear();
 
-        this.isPendingCut = EditorCM.isGlobalCutAction() && tc != null && EditorCM.getGlobalPendingCutIds().contains(tc.getId());
+        this.isPendingCut = TestEditorCM.isGlobalCutAction() && tc != null && TestEditorCM.getGlobalPendingCutIds().contains(tc.getId());
 
         Arrays.stream(TestEditorAttributes.values())
                 .filter(activeDetails::contains)

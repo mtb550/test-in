@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.EditorCM;
+import org.testin.editorPanel.testEditor.TestEditorCM;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
@@ -33,7 +33,7 @@ public class CopyTestCaseNode extends DumbAwareAction {
 
         if (!selectedTestCases.isEmpty()) {
             try {
-                EditorCM.clearCutState();
+                TestEditorCM.clearCutState();
 
                 String json = Services.getInstance(project, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));

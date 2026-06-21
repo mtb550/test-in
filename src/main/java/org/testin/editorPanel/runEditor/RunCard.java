@@ -1,4 +1,4 @@
-package org.testin.editorPanel.testRunEditor;
+package org.testin.editorPanel.runEditor;
 
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;

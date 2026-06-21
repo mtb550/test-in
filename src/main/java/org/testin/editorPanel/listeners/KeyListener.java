@@ -2,7 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBList;
-import org.testin.editorPanel.testCaseEditor.TestEditorUI;
+import org.testin.editorPanel.testEditor.TestEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Log;

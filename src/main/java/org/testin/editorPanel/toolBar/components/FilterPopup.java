@@ -11,7 +11,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editorPanel.testRunEditor.RunEditorUI;
+import org.testin.editorPanel.runEditor.RunEditorUI;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
