@@ -1,10 +1,6 @@
 package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import lombok.Getter;
@@ -16,9 +12,7 @@ import org.testin.editorPanel.IEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 
-import javax.swing.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,11 +28,8 @@ public class RunEditorCM extends EditorContextMenu {
     @Setter
     private static IEditorUI globalSourceEditorUI = null;
 
-    private final Project project;
-
-    public RunEditorCM(final Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public RunEditorCM(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
-        this.project = project;
 
         add(new SetStatusPassed(ui, list));
         add(new SetStatusFailed(ui, list));
@@ -69,27 +60,11 @@ public class RunEditorCM extends EditorContextMenu {
         globalSourceEditorUI = null;
     }
 
-    private DefaultActionGroup createSubGroup(final String title, final Icon icon, final List<? extends DumbAwareAction> actions) {
-        DefaultActionGroup group = new DefaultActionGroup(title, true);
-        group.getTemplatePresentation().setIcon(icon);
-        for (AnAction action : actions)
-            group.add(action);
-        return group;
-    }
-
-    // todo, remove it as not need for it.
     public void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final RunEditorCM testEditorCM) {
         new Escape(list);
         new OpenCM(list, testEditorCM);
-        new CreateTestCase(ui, dir, list, model);
-        //new UpdateTestCase(ui, list, dir.getPath());
-        new RemoveTestCase(project, dir, list, model);
-        //new OpenTestCaseDetails(list, dir.getPath());
         new CloseTestCaseDetails(list);
         new CopyTestCaseDescription(list);
-        new NextPageAction(ui, list);
-        new PrevPageAction(ui, list);
-
     }
 
     @Override

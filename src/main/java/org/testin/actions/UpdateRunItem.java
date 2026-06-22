@@ -62,8 +62,8 @@ public class UpdateRunItem extends DumbAwareAction {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(ui instanceof RunEditorUI);
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
     }
 
     @Override

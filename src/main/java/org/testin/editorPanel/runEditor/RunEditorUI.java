@@ -136,7 +136,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         list.setCellRenderer(new RunListRenderer(this));
 
-        final RunEditorCM runEditorCM = new RunEditorCM(project, this, vf.getTestRun(), list, model);
+        final RunEditorCM runEditorCM = new RunEditorCM(this, vf.getTestRun(), list, model);
         final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, vf.getTestRun(), runEditorCM);
 
         list.addMouseListener(mouseListenerImpl);

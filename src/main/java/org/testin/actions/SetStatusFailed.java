@@ -33,6 +33,11 @@ public class SetStatusFailed extends DumbAwareAction {
     }
 
     @Override
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+    }
+
+    @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
     }
