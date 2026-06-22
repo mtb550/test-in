@@ -90,7 +90,26 @@ public class PasteTestCaseNode extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // todo, to be implemented. show if clipboard has directoryDto objects
+        if (e.getProject() == null) {
+            e.getPresentation().setEnabled(false);
+            return;
+        }
+
+        boolean enabled = false;
+        Transferable contents = CopyPasteManager.getInstance().getContents();
+        if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+            try {
+                String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
+                if (json.trim().startsWith("[")) {
+                    List<TestCaseDto> parsedList = Services.getInstance(e.getProject(), Mapper.class).readValue(json, new TypeReference<>() {
+                    });
+                    enabled = parsedList != null && !parsedList.isEmpty();
+                }
+            } catch (Exception ex) {
+                Log.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
+            }
+        }
+        e.getPresentation().setEnabled(enabled);
     }
 
     @Override
