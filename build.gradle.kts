@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.testin"
-version = "2.4.2-SNAPSHOT"
+version = "2.4.3-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -95,8 +95,8 @@ intellijPlatform {
 
     publishing {
         token.set(System.getenv("JETBRAINS_TOKEN"))
-        channels.set(listOf("alpha"))
-        //channels.set(listOf("default"))
+        //channels.set(listOf("alpha"))
+        channels.set(listOf("default"))
     }
 
     sandboxContainer.set(layout.projectDirectory.dir(".sandbox"))
