@@ -1,20 +1,17 @@
 package org.testin.settings;
 
-import com.intellij.openapi.components.Service;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.TitledSeparator;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.Refresh;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.settings.ui.ProjectManagementPanel;
 import org.testin.settings.ui.TestinPathPanel;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
@@ -26,19 +23,17 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
 
-@Service(Service.Level.APP)
 public final class SettingsConfigurable implements Configurable {
 
     private final TestinPathPanel testinPathPanel = new TestinPathPanel();
     private final JBTextField rootAutomationPathField = new JBTextField();
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
     private final ComboBox<String> logLevelComboBox;
-    private final ProjectManagementPanel projectPanel;
+    private final Project project;
 
-    public SettingsConfigurable() {
-        this.logLevelComboBox = new ComboBox<>(
-                Arrays.stream(Log.Level.values()).map(Log.Level::name).toArray(String[]::new));
-        this.projectPanel = new ProjectManagementPanel(testinPathPanel);
+    public SettingsConfigurable(final @NotNull Project project) {
+        this.project = project;
+        this.logLevelComboBox = new ComboBox<>(Arrays.stream(Log.Level.values()).map(Log.Level::name).toArray(String[]::new));
     }
 
     @Override
@@ -56,10 +51,6 @@ public final class SettingsConfigurable implements Configurable {
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("Root testin folder: "), testinPathPanel.getComponent(), 1, false)
                 .addLabeledComponent(new JBLabel("Root Automation folder: "), rootAutomationPathField, 1, false)
-                .addVerticalGap(10)
-                .addComponent(new TitledSeparator("Project Management"))
-                .addLabeledComponent("Select test project: ", projectPanel.getProjectComboBox())
-                .addComponent(projectPanel.getButtonPanel())
                 .addVerticalGap(5)
                 .addComponent(readModeCheckBox)
                 .addVerticalGap(5)
@@ -89,7 +80,6 @@ public final class SettingsConfigurable implements Configurable {
 
         Log.setLogLevel(Log.Level.valueOf(settings.logLevel));
 
-        Project project = getProject();
         Setting setting = Services.getInstance(project, Setting.class);
 
         if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty()) {
@@ -104,8 +94,6 @@ public final class SettingsConfigurable implements Configurable {
             setting.setAutomationPath(null);
         }
 
-        projectPanel.refreshProjectList();
-
         ProjectPanel panel = Services.getInstance(project, ProjectPanel.class);
         if (panel != null) {
             new Refresh(panel).execute();
@@ -118,7 +106,6 @@ public final class SettingsConfigurable implements Configurable {
 
         testinPathPanel.setPathText(settings.rootTestinPath);
 
-        Project project = getProject();
         VirtualFile mainSourceRoot = Services.getInstance(project, Tools.class)
                 .getTestSourceRoot(project);
         if (mainSourceRoot != null) {
@@ -130,11 +117,6 @@ public final class SettingsConfigurable implements Configurable {
 
         readModeCheckBox.setSelected(settings.readMode);
         logLevelComboBox.setSelectedItem(settings.logLevel);
-        projectPanel.refreshProjectList();
     }
 
-    private Project getProject() {
-
-        return ProjectManager.getInstance().getDefaultProject();
-    }
 }

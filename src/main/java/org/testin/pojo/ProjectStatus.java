@@ -7,8 +7,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ProjectStatus {
     ACTIVE("Active"),
+
     INACTIVE("Inactive"),
+
     REMOVED("Removed"),
+
     ARCHIVED("Archived");
 
     private final String description;

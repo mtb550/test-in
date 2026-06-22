@@ -13,6 +13,7 @@ import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
 import org.testin.util.logger.Log;
+import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
@@ -136,18 +137,23 @@ public class TestProjectSelector {
 
     public void filterByTestProject(final TestProjectDirectoryDto tpDir) {
         Log.info("Panel.filterByProject(): " + tpDir.getName());
-
-        if (tpDir.getMarker().getStatus() == ProjectStatus.ACTIVE) {
-            projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
-            projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
-        } else {
-            if (projectPanel.getProjectTree() != null) {
-                projectPanel.getProjectTree().updateNodes();
+        try {
+            if (tpDir.getMarker().getStatus() == ProjectStatus.ACTIVE) {
+                projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
+                projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
+            } else {
+                if (projectPanel.getProjectTree() != null) {
+                    projectPanel.getProjectTree().updateNodes();
+                }
             }
-        }
 
-        if (projectPanel.getBranchSelector() != null) {
-            projectPanel.getBranchSelector().updateProject(tpDir);
+            if (projectPanel.getBranchSelector() != null) {
+                projectPanel.getBranchSelector().updateProject(tpDir);
+            }
+
+        } catch (Exception e) {
+            Services.getInstance(project, Notifier.class).error(project, "Error filtering project: " + tpDir.getName() + ". Exception: " + e.getMessage());
+            Log.error("Error filtering project: " + tpDir.getName() + ". Exception: " + e.getMessage());
         }
     }
 

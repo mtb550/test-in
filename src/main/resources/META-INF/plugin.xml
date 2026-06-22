@@ -111,7 +111,7 @@
         />
 
         <!-- Settings -->
-        <applicationConfigurable
+        <projectConfigurable
                 instance="org.testin.settings.SettingsConfigurable"
                 id="org.testin.settings.SettingsConfigurable"
                 key="testin.display.name"

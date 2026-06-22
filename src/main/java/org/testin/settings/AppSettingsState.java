@@ -7,12 +7,8 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-@State(
-        name = "testin.settings.AppSettingsState",
-        storages = @Storage("testinSettings.xml")
-)
+@State(name = "testin.settings.AppSettingsState", storages = @Storage("testinSettings.xml"))
 @Service(Service.Level.APP)
 public final class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
 
@@ -25,9 +21,8 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         return ApplicationManager.getApplication().getService(AppSettingsState.class);
     }
 
-    @Nullable
     @Override
-    public AppSettingsState getState() {
+    public @NotNull AppSettingsState getState() {
         return this;
     }
 

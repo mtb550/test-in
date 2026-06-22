@@ -22,13 +22,15 @@ public final class DirectoryMapper {
     public TestProjectDirectoryDto readTestProjectNode(final @NotNull Project project, final Path path) {
         final String fileName = path.getFileName().toString();
         try {
+            final TestProjectMarker marker = Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class);
+
             final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
                     .name(fileName)
                     .path(path)
                     .pathName(fileName)
                     .fqcn(List.of(Services.getInstance(project, Tools.class).sanitizePackageName(fileName)))
                     .path2(Services.getInstance(project, Tools.class).buildPath2(null, fileName))
-                    .marker(Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class))
+                    .marker(marker)
                     .build();
 
             TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto.builder()
@@ -186,6 +188,8 @@ public final class DirectoryMapper {
     public TestRunDirectoryDto readTestRunNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
+            final TestRunMarker marker = Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TR.getMarker()).toFile(), TestRunMarker.class);
+
             TestRunDirectoryDto testRunDirectoryDto = TestRunDirectoryDto
                     .builder()
                     .name(fileName)
@@ -193,7 +197,7 @@ public final class DirectoryMapper {
                     .parent(parent)
                     .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TR))
                     .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
-                    .marker(Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TR.getMarker()).toFile(), TestRunMarker.class))
+                    .marker(marker)
                     .build();
 
             Log.info("retrieve the test run directory: " + testRunDirectoryDto);
