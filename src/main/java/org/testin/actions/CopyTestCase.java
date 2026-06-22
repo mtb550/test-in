@@ -1,6 +1,7 @@
 package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
@@ -23,5 +24,15 @@ public class CopyTestCase extends DumbAwareAction {
         TestCaseDto tc = list.getSelectedValue();
         String text = "Description: " + tc.getDescription() + "\nSteps: " + tc.getSteps() + "\nExpected result: " + tc.getExpectedResult();
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+    }
+
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

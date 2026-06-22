@@ -77,13 +77,14 @@ public class RunEditorCM extends EditorContextMenu {
         return group;
     }
 
+    // todo, remove it as not need for it.
     public void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final RunEditorCM testEditorCM) {
         new Escape(list);
         new OpenCM(list, testEditorCM);
         new CreateTestCase(ui, dir, list, model);
-        new UpdateTestCase(ui, list, dir.getPath());
+        //new UpdateTestCase(ui, list, dir.getPath());
         new RemoveTestCase(project, dir, list, model);
-        new OpenTestCaseDetails(list, dir.getPath());
+        //new OpenTestCaseDetails(list, dir.getPath());
         new CloseTestCaseDetails(list);
         new CopyTestCaseDescription(list);
         new NextPageAction(ui, list);

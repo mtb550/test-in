@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testEditor.TestEditorUI;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testCase.TestCaseUpdateMenu;
@@ -33,7 +32,7 @@ public class UpdateTestCase extends DumbAwareAction {
     private final IEditorUI ui;
 
     public UpdateTestCase(final IEditorUI ui, final JBList<TestCaseDto> list, final Path path) {
-        super("Edit Test Case");
+        super("Update");
         this.list = list;
         this.path = path;
         this.ui = ui;
@@ -103,21 +102,16 @@ public class UpdateTestCase extends DumbAwareAction {
                         Log.trace("[UpdateTestCase]: Routing to Update Steps (Type 3)...");
                     }
 
-//                    CreateJavaMethodInClass generator = new CreateJavaMethodInClass();
-//                    for (TestCaseDto tc : updatedItems) {
-//                        generator.execute(project, tc.getFqcn(), tc);
-//                    }
-                } else {
+                } else
                     Log.trace("[UpdateTestCase]: Code generator is NOT selected or is null.");
-                }
 
             });
         }).show();
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(ui instanceof TestEditorUI);
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
     }
 
     @Override

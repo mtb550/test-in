@@ -1,6 +1,7 @@
 package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
@@ -9,11 +10,11 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Log;
 
-public class GenerateTestCase extends DumbAwareAction {
+public class GenerateTestMethod extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
 
-    public GenerateTestCase(final JBList<TestCaseDto> list) {
-        super("Generate Test", "", AllIcons.Actions.IntentionBulb);
+    public GenerateTestMethod(final JBList<TestCaseDto> list) {
+        super("Generate", "", AllIcons.Actions.IntentionBulb);
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.GenerateTestCase.getCustomShortcut(), list);
     }
@@ -24,5 +25,15 @@ public class GenerateTestCase extends DumbAwareAction {
 
         /// TODO: to be implemented
         Log.info(tc.getDescription());
+    }
+
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

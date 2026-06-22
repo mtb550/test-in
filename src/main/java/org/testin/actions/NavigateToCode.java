@@ -28,8 +28,15 @@ public class NavigateToCode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@Nullable AnActionEvent e) {
+        //fixme: @Nullable is not acceptable by intellij
         if (e == null) return;
+        if (e.getProject() == null) return;
         execute(e.getProject(), list.getSelectedValue());
+    }
+
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
     }
 
     @Override

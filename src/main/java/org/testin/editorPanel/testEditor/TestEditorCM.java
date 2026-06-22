@@ -34,11 +34,8 @@ public class TestEditorCM extends EditorContextMenu {
     @Setter
     private static IEditorUI globalSourceEditorUI = null;
 
-    private final Project project;
-
     public TestEditorCM(final Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
-        this.project = project;
 
         add(new CreateTestCase(ui, dir, list, model));
         add(new ViewDetails(list, dir.getPath()));
@@ -50,7 +47,7 @@ public class TestEditorCM extends EditorContextMenu {
         add(new PasteTestCaseNode(ui, list));
         add(new RemoveTestCase(project, dir, list, model));
         addSeparator();
-        add(new GenerateTestCase(list));
+        add(new GenerateTestMethod(list));
         add(new RunTestCase(list));
         add(new NavigateToCode(list));
         addSeparator();
@@ -76,17 +73,18 @@ public class TestEditorCM extends EditorContextMenu {
         return group;
     }
 
+    // todo, remove it as not need for it.
     public void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final TestEditorCM testEditorCM) {
         new Escape(list);
         new OpenCM(list, testEditorCM);
-        new CreateTestCase(ui, dir, list, model);
-        new UpdateTestCase(ui, list, dir.getPath());
-        new RemoveTestCase(project, dir, list, model);
-        new OpenTestCaseDetails(list, dir.getPath());
+        //new CreateTestCase(ui, dir, list, model);
+        //new UpdateTestCase(ui, list, dir.getPath());
+        //new RemoveTestCase(project, dir, list, model);
+        //new OpenTestCaseDetails(list, dir.getPath());
         new CloseTestCaseDetails(list);
         new CopyTestCaseDescription(list);
-        new NextPageAction(ui, list);
-        new PrevPageAction(ui, list);
+        //new NextPageAction(ui, list);
+        //new PrevPageAction(ui, list);
 
     }
 

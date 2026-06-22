@@ -2,6 +2,7 @@ package org.testin.actions;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
@@ -38,6 +39,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
         final Project project = e.getProject();
         List<TestCaseDto> pastedCases = getFromClipboard(project);
         if (pastedCases.isEmpty()) return;
@@ -88,7 +90,12 @@ public class PasteTestCaseNode extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        // todo, to be implemented. left empty for testing functionality.
+        // todo, to be implemented. show if clipboard has directoryDto objects
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     private List<TestCaseDto> getFromClipboard(final @NotNull Project project) {
@@ -97,7 +104,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
             try {
                 String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
 
-                List<TestCaseDto> parsedList = Services.getInstance(project, Mapper.class).readValue(json, new TypeReference<List<TestCaseDto>>() {
+                List<TestCaseDto> parsedList = Services.getInstance(project, Mapper.class).readValue(json, new TypeReference<>() {
                 });
                 return parsedList != null ? parsedList : Collections.emptyList();
 

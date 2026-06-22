@@ -1,6 +1,7 @@
 package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -28,8 +29,9 @@ public class CopyTestCaseNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
         final Project project = e.getProject();
-        List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
+        final List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
 
         if (!selectedTestCases.isEmpty()) {
             try {
@@ -45,7 +47,12 @@ public class CopyTestCaseNode extends DumbAwareAction {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        // todo, to be implemented. left empty for testing functionality.
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }
