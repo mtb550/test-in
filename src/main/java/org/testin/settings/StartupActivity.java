@@ -17,7 +17,7 @@ import java.util.Optional;
 
 public final class StartupActivity implements ProjectActivity {
 
-    public static void execute(@NotNull Project project) {
+    public static void execute(final @NotNull Project project) {
         Log.setProject(project);
 
         AppSettingsState settings = AppSettingsState.getInstance();

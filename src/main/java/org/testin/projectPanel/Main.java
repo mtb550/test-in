@@ -11,6 +11,7 @@ import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.settings.StartupActivity;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 public class Main implements ToolWindowFactory, DumbAware {
 
@@ -23,7 +24,7 @@ public class Main implements ToolWindowFactory, DumbAware {
                 StartupActivity.execute(project);
             }
 
-            ProjectPanel projectPanel = new ProjectPanel(project);
+            ProjectPanel projectPanel = Services.getInstance(project, ProjectPanel.class);
 
             toolWindow.setTitleActions(ProjectPanelActions.create(projectPanel));
 
