@@ -25,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -34,48 +35,43 @@ public final class ProjectIndexer {
     private final Project project;
     private final AtomicBoolean indexed = new AtomicBoolean(false);
     private final AtomicBoolean indexing = new AtomicBoolean(false);
-
     @Getter
     private final Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
-
     @Getter
     private final Map<UUID, TestRunDto> testRunsById = new ConcurrentHashMap<>();
-
     @Getter
     private final Map<String, TestProjectDirectoryDto> testProjectsByPath = new ConcurrentHashMap<>();
-
     @Getter
     private final Map<String, TestSetDirectoryDto> testSetsByPath = new ConcurrentHashMap<>();
-
     @Getter
     private final Map<String, TestRunDirectoryDto> testRunDirsByPath = new ConcurrentHashMap<>();
-
     @Getter
     private final Map<String, TestSetPackageDirectoryDto> testSetPackagesByPath = new ConcurrentHashMap<>();
-
     @Getter
     private final Map<String, TestRunPackageDirectoryDto> testRunPackagesByPath = new ConcurrentHashMap<>();
-
     @Getter
     private final Map<String, TestCasesMainDirectoryDto> testCasesMainDirsByPath = new ConcurrentHashMap<>();
-
     @Getter
     private final Map<String, TestRunsMainDirectoryDto> testRunsMainDirsByPath = new ConcurrentHashMap<>();
-
     private final Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
-
     private final Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
+    private volatile CountDownLatch indexingLatch = new CountDownLatch(1);
 
     public ProjectIndexer(final @NotNull Project project) {
         this.project = project;
     }
 
     public void indexWithProgress() {
-        if (indexed.get() || indexing.getAndSet(true)) return;
+        if (indexed.get() || indexing.getAndSet(true)) {
+            return;
+        }
+
+        indexingLatch = new CountDownLatch(1);
 
         final Path rootPath = Services.getInstance(project, Setting.class).getTestinPath();
         if (rootPath.toString().isEmpty()) {
             indexing.set(false);
+            indexingLatch.countDown();
             return;
         }
 
@@ -99,6 +95,7 @@ public final class ProjectIndexer {
 
                 indexed.set(true);
                 indexing.set(false);
+                indexingLatch.countDown();
 
                 Log.info("ProjectIndexer: indexing complete. " +
                         testCasesById.size() + " test cases, " +
@@ -114,13 +111,11 @@ public final class ProjectIndexer {
     }
 
     public void awaitIndexing() {
-        while (!indexed.get()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
+        if (indexed.get()) return;
+        try {
+            indexingLatch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -151,13 +146,6 @@ public final class ProjectIndexer {
             indicator.setFraction(i * projectWeight);
 
             indexProject(projectPath, indicator);
-
-            try {
-                Thread.sleep(6000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                break;
-            }
         }
 
         indicator.setFraction(1.0);
@@ -418,7 +406,7 @@ public final class ProjectIndexer {
             ids.add(tc.getId());
         }
 
-        Services.getInstance(project, org.testin.util.FilesUtil.class).write(project, testSetPath.resolve(tc.getId() + ".json"), tc);
+        Services.getInstance(project, FilesUtil.class).write(project, testSetPath.resolve(tc.getId() + ".json"), tc);
     }
 
     public void removeTestCase(final Path testSetPath, final UUID tcId) {
@@ -449,7 +437,7 @@ public final class ProjectIndexer {
             newIds.add(tc.getId());
             testCasesById.put(tc.getId(), tc);
 
-            Services.getInstance(project, org.testin.util.FilesUtil.class).write(project, testSetPath.resolve(tc.getId() + ".json"), tc);
+            Services.getInstance(project, FilesUtil.class).write(project, testSetPath.resolve(tc.getId() + ".json"), tc);
         }
 
         final List<UUID> oldIds = testSetCaseIds.get(pathStr);
@@ -468,6 +456,32 @@ public final class ProjectIndexer {
         testRunsByPath.put(testRunPath.toString(), tr);
 
         Services.getInstance(project, FilesUtil.class).write(project, testRunPath.resolve(testRunPath.getFileName() + ".json"), tr);
+    }
+
+    public void addTestSet(final TestSetDirectoryDto ts) {
+        testSetsByPath.put(ts.getPath().toString(), ts);
+    }
+
+    public void addTestSetPackage(final TestSetPackageDirectoryDto tsp) {
+        testSetPackagesByPath.put(tsp.getPath().toString(), tsp);
+    }
+
+    public void addTestRunDir(final TestRunDirectoryDto trd) {
+        testRunDirsByPath.put(trd.getPath().toString(), trd);
+    }
+
+    public void addTestRunPackage(final TestRunPackageDirectoryDto trp) {
+        testRunPackagesByPath.put(trp.getPath().toString(), trp);
+    }
+
+    public void addTestProject(final TestProjectDirectoryDto tp) {
+        testProjectsByPath.put(tp.getPath().toString(), tp);
+        if (tp.getTestCasesDirectory() != null) {
+            testCasesMainDirsByPath.put(tp.getTestCasesDirectory().getPath().toString(), tp.getTestCasesDirectory());
+        }
+        if (tp.getTestRunsDirectory() != null) {
+            testRunsMainDirsByPath.put(tp.getTestRunsDirectory().getPath().toString(), tp.getTestRunsDirectory());
+        }
     }
 
     public List<DirectoryDto> getChildren(final Path parentPath) {
@@ -515,5 +529,6 @@ public final class ProjectIndexer {
         testSetCaseIds.clear();
         testRunsByPath.clear();
         indexed.set(false);
+        indexingLatch = new CountDownLatch(1);
     }
 }

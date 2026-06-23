@@ -8,6 +8,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.DirectoryType;
 import org.testin.pojo.TestRunMarker;
 import org.testin.pojo.TestRunStatus;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
@@ -76,7 +77,7 @@ public class SetTestRunStatus extends DumbAwareAction {
     }
 
     private void persistMarker(final Project project, final TestRunDirectoryDto tr, final TestRunStatus newStatus) {
-        Path markerPath = tr.getPath().resolve(".tr");
+        Path markerPath = tr.getPath().resolve(DirectoryType.TR.getMarker());
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 TestRunMarker marker = Services.getInstance(project, Mapper.class).readValue(markerPath.toFile(), TestRunMarker.class);

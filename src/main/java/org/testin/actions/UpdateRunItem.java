@@ -12,8 +12,8 @@ import org.testin.editorPanel.runEditor.RunEditorUI;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testRun.update.RunItemUpdateMenu;
-import org.testin.util.FilesUtil;
 import org.testin.util.KeyboardSet;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
@@ -49,14 +49,11 @@ public class UpdateRunItem extends DumbAwareAction {
         new RunItemUpdateMenu(project, runItem, updatedItem -> {
             Log.trace("run item updated, actual result: " + updatedItem.getActualResult());
 
-            // Persist the changes
             if (runUi.getTr() != null && runUi.getVf().getTestRun() != null) {
                 Path dirPath = runUi.getVf().getTestRun().getPath();
-                Path jsonFilePath = dirPath.resolve(runUi.getVf().getTestRun().getName() + ".json");
-                Services.getInstance(project, FilesUtil.class).write(project, jsonFilePath, runUi.getTr());
+                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
             }
 
-            // Refresh the list
             list.repaint();
         }).show();
     }

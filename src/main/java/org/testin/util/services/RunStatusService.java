@@ -13,7 +13,7 @@ import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.FilesUtil;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 
 import java.nio.file.Path;
@@ -113,8 +113,7 @@ public final class RunStatusService {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = runUi.getVf().getTestRun().getPath();
-                Path jsonFilePath = dirPath.resolve(runUi.getVf().getTestRun().getName() + ".json");
-                Services.getInstance(project, FilesUtil.class).write(project, jsonFilePath, runUi.getTr());
+                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
             } catch (Exception e) {
                 Log.error("Failed to persist test run data: " + e.getMessage());
             }

@@ -7,6 +7,7 @@ import org.testin.pojo.NodeCreator;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -17,6 +18,9 @@ public class CreateTestSetPackage implements NodeCreator {
     @Override
     public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         TestSetPackageDirectoryDto tsp = Services.getInstance(project, DirectoryMapper.class).readTestSetPackageNode(project, newDirPath, parentDir);
+
+        if (tsp != null)
+            Services.getInstance(project, ProjectIndexer.class).addTestSetPackage(tsp);
 
         TreeUtilImpl util = Services.getInstance(project, TreeUtilImpl.class);
         util.createVf(project, this, parentDir.getPath(), name);

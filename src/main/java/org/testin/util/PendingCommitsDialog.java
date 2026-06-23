@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -132,7 +133,7 @@ public class PendingCommitsDialog extends DialogWrapper {
                     case "Priority" -> currentDto.setPriority(oldDto.getPriority());
                 }
 
-                Services.getInstance(project, FilesUtil.class).write(project, jsonFile.toPath(), currentDto);
+                Services.getInstance(project, ProjectIndexer.class).putTestCase(jsonFile.getParentFile().toPath(), currentDto);
                 model.removeRow(selectedRow);
             }
         } catch (Exception ex) {

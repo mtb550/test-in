@@ -16,6 +16,7 @@ import org.testin.settings.AppSettingsState;
 import org.testin.util.EditorUtil;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
@@ -53,11 +54,17 @@ public class CreateTestSet implements NodeCreator {
             sheetDir = targetDirectory.createChildDirectory(requestor, safeDirName);
             isNewDirCreated = true;
 
+            final Tools tools = Services.getInstance(project, Tools.class);
             TestSetDirectoryDto newTsDto = TestSetDirectoryDto
                     .builder()
                     .name(safeDirName)
                     .path(parentDirDto.getPath().resolve(safeDirName))
+                    .fqcn(tools.appendFqcn(parentDirDto.getFqcn(), safeDirName, DirectoryType.TS))
+                    .path2(tools.buildPath2(parentDirDto.getPath2(), safeDirName))
+                    .parent(parentDirDto)
                     .build();
+
+            Services.getInstance(project, ProjectIndexer.class).addTestSet(newTsDto);
 
             Services.getInstance(project, TreeUtilImpl.class).createNode(tree, parentNode, newTsDto);
             createJavaClassInTestRoot(project, parentDirDto.getName(), safeDirName);

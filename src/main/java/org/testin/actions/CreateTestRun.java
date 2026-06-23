@@ -62,7 +62,7 @@ public class CreateTestRun implements NodeCreator {
                     dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
 
                     tr = Services.getInstance(project, DirectoryMapper.class).readTestRunNode(project, newDirPath, parentDir);
-                    saveSelectedToJSON(form, name, root, newDirPath, action.getProjectPanel(), tr);
+                    saveSelectedToJSON(form, root, newDirPath, action.getProjectPanel(), tr);
                 });
 
                 dialogBuilder.show();
@@ -143,11 +143,9 @@ public class CreateTestRun implements NodeCreator {
     }
 
 
-    private void saveSelectedToJSON(final RunCreationForm form, final String runName, final CheckedTreeNode root, final Path savePath, final ProjectPanel projectPanel, final TestRunDirectoryDto tr) {
+    private void saveSelectedToJSON(final RunCreationForm form, final CheckedTreeNode root, final Path savePath, final ProjectPanel projectPanel, final TestRunDirectoryDto tr) {
         final TestRunDto run = new TestRunDto();
         form.populateConfiguration(run);
-
-        final String fileName = runName + ".json";
 
         final List<TestRunItems> items = new ArrayList<>();
         collectCheckedItems(root, items);
@@ -155,7 +153,7 @@ public class CreateTestRun implements NodeCreator {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Services.getInstance(project, FilesUtil.class).createDirectories(savePath);
-            Services.getInstance(project, FilesUtil.class).write(project, savePath.resolve(fileName), run);
+            Services.getInstance(project, ProjectIndexer.class).putTestRun(savePath, run);
 
             Path trMarkerPath = savePath.resolve(DirectoryType.TR.getMarker());
             TestRunMarker marker = TestRunMarker.builder()
@@ -165,6 +163,8 @@ public class CreateTestRun implements NodeCreator {
 
             Services.getInstance(project, FilesUtil.class).write(project, trMarkerPath, marker);
             tr.setMarker(marker);
+
+            Services.getInstance(project, ProjectIndexer.class).addTestRunDir(tr);
 
             VirtualFile virtualDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(savePath.toFile());
             if (virtualDir != null)

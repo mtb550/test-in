@@ -11,13 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.runEditor.RunEditorUI;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
-import org.testin.pojo.TestRunItems;
-import org.testin.pojo.TestRunMarker;
-import org.testin.pojo.TestRunStatus;
-import org.testin.pojo.TestStatus;
+import org.testin.pojo.*;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
@@ -158,7 +156,7 @@ public class ChangeTestRunStatus extends DumbAwareAction {
     }
 
     private void persistMarker(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
-        Path markerPath = runUi.getVf().getTestRun().getPath().resolve(".tr");
+        Path markerPath = runUi.getVf().getTestRun().getPath().resolve(DirectoryType.TR.getMarker());
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Mapper mapper = Services.getInstance(project, Mapper.class);
@@ -190,8 +188,7 @@ public class ChangeTestRunStatus extends DumbAwareAction {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = runUi.getVf().getTestRun().getPath();
-                Path jsonFilePath = dirPath.resolve(runUi.getVf().getTestRun().getName() + ".json");
-                Services.getInstance(project, FilesUtil.class).write(project, jsonFilePath, runUi.getTr());
+                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
                 Log.trace("[ChangeTestRunStatus] Results persisted");
             } catch (Exception e) {
                 Log.error("Failed to persist test run results: " + e.getMessage());

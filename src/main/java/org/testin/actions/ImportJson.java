@@ -24,6 +24,7 @@ import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.ui.ExcelPreviewDialog;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
@@ -33,6 +34,7 @@ import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.*;
 
 public class ImportJson extends DumbAwareAction {
@@ -201,6 +203,9 @@ public class ImportJson extends DumbAwareAction {
     }
 
     private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final Object requestor) throws IOException {
+        final Path dirPath = Path.of(dir.getPath());
+        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+
         TestCaseDto previousNode = existingTail;
 
         for (TestCaseDto currentTestCase : testCases) {
@@ -215,15 +220,11 @@ public class ImportJson extends DumbAwareAction {
         }
 
         if (existingTail != null) {
-            VirtualFile tailFile = dir.findChild(existingTail.getId() + ".json");
-            if (tailFile != null) {
-                tailFile.setBinaryContent(Services.getInstance(project, Mapper.class).writeValueAsBytes(existingTail));
-            }
+            indexer.putTestCase(dirPath, existingTail);
         }
 
         for (TestCaseDto tc : testCases) {
-            VirtualFile newJsonFile = dir.createChildData(requestor, tc.getId() + ".json");
-            newJsonFile.setBinaryContent(Services.getInstance(project, Mapper.class).writeValueAsBytes(tc));
+            indexer.putTestCase(dirPath, tc);
         }
     }
 

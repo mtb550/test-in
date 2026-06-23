@@ -19,6 +19,7 @@ import org.testin.ui.createNodes.CreateNodesDialog;
 import org.testin.util.FilesUtil;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.GeneratorType;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -100,6 +101,8 @@ public class CreateTestProject extends DumbAwareAction {
 
                 projectDir.refresh(false, true);
                 projectPanel.getTestProjectSelector().addTestProject(newTp);
+
+                Services.getInstance(project, ProjectIndexer.class).addTestProject(newTp);
 
                 Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", name));
 

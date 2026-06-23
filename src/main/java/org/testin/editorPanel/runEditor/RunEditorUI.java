@@ -31,7 +31,10 @@ import org.testin.pojo.*;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.ui.RunOpeningForm;
-import org.testin.util.*;
+import org.testin.util.FontSyncUtil;
+import org.testin.util.Mapper;
+import org.testin.util.TestCaseSorter;
+import org.testin.util.Tools;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
@@ -557,9 +560,6 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = vf.getTestRun().getPath();
-                Path jsonFilePath = dirPath.resolve(vf.getTestRun().getName() + ".json");
-
-                Services.getInstance(project, FilesUtil.class).write(project, jsonFilePath, tr);
 
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, tr);
 
