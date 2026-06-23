@@ -6,13 +6,12 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.util.logger.Log;
+import org.testin.util.indexer.ProjectIndexer;
+import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.List;
 
 public abstract class AbstractTreeBuilder {
     protected final Project project;
@@ -31,18 +30,17 @@ public abstract class AbstractTreeBuilder {
         DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(rootDirectoryDto);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            Path rootPath = rootDirectoryDto.getPath();
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            indexer.awaitIndexing();
 
-            if (Files.exists(rootPath) && Files.isDirectory(rootPath)) {
-                try (Stream<Path> paths = Files.list(rootPath)) {
-                    paths.map(path -> mapPathToDirectory(path, rootDirectoryDto))
-                            .filter(Objects::nonNull)
-                            .forEachOrdered(dir -> localRoot.add(buildNodeRecursive(dir)));
+            if (projectPanel.getProject().isDisposed()) return;
 
-                } catch (Exception e) {
-                    Log.error("Failed to read directory: " + e.getMessage());
-                    Log.error("Exception: " + e.getMessage());
-                }
+            final Path rootPath = rootDirectoryDto.getPath();
+
+            final List<DirectoryDto> children = getChildrenFromIndexer(rootPath);
+
+            for (final DirectoryDto child : children) {
+                localRoot.add(buildNodeFromIndexer(child));
             }
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -54,23 +52,21 @@ public abstract class AbstractTreeBuilder {
         });
     }
 
-    private DefaultMutableTreeNode buildNodeRecursive(final @NotNull DirectoryDto currentDir) {
+    private DefaultMutableTreeNode buildNodeFromIndexer(final @NotNull DirectoryDto currentDir) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(currentDir);
-        Path currentPath = currentDir.getPath();
+        final Path currentPath = currentDir.getPath();
 
-        if (Files.exists(currentPath) && Files.isDirectory(currentPath)) {
-            try (Stream<Path> paths = Files.list(currentPath)) {
-                paths.map(path -> mapPathToDirectory(path, currentDir))
-                        .filter(Objects::nonNull)
-                        .forEachOrdered(childDir -> node.add(buildNodeRecursive(childDir)));
-
-            } catch (Exception e) {
-                Log.error("Failed to read directory recursively: " + currentPath);
-                Log.error("Exception: " + e.getMessage());
-            }
+        final List<DirectoryDto> children = getChildrenFromIndexer(currentPath);
+        for (final DirectoryDto child : children) {
+            node.add(buildNodeFromIndexer(child));
         }
+
         return node;
     }
 
-    protected abstract DirectoryDto mapPathToDirectory(final Path path, final DirectoryDto parentDir);
+    private List<DirectoryDto> getChildrenFromIndexer(final Path path) {
+        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        return indexer.getChildren(path);
+    }
+
 }

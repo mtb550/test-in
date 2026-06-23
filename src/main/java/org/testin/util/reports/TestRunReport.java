@@ -16,7 +16,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Mapper;
-import org.testin.util.Tools;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
@@ -26,9 +26,9 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 public final class TestRunReport {
     private final Project project;
@@ -68,14 +68,18 @@ public final class TestRunReport {
             try {
                 Path dirPath = tr.getPath();
                 String folderName = dirPath.getFileName().toString();
-                File jsonFile = dirPath.resolve(folderName + ".json").toFile();
 
-                if (!jsonFile.exists() || !jsonFile.isFile()) {
-                    Services.getInstance(project, Notifier.class).error(project, "Report Error", "JSON data file not found: " + jsonFile.getAbsolutePath());
-                    return;
+                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                TestRunDto runData = indexer.getTestRunForPath(dirPath);
+
+                if (runData == null) {
+                    File jsonFile = dirPath.resolve(folderName + ".json").toFile();
+                    if (!jsonFile.exists() || !jsonFile.isFile()) {
+                        Services.getInstance(project, Notifier.class).error(project, "Report Error", "JSON data file not found: " + jsonFile.getAbsolutePath());
+                        return;
+                    }
+                    runData = Services.getInstance(project, Mapper.class).readValue(jsonFile, TestRunDto.class);
                 }
-
-                TestRunDto runData = Services.getInstance(project, Mapper.class).readValue(jsonFile, TestRunDto.class);
 
                 Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(runData);
 
@@ -130,45 +134,21 @@ public final class TestRunReport {
     }
 
     private Map<UUID, TestCaseDto> fetchTestCaseDetails(final TestRunDto tr) {
-        Map<UUID, TestCaseDto> detailsMap = new ConcurrentHashMap<>();
+        final Map<UUID, TestCaseDto> detailsMap = new ConcurrentHashMap<>();
 
         if (tr.getResults().isEmpty()) {
             return detailsMap;
         }
 
-        Map<List<String>, List<UUID>> pathMap = new HashMap<>();
-        for (TestRunItems item : tr.getResults()) {
-            pathMap.computeIfAbsent(item.getPath(), k -> new ArrayList<>()).add(item.getId());
-        }
+        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
-        for (Map.Entry<List<String>, List<UUID>> entry : pathMap.entrySet()) {
-
-            Path dirPath = Services.getInstance(project, Tools.class).buildLocalPathFromList(project, entry.getKey());
-            List<UUID> targetIds = entry.getValue();
-
-            if (dirPath == null || !Files.exists(dirPath) || targetIds.isEmpty()) {
-                continue;
-            }
-
-            Set<UUID> idsToFind = new HashSet<>(targetIds);
-
-            try (Stream<Path> paths = Files.list(dirPath)) {
-                paths.filter(Files::isRegularFile)
-                        .filter(p -> p.toString().endsWith(".json"))
-                        .parallel()
-                        .forEach(p -> {
-                            try {
-                                TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(p.toFile(), TestCaseDto.class);
-                                if (idsToFind.contains(tc.getId())) {
-                                    detailsMap.put(tc.getId(), tc);
-                                }
-                            } catch (Exception ignored) {
-                            }
-                        });
-            } catch (Exception e) {
-                Log.error("Failed to load details from path " + dirPath + ": " + e.getMessage());
+        for (final TestRunItems item : tr.getResults()) {
+            final TestCaseDto tc = indexer.getTestCaseById(item.getId());
+            if (tc != null) {
+                detailsMap.put(item.getId(), tc);
             }
         }
+
         return detailsMap;
     }
 

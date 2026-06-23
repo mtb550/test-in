@@ -7,6 +7,7 @@ import com.intellij.openapi.startup.ProjectActivity;
 import kotlin.coroutines.Continuation;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestCaseExecutionTracker;
@@ -65,6 +66,10 @@ public final class StartupActivity implements ProjectActivity {
 
         Log.info("testin Path: " + testinPath);
         Log.info("automation Path: " + automationPath);
+
+        if (testinPath != null) {
+            Services.getInstance(project, ProjectIndexer.class).indexWithProgress();
+        }
 
         TestCaseExecutionTracker.initGlobalListener(project);
     }

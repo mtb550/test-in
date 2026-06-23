@@ -5,14 +5,11 @@ import com.intellij.openapi.project.Project;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.Mapper;
-import org.testin.util.logger.Log;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class TestSessionCache {
 
@@ -51,43 +48,35 @@ public class TestSessionCache {
 
     public void startLoadingAsync() {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final List<TestCaseDto> batch = new ArrayList<>();
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+
+            indexer.awaitIndexing();
+
+            if (isDisposed) return;
+
+            final List<TestCaseDto> allCases = indexer.getTestCasesForTestSet(directoryPath);
+
+            for (final TestCaseDto tc : allCases) {
+                final String moduleName = tc.getModule();
+                if (!moduleName.trim().isEmpty()) loadedModules.add(moduleName.trim());
+            }
+
             final int BATCH_SIZE = 5;
+            final List<TestCaseDto> batch = new ArrayList<>();
+            for (final TestCaseDto tc : allCases) {
+                if (isDisposed) return;
+                loadedItems.add(tc);
+                batch.add(tc);
 
-            try (final Stream<Path> paths = Files.list(directoryPath)) {
-                paths.filter(Files::isRegularFile)
-                        .filter(p -> p.toString().endsWith(".json"))
-                        .forEach(filePath -> {
-                            if (isDisposed) return;
-
-                            try {
-                                final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(filePath.toFile(), TestCaseDto.class);
-                                if (tc != null) {
-                                    loadedItems.add(tc);
-                                    batch.add(tc);
-
-                                    final String moduleName = tc.getModule();
-                                    if (!moduleName.trim().isEmpty()) loadedModules.add(moduleName.trim());
-
-                                    if (batch.size() >= BATCH_SIZE) {
-                                        final List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
-                                        batch.clear();
-                                        notifyItemsLoaded(itemsToSend);
-                                    }
-                                }
-                            } catch (final Exception ex) {
-                                Log.error("Unable to read test case file: " + filePath.toAbsolutePath());
-                                Log.error("Exception: " + ex.getMessage());
-                            }
-                        });
-
-                if (!batch.isEmpty()) {
-                    notifyItemsLoaded(batch);
+                if (batch.size() >= BATCH_SIZE) {
+                    final List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
+                    batch.clear();
+                    notifyItemsLoaded(itemsToSend);
                 }
+            }
 
-            } catch (final Exception e) {
-                if (!isDisposed)
-                    Log.error("Exception: " + e.getMessage());
+            if (!batch.isEmpty()) {
+                notifyItemsLoaded(batch);
             }
 
             notifyLoadComplete();

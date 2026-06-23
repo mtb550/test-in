@@ -1,4 +1,4 @@
-implement mail smtp notifications..
+implement mail SMTP notifications.
 
 implement class debugger
 
@@ -11,7 +11,7 @@ once click refresh button, keep selected project without change it to the first.
 
 plan & implement delegation between leaders to leaders or leaders to members.
 
-enable RemoveTestProject in the tree, add new action, active, deactive.
+enable RemoveTestProject in the tree, add new action, active, deactivate.
 
 implement the details in marker .pr .ts file like created time date by modified, number of test cases , open bugs
 details button on context menu and show in view panel.
@@ -25,7 +25,7 @@ enhance the test run editor panel
 
 enhance view panel.
 
-change test case and test run editor size by mouse wheel. or make the font control in testin setting
+change test case and test run editor size by mouse wheel. or make the font control in test in setting
 
 Summary of list listeners:
 MotionListener: Used for your beautiful hover icons (Run / Navigate). NO NEED
@@ -66,7 +66,7 @@ I think the method runner can run the class. no need for class runner. to be che
 
 extend IntelliJ disposer to save tree state and open editors once close to re-open after run IntelliJ again
 // use activity IntelliJ class to open the editors once run directly
-//public class testinStartupActivity implements ProjectActivity {}
+//public class testingStartupActivity implements ProjectActivity {}
 
 add sorting attribute to view panel in test case details so can update the sort value.
 
@@ -166,10 +166,10 @@ make toolbar search on the right.
 remove toolbar texts(details, filter, refresh) and just put the icons.
 reset filter on tob of filter list toolbar.(Reset)
 
-pending today 31.04.2026
+pending today 31-04-2026
 put filter btn to tool par
 unify the filtered list method that in test editor ui and run editor ui (getFilteredList)
-put and use @NotNull in test case dto and clear all related and update create test case to put empty not null. (major)
+put and use @NotNull in test case dto, clear all related and update create test case to put empty not NULL. (major)
 implement toolbar button interface and enum that allow to add new button later easily.
 sorting number should be fixed in editor once search and list the results. (major)
 
@@ -237,14 +237,14 @@ update edit menu to show the actual result (with base64 screenshot or textarea e
 or use current edit menu be make it not visible if current editor is the test editor to not make tester confuse.
 make shortcut to set actual result, screenshot or exception (evidence, find another word), test case run status.
 
-fix mac shortcuts. check create test case and generate code on mac
+fix Mac shortcuts. check create test case and generate code on Mac
 
 CTRL+Z to revert back if change description for singe or bulk test cases
 
 compatability with by charm, use option of plugin that make same release matched with by charm and IntelliJ.
 install robot framework and try gutter and navigate to code.
 
-test cases repository options: local server and connect via ssh, git source, ftp server, nosql db,
+test cases repository options: local server and connect via ssh, git source, ftp server, no SQL db,
 
 apply check box once update test case. with unify methods for sanitize names for packages and classes
 
@@ -257,17 +257,10 @@ major change, move to tree async model, to manage update, remove, dispose and re
 
 fix pi report issues.
 
-final is before @notNull or not? which is correct? update all project based on that.
-
 update the buttons: PASSED, FAILED.etc. remove it and use a context buttons and shortcuts. make button double height.
 
 in test run, I want to highlight the running test case, by add a new badge (Active) or change the description color for current running.
 
-implement actual result in test run.
-
-enhance editor context menu for test editor to be shown if no list item selected with disabled buttons.
-allow only create test case.
-
 if change test run to completed then change pending test cases to untested automatic.
 
-remove testin GitHub project and recreate it with new history.
+remove test in GitHub project and recreate it with new history.

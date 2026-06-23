@@ -10,7 +10,6 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestRunMarker;
 import org.testin.pojo.TestRunStatus;
-import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.ui.TestRunStatusMenu;
 import org.testin.util.FilesUtil;
@@ -20,7 +19,6 @@ import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -47,14 +45,12 @@ public class SetTestRunStatus extends DumbAwareAction {
 
         if (userObject instanceof TestRunDirectoryDto testRunDto) {
             new TestRunStatusMenu(project, selectedStatus -> {
-                // Update in-memory marker status
                 TestRunMarker marker = testRunDto.getMarker();
                 marker.setStatus(selectedStatus);
                 marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
                 Log.trace("Status changed -> " + testRunDto.getName() + " = " + selectedStatus.getLabel());
 
-                // Persist marker to .tr file (status is only in marker, not in JSON)
                 persistMarker(project, testRunDto, selectedStatus);
 
                 tree.repaint();
@@ -90,27 +86,6 @@ public class SetTestRunStatus extends DumbAwareAction {
                 }
             } catch (Exception ex) {
                 Log.error("Failed to persist marker: " + ex.getMessage());
-            }
-        });
-    }
-
-    private void persistJsonStatus(final Project project, final TestRunDirectoryDto tr, final TestRunStatus newStatus) {
-        Path jsonPath = tr.getPath().resolve(tr.getName() + ".json");
-        if (!Files.exists(jsonPath)) {
-            Log.warn("JSON file not found for " + tr.getName());
-            return;
-        }
-
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                Mapper mapper = Services.getInstance(project, Mapper.class);
-                TestRunDto testRunDto = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
-                if (testRunDto != null) {
-                    Services.getInstance(project, FilesUtil.class).write(project, jsonPath, testRunDto);
-                    Log.trace("Persisted status to JSON -> " + tr.getName() + " = " + newStatus.getLabel());
-                }
-            } catch (Exception ex) {
-                Log.error("Failed to persist JSON status: " + ex.getMessage());
             }
         });
     }

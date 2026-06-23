@@ -18,6 +18,7 @@ import org.testin.ui.RunCreationForm;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
@@ -78,28 +79,37 @@ public class CreateTestRun implements NodeCreator {
 
         if (thisNodeDto == null || !Files.exists(folder) || !Files.isDirectory(folder)) return node;
 
-        try (final Stream<Path> paths = Files.list(folder)) {
-            paths.sorted(Comparator.comparing((Path p) -> !Files.isDirectory(p)).thenComparing(p -> p.getFileName().toString().toLowerCase()))
-                    .forEach(child -> {
+        final boolean isTestSet = Files.exists(folder.resolve(DirectoryType.TS.getMarker()));
 
-                        if (Files.isDirectory(child)) {
-                            node.add(buildDirectoryTree(child, false, thisNodeDto));
+        if (isTestSet) {
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            indexer.awaitIndexing();
 
-                        } else if (child.toString().endsWith(".json")) {
-                            try {
-                                final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(child.toFile(), TestCaseDto.class);
-                                node.add(new DefaultMutableTreeNode(tc));
-
-                            } catch (final Exception e1) {
-                                Log.info("Failed to parse " + child);
-                                Log.error("Exception: " + e1.getMessage());
+            final List<TestCaseDto> testCases = indexer.getTestCasesForTestSet(folder);
+            for (final TestCaseDto tc : testCases) {
+                node.add(new DefaultMutableTreeNode(tc));
+            }
+        } else {
+            try (final Stream<Path> paths = Files.list(folder)) {
+                paths.sorted(Comparator.comparing((Path p) -> !Files.isDirectory(p)).thenComparing(p -> p.getFileName().toString().toLowerCase()))
+                        .forEach(child -> {
+                            if (Files.isDirectory(child)) {
+                                node.add(buildDirectoryTree(child, false, thisNodeDto));
+                            } else if (child.toString().endsWith(".json")) {
+                                try {
+                                    final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(child.toFile(), TestCaseDto.class);
+                                    node.add(new DefaultMutableTreeNode(tc));
+                                } catch (final Exception e1) {
+                                    Log.info("Failed to parse " + child);
+                                    Log.error("Exception: " + e1.getMessage());
+                                }
                             }
-                        }
-                    });
-
-        } catch (final Exception e2) {
-            Log.error("Exception: " + e2.getMessage());
+                        });
+            } catch (final Exception e2) {
+                Log.error("Exception: " + e2.getMessage());
+            }
         }
+
         return node;
     }
 

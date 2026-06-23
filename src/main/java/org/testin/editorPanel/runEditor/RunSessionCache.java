@@ -2,24 +2,23 @@ package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
-import org.testin.util.Mapper;
-import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Stream;
 
 public class RunSessionCache {
 
     private final TestRunDto tr;
+    @Getter
+    private final Path testRunPath;
 
     private final List<TestCaseDto> loadedItems = Collections.synchronizedList(new ArrayList<>());
 
@@ -30,8 +29,9 @@ public class RunSessionCache {
 
     private volatile boolean isDisposed = false;
 
-    public RunSessionCache(final TestRunDto tr) {
+    public RunSessionCache(final TestRunDto tr, final Path testRunPath) {
         this.tr = tr;
+        this.testRunPath = testRunPath;
     }
 
     public List<TestCaseDto> getLoadedItems() {
@@ -56,55 +56,36 @@ public class RunSessionCache {
         }
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+
+            indexer.awaitIndexing();
+
+            if (isDisposed) return;
+
             final List<TestCaseDto> batch = new ArrayList<>();
             final int BATCH_SIZE = 5;
 
-            final Map<List<String>, List<UUID>> pathMap = new HashMap<>();
-            for (TestRunItems item : tr.getResults()) {
-                pathMap.computeIfAbsent(item.getPath(), k -> new ArrayList<>()).add(item.getId());
+            final Set<UUID> targetIds = new HashSet<>();
+            for (final TestRunItems item : tr.getResults()) {
+                targetIds.add(item.getId());
             }
 
-            for (final Map.Entry<List<String>, List<UUID>> entry : pathMap.entrySet()) {
-                if (isDisposed) break;
+            for (final UUID id : targetIds) {
+                if (isDisposed) return;
 
-                final List<String> pathSegments = entry.getKey();
-                final List<UUID> targetIds = entry.getValue();
+                final TestCaseDto tc = indexer.getTestCaseById(id);
+                if (tc != null) {
+                    loadedItems.add(tc);
+                    batch.add(tc);
 
-                final Path dirPath = Services.getInstance(project, Tools.class).buildLocalPathFromList(project, pathSegments);
+                    final String moduleName = tc.getModule();
+                    if (!moduleName.trim().isEmpty()) loadedModules.add(moduleName.trim());
 
-                if (dirPath == null || !Files.exists(dirPath) || targetIds.isEmpty()) {
-                    Log.warn("[WARNING] directory path not found: " + dirPath);
-                    Log.error("[WARNING] path not found: " + pathSegments);
-                    continue;
-                }
-
-                final Set<UUID> idsToFind = new HashSet<>(targetIds);
-
-                try (final Stream<Path> paths = Files.list(dirPath)) {
-                    paths.filter(Files::isRegularFile)
-                            .filter(p -> p.toString().endsWith(".json"))
-                            .forEach(filePath -> {
-                                if (isDisposed) return;
-
-                                try {
-                                    final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(filePath.toFile(), TestCaseDto.class);
-                                    if (tc != null && idsToFind.contains(tc.getId())) {
-                                        loadedItems.add(tc);
-                                        batch.add(tc);
-
-                                        if (batch.size() >= BATCH_SIZE) {
-                                            final List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
-                                            batch.clear();
-                                            notifyItemsLoaded(itemsToSend);
-                                        }
-                                    }
-                                } catch (final Exception ignored) {
-                                }
-                            });
-                } catch (final Exception ex) {
-                    Log.error("Unable to read test case file: " + dirPath.toAbsolutePath());
-                    Log.error("Exception: " + ex.getMessage());
-                    if (!isDisposed) Log.error("Failed to load cases from: " + dirPath);
+                    if (batch.size() >= BATCH_SIZE) {
+                        final List<TestCaseDto> itemsToSend = new ArrayList<>(batch);
+                        batch.clear();
+                        notifyItemsLoaded(itemsToSend);
+                    }
                 }
             }
 

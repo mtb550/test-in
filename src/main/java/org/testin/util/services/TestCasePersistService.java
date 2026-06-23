@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Mapper;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.notifications.Notifier;
 
 import java.io.IOException;
@@ -37,6 +38,8 @@ public final class TestCasePersistService implements Disposable {
 
                 for (TestCaseDto tc : tcs) {
                     if (tc == null) continue;
+
+                    Services.getInstance(project, ProjectIndexer.class).putTestCase(path, tc);
 
                     String fileName = tc.getId() + ".json";
                     VirtualFile targetFile = dirVFile.findChild(fileName);

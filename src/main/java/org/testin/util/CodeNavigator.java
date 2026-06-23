@@ -58,7 +58,7 @@ public class CodeNavigator {
                             });
 
                         } else
-                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Navigation Error: ", "Class Not Found: " + className));
+                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).softShow(project, "Navigation Error: ", "Class Not Found: " + className));
 
                     } catch (final IndexNotReadyException e) {
                         Log.trace("index not ready, deferring navigation");

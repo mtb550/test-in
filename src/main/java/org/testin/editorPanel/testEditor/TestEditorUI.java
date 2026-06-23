@@ -31,10 +31,10 @@ import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.FilesUtil;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.Tools;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.viewPanel.ViewPanel;
@@ -244,9 +244,9 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 TestCaseDto current = snapshot.get(i);
                 current.setIsHead(i == 0);
                 current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
-
-                Services.getInstance(project, FilesUtil.class).write(project, dirPath.resolve(current.getId() + ".json"), current);
             }
+
+            Services.getInstance(project, ProjectIndexer.class).updateSequence(dirPath, snapshot);
 
             ApplicationManager.getApplication().invokeLater(this::refreshView);
         });

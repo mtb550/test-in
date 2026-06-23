@@ -32,6 +32,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.ui.RunOpeningForm;
 import org.testin.util.*;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
@@ -155,11 +156,18 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 if (this.tr == null && vf.getTestRun() != null) {
-                    Path dirPath = vf.getTestRun().getPath();
-                    Path jsonFilePath = dirPath.resolve(vf.getTestRun().getName() + ".json");
+                    final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                    indexer.awaitIndexing();
 
-                    if (Files.exists(jsonFilePath)) {
-                        this.tr = Services.getInstance(project, Mapper.class).readValue(jsonFilePath.toFile(), TestRunDto.class);
+                    final Path dirPath = vf.getTestRun().getPath();
+
+                    this.tr = indexer.getTestRunForPath(dirPath);
+
+                    if (this.tr == null) {
+                        Path jsonFilePath = dirPath.resolve(vf.getTestRun().getName() + ".json");
+                        if (Files.exists(jsonFilePath)) {
+                            this.tr = Services.getInstance(project, Mapper.class).readValue(jsonFilePath.toFile(), TestRunDto.class);
+                        }
                     }
                 }
 
@@ -189,7 +197,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     this.list.getEmptyText().setText("Loading...");
                 }
 
-                this.sessionCache = new RunSessionCache(this.tr);
+                this.sessionCache = new RunSessionCache(this.tr, vf.getTestRun().getPath());
 
                 sessionCache.setListener(new RunSessionCache.ICacheListener() {
                     @Override
@@ -543,25 +551,6 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         startTimerForIndex(currentlyExecutingIndex + 1);
     }
 
-    public void handleManualStatusUpdate(final TestCaseDto tc, final TestStatus newStatus) {
-        TestRunItems item = resultsMap.get(tc.getId());
-        if (item != null) {
-            item.setStatus(newStatus);
-            item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-
-            int tcIndex = currentTestCases.indexOf(tc);
-            if (tcIndex != -1 && tcIndex == currentlyExecutingIndex) {
-                stopExecution();
-            }
-
-            if (list != null) {
-                list.repaint();
-            }
-
-            persistRunDataAsync();
-        }
-    }
-
     private void persistRunDataAsync() {
         if (tr == null || vf.getTestRun() == null) return;
 
@@ -571,6 +560,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                 Path jsonFilePath = dirPath.resolve(vf.getTestRun().getName() + ".json");
 
                 Services.getInstance(project, FilesUtil.class).write(project, jsonFilePath, tr);
+
+                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, tr);
 
             } catch (Exception e) {
                 Log.error("Failed to persist test run data: " + e.getMessage());

@@ -2,7 +2,6 @@ package org.testin.projectPanel.projectSelector;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -12,14 +11,17 @@ import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -59,20 +61,25 @@ public class TestProjectSelector {
         final Path root = Services.getInstance(project, Setting.class).getTestinPath();
 
         if (Files.exists(root) && Files.isDirectory(root)) {
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
-            try (Stream<Path> paths = Files.list(root)) {
-
-                paths.filter(Files::isDirectory)
-                        .filter(path -> !path.getFileName().toString().startsWith("."))
-                        .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
-                        .peek(path -> Log.info(path.getFileName().toString()))
-                        .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
-                        .filter(Objects::nonNull)
-                        .forEach(testProjectList::addElement);
-
-            } catch (Exception e) {
-                Log.error("Error reading directory: " + e.getMessage());
-                Log.error("Exception: " + e.getMessage());
+            if (indexer.isIndexed()) {
+                final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
+                projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
+                projects.forEach(testProjectList::addElement);
+            } else {
+                try (Stream<Path> paths = Files.list(root)) {
+                    paths.filter(Files::isDirectory)
+                            .filter(path -> !path.getFileName().toString().startsWith("."))
+                            .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
+                            .peek(path -> Log.info(path.getFileName().toString()))
+                            .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
+                            .filter(Objects::nonNull)
+                            .forEach(testProjectList::addElement);
+                } catch (Exception e) {
+                    Log.error("Error reading directory: " + e.getMessage());
+                    Log.error("Exception: " + e.getMessage());
+                }
             }
         }
 
@@ -101,38 +108,6 @@ public class TestProjectSelector {
             selectedTestProject.setEnabled(true);
             projectPanel.setupMainLayout();
         }
-    }
-
-    public void removeTestProject(final SimpleTree tree, final TestProjectDirectoryDto testProjectDirectory) {
-        int indexToRemove = -1;
-        for (int i = 0; i < testProjectList.getSize(); i++) {
-            if (testProjectList.getElementAt(i).getName().equals(testProjectDirectory.getName())) {
-                indexToRemove = i;
-                break;
-            }
-        }
-
-        if (indexToRemove == -1) return;
-
-        ActionListener[] listeners = selectedTestProject.getActionListeners();
-        for (ActionListener l : listeners) selectedTestProject.removeActionListener(l);
-
-        try {
-            testProjectList.removeElementAt(indexToRemove);
-
-            if (testProjectList.getSize() == 0) {
-                testProjectList.removeAllElements();
-                projectPanel.showEmptyState();
-            } else {
-                selectedTestProject.setSelectedItem(testProjectList.getElementAt(Math.max(0, indexToRemove - 1)));
-                filterByTestProject(selectedTestProject.getItem());
-            }
-        } finally {
-            for (ActionListener l : listeners) selectedTestProject.addActionListener(l);
-        }
-
-        tree.revalidate();
-        tree.repaint();
     }
 
     public void filterByTestProject(final TestProjectDirectoryDto tpDir) {

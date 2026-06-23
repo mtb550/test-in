@@ -95,6 +95,11 @@ public class RemoveTestCase extends DumbAwareAction {
             saveToFile(predecessor);
         }
 
+        final var indexer = Services.getInstance(project, org.testin.util.indexer.ProjectIndexer.class);
+        for (final TestCaseDto tc : selectedItems) {
+            indexer.removeTestCase(dir.getPath(), tc.getId());
+        }
+
         deletePhysicalFiles(selectedItems, dir.getPath(), this);
 
         for (int i = selectedItems.size() - 1; i >= 0; i--) {

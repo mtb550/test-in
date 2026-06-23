@@ -3,16 +3,9 @@ package org.testin.projectPanel.tree;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.DirectoryMapper;
-import org.testin.pojo.DirectoryType;
 import org.testin.pojo.ProjectStatus;
-import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.util.services.Services;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class TestRunTreeBuilder extends AbstractTreeBuilder {
 
@@ -33,14 +26,4 @@ public class TestRunTreeBuilder extends AbstractTreeBuilder {
         super.buildTree(selectedTestProjectDirectory.getTestRunsDirectory());
     }
 
-    @Override
-    protected DirectoryDto mapPathToDirectory(final Path path, final DirectoryDto parentDir) {
-        if (Files.exists(path.resolve(DirectoryType.TRP.getMarker())))
-            return Services.getInstance(project, DirectoryMapper.class).readTestRunPackageNode(project, path, parentDir);
-
-        if (Files.exists(path.resolve(DirectoryType.TR.getMarker())))
-            return Services.getInstance(project, DirectoryMapper.class).readTestRunNode(project, path, parentDir);
-
-        return null;
-    }
 }

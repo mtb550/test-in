@@ -12,20 +12,18 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.settings.Setting;
-import org.testin.util.Mapper;
+import org.testin.util.Tools;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
-import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.UUID;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
 
@@ -61,42 +59,36 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
     }
 
     private void openViewPanel(Project project, String targetId) {
-        Path rootPath = Services.getInstance(project, Setting.class).getTestinPath();
-
-        Log.info("[GUTTER TRACE] Root path: " + rootPath);
         Log.info("[GUTTER TRACE] Searching for UUID: " + targetId);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                File foundFile;
-                try (Stream<Path> stream = Files.walk(rootPath)) {
-                    foundFile = stream
-                            .filter(p -> p.getFileName().toString().equals(targetId + ".json"))
-                            .map(Path::toFile)
-                            .findFirst()
-                            .orElse(null);
-                }
+                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                indexer.awaitIndexing();
 
-                if (foundFile == null) {
-                    Log.error("[GUTTER TRACE] File not found in external path: " + targetId + ".json");
+                final UUID uuid = UUID.fromString(targetId);
+                final TestCaseDto dto = indexer.getTestCaseById(uuid);
+
+                if (dto == null) {
+                    Log.error("[GUTTER TRACE] Test case not found in indexer: " + targetId);
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).warn(project, "Not Found", "No JSON file found in external path for ID: " + targetId)
+                            Services.getInstance(project, Notifier.class).warn(project, "Not Found", "No test case found in indexer for ID: " + targetId)
                     );
                     return;
                 }
 
-                Log.info("[GUTTER TRACE] Found file: " + foundFile.getAbsolutePath());
+                Log.info("[GUTTER TRACE] Found in indexer: " + dto.getDescription());
+                final Path parentPath = dto.getPath().isEmpty() ? null :
+                        Services.getInstance(project, Tools.class).buildLocalPathFromList(project, dto.getPath());
 
-                TestCaseDto dto = Services.getInstance(project, Mapper.class).readValue(foundFile, TestCaseDto.class);
-
-                if (dto == null) return;
-                Path parentPath = foundFile.getParentFile().toPath();
-                ApplicationManager.getApplication().invokeLater(() -> ViewToolWindowFactory.showPanel(project, List.of(dto), parentPath));
+                ApplicationManager.getApplication().invokeLater(() ->
+                        ViewToolWindowFactory.showPanel(project, List.of(dto), parentPath)
+                );
 
             } catch (Exception ex) {
-                Log.error("[GUTTER TRACE] IO Error: " + ex.getMessage());
+                Log.error("[GUTTER TRACE] Error: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(project, Notifier.class).error(project, "Error", "Could not read JSON file: " + ex.getMessage())
+                        Services.getInstance(project, Notifier.class).error(project, "Error", "Could not find test case: " + ex.getMessage())
                 );
             }
         });
