@@ -1,5 +1,6 @@
 package org.testin.pojo;
 
+import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.testin.editorPanel.Shared;
@@ -10,7 +11,6 @@ import org.testin.util.services.Services;
 import javax.swing.*;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 // TODO: add order, then add it toolbar details (select by the order number) & add it to edit menu.
@@ -27,7 +27,7 @@ public enum TestEditorAttributes {
             true,
             false,
             false,
-            tc -> String.valueOf(tc.getId()),
+            (tc, project) -> String.valueOf(tc.getId()),
             null,
             (project, tc, v) -> {
             }
@@ -40,7 +40,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
-            TestCaseDto::getDescription,
+            (tc, project) -> tc.getDescription(),
             null,
             (project, tc, v) -> tc.setDescription(Services.getInstance(project, Tools.class).sanitizeDescription(v))
     ),
@@ -51,7 +51,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
-            TestCaseDto::getExpectedResult,
+            (tc, project) -> tc.getExpectedResult(),
             null,
             (project, tc, v) -> tc.setExpectedResult(v)
     ),
@@ -62,7 +62,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
-            tc -> String.join(", ", tc.getSteps()),
+            (tc, project) -> String.join(", ", tc.getSteps()),
             null,
             (project, tc, v) -> tc.setSteps(Services.getInstance(project, Tools.class).parseStepsSafe(v))
     ),
@@ -73,7 +73,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
-            tc -> tc.getPriority().getName(),
+            (tc, project) -> tc.getPriority().getName(),
             tc -> List.of(Shared.createPriorityBadge(tc)),
             (project, tc, v) -> tc.setPriority(Services.getInstance(project, Tools.class).parsePrioritySafe(v))
     ),
@@ -84,7 +84,7 @@ public enum TestEditorAttributes {
             true,
             true,
             false,
-            tc -> String.join(" > ", tc.getFqcn()),
+            (tc, project) -> String.join(" > ", Services.getInstance(project, Tools.class).buildFqcn(tc)),
             null,
             (project, tc, v) -> {
             }
@@ -96,7 +96,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            TestCaseDto::getReference,
+            (tc, project) -> tc.getReference(),
             null,
             (project, tc, v) -> tc.setReference(v)
     ),
@@ -107,7 +107,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            TestCaseDto::getTestData,
+            (tc, project) -> tc.getTestData(),
             null,
             (project, tc, v) -> tc.setTestData(v)
     ),
@@ -118,7 +118,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            TestCaseDto::getPreConditions,
+            (tc, project) -> tc.getPreConditions(),
             null,
             (project, tc, v) -> tc.setPreConditions(v)
     ),
@@ -129,7 +129,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
-            tc -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
+            (tc, project) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList()),
             (project, tc, v) -> tc.setGroup(Services.getInstance(project, Tools.class).parseGroupsSafe(v))
     ),
@@ -140,7 +140,7 @@ public enum TestEditorAttributes {
             true,
             false,
             false,
-            tc -> String.join(" > ", tc.getPath()),
+            (tc, project) -> String.join(" > ", tc.getPath()),
             null,
             (project, tc, v) -> {
             }
@@ -154,7 +154,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            TestCaseDto::getModule,
+            (tc, project) -> tc.getModule(),
             null,
             (project, tc, v) -> tc.setModule(v)
     ),
@@ -165,7 +165,7 @@ public enum TestEditorAttributes {
             true,
             false,
             false,
-            tc -> tc.getStatus().getDisplayText(),
+            (tc, project) -> tc.getStatus().getDisplayText(),
             null,
             (project, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v))
     ),
@@ -176,7 +176,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            TestCaseDto::getCreatedBy,
+            (tc, project) -> tc.getCreatedBy(),
             null,
             (project, tc, v) -> tc.setCreatedBy(v)
     ),
@@ -187,7 +187,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            TestCaseDto::getUpdatedBy,
+            (tc, project) -> tc.getUpdatedBy(),
             null,
             (project, tc, v) -> tc.setUpdatedBy(v)
     ),
@@ -198,7 +198,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            tc -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
+            (tc, project) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
             null,
             (project, tc, v) -> tc.setCreatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
     ),
@@ -209,7 +209,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            tc -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
+            (tc, project) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
             null,
             (project, tc, v) -> tc.setUpdatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
     );
@@ -219,12 +219,22 @@ public enum TestEditorAttributes {
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
     private final boolean importValue;
-    private final Function<TestCaseDto, String> valueExtractor;
-    private final Function<TestCaseDto, List<JComponent>> drawItem;
+    private final ValueExtractor valueExtractor;
+    private final DrawItem drawItem;
     private final ImportSetter importSetter;
 
-    public void applyToUI(final TestCaseDto tc, final List<JComponent> badges, final Map<String, String> details) {
+    public void applyToUI(final TestCaseDto tc, final List<JComponent> badges, final Map<String, String> details, final Project project) {
         if (drawItem != null) badges.addAll(drawItem.apply(tc));
-        else details.put(name, valueExtractor.apply(tc));
+        else details.put(name, valueExtractor.apply(tc, project));
+    }
+
+    @FunctionalInterface
+    public interface ValueExtractor {
+        String apply(final TestCaseDto tc, final Project project);
+    }
+
+    @FunctionalInterface
+    public interface DrawItem {
+        List<JComponent> apply(final TestCaseDto tc);
     }
 }

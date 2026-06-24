@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
@@ -15,7 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface IEditorUI extends Disposable {
-    UnifiedVirtualFile getVf();
+    DirectoryDto getParent();
 
     StatusBar getStatusBar();
 

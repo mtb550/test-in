@@ -2,7 +2,6 @@ package org.testin.util;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -27,19 +26,6 @@ public final class FilesUtil {
             Services.getInstance(project, Notifier.class).error(project, "unable to write content: " + e.getMessage());
             Log.error("unable to write content: " + e.getMessage());
             Log.error("path" + path);
-            e.printStackTrace(System.err);
-        }
-    }
-
-    public <T> void write2(final @NotNull Project project, final @NotNull VirtualFile vf, final @NotNull T content) {
-        try {
-            byte[] jsonContent = Services.getInstance(project, Mapper.class).writeValueAsBytes(content);
-            vf.setBinaryContent(jsonContent);
-
-        } catch (IOException e) {
-            Services.getInstance(project, Notifier.class).error(project, "unable to write content: " + e.getMessage());
-            Log.error("unable to write content: " + e.getMessage());
-            Log.error("vf: " + vf.getPath());
             e.printStackTrace(System.err);
         }
     }

@@ -62,12 +62,12 @@ public class CreateTreeNode extends DumbAwareAction {
             if (codeGenerator != null && codeGenerator.isSelected() && directoryType != null && directoryType.getAction() != null) {
 
                 if (directoryType == DirectoryType.TSP) {
-                    GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(e.getProject(), null, dir.getFqcn());
+                    GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(e.getProject(), null, dir.getPath2());
                     return;
                 }
 
                 if (directoryType == DirectoryType.TS) {
-                    GeneratorType.CREATE_TEST_SET.getAction().execute(e.getProject(), null, dir.getFqcn());
+                    GeneratorType.CREATE_TEST_SET.getAction().execute(e.getProject(), null, dir.getPath2());
                 }
 
             }

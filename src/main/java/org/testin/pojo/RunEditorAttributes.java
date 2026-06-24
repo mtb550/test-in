@@ -1,14 +1,16 @@
 package org.testin.pojo;
 
+import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.testin.editorPanel.Shared;
+import org.testin.util.Tools;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
@@ -19,7 +21,7 @@ public enum RunEditorAttributes {
             "Description",
             true,
             true,
-            item -> item.getTc().getDescription(),
+            (item, project) -> item.getTc().getDescription(),
             null
     ),
 
@@ -27,7 +29,7 @@ public enum RunEditorAttributes {
             "Expected Result",
             true,
             true,
-            item -> item.getTc().getExpectedResult(),
+            (item, project) -> item.getTc().getExpectedResult(),
             null
     ),
 
@@ -35,7 +37,7 @@ public enum RunEditorAttributes {
             "Steps",
             true,
             true,
-            item -> String.join(", ", item.getTc().getSteps()),
+            (item, project) -> String.join(", ", item.getTc().getSteps()),
             null
     ),
 
@@ -43,7 +45,7 @@ public enum RunEditorAttributes {
             "Priority",
             true,
             true,
-            item -> item.getTc().getPriority().getName(),
+            (item, project) -> item.getTc().getPriority().getName(),
             item -> List.of(Shared.createPriorityBadge(item.getTc()))
     ),
 
@@ -51,7 +53,7 @@ public enum RunEditorAttributes {
             "Group",
             true,
             true,
-            item -> item.getTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
+            (item, project) -> item.getTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             item -> item.getTc().getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList())
     ),
 
@@ -59,7 +61,7 @@ public enum RunEditorAttributes {
             "Actual Result",
             true,
             true,
-            TestRunItems::getActualResult,
+            (item, project) -> item.getActualResult(),
             null
     ),
 
@@ -67,7 +69,7 @@ public enum RunEditorAttributes {
             "Run Status",
             true,
             true,
-            item -> item.getStatus().name(),
+            (item, project) -> item.getStatus().name(),
             null
     ),
 
@@ -75,7 +77,7 @@ public enum RunEditorAttributes {
             "Duration",
             true,
             true,
-            item -> {
+            (item, project) -> {
                 long s = item.getDuration().getSeconds();
                 return String.format(Locale.ENGLISH, "%02d:%02d", (s % 3600) / 60, (s % 60));
             },
@@ -86,18 +88,36 @@ public enum RunEditorAttributes {
             "Path",
             true,
             true,
-            item -> String.join(" > ", item.getPath()),
+            (item, project) -> String.join(" > ", item.getPath()),
+            null
+    ),
+
+    FQCN(
+            "FQCN",
+            true,
+            true,
+            (item, project) -> String.join(" > ", Services.getInstance(project, Tools.class).buildFqcn(item.getTc())), //todo, to be updated later
             null
     );
 
     private final String name;
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
-    private final Function<TestRunItems, String> valueExtractor;
-    private final Function<TestRunItems, List<JComponent>> drawItem;
+    private final ValueExtractor valueExtractor;
+    private final DrawItem drawItem;
 
-    public void applyToUI(final TestRunItems runItem, final List<JComponent> badges, final Map<String, String> details) {
+    public void applyToUI(final TestRunItems runItem, final List<JComponent> badges, final Map<String, String> details, final Project project) {
         if (drawItem != null) badges.addAll(drawItem.apply(runItem));
-        else details.put(name, valueExtractor.apply(runItem));
+        else details.put(name, valueExtractor.apply(runItem, project));
+    }
+
+    @FunctionalInterface
+    public interface ValueExtractor {
+        String apply(final TestRunItems item, final Project project);
+    }
+
+    @FunctionalInterface
+    public interface DrawItem {
+        List<JComponent> apply(final TestRunItems item);
     }
 }

@@ -2,15 +2,17 @@ package org.testin.editorPanel.listeners;
 
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.testEditor.TestCard;
+import org.testin.editorPanel.testEditor.TestEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 
 public class TestListRenderer extends AbstractListRenderer<IEditorUI> {
-    private final TestCard card = new TestCard();
+    private final TestCard card;
 
-    public TestListRenderer(final IEditorUI ui) {
+    public TestListRenderer(final TestEditorUI ui) {
         super(ui);
+        this.card = new TestCard(ui.getProject());
     }
 
     @Override

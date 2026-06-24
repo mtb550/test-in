@@ -18,6 +18,7 @@ import org.testin.pojo.Config;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
+import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.settings.Setting;
@@ -343,5 +344,21 @@ public final class Tools {
             }
         }
         return currentPath;
+    }
+
+    public ArrayList<String> buildFqcn(final TestCaseDto tc) {
+        ArrayList<String> generatedFqcn = new ArrayList<>(tc.getPath());
+
+        if (!generatedFqcn.isEmpty()) {
+            int lastIdx = generatedFqcn.size() - 1;
+            String className = sanitizeClassName(generatedFqcn.get(lastIdx));
+            generatedFqcn.set(lastIdx, className);
+        }
+
+        String methodName = sanitizeMethodName(tc.getDescription());
+        generatedFqcn.add(methodName);
+
+        generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
+        return generatedFqcn;
     }
 }

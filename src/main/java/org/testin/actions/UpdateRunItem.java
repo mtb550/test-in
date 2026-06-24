@@ -49,8 +49,8 @@ public class UpdateRunItem extends DumbAwareAction {
         new RunItemUpdateMenu(project, runItem, updatedItem -> {
             Log.trace("run item updated, actual result: " + updatedItem.getActualResult());
 
-            if (runUi.getTr() != null && runUi.getVf().getTestRun() != null) {
-                Path dirPath = runUi.getVf().getTestRun().getPath();
+            if (runUi.getParent() != null) {
+                Path dirPath = runUi.getParent().getPath();
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
             }
 

@@ -14,7 +14,6 @@ import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
 import java.nio.file.Path;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
@@ -28,7 +27,6 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .pathName(fileName)
-                    .fqcn(List.of(Services.getInstance(project, Tools.class).sanitizePackageName(fileName)))
                     .path2(Services.getInstance(project, Tools.class).buildPath2(null, fileName))
                     .marker(marker)
                     .build();
@@ -36,7 +34,6 @@ public final class DirectoryMapper {
             TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto.builder()
                     .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
                     .name(DirectoryType.TCD.getDisplayedName())
-                    .fqcn(tp.getFqcn())
                     .parent(tp)
                     .path2(Services.getInstance(project, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
                     .build();
@@ -44,7 +41,6 @@ public final class DirectoryMapper {
             TestRunsMainDirectoryDto trd = TestRunsMainDirectoryDto.builder()
                     .path(path.resolve(DirectoryType.TRD.getDisplayedName()))
                     .name(DirectoryType.TRD.getDisplayedName())
-                    .fqcn(tp.getFqcn())
                     .parent(tp)
                     .path2(Services.getInstance(project, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
                     .build();
@@ -72,7 +68,6 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(parent.getFqcn())
                     .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
@@ -91,12 +86,12 @@ public final class DirectoryMapper {
     public TestRunsMainDirectoryDto readTestRunsRootNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
+
             TestRunsMainDirectoryDto trd = TestRunsMainDirectoryDto
                     .builder()
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn((parent.getFqcn()))
                     .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
@@ -120,7 +115,6 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TSP))
                     .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
@@ -144,7 +138,6 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TRP))
                     .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
@@ -169,7 +162,6 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TS))
                     .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .build();
 
@@ -195,7 +187,6 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(Services.getInstance(project, Tools.class).appendFqcn(parent.getFqcn(), fileName, DirectoryType.TR))
                     .path2(Services.getInstance(project, Tools.class).buildPath2(parent.getPath2(), fileName))
                     .marker(marker)
                     .build();

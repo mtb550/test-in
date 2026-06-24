@@ -108,11 +108,11 @@ public final class RunStatusService {
     }
 
     private void persistRunDataAsync(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
-        if (runUi.getTr() == null || runUi.getVf().getTestRun() == null) return;
+        if (runUi.getTr() == null || runUi.getParent() == null) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Path dirPath = runUi.getVf().getTestRun().getPath();
+                Path dirPath = runUi.getParent().getPath();
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
             } catch (Exception e) {
                 Log.error("Failed to persist test run data: " + e.getMessage());

@@ -20,7 +20,7 @@ public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
 
     public void updateEnabledState() {
         if (callbacks instanceof RunEditorUI runUi) {
-            TestRunStatus status = runUi.getVf().getTestRun().getMarker().getStatus();
+            TestRunStatus status = runUi.getParent().getMarker().getStatus();
             if (status == TestRunStatus.CLOSED || status == TestRunStatus.COMPLETED) {
                 setEnabled(false);
                 setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Nodes.Services));

@@ -11,15 +11,16 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.runEditor.RunEditorUI;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
-import org.testin.pojo.*;
+import org.testin.pojo.TestRunItems;
+import org.testin.pojo.TestRunMarker;
+import org.testin.pojo.TestRunStatus;
+import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.FilesUtil;
-import org.testin.util.Mapper;
+import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -41,7 +42,7 @@ public class ChangeTestRunStatus extends DumbAwareAction {
         final Project project = e.getProject();
         if (project == null || !(ui instanceof RunEditorUI runUi)) return;
 
-        TestRunStatus currentStatus = runUi.getVf().getTestRun().getMarker().getStatus();
+        TestRunStatus currentStatus = runUi.getParent().getMarker().getStatus();
         TestRunStatus newStatus;
 
         if (currentStatus == TestRunStatus.CREATED || currentStatus == TestRunStatus.ASSIGNED) {
@@ -64,7 +65,7 @@ public class ChangeTestRunStatus extends DumbAwareAction {
             return;
         }
 
-        TestRunStatus currentStatus = runUi.getVf().getTestRun().getMarker().getStatus();
+        TestRunStatus currentStatus = runUi.getParent().getMarker().getStatus();
         boolean enabled = currentStatus == TestRunStatus.CREATED
                 || currentStatus == TestRunStatus.ASSIGNED
                 || currentStatus == TestRunStatus.IN_PROGRESS;
@@ -88,14 +89,14 @@ public class ChangeTestRunStatus extends DumbAwareAction {
     }
 
     public void applyStatusChange(final @NotNull Project project, final @NotNull RunEditorUI runUi, final @NotNull TestRunStatus newStatus) {
-        TestRunMarker marker = runUi.getVf().getTestRun().getMarker();
+        TestRunMarker marker = runUi.getParent().getMarker();
         TestRunStatus oldStatus = marker.getStatus();
 
         marker.setStatus(newStatus);
         marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-        Log.trace("[ChangeTestRunStatus] Test run status changed: "
-                + runUi.getVf().getTestRun().getName()
+        Log.trace("Test run status changed: "
+                + runUi.getParent().getName()
                 + " = " + newStatus.getLabel());
 
         if (newStatus == TestRunStatus.COMPLETED || newStatus == TestRunStatus.CLOSED) {
@@ -124,7 +125,7 @@ public class ChangeTestRunStatus extends DumbAwareAction {
     public void onExecutionFinished(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
         runUi.stopExecution();
 
-        TestRunMarker marker = runUi.getVf().getTestRun().getMarker();
+        TestRunMarker marker = runUi.getParent().getMarker();
         marker.setStatus(TestRunStatus.COMPLETED);
         marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
@@ -156,25 +157,20 @@ public class ChangeTestRunStatus extends DumbAwareAction {
     }
 
     private void persistMarker(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
-        Path markerPath = runUi.getVf().getTestRun().getPath().resolve(DirectoryType.TR.getMarker());
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Mapper mapper = Services.getInstance(project, Mapper.class);
-                TestRunMarker marker;
+                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                final Path runPath = runUi.getParent().getPath();
+                final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(runPath);
 
-                if (Files.exists(markerPath)) {
-                    marker = mapper.readValue(markerPath.toFile(), TestRunMarker.class);
-                    if (marker != null) {
-                        marker.setStatus(runUi.getVf().getTestRun().getMarker().getStatus());
-                        marker.setCreatedAt(runUi.getVf().getTestRun().getMarker().getCreatedAt());
-                    }
-                } else {
-                    marker = runUi.getVf().getTestRun().getMarker();
-                }
+                TestRunMarker marker = (trd != null) ? trd.getMarker() : runUi.getParent().getMarker();
 
                 if (marker != null) {
-                    Services.getInstance(project, FilesUtil.class).write(project, markerPath, marker);
-                    Log.trace("[ChangeTestRunStatus] Marker persisted -> " + marker.getStatus().getLabel());
+                    marker.setStatus(runUi.getParent().getMarker().getStatus());
+                    marker.setCreatedAt(runUi.getParent().getMarker().getCreatedAt());
+
+                    indexer.updateRunMarker(project, runPath, marker);
+                    Log.trace("Marker persisted -> " + marker.getStatus().getLabel());
                 }
             } catch (Exception ex) {
                 Log.error("Failed to persist marker: " + ex.getMessage());
@@ -187,9 +183,9 @@ public class ChangeTestRunStatus extends DumbAwareAction {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Path dirPath = runUi.getVf().getTestRun().getPath();
+                Path dirPath = runUi.getParent().getPath();
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
-                Log.trace("[ChangeTestRunStatus] Results persisted");
+                Log.trace("Results persisted");
             } catch (Exception e) {
                 Log.error("Failed to persist test run results: " + e.getMessage());
             }

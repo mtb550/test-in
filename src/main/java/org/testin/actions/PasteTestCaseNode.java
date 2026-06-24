@@ -58,7 +58,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
                         .collect(Collectors.toList());
 
                 ApplicationManager.getApplication().runWriteAction(() ->
-                        RemoveTestCase.deletePhysicalFiles(cutItems, sourceUI.getVf().getTestSet().getPath(), this));
+                        RemoveTestCase.deletePhysicalFiles(cutItems, sourceUI.getParent().getPath(), this));
 
                 sourceUI.getAllTestCases().removeAll(cutItems);
                 if (sourceUI != destUI && sourceUI instanceof TestEditorUI) {
@@ -73,8 +73,9 @@ public class PasteTestCaseNode extends DumbAwareAction {
                 TestCaseDto clonedTc = cloneForPasting(project, tc, isCut);
                 if (clonedTc == null) continue;
 
-                if (destUI.getVf() != null && destUI.getVf().getTestSet() != null) {
-                    clonedTc.setPath(destUI.getVf().getTestSet().getPath2());
+                if (destUI.getParent() != null) {
+                    clonedTc.setPath(destUI.getParent().getPath2());
+                    clonedTc.setParent(destUI.getParent());
                 }
                 destUI.getAllTestCases().add(clonedTc);
             }

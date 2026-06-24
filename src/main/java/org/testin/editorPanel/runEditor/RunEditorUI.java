@@ -30,11 +30,11 @@ import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.pojo.*;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
+import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.ui.RunOpeningForm;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.Mapper;
 import org.testin.util.TestCaseSorter;
-import org.testin.util.Tools;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
@@ -59,7 +59,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
     private final Project project;
     @Getter
-    private final UnifiedVirtualFile vf; // todo, no need, get the dto here and remove it.
+    private final TestRunDirectoryDto parent;
 
     @Getter
     private final List<TestCaseDto> allTestCases;
@@ -73,7 +73,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     CheckboxTree checklistTree;
 
     @Getter
-    TestRunDto tr; //todo, change to testRun
+    TestRunDto tr;
 
     private RunSessionCache sessionCache;
 
@@ -114,7 +114,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     public RunEditorUI(final @NotNull Project project, final UnifiedVirtualFile vf) {
         this.project = project;
-        this.vf = vf;
+        this.parent = vf.getTestRun();
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -140,16 +140,16 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         list.setCellRenderer(new RunListRenderer(this));
 
-        final RunEditorCM runEditorCM = new RunEditorCM(this, vf.getTestRun(), list, model);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, vf.getTestRun(), runEditorCM);
+        final RunEditorCM runEditorCM = new RunEditorCM(this, parent, list, model);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, parent, runEditorCM);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
         list.addMouseMotionListener(mouseListenerImpl);
 
-        runEditorCM.registerShortcuts(this, vf.getTestRun(), list, model, runEditorCM);
+        runEditorCM.registerShortcuts(this, parent, list, model, runEditorCM);
 
-        Path selectionPath = vf.getTestRun().getPath();
+        Path selectionPath = parent.getPath();
         list.addListSelectionListener(new SelectionListener(project, list, this, selectionPath));
 
         refreshView();
@@ -158,16 +158,16 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     private void loadDataAsync() {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                if (this.tr == null && vf.getTestRun() != null) {
+                if (this.tr == null && parent != null) {
                     final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
                     indexer.awaitIndexing();
 
-                    final Path dirPath = vf.getTestRun().getPath();
+                    final Path dirPath = parent.getPath();
 
                     this.tr = indexer.getTestRunForPath(dirPath);
 
                     if (this.tr == null) {
-                        Path jsonFilePath = dirPath.resolve(vf.getTestRun().getName() + ".json");
+                        Path jsonFilePath = dirPath.resolve(parent.getName() + ".json");
                         if (Files.exists(jsonFilePath)) {
                             this.tr = Services.getInstance(project, Mapper.class).readValue(jsonFilePath.toFile(), TestRunDto.class);
                         }
@@ -200,7 +200,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     this.list.getEmptyText().setText("Loading...");
                 }
 
-                this.sessionCache = new RunSessionCache(this.tr, vf.getTestRun().getPath());
+                this.sessionCache = new RunSessionCache(this.tr, parent.getPath());
 
                 sessionCache.setListener(new RunSessionCache.ICacheListener() {
                     @Override
@@ -209,37 +209,12 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                         currentTestCases.addAll(items);
                         items.forEach(item -> {
                             final TestRunItems runItem = resultsMap.get(item.getId());
+
                             if (runItem != null) {
                                 runItem.setTc(item);
-
-                                // todo, this code to be removed, no need, use a method that returns the fqcn
-                                if (item.getFqcn().isEmpty()) {
-                                    List<String> pathSegments = runItem.getPath();
-                                    List<String> baseFqcn = new ArrayList<>();
-                                    int testCasesIdx = -1;
-                                    for (int i = 0; i < pathSegments.size(); i++) {
-                                        if (pathSegments.get(i).equals("Test Cases")) {
-                                            testCasesIdx = i;
-                                            break;
-                                        }
-                                    }
-                                    if (testCasesIdx != -1) {
-                                        for (int i = 0; i < pathSegments.size(); i++) {
-                                            String seg = pathSegments.get(i);
-                                            if (i < testCasesIdx) {
-                                                baseFqcn.add(Services.getInstance(project, Tools.class).sanitizePackageName(seg));
-                                            } else if (i > testCasesIdx && i < pathSegments.size() - 1) {
-                                                baseFqcn.add(Services.getInstance(project, Tools.class).sanitizePackageName(seg));
-                                            } else if (i == pathSegments.size() - 1) {
-                                                baseFqcn.add(Services.getInstance(project, Tools.class).sanitizeClassName(seg));
-                                            }
-                                        }
-                                        baseFqcn.add(Services.getInstance(project, Tools.class).sanitizeMethodName(item.getDescription()));
-                                        item.setFqcn(baseFqcn);
-                                    }
-                                }
                             }
                         });
+
                         refreshView();
                     }
 
@@ -555,11 +530,11 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     private void persistRunDataAsync() {
-        if (tr == null || vf.getTestRun() == null) return;
+        if (tr == null || parent == null) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Path dirPath = vf.getTestRun().getPath();
+                Path dirPath = parent.getPath();
 
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, tr);
 

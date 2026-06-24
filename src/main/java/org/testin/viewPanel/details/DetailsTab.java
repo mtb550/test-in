@@ -81,7 +81,7 @@ public class DetailsTab {
         row = new Steps().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new PreConditions().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new TestData().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        //row = new Fqcn().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row); // todo, commented-001
+        row = new Fqcn().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Reference().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Module().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new CreatedBy().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);

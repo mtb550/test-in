@@ -49,7 +49,7 @@ public class RunTestSet extends DumbAwareAction {
 
         if (userObject instanceof TestSetDirectoryDto ts) {
             Log.info(this.getClass() + "directory file: " + ts.getPath().toFile());
-            String fqcn = String.join(".", ts.getFqcn());
+            String fqcn = String.join(".", ts.getPath2());
             Log.info(this.getClass() + "fqcn path: " + fqcn);
 
             if (!fqcn.trim().isEmpty()) {

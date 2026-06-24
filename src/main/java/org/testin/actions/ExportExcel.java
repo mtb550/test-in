@@ -144,7 +144,7 @@ public class ExportExcel extends DumbAwareAction {
                             Row row = sheet.createRow(rowIndex++);
                             for (int i = 0; i < EXPORT_COLUMNS.size(); i++) {
                                 Cell cell = row.createCell(i);
-                                String val = EXPORT_COLUMNS.get(i).getValueExtractor().apply(tc);
+                                String val = EXPORT_COLUMNS.get(i).getValueExtractor().apply(tc, project);
                                 cell.setCellValue(val != null ? val : "");
                             }
                         }

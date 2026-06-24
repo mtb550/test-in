@@ -11,6 +11,10 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.CodeNavigator;
 import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
+import org.testin.util.services.Services;
+
+import java.util.ArrayList;
 
 public class NavigateToCode extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
@@ -22,8 +26,8 @@ public class NavigateToCode extends DumbAwareAction {
     }
 
     public void execute(final @NotNull Project project, final TestCaseDto tc) {
-        if (tc == null || tc.getFqcn().isEmpty()) return;
-        new CodeNavigator().toCode(project, tc.getFqcn());
+        ArrayList<String> generatedFqcn = Services.getInstance(project, Tools.class).buildFqcn(tc);
+        new CodeNavigator().toCode(project, generatedFqcn);
     }
 
     @Override

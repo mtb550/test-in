@@ -31,7 +31,7 @@ public class RunTestCase extends DumbAwareAction {
             if (tc == null || "RUNNING".equals(tc.getTempStatus())) continue;
 
             Services.getInstance(project, Notifier.class).softShow(project, "Running Test Case: ", tc.getDescription());
-            Services.getInstance(project, TestNGRunnerByMethod.class).runTestMethod(project, tc.getFqcn());
+            Services.getInstance(project, TestNGRunnerByMethod.class).runTestMethod(project, tc.getPath());
         }
     }
 

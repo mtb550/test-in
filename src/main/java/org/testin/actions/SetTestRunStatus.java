@@ -8,19 +8,16 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.DirectoryType;
 import org.testin.pojo.TestRunMarker;
 import org.testin.pojo.TestRunStatus;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.ui.TestRunStatusMenu;
-import org.testin.util.FilesUtil;
-import org.testin.util.Mapper;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -77,13 +74,16 @@ public class SetTestRunStatus extends DumbAwareAction {
     }
 
     private void persistMarker(final Project project, final TestRunDirectoryDto tr, final TestRunStatus newStatus) {
-        Path markerPath = tr.getPath().resolve(DirectoryType.TR.getMarker());
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                TestRunMarker marker = Services.getInstance(project, Mapper.class).readValue(markerPath.toFile(), TestRunMarker.class);
+                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(tr.getPath());
+
+                TestRunMarker marker = (trd != null) ? trd.getMarker() : tr.getMarker();
                 if (marker != null) {
                     marker.setStatus(newStatus);
-                    Services.getInstance(project, FilesUtil.class).write(project, markerPath, marker);
+
+                    indexer.updateRunMarker(project, tr.getPath(), marker);
                 }
             } catch (Exception ex) {
                 Log.error("Failed to persist marker: " + ex.getMessage());

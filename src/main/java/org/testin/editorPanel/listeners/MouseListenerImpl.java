@@ -33,6 +33,7 @@ public class MouseListenerImpl extends MouseAdapter {
     private final CollectionListModel<TestCaseDto> model;
     private final EditorContextMenu editorCm;
     private final Path path;
+    private final DirectoryDto dir;
     private final IEditorUI ui;
 
     public MouseListenerImpl(final @NotNull Project project, final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorContextMenu editorCm) {
@@ -40,6 +41,7 @@ public class MouseListenerImpl extends MouseAdapter {
         this.ui = ui;
         this.list = list;
         this.path = dir.getPath();
+        this.dir = dir;
         this.model = model;
         this.editorCm = editorCm;
     }

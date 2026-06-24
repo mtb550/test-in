@@ -16,7 +16,6 @@ import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
 import org.testin.ui.createNodes.CreateNodesDialog;
-import org.testin.util.FilesUtil;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.indexer.ProjectIndexer;
@@ -80,16 +79,16 @@ public class CreateTestProject extends DumbAwareAction {
 
                 VirtualFile projectDir = vf.createChildDirectory(this, tpName);
 
-                VirtualFile tpFile = projectDir.createChildData(this, DirectoryType.TP.getMarker());
+                projectDir.createChildData(this, DirectoryType.TP.getMarker());
 
                 TestProjectMarker marker = TestProjectMarker.builder()
                         .status(ProjectStatus.ACTIVE)
                         .createdBy(System.getProperty("user.name", ""))
                         .build();
 
-                Services.getInstance(project, FilesUtil.class).write2(project, tpFile, marker);
                 newTp.setMarker(marker);
 
+                Services.getInstance(project, ProjectIndexer.class).updateProjectMarker(project, newTp.getPath(), marker);
 
                 String tcdName = newTp.getTestCasesDirectory().getPath().getFileName().toString();
                 VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);
@@ -107,7 +106,7 @@ public class CreateTestProject extends DumbAwareAction {
                 Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", name));
 
                 if (codeGenerator.isSelected()) {
-                    GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, null, newTp.getFqcn());
+                    GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, null, newTp.getPath2());
                 }
             });
         }

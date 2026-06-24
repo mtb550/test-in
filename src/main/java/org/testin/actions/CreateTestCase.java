@@ -54,7 +54,7 @@ public class CreateTestCase extends DumbAwareAction {
             final TestCaseDto lastTc = isEmpty ? null : model.getElementAt(model.getSize() - 1);
             if (lastTc != null) lastTc.setNext(newTc.getId());
 
-            List<String> generatedFqcn = new ArrayList<>(pDir.getFqcn());
+            List<String> generatedFqcn = new ArrayList<>(pDir.getPath2());
 
             if (!generatedFqcn.isEmpty()) {
                 int lastIdx = generatedFqcn.size() - 1;
@@ -65,7 +65,7 @@ public class CreateTestCase extends DumbAwareAction {
             String methodName = Services.getInstance(project, Tools.class).sanitizeMethodName(newTc.getDescription());
             generatedFqcn.add(methodName);
 
-            newTc.setFqcn(generatedFqcn);
+            newTc.setParent(pDir);
             newTc.setPath(pDir.getPath2());
 
             ui.appendNewTestCase(newTc);
@@ -77,7 +77,7 @@ public class CreateTestCase extends DumbAwareAction {
             Services.getInstance(project, Notifier.class).softShow(project, "Created..");
 
             if (codeGenerator != null && codeGenerator.isSelected()) {
-                GeneratorType.CREATE_TEST_CASE.getAction().execute(project, newTc, newTc.getFqcn());
+                GeneratorType.CREATE_TEST_CASE.getAction().execute(project, newTc, newTc.getPath());
             }
 
             SwingUtilities.invokeLater(() -> ui.selectTestCase(newTc));

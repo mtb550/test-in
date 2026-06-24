@@ -1,7 +1,6 @@
 package org.testin.pojo.dto.dirs;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.testin.pojo.Config;
@@ -11,7 +10,6 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.List;
 
 @Getter
 @Setter
@@ -30,11 +28,6 @@ public abstract class DirectoryDto {
     @NonNull
     @Builder.Default
     private ArrayList<String> path2 = new ArrayList<>();
-
-    @NonNull
-    @JsonIgnore
-    @Builder.Default
-    private List<String> fqcn = new ArrayList<>();
 
     @ToString.Exclude
     private DirectoryDto parent;
@@ -57,7 +50,7 @@ public abstract class DirectoryDto {
     @Builder.Default
     private String modifiedBy = "";
 
-    // todo, all dtos should has marker then apply.
+    // todo, all dto's should has marker then apply.
     //private Marker marker;
 
     @NonNull

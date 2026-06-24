@@ -155,16 +155,15 @@ public class CreateTestRun implements NodeCreator {
             Services.getInstance(project, FilesUtil.class).createDirectories(savePath);
             Services.getInstance(project, ProjectIndexer.class).putTestRun(savePath, run);
 
-            Path trMarkerPath = savePath.resolve(DirectoryType.TR.getMarker());
             TestRunMarker marker = TestRunMarker.builder()
                     .status(TestRunStatus.CREATED)
                     .createdBy(System.getProperty("user.name", ""))
                     .build();
 
-            Services.getInstance(project, FilesUtil.class).write(project, trMarkerPath, marker);
             tr.setMarker(marker);
 
             Services.getInstance(project, ProjectIndexer.class).addTestRunDir(tr);
+            Services.getInstance(project, ProjectIndexer.class).updateRunMarker(project, savePath, marker);
 
             VirtualFile virtualDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(savePath.toFile());
             if (virtualDir != null)

@@ -1,7 +1,9 @@
 package org.testin.editorPanel.runEditor;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.BaseCard;
 import org.testin.pojo.RunEditorAttributes;
 import org.testin.pojo.TestRunItems;
@@ -12,11 +14,13 @@ import java.util.*;
 import java.util.List;
 
 public class RunCard extends BaseCard {
+    private final Project project;
     private final List<JComponent> badges = new ArrayList<>();
     private final Map<String, String> details = new LinkedHashMap<>();
 
-    public RunCard() {
+    public RunCard(final @NotNull Project project) {
         super();
+        this.project = project;
     }
 
     @Override
@@ -30,9 +34,9 @@ public class RunCard extends BaseCard {
 
         Arrays.stream(RunEditorAttributes.values())
                 .filter(activeDetails::contains)
-                .forEach(attr -> attr.applyToUI(runItem, badges, details));
+                .forEach(attr -> attr.applyToUI(runItem, badges, details, project));
 
-        updateUI(index, RunEditorAttributes.DESCRIPTION.getValueExtractor().apply(runItem), badges, details);
+        updateUI(index, RunEditorAttributes.DESCRIPTION.getValueExtractor().apply(runItem, project), badges, details);
 
         if (runItem != null) {
             final JBLabel statusLabel = attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName());

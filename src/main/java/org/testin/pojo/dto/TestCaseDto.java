@@ -9,6 +9,8 @@ import org.testin.pojo.Config;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestCaseStatus;
+import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -62,7 +64,7 @@ public class TestCaseDto {
     @NonNull
     @Builder.Default
     @JsonIgnore
-    private List<String> fqcn = new ArrayList<>();
+    private DirectoryDto parent = new TestSetDirectoryDto();
 
     @NonNull
     @Builder.Default
@@ -111,5 +113,4 @@ public class TestCaseDto {
     @NonNull
     @Builder.Default
     private String tempError = "";
-
 }

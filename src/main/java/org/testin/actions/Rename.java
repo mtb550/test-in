@@ -16,6 +16,7 @@ import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
@@ -67,6 +68,8 @@ public class Rename extends DumbAwareAction {
 
             Services.getInstance(e.getProject(), Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+
+            Services.getInstance(e.getProject(), ProjectIndexer.class).renameNode(oldPath, newPath);
 
             if (dir instanceof TestProjectDirectoryDto && projectPanel.getTestProjectSelector() != null) {
                 projectPanel.getTestProjectSelector().loadTestProjectList();

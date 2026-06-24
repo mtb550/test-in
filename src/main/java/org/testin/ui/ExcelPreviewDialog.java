@@ -83,7 +83,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
                 rowData[1] = String.valueOf(index++);
 
                 for (int i = 0; i < importAttributes.size(); i++) {
-                    rowData[i + 2] = importAttributes.get(i).getValueExtractor().apply(tc);
+                    rowData[i + 2] = importAttributes.get(i).getValueExtractor().apply(tc, project);
                 }
                 model.addRow(rowData);
             }
@@ -108,7 +108,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
 
                                 currentAttr.getImportSetter().accept(project, tc, updatedValue);
 
-                                String formattedValue = currentAttr.getValueExtractor().apply(tc);
+                                String formattedValue = currentAttr.getValueExtractor().apply(tc, project);
                                 model.setValueAt(formattedValue, row, col);
                             } finally {
                                 isUpdating = false;

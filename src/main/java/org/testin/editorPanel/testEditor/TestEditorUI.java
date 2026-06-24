@@ -31,9 +31,9 @@ import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
-import org.testin.util.Tools;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
@@ -51,8 +51,9 @@ import java.util.stream.Collectors;
 public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
     private final Project project;
+
     @Getter
-    private final UnifiedVirtualFile vf;
+    private final TestSetDirectoryDto parent;
 
     private final JBPanel<?> mainPanel;
 
@@ -97,7 +98,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     public TestEditorUI(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf) {
         this.project = project;
-        this.vf = vf;
+        this.parent = vf.getTestSet();
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -152,7 +153,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
-        list.addListSelectionListener(new SelectionListener(project, list, this, vf.getTestSet().getPath()));
+        list.addListSelectionListener(new SelectionListener(project, list, this, parent.getPath()));
 
         list.addKeyListener(new KeyListener(list, this));
 
@@ -160,7 +161,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     private void loadDataAsync() {
-        this.sessionCache = new TestSessionCache(project, vf.getTestSet().getPath());
+        this.sessionCache = new TestSessionCache(project, parent.getPath());
 
         sessionCache.setListener(new TestSessionCache.ICacheListener() {
 
@@ -169,12 +170,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 allTestCases.addAll(items);
                 currentTestCases.addAll(items);
                 items.forEach(item -> unsortedIds.add(item.getId()));
-                items.forEach(item -> item.setPath(vf.getTestSet().getPath2()));
-                items.forEach(item -> {
-                    List<String> baseFqcn = new ArrayList<>(vf.getTestSet().getFqcn());
-                    baseFqcn.add(Services.getInstance(project, Tools.class).sanitizeMethodName(item.getDescription()));
-                    item.setFqcn(baseFqcn);
-                });
+                items.forEach(item -> item.setPath(parent.getPath2()));
+                items.forEach(item -> item.setParent(parent));
                 refreshView();
             }
 
@@ -192,18 +189,6 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
                         unsortedIds.clear();
                         unsortedIds.addAll(result.unsortedIds());
-
-                        List<String> baseFqcn = vf.getTestSet().getFqcn();
-                        allTestCases.forEach(item -> {
-                            List<String> itemFqcn = new ArrayList<>(baseFqcn);
-                            itemFqcn.add(Services.getInstance(project, Tools.class).sanitizeMethodName(item.getDescription()));
-                            item.setFqcn(itemFqcn);
-                        });
-                        currentTestCases.forEach(item -> {
-                            List<String> itemFqcn = new ArrayList<>(baseFqcn);
-                            itemFqcn.add(Services.getInstance(project, Tools.class).sanitizeMethodName(item.getDescription()));
-                            item.setFqcn(itemFqcn);
-                        });
 
                         if (list != null) {
                             list.setPaintBusy(false);
@@ -237,7 +222,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         }
 
         this.unsortedIds.clear();
-        final Path dirPath = vf.getTestSet().getPath();
+        final Path dirPath = parent.getPath();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             for (int i = 0; i < snapshot.size(); i++) {
@@ -284,7 +269,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         sortAndIdentifyUnsorted();
         updateSequenceAndSaveAll();
 
-        final VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(vf.getTestSet().getPath().toFile());
+        final VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(parent.getPath().toFile());
         if (vDir != null) vDir.refresh(false, true);
 
         selectTestCase(tc);
@@ -310,7 +295,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        CreateTestCase.execute(project, this, vf.getTestSet(), list, model);
+        CreateTestCase.execute(project, this, parent, list, model);
     }
 
     @Override

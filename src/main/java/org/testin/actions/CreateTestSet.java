@@ -59,7 +59,6 @@ public class CreateTestSet implements NodeCreator {
                     .builder()
                     .name(safeDirName)
                     .path(parentDirDto.getPath().resolve(safeDirName))
-                    .fqcn(tools.appendFqcn(parentDirDto.getFqcn(), safeDirName, DirectoryType.TS))
                     .path2(tools.buildPath2(parentDirDto.getPath2(), safeDirName))
                     .parent(parentDirDto)
                     .build();

@@ -5,18 +5,16 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.DirectoryType;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.markers.TestProjectMarker;
-import org.testin.util.FilesUtil;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.nio.file.Path;
 
 public class Deactivate extends DumbAwareAction {
     private final SimpleTree tree;
@@ -53,8 +51,7 @@ public class Deactivate extends DumbAwareAction {
 
             tp.setMarker(marker);
 
-            Path markerPath = tp.getPath().resolve(DirectoryType.TP.getMarker());
-            Services.getInstance(project, FilesUtil.class).write(project, markerPath, marker);
+            Services.getInstance(project, ProjectIndexer.class).updateProjectMarker(project, tp.getPath(), marker);
 
             tree.revalidate();
             tree.repaint();

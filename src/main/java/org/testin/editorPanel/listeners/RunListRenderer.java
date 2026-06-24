@@ -8,10 +8,11 @@ import org.testin.pojo.dto.TestCaseDto;
 import javax.swing.*;
 
 public class RunListRenderer extends AbstractListRenderer<RunEditorUI> {
-    private final RunCard card = new RunCard();
+    private final RunCard card;
 
     public RunListRenderer(final RunEditorUI ui) {
         super(ui);
+        this.card = new RunCard(ui.getProject());
     }
 
     @Override

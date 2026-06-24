@@ -33,28 +33,42 @@ import java.util.stream.Stream;
 public final class ProjectIndexer {
 
     private final Project project;
+
     private final AtomicBoolean indexed = new AtomicBoolean(false);
+
     private final AtomicBoolean indexing = new AtomicBoolean(false);
+
     @Getter
     private final Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<UUID, TestRunDto> testRunsById = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<String, TestProjectDirectoryDto> testProjectsByPath = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<String, TestSetDirectoryDto> testSetsByPath = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<String, TestRunDirectoryDto> testRunDirsByPath = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<String, TestSetPackageDirectoryDto> testSetPackagesByPath = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<String, TestRunPackageDirectoryDto> testRunPackagesByPath = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<String, TestCasesMainDirectoryDto> testCasesMainDirsByPath = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<String, TestRunsMainDirectoryDto> testRunsMainDirsByPath = new ConcurrentHashMap<>();
+
     private final Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
+
     private final Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
+
     private volatile CountDownLatch indexingLatch = new CountDownLatch(1);
 
     public ProjectIndexer(final @NotNull Project project) {
@@ -164,7 +178,6 @@ public final class ProjectIndexer {
                     .name(fileName)
                     .path(projectPath)
                     .pathName(fileName)
-                    .fqcn(List.of(tools.sanitizePackageName(fileName)))
                     .path2(tools.buildPath2(null, fileName))
                     .marker(marker)
                     .build();
@@ -172,14 +185,16 @@ public final class ProjectIndexer {
             testProjectsByPath.put(projectPath.toString(), tp);
 
             final Path tcDir = projectPath.resolve(DirectoryType.TCD.getDisplayedName());
+
             if (Files.exists(tcDir) && Files.isDirectory(tcDir)) {
+
                 final TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto.builder()
                         .path(tcDir)
                         .name(DirectoryType.TCD.getDisplayedName())
                         .parent(tp)
-                        .fqcn(tp.getFqcn())
                         .path2(tools.buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
                         .build();
+
                 tp.setTestCasesDirectory(tcd);
                 testCasesMainDirsByPath.put(tcDir.toString(), tcd);
                 indexTestSets(tcDir, tcd, indicator);
@@ -187,11 +202,11 @@ public final class ProjectIndexer {
 
             final Path trDir = projectPath.resolve(DirectoryType.TRD.getDisplayedName());
             if (Files.exists(trDir) && Files.isDirectory(trDir)) {
+
                 final TestRunsMainDirectoryDto trd = TestRunsMainDirectoryDto.builder()
                         .path(trDir)
                         .name(DirectoryType.TRD.getDisplayedName())
                         .parent(tp)
-                        .fqcn(tp.getFqcn())
                         .path2(tools.buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
                         .build();
                 tp.setTestRunsDirectory(trd);
@@ -227,7 +242,6 @@ public final class ProjectIndexer {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(tools.appendFqcn(parent.getFqcn(), fileName, DirectoryType.TSP))
                     .path2(tools.buildPath2(parent.getPath2(), fileName))
                     .build();
 
@@ -257,14 +271,12 @@ public final class ProjectIndexer {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(tools.appendFqcn(parent.getFqcn(), fileName, DirectoryType.TS))
                     .path2(tools.buildPath2(parent.getPath2(), fileName))
                     .build();
 
             testSetsByPath.put(path.toString(), ts);
 
             final List<UUID> caseIds = new ArrayList<>();
-            final List<String> baseFqcn = ts.getFqcn();
             final List<String> basePath2 = ts.getPath2();
 
             try (Stream<Path> files = Files.list(path)) {
@@ -276,10 +288,7 @@ public final class ProjectIndexer {
                                         .readValue(filePath.toFile(), TestCaseDto.class);
                                 if (tc != null) {
                                     tc.setPath(new ArrayList<>(basePath2));
-                                    List<String> tcFqcn = new ArrayList<>(baseFqcn);
-                                    tcFqcn.add(tools.sanitizeMethodName(tc.getDescription()));
-                                    tc.setFqcn(tcFqcn);
-
+                                    tc.setParent(parent);
                                     testCasesById.put(tc.getId(), tc);
                                     caseIds.add(tc.getId());
                                 }
@@ -303,7 +312,7 @@ public final class ProjectIndexer {
             paths.filter(Files::isDirectory)
                     .forEach(dirPath -> {
                         if (Files.exists(dirPath.resolve(DirectoryType.TR.getMarker()))) {
-                            indexTestRunDir(dirPath, parent, indicator);
+                            indexTestRun(dirPath, parent, indicator);
                         } else if (Files.exists(dirPath.resolve(DirectoryType.TRP.getMarker()))) {
                             indexTestRunPackageDir(dirPath, parent, indicator);
                         }
@@ -321,7 +330,6 @@ public final class ProjectIndexer {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(tools.appendFqcn(parent.getFqcn(), fileName, DirectoryType.TRP))
                     .path2(tools.buildPath2(parent.getPath2(), fileName))
                     .build();
 
@@ -331,7 +339,7 @@ public final class ProjectIndexer {
                 subPaths.filter(Files::isDirectory)
                         .forEach(subPath -> {
                             if (Files.exists(subPath.resolve(DirectoryType.TR.getMarker()))) {
-                                indexTestRunDir(subPath, trp, indicator);
+                                indexTestRun(subPath, trp, indicator);
                             } else if (Files.exists(subPath.resolve(DirectoryType.TRP.getMarker()))) {
                                 indexTestRunPackageDir(subPath, trp, indicator);
                             }
@@ -343,7 +351,7 @@ public final class ProjectIndexer {
         }
     }
 
-    private void indexTestRunDir(final Path path, final DirectoryDto parent, final ProgressIndicator indicator) {
+    private void indexTestRun(final Path path, final DirectoryDto parent, final ProgressIndicator indicator) {
         try {
             final Tools tools = Services.getInstance(project, Tools.class);
             final String fileName = path.getFileName().toString();
@@ -351,23 +359,23 @@ public final class ProjectIndexer {
             final TestRunMarker marker = Services.getInstance(project, Mapper.class)
                     .readValue(path.resolve(DirectoryType.TR.getMarker()).toFile(), TestRunMarker.class);
 
-            final TestRunDirectoryDto trd = TestRunDirectoryDto.builder()
+            final TestRunDirectoryDto tr = TestRunDirectoryDto.builder()
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .fqcn(tools.appendFqcn(parent.getFqcn(), fileName, DirectoryType.TR))
+                    //.fqcn(tools.appendFqcn(parent.getFqcn(), fileName, DirectoryType.TR))
                     .path2(tools.buildPath2(parent.getPath2(), fileName))
                     .marker(marker)
                     .build();
 
-            testRunDirsByPath.put(path.toString(), trd);
+            testRunDirsByPath.put(path.toString(), tr);
 
             final Path jsonPath = path.resolve(fileName + ".json");
             if (Files.exists(jsonPath)) {
-                final TestRunDto tr = Services.getInstance(project, Mapper.class)
+                final TestRunDto trr = Services.getInstance(project, Mapper.class)
                         .readValue(jsonPath.toFile(), TestRunDto.class);
-                if (tr != null) {
-                    testRunsByPath.put(path.toString(), tr);
+                if (trr != null) {
+                    testRunsByPath.put(path.toString(), trr);
                 }
             }
 
@@ -472,6 +480,100 @@ public final class ProjectIndexer {
 
     public void addTestRunPackage(final TestRunPackageDirectoryDto trp) {
         testRunPackagesByPath.put(trp.getPath().toString(), trp);
+    }
+
+    public void updateProjectMarker(final Project project, final Path projectPath, final TestProjectMarker marker) {
+        final TestProjectDirectoryDto tp = testProjectsByPath.get(projectPath.toString());
+        if (tp != null) {
+            tp.setMarker(marker);
+        }
+        Services.getInstance(project, FilesUtil.class).write(project, projectPath.resolve(DirectoryType.TP.getMarker()), marker);
+    }
+
+    public void updateRunMarker(final Project project, final Path runPath, final TestRunMarker marker) {
+        final TestRunDirectoryDto trd = testRunDirsByPath.get(runPath.toString());
+        if (trd != null) {
+            trd.setMarker(marker);
+        }
+        Services.getInstance(project, FilesUtil.class).write(project, runPath.resolve(DirectoryType.TR.getMarker()), marker);
+    }
+
+    public TestRunDirectoryDto getTestRunDirByPath(final Path path) {
+        return testRunDirsByPath.get(path.toString());
+    }
+
+    public TestSetDirectoryDto getTestSetByPath(final Path path) {
+        return testSetsByPath.get(path.toString());
+    }
+
+    public TestProjectDirectoryDto getTestProjectByPath(final Path path) {
+        return testProjectsByPath.get(path.toString());
+    }
+
+    /**
+     * Rename a node in the index: updates all maps and DTO paths.
+     * Handles all node types (project, test set, test run, packages).
+     * The parent references of children are automatically correct because
+     * the parent DTO objects are shared (updated in-place by renameMapEntry).
+     */
+    public void renameNode(final Path oldPath, final Path newPath) {
+        final String oldStr = oldPath.toString();
+        final String newStr = newPath.toString();
+
+        renameMapEntry(testProjectsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testSetsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testRunDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testSetPackagesByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testRunPackagesByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testCasesMainDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testRunsMainDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testSetCaseIds, oldStr, newStr, ids -> {
+        });
+        renameMapEntry(testRunsByPath, oldStr, newStr, tr -> {
+        });
+
+        final TestProjectDirectoryDto tp = testProjectsByPath.get(newStr);
+        if (tp != null && newPath.getFileName() != null) {
+            final String newName = newPath.getFileName().toString();
+            final Tools tools = Services.getInstance(project, Tools.class);
+            tp.setPath2(tools.buildPath2(tp.getParent() != null ? tp.getParent().getPath2() : null, newName));
+        }
+
+        final TestSetDirectoryDto ts = testSetsByPath.get(newStr);
+        if (ts != null && newPath.getFileName() != null) {
+            final String newName = newPath.getFileName().toString();
+            final Tools tools = Services.getInstance(project, Tools.class);
+            ts.setPath2(tools.buildPath2(ts.getParent() != null ? ts.getParent().getPath2() : null, newName));
+        }
+
+        final TestRunDirectoryDto trd = testRunDirsByPath.get(newStr);
+        if (trd != null && newPath.getFileName() != null) {
+            final String newName = newPath.getFileName().toString();
+            final Tools tools = Services.getInstance(project, Tools.class);
+            trd.setPath2(tools.buildPath2(trd.getParent() != null ? trd.getParent().getPath2() : null, newName));
+        }
+
+        final TestSetPackageDirectoryDto tsp = testSetPackagesByPath.get(newStr);
+        if (tsp != null && newPath.getFileName() != null) {
+            final String newName = newPath.getFileName().toString();
+            final Tools tools = Services.getInstance(project, Tools.class);
+            tsp.setPath2(tools.buildPath2(tsp.getParent() != null ? tsp.getParent().getPath2() : null, newName));
+        }
+
+        final TestRunPackageDirectoryDto trp = testRunPackagesByPath.get(newStr);
+        if (trp != null && newPath.getFileName() != null) {
+            final String newName = newPath.getFileName().toString();
+            final Tools tools = Services.getInstance(project, Tools.class);
+            trp.setPath2(tools.buildPath2(trp.getParent() != null ? trp.getParent().getPath2() : null, newName));
+        }
+    }
+
+    private <V> void renameMapEntry(final Map<String, V> map, final String oldKey, final String newKey, final java.util.function.Consumer<V> updater) {
+        final V value = map.remove(oldKey);
+        if (value != null) {
+            updater.accept(value);
+            map.put(newKey, value);
+        }
     }
 
     public void addTestProject(final TestProjectDirectoryDto tp) {

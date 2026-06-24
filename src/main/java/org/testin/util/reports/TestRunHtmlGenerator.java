@@ -80,7 +80,7 @@ public final class TestRunHtmlGenerator {
                         .append(dateCell("col-updated-at", d.getUpdatedAt()))
                         .append(cell("col-reference", d.getReference(), "150px"))
                         .append(stepsCell(d.getSteps()))
-                        .append(fqcnCell(d.getFqcn()))
+                        .append(fqcnCell(d.getPath()))
                         .append(cell("col-code", "<a href='#'>Navigate</a>", "80px"))
                         .append("</tr>");
             });

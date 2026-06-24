@@ -53,7 +53,7 @@ public class KeyListener extends KeyAdapter {
                 ui.refreshView();
 
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    final Path dirPath = ui.getVf().getTestSet().getPath();
+                    final Path dirPath = ui.getParent().getPath();
                     final ProjectIndexer indexer = Services.getInstance(ui.getProject(), ProjectIndexer.class);
 
                     selectedCases.forEach(tc -> {
