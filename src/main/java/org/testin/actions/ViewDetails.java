@@ -11,14 +11,14 @@ import org.testin.util.KeyboardSet;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewDetails extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
-    private final Path path;
+    private final ArrayList<String> path;
 
-    public ViewDetails(final JBList<TestCaseDto> list, final Path path) {
+    public ViewDetails(final JBList<TestCaseDto> list, final ArrayList<String> path) {
         super("View Details", "", AllIcons.Actions.PreviewDetails);
         this.list = list;
         this.path = path;

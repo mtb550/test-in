@@ -15,7 +15,7 @@ import org.testin.viewPanel.details.components.Module;
 
 import javax.swing.*;
 import java.awt.*;
-import java.nio.file.Path;
+import java.util.ArrayList;
 
 public class DetailsTab {
 
@@ -25,7 +25,7 @@ public class DetailsTab {
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
 
-    public void load(final @NotNull Project project, final @NotNull JBPanel<?> detailsTab, final @Nullable TestCaseDto dto, final @Nullable Path currentPath) {
+    public void load(final @NotNull Project project, final @NotNull JBPanel<?> detailsTab, final @Nullable TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
@@ -58,7 +58,7 @@ public class DetailsTab {
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
-    private void renderStoneLayout(final @NotNull Project project, final JBPanel<?> panel, final TestCaseDto dto, final Path currentPath) {
+    private void renderStoneLayout(final @NotNull Project project, final JBPanel<?> panel, final TestCaseDto dto, final ArrayList<String> currentPath) {
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -69,13 +69,13 @@ public class DetailsTab {
         addVerticalSpacer(panel, row);
     }
 
-    private int setupFixedRows(final @NotNull Project project, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final Path currentPath) {
+    private int setupFixedRows(final @NotNull Project project, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final ArrayList<String> currentPath) {
         int row = 0;
 
-        row = new NavigationBar(project, currentPath).render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new NavigationBar(currentPath).render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Id().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Title().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new ActionIcons(project).render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new ActionIcons().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Badges().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new ExpectedResult().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
         row = new Steps().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);

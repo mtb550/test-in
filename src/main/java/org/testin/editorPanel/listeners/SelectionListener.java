@@ -10,18 +10,18 @@ import org.testin.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class SelectionListener implements ListSelectionListener {
     private final JBList<TestCaseDto> list;
     private final IEditorUI ui;
-    private final Path path;
+    private final ArrayList<String> path;
 
     private final Project project;
 
-    public SelectionListener(final @NotNull Project project, final JBList<TestCaseDto> list, final IEditorUI ui, final Path path) {
+    public SelectionListener(final @NotNull Project project, final JBList<TestCaseDto> list, final IEditorUI ui, final ArrayList<String> path) {
         this.project = project;
         this.list = list;
         this.ui = ui;

@@ -12,14 +12,12 @@ import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.Tools;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
-import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -78,11 +76,9 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 }
 
                 Log.info("[GUTTER TRACE] Found in indexer: " + dto.getDescription());
-                final Path parentPath = dto.getParent().getPath2().isEmpty() ? null :
-                        Services.getInstance(project, Tools.class).buildLocalPathFromList(project, dto.getParent().getPath2());
 
                 ApplicationManager.getApplication().invokeLater(() ->
-                        ViewToolWindowFactory.showPanel(project, List.of(dto), parentPath)
+                        ViewToolWindowFactory.showPanel(project, List.of(dto), dto.getParent().getPath2())
                 );
 
             } catch (Exception ex) {

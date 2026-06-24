@@ -149,7 +149,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         runEditorCM.registerShortcuts(this, parent, list, model, runEditorCM);
 
-        Path selectionPath = parent.getPath();
+        ArrayList<String> selectionPath = parent.getPath2();
         list.addListSelectionListener(new SelectionListener(project, list, this, selectionPath));
 
         refreshView();

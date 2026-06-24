@@ -21,7 +21,6 @@ import org.testin.pojo.Priority;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
-import org.testin.settings.Setting;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
@@ -89,14 +88,9 @@ public final class Tools {
         }
 
         String result = sb.toString();
-
         if (result.isEmpty()) return "DefaultTest";
-
         if (Character.isDigit(result.charAt(0))) result = "_" + result;
-
-        if (!result.toLowerCase().endsWith("test")) result += "Test";
-        else if (result.equalsIgnoreCase("test")) result = "Test";
-
+        result += "Test";
         return result;
     }
 
@@ -321,29 +315,21 @@ public final class Tools {
         return newPath;
     }
 
-    public Path buildLocalPathFromList(final @NotNull Project project, final List<String> pathSegments) {
-        Path currentPath = Path.of(Services.getInstance(project, Setting.class).getTestinPath().toString());
-
-        if (pathSegments != null && !pathSegments.isEmpty()) {
-            for (String segment : pathSegments) {
-                currentPath = currentPath.resolve(segment);
-            }
-        }
-        return currentPath;
-    }
-
     public ArrayList<String> buildFqcnMethod(final TestCaseDto tc) {
         ArrayList<String> generatedFqcn = new ArrayList<>(tc.getParent().getPath2());
+
+        generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
+
+        if (generatedFqcn.isEmpty()) {
+            generatedFqcn.add("DefaultTest");
+        }
 
         int lastIdx = generatedFqcn.size() - 1;
         String className = sanitizeClassName(generatedFqcn.get(lastIdx));
         generatedFqcn.set(lastIdx, className);
 
-
         String methodName = sanitizeMethodName(tc.getDescription());
         generatedFqcn.add(methodName);
-
-        generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
 
         for (int i = 0; i < lastIdx; i++) {
             String pkg = sanitizePackageName(generatedFqcn.get(i));
@@ -352,14 +338,18 @@ public final class Tools {
         return generatedFqcn;
     }
 
-    public @NotNull List<String> buildFqcnClass(DirectoryDto dir) {
+    public @NotNull List<String> buildFqcnClass(DirectoryDto dir, Project project) {
         ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
+
+        generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
+
+        if (generatedFqcn.isEmpty()) {
+            Services.getInstance(project, Notifier.class).softShow(project,"empty fqcn , directory: "+ dir.getPath());
+        }
 
         int lastIdx = generatedFqcn.size() - 1;
         String className = sanitizeClassName(generatedFqcn.get(lastIdx));
         generatedFqcn.set(lastIdx, className);
-
-        generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
 
         for (int i = 0; i < lastIdx; i++) {
             String pkg = sanitizePackageName(generatedFqcn.get(i));
@@ -371,6 +361,9 @@ public final class Tools {
     public @NotNull List<String> buildFqcnPackage(DirectoryDto dir) {
         ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
+        if (generatedFqcn.isEmpty()) {
+            generatedFqcn.add("generated");
+        }
         generatedFqcn.replaceAll(this::sanitizePackageName);
         return generatedFqcn;
     }

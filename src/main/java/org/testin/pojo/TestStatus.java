@@ -14,16 +14,14 @@ public enum TestStatus {
             "008000",
             " [Passed]",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.GREEN),
-            CardHoverAction.PASSED,
             JBColor.GREEN
 
     ),
 
     FAILED(
-            "FF0000", ///  TODO: change it to JBColor
+            "FF0000",
             " [Failed]",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.RED),
-            CardHoverAction.FAILED,
             JBColor.RED.darker()
     ),
 
@@ -31,7 +29,6 @@ public enum TestStatus {
             "FFA500",
             " [Blocked]",
             new SimpleTextAttributes(SimpleTextAttributes.STYLE_PLAIN, JBColor.ORANGE),
-            CardHoverAction.BLOCKED,
             JBColor.ORANGE
     ),
 
@@ -39,7 +36,6 @@ public enum TestStatus {
             "808080",
             " [Pending]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
-            CardHoverAction.PENDING,
             null
     ),
 
@@ -47,13 +43,11 @@ public enum TestStatus {
             "808080",
             " [Untested]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
-            CardHoverAction.UNTESTED,
             JBColor.GRAY.brighter()
     );
 
     private final String hex;
     private final String displayText;
     private final SimpleTextAttributes style;
-    private final CardHoverAction hoverAction;
     private final Color rowColor;
 }

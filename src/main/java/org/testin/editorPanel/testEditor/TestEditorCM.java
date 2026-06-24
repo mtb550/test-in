@@ -33,7 +33,7 @@ public class TestEditorCM extends EditorContextMenu {
         super("Editor Context Menu", true);
 
         add(new CreateTestCase(ui, dir, list, model));
-        add(new ViewDetails(list, dir.getPath()));
+        add(new ViewDetails(list, dir.getPath2()));
         addSeparator();
         add(new UpdateTestCase(ui, list, dir.getPath()));
         add(new CopyTestCase(list));

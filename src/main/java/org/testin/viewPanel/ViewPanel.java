@@ -18,7 +18,7 @@ import org.testin.viewPanel.history.HistoryTab;
 import org.testin.viewPanel.openBugs.OpenBugsTab;
 
 import java.awt.*;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPanel implements Disposable {
@@ -76,7 +76,7 @@ public class ViewPanel implements Disposable {
         return sp;
     }
 
-    public void show(final Project project, final List<TestCaseDto> testCases, final Path path) {
+    public void show(final Project project, final List<TestCaseDto> testCases, final ArrayList<String> path) {
         ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
         if (tw == null || testCases == null || testCases.isEmpty()) return;
 
@@ -86,7 +86,7 @@ public class ViewPanel implements Disposable {
         });
     }
 
-    public void show(final Project project, final List<TestCaseDto> testCases, final Path path, final ViewTab tab) {
+    public void show(final Project project, final List<TestCaseDto> testCases, final ArrayList<String> path, final ViewTab tab) {
         ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
         if (tw == null) return;
 
@@ -96,7 +96,7 @@ public class ViewPanel implements Disposable {
         });
     }
 
-    public void show(final List<TestCaseDto> testCases, final Path path) {
+    public void show(final List<TestCaseDto> testCases, final ArrayList<String> path) {
         this.show(project, testCases, path);
     }
 
@@ -138,14 +138,14 @@ public class ViewPanel implements Disposable {
         }
     }
 
-    public void updateList(final @Nullable List<TestCaseDto> testCases, final @Nullable Path path) {
+    public void updateList(final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path) {
         this.page.updateList(testCases, path);
         this.refreshCurrentView();
     }
 
     public void refreshCurrentView() {
         TestCaseDto currentTestCaseDto = this.getCurrentTestCaseDto();
-        Path currentPath = this.page.getCurrentPath();
+        ArrayList<String> currentPath = this.page.getCurrentPath();
 
         new DetailsTab().load(project, detailsTab, currentTestCaseDto, currentPath);
         new HistoryTab().load(historyTab);

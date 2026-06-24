@@ -67,7 +67,7 @@ public class CreateTreeNode extends DumbAwareAction {
                 }
 
                 if (directoryType == DirectoryType.TS) {
-                    GeneratorType.CREATE_JAVA_CLASS.getAction().execute(e.getProject(), null, Services.getInstance(e.getProject(), Tools.class).buildFqcnClass(dir));
+                    GeneratorType.CREATE_JAVA_CLASS.getAction().execute(e.getProject(), null, Services.getInstance(e.getProject(), Tools.class).buildFqcnClass(dir, e.getProject()));
                 }
 
             }

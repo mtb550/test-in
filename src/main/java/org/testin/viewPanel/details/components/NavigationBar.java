@@ -1,10 +1,7 @@
 package org.testin.viewPanel.details.components;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.projectView.ProjectView;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.Gray;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -13,9 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
-import org.testin.util.Bundle;
+import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
 import org.testin.util.FontSyncUtil;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
@@ -23,11 +21,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class NavigationBar extends BaseDetails {
@@ -44,11 +40,9 @@ public class NavigationBar extends BaseDetails {
     private static final int GBC_INSETS_BOTTOM = 0;
     private static final int GBC_INSETS_RIGHT = 16;
 
-    private final Project project;
-    private final Path currentPath;
+    private final ArrayList<String> currentPath;
 
-    public NavigationBar(final @Nullable Project project, final @Nullable Path currentPath) {
-        this.project = project;
+    public NavigationBar(final @Nullable ArrayList<String> currentPath) {
         this.currentPath = currentPath;
     }
 
@@ -60,12 +54,10 @@ public class NavigationBar extends BaseDetails {
         float navFontSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 1.0f);
 
         if (currentPath != null) {
-            final List<File> fileList = buildPathFileList(currentPath);
-            for (int i = 0; i < fileList.size(); i++) {
+            for (int i = 0; i < currentPath.size(); i++) {
 
-                final File file = fileList.get(i);
-                final String labelText = (i == 0) ? project.getName() : file.getName();
-                final boolean isTestSet = (i == fileList.size() - 1);
+                final String labelText = currentPath.get(i);
+                final boolean isLast = (i == currentPath.size() - 1);
 
                 final JBLabel folderLabel = new JBLabel(labelText);
                 folderLabel.setFont(JBUI.Fonts.label(navFontSize));
@@ -87,26 +79,26 @@ public class NavigationBar extends BaseDetails {
 
                     @Override
                     public void mouseClicked(final MouseEvent e) {
-                        final VirtualFile vf = LocalFileSystem.getInstance().findFileByIoFile(file);
-                        if (vf == null) return;
-
-                        if (isTestSet) {
-                            if (Services.getInstance(project, EditorUtil.class).isEditorOpen(project, file.getName())) {
-                                return;
+                        if (isLast) {
+                            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                            Path testSetPath = Services.getInstance(project, Setting.class).getTestinPath();
+                            for (final String segment : currentPath) {
+                                testSetPath = testSetPath.resolve(segment);
                             }
 
-                            final TestSetDirectoryDto ts = new TestSetDirectoryDto();
-                            ts.setPath(file.toPath()); // todo, why set path here?
-                            ts.setName(file.getName()); // todo, why set name here ?
-                            Services.getInstance(project, EditorUtil.class).openEditor(project, ts);
-                        } else {
-                            ProjectView.getInstance(project).select(null, vf, true);
+                            final TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
+                            if (ts != null) {
+                                if (Services.getInstance(project, EditorUtil.class).isEditorOpen(project, ts.getName())) {
+                                    return;
+                                }
+                                Services.getInstance(project, EditorUtil.class).openEditor(project, ts);
+                            }
                         }
                     }
                 });
 
                 pathPanel.add(folderLabel);
-                if (i < fileList.size() - 1) {
+                if (!isLast) {
                     final JBLabel separator = new JBLabel(AllIcons.General.ArrowRight);
                     separator.setBorder(JBUI.Borders.empty(SEPARATOR_BORDER_V, SEPARATOR_BORDER_H));
                     pathPanel.add(separator);
@@ -125,26 +117,6 @@ public class NavigationBar extends BaseDetails {
         panel.add(pathPanel, gbc);
 
         return currentRow + 1;
-    }
-
-    @NotNull
-    private List<File> buildPathFileList(final @NotNull Path path) {
-        final List<File> fileList = new ArrayList<>();
-        final String projectName = project.getName();
-        File currentDir = path.toFile();
-
-        while (currentDir != null) {
-            fileList.addFirst(currentDir);
-
-            final String dirName = currentDir.getName();
-            if (dirName.equalsIgnoreCase(projectName) || dirName.equalsIgnoreCase(Bundle.getPluginName())) {
-                break;
-            }
-
-            currentDir = currentDir.getParentFile();
-        }
-
-        return fileList;
     }
 
     private void setUnderline(final @NotNull JLabel label, final boolean underline) {

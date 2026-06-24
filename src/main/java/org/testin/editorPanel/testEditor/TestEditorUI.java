@@ -153,7 +153,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
-        list.addListSelectionListener(new SelectionListener(project, list, this, parent.getPath()));
+        list.addListSelectionListener(new SelectionListener(project, list, this, parent.getPath2()));
 
         list.addKeyListener(new KeyListener(list, this));
 

@@ -38,7 +38,7 @@ public class RunEditorCM extends EditorContextMenu {
         add(new SetActualResult(ui, list));
         add(new UpdateRunItem(ui, list));
         addSeparator();
-        add(new ViewDetails(list, dir.getPath()));
+        add(new ViewDetails(list, dir.getPath2()));
         add(new StartExecution(ui.getToolBar().getCallbacks()));
         addSeparator();
         add(new CopyTestCase(list));

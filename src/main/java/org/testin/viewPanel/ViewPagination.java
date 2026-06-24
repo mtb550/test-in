@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import lombok.Getter;
 import org.testin.pojo.dto.TestCaseDto;
 
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPagination {
@@ -12,13 +12,13 @@ public class ViewPagination {
     private List<TestCaseDto> items;
     private int currentIndex = 0;
     @Getter
-    private Path currentPath;
+    private ArrayList<String> currentPath;
 
     public ViewPagination(ViewPanel viewPanel) {
         this.viewPanel = viewPanel;
     }
 
-    public void updateList(List<TestCaseDto> testCases, Path path) {
+    public void updateList(List<TestCaseDto> testCases, ArrayList<String> path) {
         this.items = testCases;
         this.currentIndex = 0;
         this.currentPath = path;

@@ -22,7 +22,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -32,16 +32,14 @@ public class MouseListenerImpl extends MouseAdapter {
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
     private final EditorContextMenu editorCm;
-    private final Path path;
-    private final DirectoryDto dir;
+    private final ArrayList<String> path;
     private final IEditorUI ui;
 
     public MouseListenerImpl(final @NotNull Project project, final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorContextMenu editorCm) {
         this.project = project;
         this.ui = ui;
         this.list = list;
-        this.path = dir.getPath();
-        this.dir = dir;
+        this.path = dir.getPath2();
         this.model = model;
         this.editorCm = editorCm;
     }
@@ -128,7 +126,7 @@ public class MouseListenerImpl extends MouseAdapter {
             ui.setHoveredIconAction(actionName);
             needsRepaint = true;
 
-            list.setToolTipText(Optional.ofNullable(currentAction).map(CardHoverAction::getTooltip).orElse(null));
+            list.setToolTipText(Optional.ofNullable(currentAction).map(CardHoverAction::getHintText).orElse(null));
         }
 
         if (needsRepaint)

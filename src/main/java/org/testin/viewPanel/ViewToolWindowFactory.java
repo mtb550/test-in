@@ -14,7 +14,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.settings.StartupActivity;
 import org.testin.util.logger.Log;
 
-import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -28,7 +28,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         return ToolWindowManager.getInstance(project).getToolWindow("testin.view");
     }
 
-    public static void showPanel(final Project project, final List<TestCaseDto> testCases, final Path path, final Consumer<ViewPanel> onReadyAction) {
+    public static void showPanel(final Project project, final List<TestCaseDto> testCases, final ArrayList<String> path, final Consumer<ViewPanel> onReadyAction) {
         ToolWindow tw = getToolWindow(project);
 
         if (tw != null) {
@@ -45,7 +45,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         }
     }
 
-    public static void showPanel(final Project project, final List<TestCaseDto> testCases, final Path path) {
+    public static void showPanel(final Project project, final List<TestCaseDto> testCases, final ArrayList<String> path) {
         showPanel(project, testCases, path, null);
     }
 
@@ -71,8 +71,8 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
             toolWindow.getContentManager().addContent(bugsTab);
 
             toolWindow.setTitleActions(ViewPanelActions.create(viewPanel.getPage(), toolWindow.getComponent()));
-            //toolWindow.setTitle(Bundle.getPluginName());
-            //toolWindow.setStripeTitle(Bundle.getPluginName());
+            ///toolWindow.setTitle(Bundle.getPluginName());
+            ///toolWindow.setStripeTitle(Bundle.getPluginName());
 
         });
     }

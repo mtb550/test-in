@@ -14,7 +14,7 @@ import org.testin.util.services.Services;
 import java.io.IOException;
 import java.util.List;
 
-public class CreateTestSet implements GeneratorAction {
+public class CreateJavaTestClass implements GeneratorAction {
 
     @Override
     public void execute(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {

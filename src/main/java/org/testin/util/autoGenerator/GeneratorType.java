@@ -13,7 +13,7 @@ public enum GeneratorType {
     CREATE_JAVA_CLASS(
             "Create Test Set",
             "Create Automation Test Class",
-            new CreateTestSet()
+            new CreateJavaTestClass()
     ),
 
     CREATE_JAVA_PACKAGE(

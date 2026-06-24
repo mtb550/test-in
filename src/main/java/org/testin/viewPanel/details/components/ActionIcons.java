@@ -1,14 +1,18 @@
 package org.testin.viewPanel.details.components;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.NavigateToCode;
+import org.testin.pojo.CardHoverAction;
 import org.testin.pojo.RunStatus;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,12 +27,9 @@ public class ActionIcons extends BaseDetails {
     final int INSETS_LEFT = 16;
     final int INSETS_BOTTOM = 0;
     final int INSETS_RIGHT = 16;
-    final String NAVIGATE_TOOLTIP = "Navigate to Code";
     final Icon navIconRaw = AllIcons.Nodes.Class;
-    private final Project project;
 
-    public ActionIcons(final @NotNull Project project) {
-        this.project = project;
+    public ActionIcons() {
     }
 
     @Override
@@ -41,7 +42,12 @@ public class ActionIcons extends BaseDetails {
         final Icon navIconHover = IconUtil.scale(navIconRaw, navLabel, HOVER_SCALE);
         navLabel.setIcon(navIconBase);
         navLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        navLabel.setToolTipText(NAVIGATE_TOOLTIP);
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text(CardHoverAction.NAVIGATE.getTooltip()))
+                .setShortcut(KeyboardSet.NavigateToCode.getShortcutText())
+                .installOn(navLabel);
+
         final int navTargetWidth = (int) (navIconRaw.getIconWidth() * HOVER_SCALE);
         final int navTargetHeight = (int) (navIconRaw.getIconHeight() * HOVER_SCALE);
         navLabel.setPreferredSize(new Dimension(navTargetWidth, navTargetHeight));
@@ -72,7 +78,12 @@ public class ActionIcons extends BaseDetails {
         final Icon runIconHover = IconUtil.scale(currentRunIconRaw, runLabel, HOVER_SCALE);
         runLabel.setIcon(runIconBase);
         runLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        runLabel.setToolTipText(currentStatus.getTooltip());
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text(currentStatus.getTooltip()))
+                .setShortcut(KeyboardSet.RunTestCase.getShortcutText())
+                .installOn(runLabel);
+
         final int runTargetWidth = (int) (currentRunIconRaw.getIconWidth() * HOVER_SCALE);
         final int runTargetHeight = (int) (currentRunIconRaw.getIconHeight() * HOVER_SCALE);
         runLabel.setPreferredSize(new Dimension(runTargetWidth, runTargetHeight));

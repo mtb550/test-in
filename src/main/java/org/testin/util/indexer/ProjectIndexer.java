@@ -498,12 +498,14 @@ public final class ProjectIndexer {
         return testRunDirsByPath.get(path.toString());
     }
 
-    /**
-     * Rename a node in the index: updates all maps and DTO paths.
-     * Handles all node types (project, test set, test run, packages).
-     * The parent references of children are automatically correct because
-     * the parent DTO objects are shared (updated in-place by renameMapEntry).
-     */
+    public TestSetDirectoryDto getTestSetByPath(final Path path) {
+        return testSetsByPath.get(path.toString());
+    }
+
+    public TestProjectDirectoryDto getTestProjectByPath(final Path path) {
+        return testProjectsByPath.get(path.toString());
+    }
+
     public void renameNode(final Path oldPath, final Path newPath) {
         final String oldStr = oldPath.toString();
         final String newStr = newPath.toString();

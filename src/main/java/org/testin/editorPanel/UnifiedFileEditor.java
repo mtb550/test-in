@@ -84,7 +84,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
                 .ifPresent(viewer -> {
 
                     if (selected != null && !selected.isEmpty())
-                        viewer.show(selected, vf.getDir().getPath());
+                        viewer.show(selected, vf.getTestSet().getPath2());
 
                     else
                         viewer.reset();
