@@ -22,31 +22,28 @@ import org.testin.util.services.TestCaseCacheService;
 import org.testin.util.services.TestCasePersistService;
 
 import javax.swing.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CreateTestCase extends DumbAwareAction {
     private final CollectionListModel<TestCaseDto> model;
-    private final JBList<TestCaseDto> list;
     private final IEditorUI ui;
     private final DirectoryDto dir;
 
     public CreateTestCase(final IEditorUI ui, final DirectoryDto pDir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
         this.model = model;
-        this.list = list;
         this.ui = ui;
         this.dir = pDir;
         this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getCustomShortcut(), list);
     }
 
-    public static void execute(final @NotNull Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
-        performCreation(project, ui, dir, list, model);
+    public static void execute(final @NotNull Project project, final IEditorUI ui, final DirectoryDto dir, final CollectionListModel<TestCaseDto> model) {
+        performCreation(project, ui, dir, model);
     }
 
-    private static void performCreation(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull DirectoryDto pDir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    private static void performCreation(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull DirectoryDto pDir, final @NotNull CollectionListModel<TestCaseDto> model) {
         new CreateTestCaseUI(project, (newTc, codeGenerator) -> {
             final boolean isEmpty = model.isEmpty();
             newTc.setIsHead(isEmpty);
@@ -54,20 +51,7 @@ public class CreateTestCase extends DumbAwareAction {
             final TestCaseDto lastTc = isEmpty ? null : model.getElementAt(model.getSize() - 1);
             if (lastTc != null) lastTc.setNext(newTc.getId());
 
-            List<String> generatedFqcn = new ArrayList<>(pDir.getPath2());
-
-            if (!generatedFqcn.isEmpty()) {
-                int lastIdx = generatedFqcn.size() - 1;
-                String className = Services.getInstance(project, Tools.class).sanitizeClassName(generatedFqcn.get(lastIdx));
-                generatedFqcn.set(lastIdx, className);
-            }
-
-            String methodName = Services.getInstance(project, Tools.class).sanitizeMethodName(newTc.getDescription());
-            generatedFqcn.add(methodName);
-
             newTc.setParent(pDir);
-            newTc.setPath(pDir.getPath2());
-
             ui.appendNewTestCase(newTc);
 
             final List<TestCaseDto> affectedNodes = Stream.of(newTc, lastTc).filter(Objects::nonNull).toList();
@@ -77,7 +61,7 @@ public class CreateTestCase extends DumbAwareAction {
             Services.getInstance(project, Notifier.class).softShow(project, "Created..");
 
             if (codeGenerator != null && codeGenerator.isSelected()) {
-                GeneratorType.CREATE_TEST_CASE.getAction().execute(project, newTc, newTc.getPath());
+                GeneratorType.CREATE_TEST_METHOD.getAction().execute(project, newTc, Services.getInstance(project, Tools.class).buildFqcnMethod(newTc));
             }
 
             SwingUtilities.invokeLater(() -> ui.selectTestCase(newTc));
@@ -90,7 +74,7 @@ public class CreateTestCase extends DumbAwareAction {
         final Project project = e.getProject();
         if (project == null) return;
 
-        performCreation(project, ui, dir, list, model);
+        performCreation(project, ui, dir, model);
     }
 
     @Override

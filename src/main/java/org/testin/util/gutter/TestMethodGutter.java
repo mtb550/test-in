@@ -78,8 +78,8 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 }
 
                 Log.info("[GUTTER TRACE] Found in indexer: " + dto.getDescription());
-                final Path parentPath = dto.getPath().isEmpty() ? null :
-                        Services.getInstance(project, Tools.class).buildLocalPathFromList(project, dto.getPath());
+                final Path parentPath = dto.getParent().getPath2().isEmpty() ? null :
+                        Services.getInstance(project, Tools.class).buildLocalPathFromList(project, dto.getParent().getPath2());
 
                 ApplicationManager.getApplication().invokeLater(() ->
                         ViewToolWindowFactory.showPanel(project, List.of(dto), parentPath)

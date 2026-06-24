@@ -4,7 +4,9 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.testin.editorPanel.Shared;
+import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
@@ -88,7 +90,13 @@ public enum RunEditorAttributes {
             "Path",
             true,
             true,
-            (item, project) -> String.join(" > ", item.getPath()),
+            (item, project) -> {
+                final TestCaseDto tc = Services.getInstance(project, ProjectIndexer.class).getTestCaseById(item.getId());
+                if (tc != null) {
+                    return String.join(" > ", tc.getParent().getPath2());
+                }
+                return "";
+            },
             null
     ),
 
@@ -96,7 +104,10 @@ public enum RunEditorAttributes {
             "FQCN",
             true,
             true,
-            (item, project) -> String.join(" > ", Services.getInstance(project, Tools.class).buildFqcn(item.getTc())), //todo, to be updated later
+            (item, project) -> {
+                final TestCaseDto tc = item.getTc();
+                return String.join(" > ", Services.getInstance(project, Tools.class).buildFqcnMethod(tc));
+            },
             null
     );
 

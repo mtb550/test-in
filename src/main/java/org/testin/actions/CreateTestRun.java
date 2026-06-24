@@ -132,9 +132,6 @@ public class CreateTestRun implements NodeCreator {
             item.setId(tc.getId());
             item.setStatus(TestStatus.PENDING);
 
-            if (node.getParent() instanceof DefaultMutableTreeNode pNode && pNode.getUserObject() instanceof DirectoryDto dir) {
-                item.setPath(new ArrayList<>(dir.getPath2()));
-            }
             items.add(item);
         }
         for (int i = 0; i < node.getChildCount(); i++) {

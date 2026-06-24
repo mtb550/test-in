@@ -12,8 +12,6 @@ import org.testin.pojo.dto.TestCaseDto;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Setter
@@ -31,10 +29,6 @@ public class TestRunItems {
 
     @NotNull
     private UUID id;
-
-    @NotNull
-    @Builder.Default
-    private List<String> path = new ArrayList<>();
 
     @NotNull
     @Builder.Default

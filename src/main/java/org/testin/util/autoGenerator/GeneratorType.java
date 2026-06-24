@@ -10,19 +10,19 @@ public enum GeneratorType {
             new CreateTestProject()
     ),
 
-    CREATE_TEST_SET(
+    CREATE_JAVA_CLASS(
             "Create Test Set",
             "Create Automation Test Class",
             new CreateTestSet()
     ),
 
-    CREATE_TEST_SET_PACKAGE(
+    CREATE_JAVA_PACKAGE(
             "Create Test Set Package",
             "Create Automation Test Package",
             new CreateTestSetPackage()
     ),
 
-    CREATE_TEST_CASE(
+    CREATE_TEST_METHOD(
             "Create Test Case",
             "Create Automation Test Method",
             new CreateTestMethod()

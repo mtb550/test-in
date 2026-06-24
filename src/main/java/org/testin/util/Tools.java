@@ -37,8 +37,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -96,22 +98,6 @@ public final class Tools {
         else if (result.equalsIgnoreCase("test")) result = "Test";
 
         return result;
-    }
-
-    public List<String> appendFqcn(final List<String> pFqcn, final String s, final DirectoryType t) {
-        List<String> source = (pFqcn != null) ? pFqcn : Collections.emptyList();
-
-        List<String> newFqcn = new ArrayList<>(source.size() + 1);
-        newFqcn.addAll(source);
-
-        if (t == DirectoryType.TSP || t == DirectoryType.TP)
-            newFqcn.add(sanitizePackageName(s));
-        else if (t == DirectoryType.TS)
-            newFqcn.add(sanitizeClassName(s));
-        else
-            return newFqcn;
-
-        return newFqcn;
     }
 
     public Path getProjectPath(final SimpleTree tree) {
@@ -346,19 +332,46 @@ public final class Tools {
         return currentPath;
     }
 
-    public ArrayList<String> buildFqcn(final TestCaseDto tc) {
-        ArrayList<String> generatedFqcn = new ArrayList<>(tc.getPath());
+    public ArrayList<String> buildFqcnMethod(final TestCaseDto tc) {
+        ArrayList<String> generatedFqcn = new ArrayList<>(tc.getParent().getPath2());
 
-        if (!generatedFqcn.isEmpty()) {
-            int lastIdx = generatedFqcn.size() - 1;
-            String className = sanitizeClassName(generatedFqcn.get(lastIdx));
-            generatedFqcn.set(lastIdx, className);
-        }
+        int lastIdx = generatedFqcn.size() - 1;
+        String className = sanitizeClassName(generatedFqcn.get(lastIdx));
+        generatedFqcn.set(lastIdx, className);
+
 
         String methodName = sanitizeMethodName(tc.getDescription());
         generatedFqcn.add(methodName);
 
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
+
+        for (int i = 0; i < lastIdx; i++) {
+            String pkg = sanitizePackageName(generatedFqcn.get(i));
+            generatedFqcn.set(i, pkg);
+        }
+        return generatedFqcn;
+    }
+
+    public @NotNull List<String> buildFqcnClass(DirectoryDto dir) {
+        ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
+
+        int lastIdx = generatedFqcn.size() - 1;
+        String className = sanitizeClassName(generatedFqcn.get(lastIdx));
+        generatedFqcn.set(lastIdx, className);
+
+        generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
+
+        for (int i = 0; i < lastIdx; i++) {
+            String pkg = sanitizePackageName(generatedFqcn.get(i));
+            generatedFqcn.set(i, pkg);
+        }
+        return generatedFqcn;
+    }
+
+    public @NotNull List<String> buildFqcnPackage(DirectoryDto dir) {
+        ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
+        generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
+        generatedFqcn.replaceAll(this::sanitizePackageName);
         return generatedFqcn;
     }
 }

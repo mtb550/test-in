@@ -34,11 +34,6 @@ public class TestCaseDto {
 
     @NonNull
     @Builder.Default
-    @JsonIgnore
-    private ArrayList<String> path = new ArrayList<>();
-
-    @NonNull
-    @Builder.Default
     private UUID id = UUID.randomUUID();
 
     @NonNull

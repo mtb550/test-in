@@ -26,7 +26,7 @@ public class NavigateToCode extends DumbAwareAction {
     }
 
     public void execute(final @NotNull Project project, final TestCaseDto tc) {
-        ArrayList<String> generatedFqcn = Services.getInstance(project, Tools.class).buildFqcn(tc);
+        ArrayList<String> generatedFqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
         new CodeNavigator().toCode(project, generatedFqcn);
     }
 

@@ -18,26 +18,30 @@ import com.theoryinpractice.testng.model.TestType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.Tools;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class TestNGRunnerByMethod {
 
-    public void runTestMethod(final @NotNull Project project, final @NotNull List<String> rawFqcn) {
+    public void runTestMethod(final @NotNull Project project, final @NotNull TestCaseDto tc) {
+        ArrayList<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
 
-                    final String configName = String.join(".", rawFqcn);
-                    final String methodName = rawFqcn.getLast();
-                    final String classFqcn = String.join(".", rawFqcn.subList(0, rawFqcn.size() - 1));
+                    final String configName = String.join(".", fqcn);
+                    final String methodName = fqcn.getLast();
+                    final String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
                     Log.info("[RUNNER] Running Test - configName: " + configName);
                     Log.info("[RUNNER] Extracted  - classFqcn: " + classFqcn + ", methodName: " + methodName);
-                    Log.info("[RUNNER] FQCN list size: " + rawFqcn.size() + ", elements: " + rawFqcn);
+                    Log.info("[RUNNER] FQCN list size: " + fqcn.size() + ", elements: " + fqcn);
 
                     PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(classFqcn, GlobalSearchScope.projectScope(project));
 

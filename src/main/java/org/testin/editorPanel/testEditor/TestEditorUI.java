@@ -170,7 +170,6 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
                 allTestCases.addAll(items);
                 currentTestCases.addAll(items);
                 items.forEach(item -> unsortedIds.add(item.getId()));
-                items.forEach(item -> item.setPath(parent.getPath2()));
                 items.forEach(item -> item.setParent(parent));
                 refreshView();
             }
@@ -295,7 +294,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        CreateTestCase.execute(project, this, parent, list, model);
+        CreateTestCase.execute(project, this, parent, model);
     }
 
     @Override

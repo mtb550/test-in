@@ -84,7 +84,7 @@ public enum TestEditorAttributes {
             true,
             true,
             false,
-            (tc, project) -> String.join(" > ", Services.getInstance(project, Tools.class).buildFqcn(tc)),
+            (tc, project) -> String.join(" > ", Services.getInstance(project, Tools.class).buildFqcnMethod(tc)),
             null,
             (project, tc, v) -> {
             }
@@ -140,7 +140,7 @@ public enum TestEditorAttributes {
             true,
             false,
             false,
-            (tc, project) -> String.join(" > ", tc.getPath()),
+            (tc, project) -> String.join(" > ", tc.getParent().getPath2()),
             null,
             (project, tc, v) -> {
             }

@@ -277,18 +277,15 @@ public final class ProjectIndexer {
             testSetsByPath.put(path.toString(), ts);
 
             final List<UUID> caseIds = new ArrayList<>();
-            final List<String> basePath2 = ts.getPath2();
 
             try (Stream<Path> files = Files.list(path)) {
                 files.filter(Files::isRegularFile)
                         .filter(p -> p.toString().endsWith(".json"))
                         .forEach(filePath -> {
                             try {
-                                final TestCaseDto tc = Services.getInstance(project, Mapper.class)
-                                        .readValue(filePath.toFile(), TestCaseDto.class);
+                                final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(filePath.toFile(), TestCaseDto.class);
                                 if (tc != null) {
-                                    tc.setPath(new ArrayList<>(basePath2));
-                                    tc.setParent(parent);
+                                    tc.setParent(ts);
                                     testCasesById.put(tc.getId(), tc);
                                     caseIds.add(tc.getId());
                                 }
@@ -363,7 +360,6 @@ public final class ProjectIndexer {
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    //.fqcn(tools.appendFqcn(parent.getFqcn(), fileName, DirectoryType.TR))
                     .path2(tools.buildPath2(parent.getPath2(), fileName))
                     .marker(marker)
                     .build();
@@ -500,14 +496,6 @@ public final class ProjectIndexer {
 
     public TestRunDirectoryDto getTestRunDirByPath(final Path path) {
         return testRunDirsByPath.get(path.toString());
-    }
-
-    public TestSetDirectoryDto getTestSetByPath(final Path path) {
-        return testSetsByPath.get(path.toString());
-    }
-
-    public TestProjectDirectoryDto getTestProjectByPath(final Path path) {
-        return testProjectsByPath.get(path.toString());
     }
 
     /**

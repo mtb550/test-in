@@ -175,12 +175,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                 }
 
                 if (this.tr != null) {
-                    Map<UUID, TestRunItems> newResults = this.tr.getResults().stream()
-                            .collect(Collectors.toMap(
-                                    TestRunItems::getId,
-                                    item -> item,
-                                    (existingItem, duplicateItem) -> existingItem
-                            ));
+                    Map<UUID, TestRunItems> newResults = this.tr.getResults().stream().collect(Collectors.toMap(TestRunItems::getId, item -> item, (existingItem, duplicateItem) -> existingItem));
                     this.resultsMap.putAll(newResults);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
@@ -200,7 +195,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     this.list.getEmptyText().setText("Loading...");
                 }
 
-                this.sessionCache = new RunSessionCache(this.tr, parent.getPath());
+                this.sessionCache = new RunSessionCache(this.tr, parent != null ? parent.getPath() : null);
 
                 sessionCache.setListener(new RunSessionCache.ICacheListener() {
                     @Override
@@ -534,7 +529,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Path dirPath = parent.getPath();
+                final Path dirPath = parent.getPath();
 
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, tr);
 

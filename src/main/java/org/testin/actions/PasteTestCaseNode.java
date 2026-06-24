@@ -74,7 +74,6 @@ public class PasteTestCaseNode extends DumbAwareAction {
                 if (clonedTc == null) continue;
 
                 if (destUI.getParent() != null) {
-                    clonedTc.setPath(destUI.getParent().getPath2());
                     clonedTc.setParent(destUI.getParent());
                 }
                 destUI.getAllTestCases().add(clonedTc);
