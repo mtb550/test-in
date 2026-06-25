@@ -2,13 +2,11 @@ package org.testin.editorPanel;
 
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
-import lombok.Setter;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 
 @Getter
-@Setter
 public class UnifiedVirtualFile extends LightVirtualFile {
 
     private final DirectoryDto dir;

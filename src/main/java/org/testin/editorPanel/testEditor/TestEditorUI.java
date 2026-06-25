@@ -137,8 +137,8 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         this.syncListener.setOnUpdateCallback(this::onDataSynced);
         this.model.addListDataListener(syncListener);
 
-        final TestEditorCM testEditorCM = new TestEditorCM(project, this, vf.getTestSet(), list, model);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, vf.getTestSet(), testEditorCM);
+        final TestEditorCM testEditorCM = new TestEditorCM(project, this, parent, list, model);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, parent, testEditorCM);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
