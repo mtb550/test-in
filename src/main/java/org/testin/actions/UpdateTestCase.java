@@ -51,8 +51,13 @@ public class UpdateTestCase extends DumbAwareAction {
 
         new TestCaseUpdateMenu(project, selectedItems, (updatedItems, codeGenerator) -> {
 
+            //todo: move to indexer
             Services.getInstance(project, TestCaseCacheService.class).addNewItems(updatedItems);
-            Services.getInstance(project, TestCasePersistService.class).persist(path, updatedItems);
+
+            //todo: move to indexer
+            if (path != null) {
+                Services.getInstance(project, TestCasePersistService.class).persist(path, updatedItems);
+            }
 
             Services.getInstance(project, Notifier.class).softShow(project, "Updated..");
 
@@ -74,36 +79,36 @@ public class UpdateTestCase extends DumbAwareAction {
                 }
 
                 if (codeGenerator != null && codeGenerator.isSelected()) {
-                    Log.trace("[UpdateTestCase]: Code generator is selected! Change Type received: " + codeGenerator.getGeneratorType());
+                    Log.trace("Code generator is selected! Change Type received: " + codeGenerator.getGeneratorType());
 
                     // todo, all if statements here to be moved to enum class
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_DESCRIPTION) {
-                        Log.trace("[UpdateTestCase]: Routing to UpdateTestCaseDescription()...");
+                        Log.trace("Routing to UpdateTestCaseDescription()...");
                         //new UpdateTestCaseDescription().execute(project, updatedItems.getFirst().getFqcn(), updatedItems.getFirst());
                         return;
                     }
 
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT) {
-                        Log.trace("[UpdateTestCase]: Routing to Update Expected Results (Type 2)...");
+                        Log.trace("Routing to Update Expected Results (Type 2)...");
                         return;
                     }
 
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_GROUP) {
-                        Log.trace("[UpdateTestCase]: Routing to Update Group (Type 2)...");
+                        Log.trace("Routing to Update Group (Type 2)...");
                         return;
                     }
 
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_MODULE) {
-                        Log.trace("[UpdateTestCase]: Routing to Update Module (Type 2)...");
+                        Log.trace("Routing to Update Module (Type 2)...");
                         return;
                     }
 
                     if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_STEPS) {
-                        Log.trace("[UpdateTestCase]: Routing to Update Steps (Type 3)...");
+                        Log.trace("Routing to Update Steps (Type 3)...");
                     }
 
                 } else
-                    Log.trace("[UpdateTestCase]: Code generator is NOT selected or is null.");
+                    Log.trace("Code generator is NOT selected or is null.");
 
             });
         }).show();

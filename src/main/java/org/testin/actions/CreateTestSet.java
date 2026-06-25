@@ -123,17 +123,17 @@ public class CreateTestSet implements NodeCreator {
                                     String classContent = buildClassContent(fullPackageDeclaration, safeClassName);
                                     VfsUtil.saveText(newClassFile, classContent);
 
-                                    Log.debug("[TRACE] Successfully created Java class: " + newClassFile.getPath());
+                                    Log.debug("Successfully created Java class: " + newClassFile.getPath());
 
                                 } else {
-                                    Log.warn("[WARNING] Java class already exists: " + fileName);
+                                    Log.warn("Java class already exists: " + fileName);
                                 }
                             }
                         } else {
-                            Log.info("[WARNING] No Test Source Root found in the project.");
+                            Log.info("No Test Source Root found in the project.");
                         }
                     } catch (Exception ex) {
-                        Log.error("[ERROR] Failed to create Java class: " + ex.getMessage());
+                        Log.error("Failed to create Java class: " + ex.getMessage());
                     }
                 }));
     }

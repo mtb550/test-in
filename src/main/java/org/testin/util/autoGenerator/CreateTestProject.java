@@ -29,14 +29,14 @@ public class CreateTestProject implements GeneratorAction {
                         VirtualFile vf = VfsUtil.createDirectoryIfMissing(sourceRoot, fqcn.getFirst());
 
                         if (vf != null) {
-                            Log.debug("[TRACE] Successfully created project package inside Source Root: " + vf.getPath());
+                            Log.debug("Successfully created project package inside Source Root: " + vf.getPath());
                         }
                     } else {
-                        Log.warn("[WARNING] No Source Root found in the project. Please mark a directory as 'Sources Root'.");
+                        Log.warn("No Source Root found in the project. Please mark a directory as 'Sources Root'.");
                     }
                 });
             } catch (Exception ex) {
-                Log.error("[ERROR] Failed to create project package: " + ex.getMessage());
+                Log.error("Failed to create project package: " + ex.getMessage());
             }
 
         }));

@@ -2,6 +2,7 @@ package org.testin.viewPanel;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
@@ -40,6 +41,7 @@ public class ViewPanel implements Disposable {
 
     public ViewPanel(final @NotNull Project project) {
         this.project = project;
+        Disposer.register(project, this);
         detailsTab = new JBPanel<>(new BorderLayout());
         historyTab = new JBPanel<>(new BorderLayout());
         openBugsTab = new JBPanel<>(new BorderLayout());
@@ -56,7 +58,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
+        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (testName, status, error) -> {
             final TestCaseDto currentDto = getCurrentTestCaseDto();
 
             if (currentDto != null && testName.contains(currentDto.getDescription())) {

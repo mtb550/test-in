@@ -31,55 +31,55 @@ public enum GeneratorType {
     UPDATE_TEST_CASE_DESCRIPTION(
             "Update Test Case",
             "Update Automation Test Method Description & Name",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     ),
 
     UPDATE_TEST_CASE_EXPECTED_RESULT(
             "Update Test Case",
             "Update Automation Test Method Expected Result",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     ),
 
     UPDATE_TEST_CASE_MODULE(
             "Update Test Case",
             "Update Automation Test Method Groups",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     ),
 
     UPDATE_TEST_CASE_TEST_DATA(
             "Update Test Case",
             "Update Automation Test Method Test Data",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     ),
 
     UPDATE_TEST_CASE_PRE_CONDITIONS(
             "Update Test Case",
             "Update Automation Test Method Pre Conditions",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     ),
 
     UPDATE_TEST_CASE_STEPS(
             "Update Test Case",
             "Update Automation Test Method Steps",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     ),
 
     UPDATE_TEST_CASE_GROUP(
             "Update Test Case",
             "Update Automation Test Method Group",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     ),
 
     UPDATE_TEST_CASE_PRIORITY(
             "Update Test Case",
             "Update Automation Test Method Priority",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     ),
 
     UPDATE_TEST_CASE_ORDER(
             "Update Test Case",
             "Update Automation Test Method Order",
-            new UpdateTestCase()
+            new UpdateTestMethod()
     );
 
     private final String description;

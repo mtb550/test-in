@@ -24,7 +24,7 @@ public class CreateTestMethod implements GeneratorAction {
         Log.info("Creating Test Case for: " + fqcn);
 
         if (fqcn.size() < 2) {
-            Log.error("[ERROR] FQCN list is too short to generate a method.");
+            Log.error("FQCN list is too short to generate a method.");
             return;
         }
 
@@ -80,7 +80,7 @@ public class CreateTestMethod implements GeneratorAction {
                         }
 
                     } catch (Exception ex) {
-                        Log.error("[ERROR] Failed to inject Java method: " + ex.getMessage());
+                        Log.error("Failed to inject Java method: " + ex.getMessage());
                     }
                 }));
     }
@@ -158,9 +158,9 @@ public class CreateTestMethod implements GeneratorAction {
 
             CodeStyleManager.getInstance(project).reformat(addedElement);
 
-            Log.info("[TRACE] Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
+            Log.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
         } else {
-            Log.info("[WARNING] Method already exists: " + methodName);
+            Log.info("Method already exists: " + methodName);
         }
     }
 }

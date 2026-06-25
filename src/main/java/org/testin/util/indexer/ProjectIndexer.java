@@ -19,6 +19,7 @@ import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
+import org.testin.util.services.EditorStateService;
 import org.testin.util.services.Services;
 
 import java.nio.file.Files;
@@ -119,7 +120,10 @@ public final class ProjectIndexer {
 
             @Override
             public void onFinished() {
-                ApplicationManager.getApplication().invokeLater(() -> Log.info("ProjectIndexer: indexing finished, notifying listeners."));
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    Log.info("ProjectIndexer: indexing finished, restoring open editors.");
+                    Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
+                });
             }
         });
     }

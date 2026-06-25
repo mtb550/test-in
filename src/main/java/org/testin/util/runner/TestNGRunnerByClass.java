@@ -35,7 +35,7 @@ public class TestNGRunnerByClass {
             return;
         }
 
-        Log.info("[RUNNER] Running test class: " + fqcn);
+        Log.info("Running test class: " + fqcn);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
@@ -73,7 +73,7 @@ public class TestNGRunnerByClass {
                         runManager.setTemporaryConfiguration(settings);
                         runManager.setSelectedConfiguration(settings);
 
-                        Log.info("[RUNNER] Setting TEST_OBJECT=" + TestType.CLASS.getType() + ", MAIN_CLASS=" + finalFqcn + ", simpleClass=" + simpleClassName);
+                        Log.info("Setting TEST_OBJECT=" + TestType.CLASS.getType() + ", MAIN_CLASS=" + finalFqcn + ", simpleClass=" + simpleClassName);
 
                         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
                     });

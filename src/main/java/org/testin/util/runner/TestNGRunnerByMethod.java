@@ -39,14 +39,14 @@ public final class TestNGRunnerByMethod {
                     final String methodName = fqcn.getLast();
                     final String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-                    Log.info("[RUNNER] Running Test - configName: " + configName);
-                    Log.info("[RUNNER] Extracted  - classFqcn: " + classFqcn + ", methodName: " + methodName);
-                    Log.info("[RUNNER] FQCN list size: " + fqcn.size() + ", elements: " + fqcn);
+                    Log.info("Running Test - configName: " + configName);
+                    Log.info("Extracted  - classFqcn: " + classFqcn + ", methodName: " + methodName);
+                    Log.info("FQCN list size: " + fqcn.size() + ", elements: " + fqcn);
 
                     PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(classFqcn, GlobalSearchScope.projectScope(project));
 
                     if (targetClass == null) {
-                        Log.warn("[RUNNER] Target class not found for FQCN: " + classFqcn);
+                        Log.warn("Target class not found for FQCN: " + classFqcn);
                         return;
                     }
 
@@ -55,8 +55,8 @@ public final class TestNGRunnerByMethod {
                     final String simpleClassName = classFqcn.substring(classFqcn.lastIndexOf('.') + 1);
                     final String configLabel = simpleClassName + "." + methodName;
 
-                    Log.info("[RUNNER] finalFqcn: " + finalFqcn + ", simpleClass: " + simpleClassName);
-                    Log.info("[RUNNER] Config label: " + configLabel);
+                    Log.info("finalFqcn: " + finalFqcn + ", simpleClass: " + simpleClassName);
+                    Log.info("Config label: " + configLabel);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
 
@@ -74,7 +74,7 @@ public final class TestNGRunnerByMethod {
                         } else
                             configuration = (TestNGConfiguration) settings.getConfiguration();
 
-                        Log.info("[RUNNER] Setting TEST_OBJECT=" + TestType.METHOD.getType() + ", MAIN_CLASS=" + finalFqcn + ", METHOD=" + methodName);
+                        Log.info("Setting TEST_OBJECT=" + TestType.METHOD.getType() + ", MAIN_CLASS=" + finalFqcn + ", METHOD=" + methodName);
 
                         configuration.getPersistantData().TEST_OBJECT = TestType.METHOD.getType();
                         configuration.getPersistantData().MAIN_CLASS_NAME = finalFqcn;

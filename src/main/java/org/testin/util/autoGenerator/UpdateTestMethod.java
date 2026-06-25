@@ -10,16 +10,16 @@ import org.testin.util.logger.Log;
 
 import java.util.List;
 
-public class UpdateTestCase implements GeneratorAction {
+public class UpdateTestMethod implements GeneratorAction {
 
     @Override
     public void execute(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
         ApplicationManager.getApplication().invokeLater(() ->
                 WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () -> {
                     try {
-
+                        //todo, to be implemented, learn from #util.autoGenerator.CreateTestMethod
                     } catch (Exception ex) {
-                        Log.error("[ERROR] Failed to inject Java method: " + ex.getMessage());
+                        Log.error("Failed to inject Java method: " + ex.getMessage());
                     }
                 }));
     }

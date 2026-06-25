@@ -5,7 +5,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorFactory;
-import com.intellij.openapi.editor.colors.EditorColorsListener;
 import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.fileEditor.FileEditorManager;
@@ -29,7 +28,7 @@ public class FontSyncUtil {
         updateComponentFontSize(component);
 
         ApplicationManager.getApplication().getMessageBus().connect(parentDisposable)
-                .subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) scheme -> updateComponentFontSize(component));
+                .subscribe(EditorColorsManager.TOPIC, scheme -> updateComponentFontSize(component));
 
         setupGlobalJavaEditorWatcher(project, parentDisposable);
 

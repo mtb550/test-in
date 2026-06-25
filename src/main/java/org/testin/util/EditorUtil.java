@@ -13,6 +13,8 @@ import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.logger.Log;
+import org.testin.util.services.EditorStateService;
+import org.testin.util.services.Services;
 
 import java.util.Optional;
 
@@ -44,6 +46,8 @@ public final class EditorUtil {
                 break;
             }
         }
+
+        Services.getInstance(project, EditorStateService.class).saveOpenEditors();
     }
 
     public void closeThenOpenEditor(final @NotNull Project project, final VirtualFile vf, final DirectoryDto dir) {
@@ -74,10 +78,12 @@ public final class EditorUtil {
         final FileType ft = dir instanceof TestRunDirectoryDto ? FileType.TEST_RUN : FileType.TEST_CASE;
         final UnifiedVirtualFile newVf = new UnifiedVirtualFile(dir, ft);
 
-        ApplicationManager.getApplication().invokeLater(() ->
-                Optional.ofNullable(FileEditorManager.getInstance(project))
-                        .ifPresent(editorManager -> editorManager.openFile(newVf, true))
-        );
+        ApplicationManager.getApplication().invokeLater(() -> {
+            Optional.ofNullable(FileEditorManager.getInstance(project))
+                    .ifPresent(editorManager -> editorManager.openFile(newVf, true));
+
+            Services.getInstance(project, EditorStateService.class).saveOpenEditors();
+        });
     }
 
     public void openEditorIfNotOpen(final @NotNull Project project, final DirectoryDto dir) {

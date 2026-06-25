@@ -344,7 +344,7 @@ public final class Tools {
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
 
         if (generatedFqcn.isEmpty()) {
-            Services.getInstance(project, Notifier.class).softShow(project,"empty fqcn , directory: "+ dir.getPath());
+            Services.getInstance(project, Notifier.class).softShow(project, "empty fqcn , directory: " + dir.getPath());
         }
 
         int lastIdx = generatedFqcn.size() - 1;

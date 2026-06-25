@@ -16,6 +16,7 @@ import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
+import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.util.Collection;
@@ -24,9 +25,12 @@ import java.util.List;
 import java.util.UUID;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
+    private Project project;
 
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
+        this.project = element.getProject();
+
         if (!(element instanceof PsiJavaToken token) || token.getTokenType() != JavaTokenType.STRING_LITERAL) {
             return;
         }
@@ -48,7 +52,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
                 psiElement -> "View Test Case Details",
-                (mouseEvent, psiElement) -> openViewPanel(element.getProject(), extractedValue),
+                (mouseEvent, psiElement) -> openViewPanel(UUID.fromString(extractedValue)),
                 GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
         );
@@ -56,33 +60,32 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         result.add(marker);
     }
 
-    private void openViewPanel(Project project, String targetId) {
-        Log.info("[GUTTER TRACE] Searching for UUID: " + targetId);
+    private void openViewPanel(final @NotNull UUID uuid) {
+        Log.info("Searching for UUID: " + uuid);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
                 indexer.awaitIndexing();
 
-                final UUID uuid = UUID.fromString(targetId);
                 final TestCaseDto dto = indexer.getTestCaseById(uuid);
 
                 if (dto == null) {
-                    Log.error("[GUTTER TRACE] Test case not found in indexer: " + targetId);
+                    Log.error("Test case not found in indexer: " + uuid);
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).warn(project, "Not Found", "No test case found in indexer for ID: " + targetId)
+                            Services.getInstance(project, Notifier.class).warn(project, "Not Found", "No test case found in indexer for ID: " + uuid)
                     );
                     return;
                 }
 
-                Log.info("[GUTTER TRACE] Found in indexer: " + dto.getDescription());
+                Log.info("Found in indexer: " + dto.getDescription());
 
                 ApplicationManager.getApplication().invokeLater(() ->
-                        ViewToolWindowFactory.showPanel(project, List.of(dto), dto.getParent().getPath2())
+                        ViewToolWindowFactory.showPanel(project, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab)
                 );
 
             } catch (Exception ex) {
-                Log.error("[GUTTER TRACE] Error: " + ex.getMessage());
+                Log.error("Error: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
                         Services.getInstance(project, Notifier.class).error(project, "Error", "Could not find test case: " + ex.getMessage())
                 );

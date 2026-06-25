@@ -2,6 +2,7 @@ package org.testin.editorPanel;
 
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
@@ -20,6 +21,16 @@ public class UnifiedVirtualFile extends LightVirtualFile {
     @Override
     public boolean isValid() {
         return true;
+    }
+
+    @Override
+    public @NotNull String getUrl() {
+        return "testin://" + dir.getPath().toAbsolutePath().toString().replace("\\", "/");
+    }
+
+    @Override
+    public @NotNull String getPath() {
+        return dir.getPath().toAbsolutePath().toString();
     }
 
     public TestSetDirectoryDto getTestSet() {
