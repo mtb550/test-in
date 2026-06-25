@@ -75,8 +75,6 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
     TestRunDto tr;
 
-    private RunSessionCache sessionCache;
-
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
 
     private JBList<TestCaseDto> list;
@@ -195,51 +193,44 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     this.list.getEmptyText().setText("Loading...");
                 }
 
-                this.sessionCache = new RunSessionCache(this.tr, parent != null ? parent.getPath() : null);
+                ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                    final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                    indexer.awaitIndexing();
 
-                sessionCache.setListener(new RunSessionCache.ICacheListener() {
-                    @Override
-                    public void onItemsLoaded(final List<TestCaseDto> items) {
-                        allTestCases.addAll(items);
-                        currentTestCases.addAll(items);
-                        items.forEach(item -> {
-                            final TestRunItems runItem = resultsMap.get(item.getId());
+                    final List<TestCaseDto> loadedItems = new ArrayList<>();
 
-                            if (runItem != null) {
-                                runItem.setTc(item);
+                    if (tr != null && !tr.getResults().isEmpty()) {
+                        for (final TestRunItems item : tr.getResults()) {
+                            final TestCaseDto tc = indexer.getTestCaseById(item.getId());
+                            if (tc != null) {
+                                loadedItems.add(tc);
+                                final TestRunItems runItem = resultsMap.get(item.getId());
+                                if (runItem != null) {
+                                    runItem.setTc(tc);
+                                }
                             }
-                        });
+                        }
+                    }
+
+                    final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(project, loadedItems).sortedList();
+                    Services.getInstance(project, TestCaseCacheService.class).load(sorted);
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        allTestCases.clear();
+                        allTestCases.addAll(sorted);
+                        currentTestCases.clear();
+                        currentTestCases.addAll(sorted);
+
+                        if (list != null) {
+                            list.setPaintBusy(false);
+                            if (allTestCases.isEmpty()) {
+                                list.getEmptyText().setText("No test cases found in this run.");
+                            }
+                        }
 
                         refreshView();
-                    }
-
-                    @Override
-                    public void onLoadComplete(final List<TestCaseDto> allItems) {
-                        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                            final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(project, allItems).sortedList();
-                            Services.getInstance(project, TestCaseCacheService.class).load(sorted);
-
-                            ApplicationManager.getApplication().invokeLater(() -> {
-                                allTestCases.clear();
-                                allTestCases.addAll(sorted);
-
-                                currentTestCases.clear();
-                                currentTestCases.addAll(sorted);
-
-                                if (list != null) {
-                                    list.setPaintBusy(false);
-                                    if (allTestCases.isEmpty()) {
-                                        list.getEmptyText().setText("No test cases found in this run.");
-                                    }
-                                }
-
-                                refreshView();
-                            });
-                        });
-                    }
+                    });
                 });
-
-                sessionCache.startLoadingAsync(project);
             });
         });
     }
@@ -284,9 +275,6 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
         if (toolBarSearch != null)
             toolBarSearch.resetSearchQuery();
-
-        if (sessionCache != null)
-            sessionCache.dispose();
 
         this.allTestCases.clear();
         this.currentTestCases.clear();
@@ -359,10 +347,15 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public Set<String> getAvailableModules() {
-        if (this.sessionCache != null) {
-            return this.sessionCache.getLoadedModules();
+        Services.getInstance(project, ProjectIndexer.class);
+        final Set<String> modules = new HashSet<>();
+        for (final TestCaseDto tc : allTestCases) {
+            final String module = tc.getModule();
+            if (!module.trim().isEmpty()) {
+                modules.add(module.trim());
+            }
         }
-        return Collections.emptySet();
+        return modules;
     }
 
     private List<TestCaseDto> getFilteredList() {
@@ -410,10 +403,6 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         if (list != null)
             for (MouseListener listener : list.getMouseListeners())
                 list.removeMouseListener(listener);
-
-        if (sessionCache != null) {
-            sessionCache.dispose();
-        }
 
         if (toolBar != null) {
             toolBar.dispose();

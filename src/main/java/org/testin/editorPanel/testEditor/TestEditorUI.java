@@ -78,7 +78,6 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
     private final List<TestCaseDto> currentTestCases;
 
-    private TestSessionCache sessionCache;
 
     @Getter
     @Setter
@@ -161,48 +160,47 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     }
 
     private void loadDataAsync() {
-        this.sessionCache = new TestSessionCache(project, parent.getPath());
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            indexer.awaitIndexing();
 
-        sessionCache.setListener(new TestSessionCache.ICacheListener() {
+            final List<TestCaseDto> items = indexer.getTestCasesForTestSet(parent.getPath());
 
-            @Override
-            public void onItemsLoaded(final List<TestCaseDto> items) {
-                allTestCases.addAll(items);
-                currentTestCases.addAll(items);
-                items.forEach(item -> unsortedIds.add(item.getId()));
-                items.forEach(item -> item.setParent(parent));
-                refreshView();
-            }
-
-            @Override
-            public void onLoadComplete(final List<TestCaseDto> allItems) {
-                ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(project, allItems);
-                    Services.getInstance(project, TestCaseCacheService.class).load(result.sortedList());
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        allTestCases.clear();
-                        allTestCases.addAll(result.sortedList());
-                        currentTestCases.clear();
-                        currentTestCases.addAll(result.sortedList());
-
-                        unsortedIds.clear();
-                        unsortedIds.addAll(result.unsortedIds());
-
-                        if (list != null) {
-                            list.setPaintBusy(false);
-                            if (allTestCases.isEmpty()) {
-                                list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
-                            }
-                        }
-
-                        refreshView();
-                    });
+            if (items.isEmpty()) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (list != null) {
+                        list.setPaintBusy(false);
+                        list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
+                    }
                 });
+                return;
             }
-        });
 
-        sessionCache.startLoadingAsync();
+            Services.getInstance(project, TestCaseCacheService.class).load(items);
+
+            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(project, items);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                allTestCases.clear();
+                allTestCases.addAll(result.sortedList());
+                currentTestCases.clear();
+                currentTestCases.addAll(result.sortedList());
+
+                unsortedIds.clear();
+                unsortedIds.addAll(result.unsortedIds());
+
+                result.sortedList().forEach(tc -> tc.setParent(parent));
+
+                if (list != null) {
+                    list.setPaintBusy(false);
+                    if (allTestCases.isEmpty()) {
+                        list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
+                    }
+                }
+
+                refreshView();
+            });
+        });
     }
 
     private void onDataSynced() {
@@ -340,10 +338,6 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
             toolBarSearch.resetSearchQuery();
         }
 
-        if (sessionCache != null) {
-            sessionCache.dispose();
-        }
-
         this.allTestCases.clear();
         this.currentTestCases.clear();
         this.unsortedIds.clear();
@@ -411,10 +405,15 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public Set<String> getAvailableModules() {
-        if (this.sessionCache != null) {
-            return this.sessionCache.getLoadedModules();
+        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        final Set<String> modules = new HashSet<>();
+        for (final TestCaseDto tc : indexer.getTestCasesForTestSet(parent.getPath())) {
+            final String module = tc.getModule();
+            if (!module.trim().isEmpty()) {
+                modules.add(module.trim());
+            }
         }
-        return Collections.emptySet();
+        return modules;
     }
 
     private List<TestCaseDto> getFilteredList() {
@@ -453,10 +452,6 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         if (list != null)
             for (MouseListener listener : list.getMouseListeners())
                 list.removeMouseListener(listener);
-
-        if (sessionCache != null) {
-            sessionCache.dispose();
-        }
 
         if (toolBar != null) {
             toolBar.dispose();

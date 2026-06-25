@@ -49,10 +49,16 @@ public class TestNGRunnerByClass {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
 
+                        if (finalFqcn == null || finalFqcn.isEmpty()) {
+                            Log.warn("Cannot run test class: qualified name is null or empty");
+                            return;
+                        }
+
                         RunManager runManager = RunManager.getInstance(project);
                         TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
-                        String simpleClassName = finalFqcn.substring(finalFqcn.lastIndexOf('.') + 1);
+                        final int dotIndex = finalFqcn.lastIndexOf('.');
+                        String simpleClassName = (dotIndex >= 0) ? finalFqcn.substring(dotIndex + 1) : finalFqcn;
 
                         RunnerAndConfigurationSettings settings = runManager.findConfigurationByName(simpleClassName);
 

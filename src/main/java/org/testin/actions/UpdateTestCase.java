@@ -12,12 +12,14 @@ import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testCase.TestCaseUpdateMenu;
 import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
+import org.testin.util.autoGenerator.GeneratorAction;
 import org.testin.util.autoGenerator.GeneratorType;
+import org.testin.util.autoGenerator.UpdateTestMethod;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
-import org.testin.util.services.TestCaseCacheService;
-import org.testin.util.services.TestCasePersistService;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
@@ -51,12 +53,11 @@ public class UpdateTestCase extends DumbAwareAction {
 
         new TestCaseUpdateMenu(project, selectedItems, (updatedItems, codeGenerator) -> {
 
-            //todo: move to indexer
-            Services.getInstance(project, TestCaseCacheService.class).addNewItems(updatedItems);
-
-            //todo: move to indexer
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             if (path != null) {
-                Services.getInstance(project, TestCasePersistService.class).persist(path, updatedItems);
+                for (final TestCaseDto tc : updatedItems) {
+                    indexer.putTestCase(path, tc);
+                }
             }
 
             Services.getInstance(project, Notifier.class).softShow(project, "Updated..");
@@ -72,44 +73,33 @@ public class UpdateTestCase extends DumbAwareAction {
                 if (detailsPanel != null && detailsPanel.getCurrentTestCaseDto() != null) {
                     boolean isCurrentAffected = updatedItems.stream()
                             .anyMatch(item -> item.getId().equals(detailsPanel.getCurrentTestCaseDto().getId()));
-
                     if (isCurrentAffected) {
                         detailsPanel.refreshCurrentView();
                     }
                 }
 
                 if (codeGenerator != null && codeGenerator.isSelected()) {
-                    Log.trace("Code generator is selected! Change Type received: " + codeGenerator.getGeneratorType());
+                    final GeneratorType type = codeGenerator.getGeneratorType();
+                    Log.trace("Code generator selected: " + type);
 
-                    // todo, all if statements here to be moved to enum class
-                    if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_DESCRIPTION) {
-                        Log.trace("Routing to UpdateTestCaseDescription()...");
-                        //new UpdateTestCaseDescription().execute(project, updatedItems.getFirst().getFqcn(), updatedItems.getFirst());
-                        return;
+                    if (type != null) {
+                        final GeneratorAction action = type.getAction();
+                        final TestCaseDto firstItem = updatedItems.getFirst();
+
+                        final List<String> fqcn = Services.getInstance(project, Tools.class)
+                                .buildFqcnMethod(firstItem);
+
+                        if (action instanceof UpdateTestMethod utm) {
+                            utm.setChangeType(type);
+                        }
+
+                        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                                action.execute(project, firstItem, fqcn)
+                        );
                     }
-
-                    if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT) {
-                        Log.trace("Routing to Update Expected Results (Type 2)...");
-                        return;
-                    }
-
-                    if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_GROUP) {
-                        Log.trace("Routing to Update Group (Type 2)...");
-                        return;
-                    }
-
-                    if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_MODULE) {
-                        Log.trace("Routing to Update Module (Type 2)...");
-                        return;
-                    }
-
-                    if (codeGenerator.getGeneratorType() == GeneratorType.UPDATE_TEST_CASE_STEPS) {
-                        Log.trace("Routing to Update Steps (Type 3)...");
-                    }
-
-                } else
+                } else {
                     Log.trace("Code generator is NOT selected or is null.");
-
+                }
             });
         }).show();
     }

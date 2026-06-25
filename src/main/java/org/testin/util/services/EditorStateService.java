@@ -94,7 +94,4 @@ public final class EditorStateService {
         }
     }
 
-    public void clearSavedEditors() {
-        PropertiesComponent.getInstance().setValue(OPEN_EDITORS_KEY, null);
-    }
 }

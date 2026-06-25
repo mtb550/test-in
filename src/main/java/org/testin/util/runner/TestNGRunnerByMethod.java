@@ -52,7 +52,8 @@ public final class TestNGRunnerByMethod {
 
                     final Module finalModule = ModuleUtilCore.findModuleForPsiElement(targetClass);
                     final String finalFqcn = targetClass.getQualifiedName();
-                    final String simpleClassName = classFqcn.substring(classFqcn.lastIndexOf('.') + 1);
+                    final int dotIndex = classFqcn.lastIndexOf('.');
+                    final String simpleClassName = (dotIndex >= 0) ? classFqcn.substring(dotIndex + 1) : classFqcn;
                     final String configLabel = simpleClassName + "." + methodName;
 
                     Log.info("finalFqcn: " + finalFqcn + ", simpleClass: " + simpleClassName);

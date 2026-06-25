@@ -19,12 +19,14 @@ import org.testin.settings.Setting;
 import org.testin.ui.testCase.TestCaseUpdateMenu;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
+import org.testin.util.autoGenerator.GeneratorAction;
+import org.testin.util.autoGenerator.GeneratorType;
+import org.testin.util.autoGenerator.UpdateTestMethod;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
-import org.testin.util.services.TestCaseCacheService;
-import org.testin.util.services.TestCasePersistService;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 import org.testin.viewPanel.details.components.*;
@@ -145,12 +147,13 @@ public class DetailsTab {
         final List<TestCaseDto> items = List.of(dto);
 
         new TestCaseUpdateMenu(project, items, (updatedItems, codeGenerator) -> {
-            // todo, call indexer instead then it will update cache and file
-            Services.getInstance(project, TestCaseCacheService.class).addNewItems(updatedItems);
-
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             final Path editPath = resolveEditPath(project, dto, currentPath);
+
             if (editPath != null) {
-                Services.getInstance(project, TestCasePersistService.class).persist(editPath, updatedItems);
+                for (final TestCaseDto tc : updatedItems) {
+                    indexer.putTestCase(editPath, tc);
+                }
             }
 
             Services.getInstance(project, Notifier.class).softShow(project, "Updated..");
@@ -166,7 +169,24 @@ public class DetailsTab {
                 }
 
                 if (codeGenerator != null && codeGenerator.isSelected()) {
-                    Log.trace("[DetailsTab] Code generator selected: " + codeGenerator.getGeneratorType());
+                    final GeneratorType type = codeGenerator.getGeneratorType();
+                    Log.trace("Code generator selected: " + type);
+
+                    if (type != null) {
+                        final GeneratorAction action = type.getAction();
+                        final TestCaseDto firstItem = updatedItems.getFirst();
+
+                        final List<String> fqcn = Services.getInstance(project, Tools.class)
+                                .buildFqcnMethod(firstItem);
+
+                        if (action instanceof UpdateTestMethod utm) {
+                            utm.setChangeType(type);
+                        }
+
+                        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                                action.execute(project, firstItem, fqcn)
+                        );
+                    }
                 }
             });
         }).show();
