@@ -170,8 +170,8 @@ customize run toolbar to add duration and other items to details. pending
 
 put the description in details and apply control to hide or show it.
 
-/// TODO: if statement here to be removed as all will title will show and use preferences that store others shown attributes.
-/// backlog: put title in toolbar details options and make checked and enabled.
+TO DO: if statement here to be removed as all will title will show and use preferences that store others shown attributes.
+backlog: put title in toolbar details options and make checked and enabled.
 
 build edit menu for test run to edit actual result, statuses, put screenshots. also you need to build create login, need to study business first.
 
@@ -236,3 +236,6 @@ if change test run to completed then change pending test cases to untested autom
 apply adding test methods once import the test cases. [important]
 
 revamp ui -> freelancer.
+
+
+I want to add the selected project to properties to be saved for next open to select it automatic.

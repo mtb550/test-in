@@ -44,12 +44,20 @@ public final class Log {
         log(Level.INFO, WALKER.getCallerClass().getSimpleName(), message);
     }
 
+    public static void info(final @NotNull String callerClass, final @NotNull String message) {
+        log(Level.INFO, callerClass, message);
+    }
+
     public static void warn(final @NotNull String message) {
         log(Level.WARN, WALKER.getCallerClass().getSimpleName(), message);
     }
 
     public static void error(final @NotNull String message) {
         log(Level.ERROR, WALKER.getCallerClass().getSimpleName(), message);
+    }
+
+    public static void error(final @NotNull String callerClass, final @NotNull String message) {
+        log(Level.ERROR, callerClass, message);
     }
 
     public static void fatal(final @NotNull String message) {

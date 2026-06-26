@@ -106,76 +106,74 @@ public final class ProjectIndexer {
 
         Log.info("Indexing " + validProjects.size() + " projects with per-project progress...");
 
-        final CountDownLatch projectLatch = new CountDownLatch(validProjects.size());
+        ProgressManager.getInstance()
+                .run(new Task.Backgroundable(project, "Testin indexing", true) {
+                    @Override
+                    public void run(@NotNull ProgressIndicator indicator) {
+                        indicator.setIndeterminate(false);
 
-        for (final Path projectPath : validProjects) {
-            final String projectName = projectPath.getFileName().toString();
+                        for (int i = 0; i < validProjects.size(); i++) {
+                            Path projectPath = validProjects.get(i);
+                            String projectName = projectPath.getFileName().toString();
 
-            ApplicationManager.getApplication().executeOnPooledThread(() -> ProgressManager.getInstance()
-                    .run(new Task.Backgroundable(project, "Test Project: " + projectName, true) {
-                             @Override
-                             public void run(@NotNull ProgressIndicator indicator) {
-                                 indicator.setIndeterminate(false);
-                                 indicator.setFraction(0.0);
-                                 indicator.setText("Testin indexing...");
+                            indicator.setFraction((double) i / validProjects.size());
+                            indicator.setText("Indexing " + projectName + "...");
 
-                                 try {
-                                     indexProject(projectPath, indicator);
-                                 } catch (Exception e) {
-                                     Log.error("Failed to index project: " + projectName + " - " + e.getMessage());
-                                 }
+                            try {
+                                indexProject(projectPath, indicator);
+                            } catch (Exception e) {
+                                Log.error(ProjectIndexer.class.getSimpleName(), "Failed to index project: " + projectName + " - " + e.getMessage());
+                            }
+                        }
 
-                                 indicator.setFraction(1.0);
-                                 indicator.setText("Done.");
-                             }
+                        indicator.setFraction(1.0);
+                        indicator.setText("Done.");
+                    }
 
-                             @Override
-                             public void onFinished() {
-                                 projectLatch.countDown();
-                             }
-                         }
-                    ));
-        }
+                    @Override
+                    public void onSuccess() {
+                        indexed.set(true);
+                        indexing.set(false);
+                        indexingLatch.countDown();
 
-        try {
-            projectLatch.await();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+                        final long estimatedBytes = MemoryEstimator.estimate(
+                                testCasesById, testRunsById,
+                                testProjectsByPath, testSetsByPath,
+                                testRunDirsByPath, testSetPackagesByPath,
+                                testRunPackagesByPath, testCasesMainDirsByPath,
+                                testRunsMainDirsByPath, testSetCaseIds,
+                                testRunsByPath);
 
-        indexed.set(true);
-        indexing.set(false);
-        indexingLatch.countDown();
+                        MemoryEstimator.logStats(
+                                "Indexer Memory Stats",
+                                testCasesById.size(), testRunsById.size(),
+                                testProjectsByPath.size(), testSetsByPath.size(),
+                                testRunDirsByPath.size(), testSetPackagesByPath.size(),
+                                testRunPackagesByPath.size(), testCasesMainDirsByPath.size(),
+                                testRunsMainDirsByPath.size(),
+                                testSetCaseIds.size(),
+                                testSetCaseIds.values().stream().mapToInt(List::size).sum(),
+                                testRunsByPath.size(),
+                                estimatedBytes);
 
-        final long estimatedBytes = MemoryEstimator.estimate(
-                testCasesById, testRunsById,
-                testProjectsByPath, testSetsByPath,
-                testRunDirsByPath, testSetPackagesByPath,
-                testRunPackagesByPath, testCasesMainDirsByPath,
-                testRunsMainDirsByPath, testSetCaseIds,
-                testRunsByPath);
+                        Log.info(ProjectIndexer.class.getSimpleName(), "indexing complete. " +
+                                testCasesById.size() + " test cases, " +
+                                testRunsById.size() + " test runs, " +
+                                testProjectsByPath.size() + " projects indexed.");
 
-        MemoryEstimator.logStats(
-                "Indexer Memory Stats",
-                testCasesById.size(), testRunsById.size(),
-                testProjectsByPath.size(), testSetsByPath.size(),
-                testRunDirsByPath.size(), testSetPackagesByPath.size(),
-                testRunPackagesByPath.size(), testCasesMainDirsByPath.size(),
-                testRunsMainDirsByPath.size(),
-                testSetCaseIds.size(),
-                testSetCaseIds.values().stream().mapToInt(List::size).sum(),
-                testRunsByPath.size(),
-                estimatedBytes);
+                        ApplicationManager.getApplication().invokeLater(() -> {
+                            Log.info(ProjectIndexer.class.getSimpleName(), "indexing finished, restoring open editors.");
+                            Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
+                        });
+                    }
 
-        Log.info("ProjectIndexer: indexing complete. " +
-                testCasesById.size() + " test cases, " +
-                testRunsById.size() + " test runs, " +
-                testProjectsByPath.size() + " projects indexed.");
-
-        ApplicationManager.getApplication().invokeLater(() -> {
-            Log.info("ProjectIndexer: indexing finished, restoring open editors.");
-            Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
-        });
+                    @Override
+                    public void onThrowable(@NotNull Throwable error) {
+                        indexing.set(false);
+                        indexingLatch.countDown();
+                        Log.error(ProjectIndexer.class.getSimpleName(), "ProjectIndexer encountered a critical error: " + error.getMessage());
+                    }
+                });
     }
 
     public void awaitIndexing() {

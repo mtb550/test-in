@@ -97,7 +97,7 @@ public final class LoggerService implements Disposable {
         if (writerThread != null) {
             writerThread.interrupt();
         }
-        // Clear log file on application close
+
         try {
             Path logFile = getLogFile();
             if (logFile != null && Files.exists(logFile)) {

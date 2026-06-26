@@ -114,6 +114,7 @@ public class ImportExcel extends DumbAwareAction {
     private void openFileChooserAndProcess(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode) {
         final FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withTitle("Select Spreadsheet File")
+                .withExtensionFilter("Excel workbooks", "xls", "xlsx")
                 .withDescription("Please choose an .xls or .xlsx file");
 
         final VirtualFile selectedFile = FileChooser.chooseFile(descriptor, project, null);
@@ -324,7 +325,7 @@ public class ImportExcel extends DumbAwareAction {
                                     List<TestCaseDto> flatList = new ArrayList<>();
                                     selectedCasesBySheet.values().forEach(flatList::addAll);
 
-                                    linkAndSaveTestCases(project, targetDirectory, flatList, tail, ImportExcel.this);
+                                    linkAndSaveTestCases(project, targetDirectory, flatList, tail);
 
                                     Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
                                     Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
@@ -338,7 +339,7 @@ public class ImportExcel extends DumbAwareAction {
                                         VirtualFile sheetDir = new CreateTestSet().inBackground(project, ImportExcel.this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
 
                                         TestCaseDto tail = findExistingTail(project, sheetDir);
-                                        linkAndSaveTestCases(project, sheetDir, sheetCases, tail, ImportExcel.this);
+                                        linkAndSaveTestCases(project, sheetDir, sheetCases, tail);
                                         totalImported += sheetCases.size();
                                     }
                                     Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
@@ -359,7 +360,7 @@ public class ImportExcel extends DumbAwareAction {
         });
     }
 
-    private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final Object requestor) throws IOException {
+    private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail) throws IOException {
         final Path dirPath = Path.of(dir.getPath());
         final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
