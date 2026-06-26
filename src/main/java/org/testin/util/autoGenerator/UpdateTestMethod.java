@@ -11,7 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Group;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.Tools;
 import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
 
 import java.util.List;
 
@@ -95,6 +97,12 @@ public class UpdateTestMethod implements GeneratorAction {
         String newValue = "\"" + tc.getDescription().replace("\"", "\\\"") + "\"";
 
         updateAnnotationAttribute(factory, testAnnotation, "description", newValue);
+
+        final String newMethodName = Services.getInstance(project, Tools.class).sanitizeMethodName(tc.getDescription());
+        if (!method.getName().equals(newMethodName)) {
+            method.setName(newMethodName);
+        }
+
         CodeStyleManager.getInstance(project).reformat(method);
     }
 

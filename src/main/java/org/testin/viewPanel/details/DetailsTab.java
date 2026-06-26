@@ -67,7 +67,7 @@ public class DetailsTab {
 
             detailsTab.add(scrollPane, BorderLayout.CENTER);
 
-            registerEditShortcutOnce(project, detailsTab, dto, currentPath);
+            registerEditShortcutOnce(project, detailsTab);
         }
 
         detailsTab.revalidate();
@@ -124,7 +124,7 @@ public class DetailsTab {
         panel.add(Box.createVerticalGlue(), spacerGbc);
     }
 
-    private void registerEditShortcutOnce(final @NotNull Project project, final @NotNull JBPanel<?> detailsTab, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    private void registerEditShortcutOnce(final @NotNull Project project, final @NotNull JBPanel<?> detailsTab) {
         if (Boolean.TRUE.equals(detailsTab.getClientProperty(SHORTCUT_REGISTERED_KEY))) {
             return;
         }
@@ -133,7 +133,14 @@ public class DetailsTab {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
-                openUpdateMenu(project, dto, currentPath);
+                final ViewPanel viewPanel = ViewToolWindowFactory.getViewPanel();
+                if (viewPanel == null) return;
+
+                final TestCaseDto currentDto = viewPanel.getCurrentTestCaseDto();
+                if (currentDto == null) return;
+
+                final ArrayList<String> path = viewPanel.getPage().getCurrentPath();
+                openUpdateMenu(project, currentDto, path);
             }
 
             @Override

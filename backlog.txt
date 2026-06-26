@@ -64,38 +64,16 @@ open the bug on our open GitHub once test case failed within execution of test r
 
 I think the method runner can run the class. no need for class runner. to be checked.
 
-extend IntelliJ disposer to save tree state and open editors once close to re-open after run IntelliJ again
-// use activity IntelliJ class to open the editors once run directly
-//public class testingStartupActivity implements ProjectActivity {}
-
 add sorting attribute to view panel in test case details so can update the sort value.
 
-make automation reference auto added once create the test case.
-
-make created by auto added once create the test case.
-
-make modified by auto added once update the test case.
-
-test run execution light mode. small plugin can be dragged separate.
-
-update creating test case ui.
-
-extend space of pagination text field value to show 3 digits clearly.
-
-add a button once hover on label, show copy button and accept CTRL+C
+test run execution light mode. small plugin can be dragged separate. [important]
 
 make test case dto configurable.
 
-listener between editors corrected, not show the selected in view panel once change editor.
-
-زر النسخ كتقرير خطأ (Copy Bug Report)
-
-persist save action.
+زر النسخ كتقرير خطأ (Copy Bug Report), [important]
 
 make step in the first line. make dot and capitalize first letter automatic > steps
 make capitalize and dot in test case card and run card. move format method to Tools.
-
-implement progress icon in all 3 components. tree, editor, view
 
 all ui to be updated to the new ui, frameless and buttonless. remove and add and all ui (important)
 
@@ -105,15 +83,9 @@ view panel enhancements:
 merge created by at and updated by at.
 
 ui enhance:
-1-
-persist edit. (pending). remove save method in section classes,
-instead use persistence manages in action consumer.
+2-refactor remove test case class: RemoveTestCaseDialog.java
 
-2-
-refactor remove test case class: RemoveTestCaseDialog.java
-
-3-
-implement broadcasting to update project tree.
+3-implement broadcasting to update project tree.
 Config.getProject().getMessageBus().syncPublisher(TestCaseEventListener.TEST_CASE_ADDED_TOPIC).onTestCaseAdded(newTc);});
 
 test editor cards is stored in cache and not disposed. once you close editor and update one of ots test case manually from JSON then re-open the editor,
@@ -248,8 +220,8 @@ test cases repository options: local server and connect via ssh, git source, ftp
 
 apply check box once update test case. with unify methods for sanitize names for packages and classes
 
-major change, build fast parallel indexer, to retrieve test cases easily, in test runs,
-retrieve test cases faster and easier (first, restrict creating test run until commit the current changes).
+major change, build fast parallel indexer, to retrieve test cases easily. [important].
+in test runs,retrieve test cases faster and easier (first, restrict creating test run until commit the current changes).
 retrieve test cases easily and faster, as we read tree once in startup time.
 test run items will be @jsonIgnore as the JSON should have the ids only then get the objects from cache.
 
@@ -257,10 +229,10 @@ major change, move to tree async model, to manage update, remove, dispose and re
 
 fix pi report issues.
 
-update the buttons: PASSED, FAILED.etc. remove it and use a context buttons and shortcuts. make button double height.
-
 in test run, I want to highlight the running test case, by add a new badge (Active) or change the description color for current running.
 
 if change test run to completed then change pending test cases to untested automatic.
 
-remove test in GitHub project and recreate it with new history.
+apply adding test methods once import the test cases. [important]
+
+revamp ui -> freelancer.
