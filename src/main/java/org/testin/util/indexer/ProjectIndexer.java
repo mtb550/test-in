@@ -17,6 +17,7 @@ import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.settings.Setting;
 import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
+import org.testin.util.MemoryEstimator;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.services.EditorStateService;
@@ -28,6 +29,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service(Service.Level.PROJECT)
@@ -95,36 +97,84 @@ public final class ProjectIndexer {
                    ? Path.of(project.getBasePath(), rootPath.toString())
                    : rootPath);
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Indexing Testin data...", true) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(false);
-                indicator.setText("Scanning test projects...");
-                indicator.setFraction(0.0);
+        final List<Path> validProjects = collectValidProjects(absoluteRoot);
+        if (validProjects.isEmpty()) {
+            indexing.set(false);
+            indexingLatch.countDown();
+            return;
+        }
 
-                try {
-                    indexAll(absoluteRoot, indicator);
-                } catch (Exception e) {
-                    Log.error("Indexing failed: " + e.getMessage());
-                }
+        Log.info("Indexing " + validProjects.size() + " projects with per-project progress...");
 
-                indexed.set(true);
-                indexing.set(false);
-                indexingLatch.countDown();
+        final CountDownLatch projectLatch = new CountDownLatch(validProjects.size());
 
-                Log.info("ProjectIndexer: indexing complete. " +
-                        testCasesById.size() + " test cases, " +
-                        testRunsById.size() + " test runs, " +
-                        testProjectsByPath.size() + " projects indexed.");
-            }
+        for (final Path projectPath : validProjects) {
+            final String projectName = projectPath.getFileName().toString();
 
-            @Override
-            public void onFinished() {
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    Log.info("ProjectIndexer: indexing finished, restoring open editors.");
-                    Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
-                });
-            }
+            ApplicationManager.getApplication().executeOnPooledThread(() -> ProgressManager.getInstance()
+                    .run(new Task.Backgroundable(project, "Test Project: " + projectName, true) {
+                             @Override
+                             public void run(@NotNull ProgressIndicator indicator) {
+                                 indicator.setIndeterminate(false);
+                                 indicator.setFraction(0.0);
+                                 indicator.setText("Testin indexing...");
+
+                                 try {
+                                     indexProject(projectPath, indicator);
+                                 } catch (Exception e) {
+                                     Log.error("Failed to index project: " + projectName + " - " + e.getMessage());
+                                 }
+
+                                 indicator.setFraction(1.0);
+                                 indicator.setText("Done.");
+                             }
+
+                             @Override
+                             public void onFinished() {
+                                 projectLatch.countDown();
+                             }
+                         }
+                    ));
+        }
+
+        try {
+            projectLatch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        indexed.set(true);
+        indexing.set(false);
+        indexingLatch.countDown();
+
+        final long estimatedBytes = MemoryEstimator.estimate(
+                testCasesById, testRunsById,
+                testProjectsByPath, testSetsByPath,
+                testRunDirsByPath, testSetPackagesByPath,
+                testRunPackagesByPath, testCasesMainDirsByPath,
+                testRunsMainDirsByPath, testSetCaseIds,
+                testRunsByPath);
+
+        MemoryEstimator.logStats(
+                "Indexer Memory Stats",
+                testCasesById.size(), testRunsById.size(),
+                testProjectsByPath.size(), testSetsByPath.size(),
+                testRunDirsByPath.size(), testSetPackagesByPath.size(),
+                testRunPackagesByPath.size(), testCasesMainDirsByPath.size(),
+                testRunsMainDirsByPath.size(),
+                testSetCaseIds.size(),
+                testSetCaseIds.values().stream().mapToInt(List::size).sum(),
+                testRunsByPath.size(),
+                estimatedBytes);
+
+        Log.info("ProjectIndexer: indexing complete. " +
+                testCasesById.size() + " test cases, " +
+                testRunsById.size() + " test runs, " +
+                testProjectsByPath.size() + " projects indexed.");
+
+        ApplicationManager.getApplication().invokeLater(() -> {
+            Log.info("ProjectIndexer: indexing finished, restoring open editors.");
+            Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
         });
     }
 
@@ -141,33 +191,22 @@ public final class ProjectIndexer {
         return indexed.get();
     }
 
-    private void indexAll(final Path rootPath, final ProgressIndicator indicator) {
-        if (!Files.exists(rootPath) || !Files.isDirectory(rootPath)) return;
+    private List<Path> collectValidProjects(final Path rootPath) {
+        if (!Files.exists(rootPath) || !Files.isDirectory(rootPath)) return Collections.emptyList();
 
         final Path[] projectPaths;
         try (Stream<Path> dirs = Files.list(rootPath)) {
             projectPaths = dirs.filter(Files::isDirectory).toArray(Path[]::new);
         } catch (Exception e) {
             Log.error("Failed to list root directory: " + e.getMessage());
-            return;
+            return Collections.emptyList();
         }
 
-        if (projectPaths.length == 0) return;
+        if (projectPaths.length == 0) return Collections.emptyList();
 
-        final double projectWeight = 1.0 / projectPaths.length;
-
-        for (int i = 0; i < projectPaths.length; i++) {
-            final Path projectPath = projectPaths[i];
-            if (!Files.exists(projectPath.resolve(DirectoryType.TP.getMarker()))) continue;
-
-            indicator.setText("Indexing project: " + projectPath.getFileName());
-            indicator.setFraction(i * projectWeight);
-
-            indexProject(projectPath, indicator);
-        }
-
-        indicator.setFraction(1.0);
-        indicator.setText("Indexing complete.");
+        return Arrays.stream(projectPaths)
+                .filter(p -> Files.exists(p.resolve(DirectoryType.TP.getMarker())))
+                .collect(Collectors.toList());
     }
 
     private void indexProject(final Path projectPath, final ProgressIndicator indicator) {
@@ -188,6 +227,8 @@ public final class ProjectIndexer {
 
             testProjectsByPath.put(projectPath.toString(), tp);
 
+            indicator.setText("Indexing test sets...");
+
             final Path tcDir = projectPath.resolve(DirectoryType.TCD.getDisplayedName());
 
             if (Files.exists(tcDir) && Files.isDirectory(tcDir)) {
@@ -204,6 +245,8 @@ public final class ProjectIndexer {
                 indexTestSets(tcDir, tcd, indicator);
             }
 
+            indicator.setText("Indexing test runs...");
+
             final Path trDir = projectPath.resolve(DirectoryType.TRD.getDisplayedName());
             if (Files.exists(trDir) && Files.isDirectory(trDir)) {
 
@@ -217,6 +260,9 @@ public final class ProjectIndexer {
                 testRunsMainDirsByPath.put(trDir.toString(), trd);
                 indexTestRunDirs(trDir, trd, indicator);
             }
+
+            indicator.setFraction(1.0);
+            indicator.setText("Done.");
 
         } catch (Exception e) {
             Log.error("Failed to index project: " + projectPath.getFileName() + " - " + e.getMessage());
@@ -301,7 +347,7 @@ public final class ProjectIndexer {
 
             testSetCaseIds.put(path.toString(), caseIds);
 
-            indicator.setText("Indexing test set: " + fileName + " (" + caseIds.size() + " cases)");
+            indicator.setText("Test set: " + fileName + " (" + caseIds.size() + " cases)");
 
         } catch (Exception e) {
             Log.error("Failed to index test set: " + path.getFileName());
@@ -379,7 +425,7 @@ public final class ProjectIndexer {
                 }
             }
 
-            indicator.setText("Indexing test run: " + fileName);
+            indicator.setText("Test run: " + fileName);
 
         } catch (Exception e) {
             Log.error("Failed to index test run: " + path.getFileName());
@@ -613,17 +659,22 @@ public final class ProjectIndexer {
     }
 
     public void dispose() {
-        testCasesById.clear();
-        testRunsById.clear();
-        testProjectsByPath.clear();
-        testSetsByPath.clear();
-        testRunDirsByPath.clear();
-        testSetPackagesByPath.clear();
-        testRunPackagesByPath.clear();
-        testCasesMainDirsByPath.clear();
-        testRunsMainDirsByPath.clear();
-        testSetCaseIds.clear();
-        testRunsByPath.clear();
+        final long actualBytes = MemoryEstimator.measureActual(() -> {
+            testCasesById.clear();
+            testRunsById.clear();
+            testProjectsByPath.clear();
+            testSetsByPath.clear();
+            testRunDirsByPath.clear();
+            testSetPackagesByPath.clear();
+            testRunPackagesByPath.clear();
+            testCasesMainDirsByPath.clear();
+            testRunsMainDirsByPath.clear();
+            testSetCaseIds.clear();
+            testRunsByPath.clear();
+        });
+
+        Log.info("Indexer disposed — actual RAM freed: " + MemoryEstimator.formatBytes(actualBytes));
+
         indexed.set(false);
         indexingLatch = new CountDownLatch(1);
     }
