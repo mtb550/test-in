@@ -237,5 +237,10 @@ apply adding test methods once import the test cases. [important]
 
 revamp ui -> freelancer.
 
-
 I want to add the selected project to properties to be saved for next open to select it automatic.
+
+once add new test case, it is not added at the end of list.
+
+we need to store the test in path in XML file because once update the plugin every thing missed.
+
+update refresh button to reindex again
