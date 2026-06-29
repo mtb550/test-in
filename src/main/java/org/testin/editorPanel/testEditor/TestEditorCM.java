@@ -29,23 +29,29 @@ public class TestEditorCM extends EditorContextMenu {
     @Setter
     private static IEditorUI globalSourceEditorUI = null;
 
-    public TestEditorCM(final Project project, final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public TestEditorCM(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
 
-        add(new CreateTestCase(ui, dir, list, model));
+        add(new CreateTestCase(ui, dir, list));
         add(new ViewDetails(list, dir.getPath2()));
+
         addSeparator();
+
         add(new UpdateTestCase(ui, list, dir.getPath()));
         add(new CopyTestCase(list));
         add(new CopyTestCaseNode(list));
         add(new CutTestCaseNode(ui, list));
         add(new PasteTestCaseNode(ui, list));
         add(new RemoveTestCase(project, dir, list, model));
+
         addSeparator();
+
         add(new GenerateTestMethod(list));
         add(new RunTestCase(list));
         add(new NavigateToCode(list));
+
         addSeparator();
+
         add(new NextPageAction(ui, list));
         add(new PrevPageAction(ui, list));
     }

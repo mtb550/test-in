@@ -12,15 +12,15 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 
 public class CopyTestCase extends DumbAwareAction {
-    private final JBList<TestCaseDto> list;
+    private final @NotNull JBList<TestCaseDto> list;
 
-    public CopyTestCase(final JBList<TestCaseDto> list) {
+    public CopyTestCase(final @NotNull JBList<TestCaseDto> list) {
         super("Copy", "Copy test case", AllIcons.Actions.Copy);
         this.list = list;
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         TestCaseDto tc = list.getSelectedValue();
         String text = "Description: " + tc.getDescription() + "\nSteps: " + tc.getSteps() + "\nExpected result: " + tc.getExpectedResult();
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
@@ -28,7 +28,7 @@ public class CopyTestCase extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+        e.getPresentation().setEnabled(!list.getSelectedValuesList().isEmpty());
     }
 
     @Override

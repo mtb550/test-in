@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditorUI;
@@ -27,46 +26,14 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CreateTestCase extends DumbAwareAction {
-    private final CollectionListModel<TestCaseDto> model;
-    private final IEditorUI ui;
-    private final DirectoryDto dir;
+    private final @NotNull IEditorUI ui;
+    private final @NotNull DirectoryDto dir;
 
-    public CreateTestCase(final IEditorUI ui, final DirectoryDto pDir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public CreateTestCase(final @NotNull IEditorUI ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         super("Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
-        this.model = model;
         this.ui = ui;
-        this.dir = pDir;
+        this.dir = dir;
         this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getCustomShortcut(), list);
-    }
-
-    public static void execute(final @NotNull Project project, final IEditorUI ui, final DirectoryDto dir, final CollectionListModel<TestCaseDto> model) {
-        performCreation(project, ui, dir, model);
-    }
-
-    private static void performCreation(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull DirectoryDto pDir, final @NotNull CollectionListModel<TestCaseDto> model) {
-        new CreateTestCaseUI(project, (newTc, codeGenerator) -> {
-            final boolean isEmpty = model.isEmpty();
-            newTc.setIsHead(isEmpty);
-
-            final TestCaseDto lastTc = isEmpty ? null : model.getElementAt(model.getSize() - 1);
-            if (lastTc != null) lastTc.setNext(newTc.getId());
-
-            newTc.setParent(pDir);
-            ui.appendNewTestCase(newTc);
-
-            final List<TestCaseDto> affectedNodes = Stream.of(newTc, lastTc).filter(Objects::nonNull).toList();
-            Services.getInstance(project, TestCaseCacheService.class).addNewItems(affectedNodes);
-
-            Services.getInstance(project, TestCasePersistService.class).persist(pDir.getPath(), affectedNodes);
-            Services.getInstance(project, Notifier.class).softShow(project, "Created..");
-
-            if (codeGenerator != null && codeGenerator.isSelected()) {
-                GeneratorType.CREATE_TEST_METHOD.getAction().execute(project, newTc, Services.getInstance(project, Tools.class).buildFqcnMethod(newTc));
-            }
-
-            SwingUtilities.invokeLater(() -> ui.selectTestCase(newTc));
-
-        }).show();
     }
 
     @Override
@@ -74,7 +41,31 @@ public class CreateTestCase extends DumbAwareAction {
         final Project project = e.getProject();
         if (project == null) return;
 
-        performCreation(project, ui, dir, model);
+        new CreateTestCaseUI(project, (newTc, codeGenerator) -> {
+            List<TestCaseDto> allCases = ui.getAllTestCases();
+
+            final boolean isEmpty = allCases.isEmpty();
+            newTc.setIsHead(isEmpty);
+
+            final TestCaseDto lastTc = isEmpty ? null : allCases.getLast();
+            if (lastTc != null)
+                lastTc.setNext(newTc.getId());
+
+            newTc.setParent(dir);
+            ui.appendNewTestCase(newTc);
+
+            final List<TestCaseDto> affectedNodes = Stream.of(newTc, lastTc).filter(Objects::nonNull).toList();
+            Services.getInstance(project, TestCaseCacheService.class).addNewItems(affectedNodes);
+
+            Services.getInstance(project, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
+            Services.getInstance(project, Notifier.class).softShow(project, "Created..");
+
+            if (codeGenerator != null && codeGenerator.isSelected())
+                GeneratorType.CREATE_TEST_METHOD.getAction().execute(project, newTc, Services.getInstance(project, Tools.class).buildFqcnMethod(newTc));
+
+            SwingUtilities.invokeLater(() -> ui.selectTestCase(newTc));
+
+        }).show();
     }
 
     @Override

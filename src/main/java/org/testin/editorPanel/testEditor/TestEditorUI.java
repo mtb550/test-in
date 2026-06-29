@@ -292,7 +292,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        CreateTestCase.execute(project, this, parent, model);
+        new CreateTestCase(this, parent, list);
     }
 
     @Override
