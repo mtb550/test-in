@@ -27,8 +27,7 @@ public final class Mapper {
             return mapper.readValue(src, valueType);
 
         } catch (Exception e) {
-            Log.error("Failed to read file path " + src + ". to class " + valueType.getSimpleName());
-            Log.error("Exception: " + e.getMessage());
+            Log.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + e.getMessage());
             return null;
         }
     }

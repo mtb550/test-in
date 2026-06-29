@@ -75,8 +75,11 @@ public final class MemoryEstimator {
 
     public static String formatBytes(final long bytes) {
         final long kb = bytes / KB;
-        final long mb = kb / KB;
-        return "~" + mb + " MB (" + kb + " KB)";
+        final double mb = (double) kb / KB;
+        if (kb < KB) {
+            return "~" + kb + " KB (" + bytes + " bytes)";
+        }
+        return String.format("~%.1f MB (%d KB)", mb, kb);
     }
 
     public static void logStats(

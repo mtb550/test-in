@@ -79,99 +79,110 @@ public final class ProjectIndexer {
     }
 
     public void indexWithProgress() {
-        if (indexed.get() || indexing.getAndSet(true)) {
-            return;
-        }
+        try {
+            if (indexed.get() || indexing.getAndSet(true)) {
+                return;
+            }
 
-        final Path rootPath = Services.getInstance(project, Setting.class).getTestinPath();
-        if (rootPath.toString().isEmpty()) {
-            indexing.set(false);
-            return;
-        }
+            final Path rootPath = Services.getInstance(project, Setting.class).getTestinPath();
+            if (rootPath.toString().isEmpty()) {
+                indexing.set(false);
+                return;
+            }
 
-        final Path absoluteRoot = rootPath.isAbsolute() ? rootPath
-                : (project.getBasePath() != null
-                   ? Path.of(project.getBasePath(), rootPath.toString())
-                   : rootPath);
+            final Path absoluteRoot = rootPath.isAbsolute() ? rootPath
+                    : (project.getBasePath() != null
+                       ? Path.of(project.getBasePath(), rootPath.toString())
+                       : rootPath);
 
-        final List<Path> validProjects = collectValidProjects(absoluteRoot);
-        if (validProjects.isEmpty()) {
-            indexing.set(false);
-            return;
-        }
+            final List<Path> validProjects = collectValidProjects(absoluteRoot);
+            if (validProjects.isEmpty()) {
+                indexing.set(false);
+                Log.warn("indexWithProgress: No valid projects found at '" + absoluteRoot.toAbsolutePath() + "'");
+                return;
+            }
 
-        indexingLatch = new CountDownLatch(validProjects.size());
+            indexingLatch = new CountDownLatch(validProjects.size());
 
-        Log.info("Indexing " + validProjects.size() + " projects with per-project progress...");
+            Log.info("Indexing " + validProjects.size() + " projects with per-project progress...");
 
-        for (final Path projectPath : validProjects) {
-            final String projectName = projectPath.getFileName().toString();
+            for (final Path projectPath : validProjects) {
+                final String projectName = projectPath.getFileName().toString();
 
-            ProgressManager.getInstance()
-                    .run(new Task.Backgroundable(project, "Testin indexing - " + projectName, true) {
-                        @Override
-                        public void run(@NotNull ProgressIndicator indicator) {
-                            indicator.setIndeterminate(false);
-                            indicator.setFraction(0.0);
-                            indicator.setText("Indexing " + projectName + "...");
+                ProgressManager.getInstance()
+                        .run(new Task.Backgroundable(project, "Testin indexing - " + projectName, true) {
+                            @Override
+                            public void run(@NotNull ProgressIndicator indicator) {
+                                indicator.setIndeterminate(false);
+                                indicator.setFraction(0.0);
+                                indicator.setText("Indexing " + projectName + "...");
 
-                            try {
-                                indexProject(projectPath, indicator);
-                            } catch (Exception e) {
-                                Log.error(ProjectIndexer.class.getSimpleName(), "Failed to index project: " + projectName + " - " + e.getMessage());
+                                try {
+                                    indexProject(projectPath, indicator);
+                                } catch (Exception e) {
+                                    Log.error(ProjectIndexer.class.getSimpleName(), "Failed to index project: " + projectName + " - " + e.getMessage());
+                                }
+
+                                indicator.setFraction(1.0);
+                                indicator.setText("Done - " + projectName);
                             }
 
-                            indicator.setFraction(1.0);
-                            indicator.setText("Done - " + projectName);
-                        }
+                            @Override
+                            public void onSuccess() {
+                                indexingLatch.countDown();
+                                Log.info(ProjectIndexer.class.getSimpleName(), "Project '" + projectName + "' indexed successfully.");
 
-                        @Override
-                        public void onSuccess() {
-                            indexingLatch.countDown();
-                            Log.info(ProjectIndexer.class.getSimpleName(), "Project '" + projectName + "' indexed successfully.");
+                                if (indexingLatch.getCount() == 0 && indexed.compareAndSet(false, true)) {
+                                    indexing.set(false);
 
-                            if (indexed.compareAndSet(false, true)) {
-                                indexing.set(false);
+                                    try {
+                                        final long estimatedBytes = MemoryEstimator.estimate(
+                                                testCasesById, testRunsById,
+                                                testProjectsByPath, testSetsByPath,
+                                                testRunDirsByPath, testSetPackagesByPath,
+                                                testRunPackagesByPath, testCasesMainDirsByPath,
+                                                testRunsMainDirsByPath, testSetCaseIds,
+                                                testRunsByPath);
 
-                                final long estimatedBytes = MemoryEstimator.estimate(
-                                        testCasesById, testRunsById,
-                                        testProjectsByPath, testSetsByPath,
-                                        testRunDirsByPath, testSetPackagesByPath,
-                                        testRunPackagesByPath, testCasesMainDirsByPath,
-                                        testRunsMainDirsByPath, testSetCaseIds,
-                                        testRunsByPath);
+                                        MemoryEstimator.logStats(
+                                                "Indexer Memory Stats",
+                                                testCasesById.size(), testRunsById.size(),
+                                                testProjectsByPath.size(), testSetsByPath.size(),
+                                                testRunDirsByPath.size(), testSetPackagesByPath.size(),
+                                                testRunPackagesByPath.size(), testCasesMainDirsByPath.size(),
+                                                testRunsMainDirsByPath.size(),
+                                                testSetCaseIds.size(),
+                                                testSetCaseIds.values().stream().mapToInt(List::size).sum(),
+                                                testRunsByPath.size(),
+                                                estimatedBytes);
 
-                                MemoryEstimator.logStats(
-                                        "Indexer Memory Stats",
-                                        testCasesById.size(), testRunsById.size(),
-                                        testProjectsByPath.size(), testSetsByPath.size(),
-                                        testRunDirsByPath.size(), testSetPackagesByPath.size(),
-                                        testRunPackagesByPath.size(), testCasesMainDirsByPath.size(),
-                                        testRunsMainDirsByPath.size(),
-                                        testSetCaseIds.size(),
-                                        testSetCaseIds.values().stream().mapToInt(List::size).sum(),
-                                        testRunsByPath.size(),
-                                        estimatedBytes);
+                                        Log.info(ProjectIndexer.class.getSimpleName(), "indexing complete. " +
+                                                testCasesById.size() + " test cases, " +
+                                                testRunsById.size() + " test runs, " +
+                                                testProjectsByPath.size() + " projects indexed.");
 
-                                Log.info(ProjectIndexer.class.getSimpleName(), "indexing complete. " +
-                                        testCasesById.size() + " test cases, " +
-                                        testRunsById.size() + " test runs, " +
-                                        testProjectsByPath.size() + " projects indexed.");
+                                    } catch (Exception e) {
+                                        Log.error(ProjectIndexer.class.getSimpleName(), "Error logging indexer stats: " + e.getMessage());
+                                    }
 
-                                ApplicationManager.getApplication().invokeLater(() -> {
-                                    Log.info(ProjectIndexer.class.getSimpleName(), "indexing finished, restoring open editors.");
-                                    Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
-                                });
+                                    ApplicationManager.getApplication().invokeLater(() -> {
+                                        Log.info(ProjectIndexer.class.getSimpleName(), "indexing finished, restoring open editors.");
+                                        Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
+                                    });
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onThrowable(@NotNull Throwable error) {
-                            indexingLatch.countDown();
-                            Log.error(ProjectIndexer.class.getSimpleName(),
-                                    "ProjectIndexer encountered an error indexing '" + projectName + "': " + error.getMessage());
-                        }
-                    });
+                            @Override
+                            public void onThrowable(@NotNull Throwable error) {
+                                indexingLatch.countDown();
+                                Log.error(ProjectIndexer.class.getSimpleName(),
+                                        "ProjectIndexer encountered an error indexing '" + projectName + "': " + error.getMessage());
+                            }
+                        });
+            }
+        } catch (Exception e) {
+            Log.error(ProjectIndexer.class.getSimpleName(), "indexWithProgress: Failed to index projects: " + e.getMessage());
+            indexing.set(false);
         }
     }
 
@@ -334,9 +345,13 @@ public final class ProjectIndexer {
                                     tc.setParent(ts);
                                     testCasesById.put(tc.getId(), tc);
                                     caseIds.add(tc.getId());
+
+                                } else {
+                                    Log.error("indexTestSet: Mapper returned null for file: " + filePath.toAbsolutePath());
                                 }
+
                             } catch (Exception ex) {
-                                Log.error("Failed to read test case: " + filePath.getFileName());
+                                Log.error("indexTestSet: Failed to read test case file '" + filePath.toAbsolutePath() + "': " + ex.getMessage());
                             }
                         });
             }
@@ -346,22 +361,30 @@ public final class ProjectIndexer {
             indicator.setText("Test set: " + fileName + " (" + caseIds.size() + " cases)");
 
         } catch (Exception e) {
-            Log.error("Failed to index test set: " + path.getFileName());
+            Log.error("Failed to index test set '" + (path != null ? path.getFileName().toString() : "null") + "': " + e.getMessage());
         }
     }
 
     private void indexTestRunDirs(final Path trDir, final DirectoryDto parent, final ProgressIndicator indicator) {
+        Log.info("indexTestRunDirs: Scanning '" + trDir.toAbsolutePath() + "' for test run directories...");
         try (Stream<Path> paths = Files.list(trDir)) {
-            paths.filter(Files::isDirectory)
-                    .forEach(dirPath -> {
-                        if (Files.exists(dirPath.resolve(DirectoryType.TR.getMarker()))) {
-                            indexTestRun(dirPath, parent, indicator);
-                        } else if (Files.exists(dirPath.resolve(DirectoryType.TRP.getMarker()))) {
-                            indexTestRunPackageDir(dirPath, parent, indicator);
-                        }
-                    });
+            final List<Path> dirs = paths.filter(Files::isDirectory).toList();
+            Log.info("indexTestRunDirs: Found " + dirs.size() + " subdirectories in " + trDir.getFileName());
+
+            for (final Path dirPath : dirs) {
+                final Path trMarker = dirPath.resolve(DirectoryType.TR.getMarker());
+                final Path trpMarker = dirPath.resolve(DirectoryType.TRP.getMarker());
+                Log.info("indexTestRunDirs:   Checking '" + dirPath.getFileName() + "' - .tr exists: " + Files.exists(trMarker) + ", .trp exists: " + Files.exists(trpMarker));
+
+                if (Files.exists(trMarker)) {
+                    indexTestRun(dirPath, parent, indicator);
+
+                } else if (Files.exists(trpMarker)) {
+                    indexTestRunPackageDir(dirPath, parent, indicator);
+                }
+            }
         } catch (Exception e) {
-            Log.error("Failed to list test runs: " + e.getMessage());
+            Log.error("indexTestRunDirs: Failed to list test runs in '" + trDir.toAbsolutePath() + "': " + e.getMessage());
         }
     }
 
@@ -399,8 +422,13 @@ public final class ProjectIndexer {
             final Tools tools = Services.getInstance(project, Tools.class);
             final String fileName = path.getFileName().toString();
 
-            final TestRunMarker marker = Services.getInstance(project, Mapper.class)
-                    .readValue(path.resolve(DirectoryType.TR.getMarker()).toFile(), TestRunMarker.class);
+            final Path markerPath = path.resolve(DirectoryType.TR.getMarker());
+            final TestRunMarker marker = Services.getInstance(project, Mapper.class).readValue(markerPath.toFile(), TestRunMarker.class);
+
+            if (marker == null) {
+                Log.error("indexTestRun: Failed to parse .tr marker at '" + markerPath.toAbsolutePath() + "' - returned null");
+                return;
+            }
 
             final TestRunDirectoryDto tr = TestRunDirectoryDto.builder()
                     .name(fileName)
@@ -411,20 +439,30 @@ public final class ProjectIndexer {
                     .build();
 
             testRunDirsByPath.put(path.toString(), tr);
+            Log.info("indexTestRun: Indexed test run directory '" + fileName + "' at " + path.toAbsolutePath());
 
             final Path jsonPath = path.resolve(fileName + ".json");
             if (Files.exists(jsonPath)) {
+                Log.info("indexTestRun: Reading test run data from " + jsonPath.toAbsolutePath());
                 final TestRunDto trr = Services.getInstance(project, Mapper.class)
                         .readValue(jsonPath.toFile(), TestRunDto.class);
+
                 if (trr != null) {
                     testRunsByPath.put(path.toString(), trr);
+                    Log.info("indexTestRun: Loaded test run data with " +
+                            trr.getResults().size() + " results");
+                } else {
+                    Log.error("indexTestRun: Mapper returned null for test run file '" + jsonPath.toAbsolutePath() + "'");
                 }
+
+            } else {
+                Log.warn("indexTestRun: No JSON file found at " + jsonPath.toAbsolutePath());
             }
 
             indicator.setText("Test run: " + fileName);
 
         } catch (Exception e) {
-            Log.error("Failed to index test run: " + path.getFileName());
+            Log.error("indexTestRun: Failed to index test run '" + (path != null ? path.getFileName().toString() : "null") + "': " + e.getMessage());
         }
     }
 
@@ -433,6 +471,7 @@ public final class ProjectIndexer {
         if (ids == null || ids.isEmpty()) return Collections.emptyList();
 
         final List<TestCaseDto> result = new ArrayList<>(ids.size());
+
         for (final UUID id : ids) {
             final TestCaseDto tc = testCasesById.get(id);
             if (tc != null) result.add(tc);

@@ -54,11 +54,11 @@ public class MarkerDetailsView {
 
         if (dto instanceof TestProjectDirectoryDto projectDto) {
             TestProjectMarker marker = projectDto.getMarker();
-            if (marker != null) {
-                row = addRow(panel, gbc, "Status:", marker.getStatus() != null ? marker.getStatus().getDescription() : "", row);
-                row = addRow(panel, gbc, "Marker Created By:", marker.getCreatedBy(), row);
-                row = addRow(panel, gbc, "Marker Created At:", formatDate(marker.getCreatedAt()), row);
-            }
+
+            row = addRow(panel, gbc, "Status:", marker.getStatus() != null ? marker.getStatus().getDescription() : "", row);
+            row = addRow(panel, gbc, "Marker Created By:", marker.getCreatedBy(), row);
+            row = addRow(panel, gbc, "Marker Created At:", formatDate(marker.getCreatedAt()), row);
+
         } else if (dto instanceof TestRunDirectoryDto runDto) {
             TestRunMarker marker = runDto.getMarker();
             if (marker != null) {

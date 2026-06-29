@@ -41,14 +41,7 @@ public class Activate extends DumbAwareAction {
 
         try {
             TestProjectMarker marker = tp.getMarker();
-            if (marker == null) {
-                marker = TestProjectMarker.builder()
-                        .status(ProjectStatus.ACTIVE)
-                        .createdBy(System.getProperty("user.name", ""))
-                        .build();
-            } else {
-                marker.setStatus(ProjectStatus.ACTIVE);
-            }
+            marker.setStatus(ProjectStatus.ACTIVE);
 
             tp.setMarker(marker);
 

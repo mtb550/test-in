@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.indexer.ProjectIndexer;
+import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -30,38 +31,55 @@ public abstract class AbstractTreeBuilder {
         DefaultMutableTreeNode localRoot = new DefaultMutableTreeNode(rootDirectoryDto);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-            indexer.awaitIndexing();
+            try {
+                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                indexer.awaitIndexing();
 
-            if (projectPanel.getProject().isDisposed()) return;
+                if (projectPanel.getProject().isDisposed()) return;
 
-            final Path rootPath = rootDirectoryDto.getPath();
+                final Path rootPath = rootDirectoryDto.getPath();
 
-            final List<DirectoryDto> children = getChildrenFromIndexer(rootPath);
+                final List<DirectoryDto> children = getChildrenFromIndexer(rootPath);
 
-            for (final DirectoryDto child : children) {
-                localRoot.add(buildNodeFromIndexer(child));
-            }
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                this.rootNode = localRoot;
-                if (projectPanel.getProjectTree() != null) {
-                    projectPanel.getProjectTree().updateNodes();
+                for (final DirectoryDto child : children) {
+                    localRoot.add(buildNodeFromIndexer(child));
                 }
-            });
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    this.rootNode = localRoot;
+                    if (projectPanel.getProjectTree() != null) {
+                        projectPanel.getProjectTree().updateNodes();
+                    }
+                });
+
+            } catch (Exception e) {
+                Log.error("AbstractTreeBuilder.buildTree() error for directory '" + (rootDirectoryDto != null ? rootDirectoryDto.getName() : "null") + "': " + e.getMessage());
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    this.rootNode = null;
+                    if (projectPanel.getProjectTree() != null) {
+                        projectPanel.getProjectTree().updateNodes();
+                    }
+                });
+            }
         });
     }
 
     private DefaultMutableTreeNode buildNodeFromIndexer(final @NotNull DirectoryDto currentDir) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(currentDir);
-        final Path currentPath = currentDir.getPath();
+        try {
+            DefaultMutableTreeNode node = new DefaultMutableTreeNode(currentDir);
+            final Path currentPath = currentDir.getPath();
 
-        final List<DirectoryDto> children = getChildrenFromIndexer(currentPath);
-        for (final DirectoryDto child : children) {
-            node.add(buildNodeFromIndexer(child));
+            final List<DirectoryDto> children = getChildrenFromIndexer(currentPath);
+            for (final DirectoryDto child : children) {
+                node.add(buildNodeFromIndexer(child));
+            }
+
+            return node;
+
+        } catch (Exception e) {
+            Log.error("buildNodeFromIndexer() error for directory '" + currentDir.getName() + "': " + e.getMessage());
+            return new DefaultMutableTreeNode(currentDir.getName());
         }
-
-        return node;
     }
 
     private List<DirectoryDto> getChildrenFromIndexer(final Path path) {
