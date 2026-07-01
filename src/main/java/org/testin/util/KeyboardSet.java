@@ -35,6 +35,8 @@ public enum KeyboardSet {
     CopyTestCaseDescription(KeyEvent.VK_C, KeyEvent.CTRL_DOWN_MASK),
     NextTestCase(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK),
     PreviousTestCase(KeyEvent.VK_LEFT, InputEvent.CTRL_DOWN_MASK),
+    FirstPage(KeyEvent.VK_HOME, InputEvent.CTRL_DOWN_MASK),
+    LastPage(KeyEvent.VK_END, InputEvent.CTRL_DOWN_MASK),
     SaveAlternate(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK),
     AddStep(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK),
     TabNext(KeyEvent.VK_TAB, 0),

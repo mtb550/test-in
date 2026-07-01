@@ -333,12 +333,13 @@ public final class ProjectIndexer {
 
             testSetsByPath.put(path.toString(), ts);
 
-            final List<UUID> caseIds = new ArrayList<>();
+            final List<UUID> caseIds = Collections.synchronizedList(new ArrayList<>());
 
             try (Stream<Path> files = Files.list(path)) {
                 files.filter(Files::isRegularFile)
                         .filter(p -> p.toString().endsWith(".json"))
-                        .forEach(filePath -> {
+                        .parallel().
+                        forEach(filePath -> {
                             try {
                                 final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(filePath.toFile(), TestCaseDto.class);
                                 if (tc != null) {

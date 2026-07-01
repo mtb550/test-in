@@ -237,10 +237,103 @@ apply adding test methods once import the test cases. [important]
 
 revamp ui -> freelancer.
 
-I want to add the selected test project to IntelliJ properties to be saved for next open to select it automatic.
+1- I want to add the current selected test project to IntelliJ properties to be saved for next open, to select it automatic.
 
-we need to store the test in path in XML file because once update the plugin every thing missed.
+2- we need to store the test in path in XML file because once update the project every thing missed.
 
-update refresh button to reindex again
+3- reactor refresh action to reindex again.
 
-editor status bar, remove border of arrows & add new arrows (go to first + go to end) & reduce arrow padding
+4- editor status bar, remove border of arrows & add new arrows (go to first button + go to end button) & reduce arrow padding & show boarder when hover.
+
+5- test run report enhancements:
+    A - add JavaScript to switch between dark and white mode, if you need to change colors please change it.
+    B - add new field: project name, branch name, commit id.
+    C - add testin logo at left top.
+    D - add charts, passes, faild, blocked, untested.
+    E - make test run report uneditable to be secure and confidant.
+
+    fix:
+    2026-06-30 23:04:35,180 [  12993]   WARN - #c.i.o.a.i.ActionUpdater - 3010 ms total to grab EDT 1 times to expand ToolWindowHeader$2#expandGroup@ToolwindowTitle (com.intellij.toolWindow.ToolWindowHeader$2). Use `ActionUpdateThread.BGT`.
+    2026-06-30 23:04:39,865 [  17678]   WARN - #c.i.o.a.i.ActionUpdater - 3029 ms to call on BGT DefaultActionGroup#children@ToolwindowTitle (DefaultActionGroup) "ProjectViewToolbar"
+    2026-06-30 23:04:41,816 [  19629]   WARN - #c.i.o.a.i.ActionUpdater - 9566 ms total to grab EDT 5 times to expand ToolWindowHeader$2#expandGroup@ToolwindowTitle (com.intellij.toolWindow.ToolWindowHeader$2). Use `ActionUpdateThread.BGT`.
+
+    fix below that shown after close intellij:
+
+2026-06-30 23:06:45,545 [ 143358] SEVERE - #c.i.i.shutdown - Application Application (internal) (RA allowed) (exit in progress): attempt to synchronously wait our own completion
+java.lang.Throwable
+	at com.intellij.ide.ShutdownKt.cancelAndJoinBlocking(shutdown.kt:100)
+	at com.intellij.ide.ShutdownKt.cancelAndJoinBlocking(shutdown.kt:46)
+	at com.intellij.openapi.application.impl.ApplicationImpl.disposeContainer(ApplicationImpl.java:323)
+	at com.intellij.openapi.application.impl.ApplicationImpl.destructApplication(ApplicationImpl.java:892)
+	at com.intellij.openapi.application.impl.ApplicationImpl.doExit(ApplicationImpl.java:788)
+	at com.intellij.openapi.application.impl.ApplicationImpl.exit(ApplicationImpl.java:773)
+	at com.intellij.openapi.application.impl.ApplicationImpl.exit(ApplicationImpl.java:762)
+	at com.intellij.openapi.application.ex.ApplicationEx.exit(ApplicationEx.java:69)
+	at com.intellij.openapi.wm.impl.CloseProjectWindowHelper.quitApp(CloseProjectWindowHelper.kt:103)
+	at com.intellij.openapi.wm.impl.CloseProjectWindowHelper.windowClosing$lambda$0(CloseProjectWindowHelper.kt:82)
+	at com.intellij.openapi.application.WriteIntentReadAction.lambda$run$0(WriteIntentReadAction.java:24)
+	at com.intellij.openapi.application.impl.AppImplKt$rethrowCheckedExceptions$2.invoke(appImpl.kt:126)
+	at com.intellij.platform.locking.impl.NestedLocksThreadingSupport.runWriteIntentReadAction(NestedLocksThreadingSupport.kt:705)
+	at com.intellij.openapi.application.impl.ApplicationImpl.runWriteIntentReadAction(ApplicationImpl.java:1214)
+	at com.intellij.openapi.application.WriteIntentReadAction.computeThrowable(WriteIntentReadAction.java:55)
+	at com.intellij.openapi.application.WriteIntentReadAction.run(WriteIntentReadAction.java:23)
+	at com.intellij.openapi.wm.impl.CloseProjectWindowHelper.windowClosing(CloseProjectWindowHelper.kt:65)
+	at com.intellij.openapi.wm.impl.ProjectFrameHelper.windowClosing(ProjectFrameHelper.kt:627)
+	at com.intellij.openapi.wm.impl.WindowCloseListener.windowClosing$lambda$0(ProjectFrameHelper.kt:674)
+	at com.intellij.concurrency.ThreadContext.installThreadContext(threadContext.kt:305)
+	at com.intellij.concurrency.ThreadContext.installThreadContext$default(threadContext.kt:303)
+	at com.intellij.openapi.wm.impl.WindowCloseListener.windowClosing(ProjectFrameHelper.kt:673)
+	at java.desktop/java.awt.AWTEventMulticaster.windowClosing(AWTEventMulticaster.java:359)
+	at java.desktop/java.awt.AWTEventMulticaster.windowClosing(AWTEventMulticaster.java:359)
+	at java.desktop/java.awt.Window.processWindowEvent(Window.java:2037)
+	at java.desktop/javax.swing.JFrame.processWindowEvent(JFrame.java:298)
+	at java.desktop/java.awt.Window.processEvent(Window.java:1996)
+	at java.desktop/java.awt.Component.dispatchEventImpl(Component.java:5008)
+	at java.desktop/java.awt.Container.dispatchEventImpl(Container.java:2318)
+	at java.desktop/java.awt.Window.dispatchEventImpl(Window.java:2713)
+	at java.desktop/java.awt.Component.dispatchEvent(Component.java:4836)
+	at java.desktop/java.awt.EventQueue.dispatchEventImpl(EventQueue.java:734)
+	at java.desktop/java.awt.EventQueue.dispatchEvent(EventQueue.java:711)
+	at com.intellij.ide.IdeEventQueue.defaultDispatchEvent(IdeEventQueue.kt:721)
+	at com.intellij.ide.IdeEventQueue._dispatchEvent(IdeEventQueue.kt:574)
+	at com.intellij.ide.IdeEventQueue.dispatchEvent$lambda$0$0$0$0(IdeEventQueue.kt:382)
+	at com.intellij.openapi.progress.impl.CoreProgressManager.computePrioritized(CoreProgressManager.java:928)
+	at com.intellij.ide.IdeEventQueue.dispatchEvent$lambda$0$0$0(IdeEventQueue.kt:381)
+	at com.intellij.ide.IdeEventQueueKt.performActivity$lambda$0(IdeEventQueue.kt:1111)
+	at com.intellij.openapi.application.TransactionGuardImpl.performActivity(TransactionGuardImpl.java:114)
+	at com.intellij.ide.IdeEventQueueKt.performActivity(IdeEventQueue.kt:1111)
+	at com.intellij.ide.IdeEventQueue.dispatchEvent$lambda$0(IdeEventQueue.kt:376)
+	at com.intellij.ide.IdeEventQueue.dispatchEvent(IdeEventQueue.kt:416)
+	at java.desktop/java.awt.EventDispatchThread.pumpOneEventForFilters(EventDispatchThread.java:207)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForFilter(EventDispatchThread.java:128)
+	at java.desktop/java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:117)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:113)
+	at java.desktop/java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:105)
+	at java.desktop/java.awt.EventDispatchThread.run(EventDispatchThread.java:92)
+2026-06-30 23:06:45,549 [ 143362] SEVERE - #c.i.i.shutdown - IntelliJ IDEA 2026.1.3  Build #IU-261.25134.95
+2026-06-30 23:06:45,570 [ 143383] SEVERE - #c.i.i.shutdown - JDK: 25.0.3; VM: OpenJDK 64-Bit Server VM; Vendor: JetBrains s.r.o.
+2026-06-30 23:06:45,571 [ 143384] SEVERE - #c.i.i.shutdown - OS: Windows 11
+2026-06-30 23:06:47,789 [ 145602]   WARN - #c.i.u.n.AppShutdownProxySelector - network access during/after app shutdown
+java.lang.Throwable
+	at com.intellij.util.net.AppShutdownProxySelector.select(JdkProxyProvider.kt:153)
+	at io.ktor.client.engine.cio.Proxy_jvmKt.lookupGlobalProxy(Proxy.jvm.kt:25)
+	at io.ktor.client.engine.cio.CIOEngine.selectEndpoint(CIOEngine.kt:119)
+	at io.ktor.client.engine.cio.CIOEngine.execute(CIOEngine.kt:86)
+	at io.ktor.client.engine.HttpClientEngine$executeWithinCallContext$2.invokeSuspend(HttpClientEngine.kt:183)
+	at kotlin.coroutines.jvm.internal.BaseContinuationImpl.resumeWith(ContinuationImpl.kt:34)
+	at kotlinx.coroutines.DispatchedTask.run(DispatchedTask.kt:100)
+	at kotlinx.coroutines.internal.SoftLimitedDispatcher$Worker.run(SoftLimitedDispatcher.kt:130)
+	at kotlinx.coroutines.scheduling.TaskImpl.run(Tasks.kt:89)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(CoroutineScheduler.kt:610)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.executeTask(CoroutineScheduler.kt:1188)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.runWorker(CoroutineScheduler.kt:775)
+	at kotlinx.coroutines.scheduling.CoroutineScheduler$Worker.run(CoroutineScheduler.kt:762)
+
+BUILD SUCCESSFUL in 2m 29s
+11 actionable tasks: 2 executed, 9 up-to-date
+
+Publishing Build Scan to Develocity...
+https://gradle.com/s/amehwuxiaunvm
+
+Configuration cache entry stored.
+11:06:49 PM: Execution finished 'runIde --scan'.
