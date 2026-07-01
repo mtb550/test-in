@@ -243,7 +243,13 @@ revamp ui -> freelancer.
 
 3- reactor refresh action to reindex again.
 
-4- editor status bar, remove border of arrows & add new arrows (go to first button + go to end button) & reduce arrow padding & show boarder when hover.
+4- editor status bar,
+remove border of arrows &
+ add new arrows (go to first button + go to end button) &
+reduce arrow padding &
+ show boarder when hover &
+ expand paggination field to see value if value is 3 digits &
+ make max value.
 
 5- test run report enhancements:
     A - add JavaScript to switch between dark and white mode, if you need to change colors please change it.
