@@ -41,6 +41,8 @@ public final class ProjectIndexer {
 
     private final AtomicBoolean indexing = new AtomicBoolean(false);
 
+    private final AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
+
     @Getter
     private final Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
 
@@ -166,8 +168,12 @@ public final class ProjectIndexer {
                                     }
 
                                     ApplicationManager.getApplication().invokeLater(() -> {
-                                        Log.info(ProjectIndexer.class.getSimpleName(), "indexing finished, restoring open editors.");
-                                        Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
+                                        if (restoreEditorsOnComplete.compareAndSet(true, true)) {
+                                            Log.info(ProjectIndexer.class.getSimpleName(), "indexing finished, restoring open editors.");
+                                            Services.getInstance(project, EditorStateService.class).restoreOpenEditors();
+                                        } else {
+                                            Log.info(ProjectIndexer.class.getSimpleName(), "indexing finished, skipping editor restore.");
+                                        }
                                     });
                                 }
                             }
@@ -603,39 +609,18 @@ public final class ProjectIndexer {
         renameMapEntry(testRunsByPath, oldStr, newStr, tr -> {
         });
 
-        final TestProjectDirectoryDto tp = testProjectsByPath.get(newStr);
-        if (tp != null && newPath.getFileName() != null) {
-            final String newName = newPath.getFileName().toString();
-            final Tools tools = Services.getInstance(project, Tools.class);
-            tp.setPath2(tools.buildPath2(tp.getParent() != null ? tp.getParent().getPath2() : null, newName));
-        }
+        updatePath2IfNeeded(testProjectsByPath.get(newStr), newPath);
+        updatePath2IfNeeded(testSetsByPath.get(newStr), newPath);
+        updatePath2IfNeeded(testRunDirsByPath.get(newStr), newPath);
+        updatePath2IfNeeded(testSetPackagesByPath.get(newStr), newPath);
+        updatePath2IfNeeded(testRunPackagesByPath.get(newStr), newPath);
+    }
 
-        final TestSetDirectoryDto ts = testSetsByPath.get(newStr);
-        if (ts != null && newPath.getFileName() != null) {
+    private void updatePath2IfNeeded(final DirectoryDto dto, final Path newPath) {
+        if (dto != null && newPath.getFileName() != null) {
             final String newName = newPath.getFileName().toString();
             final Tools tools = Services.getInstance(project, Tools.class);
-            ts.setPath2(tools.buildPath2(ts.getParent() != null ? ts.getParent().getPath2() : null, newName));
-        }
-
-        final TestRunDirectoryDto trd = testRunDirsByPath.get(newStr);
-        if (trd != null && newPath.getFileName() != null) {
-            final String newName = newPath.getFileName().toString();
-            final Tools tools = Services.getInstance(project, Tools.class);
-            trd.setPath2(tools.buildPath2(trd.getParent() != null ? trd.getParent().getPath2() : null, newName));
-        }
-
-        final TestSetPackageDirectoryDto tsp = testSetPackagesByPath.get(newStr);
-        if (tsp != null && newPath.getFileName() != null) {
-            final String newName = newPath.getFileName().toString();
-            final Tools tools = Services.getInstance(project, Tools.class);
-            tsp.setPath2(tools.buildPath2(tsp.getParent() != null ? tsp.getParent().getPath2() : null, newName));
-        }
-
-        final TestRunPackageDirectoryDto trp = testRunPackagesByPath.get(newStr);
-        if (trp != null && newPath.getFileName() != null) {
-            final String newName = newPath.getFileName().toString();
-            final Tools tools = Services.getInstance(project, Tools.class);
-            trp.setPath2(tools.buildPath2(trp.getParent() != null ? trp.getParent().getPath2() : null, newName));
+            dto.setPath2(tools.buildPath2(dto.getParent() != null ? dto.getParent().getPath2() : null, newName));
         }
     }
 
@@ -690,6 +675,17 @@ public final class ProjectIndexer {
     }
 
     public void dispose() {
+        clearAll();
+        Log.info("Indexer disposed");
+    }
+
+    public void resetForReindex() {
+        restoreEditorsOnComplete.set(false);
+        clearAll();
+        Log.info("Indexer reset for re-indexing");
+    }
+
+    private void clearAll() {
         final long actualBytes = MemoryEstimator.measureActual(() -> {
             testCasesById.clear();
             testRunsById.clear();
@@ -704,7 +700,7 @@ public final class ProjectIndexer {
             testRunsByPath.clear();
         });
 
-        Log.info("Indexer disposed — actual RAM freed: " + MemoryEstimator.formatBytes(actualBytes));
+        Log.info("Indexer cleared — RAM freed: " + MemoryEstimator.formatBytes(actualBytes));
 
         indexed.set(false);
         indexing.set(false);
