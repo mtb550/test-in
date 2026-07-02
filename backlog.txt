@@ -237,11 +237,9 @@ apply adding test methods once import the test cases. [important]
 
 revamp ui -> freelancer.
 
-1- I want to add the current selected test project to IntelliJ properties to be saved for next open, to select it automatic.
-
 2- we need to store the test in path in XML file because once update the project every thing missed.
 
-4.1- refactor indexer class to multi classes to be clean and clear for easy maitinance,
+4.1- refactor indexer class to multi classes to be clean and clear for easy maintenance,
 
 4- editor status bar,
 remove border of arrows &

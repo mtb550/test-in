@@ -1,0 +1,287 @@
+package org.testin.util.indexer;
+
+import com.intellij.openapi.project.Project;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.DirectoryType;
+import org.testin.pojo.TestRunMarker;
+import org.testin.pojo.dto.TestCaseDto;
+import org.testin.pojo.dto.TestRunDto;
+import org.testin.pojo.dto.dirs.*;
+import org.testin.pojo.markers.TestProjectMarker;
+import org.testin.util.FilesUtil;
+import org.testin.util.Tools;
+import org.testin.util.logger.Log;
+import org.testin.util.services.Services;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+final class IndexerDataStore {
+
+    private final Project project;
+
+    @Getter
+    private final Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<UUID, TestRunDto> testRunsById = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, TestProjectDirectoryDto> testProjectsByPath = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, TestSetDirectoryDto> testSetsByPath = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, TestRunDirectoryDto> testRunDirsByPath = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, TestSetPackageDirectoryDto> testSetPackagesByPath = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, TestRunPackageDirectoryDto> testRunPackagesByPath = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, TestCasesMainDirectoryDto> testCasesMainDirsByPath = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, TestRunsMainDirectoryDto> testRunsMainDirsByPath = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
+
+    @Getter
+    private final Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
+
+    IndexerDataStore(final @NotNull Project project) {
+        this.project = project;
+    }
+
+    List<TestCaseDto> getTestCasesForTestSet(final Path testSetPath) {
+        final List<UUID> ids = testSetCaseIds.get(testSetPath.toString());
+        if (ids == null || ids.isEmpty()) return Collections.emptyList();
+
+        final List<TestCaseDto> result = new ArrayList<>(ids.size());
+        for (final UUID id : ids) {
+            final TestCaseDto tc = testCasesById.get(id);
+            if (tc != null) result.add(tc);
+        }
+        return result;
+    }
+
+    TestRunDto getTestRunForPath(final Path testRunPath) {
+        return testRunsByPath.get(testRunPath.toString());
+    }
+
+    TestCaseDto getTestCaseById(final UUID id) {
+        return testCasesById.get(id);
+    }
+
+    TestSetDirectoryDto getTestSetByPath(final Path path) {
+        return testSetsByPath.get(path.toString());
+    }
+
+    TestRunDirectoryDto getTestRunDirByPath(final Path path) {
+        return testRunDirsByPath.get(path.toString());
+    }
+
+    void putTestCase(final Path testSetPath, final TestCaseDto tc) {
+        testCasesById.put(tc.getId(), tc);
+
+        final List<UUID> ids = testSetCaseIds.computeIfAbsent(
+                testSetPath.toString(), k -> Collections.synchronizedList(new ArrayList<>()));
+        if (!ids.contains(tc.getId())) {
+            ids.add(tc.getId());
+        }
+
+        Services.getInstance(project, FilesUtil.class)
+                .write(project, testSetPath.resolve(tc.getId() + ".json"), tc);
+    }
+
+    void removeTestCase(final Path testSetPath, final UUID tcId) {
+        testCasesById.remove(tcId);
+
+        final List<UUID> ids = testSetCaseIds.get(testSetPath.toString());
+        if (ids != null) ids.remove(tcId);
+
+        final Path filePath = testSetPath.resolve(tcId + ".json");
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (Exception e) {
+            Log.error("Failed to delete test case file: " + filePath);
+        }
+    }
+
+    void updateSequence(final Path testSetPath, final List<TestCaseDto> sortedList) {
+        final String pathStr = testSetPath.toString();
+        final List<UUID> ids = new ArrayList<>(sortedList.size());
+        final Set<UUID> newIds = new HashSet<>();
+
+        for (int i = 0; i < sortedList.size(); i++) {
+            final TestCaseDto tc = sortedList.get(i);
+            tc.setIsHead(i == 0);
+            tc.setNext(i < sortedList.size() - 1 ? sortedList.get(i + 1).getId() : null);
+            ids.add(tc.getId());
+            newIds.add(tc.getId());
+            testCasesById.put(tc.getId(), tc);
+
+            Services.getInstance(project, FilesUtil.class)
+                    .write(project, testSetPath.resolve(tc.getId() + ".json"), tc);
+        }
+
+        final List<UUID> oldIds = testSetCaseIds.get(pathStr);
+        if (oldIds != null) {
+            for (final UUID oldId : oldIds) {
+                if (!newIds.contains(oldId)) {
+                    testCasesById.remove(oldId);
+                }
+            }
+        }
+
+        testSetCaseIds.put(pathStr, ids);
+    }
+
+    void putTestRun(final Path testRunPath, final TestRunDto tr) {
+        testRunsByPath.put(testRunPath.toString(), tr);
+
+        Services.getInstance(project, FilesUtil.class)
+                .write(project, testRunPath.resolve(testRunPath.getFileName() + ".json"), tr);
+    }
+
+    void addTestSet(final TestSetDirectoryDto ts) {
+        testSetsByPath.put(ts.getPath().toString(), ts);
+    }
+
+    void addTestSetPackage(final TestSetPackageDirectoryDto tsp) {
+        testSetPackagesByPath.put(tsp.getPath().toString(), tsp);
+    }
+
+    void addTestRunDir(final TestRunDirectoryDto trd) {
+        testRunDirsByPath.put(trd.getPath().toString(), trd);
+    }
+
+    void addTestRunPackage(final TestRunPackageDirectoryDto trp) {
+        testRunPackagesByPath.put(trp.getPath().toString(), trp);
+    }
+
+    void addTestProject(final TestProjectDirectoryDto tp) {
+        testProjectsByPath.put(tp.getPath().toString(), tp);
+        if (tp.getTestCasesDirectory() != null) {
+            testCasesMainDirsByPath.put(
+                    tp.getTestCasesDirectory().getPath().toString(),
+                    tp.getTestCasesDirectory());
+        }
+        if (tp.getTestRunsDirectory() != null) {
+            testRunsMainDirsByPath.put(
+                    tp.getTestRunsDirectory().getPath().toString(),
+                    tp.getTestRunsDirectory());
+        }
+    }
+
+    void updateProjectMarker(final Project project, final Path projectPath, final TestProjectMarker marker) {
+        final TestProjectDirectoryDto tp = testProjectsByPath.get(projectPath.toString());
+        if (tp != null) {
+            tp.setMarker(marker);
+        }
+        Services.getInstance(project, FilesUtil.class)
+                .write(project, projectPath.resolve(DirectoryType.TP.getMarker()), marker);
+    }
+
+    void updateRunMarker(final Project project, final Path runPath, final TestRunMarker marker) {
+        final TestRunDirectoryDto trd = testRunDirsByPath.get(runPath.toString());
+        if (trd != null) {
+            trd.setMarker(marker);
+        }
+        Services.getInstance(project, FilesUtil.class)
+                .write(project, runPath.resolve(DirectoryType.TR.getMarker()), marker);
+    }
+
+    void renameNode(final Path oldPath, final Path newPath) {
+        final String oldStr = oldPath.toString();
+        final String newStr = newPath.toString();
+
+        renameMapEntry(testProjectsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testSetsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testRunDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testSetPackagesByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testRunPackagesByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testCasesMainDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testRunsMainDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testSetCaseIds, oldStr, newStr, ids -> {
+        });
+        renameMapEntry(testRunsByPath, oldStr, newStr, tr -> {
+        });
+
+        updatePath2(testProjectsByPath.get(newStr), newPath);
+        updatePath2(testSetsByPath.get(newStr), newPath);
+        updatePath2(testRunDirsByPath.get(newStr), newPath);
+        updatePath2(testSetPackagesByPath.get(newStr), newPath);
+        updatePath2(testRunPackagesByPath.get(newStr), newPath);
+    }
+
+    List<DirectoryDto> getChildren(final Path parentPath) {
+        final String parentStr = parentPath.toString();
+        final List<DirectoryDto> children = new ArrayList<>();
+
+        for (final TestSetPackageDirectoryDto dto : testSetPackagesByPath.values()) {
+            if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
+                children.add(dto);
+            }
+        }
+        for (final TestSetDirectoryDto dto : testSetsByPath.values()) {
+            if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
+                children.add(dto);
+            }
+        }
+        for (final TestRunPackageDirectoryDto dto : testRunPackagesByPath.values()) {
+            if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
+                children.add(dto);
+            }
+        }
+        for (final TestRunDirectoryDto dto : testRunDirsByPath.values()) {
+            if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
+                children.add(dto);
+            }
+        }
+
+        children.sort(Comparator.comparing(DirectoryDto::getName));
+        return children;
+    }
+
+    private <V> void renameMapEntry(final Map<String, V> map, final String oldKey,
+                                    final String newKey, final java.util.function.Consumer<V> updater) {
+        final V value = map.remove(oldKey);
+        if (value != null) {
+            updater.accept(value);
+            map.put(newKey, value);
+        }
+    }
+
+    private void updatePath2(final DirectoryDto dto, final Path newPath) {
+        if (dto != null && newPath.getFileName() != null) {
+            final String newName = newPath.getFileName().toString();
+            final Tools tools = Services.getInstance(project, Tools.class);
+            dto.setPath2(tools.buildPath2(
+                    dto.getParent() != null ? dto.getParent().getPath2() : null, newName));
+        }
+    }
+
+    void clearAll() {
+        testCasesById.clear();
+        testRunsById.clear();
+        testProjectsByPath.clear();
+        testSetsByPath.clear();
+        testRunDirsByPath.clear();
+        testSetPackagesByPath.clear();
+        testRunPackagesByPath.clear();
+        testCasesMainDirsByPath.clear();
+        testRunsMainDirsByPath.clear();
+        testSetCaseIds.clear();
+        testRunsByPath.clear();
+
+        Log.info("IndexerDataStore: all maps cleared");
+    }
+}
