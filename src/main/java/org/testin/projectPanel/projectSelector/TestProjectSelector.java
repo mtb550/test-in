@@ -1,5 +1,6 @@
 package org.testin.projectPanel.projectSelector;
 
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import lombok.Getter;
@@ -25,8 +26,12 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class TestProjectSelector {
+    private static final String SELECTED_PROJECT_KEY = "org.testin.selectedTestProject";
+
     private final Project project;
     private final ProjectPanel projectPanel;
+
+    private boolean isLoading = false;
 
     @Getter
     @Setter
@@ -44,7 +49,15 @@ public class TestProjectSelector {
 
         selectedTestProject.setFocusable(false);
         selectedTestProject.setRenderer(new RendererImpl());
+
         selectedTestProject.addActionListener(new ListenerImpl(projectPanel));
+        selectedTestProject.addActionListener(e -> {
+            if (isLoading) return;
+
+            TestProjectDirectoryDto selected = (TestProjectDirectoryDto) selectedTestProject.getSelectedItem();
+            if (selected != null)
+                PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, selected.getName());
+        });
     }
 
     public boolean init() {
@@ -55,54 +68,77 @@ public class TestProjectSelector {
     public boolean loadTestProjectList() {
         Log.info("TestProjectSelector.loadTestProjectList()");
 
-        testProjectList.removeAllElements();
+        isLoading = true;
+        try {
+            String savedProjectName = PropertiesComponent.getInstance(project).getValue(SELECTED_PROJECT_KEY);
 
-        final Path root = Services.getInstance(project, Setting.class).getTestinPath();
+            testProjectList.removeAllElements();
+            final Path root = Services.getInstance(project, Setting.class).getTestinPath();
 
-        if (Files.exists(root) && Files.isDirectory(root)) {
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            if (Files.exists(root) && Files.isDirectory(root)) {
+                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
-            if (indexer.isIndexed()) {
-                final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
-                projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
-                projects.forEach(testProjectList::addElement);
-            } else {
-                try (Stream<Path> paths = Files.list(root)) {
-                    paths.filter(Files::isDirectory)
-                            .filter(path -> !path.getFileName().toString().startsWith("."))
-                            .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
-                            .peek(path -> Log.info(path.getFileName().toString()))
-                            .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
-                            .filter(Objects::nonNull)
-                            .forEach(testProjectList::addElement);
-                } catch (Exception e) {
-                    Log.error("Error reading directory: " + e.getMessage());
-                    Log.error("Exception: " + e.getMessage());
+                if (indexer.isIndexed()) {
+                    final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
+                    projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
+                    projects.forEach(testProjectList::addElement);
+                } else {
+                    try (Stream<Path> paths = Files.list(root)) {
+                        paths.filter(Files::isDirectory)
+                                .filter(path -> !path.getFileName().toString().startsWith("."))
+                                .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
+                                .peek(path -> Log.info(path.getFileName().toString()))
+                                .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
+                                .filter(Objects::nonNull)
+                                .forEach(testProjectList::addElement);
+                    } catch (Exception e) {
+                        Log.error("Error reading directory: " + e.getMessage());
+                    }
                 }
             }
-        }
 
-        if (!Files.exists(root) || testProjectList.getSize() == 0) {
-            Log.info("no projects. " + Files.exists(root) + " , " + testProjectList.getSize());
-            projectPanel.showEmptyState();
-            selectedTestProject.setEnabled(false);
-            return false;
-        }
+            if (!Files.exists(root) || testProjectList.getSize() == 0) {
+                projectPanel.showEmptyState();
+                selectedTestProject.setEnabled(false);
+                return false;
+            }
 
-        selectedTestProject.setEnabled(true);
-        TestProjectDirectoryDto firstTestTestProjectDirectory = testProjectList.getElementAt(0);
-        selectedTestProject.setSelectedItem(firstTestTestProjectDirectory);
-        return true;
+            selectedTestProject.setEnabled(true);
+
+            TestProjectDirectoryDto projectToSelect = testProjectList.getElementAt(0);
+            if (savedProjectName != null) {
+                for (int i = 0; i < testProjectList.getSize(); i++) {
+                    TestProjectDirectoryDto item = testProjectList.getElementAt(i);
+                    if (savedProjectName.equals(item.getName())) {
+                        projectToSelect = item;
+                        break;
+                    }
+                }
+            }
+
+            selectedTestProject.setSelectedItem(projectToSelect);
+            return true;
+
+        } finally {
+            isLoading = false;
+        }
     }
 
     public void addTestProject(final TestProjectDirectoryDto newTestTestProjectDirectory) {
         Log.info("TestProjectSelector.addTestProject()");
-        if (!selectedTestProject.isEnabled()) {
+        if (!selectedTestProject.isEnabled())
             projectPanel.showEmptyState();
+
+        isLoading = true;
+        try {
+            testProjectList.addElement(newTestTestProjectDirectory);
+            selectedTestProject.setSelectedItem(newTestTestProjectDirectory);
+        } finally {
+            isLoading = false;
         }
 
-        testProjectList.addElement(newTestTestProjectDirectory);
-        selectedTestProject.setSelectedItem(newTestTestProjectDirectory);
+        PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, newTestTestProjectDirectory.getName());
+
         if (testProjectList.getSize() == 1) {
             selectedTestProject.setEnabled(true);
             projectPanel.setupMainLayout();
@@ -117,6 +153,9 @@ public class TestProjectSelector {
             }
 
             Log.info("Panel.filterByProject(): " + tpDir.getName());
+
+            if (!isLoading)
+                PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, tpDir.getName());
 
             if (tpDir.getMarker().getStatus() == ProjectStatus.ACTIVE) {
                 projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
