@@ -1,5 +1,6 @@
 package org.testin.actions;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
@@ -61,6 +62,11 @@ public class Deactivate extends DumbAwareAction {
             Log.error("Failed to deactivate project: " + ex.getMessage());
             Services.getInstance(project, Notifier.class).error(project, "Deactivation Failed", "Could not deactivate test project.");
         }
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package org.testin.actions;
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -20,6 +21,11 @@ public class ImportCsv extends DumbAwareAction {
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
         /// TODO: Import test cases From CSV
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
     @Override
