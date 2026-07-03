@@ -45,8 +45,6 @@ public final class ProjectIndexer {
         this.scanner = new IndexingScanner(project, store);
     }
 
-    // ===== Lifecycle =====
-
     public void indexWithProgress() {
         try {
             if (indexed.get() || indexing.getAndSet(true)) {
@@ -161,8 +159,6 @@ public final class ProjectIndexer {
         Log.info("Indexer reset for re-indexing");
     }
 
-    // ===== Internals =====
-
     private List<Path> collectValidProjects(final Path rootPath) {
         if (!Files.exists(rootPath) || !Files.isDirectory(rootPath)) return Collections.emptyList();
 
@@ -234,8 +230,6 @@ public final class ProjectIndexer {
         return String.format("~%.1f MB", kb / 1024.0);
     }
 
-    // ===== Delegated data access =====
-
     public List<TestCaseDto> getTestCasesForTestSet(final Path testSetPath) {
         return store.getTestCasesForTestSet(testSetPath);
     }
@@ -258,14 +252,6 @@ public final class ProjectIndexer {
 
     public Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
         return store.getTestProjectsByPath();
-    }
-
-    public Map<UUID, TestCaseDto> getTestCasesById() {
-        return store.getTestCasesById();
-    }
-
-    public Map<UUID, TestRunDto> getTestRunsById() {
-        return store.getTestRunsById();
     }
 
     public List<DirectoryDto> getChildren(final Path parentPath) {
