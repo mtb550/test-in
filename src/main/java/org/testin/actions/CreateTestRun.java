@@ -18,6 +18,7 @@ import org.testin.ui.RunCreationForm;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
+import org.testin.util.Tools;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
@@ -61,7 +62,14 @@ public class CreateTestRun implements NodeCreator {
                 dialogBuilder.setOkOperation(() -> {
                     dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
 
-                    tr = Services.getInstance(project, DirectoryMapper.class).readTestRunNode(project, newDirPath, parentDir);
+                    final String trName = newDirPath.getFileName().toString();
+                    final Tools tools = Services.getInstance(project, Tools.class);
+                    tr = TestRunDirectoryDto.builder()
+                            .name(trName)
+                            .path(newDirPath)
+                            .parent(parentDir)
+                            .path2(tools.buildPath2(parentDir.getPath2(), trName))
+                            .build();
                     saveSelectedToJSON(form, root, newDirPath, action.getProjectPanel(), tr);
                 });
 
