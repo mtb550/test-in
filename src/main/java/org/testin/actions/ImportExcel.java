@@ -61,7 +61,7 @@ public class ImportExcel extends DumbAwareAction {
     private final SimpleTree tree;
 
     public ImportExcel(final SimpleTree tree) {
-        super("From Excel", "Import test cases from excel", AllIcons.Providers.Microsoft);
+        super("Import from Excel", "Import test cases from an excel file", AllIcons.FileTypes.MicrosoftWindows);
         this.tree = tree;
     }
 

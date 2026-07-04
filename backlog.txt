@@ -1,82 +1,25 @@
 implement mail SMTP notifications.
-
 implement class debugger
-
 implement method debugger
-
-save open editors to workspace preferences once close IntelliJ.
-save selected project and hierarchy with selected focus.
-
-once click refresh button, keep selected project without change it to the first.
-
 plan & implement delegation between leaders to leaders or leaders to members.
-
-enable RemoveTestProject in the tree, add new action, active, deactivate.
-
-implement the details in marker .pr .ts file like created time date by modified, number of test cases , open bugs
-details button on context menu and show in view panel.
-
-try to read the current root node for controller, no need to search again in test run.
-you need just a move to check box object
-
-enhance the test case editor panel
-
-enhance the test run editor panel
-
-enhance view panel.
-
-change test case and test run editor size by mouse wheel. or make the font control in test in setting
-
-Summary of list listeners:
-MotionListener: Used for your beautiful hover icons (Run / Navigate). NO NEED
-AnAction System: Replaces KeyListener for professional, cross-platform keyboard shortcuts (Delete, Copy, Paste).
-MouseAdapter (ClickCount==2): Used for Double-Click to open.
-** PopupHandler: Replaces manual right-click math for context menus.
-** Dynamic Tooltips: Quick peeks at data without clicking.
-
-add popup menu in test case editor, group for copy, copy -> title, expected, steps, priority ...etc
-
-how to add official listener for status bar
-
-make mouse released after update paging value the click enter
-
-return the code for bg color for navigate, run
-
 move all fonts to setting.
-
 separate plugin component for execution test cases. small clean quick. (light mode)
-
-put shortcuts for passed, failed and blocked in run editor
-
-add toolbar item, show (passed, failed, blocked)
-
-add dictionary to correct test cases titles
-
-drag and drop for test runs, multi
-
-add dashboards and result in charts for each test run. right click details the show in view panel.
-
-grid view editor.
-
-add new filter for test execution status. shown only in run editor (show: passed, failed, blocked, untested) and not shown in test editor. I will put it to the backlog.
-
-open the bug on our open GitHub once test case failed within execution of test run
-
-I think the method runner can run the class. no need for class runner. to be checked.
-
-add sorting attribute to view panel in test case details so can update the sort value.
-
 test run execution light mode. small plugin can be dragged separate. [important]
-
+add spell checker to correct test cases titles
+add dashboards and result in charts for each test run. right click details the show in view panel.
+grid view editor.
+add new filter for test execution status. shown only in run editor (show: passed, failed, blocked, untested) and not shown in test editor. I will put it to the backlog.
+add sorting attribute to view panel in test case details so can update the sort value.
 make test case dto configurable.
-
 زر النسخ كتقرير خطأ (Copy Bug Report), [important]
 
+save selected project and hierarchy with selected focus.
+enable RemoveTestProject in the tree, add new action, active, deactivate.
+open the bug on our open GitHub once test case failed within execution of test run
+I think the method runner can run the class. no need for class runner. to be checked.
 make step in the first line. make dot and capitalize first letter automatic > steps
 make capitalize and dot in test case card and run card. move format method to Tools.
-
 all ui to be updated to the new ui, frameless and buttonless. remove and add and all ui (important)
-
 fix step issues: 1- remove use CTRL+D, 2- add new array item for all cursors not for the last only, 3-remove use quotation in step value, 4- step class not use the splitter class. it is too long
 
 view panel enhancements:
@@ -95,27 +38,11 @@ remove sorting in test run and show the path as relationship many to many
 
 make the sorting and unsorted badge run in separate thread.
 
-add actual result to test run and use it.
-
 let us continue, why do you need t retrieve all list as I use paging ? why don't use the paging value to get the first x list, once go next page, load the next x list.
 
 @ToolBar put title in toolbar details options and make checked and enabled.
 
 @BaseCard, put background color for odd and even in Config and use it in all project to unify the UI.
-
-@all classes, how to remove null checks or reduce it ? use empty strings in JSON files.
-another solution, here new code:
-        Optional.ofNullable(ViewToolWindowFactory.getViewPanel()).ifPresent(ViewPanel::reset);
-old code:
-ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
-        if (viewer != null) {
-            viewer.reset();
-        }
-also, will reduce @Nullable and put @NotNull
-
-remove most static in project.
-
-refactor sorting logic, unsorted are the remain in the list, no need for the loop again.
 
 move all hash maps from: (to bypass re-hashing & oversize reserving)
 Map<UUID, TestCaseDto> idMap = new HashMap<>();
@@ -123,8 +50,6 @@ to:
 Maps.newHashMapWithExpectedSize(unsortedList.size()); (for key-value) --no equivalent exists in jdk17 but exist in jdk21
 or new ArrayList<>(unsortedList.size()); (for numbers, names)
 so also, you need to refactor the ArrayList in project.
-
-TestEditorUI (review pending) refactor sorting logic
 
 optional of nullable not recommended inside loop as it create temp objects in ram within process.
 
@@ -244,7 +169,7 @@ remove border of arrows &
  add new arrows (go to first button + go to end button) &
 reduce arrow padding &
  show boarder when hover &
- expand paggination field to see value if value is 3 digits &
+ expand pagination field to see value if value is 3 digits &
  make max value.
 
 5- test run report enhancements:

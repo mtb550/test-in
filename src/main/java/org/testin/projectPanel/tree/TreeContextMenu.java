@@ -41,7 +41,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         addSeparator();
 
         add(createSubGroup("Export", AllIcons.ToolbarDecorator.Export,
-                List.of(new ExportCsv(),
+                List.of(new ExportCsv(tree),
                         new ExportHtml(),
                         new ExportExcel(tree),
                         new ExportJson(tree))

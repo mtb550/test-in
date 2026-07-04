@@ -45,6 +45,35 @@ public final class ProjectIndexer {
         this.scanner = new IndexingScanner(project, store);
     }
 
+    private static long estimateBytes(final int testCases, final int testRuns,
+                                      final int projects, final int testSets,
+                                      final int testRunDirs, final int testSetPkgs,
+                                      final int testRunPkgs, final int testSetCaseSets) {
+        final long MAP_OVERHEAD = 256L;
+        final long TC_SIZE = 2048L;
+        final long TR_SIZE = 1024L;
+        final long DIR_SIZE = 512L;
+
+        long total = 0;
+        total += testCases * (TC_SIZE + MAP_OVERHEAD);
+        total += testRuns * (TR_SIZE + MAP_OVERHEAD);
+        total += projects * (DIR_SIZE + MAP_OVERHEAD);
+        total += testSets * (DIR_SIZE + MAP_OVERHEAD);
+        total += testRunDirs * (DIR_SIZE + MAP_OVERHEAD);
+        total += testSetPkgs * (DIR_SIZE + MAP_OVERHEAD);
+        total += testRunPkgs * (DIR_SIZE + MAP_OVERHEAD);
+        total += testSetCaseSets * MAP_OVERHEAD;
+        return total;
+    }
+
+    private static String formatBytes(final long bytes) {
+        final long kb = bytes / 1024;
+        if (kb < 1024) {
+            return "~" + kb + " KB";
+        }
+        return String.format("~%.1f MB", kb / 1024.0);
+    }
+
     public void indexWithProgress() {
         try {
             if (indexed.get() || indexing.getAndSet(true)) {
@@ -199,35 +228,6 @@ public final class ProjectIndexer {
                 setPkgCount + " test set packages, " +
                 runPkgCount + " test run packages | " +
                 formatBytes(estimatedBytes));
-    }
-
-    private static long estimateBytes(final int testCases, final int testRuns,
-                                      final int projects, final int testSets,
-                                      final int testRunDirs, final int testSetPkgs,
-                                      final int testRunPkgs, final int testSetCaseSets) {
-        final long MAP_OVERHEAD = 256L;
-        final long TC_SIZE = 2048L;
-        final long TR_SIZE = 1024L;
-        final long DIR_SIZE = 512L;
-
-        long total = 0;
-        total += testCases * (TC_SIZE + MAP_OVERHEAD);
-        total += testRuns * (TR_SIZE + MAP_OVERHEAD);
-        total += projects * (DIR_SIZE + MAP_OVERHEAD);
-        total += testSets * (DIR_SIZE + MAP_OVERHEAD);
-        total += testRunDirs * (DIR_SIZE + MAP_OVERHEAD);
-        total += testSetPkgs * (DIR_SIZE + MAP_OVERHEAD);
-        total += testRunPkgs * (DIR_SIZE + MAP_OVERHEAD);
-        total += testSetCaseSets * MAP_OVERHEAD;
-        return total;
-    }
-
-    private static String formatBytes(final long bytes) {
-        final long kb = bytes / 1024;
-        if (kb < 1024) {
-            return "~" + kb + " KB";
-        }
-        return String.format("~%.1f MB", kb / 1024.0);
     }
 
     public List<TestCaseDto> getTestCasesForTestSet(final Path testSetPath) {
