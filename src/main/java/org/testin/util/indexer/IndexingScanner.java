@@ -91,14 +91,15 @@ final class IndexingScanner {
     private void scanTestSets(final Path tcDir, final DirectoryDto parent,
                               final ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(tcDir)) {
-            paths.filter(Files::isDirectory)
-                    .forEach(dirPath -> {
-                        if (Files.exists(dirPath.resolve(DirectoryType.TS.getMarker()))) {
-                            scanTestSet(dirPath, parent, indicator);
-                        } else if (Files.exists(dirPath.resolve(DirectoryType.TSP.getMarker()))) {
-                            scanTestSetPackage(dirPath, parent, indicator);
-                        }
-                    });
+            final List<Path> dirs = paths.filter(Files::isDirectory).toList();
+
+            dirs.parallelStream().forEach(dirPath -> {
+                if (Files.exists(dirPath.resolve(DirectoryType.TS.getMarker()))) {
+                    scanTestSet(dirPath, parent, indicator);
+                } else if (Files.exists(dirPath.resolve(DirectoryType.TSP.getMarker()))) {
+                    scanTestSetPackage(dirPath, parent, indicator);
+                }
+            });
         } catch (Exception e) {
             Log.error("Failed to list test sets: " + e.getMessage());
         }
@@ -115,6 +116,7 @@ final class IndexingScanner {
 
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
+                        .parallel()
                         .forEach(subPath -> {
                             if (Files.exists(subPath.resolve(DirectoryType.TS.getMarker()))) {
                                 scanTestSet(subPath, tsp, indicator);
@@ -174,13 +176,13 @@ final class IndexingScanner {
         try (Stream<Path> paths = Files.list(trDir)) {
             final List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
-            for (final Path dirPath : dirs) {
+            dirs.parallelStream().forEach(dirPath -> {
                 if (Files.exists(dirPath.resolve(DirectoryType.TR.getMarker()))) {
                     scanTestRun(dirPath, parent, indicator);
                 } else if (Files.exists(dirPath.resolve(DirectoryType.TRP.getMarker()))) {
                     scanTestRunPackageDir(dirPath, parent, indicator);
                 }
-            }
+            });
         } catch (Exception e) {
             Log.error("Failed to list test runs: " + e.getMessage());
         }
@@ -197,6 +199,7 @@ final class IndexingScanner {
 
             try (Stream<Path> subPaths = Files.list(path)) {
                 subPaths.filter(Files::isDirectory)
+                        .parallel()
                         .forEach(subPath -> {
                             if (Files.exists(subPath.resolve(DirectoryType.TR.getMarker()))) {
                                 scanTestRun(subPath, trp, indicator);

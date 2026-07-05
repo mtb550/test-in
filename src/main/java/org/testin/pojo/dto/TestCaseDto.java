@@ -25,87 +25,87 @@ import java.util.UUID;
 @Accessors(chain = true)
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-@ToString()
-public class TestCaseDto {
+@ToString
+public final class TestCaseDto {
 
-    private UUID next;
+    private volatile UUID next;
 
-    private Boolean isHead;
-
-    @NonNull
-    @Builder.Default
-    private UUID id = UUID.randomUUID();
+    private volatile Boolean isHead;
 
     @NonNull
     @Builder.Default
-    private String description = "";
+    private volatile UUID id = UUID.randomUUID();
 
     @NonNull
     @Builder.Default
-    private String expectedResult = "";
+    private volatile String description = "";
 
     @NonNull
     @Builder.Default
-    private TestCaseStatus status = TestCaseStatus.PENDING;
+    private volatile String expectedResult = "";
 
     @NonNull
     @Builder.Default
-    private List<String> steps = new ArrayList<>();
+    private volatile TestCaseStatus status = TestCaseStatus.PENDING;
 
     @NonNull
     @Builder.Default
-    private Priority priority = Priority.LOW;
+    private volatile List<String> steps = new ArrayList<>();
+
+    @NonNull
+    @Builder.Default
+    private volatile Priority priority = Priority.LOW;
 
     @NonNull
     @Builder.Default
     @JsonIgnore
-    private DirectoryDto parent = new TestSetDirectoryDto();
+    private volatile DirectoryDto parent = new TestSetDirectoryDto();
 
     @NonNull
     @Builder.Default
-    private String reference = "";
+    private volatile String reference = "";
 
     @NonNull
     @Builder.Default
-    private List<Group> group = new ArrayList<>();
+    private volatile List<Group> group = new ArrayList<>();
 
     @NonNull
     @Builder.Default
-    private String createdBy = "";
+    private volatile String createdBy = "";
 
     @NonNull
     @Builder.Default
-    private String updatedBy = "";
+    private volatile String updatedBy = "";
 
     @NonNull
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private volatile ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
     @NonNull
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private volatile ZonedDateTime updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
     @NonNull
     @Builder.Default
-    private String module = "";
+    private volatile String module = "";
 
     @NonNull
     @Builder.Default
-    private String testData = "";
+    private volatile String testData = "";
 
     @NonNull
     @Builder.Default
-    private String preConditions = "";
-
-    @JsonIgnore
-    @NonNull
-    @Builder.Default
-    private String tempStatus = "";
+    private volatile String preConditions = "";
 
     @JsonIgnore
     @NonNull
     @Builder.Default
-    private String tempError = "";
+    private volatile String tempStatus = "";
+
+    @JsonIgnore
+    @NonNull
+    @Builder.Default
+    private volatile String tempError = "";
 }
