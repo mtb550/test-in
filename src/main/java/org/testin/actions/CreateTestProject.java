@@ -8,14 +8,16 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.CreateNodeMenu;
-import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.ProjectStatus;
+import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
+import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
 import org.testin.ui.createNodes.CreateNodesDialog;
+import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.indexer.ProjectIndexer;
@@ -63,12 +65,30 @@ public class CreateTestProject extends DumbAwareAction {
                 return;
             }
 
-            TestProjectDirectoryDto newTp = Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, tpPath);
+            final String fileName = tpPath.getFileName().toString();
+            final TestProjectDirectoryDto newTp = TestProjectDirectoryDto.builder()
+                    .name(fileName)
+                    .path(tpPath)
+                    .pathName(fileName)
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(null, fileName))
+                    .build();
 
-            if (newTp == null) {
-                Services.getInstance(project, Notifier.class).error(project, "Creation Failed", "Could not map test project directory in memory.");
-                return;
-            }
+            final TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto.builder()
+                    .path(tpPath.resolve(DirectoryType.TCD.getDisplayedName()))
+                    .name(DirectoryType.TCD.getDisplayedName())
+                    .parent(newTp)
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(newTp.getPath2(), DirectoryType.TCD.getDisplayedName()))
+                    .build();
+
+            final TestRunsMainDirectoryDto trd = TestRunsMainDirectoryDto.builder()
+                    .path(tpPath.resolve(DirectoryType.TRD.getDisplayedName()))
+                    .name(DirectoryType.TRD.getDisplayedName())
+                    .parent(newTp)
+                    .path2(Services.getInstance(project, Tools.class).buildPath2(newTp.getPath2(), DirectoryType.TRD.getDisplayedName()))
+                    .build();
+
+            newTp.setTestCasesDirectory(tcd);
+            newTp.setTestRunsDirectory(trd);
 
             Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, Services.getInstance(project, Setting.class).getTestinPath(), "IO Error", vf -> {
 
