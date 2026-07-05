@@ -17,6 +17,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.dto.JsonExportDto;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
@@ -103,7 +104,11 @@ public class ExportJson extends DumbAwareAction {
 
                 indicator.setText("Generating JSON file...");
 
-                Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), directoryData);
+                JsonExportDto exportDto = JsonExportDto.builder()
+                        .data(directoryData)
+                        .build();
+
+                Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), exportDto);
 
                 ApplicationManager.getApplication().invokeLater(() ->
                         Services.getInstance(project, Notifier.class).info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));

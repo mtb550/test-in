@@ -1,6 +1,5 @@
 package org.testin.actions;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -16,6 +15,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.dto.JsonExportDto;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
@@ -42,7 +42,7 @@ public class ImportJson extends DumbAwareAction {
     private final SimpleTree tree;
 
     public ImportJson(final SimpleTree tree) {
-        super("From JSON", "Import test cases from a JSON file", AllIcons.FileTypes.Json);
+        super("Import from JSON", "Import test cases from a JSON file", AllIcons.FileTypes.Json);
         this.tree = tree;
     }
 
@@ -113,10 +113,9 @@ public class ImportJson extends DumbAwareAction {
                 indicator.setIndeterminate(true);
                 indicator.setText("Parsing JSON file...");
 
-                Map<String, List<TestCaseDto>> rawData = Services.getInstance(project, Mapper.class).readValue(file, new TypeReference<Map<String, List<TestCaseDto>>>() {
-                });
+                JsonExportDto exportDto = Services.getInstance(project, Mapper.class).readValue(file, JsonExportDto.class);
 
-                if (rawData == null) {
+                if (exportDto == null) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(project, Notifier.class).error(project, "Failed to parse JSON file. It may be corrupted or incorrectly formatted.")
                     );
@@ -126,7 +125,7 @@ public class ImportJson extends DumbAwareAction {
                 if (indicator.isCanceled()) return;
 
                 Map<String, List<TestCaseDto>> sanitizedData = new LinkedHashMap<>();
-                for (Map.Entry<String, List<TestCaseDto>> entry : rawData.entrySet()) {
+                for (Map.Entry<String, List<TestCaseDto>> entry : exportDto.getData().entrySet()) {
                     List<TestCaseDto> sanitizedList = new ArrayList<>();
                     for (TestCaseDto tc : entry.getValue()) {
                         tc.setId(UUID.randomUUID());
@@ -167,7 +166,7 @@ public class ImportJson extends DumbAwareAction {
                                     List<TestCaseDto> flatList = new ArrayList<>();
                                     selectedCasesByGroup.values().forEach(flatList::addAll);
 
-                                    linkAndSaveTestCases(project, targetDirectory, flatList, tail, ImportJson.this);
+                                    linkAndSaveTestCases(project, targetDirectory, flatList, tail);
 
                                     Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
                                     Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
@@ -181,7 +180,7 @@ public class ImportJson extends DumbAwareAction {
                                         VirtualFile groupDir = new CreateTestSet().inBackground(project, ImportJson.this, targetDirectory, selectedDirDto, parentNode, tree, rawGroupName);
 
                                         TestCaseDto tail = findExistingTail(project, groupDir);
-                                        linkAndSaveTestCases(project, groupDir, groupCases, tail, ImportJson.this);
+                                        linkAndSaveTestCases(project, groupDir, groupCases, tail);
                                         totalImported += groupCases.size();
                                     }
                                     Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
@@ -202,7 +201,7 @@ public class ImportJson extends DumbAwareAction {
         });
     }
 
-    private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail, final Object requestor) throws IOException {
+    private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail) throws IOException {
         final Path dirPath = Path.of(dir.getPath());
         final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
