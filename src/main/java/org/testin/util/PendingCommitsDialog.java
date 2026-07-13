@@ -41,7 +41,7 @@ public class PendingCommitsDialog extends DialogWrapper {
     protected JComponent createCenterPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        String[] columns = {"Test Case ID", "Change Type", "Field", "Old Value", "New Value"};
+        String[] columns = {"Test Case ID", "Change Type", "Test Case Description", "Old Value", "New Value"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -51,10 +51,12 @@ public class PendingCommitsDialog extends DialogWrapper {
 
         for (TestCaseDiff diff : differences) {
             for (TestCaseDiff.FieldChange fc : diff.fieldChanges()) {
+                String changeTypeLabel = getChangeTypeLabel(fc.changeType());
+                String description = getDescriptionForRow(diff, fc);
                 model.addRow(new Object[]{
                         diff.testCaseId(),
-                        diff.type().name(),
-                        fc.fieldName(),
+                        changeTypeLabel,
+                        description,
                         fc.oldValue(),
                         fc.newValue()
                 });
@@ -64,10 +66,10 @@ public class PendingCommitsDialog extends DialogWrapper {
         JBTable table = new JBTable(model);
         table.setFillsViewportHeight(true);
         table.getColumnModel().getColumn(0).setPreferredWidth(100);
-        table.getColumnModel().getColumn(1).setPreferredWidth(80);
-        table.getColumnModel().getColumn(2).setPreferredWidth(100);
-        table.getColumnModel().getColumn(3).setPreferredWidth(250);
-        table.getColumnModel().getColumn(4).setPreferredWidth(250);
+        table.getColumnModel().getColumn(1).setPreferredWidth(120);
+        table.getColumnModel().getColumn(2).setPreferredWidth(200);
+        table.getColumnModel().getColumn(3).setPreferredWidth(200);
+        table.getColumnModel().getColumn(4).setPreferredWidth(200);
 
         // --- Context Menu for Rejecting Changes ---
         JPopupMenu popupMenu = new JPopupMenu();
@@ -93,9 +95,34 @@ public class PendingCommitsDialog extends DialogWrapper {
         });
 
         panel.add(new JBScrollPane(table), BorderLayout.CENTER);
-        panel.setPreferredSize(new Dimension(800, 400));
+        panel.setPreferredSize(new Dimension(900, 400));
 
         return panel;
+    }
+
+    private String getChangeTypeLabel(TestCaseDiff.ChangeType changeType) {
+        return switch (changeType) {
+            case CREATE_TEST_CASE -> "Create Test Case";
+            case REMOVE_TEST_CASE -> "Remove Test Case";
+            case CHANGE_DESCRIPTION -> "Change Description";
+            case CHANGE_EXPECTED_RESULT -> "Change Expected Result";
+            case CHANGE_PRIORITY -> "Change Priority";
+            case CHANGE_GROUP -> "Change Group";
+        };
+    }
+
+    private String getDescriptionForRow(TestCaseDiff diff, TestCaseDiff.FieldChange fc) {
+        if (diff.type() == TestCaseDiff.DiffType.ADDED) {
+            TestCaseDto newState = diff.newState();
+            return newState != null ? newState.getDescription() : fc.newValue();
+        } else if (diff.type() == TestCaseDiff.DiffType.DELETED) {
+            TestCaseDto oldState = diff.oldState();
+            return oldState != null ? oldState.getDescription() : fc.oldValue();
+        } else {
+            // MODIFIED: show the current (new) description from the DTO
+            TestCaseDto newState = diff.newState();
+            return newState != null ? newState.getDescription() : fc.newValue();
+        }
     }
 
     private void rejectSelectedChange(JBTable table, DefaultTableModel model) {
@@ -103,7 +130,7 @@ public class PendingCommitsDialog extends DialogWrapper {
         if (selectedRow < 0) return;
 
         String testCaseId = (String) model.getValueAt(selectedRow, 0);
-        String fieldName = (String) model.getValueAt(selectedRow, 2);
+        String changeTypeLabel = (String) model.getValueAt(selectedRow, 1);
 
         TestCaseDiff diff = differences.stream()
                 .filter(d -> d.testCaseId().equals(testCaseId))
@@ -125,12 +152,15 @@ public class PendingCommitsDialog extends DialogWrapper {
 
                 TestCaseDto oldDto = diff.oldState();
 
-                switch (fieldName) {
-                    case "Description" -> currentDto.setDescription(oldDto.getDescription());
-
-                    case "Expected Result" -> currentDto.setExpectedResult(oldDto.getExpectedResult());
-
-                    case "Priority" -> currentDto.setPriority(oldDto.getPriority());
+                // Determine which field to revert based on the change type label
+                if (changeTypeLabel.contains("Description")) {
+                    currentDto.setDescription(oldDto.getDescription());
+                } else if (changeTypeLabel.contains("Expected Result")) {
+                    currentDto.setExpectedResult(oldDto.getExpectedResult());
+                } else if (changeTypeLabel.contains("Priority")) {
+                    currentDto.setPriority(oldDto.getPriority());
+                } else if (changeTypeLabel.contains("Group")) {
+                    currentDto.setGroup(oldDto.getGroup());
                 }
 
                 Services.getInstance(project, ProjectIndexer.class).putTestCase(jsonFile.getParentFile().toPath(), currentDto);
