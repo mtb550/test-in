@@ -154,8 +154,6 @@ in test run, I want to highlight the running test case, by add a new badge (Acti
 
 if change test run to completed then change pending test cases to untested automatic.
 
-apply adding test methods once import the test cases. [important]
-
 revamp ui -> freelancer.
 
 2- we need to store the test in path in XML file because once update the project every thing missed.
