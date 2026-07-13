@@ -7,11 +7,14 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.autoGenerator.CodeGenerator;
+import org.testin.util.autoGenerator.GeneratorType;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -27,6 +30,8 @@ public class ExcelPreviewDialog extends DialogWrapper {
     private final Map<String, List<TestCaseDto>> originalSheetsData;
     private final Map<String, DefaultTableModel> tableModelsMap = new LinkedHashMap<>();
     private final Project project;
+    @Getter
+    private final CodeGenerator codeGenerator;
 
     private final List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportValue)
@@ -36,6 +41,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
         super(project, true);
         this.project = project;
         this.originalSheetsData = sheetsData;
+        this.codeGenerator = new CodeGenerator(GeneratorType.CREATE_TEST_METHOD);
 
         setTitle("Preview & Select Excel Import");
         setOKButtonText("Import Selected");
@@ -48,6 +54,10 @@ public class ExcelPreviewDialog extends DialogWrapper {
     @Override
     protected JComponent createCenterPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.add(codeGenerator);
+        panel.add(topPanel, BorderLayout.NORTH);
 
         JBTabbedPane tabbedPane = new JBTabbedPane();
 
@@ -177,7 +187,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
             int tableTotalWidth = 0;
             for (int i = 0; i < table.getColumnCount(); i++) {
                 TableColumn col = table.getColumnModel().getColumn(i);
-                int maxWidth = 0;
+                int maxWidth;
 
                 TableCellRenderer headerRenderer = col.getHeaderRenderer();
                 if (headerRenderer == null) {

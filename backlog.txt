@@ -102,10 +102,6 @@ build edit menu for test run to edit actual result, statuses, put screenshots. a
 
 how to isolate sort in card so you can show or hide.
 
-persist save test run inputs.
-
-disable start execution if test run status is completed.
-
 add new object: commit id to RunEditorAttributes, it is required in each test run.
 work on test run properties, to show the test run configs like commit id and platform and status and language, add right click context menu and toolbar button
 on test properties, add charts for conclusion of run, diagrams and by chart, and put it to the report.

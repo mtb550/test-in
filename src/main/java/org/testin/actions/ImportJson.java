@@ -24,6 +24,8 @@ import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.ui.ExcelPreviewDialog;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
+import org.testin.util.Tools;
+import org.testin.util.autoGenerator.CreateTestMethod;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
@@ -168,6 +170,16 @@ public class ImportJson extends DumbAwareAction {
 
                                     linkAndSaveTestCases(project, targetDirectory, flatList, tail);
 
+                                    if (dialog.getCodeGenerator().isSelected()) {
+                                        Log.info("ImportJson: generating test methods for " + flatList.size() + " imported cases");
+                                        CreateTestMethod syncInjector = new CreateTestMethod();
+                                        for (TestCaseDto tc : flatList) {
+                                            tc.setParent(ts);
+                                            List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+                                            syncInjector.executeSync(project, tc, fqcn);
+                                        }
+                                    }
+
                                     Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
                                     Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
@@ -181,6 +193,24 @@ public class ImportJson extends DumbAwareAction {
 
                                         TestCaseDto tail = findExistingTail(project, groupDir);
                                         linkAndSaveTestCases(project, groupDir, groupCases, tail);
+
+                                        if (dialog.getCodeGenerator().isSelected()) {
+                                            String sheetName = groupDir.getName();
+                                            TestSetDirectoryDto sheetDto = TestSetDirectoryDto.builder()
+                                                    .name(sheetName)
+                                                    .path(Path.of(groupDir.getPath()))
+                                                    .path2(Services.getInstance(project, Tools.class).buildPath2(selectedDirDto.getPath2(), sheetName))
+                                                    .parent(selectedDirDto)
+                                                    .build();
+                                            Log.info("ImportJson: generating test methods for group '" + sheetName + "' with " + groupCases.size() + " cases");
+                                            CreateTestMethod syncInjector = new CreateTestMethod();
+                                            for (TestCaseDto tc : groupCases) {
+                                                tc.setParent(sheetDto);
+                                                List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+                                                syncInjector.executeSync(project, tc, fqcn);
+                                            }
+                                        }
+
                                         totalImported += groupCases.size();
                                     }
                                     Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");

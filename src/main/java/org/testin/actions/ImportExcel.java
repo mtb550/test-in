@@ -27,6 +27,7 @@ import org.testin.ui.ExcelPreviewDialog;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
+import org.testin.util.autoGenerator.CreateTestMethod;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
@@ -327,6 +328,16 @@ public class ImportExcel extends DumbAwareAction {
 
                                     linkAndSaveTestCases(project, targetDirectory, flatList, tail);
 
+                                    if (dialog.getCodeGenerator().isSelected()) {
+                                        Log.info("ImportExcel: generating test methods for " + flatList.size() + " imported cases");
+                                        CreateTestMethod syncInjector = new CreateTestMethod();
+                                        for (TestCaseDto tc : flatList) {
+                                            tc.setParent(ts);
+                                            List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+                                            syncInjector.executeSync(project, tc, fqcn);
+                                        }
+                                    }
+
                                     Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
                                     Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
@@ -340,6 +351,24 @@ public class ImportExcel extends DumbAwareAction {
 
                                         TestCaseDto tail = findExistingTail(project, sheetDir);
                                         linkAndSaveTestCases(project, sheetDir, sheetCases, tail);
+
+                                        if (dialog.getCodeGenerator().isSelected()) {
+                                            String sheetName = sheetDir.getName();
+                                            TestSetDirectoryDto sheetDto = TestSetDirectoryDto.builder()
+                                                    .name(sheetName)
+                                                    .path(Path.of(sheetDir.getPath()))
+                                                    .path2(Services.getInstance(project, Tools.class).buildPath2(selectedDirDto.getPath2(), sheetName))
+                                                    .parent(selectedDirDto)
+                                                    .build();
+                                            Log.info("ImportExcel: generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
+                                            CreateTestMethod syncInjector = new CreateTestMethod();
+                                            for (TestCaseDto tc : sheetCases) {
+                                                tc.setParent(sheetDto);
+                                                List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+                                                syncInjector.executeSync(project, tc, fqcn);
+                                            }
+                                        }
+
                                         totalImported += sheetCases.size();
                                     }
                                     Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");

@@ -87,80 +87,164 @@ public class CreateTestMethod implements GeneratorAction {
 
     // todo, move to tools class
     private void retryInjectPhysically(Project project, List<String> packageList, String className, String methodName, TestCaseDto tc) {
-        VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
-        if (sourceRoot == null) return;
-
-        String relativePath = String.join("/", packageList).toLowerCase() + "/" + className + ".java";
-        VirtualFile javaFile = sourceRoot.findFileByRelativePath(relativePath);
-
-        if (javaFile != null) {
-            PsiFile psiFile = PsiManager.getInstance(project).findFile(javaFile);
-            if (psiFile instanceof PsiJavaFile javaPsiFile) {
-                PsiClass[] classes = javaPsiFile.getClasses();
-                if (classes.length > 0) {
-                    injectMethod(project, classes[0], methodName, tc);
-                }
+        try {
+            VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
+            if (sourceRoot == null) {
+                Log.error("retryInjectPhysically: sourceRoot is null, cannot inject method '" + methodName + "'");
+                return;
             }
+
+            String relativePath = String.join("/", packageList).toLowerCase() + "/" + className + ".java";
+            VirtualFile javaFile = sourceRoot.findFileByRelativePath(relativePath);
+
+            if (javaFile != null) {
+                PsiFile psiFile = PsiManager.getInstance(project).findFile(javaFile);
+                if (psiFile instanceof PsiJavaFile javaPsiFile) {
+                    PsiClass[] classes = javaPsiFile.getClasses();
+                    if (classes.length > 0) {
+                        injectMethod(project, classes[0], methodName, tc);
+                    } else {
+                        Log.error("retryInjectPhysically: no classes found in " + className + ".java for method '" + methodName + "'");
+                    }
+                } else {
+                    Log.error("retryInjectPhysically: file " + className + ".java is not a valid Java file for method '" + methodName + "'");
+                }
+            } else {
+                Log.error("retryInjectPhysically: file not found at " + relativePath + " for method '" + methodName + "'");
+            }
+        } catch (Exception ex) {
+            Log.error("retryInjectPhysically failed for method '" + methodName + "': " + ex.getMessage());
         }
+    }
+
+    public void executeSync(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
+        Log.info("Creating Test Case (sync) for: " + fqcn);
+
+        if (fqcn.size() < 2) {
+            Log.error("FQCN list is too short to generate a method.");
+            return;
+        }
+
+        final String methodName = fqcn.getLast();
+        final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
+        final String className = fqcn.get(fqcn.size() - 2);
+        final List<String> packageList = fqcn.subList(0, fqcn.size() - 2);
+        final String packageName = String.join(".", packageList);
+
+        Log.info("Class Path: " + path);
+        Log.info("MethodName: " + methodName);
+
+        try {
+            JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
+            GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+
+            PsiClass targetClass = psiFacade.findClass(path, scope);
+
+            if (targetClass == null) {
+                VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
+                if (sourceRoot != null) {
+                    String relativePath = String.join("/", packageList).toLowerCase();
+                    VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, relativePath);
+
+                    if (packageDir != null) {
+                        String fileName = className + ".java";
+                        VirtualFile javaFile = packageDir.findChild(fileName);
+
+                        if (javaFile == null) {
+                            javaFile = packageDir.createChildData(this, fileName);
+                            String fileContent;
+                            if (packageName.isEmpty()) {
+                                fileContent = "public class " + className + " {\n\n}\n";
+                            } else {
+                                fileContent = "package " + packageName + ";\n\npublic class " + className + " {\n\n}\n";
+                            }
+                            VfsUtil.saveText(javaFile, fileContent);
+                            javaFile.refresh(false, false);
+                        }
+                    }
+                }
+
+                PsiDocumentManager.getInstance(project).commitAllDocuments();
+                targetClass = psiFacade.findClass(path, scope);
+            }
+
+            final PsiClass finalClass = targetClass;
+            if (finalClass != null) {
+                WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () ->
+                        injectMethod(project, finalClass, methodName, tc)
+                );
+            } else {
+                WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () ->
+                        retryInjectPhysically(project, packageList, className, methodName, tc)
+                );
+            }
+
+        } catch (Exception ex) {
+            Log.error("Failed to inject Java method '" + methodName + "': " + ex.getMessage());
+        }
+        Log.info("executeSync completed for method: " + methodName);
     }
 
     // todo, move to tools class
     private void injectMethod(Project project, PsiClass targetClass, String methodName, TestCaseDto tc) {
-        PsiMethod[] existingMethods = targetClass.getMethods();
-        PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
-        PsiFile file = targetClass.getContainingFile();
+        try {
+            PsiMethod[] existingMethods = targetClass.getMethods();
+            PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+            PsiFile file = targetClass.getContainingFile();
 
-        if (file instanceof PsiJavaFile javaFile) {
-            PsiImportList importList = javaFile.getImportList();
-            if (importList != null && importList.findSingleClassImportStatement("org.testng.annotations.Test") == null) {
-                PsiClass testClass = JavaPsiFacade.getInstance(project).findClass("org.testng.annotations.Test", GlobalSearchScope.allScope(project));
-                if (testClass != null) {
-                    importList.add(factory.createImportStatement(testClass));
-                }
-            }
-        }
-
-        boolean methodExists = false;
-        for (PsiMethod m : existingMethods) {
-            if (m.getName().equals(methodName)) {
-                methodExists = true;
-                break;
-            }
-        }
-
-        if (!methodExists) {
-            StringBuilder attributes = new StringBuilder();
-
-            if (!tc.getGroup().isEmpty()) {
-                List<String> activeGroups = tc.getGroup().stream()
-                        .filter(g -> g != Group.UNASSIGNED)
-                        .map(g -> "\"" + g.getName() + "\"")
-                        .toList();
-
-                if (!activeGroups.isEmpty()) {
-                    attributes.append(", groups = {")
-                            .append(String.join(", ", activeGroups))
-                            .append("}");
+            if (file instanceof PsiJavaFile javaFile) {
+                PsiImportList importList = javaFile.getImportList();
+                if (importList != null && importList.findSingleClassImportStatement("org.testng.annotations.Test") == null) {
+                    PsiClass testClass = JavaPsiFacade.getInstance(project).findClass("org.testng.annotations.Test", GlobalSearchScope.allScope(project));
+                    if (testClass != null) {
+                        importList.add(factory.createImportStatement(testClass));
+                    }
                 }
             }
 
-            attributes.append(", priority = ").append(tc.getPriority().getValue());
+            boolean methodExists = false;
+            for (PsiMethod m : existingMethods) {
+                if (m.getName().equals(methodName)) {
+                    methodExists = true;
+                    break;
+                }
+            }
 
-            String annotationText = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
-                    tc.getDescription().replace("\"", "\\\""),
-                    tc.getId(),
-                    attributes);
+            if (!methodExists) {
+                StringBuilder attributes = new StringBuilder();
 
-            String methodText = annotationText + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for " + methodName + "\n}";
+                if (!tc.getGroup().isEmpty()) {
+                    List<String> activeGroups = tc.getGroup().stream()
+                            .filter(g -> g != Group.UNASSIGNED)
+                            .map(g -> "\"" + g.getName() + "\"")
+                            .toList();
 
-            PsiMethod newMethod = factory.createMethodFromText(methodText, targetClass);
-            PsiElement addedElement = targetClass.add(newMethod);
+                    if (!activeGroups.isEmpty()) {
+                        attributes.append(", groups = {")
+                                .append(String.join(", ", activeGroups))
+                                .append("}");
+                    }
+                }
 
-            CodeStyleManager.getInstance(project).reformat(addedElement);
+                attributes.append(", priority = ").append(tc.getPriority().getValue());
 
-            Log.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
-        } else {
-            Log.info("Method already exists: " + methodName);
+                String annotationText = String.format("@Test(description = \"%s\", testName = \"%s\"%s)",
+                        tc.getDescription().replace("\"", "\\\""),
+                        tc.getId(),
+                        attributes);
+
+                String methodText = annotationText + "\npublic void " + methodName + "() {\n    // TODO: Auto-generated test steps for " + methodName + "\n}";
+
+                PsiMethod newMethod = factory.createMethodFromText(methodText, targetClass);
+                PsiElement addedElement = targetClass.add(newMethod);
+                CodeStyleManager.getInstance(project).reformat(addedElement);
+
+                Log.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
+            } else {
+                Log.info("Method already exists: " + methodName);
+            }
+        } catch (Exception ex) {
+            Log.error("injectMethod failed for '" + methodName + "': " + ex.getMessage());
         }
     }
 }
