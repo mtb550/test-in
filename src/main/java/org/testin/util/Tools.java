@@ -1,9 +1,12 @@
 package org.testin.util;
 
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.text.StringUtil;
@@ -25,6 +28,7 @@ import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
@@ -366,5 +370,13 @@ public final class Tools {
         }
         generatedFqcn.replaceAll(this::sanitizePackageName);
         return generatedFqcn;
+    }
+
+    public DefaultActionGroup createSubGroup(final @NotNull String title, final @NotNull Icon icon, final @NotNull List<? extends DumbAwareAction> actions) {
+        DefaultActionGroup group = new DefaultActionGroup(title, true);
+        group.getTemplatePresentation().setIcon(icon);
+        for (AnAction action : actions)
+            group.add(action);
+        return group;
     }
 }

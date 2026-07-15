@@ -56,10 +56,10 @@ public class ProjectTree {
         this.transferHandler = new TreeTransferHandler(project, mainTree, sharedCutNodes);
         mainTree.setTransferHandler(transferHandler);
 
-        treeContextMenu = new TreeContextMenu(projectPanel, mainTree);
+        treeContextMenu = new TreeContextMenu(project, projectPanel, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(project, mainTree, treeContextMenu));
 
-        TreeContextMenu.registerShortcuts(mainTree, transferHandler, treeContextMenu);
+        treeContextMenu.registerShortcuts(mainTree, transferHandler);
     }
 
     public void updateNodes() {

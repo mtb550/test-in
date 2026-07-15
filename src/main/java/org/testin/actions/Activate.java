@@ -19,16 +19,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class Activate extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public Activate(final SimpleTree tree) {
-        super("Activate", "", AllIcons.Actions.Edit);
+    public Activate(final @NotNull SimpleTree tree) {
+        super("Activate", "Activate test project", AllIcons.Actions.Edit);
         this.tree = tree;
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        if (tree == null) return;
+    public void actionPerformed(final @NotNull AnActionEvent e) {
 
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
@@ -37,7 +36,7 @@ public class Activate extends DumbAwareAction {
         Object userObject = node.getUserObject();
         if (!(userObject instanceof TestProjectDirectoryDto tp)) return;
 
-        Project project = e.getProject();
+        final Project project = e.getProject();
         if (project == null) return;
 
         try {
@@ -51,7 +50,8 @@ public class Activate extends DumbAwareAction {
             tree.revalidate();
             tree.repaint();
 
-            Services.getInstance(project, Notifier.class).info(project, "Activate", "Test project '" + tp.getName() + "' has been activated.");
+            Services.getInstance(project, Notifier.class).info(project, "Test project '" + tp.getName() + "' has been activated.");
+
         } catch (Exception ex) {
             Log.error("Failed to activate project: " + ex.getMessage());
             Services.getInstance(project, Notifier.class).error(project, "Activation Failed", "Could not activate test project.");
@@ -59,20 +59,16 @@ public class Activate extends DumbAwareAction {
     }
 
     @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+    public void update(final @NotNull AnActionEvent e) {
+        final TreePath path = tree.getSelectionPath();
+        if (path == null) return;
+
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+        e.getPresentation().setEnabled(node.getUserObject() instanceof TestProjectDirectoryDto);
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        if (tree == null) return;
-
-        TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = node.getUserObject();
-
-        e.getPresentation().setEnabled(userObject instanceof TestProjectDirectoryDto);
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

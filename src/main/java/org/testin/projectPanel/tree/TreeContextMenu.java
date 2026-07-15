@@ -2,29 +2,30 @@ package org.testin.projectPanel.tree;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
-import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.util.Tools;
+import org.testin.util.services.Services;
 
-import javax.swing.*;
 import java.util.List;
 
-@NoArgsConstructor
 public class TreeContextMenu extends DefaultActionGroup {
+    final @NotNull Project project;
 
-    public TreeContextMenu(final ProjectPanel projectPanel, final SimpleTree tree) {
+    public TreeContextMenu(final @NotNull Project project, final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
         super("Tree Popup Menu", true);
+        this.project = project;
 
         add(new Open(tree));
         add(new CreateTreeNode(projectPanel, tree));
+
         addSeparator();
 
-        add(createSubGroup("Actions", AllIcons.Actions.Edit,
+        add(Services.getInstance(project, Tools.class).createSubGroup("Actions", AllIcons.Actions.Edit,
                 List.of(new Activate(tree),
                         new Deactivate(tree),
                         new UndoNode(tree),
@@ -37,17 +38,19 @@ public class TreeContextMenu extends DefaultActionGroup {
         ));
 
         addSeparator();
+
         add(new RunTestSet(tree));
+
         addSeparator();
 
-        add(createSubGroup("Export", AllIcons.ToolbarDecorator.Export,
+        add(Services.getInstance(project, Tools.class).createSubGroup("Export", AllIcons.ToolbarDecorator.Export,
                 List.of(new ExportCsv(tree),
                         new ExportHtml(),
                         new ExportExcel(tree),
                         new ExportJson(tree))
         ));
 
-        add(createSubGroup("Import", AllIcons.ToolbarDecorator.Import,
+        add(Services.getInstance(project, Tools.class).createSubGroup("Import", AllIcons.ToolbarDecorator.Import,
                 List.of(new ImportCsv(tree),
                         new ImportExcel(tree),
                         new ImportJson(tree))
@@ -55,7 +58,6 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        //add(new OpenOldVersions());
         add(new Sync(tree, projectPanel));
         add(new ViewPendingCommits(tree));
 
@@ -63,9 +65,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(new SetTestRunStatus(tree));
         addSeparator();
 
-        add(createSubGroup(
-                "Generate Report",
-                AllIcons.ToolbarDecorator.Export,
+        add(Services.getInstance(project, Tools.class).createSubGroup("Generate Report", AllIcons.ToolbarDecorator.Export,
                 List.of(
                         new GenerateReportHtml(tree),
                         new GenerateReportPdf(tree),
@@ -79,18 +79,10 @@ public class TreeContextMenu extends DefaultActionGroup {
 
     }
 
-    public static void registerShortcuts(final SimpleTree tree, final TreeTransferHandler transferHandler, final TreeContextMenu treeContextMenu) {
+    public void registerShortcuts(final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         new Escape(tree, transferHandler);
-        new OpenCM(tree, treeContextMenu);
+        new OpenCM(tree, this);
 
-    }
-
-    private DefaultActionGroup createSubGroup(final String title, final Icon icon, final List<? extends DumbAwareAction> actions) {
-        DefaultActionGroup group = new DefaultActionGroup(title, true);
-        group.getTemplatePresentation().setIcon(icon);
-        for (AnAction action : actions)
-            group.add(action);
-        return group;
     }
 
     @Override
