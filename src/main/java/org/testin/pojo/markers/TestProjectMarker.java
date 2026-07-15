@@ -31,4 +31,12 @@ public class TestProjectMarker {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
+    @NonNull
+    @Builder.Default
+    private String updatedBy = "";
+
+    @NonNull
+    @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    private ZonedDateTime updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 }

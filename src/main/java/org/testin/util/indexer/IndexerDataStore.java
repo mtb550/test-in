@@ -8,7 +8,6 @@ import org.testin.pojo.TestRunMarker;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.*;
-import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.util.FilesUtil;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
@@ -181,22 +180,10 @@ final class IndexerDataStore {
         }
     }
 
-    void updateProjectMarker(final Project project, final Path projectPath, final TestProjectMarker marker) {
-        final TestProjectDirectoryDto tp = testProjectsByPath.get(projectPath.toString());
-        if (tp != null) {
-            tp.setMarker(marker);
-        }
-        Services.getInstance(project, FilesUtil.class)
-                .write(project, projectPath.resolve(DirectoryType.TP.getMarker()), marker);
-    }
-
     void updateRunMarker(final Project project, final Path runPath, final TestRunMarker marker) {
         final TestRunDirectoryDto trd = testRunDirsByPath.get(runPath.toString());
-        if (trd != null) {
-            trd.setMarker(marker);
-        }
-        Services.getInstance(project, FilesUtil.class)
-                .write(project, runPath.resolve(DirectoryType.TR.getMarker()), marker);
+        trd.setMarker(marker);
+        Services.getInstance(project, FilesUtil.class).write(project, runPath.resolve(DirectoryType.TR.getMarker()), marker);
     }
 
     void renameNode(final Path oldPath, final Path newPath) {

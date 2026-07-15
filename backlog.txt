@@ -172,3 +172,6 @@ reduce arrow padding &
     C - add testin logo at left top.
     D - add charts, passes, faild, blocked, untested.
     E - make test run report uneditable to be secure and confidant.
+
+
+* need to set team members, leaders.

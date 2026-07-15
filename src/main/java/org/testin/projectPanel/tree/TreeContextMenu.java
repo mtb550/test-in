@@ -26,8 +26,8 @@ public class TreeContextMenu extends DefaultActionGroup {
         addSeparator();
 
         add(Services.getInstance(project, Tools.class).createSubGroup("Actions", AllIcons.Actions.Edit,
-                List.of(new Activate(tree),
-                        new Deactivate(tree),
+                List.of(new ActivateTestProject(tree),
+                        new DeactivateTestProject(tree),
                         new UndoNode(tree),
                         new RedoNode(tree),
                         new Remove(tree, projectPanel),

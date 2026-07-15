@@ -12,7 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.ChangeTestRunStatus;
+import org.testin.actions.UpdateTestRunStatus;
 import org.testin.editorPanel.IEditorUI;
 import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;
@@ -454,7 +454,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            ChangeTestRunStatus changeStatus = new ChangeTestRunStatus(this, list);
+            UpdateTestRunStatus changeStatus = new UpdateTestRunStatus(this, list);
             changeStatus.onExecutionFinished(project, this);
             return;
         }
@@ -537,7 +537,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
     @Override
     public void onStartExecutionClicked() {
-        ChangeTestRunStatus changeStatus = new ChangeTestRunStatus(this, list);
+        UpdateTestRunStatus changeStatus = new UpdateTestRunStatus(this, list);
         changeStatus.applyStatusChange(project, this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
     }

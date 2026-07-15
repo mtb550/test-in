@@ -1,5 +1,6 @@
 package org.testin.actions;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -16,18 +17,18 @@ import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.time.ZonedDateTime;
 
-public class Deactivate extends DumbAwareAction {
-    private final SimpleTree tree;
+public class DeactivateTestProject extends DumbAwareAction {
+    private final @NotNull SimpleTree tree;
 
-    public Deactivate(final SimpleTree tree) {
-        super("Deactivate");
+    public DeactivateTestProject(final @NotNull SimpleTree tree) {
+        super("Deactivate", "Deactivate test project", AllIcons.Actions.Edit);
         this.tree = tree;
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        if (tree == null) return;
+    public void actionPerformed(final @NotNull AnActionEvent e) {
 
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
@@ -36,28 +37,24 @@ public class Deactivate extends DumbAwareAction {
         Object userObject = node.getUserObject();
         if (!(userObject instanceof TestProjectDirectoryDto tp)) return;
 
-        Project project = e.getProject();
+        final Project project = e.getProject();
         if (project == null) return;
 
         try {
-            TestProjectMarker marker = tp.getMarker();
-            if (marker == null) {
-                marker = TestProjectMarker.builder()
-                        .status(ProjectStatus.INACTIVE)
-                        .createdBy(System.getProperty("user.name", ""))
-                        .build();
-            } else {
-                marker.setStatus(ProjectStatus.INACTIVE);
-            }
+            final TestProjectMarker marker = tp.getMarker();
 
+            marker.setStatus(ProjectStatus.INACTIVE);
+            marker.setUpdatedBy(System.getProperty("user.name", ""));
+            marker.setUpdatedAt(ZonedDateTime.now());
             tp.setMarker(marker);
 
-            Services.getInstance(project, ProjectIndexer.class).updateProjectMarker(project, tp.getPath(), marker);
+            Services.getInstance(project, ProjectIndexer.class).persistTestProjectMarker(project, tp);
 
             tree.revalidate();
             tree.repaint();
 
-            Services.getInstance(project, Notifier.class).info(project, "Deactivate", "Test project '" + tp.getName() + "' has been deactivated.");
+            Services.getInstance(project, Notifier.class).info(project, "Test project '" + tp.getName() + "' has been deactivated.");
+
         } catch (Exception ex) {
             Log.error("Failed to deactivate project: " + ex.getMessage());
             Services.getInstance(project, Notifier.class).error(project, "Deactivation Failed", "Could not deactivate test project.");
@@ -65,20 +62,16 @@ public class Deactivate extends DumbAwareAction {
     }
 
     @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+    public void update(final @NotNull AnActionEvent e) {
+        final TreePath path = tree.getSelectionPath();
+        if (path == null) return;
+
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+        e.getPresentation().setEnabled(node.getUserObject() instanceof TestProjectDirectoryDto);
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        if (tree == null) return;
-
-        TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = node.getUserObject();
-
-        e.getPresentation().setEnabled(userObject instanceof TestProjectDirectoryDto);
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

@@ -12,8 +12,8 @@ import org.testin.pojo.TestRunMarker;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.*;
-import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.settings.Setting;
+import org.testin.util.FilesUtil;
 import org.testin.util.logger.Log;
 import org.testin.util.services.EditorStateService;
 import org.testin.util.services.Services;
@@ -45,10 +45,7 @@ public final class ProjectIndexer {
         this.scanner = new IndexingScanner(project, store);
     }
 
-    private static long estimateBytes(final int testCases, final int testRuns,
-                                      final int projects, final int testSets,
-                                      final int testRunDirs, final int testSetPkgs,
-                                      final int testRunPkgs, final int testSetCaseSets) {
+    private static long estimateBytes(final int testCases, final int testRuns, final int projects, final int testSets, final int testRunDirs, final int testSetPkgs, final int testRunPkgs, final int testSetCaseSets) {
         final long MAP_OVERHEAD = 256L;
         final long TC_SIZE = 2048L;
         final long TR_SIZE = 1024L;
@@ -294,9 +291,8 @@ public final class ProjectIndexer {
         store.addTestRunPackage(trp);
     }
 
-    public void updateProjectMarker(final Project project, final Path projectPath,
-                                    final TestProjectMarker marker) {
-        store.updateProjectMarker(project, projectPath, marker);
+    public void persistTestProjectMarker(final Project project, final TestProjectDirectoryDto tp) {
+        Services.getInstance(project, FilesUtil.class).write(project, tp.getPath().resolve(DirectoryType.TP.getMarker()), tp.getMarker());
     }
 
     public void updateRunMarker(final Project project, final Path runPath,

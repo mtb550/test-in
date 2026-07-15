@@ -26,6 +26,7 @@ import org.testin.util.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
 
 public class CreateTestProject extends DumbAwareAction {
     private final ProjectPanel projectPanel;
@@ -104,11 +105,12 @@ public class CreateTestProject extends DumbAwareAction {
                 TestProjectMarker marker = TestProjectMarker.builder()
                         .status(ProjectStatus.ACTIVE)
                         .createdBy(System.getProperty("user.name", ""))
+                        .createdAt(ZonedDateTime.now())
                         .build();
 
                 newTp.setMarker(marker);
 
-                Services.getInstance(project, ProjectIndexer.class).updateProjectMarker(project, newTp.getPath(), marker);
+                Services.getInstance(project, ProjectIndexer.class).persistTestProjectMarker(project, newTp);
 
                 String tcdName = newTp.getTestCasesDirectory().getPath().getFileName().toString();
                 VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);

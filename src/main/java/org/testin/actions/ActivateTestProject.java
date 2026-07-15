@@ -17,11 +17,12 @@ import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.time.ZonedDateTime;
 
-public class Activate extends DumbAwareAction {
+public class ActivateTestProject extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
 
-    public Activate(final @NotNull SimpleTree tree) {
+    public ActivateTestProject(final @NotNull SimpleTree tree) {
         super("Activate", "Activate test project", AllIcons.Actions.Edit);
         this.tree = tree;
     }
@@ -40,12 +41,14 @@ public class Activate extends DumbAwareAction {
         if (project == null) return;
 
         try {
-            TestProjectMarker marker = tp.getMarker();
-            marker.setStatus(ProjectStatus.ACTIVE);
+            final TestProjectMarker marker = tp.getMarker();
 
+            marker.setStatus(ProjectStatus.ACTIVE);
+            marker.setUpdatedBy(System.getProperty("user.name", ""));
+            marker.setUpdatedAt(ZonedDateTime.now());
             tp.setMarker(marker);
 
-            Services.getInstance(project, ProjectIndexer.class).updateProjectMarker(project, tp.getPath(), marker);
+            Services.getInstance(project, ProjectIndexer.class).persistTestProjectMarker(project, tp);
 
             tree.revalidate();
             tree.repaint();
