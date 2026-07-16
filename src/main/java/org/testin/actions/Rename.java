@@ -71,7 +71,7 @@ public class Rename extends DumbAwareAction {
 
             Services.getInstance(e.getProject(), ProjectIndexer.class).renameNode(oldPath, newPath);
 
-            if (dir instanceof TestProjectDirectoryDto && projectPanel.getTestProjectSelector() != null) {
+            if (dir instanceof TestProjectDirectoryDto) {
                 projectPanel.getTestProjectSelector().loadTestProjectList();
             }
 

@@ -47,18 +47,14 @@ public abstract class AbstractTreeBuilder {
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     this.rootNode = localRoot;
-                    if (projectPanel.getProjectTree() != null) {
-                        projectPanel.getProjectTree().refreshTree();
-                    }
+                    projectPanel.getProjectTree().refreshTree();
                 });
 
             } catch (Exception e) {
                 Log.error("AbstractTreeBuilder.buildTree() error for directory '" + (rootDirectoryDto != null ? rootDirectoryDto.getName() : "null") + "': " + e.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
                     this.rootNode = null;
-                    if (projectPanel.getProjectTree() != null) {
-                        projectPanel.getProjectTree().refreshTree();
-                    }
+                    projectPanel.getProjectTree().refreshTree();
                 });
             }
         });

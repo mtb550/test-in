@@ -21,7 +21,9 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     @NotNull
     private String pathName;
 
-    private TestProjectMarker marker;
+    @NotNull
+    @Builder.Default
+    private TestProjectMarker marker = new TestProjectMarker();
 
     @Override
     public @NonNull CreateNodeMenu getMenu() {

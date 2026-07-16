@@ -29,14 +29,14 @@ import java.awt.*;
 @Getter
 @Service(Service.Level.PROJECT)
 public final class ProjectPanel implements Disposable {
-    private final Project project;
-    private final JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
-    private final TestProjectSelector testProjectSelector;
-    private final TestProjectTreeBuilder testProjectTreeBuilder;
-    private final TestCaseTreeBuilder testCaseTreeBuilder;
-    private final TestRunTreeBuilder testRunTreeBuilder;
-    private BranchSelector branchSelector;
-    private ProjectTree projectTree;
+    private final @NotNull Project project;
+    private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
+    private final @NotNull TestProjectSelector testProjectSelector;
+    private final @NotNull TestProjectTreeBuilder testProjectTreeBuilder;
+    private final @NotNull TestCaseTreeBuilder testCaseTreeBuilder;
+    private final @NotNull TestRunTreeBuilder testRunTreeBuilder;
+    private @NotNull BranchSelector branchSelector;
+    private @NotNull ProjectTree projectTree;
 
     public ProjectPanel(final @NotNull Project project) {
         this.project = project;
@@ -46,6 +46,8 @@ public final class ProjectPanel implements Disposable {
         testProjectTreeBuilder = new TestProjectTreeBuilder(project, this);
         testCaseTreeBuilder = new TestCaseTreeBuilder(project, this);
         testRunTreeBuilder = new TestRunTreeBuilder(project, this);
+        branchSelector = new BranchSelector(project, this, testProjectSelector.getSelectedTestProject().getItem());
+        projectTree = new ProjectTree(project, this);
 
         setupMainLayout();
 
@@ -92,7 +94,7 @@ public final class ProjectPanel implements Disposable {
         emptyText.appendSecondaryText("The new awesome test management tool", StatusText.DEFAULT_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine("By", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
-        emptyText.appendLine("Muteb Almughyiri", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
+        emptyText.appendLine("Muteb almughyiri", SimpleTextAttributes.GRAYED_ATTRIBUTES, null);
         emptyText.appendLine("");
         emptyText.appendLine("");
 
@@ -118,7 +120,7 @@ public final class ProjectPanel implements Disposable {
 
     @Override
     public void dispose() {
-        if (projectTree != null && projectTree.getMainTree() != null) {
+        if (projectTree.getMainTree() != null) {
             projectTree.getMainTree().setModel(null);
         }
     }

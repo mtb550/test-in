@@ -18,11 +18,7 @@ public class TestRunTreeBuilder extends AbstractTreeBuilder {
         try {
             if (selectedTestProjectDirectory == null || selectedTestProjectDirectory.getMarker().getStatus() != ProjectStatus.ACTIVE) {
                 this.rootNode = null;
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    if (projectPanel.getProjectTree() != null) {
-                        projectPanel.getProjectTree().refreshTree();
-                    }
-                });
+                ApplicationManager.getApplication().invokeLater(() -> projectPanel.getProjectTree().refreshTree());
                 return;
             }
 
@@ -31,11 +27,7 @@ public class TestRunTreeBuilder extends AbstractTreeBuilder {
         } catch (Exception e) {
             Log.error("TestRunTreeBuilder.buildTree() error for directory '" + (selectedTestProjectDirectory != null ? selectedTestProjectDirectory.getName() : "null") + "': " + e.getMessage());
             this.rootNode = null;
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (projectPanel.getProjectTree() != null) {
-                    projectPanel.getProjectTree().refreshTree();
-                }
-            });
+            ApplicationManager.getApplication().invokeLater(() -> projectPanel.getProjectTree().refreshTree());
         }
     }
 

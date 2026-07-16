@@ -19,7 +19,6 @@ public class CollapseAll extends DumbAwareAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        if (projectPanel.getProjectTree() == null) return;
 
         SimpleTree tree = projectPanel.getProjectTree().getMainTree();
 
@@ -35,7 +34,7 @@ public class CollapseAll extends DumbAwareAction {
             return;
         }
 
-        boolean hasTree = projectPanel.getProjectTree() != null && projectPanel.getProjectTree().getMainTree() != null;
+        boolean hasTree = projectPanel.getProjectTree().getMainTree() != null;
         e.getPresentation().setEnabled(hasTree);
     }
 

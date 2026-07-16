@@ -26,23 +26,26 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class TestProjectSelector {
+
     private static final String SELECTED_PROJECT_KEY = "org.testin.selectedTestProject";
 
-    private final Project project;
-    private final ProjectPanel projectPanel;
+    private final @NotNull Project project;
+    private final @NotNull ProjectPanel projectPanel;
 
     @Getter
     private boolean isLoading = false;
 
     @Getter
     @Setter
+    @NotNull
     private DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList;
 
     @Getter
     @Setter
+    @NotNull
     private ComboBox<TestProjectDirectoryDto> selectedTestProject;
 
-    public TestProjectSelector(final @NotNull Project project, final ProjectPanel projectPanel) {
+    public TestProjectSelector(final @NotNull Project project, final @NotNull ProjectPanel projectPanel) {
         this.project = project;
         this.projectPanel = projectPanel;
         testProjectList = new DefaultComboBoxModel<>();
@@ -69,8 +72,6 @@ public class TestProjectSelector {
     public boolean loadTestProjectList() {
         Log.info("TestProjectSelector.loadTestProjectList()");
 
-        // Save the currently selected project name before clearing the list
-        // so after reload we can re-select it (e.g. after create/remove)
         final Object currentSelected = selectedTestProject.getSelectedItem();
         final String currentSelectedName = currentSelected instanceof TestProjectDirectoryDto
                 ? ((TestProjectDirectoryDto) currentSelected).getName()
@@ -91,7 +92,7 @@ public class TestProjectSelector {
                     final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
                     projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
                     projects.stream()
-                            .filter(tp -> tp.getMarker() != null && tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
+                            .filter(tp -> tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
                             .forEach(testProjectList::addElement);
                 } else {
                     try (Stream<Path> paths = Files.list(root)) {
@@ -101,7 +102,7 @@ public class TestProjectSelector {
                                 .peek(path -> Log.info(path.getFileName().toString()))
                                 .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
                                 .filter(Objects::nonNull)
-                                .filter(tp -> tp.getMarker() != null && tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
+                                .filter(tp -> tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
                                 .forEach(testProjectList::addElement);
                     } catch (Exception e) {
                         Log.error("Error reading directory: " + e.getMessage());
@@ -190,14 +191,10 @@ public class TestProjectSelector {
                 projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
                 projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
             } else {
-                if (projectPanel.getProjectTree() != null) {
-                    projectPanel.getProjectTree().refreshTree();
-                }
+                projectPanel.getProjectTree().refreshTree();
             }
 
-            if (projectPanel.getBranchSelector() != null) {
-                projectPanel.getBranchSelector().updateProject(tpDir);
-            }
+            projectPanel.getBranchSelector().updateProject(tpDir);
 
         } catch (Exception e) {
             Log.error("filterByTestProject: Error for project '" + (tpDir != null ? tpDir.getName() : "null") + "': " + e.getMessage());

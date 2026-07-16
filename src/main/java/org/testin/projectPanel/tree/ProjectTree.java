@@ -32,10 +32,8 @@ public class ProjectTree {
         this.project = project;
         this.projectPanel = projectPanel;
 
-        TestProjectDirectoryDto testProjectDirectory = null;
-        if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
-            testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-        }
+        TestProjectDirectoryDto testProjectDirectory;
+        testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
         this.mainRoot = new DefaultMutableTreeNode(testProjectDirectory != null ? testProjectDirectory : "Project");
         this.treeModel = new DefaultTreeModel(mainRoot);
@@ -66,13 +64,10 @@ public class ProjectTree {
         ApplicationManager.getApplication().invokeLater(() -> {
             mainRoot.removeAllChildren();
 
-            if (projectPanel.getTestProjectSelector() != null)
-                projectPanel.getTestProjectSelector().loadTestProjectList();
+            projectPanel.getTestProjectSelector().loadTestProjectList();
 
-            TestProjectDirectoryDto testProjectDirectory = null;
-            if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
-                testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-            }
+            TestProjectDirectoryDto testProjectDirectory;
+            testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
             if (testProjectDirectory != null) {
                 mainRoot.setUserObject(testProjectDirectory);
@@ -95,10 +90,8 @@ public class ProjectTree {
         ApplicationManager.getApplication().invokeLater(() -> {
             mainRoot.removeAllChildren();
 
-            TestProjectDirectoryDto testProjectDirectory = null;
-            if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
-                testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-            }
+            TestProjectDirectoryDto testProjectDirectory;
+            testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
             if (testProjectDirectory != null) {
                 mainRoot.setUserObject(testProjectDirectory);

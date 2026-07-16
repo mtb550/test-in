@@ -25,15 +25,13 @@ public class ListenerImpl implements ActionListener {
                     return;
                 }
 
-                if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().isLoading())
+                if (projectPanel.getTestProjectSelector().isLoading())
                     return;
 
                 lastSelected = selected;
 
-                if (projectPanel.getTestProjectSelector() != null) {
-                    Log.info("Selection changed to: " + selected.getName());
-                    projectPanel.getTestProjectSelector().filterByTestProject(selected);
-                }
+                Log.info("Selection changed to: " + selected.getName());
+                projectPanel.getTestProjectSelector().filterByTestProject(selected);
             }
         }
     }

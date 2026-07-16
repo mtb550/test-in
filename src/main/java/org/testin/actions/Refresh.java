@@ -35,9 +35,7 @@ public class Refresh extends DumbAwareAction {
 
         Log.info("Refresh: re-indexing started");
 
-        final TestProjectDirectoryDto previouslySelected = projectPanel.getTestProjectSelector() != null
-                ? (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem()
-                : null;
+        final TestProjectDirectoryDto previouslySelected = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
         final String previousProjectName = previouslySelected != null ? previouslySelected.getName() : null;
 
         final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
@@ -83,7 +81,7 @@ public class Refresh extends DumbAwareAction {
             return;
         }
 
-        boolean hasTree = projectPanel.getProjectTree() != null && projectPanel.getProjectTree().getMainTree() != null;
+        boolean hasTree = projectPanel.getProjectTree().getMainTree() != null;
         e.getPresentation().setEnabled(hasTree);
     }
 
