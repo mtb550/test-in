@@ -62,52 +62,35 @@ public class ProjectTree {
 
     public void updateNodes() {
         ApplicationManager.getApplication().invokeLater(() -> {
-            mainRoot.removeAllChildren();
-
             projectPanel.getTestProjectSelector().loadTestProjectList();
-
-            TestProjectDirectoryDto testProjectDirectory;
-            testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-
-            if (testProjectDirectory != null) {
-                mainRoot.setUserObject(testProjectDirectory);
-
-                if (testProjectDirectory.getMarker().getStatus() == ProjectStatus.ACTIVE) {
-                    DefaultMutableTreeNode tcNode = projectPanel.getTestCaseTreeBuilder().getRootNode();
-                    DefaultMutableTreeNode trNode = projectPanel.getTestRunTreeBuilder().getRootNode();
-
-                    if (tcNode != null) mainRoot.add(tcNode);
-                    if (trNode != null) mainRoot.add(trNode);
-                }
-            }
-
-            treeModel.reload();
-            TreeUtil.expandAll(mainTree);
+            doRefreshTree();
         });
     }
 
-    public void refreshTree() {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            mainRoot.removeAllChildren();
+    private void doRefreshTree() {
+        mainRoot.removeAllChildren();
 
-            TestProjectDirectoryDto testProjectDirectory;
-            testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+        TestProjectDirectoryDto testProjectDirectory;
+        testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
-            if (testProjectDirectory != null) {
-                mainRoot.setUserObject(testProjectDirectory);
+        if (testProjectDirectory != null) {
+            mainRoot.setUserObject(testProjectDirectory);
 
-                if (testProjectDirectory.getMarker().getStatus() == ProjectStatus.ACTIVE) {
-                    DefaultMutableTreeNode tcNode = projectPanel.getTestCaseTreeBuilder().getRootNode();
-                    DefaultMutableTreeNode trNode = projectPanel.getTestRunTreeBuilder().getRootNode();
+            if (testProjectDirectory.getMarker().getStatus() == ProjectStatus.ACTIVE) {
+                DefaultMutableTreeNode tcNode = projectPanel.getTestCaseTreeBuilder().getRootNode();
+                DefaultMutableTreeNode trNode = projectPanel.getTestRunTreeBuilder().getRootNode();
 
-                    if (tcNode != null) mainRoot.add(tcNode);
-                    if (trNode != null) mainRoot.add(trNode);
-                }
+                if (tcNode != null) mainRoot.add(tcNode);
+                if (trNode != null) mainRoot.add(trNode);
             }
+        }
 
-            treeModel.reload();
-            TreeUtil.expandAll(mainTree);
-        });
+        treeModel.reload();
+        TreeUtil.expandAll(mainTree);
+    }
+
+    public void refreshTree() {
+        ApplicationManager.getApplication().invokeLater(this::doRefreshTree);
     }
 
     public JComponent getComponent() {

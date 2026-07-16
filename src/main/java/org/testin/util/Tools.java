@@ -379,4 +379,19 @@ public final class Tools {
             group.add(action);
         return group;
     }
+
+    public String extractProjectNameFromUrl(final @NotNull String gitUrl) {
+        String name = gitUrl;
+        if (name.endsWith("/")) name = name.substring(0, name.length() - 1);
+        if (name.endsWith(".git")) name = name.substring(0, name.length() - 4);
+
+        final int lastSlashIndex = name.lastIndexOf('/');
+        final int lastColonIndex = name.lastIndexOf(':');
+        final int splitIndex = Math.max(lastSlashIndex, lastColonIndex);
+
+        if (splitIndex != -1 && splitIndex < name.length() - 1)
+            return name.substring(splitIndex + 1);
+
+        return "ImportedTestProject";
+    }
 }

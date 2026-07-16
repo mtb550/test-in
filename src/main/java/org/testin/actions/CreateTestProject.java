@@ -29,22 +29,11 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 
 public class CreateTestProject extends DumbAwareAction {
-    private final ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel projectPanel;
 
-    public CreateTestProject(final ProjectPanel projectPanel) {
+    public CreateTestProject(final @NotNull ProjectPanel projectPanel) {
         super("New Test Project", "Create a new test project", AllIcons.General.Add);
         this.projectPanel = projectPanel;
-    }
-
-    private String extractProjectNameFromUrl(final String gitUrl) {
-        String name = gitUrl;
-        if (name.endsWith("/")) name = name.substring(0, name.length() - 1);
-        if (name.endsWith(".git")) name = name.substring(0, name.length() - 4);
-        int lastSlashIndex = name.lastIndexOf('/');
-        int lastColonIndex = name.lastIndexOf(':');
-        int splitIndex = Math.max(lastSlashIndex, lastColonIndex);
-        if (splitIndex != -1 && splitIndex < name.length() - 1) return name.substring(splitIndex + 1);
-        return "ImportedTestProject";
     }
 
     public void execute(final @NotNull Project project) {
@@ -53,7 +42,7 @@ public class CreateTestProject extends DumbAwareAction {
 
             if (directoryType == DirectoryType.IMPORT_TP) {
                 String gitUrl = name.trim();
-                String projectName = extractProjectNameFromUrl(gitUrl);
+                String projectName = Services.getInstance(project, Tools.class).extractProjectNameFromUrl(gitUrl);
                 new CloneProject(gitUrl, projectName, projectPanel).execute(project);
                 return;
             }

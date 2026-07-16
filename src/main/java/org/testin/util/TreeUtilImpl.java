@@ -111,16 +111,14 @@ public final class TreeUtilImpl {
     }
 
     public void removeVf(final @NotNull Project project, final Object requester, final Path path) {
-        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
-            try {
-                VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
-                if (vf != null) {
-                    vf.delete(requester);
-                }
-            } catch (IOException ex) {
-                Services.getInstance(project, Notifier.class).error(project, "Could not delete file: " + ex.getMessage(), "Error");
+        try {
+            VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
+            if (vf != null) {
+                WriteAction.run(() -> vf.delete(requester));
             }
-        }));
+        } catch (IOException ex) {
+            Services.getInstance(project, Notifier.class).error(project, "Could not delete file: " + ex.getMessage(), "Error");
+        }
     }
 
     public interface IVfsOperation {

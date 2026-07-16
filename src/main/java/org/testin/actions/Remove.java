@@ -68,6 +68,7 @@ public class Remove extends DumbAwareAction {
         if (Messages.showYesNoDialog(msg, "Confirm Removing", Messages.getQuestionIcon()) != Messages.YES)
             return;
 
+        boolean hasRootNode = false;
         for (DefaultMutableTreeNode node : nodesToRemove) {
             DirectoryDto pkg = (DirectoryDto) node.getUserObject();
 
@@ -81,13 +82,18 @@ public class Remove extends DumbAwareAction {
                 util.removeNode(node, tree);
             else {
                 util.removeRootNode(tree);
-                new Refresh(projectPanel).execute();
+                hasRootNode = true;
             }
         }
 
         VirtualFileManager.getInstance().syncRefresh();
+
         Services.getInstance(project, ProjectIndexer.class).resetForReindex();
-        Services.getInstance(project, ProjectPanel.class).getProjectTree().updateNodes();
+        if (hasRootNode)
+            new Refresh(projectPanel).execute();
+        else
+            Services.getInstance(project, ProjectPanel.class).getProjectTree().updateNodes();
+
         Log.info("Removed " + nodesToRemove.size() + " node(s).");
     }
 
