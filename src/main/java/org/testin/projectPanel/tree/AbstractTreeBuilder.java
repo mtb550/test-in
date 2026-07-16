@@ -48,7 +48,7 @@ public abstract class AbstractTreeBuilder {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     this.rootNode = localRoot;
                     if (projectPanel.getProjectTree() != null) {
-                        projectPanel.getProjectTree().updateNodes();
+                        projectPanel.getProjectTree().refreshTree();
                     }
                 });
 
@@ -57,7 +57,7 @@ public abstract class AbstractTreeBuilder {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     this.rootNode = null;
                     if (projectPanel.getProjectTree() != null) {
-                        projectPanel.getProjectTree().updateNodes();
+                        projectPanel.getProjectTree().refreshTree();
                     }
                 });
             }

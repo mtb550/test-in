@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.DirectoryType;
+import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.*;
@@ -42,6 +43,11 @@ final class IndexingScanner {
                     projectPath.resolve(DirectoryType.TP.getMarker()).toFile(),
                     TestProjectMarker.class);
             if (marker == null) return;
+
+            if (marker.getStatus() == ProjectStatus.ARCHIVED) {
+                Log.info("Skipping archived project: " + projectPath.getFileName());
+                return;
+            }
 
             final String fileName = projectPath.getFileName().toString();
             final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()

@@ -13,6 +13,7 @@ import org.testin.pojo.dto.dirs.*;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.EditorUtil;
 import org.testin.util.TreeUtilImpl;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
@@ -24,10 +25,10 @@ import java.util.List;
 import static org.testin.util.KeyboardSet.DeletePackage;
 
 public class Remove extends DumbAwareAction {
-    private final SimpleTree tree;
-    private final ProjectPanel projectPanel;
+    private final @NotNull SimpleTree tree;
+    private final @NotNull ProjectPanel projectPanel;
 
-    public Remove(final SimpleTree tree, final ProjectPanel projectPanel) {
+    public Remove(final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
         super("Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.tree = tree;
         this.projectPanel = projectPanel;
@@ -85,6 +86,8 @@ public class Remove extends DumbAwareAction {
         }
 
         VirtualFileManager.getInstance().syncRefresh();
+        Services.getInstance(project, ProjectIndexer.class).resetForReindex();
+        Services.getInstance(project, ProjectPanel.class).getProjectTree().updateNodes();
         Log.info("Removed " + nodesToRemove.size() + " node(s).");
     }
 

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.markers.TestProjectMarker;
+import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
@@ -19,22 +20,24 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.time.ZonedDateTime;
 
-public class ActivateTestProject extends DumbAwareAction {
-    private final @NotNull SimpleTree tree;
+public class UpdateTestProjectStatus extends DumbAwareAction {
 
-    public ActivateTestProject(final @NotNull SimpleTree tree) {
-        super("Activate", "Activate test project", AllIcons.Actions.Edit);
+    private final @NotNull SimpleTree tree;
+    private final @NotNull ProjectStatus projectStatus;
+
+    public UpdateTestProjectStatus(final @NotNull SimpleTree tree, final @NotNull ProjectStatus projectStatus) {
+        super(projectStatus.getButtonName(), projectStatus.getButtonDescription(), AllIcons.Actions.Edit);
         this.tree = tree;
+        this.projectStatus = projectStatus;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-
-        TreePath path = tree.getSelectionPath();
+        final TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = node.getUserObject();
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final Object userObject = node.getUserObject();
         if (!(userObject instanceof TestProjectDirectoryDto tp)) return;
 
         final Project project = e.getProject();
@@ -42,22 +45,23 @@ public class ActivateTestProject extends DumbAwareAction {
 
         try {
             final TestProjectMarker marker = tp.getMarker();
-
-            marker.setStatus(ProjectStatus.ACTIVE);
+            marker.setStatus(projectStatus);
             marker.setUpdatedBy(System.getProperty("user.name", ""));
             marker.setUpdatedAt(ZonedDateTime.now());
             tp.setMarker(marker);
 
             Services.getInstance(project, ProjectIndexer.class).persistTestProjectMarker(project, tp);
 
-            tree.revalidate();
-            tree.repaint();
+            final ProjectPanel projectPanel = Services.getInstance(project, ProjectPanel.class);
+            if (projectPanel != null && projectPanel.getProjectTree() != null)
+                projectPanel.getProjectTree().updateNodes();
 
-            Services.getInstance(project, Notifier.class).info(project, "Test project '" + tp.getName() + "' has been activated.");
+            Services.getInstance(project, Notifier.class).info(project, "Test project '" + tp.getName() + "' is " + projectStatus.getDescription() + ".");
 
         } catch (Exception ex) {
-            Log.error("Failed to activate project: " + ex.getMessage());
-            Services.getInstance(project, Notifier.class).error(project, "Activation Failed", "Could not activate test project.");
+            Log.error("Unable to update status to " + projectStatus.getDescription());
+            Log.error(ex.getMessage());
+            Services.getInstance(project, Notifier.class).error(project, "Unable to update status to " + projectStatus.getDescription());
         }
     }
 
@@ -65,7 +69,6 @@ public class ActivateTestProject extends DumbAwareAction {
     public void update(final @NotNull AnActionEvent e) {
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
-
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
         e.getPresentation().setEnabled(node.getUserObject() instanceof TestProjectDirectoryDto);
     }

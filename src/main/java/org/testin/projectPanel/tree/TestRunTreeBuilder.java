@@ -20,7 +20,7 @@ public class TestRunTreeBuilder extends AbstractTreeBuilder {
                 this.rootNode = null;
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (projectPanel.getProjectTree() != null) {
-                        projectPanel.getProjectTree().updateNodes();
+                        projectPanel.getProjectTree().refreshTree();
                     }
                 });
                 return;
@@ -33,7 +33,7 @@ public class TestRunTreeBuilder extends AbstractTreeBuilder {
             this.rootNode = null;
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (projectPanel.getProjectTree() != null) {
-                    projectPanel.getProjectTree().updateNodes();
+                    projectPanel.getProjectTree().refreshTree();
                 }
             });
         }

@@ -66,6 +66,35 @@ public class ProjectTree {
         ApplicationManager.getApplication().invokeLater(() -> {
             mainRoot.removeAllChildren();
 
+            if (projectPanel.getTestProjectSelector() != null)
+                projectPanel.getTestProjectSelector().loadTestProjectList();
+
+            TestProjectDirectoryDto testProjectDirectory = null;
+            if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
+                testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+            }
+
+            if (testProjectDirectory != null) {
+                mainRoot.setUserObject(testProjectDirectory);
+
+                if (testProjectDirectory.getMarker().getStatus() == ProjectStatus.ACTIVE) {
+                    DefaultMutableTreeNode tcNode = projectPanel.getTestCaseTreeBuilder().getRootNode();
+                    DefaultMutableTreeNode trNode = projectPanel.getTestRunTreeBuilder().getRootNode();
+
+                    if (tcNode != null) mainRoot.add(tcNode);
+                    if (trNode != null) mainRoot.add(trNode);
+                }
+            }
+
+            treeModel.reload();
+            TreeUtil.expandAll(mainTree);
+        });
+    }
+
+    public void refreshTree() {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            mainRoot.removeAllChildren();
+
             TestProjectDirectoryDto testProjectDirectory = null;
             if (projectPanel.getTestProjectSelector() != null && projectPanel.getTestProjectSelector().getSelectedTestProject() != null) {
                 testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();

@@ -31,6 +31,7 @@ public class TestProjectSelector {
     private final Project project;
     private final ProjectPanel projectPanel;
 
+    @Getter
     private boolean isLoading = false;
 
     @Getter
@@ -68,7 +69,15 @@ public class TestProjectSelector {
     public boolean loadTestProjectList() {
         Log.info("TestProjectSelector.loadTestProjectList()");
 
+        // Save the currently selected project name before clearing the list
+        // so after reload we can re-select it (e.g. after create/remove)
+        final Object currentSelected = selectedTestProject.getSelectedItem();
+        final String currentSelectedName = currentSelected instanceof TestProjectDirectoryDto
+                ? ((TestProjectDirectoryDto) currentSelected).getName()
+                : null;
+
         isLoading = true;
+        TestProjectDirectoryDto projectToSelect;
         try {
             String savedProjectName = PropertiesComponent.getInstance(project).getValue(SELECTED_PROJECT_KEY);
 
@@ -81,7 +90,9 @@ public class TestProjectSelector {
                 if (indexer.isIndexed()) {
                     final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
                     projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
-                    projects.forEach(testProjectList::addElement);
+                    projects.stream()
+                            .filter(tp -> tp.getMarker() != null && tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
+                            .forEach(testProjectList::addElement);
                 } else {
                     try (Stream<Path> paths = Files.list(root)) {
                         paths.filter(Files::isDirectory)
@@ -90,6 +101,7 @@ public class TestProjectSelector {
                                 .peek(path -> Log.info(path.getFileName().toString()))
                                 .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
                                 .filter(Objects::nonNull)
+                                .filter(tp -> tp.getMarker() != null && tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
                                 .forEach(testProjectList::addElement);
                     } catch (Exception e) {
                         Log.error("Error reading directory: " + e.getMessage());
@@ -105,8 +117,22 @@ public class TestProjectSelector {
 
             selectedTestProject.setEnabled(true);
 
-            TestProjectDirectoryDto projectToSelect = testProjectList.getElementAt(0);
-            if (savedProjectName != null) {
+            // Prefer the currently selected project (if still in the list),
+            // then fall back to savedProjectName, then first element
+            projectToSelect = testProjectList.getElementAt(0);
+
+            if (currentSelectedName != null) {
+                for (int i = 0; i < testProjectList.getSize(); i++) {
+                    TestProjectDirectoryDto item = testProjectList.getElementAt(i);
+                    if (currentSelectedName.equals(item.getName())) {
+                        projectToSelect = item;
+                        break;
+                    }
+                }
+            }
+
+            // If current selection didn't match and we have a saved project name, try that
+            if (savedProjectName != null && !savedProjectName.equals(currentSelectedName)) {
                 for (int i = 0; i < testProjectList.getSize(); i++) {
                     TestProjectDirectoryDto item = testProjectList.getElementAt(i);
                     if (savedProjectName.equals(item.getName())) {
@@ -117,11 +143,14 @@ public class TestProjectSelector {
             }
 
             selectedTestProject.setSelectedItem(projectToSelect);
-            return true;
 
         } finally {
             isLoading = false;
         }
+
+        if (projectToSelect != null)
+            filterByTestProject(projectToSelect);
+        return true;
     }
 
     public void addTestProject(final TestProjectDirectoryDto newTestTestProjectDirectory) {
@@ -162,7 +191,7 @@ public class TestProjectSelector {
                 projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
             } else {
                 if (projectPanel.getProjectTree() != null) {
-                    projectPanel.getProjectTree().updateNodes();
+                    projectPanel.getProjectTree().refreshTree();
                 }
             }
 

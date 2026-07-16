@@ -124,7 +124,7 @@ public class CreateTestProject extends DumbAwareAction {
                 projectPanel.getTestProjectSelector().addTestProject(newTp);
 
                 Services.getInstance(project, ProjectIndexer.class).addTestProject(newTp);
-
+                Services.getInstance(project, ProjectPanel.class).getProjectTree().updateNodes();
                 Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", name));
 
                 if (codeGenerator.isSelected()) {

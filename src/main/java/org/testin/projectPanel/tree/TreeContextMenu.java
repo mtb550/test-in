@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
+import org.testin.pojo.ProjectStatus;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.Tools;
 import org.testin.util.services.Services;
@@ -26,8 +27,10 @@ public class TreeContextMenu extends DefaultActionGroup {
         addSeparator();
 
         add(Services.getInstance(project, Tools.class).createSubGroup("Actions", AllIcons.Actions.Edit,
-                List.of(new ActivateTestProject(tree),
-                        new DeactivateTestProject(tree),
+                List.of(
+                        new UpdateTestProjectStatus(tree, ProjectStatus.ACTIVE),
+                        new UpdateTestProjectStatus(tree, ProjectStatus.INACTIVE),
+                        new UpdateTestProjectStatus(tree, ProjectStatus.ARCHIVED),
                         new UndoNode(tree),
                         new RedoNode(tree),
                         new Remove(tree, projectPanel),
