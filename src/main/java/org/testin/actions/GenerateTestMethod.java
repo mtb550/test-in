@@ -20,7 +20,7 @@ public class GenerateTestMethod extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         TestCaseDto tc = list.getSelectedValue();
 
         /// TODO: to be implemented

@@ -28,7 +28,7 @@ public class CopyTestCaseNode extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
         final Project project = e.getProject();
         final List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();

@@ -40,7 +40,7 @@ public class RunTestCase extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
 
         List<TestCaseDto> selectedValues = list.getSelectedValuesList();

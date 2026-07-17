@@ -1,6 +1,7 @@
 package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -33,4 +34,10 @@ public class ShowNodeDetails extends DumbAwareAction {
 
         MarkerDetailsView.show(e.getProject(), dir);
     }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
 }

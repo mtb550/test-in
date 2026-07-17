@@ -27,7 +27,7 @@ public class ViewDetails extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         List<TestCaseDto> selected = list.getSelectedValuesList();
 
         if (selected != null && !selected.isEmpty())

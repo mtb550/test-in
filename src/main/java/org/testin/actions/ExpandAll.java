@@ -17,7 +17,7 @@ public class ExpandAll extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
 
         SimpleTree tree = projectPanel.getProjectTree().getMainTree();
 
@@ -29,7 +29,7 @@ public class ExpandAll extends DumbAwareAction {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) {
             e.getPresentation().setEnabled(false);
             return;

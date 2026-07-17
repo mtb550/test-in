@@ -1,6 +1,7 @@
 package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -21,11 +22,17 @@ public class CutNode extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         Action action = tree.getActionMap().get("cut");
         if (action != null) {
             action.actionPerformed(new ActionEvent(tree, ActionEvent.ACTION_PERFORMED, "cut"));
         }
+    }
+
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 
 }

@@ -22,16 +22,17 @@ public class GenerateReportPdf extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
+        final Project project = e.getProject();
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto tr) {
-            final Project project = e.getProject();
             new TestRunReport(project, tr).build().asPdf();
         }
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(final @NotNull AnActionEvent e) {
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
         e.getPresentation().setEnabled(selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto);
     }

@@ -28,10 +28,10 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class Rename extends DumbAwareAction {
-    private final ProjectPanel projectPanel;
-    private final SimpleTree tree;
+    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull SimpleTree tree;
 
-    public Rename(final ProjectPanel projectPanel, final SimpleTree tree) {
+    public Rename(final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
         super("Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.projectPanel = projectPanel;
         this.tree = tree;
@@ -39,8 +39,8 @@ public class Rename extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-        if (tree == null || e.getProject() == null) return;
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
 
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
@@ -80,17 +80,15 @@ public class Rename extends DumbAwareAction {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(final @NotNull AnActionEvent e) {
         TreePath path = tree.getSelectionPath();
 
-        boolean shouldEnable = (path != null &&
+        e.getPresentation().setEnabled(path != null &&
                 path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
                 node.getUserObject() instanceof DirectoryDto dir &&
                 !(dir instanceof TestCasesMainDirectoryDto) &&
                 !(dir instanceof TestRunsMainDirectoryDto)
         );
-
-        e.getPresentation().setEnabled(shouldEnable);
     }
 
     @Override

@@ -1,0 +1,18 @@
+*.java        text eol=lf
+*.kt          text eol=lf
+*.xml         text eol=lf
+*.gradle.kts  text eol=lf
+*.properties  text eol=lf
+*.md          text eol=lf
+*.csv         text eol=lf
+*.json        text eol=lf
+*.yml         text eol=lf
+*.yaml        text eol=lf
+
+*.jar         binary
+*.png         binary
+*.jpg         binary
+*.gif         binary
+*.ico         binary
+*.zip         binary
+*.class       binary

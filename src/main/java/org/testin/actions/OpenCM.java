@@ -1,9 +1,6 @@
 package org.testin.actions;
 
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -34,7 +31,7 @@ public class OpenCM extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         if (tree != null && cm != null) {
             int[] selectedRows = tree.getSelectionRows();
             if (selectedRows != null && selectedRows.length > 0) {
@@ -63,4 +60,10 @@ public class OpenCM extends DumbAwareAction {
             }
         }
     }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
 }

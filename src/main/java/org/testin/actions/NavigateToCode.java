@@ -7,7 +7,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.CodeNavigator;
 import org.testin.util.KeyboardSet;
@@ -25,15 +24,13 @@ public class NavigateToCode extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.NavigateToCode.getCustomShortcut(), list);
     }
 
-    public void execute(final @NotNull Project project, final TestCaseDto tc) {
+    public void execute(final @NotNull Project project, final @NotNull TestCaseDto tc) {
         ArrayList<String> generatedFqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
         new CodeNavigator().toCode(project, generatedFqcn);
     }
 
     @Override
-    public void actionPerformed(@Nullable AnActionEvent e) {
-        //fixme: @Nullable is not acceptable by intellij
-        if (e == null) return;
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
         execute(e.getProject(), list.getSelectedValue());
     }

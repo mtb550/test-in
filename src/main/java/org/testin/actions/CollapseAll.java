@@ -10,32 +10,29 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.projectPanel.ProjectPanel;
 
 public class CollapseAll extends DumbAwareAction {
-    ProjectPanel projectPanel;
+    final @NotNull ProjectPanel projectPanel;
 
-    public CollapseAll(ProjectPanel projectPanel) {
+    public CollapseAll(final @NotNull ProjectPanel projectPanel) {
         super("Collapse All", "Collapse all nodes", AllIcons.Actions.Collapseall);
         this.projectPanel = projectPanel;
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
-
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         SimpleTree tree = projectPanel.getProjectTree().getMainTree();
 
-        if (tree != null) {
+        if (tree != null)
             TreeUtil.collapseAll(tree, 0);
-        }
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
-        if (e.getProject() == null) {
-            e.getPresentation().setEnabled(false);
+    public void update(final @NotNull AnActionEvent e) {
+        if (e.getProject() != null) {
+            e.getPresentation().setEnabled(projectPanel.getProjectTree().getMainTree() != null);
             return;
         }
 
-        boolean hasTree = projectPanel.getProjectTree().getMainTree() != null;
-        e.getPresentation().setEnabled(hasTree);
+        e.getPresentation().setEnabled(false);
     }
 
     @Override

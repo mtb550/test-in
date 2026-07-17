@@ -8,6 +8,7 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -25,28 +26,29 @@ import java.nio.file.Path;
 
 public class Sync extends DumbAwareAction {
 
-    private final SimpleTree tree;
-    private final ProjectPanel projectPanel;
+    private final @NotNull SimpleTree tree;
+    private final @NotNull ProjectPanel projectPanel;
 
-    public Sync(final SimpleTree tree, final ProjectPanel projectPanel) {
+    public Sync(final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
         super("Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
         this.tree = tree;
         this.projectPanel = projectPanel;
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
+        final Project project = e.getProject();
         Path repoPath = getActiveProjectPath();
 
         if (repoPath == null) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Sync Error", "Could not determine the active project. Please select a project in the tree.");
+            Services.getInstance(project, Notifier.class).error(project, "Sync Error", "Could not determine the active project. Please select a project in the tree.");
             return;
         }
 
         File gitDir = new File(repoPath.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Services.getInstance(e.getProject(), Notifier.class).warn(e.getProject(), "Sync Error", "This project is not a Git repository. Initialize it first.");
+            Services.getInstance(project, Notifier.class).warn(project, "Sync Error", "This project is not a Git repository. Initialize it first.");
             return;
         }
 
@@ -81,9 +83,7 @@ public class Sync extends DumbAwareAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Services.getInstance(e.getProject(), Notifier.class).info(e.getProject(), "Sync Successful", "Your project is now up to date with the remote repository.");
-                        if (projectPanel != null) {
-                            projectPanel.setupMainLayout();
-                        }
+                        projectPanel.setupMainLayout();
                     });
 
                 } catch (Exception ex) {

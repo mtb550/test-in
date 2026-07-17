@@ -26,7 +26,7 @@ public class SetStatusFailed extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         Project project = e.getProject();
         if (project == null) return;
         Services.getInstance(project, RunStatusService.class).applyStatus(project, ui, list, TestStatus.FAILED);

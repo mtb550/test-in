@@ -47,12 +47,13 @@ public class ExportCsv extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
+        final Project project = e.getProject();
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(project, Notifier.class).error(project, "Export Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -61,7 +62,7 @@ public class ExportCsv extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Services.getInstance(project, Notifier.class).error(project, "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
@@ -72,19 +73,19 @@ public class ExportCsv extends DumbAwareAction {
         }
 
         if (targetDirectory == null) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "The selected path in the Project Panel is invalid.");
+            Services.getInstance(project, Notifier.class).error(project, "Export Error", "The selected path in the Project Panel is invalid.");
             return;
         }
 
         FileSaverDescriptor descriptor = new FileSaverDescriptor("Export CSV", "Save test cases as a CSV file", "csv");
-        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, e.getProject());
+        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, project);
 
         String defaultFileName = targetDirectory.getName() + "_Export.csv";
         VirtualFileWrapper wrapper = dialog.save((VirtualFile) null, defaultFileName);
 
         if (wrapper != null) {
             File destFile = wrapper.getFile();
-            processExport(e.getProject(), destFile, targetDirectory, dirDto);
+            processExport(project, destFile, targetDirectory, dirDto);
         }
     }
 

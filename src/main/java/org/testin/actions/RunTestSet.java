@@ -24,7 +24,7 @@ public class RunTestSet extends DumbAwareAction {
     }
 
     @Override
-    public void update(@NotNull AnActionEvent e) {
+    public void update(final @NotNull AnActionEvent e) {
         if (tree == null) {
             e.getPresentation().setEnabled(false);
             return;
@@ -41,7 +41,7 @@ public class RunTestSet extends DumbAwareAction {
     }
 
     @Override
-    public void actionPerformed(@NotNull AnActionEvent e) {
+    public void actionPerformed(final @NotNull AnActionEvent e) {
         TreePath path = tree.getSelectionPath();
         if (e.getProject() == null || path == null) return;
 

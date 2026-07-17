@@ -1,4 +1,4 @@
-package org.testin.actions;
+package org.testin.actions.nodeCreator;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.CreateTreeNode;
 import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.DirectoryType;
 import org.testin.pojo.NodeCreator;

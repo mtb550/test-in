@@ -319,7 +319,7 @@ public final class Tools {
         return newPath;
     }
 
-    public ArrayList<String> buildFqcnMethod(final TestCaseDto tc) {
+    public ArrayList<String> buildFqcnMethod(final @NotNull TestCaseDto tc) {
         ArrayList<String> generatedFqcn = new ArrayList<>(tc.getParent().getPath2());
 
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());

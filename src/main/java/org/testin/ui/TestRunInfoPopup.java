@@ -1,4 +1,4 @@
-package org.testin.actions;
+package org.testin.ui;
 
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
