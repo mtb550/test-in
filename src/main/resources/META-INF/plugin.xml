@@ -70,9 +70,8 @@
         <postStartupActivity implementation="org.testin.settings.StartupActivity"/>
 
         <!-- File editors -->
-        <fileEditorProvider
-                implementation="org.testin.editorPanel.UnifiedEditorProvider"
-        />
+        <virtualFileSystem key="testin" implementationClass="org.testin.editorPanel.TestinFileSystem" physical="false"/>
+        <fileEditorProvider implementation="org.testin.editorPanel.UnifiedEditorProvider"/>
 
         <!-- Editor Drop Handler -->
         <fileDropHandler implementation="org.testin.projectPanel.tree.TreeDropHandler"/>

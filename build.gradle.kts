@@ -1,5 +1,3 @@
-import org.jetbrains.intellij.platform.gradle.TestFrameworkType
-
 plugins {
     id("java")
     id("org.jetbrains.intellij.platform")
@@ -36,14 +34,15 @@ dependencies {
         jetbrainsRuntime()
         pluginVerifier()
         zipSigner()
-        testFramework(TestFrameworkType.Platform)
+        testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
 
-    implementation(libs.lombok)
-    compileOnly(libs.lombok)
-    annotationProcessor(libs.lombok)
-    testCompileOnly(libs.lombok)
-    testAnnotationProcessor(libs.lombok)
+    listOf(
+        "implementation", "compileOnly", "annotationProcessor",
+        "testCompileOnly", "testAnnotationProcessor"
+    ).forEach { configName ->
+        add(configName, libs.lombok)
+    }
 
     implementation(libs.jackson.databind)
     implementation(libs.jackson.datatype.jsr310)
@@ -127,4 +126,8 @@ configurations.all {
         cacheDynamicVersionsFor(7, TimeUnit.DAYS)
         cacheChangingModulesFor(7, TimeUnit.DAYS)
     }
+}
+
+tasks.named<org.jetbrains.intellij.platform.gradle.tasks.RunIdeTask>("runIde") {
+    jvmArgs("--sun-misc-unsafe-memory-access=allow")
 }

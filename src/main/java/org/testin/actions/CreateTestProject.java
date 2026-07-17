@@ -36,14 +36,18 @@ public class CreateTestProject extends DumbAwareAction {
         this.projectPanel = projectPanel;
     }
 
-    public void execute(final @NotNull Project project) {
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        final Project project = e.getProject();
+        if (project == null) return;
+
         new CreateNodesDialog(project, CreateNodeMenu.TEST_PROJECT, (name, directoryType, codeGenerator) -> {
             if (name == null || name.trim().isEmpty()) return;
 
             if (directoryType == DirectoryType.IMPORT_TP) {
                 String gitUrl = name.trim();
                 String projectName = Services.getInstance(project, Tools.class).extractProjectNameFromUrl(gitUrl);
-                new CloneProject(gitUrl, projectName, projectPanel).execute(project);
+                new CloneProject(gitUrl, projectName, projectPanel).actionPerformed(e);
                 return;
             }
 
@@ -122,12 +126,6 @@ public class CreateTestProject extends DumbAwareAction {
             });
         }
         ).show();
-    }
-
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        execute(e.getProject());
     }
 
     @Override

@@ -1,5 +1,7 @@
 package org.testin.editorPanel;
 
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -25,12 +27,17 @@ public class UnifiedVirtualFile extends LightVirtualFile {
 
     @Override
     public @NotNull String getUrl() {
-        return "testin://" + dir.getPath().toAbsolutePath().toString().replace("\\", "/");
+        return TestinFileSystem.PROTOCOL + "://" + dir.getPath().toAbsolutePath().toString().replace("\\", "/");
     }
 
     @Override
     public @NotNull String getPath() {
         return dir.getPath().toAbsolutePath().toString();
+    }
+
+    @Override
+    public @NotNull VirtualFileSystem getFileSystem() {
+        return VirtualFileManager.getInstance().getFileSystem(TestinFileSystem.PROTOCOL);
     }
 
     public TestSetDirectoryDto getTestSet() {

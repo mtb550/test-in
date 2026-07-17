@@ -32,10 +32,8 @@ public class CloneProject extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        execute(e.getProject());
-    }
-
-    public void execute(final Project project) {
+        final Project project = e.getProject();
+        if (project == null) return;
 
         if (gitUrl == null || gitUrl.trim().isEmpty() || projectName == null || projectName.trim().isEmpty()) {
             Services.getInstance(project, Notifier.class).error(project, "Clone Error", "Missing parameters for cloning the project.");
