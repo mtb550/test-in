@@ -66,7 +66,7 @@ public class TestEditorCM extends EditorContextMenu {
         globalSourceEditorUI = null;
     }
 
-    public void registerShortcuts(final JBList<TestCaseDto> list, final TestEditorCM testEditorCM) {
+    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditorCM testEditorCM) {
         new Escape(list);
         new OpenCM(list, testEditorCM);
         new CloseTestCaseDetails(list);

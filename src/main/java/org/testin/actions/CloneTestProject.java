@@ -1,6 +1,7 @@
 package org.testin.actions;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -17,13 +18,13 @@ import org.testin.util.GitCommandRunner;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
-public class CloneProject extends DumbAwareAction {
+public class CloneTestProject extends DumbAwareAction {
 
     private final String gitUrl;
     private final String projectName;
-    private final ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel projectPanel;
 
-    public CloneProject(final String gitUrl, final String projectName, final ProjectPanel projectPanel) {
+    public CloneTestProject(final String gitUrl, final String projectName, final @NotNull ProjectPanel projectPanel) {
         super("Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
         this.gitUrl = gitUrl;
         this.projectName = projectName;
@@ -65,5 +66,10 @@ public class CloneProject extends DumbAwareAction {
                 }
             }
         });
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

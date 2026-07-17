@@ -47,7 +47,7 @@ public class CreateTestProject extends DumbAwareAction {
             if (directoryType == DirectoryType.IMPORT_TP) {
                 String gitUrl = name.trim();
                 String projectName = Services.getInstance(project, Tools.class).extractProjectNameFromUrl(gitUrl);
-                new CloneProject(gitUrl, projectName, projectPanel).actionPerformed(e);
+                new CloneTestProject(gitUrl, projectName, projectPanel).actionPerformed(e);
                 return;
             }
 
