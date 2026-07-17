@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.projectPanel.ProjectPanel;
 
 public class CollapseAll extends DumbAwareAction {
-    final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel projectPanel;
 
     public CollapseAll(final @NotNull ProjectPanel projectPanel) {
         super("Collapse All", "Collapse all nodes", AllIcons.Actions.Collapseall);

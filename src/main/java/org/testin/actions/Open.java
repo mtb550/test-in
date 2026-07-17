@@ -19,9 +19,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class Open extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public Open(final SimpleTree tree) {
+    public Open(final @NotNull SimpleTree tree) {
         super("Open", "Open selected test sets or runs", AllIcons.Actions.MenuOpen);
         this.tree = tree;
 

@@ -13,9 +13,9 @@ import java.awt.event.ActionEvent;
 
 
 public class CutNode extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public CutNode(final SimpleTree tree) {
+    public CutNode(final @NotNull SimpleTree tree) {
         super("Cut", "Cut selected items", AllIcons.Actions.MenuCut);
         this.tree = tree;
         this.registerCustomShortcutSet(KeyboardSet.CutNode.getCustomShortcut(), tree);

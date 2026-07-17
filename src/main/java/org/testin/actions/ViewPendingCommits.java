@@ -30,7 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ViewPendingCommits extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
     private Notification pushNotification;
 
     public ViewPendingCommits(final @NotNull SimpleTree tree) {
@@ -55,8 +55,11 @@ public class ViewPendingCommits extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
         final Project project = e.getProject();
+
         final Path path = Services.getInstance(project, Tools.class).getProjectPath(tree);
+        if (path == null) return;
 
         File gitDir = new File(path.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {

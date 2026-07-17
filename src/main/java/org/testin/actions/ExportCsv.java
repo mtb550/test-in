@@ -35,13 +35,13 @@ import java.util.*;
 
 public class ExportCsv extends DumbAwareAction {
 
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
     private final List<TestEditorAttributes> EXPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportValue)
             .toList();
 
-    public ExportCsv(final SimpleTree tree) {
+    public ExportCsv(final @NotNull SimpleTree tree) {
         super("Export to CSV", "Export test cases to a CSV file", AllIcons.FileTypes.Csv);
         this.tree = tree;
     }

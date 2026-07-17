@@ -24,12 +24,12 @@ import java.nio.file.Path;
 
 public class CreateTreeNode extends DumbAwareAction {
     @Getter
-    private final ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel projectPanel;
 
     @Getter
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public CreateTreeNode(final ProjectPanel projectPanel, final SimpleTree tree) {
+    public CreateTreeNode(final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
         super("Create", "Create new node", AllIcons.General.Add);
         this.projectPanel = projectPanel;
         this.tree = tree;

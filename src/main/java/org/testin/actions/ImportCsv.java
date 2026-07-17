@@ -40,7 +40,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class ImportCsv extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
     private final List<String> IMPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportValue)
@@ -57,7 +57,7 @@ public class ImportCsv extends DumbAwareAction {
                             The CSV should use comma as delimiter. Values containing commas or newlines must be quoted with double quotes.""",
                     String.join(", ", IMPORT_COLUMNS));
 
-    public ImportCsv(final SimpleTree tree) {
+    public ImportCsv(final @NotNull SimpleTree tree) {
         super("Import from CSV", "Import test cases from a CSV file", AllIcons.FileTypes.Csv);
         this.tree = tree;
     }

@@ -16,20 +16,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class RunTestSet extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public RunTestSet(final SimpleTree tree) {
+    public RunTestSet(final @NotNull SimpleTree tree) {
         super("Run Test Set", "Run selected test set", AllIcons.RunConfigurations.TestState.Run);
         this.tree = tree;
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (tree == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
         TreePath path = tree.getSelectionPath();
         if (path == null) {
             e.getPresentation().setEnabled(false);

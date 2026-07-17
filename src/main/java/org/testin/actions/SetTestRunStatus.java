@@ -23,7 +23,7 @@ import java.time.temporal.ChronoUnit;
 
 // todo, to be refactored
 public class SetTestRunStatus extends DumbAwareAction {
-    final SimpleTree tree;
+    final @NotNull SimpleTree tree;
 
     public SetTestRunStatus(final @NotNull SimpleTree tree) {
         super("Set Status", "Set test run status", AllIcons.Nodes.Test);

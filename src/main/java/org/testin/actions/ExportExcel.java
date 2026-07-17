@@ -39,13 +39,13 @@ import java.util.*;
 
 public class ExportExcel extends DumbAwareAction {
 
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
     private final List<TestEditorAttributes> EXPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportValue)
             .toList();
 
-    public ExportExcel(final SimpleTree tree) {
+    public ExportExcel(final @NotNull SimpleTree tree) {
         super("Export to Excel", "Export test cases to an Excel file", AllIcons.FileTypes.MicrosoftWindows);
         this.tree = tree;
     }

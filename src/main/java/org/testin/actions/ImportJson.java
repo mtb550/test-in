@@ -42,9 +42,9 @@ import java.util.*;
 
 public class ImportJson extends DumbAwareAction {
 
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public ImportJson(final SimpleTree tree) {
+    public ImportJson(final @NotNull SimpleTree tree) {
         super("Import from JSON", "Import test cases from a JSON file", AllIcons.FileTypes.Json);
         this.tree = tree;
     }
@@ -52,10 +52,11 @@ public class ImportJson extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
+        final Project project = e.getProject();
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Import Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 

@@ -13,9 +13,9 @@ import java.awt.event.ActionEvent;
 
 
 public class PasteNode extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public PasteNode(final SimpleTree tree) {
+    public PasteNode(final @NotNull SimpleTree tree) {
         super("Paste", "Paste items", AllIcons.Actions.MenuPaste);
         this.tree = tree;
         this.registerCustomShortcutSet(KeyboardSet.PasteNode.getCustomShortcut(), tree);

@@ -20,7 +20,7 @@ public class Refresh extends DumbAwareAction {
     private final ProjectPanel projectPanel;
     private final AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
-    public Refresh(final ProjectPanel projectPanel) {
+    public Refresh(final @NotNull ProjectPanel projectPanel) {
         super("Refresh", "Re-index and reload tree", AllIcons.Actions.Refresh);
         this.projectPanel = projectPanel;
     }

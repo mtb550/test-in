@@ -14,9 +14,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 // TODO: implement save as to allow tester to specify save place
 public class GenerateReportXml extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public GenerateReportXml(final SimpleTree tree) {
+    public GenerateReportXml(final @NotNull SimpleTree tree) {
         super("As XML", "Generate test run XML report", AllIcons.FileTypes.Xml);
         this.tree = tree;
     }

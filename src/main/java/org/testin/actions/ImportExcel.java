@@ -60,9 +60,9 @@ public class ImportExcel extends DumbAwareAction {
                             You can also download a ready-to-use sample file using the button below.""",
                     String.join("\n ", IMPORT_COLUMNS));
 
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public ImportExcel(final SimpleTree tree) {
+    public ImportExcel(final @NotNull SimpleTree tree) {
         super("Import from Excel", "Import test cases from an excel file", AllIcons.FileTypes.MicrosoftWindows);
         this.tree = tree;
     }

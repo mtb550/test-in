@@ -13,7 +13,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class ShowNodeDetails extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
     public ShowNodeDetails(final @NotNull SimpleTree tree) {
         super("Details", "Show node details", AllIcons.General.IndentDetected);

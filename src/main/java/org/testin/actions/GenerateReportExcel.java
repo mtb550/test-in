@@ -14,9 +14,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 // TODO: implement save as to allow tester to specify save place
 public class GenerateReportExcel extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public GenerateReportExcel(final SimpleTree tree) {
+    public GenerateReportExcel(final @NotNull SimpleTree tree) {
         super("As Excel", "Generate test run Excel report", AllIcons.Nodes.DataTables);
         this.tree = tree;
     }

@@ -14,9 +14,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 // TODO: implement save as to allow tester to specify save place
 public class GenerateReportJson extends DumbAwareAction {
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public GenerateReportJson(final SimpleTree tree) {
+    public GenerateReportJson(final @NotNull SimpleTree tree) {
         super("As JSON", "Generate test run JSON report", AllIcons.FileTypes.Json);
         this.tree = tree;
     }

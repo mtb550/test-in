@@ -10,7 +10,7 @@ import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Log;
 
 public class UndoNode extends DumbAwareAction {
-    public UndoNode(SimpleTree tree) {
+    public UndoNode(final @NotNull SimpleTree tree) {
         super("Undo", "Undo last action", AllIcons.Actions.Undo);
         this.registerCustomShortcutSet(KeyboardSet.Undo.getCustomShortcut(), tree);
     }

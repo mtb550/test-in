@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.projectPanel.ProjectPanel;
 
 public class ExpandAll extends DumbAwareAction {
-    ProjectPanel projectPanel;
+    final @NotNull ProjectPanel projectPanel;
 
-    public ExpandAll(ProjectPanel projectPanel) {
+    public ExpandAll(final @NotNull ProjectPanel projectPanel) {
         super("Expand All", "Expand all nodes", AllIcons.Actions.Expandall);
         this.projectPanel = projectPanel;
     }

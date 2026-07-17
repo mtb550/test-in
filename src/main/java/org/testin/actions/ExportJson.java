@@ -36,9 +36,9 @@ import java.util.*;
 
 public class ExportJson extends DumbAwareAction {
 
-    private final SimpleTree tree;
+    private final @NotNull SimpleTree tree;
 
-    public ExportJson(final SimpleTree tree) {
+    public ExportJson(final @NotNull SimpleTree tree) {
         super("Export to JSON", "Export test cases to a JSON file", AllIcons.FileTypes.Json);
         this.tree = tree;
     }
@@ -46,10 +46,11 @@ public class ExportJson extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
+        final Project project = e.getProject();
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(project, Notifier.class).error(project, "Export Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -58,7 +59,7 @@ public class ExportJson extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Services.getInstance(project, Notifier.class).error(project, "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
