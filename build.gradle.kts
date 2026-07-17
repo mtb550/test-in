@@ -109,6 +109,8 @@ tasks {
     withType<Test> {
         useTestNG()
 
+        jvmArgs("--sun-misc-unsafe-memory-access=allow")
+
         testLogging {
             events("passed", "skipped", "failed")
         }
