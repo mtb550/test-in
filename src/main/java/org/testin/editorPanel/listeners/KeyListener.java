@@ -31,7 +31,7 @@ public class KeyListener extends KeyAdapter {
     @Override
     public void keyPressed(final KeyEvent e) {
 
-        if (KeyboardSet.CopyTestCaseDescription.matches(e)) {
+        if (KeyboardSet.CopyTestCase.matches(e)) {
             final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
             if (selectedCases != null && !selectedCases.isEmpty()) {
                 final String titles = selectedCases.stream()

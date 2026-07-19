@@ -19,9 +19,9 @@ import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
 public class CopyTestCaseNode extends DumbAwareAction {
-    private final JBList<TestCaseDto> list;
+    private final @NotNull JBList<TestCaseDto> list;
 
-    public CopyTestCaseNode(final JBList<TestCaseDto> list) {
+    public CopyTestCaseNode(final @NotNull JBList<TestCaseDto> list) {
         super("Copy Node", "Copy selected test case(s) to clipboard", AllIcons.Actions.Copy);
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.CopyTestCaseNode.getCustomShortcut(), list);

@@ -1,7 +1,6 @@
 package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +27,7 @@ public class RunEditorCM extends EditorContextMenu {
     @Setter
     private static IEditorUI globalSourceEditorUI = null;
 
-    public RunEditorCM(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public RunEditorCM(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list) {
         super("Editor Context Menu", true);
 
         add(new SetStatusPassed(ui, list));
@@ -50,6 +49,7 @@ public class RunEditorCM extends EditorContextMenu {
         add(new PrevPageAction(ui, list));
     }
 
+    // todo: why not used!!
     public static void clearCutState() {
         globalCutAction = false;
         globalPendingCutIds.clear();
@@ -60,11 +60,10 @@ public class RunEditorCM extends EditorContextMenu {
         globalSourceEditorUI = null;
     }
 
-    public void registerShortcuts(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final RunEditorCM testEditorCM) {
+    public void registerShortcuts(final JBList<TestCaseDto> list, final RunEditorCM cm) {
         new Escape(list);
-        new OpenCM(list, testEditorCM);
+        new OpenCM(list, cm);
         new CloseTestCaseDetails(list);
-        new CopyTestCaseDescription(list);
     }
 
     @Override

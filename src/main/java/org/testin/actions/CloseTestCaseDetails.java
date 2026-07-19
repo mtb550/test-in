@@ -19,7 +19,7 @@ public class CloseTestCaseDetails extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
+        final ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
 
         if (viewer != null)
             viewer.hide().reset();

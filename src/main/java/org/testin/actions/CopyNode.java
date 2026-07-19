@@ -24,11 +24,10 @@ public class CopyNode extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         Action action = tree.getActionMap().get("copy");
-        if (action != null) {
-            action.actionPerformed(new ActionEvent(tree, ActionEvent.ACTION_PERFORMED, "copy"));
-        }
-    }
 
+        if (action != null)
+            action.actionPerformed(new ActionEvent(tree, ActionEvent.ACTION_PERFORMED, "copy"));
+    }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {

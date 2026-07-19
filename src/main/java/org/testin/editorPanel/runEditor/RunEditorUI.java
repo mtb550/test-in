@@ -136,14 +136,14 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
         list.setCellRenderer(new RunListRenderer(this));
 
-        final RunEditorCM runEditorCM = new RunEditorCM(this, parent, list, model);
+        final RunEditorCM runEditorCM = new RunEditorCM(this, parent, list);
         final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, parent, runEditorCM);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
         list.addMouseMotionListener(mouseListenerImpl);
 
-        runEditorCM.registerShortcuts(this, parent, list, model, runEditorCM);
+        runEditorCM.registerShortcuts(list, runEditorCM);
 
         ArrayList<String> selectionPath = parent.getPath2();
         list.addListSelectionListener(new SelectionListener(project, list, this, selectionPath));

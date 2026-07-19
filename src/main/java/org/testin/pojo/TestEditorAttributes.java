@@ -3,6 +3,7 @@ package org.testin.pojo;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.Shared;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
@@ -27,6 +28,7 @@ public enum TestEditorAttributes {
             true,
             false,
             false,
+            false,
             (tc, project) -> String.valueOf(tc.getId()),
             null,
             (project, tc, v) -> {
@@ -37,6 +39,7 @@ public enum TestEditorAttributes {
     DESCRIPTION(
             "Description",
             "Description:",
+            true,
             true,
             true,
             true,
@@ -51,6 +54,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
+            false,
             (tc, project) -> tc.getExpectedResult(),
             null,
             (project, tc, v) -> tc.setExpectedResult(v)
@@ -62,6 +66,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
+            false,
             (tc, project) -> String.join(", ", tc.getSteps()),
             null,
             (project, tc, v) -> tc.setSteps(Services.getInstance(project, Tools.class).parseStepsSafe(v))
@@ -73,6 +78,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
+            false,
             (tc, project) -> tc.getPriority().getName(),
             tc -> List.of(Shared.createPriorityBadge(tc)),
             (project, tc, v) -> tc.setPriority(Services.getInstance(project, Tools.class).parsePrioritySafe(v))
@@ -83,6 +89,7 @@ public enum TestEditorAttributes {
             "FQCN:",
             true,
             true,
+            false,
             false,
             (tc, project) -> String.join(" > ", Services.getInstance(project, Tools.class).buildFqcnMethod(tc)),
             null,
@@ -96,6 +103,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
+            false,
             (tc, project) -> tc.getReference(),
             null,
             (project, tc, v) -> tc.setReference(v)
@@ -107,6 +115,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
+            false,
             (tc, project) -> tc.getTestData(),
             null,
             (project, tc, v) -> tc.setTestData(v)
@@ -118,6 +127,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
+            false,
             (tc, project) -> tc.getPreConditions(),
             null,
             (project, tc, v) -> tc.setPreConditions(v)
@@ -129,6 +139,7 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
+            false,
             (tc, project) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList()),
             (project, tc, v) -> tc.setGroup(Services.getInstance(project, Tools.class).parseGroupsSafe(v))
@@ -138,6 +149,7 @@ public enum TestEditorAttributes {
             "Path",
             "Path:",
             true,
+            false,
             false,
             false,
             (tc, project) -> String.join(" > ", tc.getParent().getPath2()),
@@ -154,6 +166,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
+            false,
             (tc, project) -> tc.getModule(),
             null,
             (project, tc, v) -> tc.setModule(v)
@@ -163,6 +176,7 @@ public enum TestEditorAttributes {
             "Status",
             "Status:",
             true,
+            false,
             false,
             false,
             (tc, project) -> tc.getStatus().getDisplayText(),
@@ -176,6 +190,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
+            false,
             (tc, project) -> tc.getCreatedBy(),
             null,
             (project, tc, v) -> tc.setCreatedBy(v)
@@ -187,6 +202,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
+            false,
             (tc, project) -> tc.getUpdatedBy(),
             null,
             (project, tc, v) -> tc.setUpdatedBy(v)
@@ -198,6 +214,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
+            false,
             (tc, project) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
             null,
             (project, tc, v) -> tc.setCreatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
@@ -209,6 +226,7 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
+            false,
             (tc, project) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
             null,
             (project, tc, v) -> tc.setUpdatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
@@ -219,18 +237,19 @@ public enum TestEditorAttributes {
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
     private final boolean importValue;
+    private final boolean copyable;
     private final ValueExtractor valueExtractor;
     private final DrawItem drawItem;
     private final ImportSetter importSetter;
 
-    public void applyToUI(final TestCaseDto tc, final List<JComponent> badges, final Map<String, String> details, final Project project) {
+    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project project) {
         if (drawItem != null) badges.addAll(drawItem.apply(tc));
         else details.put(name, valueExtractor.apply(tc, project));
     }
 
     @FunctionalInterface
     public interface ValueExtractor {
-        String apply(final TestCaseDto tc, final Project project);
+        String apply(final @NotNull TestCaseDto tc, final @NotNull Project project);
     }
 
     @FunctionalInterface

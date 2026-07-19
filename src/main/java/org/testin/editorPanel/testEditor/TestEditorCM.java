@@ -70,7 +70,6 @@ public class TestEditorCM extends EditorContextMenu {
         new Escape(list);
         new OpenCM(list, testEditorCM);
         new CloseTestCaseDetails(list);
-        new CopyTestCaseDescription(list);
     }
 
     @Override

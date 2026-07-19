@@ -19,7 +19,7 @@ public class CollapseAll extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        SimpleTree tree = projectPanel.getProjectTree().getMainTree();
+        final SimpleTree tree = projectPanel.getProjectTree().getMainTree();
 
         if (tree != null)
             TreeUtil.collapseAll(tree, 0);
