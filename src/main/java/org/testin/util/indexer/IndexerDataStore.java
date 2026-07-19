@@ -87,6 +87,18 @@ final class IndexerDataStore {
         return testRunDirsByPath.get(path.toString());
     }
 
+    TestSetPackageDirectoryDto getTestSetPackageByPath(final Path path) {
+        return testSetPackagesByPath.get(path.toString());
+    }
+
+    TestCasesMainDirectoryDto getTestCasesMainDirByPath(final Path path) {
+        return testCasesMainDirsByPath.get(path.toString());
+    }
+
+    TestRunsMainDirectoryDto getTestRunsMainDirByPath(final Path path) {
+        return testRunsMainDirsByPath.get(path.toString());
+    }
+
     void putTestCase(final Path testSetPath, final TestCaseDto tc) {
         testCasesById.put(tc.getId(), tc);
 

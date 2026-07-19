@@ -6,8 +6,6 @@ import com.intellij.openapi.ui.ComboBox;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.DirectoryMapper;
-import org.testin.pojo.DirectoryType;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
@@ -22,8 +20,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 public class TestProjectSelector {
 
@@ -64,12 +60,12 @@ public class TestProjectSelector {
         });
     }
 
-    public boolean init() {
+    public void init() {
         Log.info("TestProjectSelector.init()");
-        return loadTestProjectList();
+        loadTestProjectList();
     }
 
-    public boolean loadTestProjectList() {
+    public void loadTestProjectList() {
         Log.info("TestProjectSelector.loadTestProjectList()");
 
         final Object currentSelected = selectedTestProject.getSelectedItem();
@@ -88,32 +84,19 @@ public class TestProjectSelector {
             if (Files.exists(root) && Files.isDirectory(root)) {
                 final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
-                if (indexer.isIndexed()) {
-                    final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
-                    projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
-                    projects.stream()
-                            .filter(tp -> tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
-                            .forEach(testProjectList::addElement);
-                } else {
-                    try (Stream<Path> paths = Files.list(root)) {
-                        paths.filter(Files::isDirectory)
-                                .filter(path -> !path.getFileName().toString().startsWith("."))
-                                .filter(path -> Files.exists(path.resolve(DirectoryType.TP.getMarker())))
-                                .peek(path -> Log.info(path.getFileName().toString()))
-                                .map(path -> Services.getInstance(project, DirectoryMapper.class).readTestProjectNode(project, path))
-                                .filter(Objects::nonNull)
-                                .filter(tp -> tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
-                                .forEach(testProjectList::addElement);
-                    } catch (Exception e) {
-                        Log.error("Error reading directory: " + e.getMessage());
-                    }
-                }
+                final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
+                projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
+                projects.stream()
+                        .filter(tp -> tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
+                        .forEach(testProjectList::addElement);
+
             }
 
             if (!Files.exists(root) || testProjectList.getSize() == 0) {
                 projectPanel.showEmptyState();
                 selectedTestProject.setEnabled(false);
-                return false;
+                selectedTestProject.setSelectedItem(null);
+                return;
             }
 
             selectedTestProject.setEnabled(true);
@@ -149,9 +132,13 @@ public class TestProjectSelector {
             isLoading = false;
         }
 
-        if (projectToSelect != null)
+        if (projectToSelect != null) {
+            // If the panel was in empty state (no components), transition to main layout
+            if (projectPanel.getPanel().getComponentCount() == 0) {
+                projectPanel.setupMainLayout();
+            }
             filterByTestProject(projectToSelect);
-        return true;
+        }
     }
 
     public void addTestProject(final TestProjectDirectoryDto newTestTestProjectDirectory) {
@@ -171,7 +158,6 @@ public class TestProjectSelector {
 
         if (testProjectList.getSize() == 1) {
             selectedTestProject.setEnabled(true);
-            projectPanel.setupMainLayout();
         }
     }
 

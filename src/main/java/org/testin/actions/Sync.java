@@ -83,6 +83,7 @@ public class Sync extends DumbAwareAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Services.getInstance(e.getProject(), Notifier.class).info(e.getProject(), "Sync Successful", "Your project is now up to date with the remote repository.");
+                        projectPanel.getTestProjectSelector().loadTestProjectList();
                         projectPanel.setupMainLayout();
                     });
 

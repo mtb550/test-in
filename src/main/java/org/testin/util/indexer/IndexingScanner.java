@@ -65,7 +65,7 @@ final class IndexingScanner {
 
             final Path tcDir = projectPath.resolve(DirectoryType.TCD.getDisplayedName());
             if (Files.exists(tcDir) && Files.isDirectory(tcDir)) {
-                final TestCasesMainDirectoryDto tcd = dirMapper.readTestCasesRootNode(project, tcDir, tp);
+                final TestCasesMainDirectoryDto tcd = dirMapper.getTestCasesRootNode(project, tcDir, tp);
                 if (tcd != null) {
                     tp.setTestCasesDirectory(tcd);
                     store.getTestCasesMainDirsByPath().put(tcDir.toString(), tcd);
@@ -78,7 +78,7 @@ final class IndexingScanner {
 
             final Path trDir = projectPath.resolve(DirectoryType.TRD.getDisplayedName());
             if (Files.exists(trDir) && Files.isDirectory(trDir)) {
-                final TestRunsMainDirectoryDto trd = dirMapper.readTestRunsRootNode(project, trDir, tp);
+                final TestRunsMainDirectoryDto trd = dirMapper.getTestRunsRootNode(project, trDir, tp);
                 if (trd != null) {
                     tp.setTestRunsDirectory(trd);
                     store.getTestRunsMainDirsByPath().put(trDir.toString(), trd);
@@ -115,7 +115,7 @@ final class IndexingScanner {
                                     final ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
-            final TestSetPackageDirectoryDto tsp = dirMapper.readTestSetPackageNode(project, path, parent);
+            final TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(project, path, parent);
             if (tsp == null) return;
 
             store.getTestSetPackagesByPath().put(path.toString(), tsp);
@@ -141,7 +141,7 @@ final class IndexingScanner {
                              final ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
-            final TestSetDirectoryDto ts = dirMapper.readTestSetNode(project, path, parent);
+            final TestSetDirectoryDto ts = dirMapper.getTestSetNode(project, path, parent);
             if (ts == null) return;
 
             store.getTestSetsByPath().put(path.toString(), ts);
@@ -198,7 +198,7 @@ final class IndexingScanner {
                                        final ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
-            final TestRunPackageDirectoryDto trp = dirMapper.readTestRunPackageNode(project, path, parent);
+            final TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(project, path, parent);
             if (trp == null) return;
 
             store.getTestRunPackagesByPath().put(path.toString(), trp);
@@ -224,7 +224,7 @@ final class IndexingScanner {
                              final ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
-            final TestRunDirectoryDto tr = dirMapper.readTestRunNode(project, path, parent);
+            final TestRunDirectoryDto tr = dirMapper.getTestRunNode(project, path, parent);
             if (tr == null) return;
 
             store.getTestRunDirsByPath().put(path.toString(), tr);

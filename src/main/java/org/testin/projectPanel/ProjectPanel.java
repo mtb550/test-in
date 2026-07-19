@@ -52,6 +52,7 @@ public final class ProjectPanel implements Disposable {
         branchSelector = new BranchSelector(project, this, testProjectSelector.getSelectedTestProject().getItem());
         projectTree = new ProjectTree(project, this);
 
+        testProjectSelector.init();
         setupMainLayout();
 
     }
@@ -60,10 +61,8 @@ public final class ProjectPanel implements Disposable {
         panel.removeAll();
         panel.getEmptyText().clear();
 
-        boolean status = testProjectSelector.init();
-
-        if (status) {
-            Log.info("ProjectPanel(). projects found");
+        if (testProjectSelector.getTestProjectList().getSize() > 0) {
+            Log.info("ProjectPanel.setupMainLayout(): projects found");
 
             panel.setLayout(new BorderLayout());
             JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
@@ -78,7 +77,7 @@ public final class ProjectPanel implements Disposable {
             panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         } else {
-            Log.info("ProjectPanel(). not projects found");
+            Log.info("ProjectPanel.setupMainLayout(): no projects found");
             showEmptyState();
         }
 

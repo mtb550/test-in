@@ -18,6 +18,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 
 public class PendingCommitsDialog extends DialogWrapper {
 
@@ -146,7 +147,7 @@ public class PendingCommitsDialog extends DialogWrapper {
                     model.removeRow(selectedRow);
                 }
             } else if (diff.type() == TestCaseDiff.DiffType.MODIFIED) {
-                TestCaseDto currentDto = Services.getInstance(project, Mapper.class).readValue(jsonFile, TestCaseDto.class);
+                TestCaseDto currentDto = Services.getInstance(project, ProjectIndexer.class).getTestCaseById(UUID.fromString(testCaseId));
 
                 if (currentDto == null) return;
 

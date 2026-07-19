@@ -3,6 +3,7 @@ package org.testin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
@@ -68,7 +69,6 @@ public class Remove extends DumbAwareAction {
         if (Messages.showYesNoDialog(msg, "Confirm Removing", Messages.getQuestionIcon()) != Messages.YES)
             return;
 
-        boolean hasRootNode = false;
         for (DefaultMutableTreeNode node : nodesToRemove) {
             DirectoryDto pkg = (DirectoryDto) node.getUserObject();
 
@@ -80,21 +80,24 @@ public class Remove extends DumbAwareAction {
 
             if (node.getParent() != null)
                 util.removeNode(node, tree);
-            else {
-                util.removeRootNode(tree);
-                hasRootNode = true;
-            }
         }
 
         VirtualFileManager.getInstance().syncRefresh();
 
-        Services.getInstance(project, ProjectIndexer.class).resetForReindex();
-        if (hasRootNode)
-            new Refresh(projectPanel).execute();
-        else
-            Services.getInstance(project, ProjectPanel.class).getProjectTree().updateNodes();
+        // todo, just remove by user indexer removeProject() then it will removed from disk, no need for this below code block
+        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        indexer.resetForReindex();
+        indexer.indexWithProgress();
 
-        Log.info("Removed " + nodesToRemove.size() + " node(s).");
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            indexer.awaitIndexing();
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                projectPanel.getProjectTree().updateNodes();
+                Log.info("Removed " + nodesToRemove.size() + " node(s).");
+            });
+        });
+        // todo, just remove by user indexer removeProject() then it will removed from disk, no need for this below code block
     }
 
     @Override

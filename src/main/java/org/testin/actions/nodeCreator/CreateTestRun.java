@@ -14,24 +14,20 @@ import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
+import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.RunCreationForm;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
-import org.testin.util.Mapper;
 import org.testin.util.Tools;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class CreateTestRun implements NodeCreator {
     private Project project;
@@ -82,55 +78,51 @@ public class CreateTestRun implements NodeCreator {
     }
 
     private DefaultMutableTreeNode buildDirectoryTree(final Path folder, final boolean isRoot, final DirectoryDto parentOfThisNode) {
-        final Object label = isRoot ? parentOfThisNode : resolveDirectoryObject(folder, parentOfThisNode);
+        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        indexer.awaitIndexing();
+
+        final Object label = isRoot ? parentOfThisNode : resolveDirectoryObject(folder, parentOfThisNode, indexer);
         final DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
         final DirectoryDto thisNodeDto = (label instanceof DirectoryDto) ? (DirectoryDto) label : null;
 
-        if (thisNodeDto == null || !Files.exists(folder) || !Files.isDirectory(folder)) return node;
+        if (thisNodeDto == null) return node;
 
-        final boolean isTestSet = Files.exists(folder.resolve(DirectoryType.TS.getMarker()));
+        final boolean isTestSet = thisNodeDto instanceof TestSetDirectoryDto;
 
         if (isTestSet) {
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-            indexer.awaitIndexing();
-
             final List<TestCaseDto> testCases = indexer.getTestCasesForTestSet(folder);
             for (final TestCaseDto tc : testCases) {
                 node.add(new DefaultMutableTreeNode(tc));
             }
         } else {
-            try (final Stream<Path> paths = Files.list(folder)) {
-                paths.sorted(Comparator.comparing((Path p) -> !Files.isDirectory(p)).thenComparing(p -> p.getFileName().toString().toLowerCase()))
-                        .forEach(child -> {
-                            if (Files.isDirectory(child)) {
-                                node.add(buildDirectoryTree(child, false, thisNodeDto));
-                            } else if (child.toString().endsWith(".json")) {
-                                try {
-                                    final TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(child.toFile(), TestCaseDto.class);
-                                    node.add(new DefaultMutableTreeNode(tc));
-                                } catch (final Exception e1) {
-                                    Log.info("Failed to parse " + child);
-                                    Log.error("Exception: " + e1.getMessage());
-                                }
-                            }
-                        });
-            } catch (final Exception e2) {
-                Log.error("Exception: " + e2.getMessage());
+            final List<DirectoryDto> children = indexer.getChildren(folder);
+            for (final DirectoryDto child : children) {
+                node.add(buildDirectoryTree(child.getPath(), false, child));
             }
         }
 
         return node;
     }
 
-    private Object resolveDirectoryObject(final Path folder, final DirectoryDto parentDir) {
-        if (Files.exists(folder.resolve(DirectoryType.TSP.getMarker())))
-            return Services.getInstance(project, DirectoryMapper.class).readTestSetPackageNode(project, folder, parentDir);
+    private Object resolveDirectoryObject(final Path folder, final DirectoryDto parentDir, final ProjectIndexer indexer) {
+        final DirectoryDto child = indexer.getChildren(parentDir.getPath()).stream()
+                .filter(dto -> dto.getPath().equals(folder))
+                .findFirst()
+                .orElse(null);
 
-        if (Files.exists(folder.resolve(DirectoryType.TS.getMarker())))
-            return Services.getInstance(project, DirectoryMapper.class).readTestSetNode(project, folder, parentDir);
+        if (child != null) return child;
 
-        if (Files.exists(folder.resolve(DirectoryType.TCD.getMarker())))
-            return Services.getInstance(project, DirectoryMapper.class).readTestCasesRootNode(project, folder, parentDir);
+        // Fallback: try direct lookups by path
+        if (indexer.getTestSetPackageByPath(folder) != null)
+            return indexer.getTestSetPackageByPath(folder);
+        if (indexer.getTestSetByPath(folder) != null)
+            return indexer.getTestSetByPath(folder);
+        if (indexer.getTestCasesMainDirByPath(folder) != null)
+            return indexer.getTestCasesMainDirByPath(folder);
+        if (indexer.getTestRunDirByPath(folder) != null)
+            return indexer.getTestRunDirByPath(folder);
+        if (indexer.getTestRunsMainDirByPath(folder) != null)
+            return indexer.getTestRunsMainDirByPath(folder);
 
         throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + parentDir.getClass().getSimpleName());
     }

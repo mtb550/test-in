@@ -49,6 +49,7 @@ public class Refresh extends DumbAwareAction {
             Log.info("Refresh: re-indexing complete, rebuilding tree");
 
             ApplicationManager.getApplication().invokeLater(() -> {
+                projectPanel.getTestProjectSelector().loadTestProjectList();
                 projectPanel.setupMainLayout();
 
                 if (previousProjectName != null) {

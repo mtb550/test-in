@@ -33,7 +33,6 @@ import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.ui.RunOpeningForm;
 import org.testin.util.FontSyncUtil;
-import org.testin.util.Mapper;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
@@ -44,7 +43,6 @@ import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.MouseListener;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -163,13 +161,6 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                     final Path dirPath = parent.getPath();
 
                     this.tr = indexer.getTestRunForPath(dirPath);
-
-                    if (this.tr == null) {
-                        Path jsonFilePath = dirPath.resolve(parent.getName() + ".json");
-                        if (Files.exists(jsonFilePath)) {
-                            this.tr = Services.getInstance(project, Mapper.class).readValue(jsonFilePath.toFile(), TestRunDto.class);
-                        }
-                    }
                 }
 
                 if (this.tr != null) {

@@ -18,7 +18,27 @@ import java.nio.file.Path;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class DirectoryMapper {
-    public TestProjectDirectoryDto readTestProjectNode(final @NotNull Project project, final Path path) {
+
+    public TestProjectDirectoryDto setTestProjectNode(final @NotNull Project project, final Path path) {
+        final String fileName = path.getFileName().toString();
+
+        final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
+                .name(fileName)
+                .path(path)
+                .pathName(fileName)
+                .path2(Services.getInstance(project, Tools.class).buildPath2(null, fileName))
+                .build();
+
+        final TestCasesMainDirectoryDto tcd = setTestCasesRootNode(project, path, tp);
+        final TestRunsMainDirectoryDto trd = setTestRunsRootNode(project, path, tp);
+
+        tp.setTestCasesDirectory(tcd);
+        tp.setTestRunsDirectory(trd);
+
+        return tp;
+    }
+
+    public TestProjectDirectoryDto getTestProjectNode(final @NotNull Project project, final Path path) {
         final String fileName = path.getFileName().toString();
         try {
             final TestProjectMarker marker = Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class);
@@ -35,19 +55,8 @@ public final class DirectoryMapper {
                     .marker(marker)
                     .build();
 
-            TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto.builder()
-                    .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
-                    .name(DirectoryType.TCD.getDisplayedName())
-                    .parent(tp)
-                    .path2(Services.getInstance(project, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
-                    .build();
-
-            TestRunsMainDirectoryDto trd = TestRunsMainDirectoryDto.builder()
-                    .path(path.resolve(DirectoryType.TRD.getDisplayedName()))
-                    .name(DirectoryType.TRD.getDisplayedName())
-                    .parent(tp)
-                    .path2(Services.getInstance(project, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
-                    .build();
+            final TestCasesMainDirectoryDto tcd = getTestCasesRootNode(project, path, tp);
+            final TestRunsMainDirectoryDto trd = getTestRunsRootNode(project, path, tp);
 
             tp.setTestCasesDirectory(tcd);
             tp.setTestRunsDirectory(trd);
@@ -62,7 +71,7 @@ public final class DirectoryMapper {
         }
     }
 
-    public TestCasesMainDirectoryDto readTestCasesRootNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto
@@ -83,7 +92,16 @@ public final class DirectoryMapper {
         }
     }
 
-    public TestRunsMainDirectoryDto readTestRunsRootNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public TestCasesMainDirectoryDto setTestCasesRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto tp) {
+        return TestCasesMainDirectoryDto.builder()
+                .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
+                .name(DirectoryType.TCD.getDisplayedName())
+                .parent(tp)
+                .path2(Services.getInstance(project, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
+                .build();
+    }
+
+    public TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
 
@@ -105,7 +123,16 @@ public final class DirectoryMapper {
         }
     }
 
-    public TestSetPackageDirectoryDto readTestSetPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public TestRunsMainDirectoryDto setTestRunsRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto tp) {
+        return TestRunsMainDirectoryDto.builder()
+                .path(path.resolve(DirectoryType.TRD.getDisplayedName()))
+                .name(DirectoryType.TRD.getDisplayedName())
+                .parent(tp)
+                .path2(Services.getInstance(project, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
+                .build();
+    }
+
+    public TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestSetPackageDirectoryDto testSetPackageDirectoryDto = TestSetPackageDirectoryDto
@@ -126,7 +153,7 @@ public final class DirectoryMapper {
         }
     }
 
-    public TestRunPackageDirectoryDto readTestRunPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestRunPackageDirectoryDto testRunPackageDirectoryDto = TestRunPackageDirectoryDto
@@ -147,7 +174,7 @@ public final class DirectoryMapper {
         }
     }
 
-    public TestSetDirectoryDto readTestSetNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public TestSetDirectoryDto getTestSetNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             Log.info("retrieve the test set directory: " + fileName);
@@ -169,7 +196,7 @@ public final class DirectoryMapper {
         }
     }
 
-    public TestRunDirectoryDto readTestRunNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public TestRunDirectoryDto getTestRunNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             final Path markerPath = path.resolve(DirectoryType.TR.getMarker());

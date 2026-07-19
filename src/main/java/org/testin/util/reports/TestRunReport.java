@@ -15,7 +15,6 @@ import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
-import org.testin.util.Mapper;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
@@ -73,12 +72,8 @@ public final class TestRunReport {
                 TestRunDto runData = indexer.getTestRunForPath(dirPath);
 
                 if (runData == null) {
-                    File jsonFile = dirPath.resolve(folderName + ".json").toFile();
-                    if (!jsonFile.exists() || !jsonFile.isFile()) {
-                        Services.getInstance(project, Notifier.class).error(project, "Report Error", "JSON data file not found: " + jsonFile.getAbsolutePath());
-                        return;
-                    }
-                    runData = Services.getInstance(project, Mapper.class).readValue(jsonFile, TestRunDto.class);
+                    Services.getInstance(project, Notifier.class).error(project, "Report Error", "Test run data not found in indexer for: " + dirPath);
+                    return;
                 }
 
                 Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(runData);

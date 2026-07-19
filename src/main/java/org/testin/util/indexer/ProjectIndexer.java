@@ -80,6 +80,8 @@ public final class ProjectIndexer {
             final Path rootPath = Services.getInstance(project, Setting.class).getTestinPath();
             if (rootPath.toString().isEmpty()) {
                 indexing.set(false);
+                indexed.set(true);
+                indexingLatch.countDown();
                 return;
             }
 
@@ -92,6 +94,8 @@ public final class ProjectIndexer {
             final List<Path> validProjects = collectValidProjects(absoluteRoot);
             if (validProjects.isEmpty()) {
                 indexing.set(false);
+                indexed.set(true);
+                indexingLatch.countDown();
                 Log.warn("No valid projects found at '" + absoluteRoot.toAbsolutePath() + "'");
                 return;
             }
@@ -241,6 +245,18 @@ public final class ProjectIndexer {
 
     public TestSetDirectoryDto getTestSetByPath(final Path path) {
         return store.getTestSetByPath(path);
+    }
+
+    public TestSetPackageDirectoryDto getTestSetPackageByPath(final Path path) {
+        return store.getTestSetPackageByPath(path);
+    }
+
+    public TestCasesMainDirectoryDto getTestCasesMainDirByPath(final Path path) {
+        return store.getTestCasesMainDirByPath(path);
+    }
+
+    public TestRunsMainDirectoryDto getTestRunsMainDirByPath(final Path path) {
+        return store.getTestRunsMainDirByPath(path);
     }
 
     public TestRunDirectoryDto getTestRunDirByPath(final Path path) {

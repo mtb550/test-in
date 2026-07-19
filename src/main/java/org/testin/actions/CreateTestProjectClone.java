@@ -15,16 +15,17 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
 import org.testin.util.GitCommandRunner;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
-public class CloneTestProject extends DumbAwareAction {
+public class CreateTestProjectClone extends DumbAwareAction {
 
     private final String gitUrl;
     private final String projectName;
     private final @NotNull ProjectPanel projectPanel;
 
-    public CloneTestProject(final String gitUrl, final String projectName, final @NotNull ProjectPanel projectPanel) {
+    public CreateTestProjectClone(final String gitUrl, final String projectName, final @NotNull ProjectPanel projectPanel) {
         super("Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
         this.gitUrl = gitUrl;
         this.projectName = projectName;
@@ -55,9 +56,22 @@ public class CloneTestProject extends DumbAwareAction {
                         if (vRoot != null) {
                             vRoot.refresh(false, true);
                         }
-                        Services.getInstance(project, Notifier.class).info(project, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
-                        new Refresh(projectPanel).execute();
+
+                        // todo, move this logic to indexer addProject()
+                        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                        indexer.resetForReindex();
+                        indexer.indexWithProgress();
+
+                        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                            indexer.awaitIndexing();
+
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                projectPanel.getProjectTree().updateNodes();
+                                Services.getInstance(project, Notifier.class).info(project, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
+                            });
+                        });
                     });
+                    // todo, move this logic to indexer addProject()
 
                 } catch (Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->

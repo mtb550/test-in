@@ -31,8 +31,8 @@ public class CreateTestSet implements NodeCreator {
 
     @Override
     public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
-        TestSetDirectoryDto ts = Services.getInstance(project, DirectoryMapper.class).readTestSetNode(project, newDirPath, parentDir);
-        if (ts == null) return null;
+        TestSetDirectoryDto ts = Services.getInstance(project, DirectoryMapper.class).getTestSetNode(project, newDirPath, parentDir);
+        Services.getInstance(project, ProjectIndexer.class).addTestSet(ts);
 
         TreeUtilImpl util = Services.getInstance(project, TreeUtilImpl.class);
         util.createVf(project, this, parentDir.getPath(), ts.getName());
