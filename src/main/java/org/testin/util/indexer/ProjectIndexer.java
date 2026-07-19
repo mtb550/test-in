@@ -167,10 +167,6 @@ public final class ProjectIndexer {
         }
     }
 
-    public boolean isIndexed() {
-        return indexed.get();
-    }
-
     public void dispose() {
         store.clearAll();
         indexed.set(false);
@@ -284,6 +280,26 @@ public final class ProjectIndexer {
 
     public void putTestRun(final Path testRunPath, final TestRunDto tr) {
         store.putTestRun(testRunPath, tr);
+    }
+
+    public void removeTestProject(final Path path) {
+        store.removeTestProject(path);
+    }
+
+    public void removeTestSet(final @NotNull Path path) {
+        store.removeTestSet(path);
+    }
+
+    public void removeTestRun(final @NotNull Path path) {
+        store.removeTestRun(path);
+    }
+
+    public void removeTestSetPackage(final @NotNull Path path) {
+        store.removeTestSetPackage(path);
+    }
+
+    public void removeTestRunPackage(final @NotNull Path path) {
+        store.removeTestRunPackage(path);
     }
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {

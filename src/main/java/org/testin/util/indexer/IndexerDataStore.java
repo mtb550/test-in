@@ -170,12 +170,51 @@ final class IndexerDataStore {
         testSetPackagesByPath.put(tsp.getPath().toString(), tsp);
     }
 
-    void addTestRunDir(final TestRunDirectoryDto trd) {
+    void addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
         testRunDirsByPath.put(trd.getPath().toString(), trd);
     }
 
-    void addTestRunPackage(final TestRunPackageDirectoryDto trp) {
+    void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
         testRunPackagesByPath.put(trp.getPath().toString(), trp);
+    }
+
+    void removeTestProject(final @NotNull Path path) {
+        final String pathStr = path.toString();
+        testProjectsByPath.remove(pathStr);
+        testCasesMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
+        testRunsMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
+        Log.info("Removed test project at: " + pathStr);
+    }
+
+    void removeTestSet(final @NotNull Path path) {
+        final String pathStr = path.toString();
+        testSetsByPath.remove(pathStr);
+
+        final List<UUID> ids = testSetCaseIds.remove(pathStr);
+        if (ids != null) {
+            for (final UUID id : ids)
+                testCasesById.remove(id);
+        }
+        Log.info("Removed test set at: " + pathStr);
+    }
+
+    void removeTestRun(final @NotNull Path path) {
+        final String pathStr = path.toString();
+        testRunDirsByPath.remove(pathStr);
+        testRunsByPath.remove(pathStr);
+        Log.info("Removed test run at: " + pathStr);
+    }
+
+    void removeTestSetPackage(final @NotNull Path path) {
+        final String pathStr = path.toString();
+        testSetPackagesByPath.remove(pathStr);
+        Log.info("Removed test set package at: " + pathStr);
+    }
+
+    void removeTestRunPackage(final @NotNull Path path) {
+        final String pathStr = path.toString();
+        testRunPackagesByPath.remove(pathStr);
+        Log.info("Removed test run package at: " + pathStr);
     }
 
     void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
@@ -189,13 +228,13 @@ final class IndexerDataStore {
         Services.getInstance(project, FilesUtil.class).write(project, markerPath, tp.getMarker());
     }
 
-    void updateRunMarker(final Project project, final Path runPath, final TestRunMarker marker) {
+    void updateRunMarker(final @NotNull Project project, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
         final TestRunDirectoryDto trd = testRunDirsByPath.get(runPath.toString());
         trd.setMarker(marker);
         Services.getInstance(project, FilesUtil.class).write(project, runPath.resolve(DirectoryType.TR.getMarker()), marker);
     }
 
-    void renameNode(final Path oldPath, final Path newPath) {
+    void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
         final String oldStr = oldPath.toString();
         final String newStr = newPath.toString();
 
@@ -256,13 +295,11 @@ final class IndexerDataStore {
         }
     }
 
-    private void updatePath2(final DirectoryDto dto, final Path newPath) {
-        if (dto != null && newPath.getFileName() != null) {
-            final String newName = newPath.getFileName().toString();
-            final Tools tools = Services.getInstance(project, Tools.class);
-            dto.setPath2(tools.buildPath2(
-                    dto.getParent() != null ? dto.getParent().getPath2() : null, newName));
-        }
+    private void updatePath2(final @NotNull DirectoryDto dto, final Path newPath) {
+        final String newName = newPath.getFileName().toString();
+        final Tools tools = Services.getInstance(project, Tools.class);
+        dto.setPath2(tools.buildPath2(
+                dto.getParent() != null ? dto.getParent().getPath2() : null, newName));
     }
 
     void clearAll() {

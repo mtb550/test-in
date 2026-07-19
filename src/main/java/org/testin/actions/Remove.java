@@ -20,6 +20,7 @@ import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -84,20 +85,26 @@ public class Remove extends DumbAwareAction {
 
         VirtualFileManager.getInstance().syncRefresh();
 
-        // todo, just remove by user indexer removeProject() then it will removed from disk, no need for this below code block
         final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-        indexer.resetForReindex();
-        indexer.indexWithProgress();
+        for (final DefaultMutableTreeNode node : nodesToRemove) {
+            final DirectoryDto dir = (DirectoryDto) node.getUserObject();
+            final Path path = dir.getPath();
 
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            indexer.awaitIndexing();
+            switch (dir) {
+                case TestProjectDirectoryDto ignored -> indexer.removeTestProject(path);
+                case TestSetDirectoryDto ignored -> indexer.removeTestSet(path);
+                case TestRunDirectoryDto ignored -> indexer.removeTestRun(path);
+                case TestSetPackageDirectoryDto ignored -> indexer.removeTestSetPackage(path);
+                case TestRunPackageDirectoryDto ignored -> indexer.removeTestRunPackage(path);
+                default -> {
+                }
+            }
+        }
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                projectPanel.getProjectTree().updateNodes();
-                Log.info("Removed " + nodesToRemove.size() + " node(s).");
-            });
+        ApplicationManager.getApplication().invokeLater(() -> {
+            projectPanel.getProjectTree().updateNodes();
+            Log.info("Removed " + nodesToRemove.size() + " node(s).");
         });
-        // todo, just remove by user indexer removeProject() then it will removed from disk, no need for this below code block
     }
 
     @Override
