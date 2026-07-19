@@ -105,7 +105,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
                     });
                     enabled = parsedList != null && !parsedList.isEmpty();
                 }
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 Log.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
             }
         }
@@ -127,7 +127,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
                 });
                 return parsedList != null ? parsedList : Collections.emptyList();
 
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 Log.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
             }
         }

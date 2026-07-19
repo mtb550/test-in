@@ -24,8 +24,8 @@ public class TestCaseTreeBuilder extends AbstractTreeBuilder {
 
             super.buildTree(selectedTestProjectDirectory.getTestCasesDirectory());
 
-        } catch (Exception e) {
-            Log.error("TestCaseTreeBuilder.buildTree() error for directory '" + (selectedTestProjectDirectory != null ? selectedTestProjectDirectory.getName() : "null") + "': " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("TestCaseTreeBuilder.buildTree() error for directory '" + (selectedTestProjectDirectory != null ? selectedTestProjectDirectory.getName() : "null") + "': " + ex.getMessage());
             this.rootNode = null;
             ApplicationManager.getApplication().invokeLater(() -> projectPanel.getProjectTree().refreshTree());
         }

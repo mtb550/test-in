@@ -22,19 +22,19 @@ public final class FilesUtil {
             byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(content);
             Files.write(path, jsonBytes);
 
-        } catch (IOException e) {
-            Services.getInstance(project, Notifier.class).error(project, "unable to write content: " + e.getMessage());
-            Log.error("unable to write content: " + e.getMessage());
+        } catch (final IOException ex) {
+            Services.getInstance(project, Notifier.class).error(project, "unable to write content: " + ex.getMessage());
+            Log.error("unable to write content: " + ex.getMessage());
             Log.error("path" + path);
-            e.printStackTrace(System.err);
+            ex.printStackTrace(System.err);
         }
     }
 
     public void createDirectories(final @NotNull Path path) {
         try {
             Files.createDirectories(path);
-        } catch (IOException e) {
-            Log.error("Exception: " + e.getMessage());
+        } catch (final IOException ex) {
+            Log.error("Exception: " + ex.getMessage());
         }
     }
 

@@ -220,7 +220,7 @@ public class ImportJson extends DumbAwareAction {
 
                                 targetDirectory.refresh(false, true);
 
-                            } catch (IOException ex) {
+                            } catch (final IOException ex) {
                                 Log.error("Failed to write files: " + ex.getMessage());
                             }
                         });

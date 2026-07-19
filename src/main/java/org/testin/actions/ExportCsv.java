@@ -140,7 +140,7 @@ public class ExportCsv extends DumbAwareAction {
                             Services.getInstance(project, Notifier.class).info(project, "Export Complete",
                                     "Successfully exported " + finalTotalWritten + " test cases to:\n" + destFile.getName()));
 
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     Log.error("Export crashed: " + ex.getMessage());
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(project, Notifier.class).error(project, "Export Failed",

@@ -79,7 +79,7 @@ public class CreateTestMethod implements GeneratorAction {
                             retryInjectPhysically(project, packageList, className, methodName, tc);
                         }
 
-                    } catch (Exception ex) {
+                    } catch (final Exception ex) {
                         Log.error("Failed to inject Java method: " + ex.getMessage());
                     }
                 }));
@@ -112,7 +112,7 @@ public class CreateTestMethod implements GeneratorAction {
             } else {
                 Log.error("retryInjectPhysically: file not found at " + relativePath + " for method '" + methodName + "'");
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             Log.error("retryInjectPhysically failed for method '" + methodName + "': " + ex.getMessage());
         }
     }
@@ -179,7 +179,7 @@ public class CreateTestMethod implements GeneratorAction {
                 );
             }
 
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             Log.error("Failed to inject Java method '" + methodName + "': " + ex.getMessage());
         }
         Log.info("executeSync completed for method: " + methodName);
@@ -243,7 +243,7 @@ public class CreateTestMethod implements GeneratorAction {
             } else {
                 Log.info("Method already exists: " + methodName);
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             Log.error("injectMethod failed for '" + methodName + "': " + ex.getMessage());
         }
     }

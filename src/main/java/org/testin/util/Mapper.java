@@ -26,8 +26,8 @@ public final class Mapper {
         try {
             return mapper.readValue(src, valueType);
 
-        } catch (Exception e) {
-            Log.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + ex.getMessage());
             return null;
         }
     }
@@ -36,9 +36,9 @@ public final class Mapper {
         try {
             return mapper.readValue(src, valueTypeRef);
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to read file path " + src + " to TypeReference");
-            Log.error("Exception: " + e.getMessage());
+            Log.error("Exception: " + ex.getMessage());
             return null;
         }
     }
@@ -47,7 +47,7 @@ public final class Mapper {
         try {
             return mapper.readValue(content, valueType);
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to parse JSON string to class " + valueType.getSimpleName());
             return null;
         }
@@ -57,9 +57,9 @@ public final class Mapper {
         try {
             return mapper.readValue(src, valueType);
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to read InputStream to class " + valueType.getSimpleName());
-            Log.error("Exception: " + e.getMessage());
+            Log.error("Exception: " + ex.getMessage());
             return null;
         }
     }
@@ -68,7 +68,7 @@ public final class Mapper {
         try {
             return mapper.readValue(content, valueTypeRef);
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to parse JSON string to TypeReference.");
             return null;
         }
@@ -78,9 +78,9 @@ public final class Mapper {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(value);
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to serialize object to bytes: " + value.getClass().getSimpleName());
-            Log.error("Exception: " + e.getMessage());
+            Log.error("Exception: " + ex.getMessage());
             return new byte[0];
         }
     }
@@ -89,7 +89,7 @@ public final class Mapper {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to serialize object to string: " + value.getClass().getSimpleName());
             return "";
         }
@@ -99,7 +99,7 @@ public final class Mapper {
         try {
             return mapper.convertValue(fromValue, toValueType);
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to convert value to class " + toValueType.getSimpleName());
             return null;
         }

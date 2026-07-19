@@ -103,8 +103,8 @@ final class IndexingScanner {
                 indicator.setText(fileName + " - done.");
             }
 
-        } catch (Exception e) {
-            Log.error("Failed to scan project: " + projectPath.getFileName() + " - " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
         }
     }
 
@@ -120,8 +120,8 @@ final class IndexingScanner {
                     scanTestSetPackage(dirPath, parent, indicator);
                 }
             });
-        } catch (Exception e) {
-            Log.error("Failed to list test sets: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Failed to list test sets: " + ex.getMessage());
         }
     }
 
@@ -130,7 +130,6 @@ final class IndexingScanner {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
             final TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(project, path, parent);
-            if (tsp == null) return;
 
             store.getTestSetPackagesByPath().put(path.toString(), tsp);
 
@@ -146,7 +145,7 @@ final class IndexingScanner {
                         });
             }
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to scan test set package: " + path.getFileName());
         }
     }
@@ -156,7 +155,6 @@ final class IndexingScanner {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
             final TestSetDirectoryDto ts = dirMapper.getTestSetNode(project, path, parent);
-            if (ts == null) return;
 
             store.getTestSetsByPath().put(path.toString(), ts);
 
@@ -175,7 +173,7 @@ final class IndexingScanner {
                                     store.getTestCasesById().put(tc.getId(), tc);
                                     caseIds.add(tc.getId());
                                 }
-                            } catch (Exception ex) {
+                            } catch (final Exception ex) {
                                 Log.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + ex.getMessage());
                             }
@@ -185,9 +183,9 @@ final class IndexingScanner {
             store.getTestSetCaseIds().put(path.toString(), caseIds);
             indicator.setText("Test set: " + ts.getName() + " (" + caseIds.size() + " cases)");
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to scan test set '" +
-                    (path != null ? path.getFileName().toString() : "null") + "': " + e.getMessage());
+                    (path != null ? path.getFileName().toString() : "null") + "': " + ex.getMessage());
         }
     }
 
@@ -203,8 +201,8 @@ final class IndexingScanner {
                     scanTestRunPackageDir(dirPath, parent, indicator);
                 }
             });
-        } catch (Exception e) {
-            Log.error("Failed to list test runs: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Failed to list test runs: " + ex.getMessage());
         }
     }
 
@@ -213,7 +211,6 @@ final class IndexingScanner {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
             final TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(project, path, parent);
-            if (trp == null) return;
 
             store.getTestRunPackagesByPath().put(path.toString(), trp);
 
@@ -229,7 +226,7 @@ final class IndexingScanner {
                         });
             }
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to scan test run package: " + path.getFileName());
         }
     }
@@ -239,7 +236,6 @@ final class IndexingScanner {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
             final TestRunDirectoryDto tr = dirMapper.getTestRunNode(project, path, parent);
-            if (tr == null) return;
 
             store.getTestRunDirsByPath().put(path.toString(), tr);
 
@@ -255,9 +251,9 @@ final class IndexingScanner {
 
             indicator.setText("Test run: " + fileName);
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to scan test run '" +
-                    (path != null ? path.getFileName().toString() : "null") + "': " + e.getMessage());
+                    (path != null ? path.getFileName().toString() : "null") + "': " + ex.getMessage());
         }
     }
 }

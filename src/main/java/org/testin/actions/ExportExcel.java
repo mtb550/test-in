@@ -162,7 +162,7 @@ public class ExportExcel extends DumbAwareAction {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(project, Notifier.class).info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
 
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     Log.error("Export crashed: " + ex.getMessage());
                     Log.error("Exception: " + ex.getMessage());
 

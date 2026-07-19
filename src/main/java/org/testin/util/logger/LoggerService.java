@@ -52,7 +52,7 @@ public final class LoggerService implements Disposable {
                         writer.flush();
                     }
                 }
-            } catch (IOException | InterruptedException e) {
+            } catch (final IOException | InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
         }, "Testin-Async-Logger");
@@ -72,8 +72,8 @@ public final class LoggerService implements Disposable {
             }
             if (!Files.exists(projectDir)) Files.createDirectories(projectDir);
             return projectDir.resolve("testin.log");
-        } catch (Exception e) {
-            Log.error("Failed to initialize log file path: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Failed to initialize log file path: " + ex.getMessage());
             return null;
         }
     }

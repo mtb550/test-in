@@ -172,7 +172,7 @@ public class UpdateTestRunStatus extends DumbAwareAction {
                     indexer.updateRunMarker(project, runPath, marker);
                     Log.trace("Marker persisted -> " + marker.getStatus().getLabel());
                 }
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 Log.error("Failed to persist marker: " + ex.getMessage());
             }
         });
@@ -186,8 +186,8 @@ public class UpdateTestRunStatus extends DumbAwareAction {
                 Path dirPath = runUi.getParent().getPath();
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
                 Log.trace("Results persisted");
-            } catch (Exception e) {
-                Log.error("Failed to persist test run results: " + e.getMessage());
+            } catch (final Exception ex) {
+                Log.error("Failed to persist test run results: " + ex.getMessage());
             }
         });
     }

@@ -52,8 +52,8 @@ public final class TestCasePersistService implements Disposable {
                     targetFile.setBinaryContent(jsonBytes);
                 }
 
-            } catch (IOException e) {
-                Services.getInstance(project, Notifier.class).error(project, "Save Error", "Failed to persist data: " + e.getMessage());
+            } catch (final IOException ex) {
+                Services.getInstance(project, Notifier.class).error(project, "Save Error", "Failed to persist data: " + ex.getMessage());
             }
         }));
     }

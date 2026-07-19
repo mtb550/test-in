@@ -84,7 +84,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                         ViewToolWindowFactory.showPanel(project, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab)
                 );
 
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 Log.error("Error: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
                         Services.getInstance(project, Notifier.class).error(project, "Error", "Could not find test case: " + ex.getMessage())

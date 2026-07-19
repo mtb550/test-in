@@ -50,7 +50,7 @@ public class CutTestCaseNode extends DumbAwareAction {
 
                 list.repaint();
 
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 Log.error("Exception: " + ex.getMessage());
             }
         }

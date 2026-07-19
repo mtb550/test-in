@@ -51,7 +51,7 @@ public final class TestinPathPanel {
             try {
                 Desktop.getDesktop().open(new File(pathField.getText()));
 
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 // todo, change this to get the correct project direct.
                 Project project = ProjectManager.getInstance().getDefaultProject();
 
@@ -89,7 +89,7 @@ public final class TestinPathPanel {
         try {
             Path path = Path.of(pathStr);
             openFolderBtn.setEnabled(Files.exists(path) && Files.isDirectory(path));
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             openFolderBtn.setEnabled(false);
         }
     }

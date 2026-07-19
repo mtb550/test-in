@@ -167,7 +167,7 @@ public class PendingCommitsDialog extends DialogWrapper {
                 Services.getInstance(project, ProjectIndexer.class).putTestCase(jsonFile.getParentFile().toPath(), currentDto);
                 model.removeRow(selectedRow);
             }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             Services.getInstance(project, Notifier.class).error(project, "Revert Failed", "Could not revert change: " + ex.getMessage());
         }
     }

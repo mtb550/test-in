@@ -33,8 +33,8 @@ public class TreeTransferHandler extends TransferHandler {
     static {
         try {
             NODE_FLAVOR = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=\"" + DefaultMutableTreeNode[].class.getName() + "\"");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to create custom DataFlavor", e);
+        } catch (final ClassNotFoundException ex) {
+            throw new RuntimeException("Failed to create custom DataFlavor", ex);
         }
     }
 
@@ -112,7 +112,7 @@ public class TreeTransferHandler extends TransferHandler {
             resetLastAction();
 
             return true;
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             return false;
         }
     }
@@ -140,9 +140,9 @@ public class TreeTransferHandler extends TransferHandler {
 
             return clonedNode;
 
-        } catch (Exception e) {
-            Log.error("Failed to deep clone node: " + e.getMessage());
-            Log.error("Exception: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Failed to deep clone node: " + ex.getMessage());
+            Log.error("Exception: " + ex.getMessage());
             return new DefaultMutableTreeNode(userObject);
         }
     }

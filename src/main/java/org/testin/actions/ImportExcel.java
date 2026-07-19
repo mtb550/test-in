@@ -171,7 +171,7 @@ public class ImportExcel extends DumbAwareAction {
                     Services.getInstance(project, Notifier.class).info(project, "Sample Ready", "Sample file has been added to your project and opened in Excel.");
                 });
 
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 ApplicationManager.getApplication().invokeLater(() ->
                         Services.getInstance(project, Notifier.class).error(project, "Download Error", "Failed to save sample file: " + ex.getMessage()));
             }
@@ -286,7 +286,7 @@ public class ImportExcel extends DumbAwareAction {
                         }
                     }
 
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     Log.error("Import crashed: " + ex.getMessage());
                     Log.error("Exception: " + ex.getMessage());
                     Services.getInstance(project, Notifier.class).error(project, "Failed to import data: (Tip: Ensure the file is completely closed in Microsoft Excel and try again.)");
@@ -377,7 +377,7 @@ public class ImportExcel extends DumbAwareAction {
 
                                 targetDirectory.refresh(false, true);
 
-                            } catch (IOException ex) {
+                            } catch (final IOException ex) {
                                 Log.error("Failed to write files: " + ex.getMessage());
                             }
                         });

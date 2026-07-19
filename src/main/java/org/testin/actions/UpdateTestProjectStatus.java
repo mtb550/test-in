@@ -58,7 +58,7 @@ public class UpdateTestProjectStatus extends DumbAwareAction {
 
             Services.getInstance(project, Notifier.class).info(project, "Test project '" + tp.getName() + "' is " + projectStatus.getDescription() + ".");
 
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
             Log.error("Unable to update status to " + projectStatus.getDescription());
             Log.error(ex.getMessage());
             Services.getInstance(project, Notifier.class).error(project, "Unable to update status to " + projectStatus.getDescription());

@@ -105,7 +105,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                         }
                     });
 
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(project, Notifier.class).error(project, "Git Error", "Failed to calculate diffs: " + ex.getMessage())
                     );
@@ -177,7 +177,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(project, Notifier.class).info(project, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName())
                     );
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(project, Notifier.class).error(project, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage())
                     );
@@ -214,7 +214,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                     try {
                         GitCommandRunner.execute(repoPath, "git", "remote", "add", "origin", finalRemoteUrl);
                         executeGitPush(project, repoPath);
-                    } catch (Exception ex) {
+                    } catch (final Exception ex) {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(project, Notifier.class).error(project, "Git Error", "Failed to add remote: " + ex.getMessage())
                         );
@@ -240,7 +240,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                     indicator.setText("Syncing with remote (Pull --rebase)...");
                     try {
                         GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "--autostash", "origin", "main");
-                    } catch (Exception pullEx) {
+                    } catch (final Exception ex1) {
                         try {
                             GitCommandRunner.execute(repoPath, "git", "rebase", "--abort");
                         } catch (Exception ignored) {
@@ -305,7 +305,7 @@ public class ViewPendingCommits extends DumbAwareAction {
                                 Services.getInstance(project, Notifier.class).info(project, "Git Identity Set", "Identity configured successfully. Resuming commit...");
                                 performCommitWorkflow(project, repoPath, pendingCommitMessage);
                             });
-                        } catch (Exception ex) {
+                        } catch (final Exception ex) {
                             ApplicationManager.getApplication().invokeLater(() ->
                                     Services.getInstance(project, Notifier.class).error(project, "Config Failed", "Failed to set Git identity:\n" + ex.getMessage())
                             );

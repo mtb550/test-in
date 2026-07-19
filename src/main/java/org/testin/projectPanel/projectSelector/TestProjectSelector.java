@@ -171,8 +171,8 @@ public class TestProjectSelector {
 
             projectPanel.getBranchSelector().updateProject(tp);
 
-        } catch (final Exception e) {
-            Log.error("filterByTestProject: Error for project '" + tp.getName() + "': " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("filterByTestProject: Error for project '" + tp.getName() + "': " + ex.getMessage());
         }
     }
 

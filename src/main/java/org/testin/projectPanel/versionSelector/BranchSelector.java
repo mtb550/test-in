@@ -111,7 +111,7 @@ public class BranchSelector {
                         }
                     });
 
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         isUpdating = true;
                         try {
@@ -169,7 +169,7 @@ public class BranchSelector {
                         }
                     });
 
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         isUpdating = true;
                         try {

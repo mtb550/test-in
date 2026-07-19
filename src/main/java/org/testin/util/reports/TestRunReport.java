@@ -121,9 +121,9 @@ public final class TestRunReport {
                         copyAction
                 );
 
-            } catch (Exception e) {
-                Services.getInstance(project, Notifier.class).error(project, "Report Error", "Failed to generate " + format.name() + " report: " + e.getMessage());
-                Log.error("Exception: " + e.getMessage());
+            } catch (final Exception ex) {
+                Services.getInstance(project, Notifier.class).error(project, "Report Error", "Failed to generate " + format.name() + " report: " + ex.getMessage());
+                Log.error("Exception: " + ex.getMessage());
             }
         });
     }

@@ -6,7 +6,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.*;
-import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
@@ -19,7 +18,7 @@ import java.nio.file.Path;
 @Service(Service.Level.PROJECT)
 public final class DirectoryMapper {
 
-    public TestProjectDirectoryDto setTestProjectNode(final @NotNull Project project, final Path path) {
+    public @NotNull TestProjectDirectoryDto setTestProjectNode(final @NotNull Project project, final Path path) {
         final String fileName = path.getFileName().toString();
 
         final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
@@ -38,25 +37,18 @@ public final class DirectoryMapper {
         return tp;
     }
 
-    public TestProjectDirectoryDto getTestProjectNode(final @NotNull Project project, final Path path) {
+    public @NotNull TestProjectDirectoryDto getTestProjectNode(final @NotNull Project project, final Path path) {
         final String fileName = path.getFileName().toString();
         try {
-            final TestProjectMarker marker = Services.getInstance(project, Mapper.class).readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class);
-            if (marker == null) {
-                Log.error("readTestProjectNode: Failed to parse .tp marker for project '" + fileName + "' at " + path.toAbsolutePath());
-                return null;
-            }
-
             final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
                     .name(fileName)
                     .path(path)
                     .pathName(fileName)
                     .path2(Services.getInstance(project, Tools.class).buildPath2(null, fileName))
-                    .marker(marker)
                     .build();
 
-            final TestCasesMainDirectoryDto tcd = getTestCasesRootNode(project, path, tp);
-            final TestRunsMainDirectoryDto trd = getTestRunsRootNode(project, path, tp);
+            final @NotNull TestCasesMainDirectoryDto tcd = getTestCasesRootNode(project, path, tp);
+            final @NotNull TestRunsMainDirectoryDto trd = getTestRunsRootNode(project, path, tp);
 
             tp.setTestCasesDirectory(tcd);
             tp.setTestRunsDirectory(trd);
@@ -64,14 +56,14 @@ public final class DirectoryMapper {
             Log.info("retrieve the project directory: " + tp);
             return tp;
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Services.getInstance(project, Notifier.class).error(project, "Read Test Project Failed", "Skipping invalid format: " + fileName);
-            Log.error("readTestProjectNode: Failed to parse project '" + fileName + "' at " + path.toAbsolutePath() + ": " + e.getMessage());
-            return null;
+            Log.error("readTestProjectNode: Failed to parse project '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 
-    public TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto parent) {
+    public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestCasesMainDirectoryDto tcd = TestCasesMainDirectoryDto
@@ -85,14 +77,14 @@ public final class DirectoryMapper {
             Log.info("retrieve the test cases main directory: " + tcd);
             return tcd;
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Services.getInstance(project, Notifier.class).error(project, "Read Test Case Package Failed", "Failed to parse directory: " + fileName);
-            Log.error("readTestCasesRootNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + e.getMessage());
-            return null;
+            Log.error("readTestCasesRootNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 
-    public TestCasesMainDirectoryDto setTestCasesRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto tp) {
+    public @NotNull TestCasesMainDirectoryDto setTestCasesRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto tp) {
         return TestCasesMainDirectoryDto.builder()
                 .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
                 .name(DirectoryType.TCD.getDisplayedName())
@@ -101,7 +93,7 @@ public final class DirectoryMapper {
                 .build();
     }
 
-    public TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto parent) {
+    public @NotNull TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
 
@@ -116,14 +108,14 @@ public final class DirectoryMapper {
             Log.info("retrieve the test runs main directory: " + trd);
             return trd;
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Services.getInstance(project, Notifier.class).error(project, "Read Test Runs Main Directory Failed", "Failed to parse directory: " + fileName);
-            Log.error("readTestRunsRootNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + e.getMessage());
-            return null;
+            Log.error("readTestRunsRootNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 
-    public TestRunsMainDirectoryDto setTestRunsRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto tp) {
+    public @NotNull TestRunsMainDirectoryDto setTestRunsRootNode(final @NotNull Project project, final Path path, final TestProjectDirectoryDto tp) {
         return TestRunsMainDirectoryDto.builder()
                 .path(path.resolve(DirectoryType.TRD.getDisplayedName()))
                 .name(DirectoryType.TRD.getDisplayedName())
@@ -132,7 +124,7 @@ public final class DirectoryMapper {
                 .build();
     }
 
-    public TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public @NotNull TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestSetPackageDirectoryDto testSetPackageDirectoryDto = TestSetPackageDirectoryDto
@@ -146,14 +138,14 @@ public final class DirectoryMapper {
             Log.info("retrieve the test set package directory: " + testSetPackageDirectoryDto);
             return testSetPackageDirectoryDto;
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Services.getInstance(project, Notifier.class).error(project, "Read Test Set Package Failed", "Failed to parse directory: " + fileName);
-            Log.error("readTestSetPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + e.getMessage());
-            return null;
+            Log.error("readTestSetPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 
-    public TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public @NotNull TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestRunPackageDirectoryDto testRunPackageDirectoryDto = TestRunPackageDirectoryDto
@@ -167,14 +159,14 @@ public final class DirectoryMapper {
             Log.info("retrieve the test run package directory: " + testRunPackageDirectoryDto);
             return testRunPackageDirectoryDto;
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Services.getInstance(project, Notifier.class).error(project, "Read Test Run Package Failed", "Failed to parse directory: " + fileName);
-            Log.error("readTestRunPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + e.getMessage());
-            return null;
+            Log.error("readTestRunPackageNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 
-    public TestSetDirectoryDto getTestSetNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public @NotNull TestSetDirectoryDto getTestSetNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             Log.info("retrieve the test set directory: " + fileName);
@@ -189,22 +181,19 @@ public final class DirectoryMapper {
             Log.info("retrieve the test set directory: " + testSetDirectoryDto);
             return testSetDirectoryDto;
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Services.getInstance(project, Notifier.class).error(project, "Read Test Set Failed", "Failed to parse directory: " + fileName);
-            Log.error("readTestSetNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + e.getMessage());
-            return null;
+            Log.error("readTestSetNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 
-    public TestRunDirectoryDto getTestRunNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
+    public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Project project, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             final Path markerPath = path.resolve(DirectoryType.TR.getMarker());
             final TestRunMarker marker = Services.getInstance(project, Mapper.class).readValue(markerPath.toFile(), TestRunMarker.class);
-            if (marker == null) {
-                Log.error("readTestRunNode: Failed to parse .tr marker for '" + fileName + "' at " + markerPath.toAbsolutePath());
-                return null;
-            }
+
 
             TestRunDirectoryDto testRunDirectoryDto = TestRunDirectoryDto
                     .builder()
@@ -218,10 +207,10 @@ public final class DirectoryMapper {
             Log.info("retrieve the test run directory: " + testRunDirectoryDto);
             return testRunDirectoryDto;
 
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Services.getInstance(project, Notifier.class).error(project, "Read Test Run Failed", "Failed to parse directory: " + fileName);
-            Log.error("readTestRunNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + e.getMessage());
-            return null;
+            Log.error("readTestRunNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 }

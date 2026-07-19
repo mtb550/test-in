@@ -53,7 +53,7 @@ public class CreateJavaTestClass implements GeneratorAction {
                     Log.info("Could not find Main Source Root in the project modules.");
                 }
 
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 Log.info("Error creating test class: " + ex.getMessage());
             }
         });

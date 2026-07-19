@@ -216,9 +216,9 @@ public final class Tools {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 desktop.open(file);
-            } catch (IOException e) {
+            } catch (final IOException ex) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(project, Notifier.class).error(project, "Execution Error", "Failed to open the file: " + e.getMessage())
+                        Services.getInstance(project, Notifier.class).error(project, "Execution Error", "Failed to open the file: " + ex.getMessage())
                 );
             }
         });
@@ -253,7 +253,7 @@ public final class Tools {
         }
         try {
             return Priority.valueOf(priorityStr.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException ex) {
             return Priority.LOW;
         }
     }
@@ -264,7 +264,7 @@ public final class Tools {
         }
         try {
             return LocalDateTime.parse(dateStr, Config.EXCEL_DATE_FORMATTER).atZone(ZoneId.systemDefault());
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             return ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         }
     }
@@ -281,7 +281,7 @@ public final class Tools {
                 .map(groupName -> {
                     try {
                         return Group.valueOf(groupName);
-                    } catch (IllegalArgumentException ex) {
+                    } catch (final IllegalArgumentException ex) {
                         return null;
                     }
                 })

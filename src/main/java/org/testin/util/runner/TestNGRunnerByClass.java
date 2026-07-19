@@ -84,7 +84,7 @@ public class TestNGRunnerByClass {
                         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
                     });
                 });
-            } catch (IndexNotReadyException e) {
+            } catch (final IndexNotReadyException ex) {
                 ApplicationManager.getApplication().invokeLater(() -> DumbService.getInstance(project).showDumbModeNotification("Indexing interrupted the test run. Please try again."));
             }
         });

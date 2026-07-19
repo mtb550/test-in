@@ -49,8 +49,8 @@ public class RemoveTestCase extends DumbAwareAction {
             if (targetFile != null) {
                 try {
                     targetFile.delete(requestor);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (final IOException ex) {
+                    throw new RuntimeException(ex);
                 }
             }
         }
@@ -72,7 +72,7 @@ public class RemoveTestCase extends DumbAwareAction {
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 performDeletion(selectedItems);
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 Log.error("Exception: " + ex.getMessage());
             }
         });
@@ -122,8 +122,8 @@ public class RemoveTestCase extends DumbAwareAction {
             String jsonContent = Services.getInstance(project, Mapper.class).writeValueAsString(item);
             VfsUtil.saveText(targetFile, jsonContent);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (final IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 

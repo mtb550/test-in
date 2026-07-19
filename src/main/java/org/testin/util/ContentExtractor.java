@@ -33,8 +33,8 @@ public class ContentExtractor {
             Log.info("--- NEW CONTENT ---\n" + newContent);
             Log.info("-------------------");
 
-        } catch (VcsException e) {
-            Log.error("Error reading VCS content: " + e.getMessage());
+        } catch (final VcsException ex) {
+            Log.error("Error reading VCS content: " + ex.getMessage());
         }
     }
 }

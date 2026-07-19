@@ -133,7 +133,7 @@ public class CreateTestSet implements NodeCreator {
                         } else {
                             Log.info("No Test Source Root found in the project.");
                         }
-                    } catch (Exception ex) {
+                    } catch (final Exception ex) {
                         Log.error("Failed to create Java class: " + ex.getMessage());
                     }
                 }));

@@ -67,7 +67,7 @@ public class Sync extends DumbAwareAction {
 
                     if (remoteUrl.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(e.getProject(), Notifier.class).warn(e.getProject(), "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
+                                Services.getInstance(project, Notifier.class).warn(project, "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
                         );
                         return;
                     }
@@ -82,14 +82,14 @@ public class Sync extends DumbAwareAction {
                     }
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        Services.getInstance(e.getProject(), Notifier.class).info(e.getProject(), "Sync Successful", "Your project is now up to date with the remote repository.");
+                        Services.getInstance(project, Notifier.class).info(project, "Sync Successful", "Your project is now up to date with the remote repository.");
                         projectPanel.getTestProjectSelector().loadTestProjectList();
                         projectPanel.setupMainLayout();
                     });
 
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
+                            Services.getInstance(project, Notifier.class).error(project, "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
                     );
                 }
             }

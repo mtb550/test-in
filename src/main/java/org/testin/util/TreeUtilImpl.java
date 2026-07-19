@@ -32,7 +32,7 @@ public final class TreeUtilImpl {
                 } else {
                     Services.getInstance(project, Notifier.class).error(project, "Could not find path on disk:\n" + path, errorTitle);
                 }
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 Services.getInstance(project, Notifier.class).error(project, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
@@ -49,7 +49,7 @@ public final class TreeUtilImpl {
                 } else {
                     Services.getInstance(project, Notifier.class).error(project, "Could not find source or target path on disk.", errorTitle);
                 }
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 Services.getInstance(project, Notifier.class).error(project, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
@@ -88,7 +88,7 @@ public final class TreeUtilImpl {
                 if (parentVf != null && parentVf.isDirectory()) {
                     parentVf.createChildDirectory(requester, folderName);
                 }
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 Services.getInstance(project, Notifier.class).error(project, "Could not create directory: " + ex.getMessage(), "Error");
             }
         }));
@@ -104,7 +104,7 @@ public final class TreeUtilImpl {
                         parentVf.createChildData(requester, fileName);
                     }
                 }
-            } catch (IOException ex) {
+            } catch (final IOException ex) {
                 Services.getInstance(project, Notifier.class).error(project, "Could not create marker file: " + ex.getMessage(), "Error");
             }
         }));
@@ -116,7 +116,7 @@ public final class TreeUtilImpl {
             if (vf != null) {
                 WriteAction.run(() -> vf.delete(requester));
             }
-        } catch (IOException ex) {
+        } catch (final IOException ex) {
             Services.getInstance(project, Notifier.class).error(project, "Could not delete file: " + ex.getMessage(), "Error");
         }
     }

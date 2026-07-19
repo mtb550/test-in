@@ -115,8 +115,8 @@ public final class ProjectIndexer {
 
                                 try {
                                     scanner.scanProject(projectPath, indicator);
-                                } catch (Exception e) {
-                                    Log.error("Failed to index project: " + projectName + " - " + e.getMessage());
+                                } catch (final Exception ex) {
+                                    Log.error("Failed to index project: " + projectName + " - " + ex.getMessage());
                                 }
 
                                 indicator.setFraction(1.0);
@@ -152,8 +152,8 @@ public final class ProjectIndexer {
                             }
                         });
             }
-        } catch (Exception e) {
-            Log.error("indexWithProgress: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("indexWithProgress: " + ex.getMessage());
             indexing.set(false);
         }
     }
@@ -162,7 +162,7 @@ public final class ProjectIndexer {
         if (indexed.get()) return;
         try {
             indexingLatch.await();
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
     }
@@ -194,8 +194,8 @@ public final class ProjectIndexer {
         final Path[] projectPaths;
         try (Stream<Path> dirs = Files.list(rootPath)) {
             projectPaths = dirs.filter(Files::isDirectory).toArray(Path[]::new);
-        } catch (Exception e) {
-            Log.error("Failed to list root directory: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Failed to list root directory: " + ex.getMessage());
             return Collections.emptyList();
         }
 
@@ -311,8 +311,8 @@ public final class ProjectIndexer {
         Log.info("Scanning single project: " + projectPath.getFileName());
         try {
             scanner.scanProject(projectPath);
-        } catch (final Exception e) {
-            Log.error("Failed to scan single project: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Failed to scan single project: " + ex.getMessage());
         }
     }
 

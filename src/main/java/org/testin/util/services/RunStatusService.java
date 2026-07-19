@@ -114,8 +114,8 @@ public final class RunStatusService {
             try {
                 Path dirPath = runUi.getParent().getPath();
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
-            } catch (Exception e) {
-                Log.error("Failed to persist test run data: " + e.getMessage());
+            } catch (final Exception ex) {
+                Log.error("Failed to persist test run data: " + ex.getMessage());
             }
         });
     }

@@ -50,8 +50,8 @@ public abstract class AbstractTreeBuilder {
                     projectPanel.getProjectTree().refreshTree();
                 });
 
-            } catch (Exception e) {
-                Log.error("AbstractTreeBuilder.buildTree() error for directory '" + (rootDirectoryDto != null ? rootDirectoryDto.getName() : "null") + "': " + e.getMessage());
+            } catch (final Exception ex) {
+                Log.error("AbstractTreeBuilder.buildTree() error for directory '" + (rootDirectoryDto != null ? rootDirectoryDto.getName() : "null") + "': " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
                     this.rootNode = null;
                     projectPanel.getProjectTree().refreshTree();
@@ -72,8 +72,8 @@ public abstract class AbstractTreeBuilder {
 
             return node;
 
-        } catch (Exception e) {
-            Log.error("buildNodeFromIndexer() error for directory '" + currentDir.getName() + "': " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("buildNodeFromIndexer() error for directory '" + currentDir.getName() + "': " + ex.getMessage());
             return new DefaultMutableTreeNode(currentDir.getName());
         }
     }

@@ -40,7 +40,7 @@ public class CopyTestCaseNode extends DumbAwareAction {
                 String json = Services.getInstance(project, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 Log.error("Exception: " + ex.getMessage());
             }
         }

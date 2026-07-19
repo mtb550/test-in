@@ -60,7 +60,7 @@ public class CodeNavigator {
                         } else
                             ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).softShow(project, "Navigation Error: ", "Class Not Found: " + className));
 
-                    } catch (final IndexNotReadyException e) {
+                    } catch (final IndexNotReadyException ex) {
                         Log.trace("index not ready, deferring navigation");
                         Services.getInstance(project, Notifier.class).softShow(project, "index not ready, deferring navigation");
                         DumbService.getInstance(project).runWhenSmart(() -> toCode(project, fqcn));

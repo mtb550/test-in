@@ -35,7 +35,7 @@ public class CreateTestProject implements GeneratorAction {
                         Log.warn("No Source Root found in the project. Please mark a directory as 'Sources Root'.");
                     }
                 });
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 Log.error("Failed to create project package: " + ex.getMessage());
             }
 

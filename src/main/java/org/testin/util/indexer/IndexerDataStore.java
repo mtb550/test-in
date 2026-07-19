@@ -121,7 +121,7 @@ final class IndexerDataStore {
         final Path filePath = testSetPath.resolve(tcId + ".json");
         try {
             Files.deleteIfExists(filePath);
-        } catch (Exception e) {
+        } catch (final Exception ex) {
             Log.error("Failed to delete test case file: " + filePath);
         }
     }

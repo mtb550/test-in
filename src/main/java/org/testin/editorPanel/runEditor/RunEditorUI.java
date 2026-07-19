@@ -174,8 +174,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
                         }
                     });
                 }
-            } catch (Exception e) {
-                Log.error("Failed to load Test Run data from disk: " + e.getMessage());
+            } catch (final Exception ex) {
+                Log.error("Failed to load Test Run data from disk: " + ex.getMessage());
             }
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -513,8 +513,8 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
 
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, tr);
 
-            } catch (Exception e) {
-                Log.error("Failed to persist test run data: " + e.getMessage());
+            } catch (final Exception ex) {
+                Log.error("Failed to persist test run data: " + ex.getMessage());
             }
         });
     }

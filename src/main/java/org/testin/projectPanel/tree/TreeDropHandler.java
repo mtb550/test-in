@@ -48,8 +48,8 @@ public class TreeDropHandler implements FileDropHandler {
             });
             return true;
 
-        } catch (Exception e) {
-            Log.error("Exception: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Exception: " + ex.getMessage());
             return false;
         }
     }

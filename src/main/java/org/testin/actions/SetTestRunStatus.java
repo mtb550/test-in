@@ -85,7 +85,7 @@ public class SetTestRunStatus extends DumbAwareAction {
 
                     indexer.updateRunMarker(project, tr.getPath(), marker);
                 }
-            } catch (Exception ex) {
+            } catch (final Exception ex) {
                 Log.error("Failed to persist marker: " + ex.getMessage());
             }
         });

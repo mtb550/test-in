@@ -83,7 +83,7 @@ public class UpdateTestMethod implements GeneratorAction {
                         }
 
                         Log.info("Updated test method: " + methodName);
-                    } catch (Exception ex) {
+                    } catch (final Exception ex) {
                         Log.error("Failed to update test method: " + ex.getMessage());
                     }
                 }));

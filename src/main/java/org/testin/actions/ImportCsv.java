@@ -163,7 +163,7 @@ public class ImportCsv extends DumbAwareAction {
                     String fileName = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
                     allSheetsData.put(fileName, testCases);
 
-                } catch (Exception ex) {
+                } catch (final Exception ex) {
                     Log.error("Import crashed: " + ex.getMessage());
                     Services.getInstance(project, Notifier.class).error(project, "Failed to import data: " + ex.getMessage());
                     return;
@@ -239,7 +239,7 @@ public class ImportCsv extends DumbAwareAction {
 
                                 targetDirectory.refresh(false, true);
 
-                            } catch (IOException ex) {
+                            } catch (final IOException ex) {
                                 Log.error("Failed to write files: " + ex.getMessage());
                             }
                         });

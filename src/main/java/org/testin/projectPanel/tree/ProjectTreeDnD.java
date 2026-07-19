@@ -29,8 +29,8 @@ public class ProjectTreeDnD {
     static {
         try {
             DTO_LIST_FLAVOR = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=\"java.util.List\"");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Failed to create custom DataFlavor", e);
+        } catch (final ClassNotFoundException ex) {
+            throw new RuntimeException("Failed to create custom DataFlavor", ex);
         }
     }
 

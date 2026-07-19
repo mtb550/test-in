@@ -107,8 +107,8 @@ public class TransferListener extends TransferHandler {
             );
 
             return true;
-        } catch (final Exception e) {
-            Log.error("Exception: " + e.getMessage());
+        } catch (final Exception ex) {
+            Log.error("Exception: " + ex.getMessage());
             return false;
         }
     }

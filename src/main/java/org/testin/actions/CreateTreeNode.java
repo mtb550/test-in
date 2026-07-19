@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -39,6 +40,7 @@ public class CreateTreeNode extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
+        final Project project = e.getProject();
 
         final DirectoryDto parentDir = Services.getInstance(e.getProject(), Tools.class).getCurrentSelectedDirectory(tree);
         final TreePath path = tree.getSelectionPath();
@@ -62,12 +64,12 @@ public class CreateTreeNode extends DumbAwareAction {
             if (codeGenerator != null && codeGenerator.isSelected() && directoryType != null && directoryType.getAction() != null) {
 
                 if (directoryType == DirectoryType.TSP) {
-                    GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(e.getProject(), null, Services.getInstance(e.getProject(), Tools.class).buildFqcnPackage(dir));
+                    GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(project, null, Services.getInstance(project, Tools.class).buildFqcnPackage(dir));
                     return;
                 }
 
                 if (directoryType == DirectoryType.TS) {
-                    GeneratorType.CREATE_JAVA_CLASS.getAction().execute(e.getProject(), null, Services.getInstance(e.getProject(), Tools.class).buildFqcnClass(dir, e.getProject()));
+                    GeneratorType.CREATE_JAVA_CLASS.getAction().execute(project, null, Services.getInstance(project, Tools.class).buildFqcnClass(dir, e.getProject()));
                 }
 
             }
