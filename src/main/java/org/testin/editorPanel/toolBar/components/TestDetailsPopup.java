@@ -36,7 +36,7 @@ public class TestDetailsPopup extends AbstractButton implements IToolbarItem {
                 .forEach(s -> {
                     try {
                         selectedDetails.add(TestEditorAttributes.valueOf(s));
-                    } catch (IllegalArgumentException ignored) {
+                    } catch (final IllegalArgumentException ignored) {
                         Log.error("Invalid test editor attributes: " + s);
                     }
                 });

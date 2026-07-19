@@ -178,18 +178,15 @@ final class IndexerDataStore {
         testRunPackagesByPath.put(trp.getPath().toString(), trp);
     }
 
-    void addTestProject(final TestProjectDirectoryDto tp) {
+    void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         testProjectsByPath.put(tp.getPath().toString(), tp);
-        if (tp.getTestCasesDirectory() != null) {
-            testCasesMainDirsByPath.put(
-                    tp.getTestCasesDirectory().getPath().toString(),
-                    tp.getTestCasesDirectory());
-        }
-        if (tp.getTestRunsDirectory() != null) {
-            testRunsMainDirsByPath.put(
-                    tp.getTestRunsDirectory().getPath().toString(),
-                    tp.getTestRunsDirectory());
-        }
+        testCasesMainDirsByPath.put(tp.getTestCasesDirectory().getPath().toString(), tp.getTestCasesDirectory());
+        testRunsMainDirsByPath.put(tp.getTestRunsDirectory().getPath().toString(), tp.getTestRunsDirectory());
+    }
+
+    void addTestProjectMarker(final @NotNull Project project, final @NotNull TestProjectDirectoryDto tp) {
+        final Path markerPath = tp.getPath().resolve(DirectoryType.TP.getMarker());
+        Services.getInstance(project, FilesUtil.class).write(project, markerPath, tp.getMarker());
     }
 
     void updateRunMarker(final Project project, final Path runPath, final TestRunMarker marker) {

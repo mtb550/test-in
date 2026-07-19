@@ -13,7 +13,6 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.*;
 import org.testin.settings.Setting;
-import org.testin.util.FilesUtil;
 import org.testin.util.logger.Log;
 import org.testin.util.services.EditorStateService;
 import org.testin.util.services.Services;
@@ -88,8 +87,8 @@ public final class ProjectIndexer {
             final Path absoluteRoot = rootPath.isAbsolute()
                     ? rootPath
                     : (project.getBasePath() != null
-                       ? Path.of(project.getBasePath(), rootPath.toString())
-                       : rootPath);
+                    ? Path.of(project.getBasePath(), rootPath.toString())
+                    : rootPath);
 
             final List<Path> validProjects = collectValidProjects(absoluteRoot);
             if (validProjects.isEmpty()) {
@@ -287,8 +286,9 @@ public final class ProjectIndexer {
         store.putTestRun(testRunPath, tr);
     }
 
-    public void addTestProject(final TestProjectDirectoryDto tp) {
+    public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         store.addTestProject(tp);
+        store.addTestProjectMarker(project, tp);
     }
 
     public void addTestSet(final TestSetDirectoryDto ts) {
@@ -307,8 +307,17 @@ public final class ProjectIndexer {
         store.addTestRunPackage(trp);
     }
 
+    public void scanSingleProject(final Path projectPath) {
+        Log.info("Scanning single project: " + projectPath.getFileName());
+        try {
+            scanner.scanProject(projectPath);
+        } catch (final Exception e) {
+            Log.error("Failed to scan single project: " + e.getMessage());
+        }
+    }
+
     public void persistTestProjectMarker(final Project project, final TestProjectDirectoryDto tp) {
-        Services.getInstance(project, FilesUtil.class).write(project, tp.getPath().resolve(DirectoryType.TP.getMarker()), tp.getMarker());
+        store.addTestProjectMarker(project, tp);
     }
 
     public void updateRunMarker(final Project project, final Path runPath,

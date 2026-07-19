@@ -3,16 +3,13 @@ package org.testin.actions;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.DirectoryType;
-import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
-import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
 import org.testin.util.TreeUtilImpl;
@@ -24,7 +21,6 @@ import org.testin.util.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
 
 public class CreateTestProjectNew extends DumbAwareAction {
     private final @NotNull ProjectPanel projectPanel;
@@ -63,17 +59,6 @@ public class CreateTestProjectNew extends DumbAwareAction {
 
             projectDir.createChildData(this, DirectoryType.TP.getMarker());
 
-            // todo: created by default, no need
-            TestProjectMarker marker = TestProjectMarker.builder()
-                    .status(ProjectStatus.ACTIVE)
-                    .createdBy(System.getProperty("user.name", ""))
-                    .createdAt(ZonedDateTime.now())
-                    .build();
-
-            tp.setMarker(marker);
-
-            Services.getInstance(project, ProjectIndexer.class).persistTestProjectMarker(project, tp);
-
             String tcdName = tp.getTestCasesDirectory().getPath().getFileName().toString();
             VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);
             tcdDir.createChildData(this, DirectoryType.TCD.getMarker());
@@ -87,21 +72,8 @@ public class CreateTestProjectNew extends DumbAwareAction {
 
             Services.getInstance(project, ProjectIndexer.class).addTestProject(tp);
 
-            // todo, move this logic to indexer addProject()
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-            indexer.resetForReindex();
-            indexer.indexWithProgress();
-
-            ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                indexer.awaitIndexing();
-
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    projectPanel.getProjectTree().updateNodes();
-                    Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", tpName));
-                });
-
-            });
-            // todo, move this logic to indexer addProject()
+            projectPanel.getProjectTree().updateNodes();
+            Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", tpName));
 
             if (codeGenerator.isSelected()) {
                 GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, null, tp.getPath2());

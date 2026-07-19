@@ -34,6 +34,14 @@ final class IndexingScanner {
     }
 
     void scanProject(final Path projectPath, final ProgressIndicator indicator) {
+        scanProjectContents(projectPath, indicator);
+    }
+
+    void scanProject(final Path projectPath) {
+        scanProjectContents(projectPath, null);
+    }
+
+    private void scanProjectContents(final Path projectPath, final ProgressIndicator indicator) {
         try {
             final Tools tools = Services.getInstance(project, Tools.class);
             final Mapper mapper = Services.getInstance(project, Mapper.class);
@@ -60,8 +68,10 @@ final class IndexingScanner {
 
             store.getTestProjectsByPath().put(projectPath.toString(), tp);
 
-            indicator.setFraction(0.1);
-            indicator.setText(fileName + " - test sets...");
+            if (indicator != null) {
+                indicator.setFraction(0.1);
+                indicator.setText(fileName + " - test sets...");
+            }
 
             final Path tcDir = projectPath.resolve(DirectoryType.TCD.getDisplayedName());
             if (Files.exists(tcDir) && Files.isDirectory(tcDir)) {
@@ -73,8 +83,10 @@ final class IndexingScanner {
                 }
             }
 
-            indicator.setFraction(0.5);
-            indicator.setText(fileName + " - test runs...");
+            if (indicator != null) {
+                indicator.setFraction(0.5);
+                indicator.setText(fileName + " - test runs...");
+            }
 
             final Path trDir = projectPath.resolve(DirectoryType.TRD.getDisplayedName());
             if (Files.exists(trDir) && Files.isDirectory(trDir)) {
@@ -86,8 +98,10 @@ final class IndexingScanner {
                 }
             }
 
-            indicator.setFraction(1.0);
-            indicator.setText(fileName + " - done.");
+            if (indicator != null) {
+                indicator.setFraction(1.0);
+                indicator.setText(fileName + " - done.");
+            }
 
         } catch (Exception e) {
             Log.error("Failed to scan project: " + projectPath.getFileName() + " - " + e.getMessage());

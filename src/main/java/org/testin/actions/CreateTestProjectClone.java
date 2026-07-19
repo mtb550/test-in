@@ -12,12 +12,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
 import org.testin.util.GitCommandRunner;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
+
+import java.nio.file.Path;
 
 public class CreateTestProjectClone extends DumbAwareAction {
 
@@ -57,26 +60,20 @@ public class CreateTestProjectClone extends DumbAwareAction {
                             vRoot.refresh(false, true);
                         }
 
-                        // todo, move this logic to indexer addProject()
                         final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-                        indexer.resetForReindex();
-                        indexer.indexWithProgress();
+                        final Path projectPath = Services.getInstance(project, Setting.class).getTestinPath().resolve(projectName);
 
-                        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                            indexer.awaitIndexing();
+                        indexer.scanSingleProject(projectPath);
+                        final TestProjectDirectoryDto clonedProject = indexer.getTestProjectsByPath().get(projectPath.toString());
+                        if (clonedProject != null)
+                            projectPanel.getTestProjectSelector().addTestProject(clonedProject);
 
-                            ApplicationManager.getApplication().invokeLater(() -> {
-                                projectPanel.getProjectTree().updateNodes();
-                                Services.getInstance(project, Notifier.class).info(project, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
-                            });
-                        });
+                        projectPanel.getProjectTree().updateNodes();
+                        Services.getInstance(project, Notifier.class).info(project, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
                     });
-                    // todo, move this logic to indexer addProject()
 
-                } catch (Exception ex) {
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).error(project, "Clone Failed", "Could not clone repository:\n" + ex.getMessage())
-                    );
+                } catch (final Exception ex) {
+                    Services.getInstance(project, Notifier.class).error(project, "Clone Failed", "Could not clone repository:\n" + ex.getMessage());
                 }
             }
         });

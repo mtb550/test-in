@@ -69,9 +69,7 @@ public class TestProjectSelector {
         Log.info("TestProjectSelector.loadTestProjectList()");
 
         final Object currentSelected = selectedTestProject.getSelectedItem();
-        final String currentSelectedName = currentSelected instanceof TestProjectDirectoryDto
-                ? ((TestProjectDirectoryDto) currentSelected).getName()
-                : null;
+        final String currentSelectedName = currentSelected instanceof TestProjectDirectoryDto ? ((TestProjectDirectoryDto) currentSelected).getName() : null;
 
         isLoading = true;
         TestProjectDirectoryDto projectToSelect;
@@ -89,7 +87,6 @@ public class TestProjectSelector {
                 projects.stream()
                         .filter(tp -> tp.getMarker().getStatus() != ProjectStatus.ARCHIVED)
                         .forEach(testProjectList::addElement);
-
             }
 
             if (!Files.exists(root) || testProjectList.getSize() == 0) {
@@ -101,8 +98,6 @@ public class TestProjectSelector {
 
             selectedTestProject.setEnabled(true);
 
-            // Prefer the currently selected project (if still in the list),
-            // then fall back to savedProjectName, then first element
             projectToSelect = testProjectList.getElementAt(0);
 
             if (currentSelectedName != null) {
@@ -115,7 +110,6 @@ public class TestProjectSelector {
                 }
             }
 
-            // If current selection didn't match and we have a saved project name, try that
             if (savedProjectName != null && !savedProjectName.equals(currentSelectedName)) {
                 for (int i = 0; i < testProjectList.getSize(); i++) {
                     TestProjectDirectoryDto item = testProjectList.getElementAt(i);
@@ -133,7 +127,6 @@ public class TestProjectSelector {
         }
 
         if (projectToSelect != null) {
-            // If the panel was in empty state (no components), transition to main layout
             if (projectPanel.getPanel().getComponentCount() == 0) {
                 projectPanel.setupMainLayout();
             }
@@ -141,49 +134,45 @@ public class TestProjectSelector {
         }
     }
 
-    public void addTestProject(final TestProjectDirectoryDto newTestTestProjectDirectory) {
+    public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         Log.info("TestProjectSelector.addTestProject()");
         if (!selectedTestProject.isEnabled())
             projectPanel.showEmptyState();
 
         isLoading = true;
         try {
-            testProjectList.addElement(newTestTestProjectDirectory);
-            selectedTestProject.setSelectedItem(newTestTestProjectDirectory);
+            testProjectList.addElement(tp);
+            selectedTestProject.setSelectedItem(tp);
         } finally {
             isLoading = false;
         }
 
-        PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, newTestTestProjectDirectory.getName());
+        PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, tp.getName());
 
         if (testProjectList.getSize() == 1) {
             selectedTestProject.setEnabled(true);
         }
     }
 
-    public void filterByTestProject(final TestProjectDirectoryDto tpDir) {
+    public void filterByTestProject(final @NotNull TestProjectDirectoryDto tp) {
         try {
-            if (tpDir == null) {
-                Log.warn("filterByTestProject: Skipping project with null marker");
-                return;
-            }
 
-            Log.info("Panel.filterByProject(): " + tpDir.getName());
+            Log.info("Panel.filterByProject(): " + tp.getName());
 
             if (!isLoading)
-                PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, tpDir.getName());
+                PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, tp.getName());
 
-            if (tpDir.getMarker().getStatus() == ProjectStatus.ACTIVE) {
+            if (tp.getMarker().getStatus() == ProjectStatus.ACTIVE) {
                 projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
                 projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
             } else {
                 projectPanel.getProjectTree().refreshTree();
             }
 
-            projectPanel.getBranchSelector().updateProject(tpDir);
+            projectPanel.getBranchSelector().updateProject(tp);
 
-        } catch (Exception e) {
-            Log.error("filterByTestProject: Error for project '" + (tpDir != null ? tpDir.getName() : "null") + "': " + e.getMessage());
+        } catch (final Exception e) {
+            Log.error("filterByTestProject: Error for project '" + tp.getName() + "': " + e.getMessage());
         }
     }
 

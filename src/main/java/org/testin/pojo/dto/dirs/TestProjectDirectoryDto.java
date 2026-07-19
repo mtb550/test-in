@@ -14,9 +14,13 @@ import org.testin.pojo.markers.TestProjectMarker;
 @ToString(callSuper = true)
 public class TestProjectDirectoryDto extends DirectoryDto {
 
-    private TestCasesMainDirectoryDto testCasesDirectory;
+    @NotNull
+    @Builder.Default
+    private TestCasesMainDirectoryDto testCasesDirectory = new TestCasesMainDirectoryDto();
 
-    private TestRunsMainDirectoryDto testRunsDirectory;
+    @NotNull
+    @Builder.Default
+    private TestRunsMainDirectoryDto testRunsDirectory = new TestRunsMainDirectoryDto();
 
     @NotNull
     private String pathName;
