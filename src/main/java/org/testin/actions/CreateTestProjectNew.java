@@ -25,13 +25,13 @@ import java.nio.file.Path;
 public class CreateTestProjectNew extends DumbAwareAction {
     private final @NotNull ProjectPanel projectPanel;
     private final @NotNull String tpName;
-    private final @NotNull CodeGenerator codeGenerator;
+    private final @NotNull CodeGenerator cg;
 
-    public CreateTestProjectNew(final @NotNull ProjectPanel projectPanel, final @NotNull String tpName, final @NotNull CodeGenerator codeGenerator) {
+    public CreateTestProjectNew(final @NotNull ProjectPanel projectPanel, final @NotNull String name, final @NotNull CodeGenerator cg) {
         super("New Test Project", "Create a new test project", AllIcons.General.Add);
         this.projectPanel = projectPanel;
-        this.tpName = tpName;
-        this.codeGenerator = codeGenerator;
+        this.tpName = name;
+        this.cg = cg;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class CreateTestProjectNew extends DumbAwareAction {
             projectPanel.getProjectTree().updateNodes();
             Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", tpName));
 
-            if (codeGenerator.isSelected())
+            if (cg.isSelected())
                 GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, tp);
 
         });

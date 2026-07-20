@@ -27,19 +27,19 @@ public class CreateTestProject extends DumbAwareAction {
         final Project project = e.getProject();
         if (project == null) return;
 
-        new CreateNodesDialog(project, CreateNodeMenu.TEST_PROJECT, (name, directoryType, codeGenerator) -> {
-            if (name == null || name.trim().isEmpty()) return;
+        new CreateNodesDialog(project, CreateNodeMenu.TEST_PROJECT, (name, type, cg) -> {
+            if (name.trim().isEmpty()) return;
 
-            if (directoryType == DirectoryType.IMPORT_TP) {
+            if (type == DirectoryType.IMPORT_TP) {
                 String gitUrl = name.trim();
                 String projectName = Services.getInstance(project, Tools.class).extractProjectNameFromUrl(gitUrl);
                 new CreateTestProjectClone(gitUrl, projectName, projectPanel).actionPerformed(e);
                 return;
             }
 
-            if (directoryType == DirectoryType.TP) {
+            if (type == DirectoryType.TP) {
                 final String tpName = name.trim();
-                new CreateTestProjectNew(projectPanel, tpName, codeGenerator).actionPerformed(e);
+                new CreateTestProjectNew(projectPanel, tpName, cg).actionPerformed(e);
                 //return;
             }
 

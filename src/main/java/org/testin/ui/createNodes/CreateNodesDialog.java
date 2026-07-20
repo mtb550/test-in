@@ -30,7 +30,7 @@ public class CreateNodesDialog {
     private final ExtendableTextField textField;
     private final JBList<DirectoryType> list;
     private final JBPopup popup;
-    private final CodeGenerator codeGenerator;
+    private final CodeGenerator cg;
     private final Project project;
 
     public CreateNodesDialog(final @NotNull Project project, final @NotNull CreateNodeMenu menu, final TriConsumer<@NotNull String, @NotNull DirectoryType, @NotNull CodeGenerator> onSelected) {
@@ -57,7 +57,7 @@ public class CreateNodesDialog {
         mainPanel.add(textField, BorderLayout.NORTH);
 
         this.project = project;
-        this.codeGenerator = new CodeGenerator(menu.getGeneratorType());
+        this.cg = new CodeGenerator(menu.getGeneratorType());
 
         JPanel listWrapper = new JPanel(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
@@ -71,7 +71,7 @@ public class CreateNodesDialog {
 
         ComponentPopupBuilder builder = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, textField)
-                .setSettingButtons(this.codeGenerator)
+                .setSettingButtons(this.cg)
                 .setTitle(menu.getTitle())
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
@@ -109,7 +109,7 @@ public class CreateNodesDialog {
         final String text = textField.getText().trim();
 
         if (!text.isEmpty()) {
-            onSelected.accept(text, list.getSelectedValue(), codeGenerator);
+            onSelected.accept(text, list.getSelectedValue(), cg);
             popup.closeOk(null);
 
         } else textField.requestFocus();

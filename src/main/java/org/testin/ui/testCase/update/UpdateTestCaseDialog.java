@@ -23,7 +23,7 @@ public class UpdateTestCaseDialog extends TestCaseDialogBase {
     private @NotNull JBPopup popup;
 
     public UpdateTestCaseDialog(final @NotNull Project project, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull BiConsumer<@NotNull TestCaseDto, @NotNull CodeGenerator> onSave) {
-        super(project, selectedItem.getChangeType());
+        super(project, selectedItem.getGt());
         this.project = project;
 
         IUIAction repackPopup = () -> {
@@ -106,7 +106,7 @@ public class UpdateTestCaseDialog extends TestCaseDialogBase {
         popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
                 .setTitle("Update " + selectedItem.getName())
-                .setSettingButtons(codeGenerator)
+                .setSettingButtons(cg)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)

@@ -152,12 +152,12 @@ public class DetailsTab {
     private void openUpdateMenu(final @NotNull Project project, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         final List<TestCaseDto> items = List.of(dto);
 
-        new TestCaseUpdateMenu(project, items, (updatedItems, codeGenerator) -> {
+        new TestCaseUpdateMenu(project, items, (tcs, cg) -> {
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             final Path editPath = resolveEditPath(project, dto, currentPath);
 
             if (editPath != null) {
-                for (final TestCaseDto tc : updatedItems) {
+                for (final TestCaseDto tc : tcs) {
                     indexer.putTestCase(editPath, tc);
                 }
             }
@@ -167,23 +167,23 @@ public class DetailsTab {
             ApplicationManager.getApplication().invokeLater(() -> {
                 final ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
                 if (detailsPanel != null && detailsPanel.getCurrentTestCaseDto() != null) {
-                    boolean isCurrentAffected = updatedItems.stream()
+                    boolean isCurrentAffected = tcs.stream()
                             .anyMatch(item -> item.getId().equals(detailsPanel.getCurrentTestCaseDto().getId()));
                     if (isCurrentAffected) {
                         detailsPanel.refreshCurrentView();
                     }
                 }
 
-                if (codeGenerator != null && codeGenerator.isSelected()) {
-                    final GeneratorType type = codeGenerator.getGeneratorType();
-                    Log.trace("Code generator selected: " + type);
+                if (cg.isSelected()) {
+                    final GeneratorType gt = cg.getGt();
+                    Log.trace("Code generator selected: " + gt);
 
-                    if (type != null) {
-                        final GeneratorAction action = type.getAction();
-                        final TestCaseDto firstItem = updatedItems.getFirst();
+                    if (gt != null) {
+                        final GeneratorAction action = gt.getAction();
+                        final TestCaseDto firstItem = tcs.getFirst();
 
                         if (action instanceof UpdateTestMethod utm)
-                            utm.setChangeType(type);
+                            utm.setGt(gt);
 
                         ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
                     }

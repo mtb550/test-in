@@ -203,30 +203,30 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     private final Icon icon;
     private final IStatusBarItem[] statusBarItems;
     private final boolean updateMenuItem;
-    private final GeneratorType changeType;
+    private final GeneratorType gt;
     private final IBulkEditorAction bulkAction;
     private final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor;
 
-    UpdateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final GeneratorType changeType, final IBulkEditorAction bulkAction, final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final GeneratorType gt, final IBulkEditorAction bulkAction, final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = shortcut;
         this.customShortcutText = null;
         this.icon = icon;
         this.statusBarItems = statusBarItems;
         this.updateMenuItem = updateMenuItem;
-        this.changeType = changeType;
+        this.gt = gt;
         this.bulkAction = bulkAction;
         this.sectionExtractor = sectionExtractor;
     }
 
-    UpdateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final GeneratorType changeType, final IBulkEditorAction bulkAction, final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final GeneratorType gt, final IBulkEditorAction bulkAction, final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;
         this.icon = icon;
         this.statusBarItems = statusBarItems;
         this.updateMenuItem = updateMenuItem;
-        this.changeType = changeType;
+        this.gt = gt;
         this.bulkAction = bulkAction;
         this.sectionExtractor = sectionExtractor;
     }

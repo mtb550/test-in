@@ -110,7 +110,7 @@ public class CreateTestCaseDialog extends TestCaseDialogBase {
         popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
                 .setTitle("Create Test Case")
-                .setSettingButtons(codeGenerator)
+                .setSettingButtons(cg)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)

@@ -24,14 +24,14 @@ import java.nio.file.Path;
 
 public class CreateTestProjectClone extends DumbAwareAction {
 
-    private final String gitUrl;
-    private final String projectName;
+    private final @NotNull String gitUrl;
+    private final @NotNull String projectName;
     private final @NotNull ProjectPanel projectPanel;
 
-    public CreateTestProjectClone(final String gitUrl, final String projectName, final @NotNull ProjectPanel projectPanel) {
+    public CreateTestProjectClone(final @NotNull String gitUrl, final @NotNull String name, final @NotNull ProjectPanel projectPanel) {
         super("Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
         this.gitUrl = gitUrl;
-        this.projectName = projectName;
+        this.projectName = name;
         this.projectPanel = projectPanel;
     }
 
@@ -40,7 +40,7 @@ public class CreateTestProjectClone extends DumbAwareAction {
         final Project project = e.getProject();
         if (project == null) return;
 
-        if (gitUrl == null || gitUrl.trim().isEmpty() || projectName == null || projectName.trim().isEmpty()) {
+        if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {
             Services.getInstance(project, Notifier.class).error(project, "Clone Error", "Missing parameters for cloning the project.");
             return;
         }

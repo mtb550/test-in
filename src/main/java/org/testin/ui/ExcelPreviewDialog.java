@@ -31,7 +31,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
     private final Map<String, DefaultTableModel> tableModelsMap = new LinkedHashMap<>();
     private final Project project;
     @Getter
-    private final CodeGenerator codeGenerator;
+    private final CodeGenerator cg;
 
     private final List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportValue)
@@ -41,7 +41,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
         super(project, true);
         this.project = project;
         this.originalSheetsData = sheetsData;
-        this.codeGenerator = new CodeGenerator(GeneratorType.CREATE_TEST_METHOD);
+        this.cg = new CodeGenerator(GeneratorType.CREATE_TEST_METHOD);
 
         setTitle("Preview & Select Excel Import");
         setOKButtonText("Import Selected");
@@ -56,7 +56,7 @@ public class ExcelPreviewDialog extends DialogWrapper {
         JPanel panel = new JPanel(new BorderLayout());
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.add(codeGenerator);
+        topPanel.add(cg);
         panel.add(topPanel, BorderLayout.NORTH);
 
         JBTabbedPane tabbedPane = new JBTabbedPane();

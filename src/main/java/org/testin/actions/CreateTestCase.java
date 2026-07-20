@@ -47,8 +47,7 @@ public class CreateTestCase extends DumbAwareAction {
             tc.setIsHead(isEmpty);
 
             final TestCaseDto lastTc = isEmpty ? null : tcs.getLast();
-            if (lastTc != null)
-                lastTc.setNext(tc.getId());
+            if (lastTc != null) lastTc.setNext(tc.getId());
 
             tc.setParent(dir);
             editor.appendNewTestCase(tc);

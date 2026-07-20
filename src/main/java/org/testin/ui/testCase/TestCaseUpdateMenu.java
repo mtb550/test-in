@@ -29,11 +29,11 @@ import java.util.function.Consumer;
 
 public class TestCaseUpdateMenu {
 
-    private final Project project;
-    private final List<TestCaseDto> items;
-    private final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems;
+    private final @NotNull Project project;
+    private final @NotNull List<TestCaseDto> items;
+    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGenerator> updatedItems;
 
-    public TestCaseUpdateMenu(final @NotNull Project project, final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
+    public TestCaseUpdateMenu(final @NotNull Project project, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGenerator> updatedItems) {
         this.project = project;
         this.items = items;
         this.updatedItems = updatedItems;
@@ -45,27 +45,27 @@ public class TestCaseUpdateMenu {
 
         showMenu(title, selectedItem -> {
 
-            final GeneratorType targetChangeType = selectedItem.getChangeType();
-            Log.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + targetChangeType);
+            final GeneratorType gt = selectedItem.getGt();
+            Log.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
 
             if (isSingle) {
-                new UpdateTestCaseDialog(project, items.getFirst(), selectedItem, (tc, codeGenerator) -> {
-                    codeGenerator = new CodeGenerator(targetChangeType);
-                    codeGenerator.setGeneratorType(targetChangeType);
+                new UpdateTestCaseDialog(project, items.getFirst(), selectedItem, (tc, cg) -> {
+                    cg = new CodeGenerator(gt);
+                    cg.setGt(gt);
 
-                    Log.trace("Single Edit Save -> Injecting changeType " + codeGenerator.getGeneratorType() + " into UI's CodeGenerator.");
-                    updatedItems.accept(items, codeGenerator);
+                    Log.trace("Single Edit Save -> Injecting changeType " + cg.getGt() + " into UI's CodeGenerator.");
+                    updatedItems.accept(items, cg);
 
                 }).show();
 
             } else {
-                selectedItem.getBulkAction().show(project, items, (list, codeGenerator) -> {
-                    codeGenerator = new CodeGenerator(targetChangeType);
-                    codeGenerator.setGeneratorType(targetChangeType);
+                selectedItem.getBulkAction().show(project, items, (list, cg) -> {
+                    cg = new CodeGenerator(gt);
+                    cg.setGt(gt);
 
 
-                    Log.trace("Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + codeGenerator.getGeneratorType());
-                    updatedItems.accept(list, codeGenerator);
+                    Log.trace("Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + cg.getGt());
+                    updatedItems.accept(list, cg);
                 });
             }
         });

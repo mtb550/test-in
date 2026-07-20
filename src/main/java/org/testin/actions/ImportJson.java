@@ -172,7 +172,7 @@ public class ImportJson extends DumbAwareAction {
 
                                     linkAndSaveTestCases(project, targetDirectory, flatList, tail);
 
-                                    if (dialog.getCodeGenerator().isSelected()) {
+                                    if (dialog.getCg().isSelected()) {
                                         Log.info("ImportJson: generating test methods for " + flatList.size() + " imported cases");
                                         CreateTestMethod syncInjector = new CreateTestMethod();
                                         for (TestCaseDto tc : flatList) {
@@ -196,7 +196,7 @@ public class ImportJson extends DumbAwareAction {
                                         TestCaseDto tail = findExistingTail(project, groupDir);
                                         linkAndSaveTestCases(project, groupDir, groupCases, tail);
 
-                                        if (dialog.getCodeGenerator().isSelected()) {
+                                        if (dialog.getCg().isSelected()) {
                                             String sheetName = groupDir.getName();
                                             TestSetDirectoryDto sheetDto = TestSetDirectoryDto.builder()
                                                     .name(sheetName)

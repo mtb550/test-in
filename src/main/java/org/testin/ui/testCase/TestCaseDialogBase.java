@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public abstract class TestCaseDialogBase {
-    protected final CodeGenerator codeGenerator;
+    protected final CodeGenerator cg;
     protected final DescriptionSection DescriptionSection;
     protected final ExpectedResultSection expectedResultSection;
     protected final ModuleSection moduleSection;
@@ -39,8 +39,8 @@ public abstract class TestCaseDialogBase {
     protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
-    public TestCaseDialogBase(final @NotNull Project project, final @NotNull GeneratorType generatorType) {
-        this.codeGenerator = new CodeGenerator(generatorType);
+    public TestCaseDialogBase(final @NotNull Project project, final @NotNull GeneratorType gt) {
+        this.cg = new CodeGenerator(gt);
         this.DescriptionSection = new DescriptionSection(project);
         this.expectedResultSection = new ExpectedResultSection(project);
         this.moduleSection = new ModuleSection(project);
@@ -125,7 +125,7 @@ public abstract class TestCaseDialogBase {
 
             String title = dto.getDescription();
             if (DescriptionSection.getWrapper().getParent() == null || !title.trim().isEmpty()) {
-                onSave.accept(dto, codeGenerator);
+                onSave.accept(dto, cg);
 
                 if (popupWrapper[0] != null)
                     popupWrapper[0].closeOk(null);

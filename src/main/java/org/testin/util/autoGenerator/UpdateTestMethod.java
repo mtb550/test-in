@@ -20,14 +20,14 @@ import java.util.List;
 public class UpdateTestMethod implements GeneratorAction {
 
     @Setter
-    private GeneratorType changeType;
+    private GeneratorType gt;
 
     @Override
     public void execute(final @NotNull Project project, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
         final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
 
-        Log.trace("execute() called — tc=" + tc.getId() + ", fqcn=" + fqcn + ", changeType=" + changeType);
+        Log.trace("execute() called — tc=" + tc.getId() + ", fqcn=" + fqcn + ", changeType=" + gt);
 
         if (fqcn.size() < 2) {
             Log.warn("UpdateTestMethod: missing test case or FQCN");
@@ -37,7 +37,7 @@ public class UpdateTestMethod implements GeneratorAction {
         final String methodName = fqcn.getLast();
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-        Log.info("Updating test method: " + methodName + " in " + path + " type=" + changeType);
+        Log.info("Updating test method: " + methodName + " in " + path + " type=" + gt);
 
         ApplicationManager.getApplication().invokeLater(() ->
                 WriteCommandAction.runWriteCommandAction(project, "Update Test Method", null, () -> {
@@ -60,8 +60,8 @@ public class UpdateTestMethod implements GeneratorAction {
 
                         Log.trace("Found method: " + targetMethod.getName() + " by testName=" + tc.getId());
 
-                        if (changeType != null) {
-                            switch (changeType) {
+                        if (gt != null) {
+                            switch (gt) {
                                 case UPDATE_TEST_CASE_DESCRIPTION:
                                     updateDescription(project, targetMethod, tc);
                                     break;
@@ -77,10 +77,10 @@ public class UpdateTestMethod implements GeneratorAction {
                                 case UPDATE_TEST_CASE_TEST_DATA:
                                 case UPDATE_TEST_CASE_PRE_CONDITIONS:
                                 case UPDATE_TEST_CASE_STEPS:
-                                    Log.info("UpdateTestMethod: " + changeType + " is data-only (no @Test annotation change)");
+                                    Log.info("UpdateTestMethod: " + gt + " is data-only (no @Test annotation change)");
                                     break;
                                 default:
-                                    Log.warn("UpdateTestMethod: unsupported change type: " + changeType);
+                                    Log.warn("UpdateTestMethod: unsupported change type: " + gt);
                                     break;
                             }
                         }

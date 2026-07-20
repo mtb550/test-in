@@ -14,11 +14,11 @@ public class CodeGenerator extends JBCheckBox {
 
     @Getter
     @Setter
-    private GeneratorType generatorType;
+    private GeneratorType gt;
 
-    public CodeGenerator(final GeneratorType generatorType) {
-        if (generatorType != null)
-            setToolTipText(generatorType.getTooltip());
+    public CodeGenerator(final GeneratorType gt) {
+        if (gt != null)
+            setToolTipText(gt.getTooltip());
 
         setOpaque(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
