@@ -1,0 +1,28 @@
+package org.testin.actions.clipboard;
+
+import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.project.DumbAwareAction;
+import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.dto.TestCaseDto;
+
+public class UndoDetails extends DumbAwareAction {
+    TestCaseDto tc;
+
+    public UndoDetails(TestCaseDto tc) {
+        super("Undo", "", AllIcons.Actions.Undo);
+        this.tc = tc;
+    }
+
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        ///TODO:  TO BE IMPLEMENTED
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
+    }
+
+}
