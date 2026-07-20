@@ -23,7 +23,7 @@ public class Escape extends DumbAwareAction {
     private final TreeTransferHandler transferHandler;
     private final JBList<TestCaseDto> list;
 
-    public Escape(final SimpleTree tree, final TreeTransferHandler transferHandler) {
+    public Escape(final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
         this.tree = tree;
         this.transferHandler = transferHandler;
@@ -31,7 +31,7 @@ public class Escape extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.Escape.getCustomShortcut(), tree);
     }
 
-    public Escape(final JBList<TestCaseDto> list) {
+    public Escape(final @NotNull JBList<TestCaseDto> list) {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
         this.list = list;
         this.tree = null;

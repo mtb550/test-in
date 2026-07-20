@@ -23,7 +23,7 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.ui.ExcelPreviewDialog;
+import org.testin.ui.ExportImportPreviewDialog;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
@@ -43,7 +43,7 @@ public class ImportCsv extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
 
     private final List<String> IMPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
-            .filter(TestEditorAttributes::isImportValue)
+            .filter(TestEditorAttributes::isImportable)
             .map(TestEditorAttributes::getName)
             .toList();
 
@@ -173,7 +173,7 @@ public class ImportCsv extends DumbAwareAction {
                 indicator.setText2("");
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    ExcelPreviewDialog dialog = new ExcelPreviewDialog(project, allSheetsData);
+                    ExportImportPreviewDialog dialog = new ExportImportPreviewDialog(project, allSheetsData);
 
                     if (dialog.showAndGet()) {
                         Map<String, List<TestCaseDto>> selectedCasesBySheet = dialog.getSelectedTestCasesBySheet();
@@ -292,7 +292,7 @@ public class ImportCsv extends DumbAwareAction {
             currentTestCase.setIsHead(null);
 
             for (TestEditorAttributes attr : TestEditorAttributes.values()) {
-                if (attr.isImportValue()) {
+                if (attr.isImportable()) {
                     Integer colIndex = headerIndexMap.get(attr.getName().toLowerCase());
                     String rawValue = "";
 

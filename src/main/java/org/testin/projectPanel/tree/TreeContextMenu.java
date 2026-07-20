@@ -7,6 +7,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
+import org.testin.actions.export.ExportCsv;
+import org.testin.actions.export.ExportExcel;
+import org.testin.actions.export.ExportHtml;
+import org.testin.actions.export.ExportJson;
 import org.testin.pojo.ProjectStatus;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.Tools;
@@ -48,7 +52,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         add(Services.getInstance(project, Tools.class).createSubGroup("Export", AllIcons.ToolbarDecorator.Export,
                 List.of(new ExportCsv(tree),
-                        new ExportHtml(),
+                        new ExportHtml(tree),
                         new ExportExcel(tree),
                         new ExportJson(tree))
         ));

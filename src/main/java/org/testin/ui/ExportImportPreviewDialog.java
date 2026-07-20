@@ -26,7 +26,7 @@ import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 
-public class ExcelPreviewDialog extends DialogWrapper {
+public class ExportImportPreviewDialog extends DialogWrapper {
     private final Map<String, List<TestCaseDto>> originalSheetsData;
     private final Map<String, DefaultTableModel> tableModelsMap = new LinkedHashMap<>();
     private final Project project;
@@ -34,10 +34,10 @@ public class ExcelPreviewDialog extends DialogWrapper {
     private final CodeGenerator cg;
 
     private final List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
-            .filter(TestEditorAttributes::isImportValue)
+            .filter(TestEditorAttributes::isImportable)
             .toList();
 
-    public ExcelPreviewDialog(final @Nullable Project project, final Map<String, List<TestCaseDto>> sheetsData) {
+    public ExportImportPreviewDialog(final @Nullable Project project, final Map<String, List<TestCaseDto>> sheetsData) {
         super(project, true);
         this.project = project;
         this.originalSheetsData = sheetsData;

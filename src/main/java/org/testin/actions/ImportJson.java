@@ -22,7 +22,7 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.ui.ExcelPreviewDialog;
+import org.testin.ui.ExportImportPreviewDialog;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
@@ -152,7 +152,7 @@ public class ImportJson extends DumbAwareAction {
                 indicator.setText("Waiting for user confirmation...");
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    ExcelPreviewDialog dialog = new ExcelPreviewDialog(project, sanitizedData);
+                    ExportImportPreviewDialog dialog = new ExportImportPreviewDialog(project, sanitizedData);
                     dialog.setTitle("Preview & Select JSON Import");
 
                     if (dialog.showAndGet()) {

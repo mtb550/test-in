@@ -76,14 +76,14 @@ public class UpdateTestCase extends DumbAwareAction {
                 }
 
                 if (cg.isSelected()) {
-                    final GeneratorType type = cg.getGt();
-                    Log.trace("Code generator selected: " + type);
+                    final GeneratorType gt = cg.getGt();
+                    Log.trace("Code generator selected: " + gt);
 
-                    if (type != null) {
-                        final GeneratorAction action = type.getAction();
+                    if (gt != null) {
+                        final GeneratorAction action = gt.getAction();
                         final TestCaseDto firstItem = updatedItems.getFirst();
 
-                        if (action instanceof UpdateTestMethod utm) utm.setGt(type);
+                        if (action instanceof UpdateTestMethod utm) utm.setGt(gt);
 
                         ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
                     }

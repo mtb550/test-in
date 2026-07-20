@@ -1,6 +1,7 @@
-package org.testin.actions;
+package org.testin.actions.export;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -10,7 +11,6 @@ import com.intellij.openapi.fileChooser.FileSaverDialog;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -23,27 +23,25 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.util.Mapper;
+import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-public class ExportCsv extends DumbAwareAction {
-
-    private final @NotNull SimpleTree tree;
-
-    private final List<TestEditorAttributes> EXPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
-            .filter(TestEditorAttributes::isImportValue)
-            .toList();
+public class ExportCsv extends ExportBase {
 
     public ExportCsv(final @NotNull SimpleTree tree) {
-        super("Export to CSV", "Export test cases to a CSV file", AllIcons.FileTypes.Csv);
-        this.tree = tree;
+        super(tree, "Export to CSV", "Export test cases to a CSV file", AllIcons.FileTypes.Csv);
     }
 
     @Override
@@ -109,7 +107,7 @@ public class ExportCsv extends DumbAwareAction {
                 indicator.setText("Generating CSV file...");
 
                 try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
-                    // Write header
+
                     List<String> headerNames = EXPORT_COLUMNS.stream()
                             .map(TestEditorAttributes::getName)
                             .toList();
@@ -136,9 +134,17 @@ public class ExportCsv extends DumbAwareAction {
                     }
 
                     final int finalTotalWritten = totalWritten;
+                    NotificationAction openAction = NotificationAction.createSimple("Open file", () -> {
+                        VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+                        if (vf != null) {
+                            Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                        }
+                    });
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).info(project, "Export Complete",
-                                    "Successfully exported " + finalTotalWritten + " test cases to:\n" + destFile.getName()));
+                            Services.getInstance(project, Notifier.class).infoWithActions(project,
+                                    "Export Complete",
+                                    "Successfully exported " + finalTotalWritten + " test cases to:\n" + destFile.getName(),
+                                    openAction));
 
                 } catch (final Exception ex) {
                     Log.error("Export crashed: " + ex.getMessage());
@@ -150,73 +156,6 @@ public class ExportCsv extends DumbAwareAction {
         });
     }
 
-    private Map<String, List<TestCaseDto>> gatherData(final @NotNull Project project, VirtualFile targetDirectory, DirectoryDto dirDto) {
-        Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
-
-        if (dirDto instanceof TestSetDirectoryDto) {
-            allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(project, targetDirectory));
-        } else {
-            VirtualFile[] children = targetDirectory.getChildren();
-            if (children != null) {
-                for (VirtualFile child : children) {
-                    if (child.isDirectory()) {
-                        List<TestCaseDto> tcs = loadTestCasesInOrder(project, child);
-                        if (!tcs.isEmpty()) {
-                            allSheets.put(child.getName(), tcs);
-                        }
-                    }
-                }
-            }
-        }
-        return allSheets;
-    }
-
-    private List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project project, final VirtualFile dir) {
-        Map<UUID, TestCaseDto> tcMap = new HashMap<>();
-        TestCaseDto head = null;
-
-        VirtualFile[] files = dir.getChildren();
-        if (files == null) return Collections.emptyList();
-
-        for (VirtualFile file : files) {
-            if (!file.isDirectory() && file.getName().endsWith(".json")) {
-                try (InputStream is = file.getInputStream()) {
-                    TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(is, TestCaseDto.class);
-                    if (tc != null) {
-                        tcMap.put(tc.getId(), tc);
-                        if (Boolean.TRUE.equals(tc.getIsHead())) {
-                            head = tc;
-                        }
-                    }
-                } catch (Exception ignored) {
-                }
-            }
-        }
-
-        if (head == null && !tcMap.isEmpty()) {
-            return new ArrayList<>(tcMap.values());
-        }
-
-        List<TestCaseDto> orderedList = new ArrayList<>();
-        TestCaseDto current = head;
-
-        while (current != null) {
-            orderedList.add(current);
-            if (current.getNext() != null) {
-                current = tcMap.get(current.getNext());
-            } else {
-                current = null;
-            }
-        }
-
-        return orderedList;
-    }
-
-    /**
-     * Escapes a field value for CSV format.
-     * If the value contains commas, newlines, or double quotes, wrap it in double quotes
-     * and escape any internal double quotes.
-     */
     private String escapeCsvField(final String value) {
         if (value == null) return "";
         if (value.contains(",") || value.contains("\"") || value.contains("\n") || value.contains("\r")) {

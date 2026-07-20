@@ -1,6 +1,7 @@
-package org.testin.actions;
+package org.testin.actions.export;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -25,6 +26,7 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
+import org.testin.util.Tools;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -111,8 +113,17 @@ public class ExportJson extends DumbAwareAction {
 
                 Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), exportDto);
 
+                NotificationAction openAction = NotificationAction.createSimple("Open file", () -> {
+                    VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+                    if (vf != null) {
+                        Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                    }
+                });
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(project, Notifier.class).info(project, "Export Complete", "Successfully exported test cases to:\n" + destFile.getName()));
+                        Services.getInstance(project, Notifier.class).infoWithActions(project,
+                                "Export Complete",
+                                "Successfully exported test cases to:\n" + destFile.getName(),
+                                openAction));
             }
         });
     }

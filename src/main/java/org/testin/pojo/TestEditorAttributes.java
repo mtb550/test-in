@@ -29,6 +29,7 @@ public enum TestEditorAttributes {
             false,
             false,
             false,
+            true,
             (tc, project) -> String.valueOf(tc.getId()),
             null,
             (project, tc, v) -> {
@@ -39,6 +40,7 @@ public enum TestEditorAttributes {
     DESCRIPTION(
             "Description",
             "Description:",
+            true,
             true,
             true,
             true,
@@ -55,6 +57,7 @@ public enum TestEditorAttributes {
             true,
             true,
             false,
+            true,
             (tc, project) -> tc.getExpectedResult(),
             null,
             (project, tc, v) -> tc.setExpectedResult(v)
@@ -67,6 +70,7 @@ public enum TestEditorAttributes {
             true,
             true,
             false,
+            true,
             (tc, project) -> String.join(", ", tc.getSteps()),
             null,
             (project, tc, v) -> tc.setSteps(Services.getInstance(project, Tools.class).parseStepsSafe(v))
@@ -79,6 +83,7 @@ public enum TestEditorAttributes {
             true,
             true,
             false,
+            true,
             (tc, project) -> tc.getPriority().getName(),
             tc -> List.of(Shared.createPriorityBadge(tc)),
             (project, tc, v) -> tc.setPriority(Services.getInstance(project, Tools.class).parsePrioritySafe(v))
@@ -91,6 +96,7 @@ public enum TestEditorAttributes {
             true,
             false,
             false,
+            true,
             (tc, project) -> String.join(" > ", Services.getInstance(project, Tools.class).buildFqcnMethod(tc)),
             null,
             (project, tc, v) -> {
@@ -104,6 +110,7 @@ public enum TestEditorAttributes {
             false,
             true,
             false,
+            true,
             (tc, project) -> tc.getReference(),
             null,
             (project, tc, v) -> tc.setReference(v)
@@ -116,6 +123,7 @@ public enum TestEditorAttributes {
             false,
             true,
             false,
+            true,
             (tc, project) -> tc.getTestData(),
             null,
             (project, tc, v) -> tc.setTestData(v)
@@ -128,6 +136,7 @@ public enum TestEditorAttributes {
             false,
             true,
             false,
+            true,
             (tc, project) -> tc.getPreConditions(),
             null,
             (project, tc, v) -> tc.setPreConditions(v)
@@ -140,6 +149,7 @@ public enum TestEditorAttributes {
             true,
             true,
             false,
+            true,
             (tc, project) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList()),
             (project, tc, v) -> tc.setGroup(Services.getInstance(project, Tools.class).parseGroupsSafe(v))
@@ -152,6 +162,7 @@ public enum TestEditorAttributes {
             false,
             false,
             false,
+            true,
             (tc, project) -> String.join(" > ", tc.getParent().getPath2()),
             null,
             (project, tc, v) -> {
@@ -167,6 +178,7 @@ public enum TestEditorAttributes {
             false,
             true,
             false,
+            true,
             (tc, project) -> tc.getModule(),
             null,
             (project, tc, v) -> tc.setModule(v)
@@ -179,6 +191,7 @@ public enum TestEditorAttributes {
             false,
             false,
             false,
+            true,
             (tc, project) -> tc.getStatus().getDisplayText(),
             null,
             (project, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v))
@@ -191,6 +204,7 @@ public enum TestEditorAttributes {
             false,
             true,
             false,
+            true,
             (tc, project) -> tc.getCreatedBy(),
             null,
             (project, tc, v) -> tc.setCreatedBy(v)
@@ -203,6 +217,7 @@ public enum TestEditorAttributes {
             false,
             true,
             false,
+            true,
             (tc, project) -> tc.getUpdatedBy(),
             null,
             (project, tc, v) -> tc.setUpdatedBy(v)
@@ -215,6 +230,7 @@ public enum TestEditorAttributes {
             false,
             true,
             false,
+            true,
             (tc, project) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
             null,
             (project, tc, v) -> tc.setCreatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
@@ -227,6 +243,7 @@ public enum TestEditorAttributes {
             false,
             true,
             false,
+            true,
             (tc, project) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
             null,
             (project, tc, v) -> tc.setUpdatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
@@ -236,8 +253,9 @@ public enum TestEditorAttributes {
     private final String name2;
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
-    private final boolean importValue;
+    private final boolean importable;
     private final boolean copyable;
+    private final boolean exportable;
     private final ValueExtractor valueExtractor;
     private final DrawItem drawItem;
     private final ImportSetter importSetter;
