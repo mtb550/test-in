@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.NavigateToCode;
-import org.testin.actions.RunTestCase;
+import org.testin.actions.run.RunTestCase;
 import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.pojo.CardHoverAction;

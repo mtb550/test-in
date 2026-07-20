@@ -85,6 +85,13 @@ public class ExportHtml extends ExportBase {
         }
     }
 
+    public void exportToFile(final @NotNull Project project, final File destFile,
+                             final Map<String, List<TestCaseDto>> sheetsData) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
+            writeHtmlDocument(writer, project, sheetsData);
+        }
+    }
+
     private void processExport(final @NotNull Project project, final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases to HTML", true) {
             @Override

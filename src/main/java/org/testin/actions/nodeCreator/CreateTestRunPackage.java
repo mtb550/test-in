@@ -1,10 +1,8 @@
 package org.testin.actions.nodeCreator;
 
 import com.intellij.openapi.project.Project;
-import org.testin.actions.CreateTreeNode;
 import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.DirectoryType;
-import org.testin.pojo.NodeCreator;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunPackageDirectoryDto;
 import org.testin.util.TreeUtilImpl;

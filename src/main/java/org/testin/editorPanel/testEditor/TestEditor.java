@@ -16,7 +16,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.CreateTestCase;
+import org.testin.actions.crud.CreateTestCase;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;

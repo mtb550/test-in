@@ -2,7 +2,11 @@ package org.testin.projectPanel;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.*;
+import org.testin.actions.CollapseAll;
+import org.testin.actions.ExpandAll;
+import org.testin.actions.OpenSettings;
+import org.testin.actions.Refresh;
+import org.testin.actions.crud.CreateTestProject;
 
 import java.util.List;
 

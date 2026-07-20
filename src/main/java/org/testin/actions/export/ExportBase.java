@@ -1,21 +1,28 @@
 package org.testin.actions.export;
 
+import com.intellij.ide.BrowserUtil;
+import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.FileTypes;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Mapper;
+import org.testin.util.Tools;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
+import java.io.File;
 import java.io.InputStream;
 import java.util.*;
 
+// todo: add abstract method to be override in all extends classes: exportToFile()
 public abstract class ExportBase extends DumbAwareAction {
     final @NotNull SimpleTree tree;
 
@@ -47,6 +54,30 @@ public abstract class ExportBase extends DumbAwareAction {
             }
         }
         return allSheets;
+    }
+
+    // todo: remove static
+    public static NotificationAction createOpenAction(final @NotNull Project project, final File destFile, final String format) {
+        FileTypes ef = FileTypes.fromLabel(format);
+        if (ef == FileTypes.HTML) {
+            return NotificationAction.createSimple("Open file", () ->
+                    BrowserUtil.browse(destFile.toURI().toString())
+            );
+        }
+        return NotificationAction.createSimple("Open file", () -> {
+            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+            if (vf != null) {
+                Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+            }
+        });
+    }
+
+    public VirtualFile resolveTargetDir(final DirectoryDto dirDto) {
+        VirtualFile target = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
+        if (target != null && !target.isDirectory()) {
+            target = target.getParent();
+        }
+        return target;
     }
 
     public List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project project, final VirtualFile dir) {

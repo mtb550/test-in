@@ -3,10 +3,7 @@ package org.testin.pojo;
 import com.intellij.icons.AllIcons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.testin.actions.nodeCreator.CreateTestRun;
-import org.testin.actions.nodeCreator.CreateTestRunPackage;
-import org.testin.actions.nodeCreator.CreateTestSet;
-import org.testin.actions.nodeCreator.CreateTestSetPackage;
+import org.testin.actions.nodeCreator.*;
 import org.testin.pojo.dto.dirs.*;
 
 import javax.swing.*;

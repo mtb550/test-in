@@ -1,14 +1,18 @@
 package org.testin.ui;
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.TextComponentAccessor;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
+import org.testin.pojo.FileTypes;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
@@ -23,6 +27,7 @@ import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.*;
 import java.util.List;
 
@@ -37,14 +42,57 @@ public class ExportImportPreviewDialog extends DialogWrapper {
             .filter(TestEditorAttributes::isImportable)
             .toList();
 
+    private static final FileTypes[] FORMATS = FileTypes.values();
+    private final TextFieldWithBrowseButton folderField;
+    private final JTextField fileNameField;
+    private final JComboBox<String> formatCombo;
+    private final boolean isExportMode;
+    @Getter
+    private String selectedFormat;
+    @Getter
+    private File selectedFile;
+
     public ExportImportPreviewDialog(final @Nullable Project project, final Map<String, List<TestCaseDto>> sheetsData) {
+        this(project, sheetsData, null);
+    }
+
+    public ExportImportPreviewDialog(final @Nullable Project project, final Map<String, List<TestCaseDto>> sheetsData, final @Nullable Object exportTarget) {
         super(project, true);
         this.project = project;
         this.originalSheetsData = sheetsData;
+        this.isExportMode = exportTarget != null;
         this.cg = new CodeGenerator(GeneratorType.CREATE_TEST_METHOD);
 
-        setTitle("Preview & Select Excel Import");
-        setOKButtonText("Import Selected");
+        folderField = new TextFieldWithBrowseButton();
+        fileNameField = new JTextField(30);
+        formatCombo = new ComboBox<>(Arrays.stream(FORMATS).map(FileTypes::getLabel).toArray(String[]::new));
+
+        if (isExportMode) {
+            setTitle("Export Test Cases");
+            setOKButtonText("Export");
+
+            // Default filename = test set name (user adds folder via browse)
+            String dirName = exportTarget instanceof String s ? s :
+                    exportTarget instanceof com.intellij.openapi.vfs.VirtualFile vf ? vf.getName() :
+                            "Export";
+            fileNameField.setText(dirName);
+            formatCombo.setSelectedItem(FileTypes.EXCEL.getLabel());
+
+            // Browse selects a folder — same pattern as TestinPathPanel
+            folderField.addBrowseFolderListener(
+                    null,
+                    FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                            .withTitle("Select Export Folder")
+                            .withDescription("Choose the folder to save the export file in"),
+                    TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+            );
+        } else {
+            setTitle("Preview & Select Import");
+            setOKButtonText("Import Selected");
+            folderField.setVisible(false);
+            fileNameField.setVisible(false);
+            formatCombo.setVisible(false);
+        }
         setCancelButtonText("Cancel");
 
         init();
@@ -55,10 +103,55 @@ public class ExportImportPreviewDialog extends DialogWrapper {
     protected JComponent createCenterPanel() {
         JPanel panel = new JPanel(new BorderLayout());
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        topPanel.add(cg);
-        panel.add(topPanel, BorderLayout.NORTH);
+        // Top panel: file path + format selection (only for export mode)
+        if (isExportMode) {
+            JPanel topPanel = new JPanel(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(4, 4, 4, 4);
+            gbc.fill = GridBagConstraints.HORIZONTAL;
 
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            gbc.anchor = GridBagConstraints.WEST;
+            topPanel.add(new JLabel("Folder:"), gbc);
+
+            gbc.gridx = 1;
+            gbc.weightx = 1.0;
+            topPanel.add(folderField, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 1;
+            gbc.anchor = GridBagConstraints.WEST;
+            topPanel.add(new JLabel("File name:"), gbc);
+
+            gbc.gridx = 1;
+            gbc.weightx = 1.0;
+            topPanel.add(fileNameField, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            gbc.weightx = 0;
+            topPanel.add(new JLabel("Format:"), gbc);
+
+            gbc.gridx = 1;
+            gbc.weightx = 1.0;
+            topPanel.add(formatCombo, gbc);
+
+            panel.add(topPanel, BorderLayout.NORTH);
+        } else {
+            JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            topPanel.add(cg);
+            panel.add(topPanel, BorderLayout.NORTH);
+        }
+
+        // Table panel (extracted method)
+        JComponent tablePanel = createTablePanel();
+        panel.add(tablePanel, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private JComponent createTablePanel() {
         JBTabbedPane tabbedPane = new JBTabbedPane();
 
         List<String> columnNames = new ArrayList<>();
@@ -219,9 +312,34 @@ public class ExportImportPreviewDialog extends DialogWrapper {
             tabbedPane.addTab(sheetName, scrollPane);
         }
 
-        panel.add(tabbedPane, BorderLayout.CENTER);
+        return tabbedPane;
+    }
 
-        return panel;
+    @Override
+    protected void doOKAction() {
+        if (isExportMode) {
+            String folder = folderField.getText().trim();
+            String fileName = fileNameField.getText().trim();
+            if (fileName.isEmpty()) {
+                fileNameField.requestFocus();
+                return;
+            }
+            if (folder.isEmpty()) {
+                folderField.getTextField().requestFocus();
+                return;
+            }
+            FileTypes fmt = FileTypes.fromLabel((String) formatCombo.getSelectedItem());
+            // Ensure the filename has the correct extension
+            String ext = fmt.getExtension();
+            if (!fileName.endsWith(ext)) {
+                // Strip any old extension and append the correct one
+                int dot = fileName.lastIndexOf('.');
+                fileName = dot >= 0 ? fileName.substring(0, dot) + ext : fileName + ext;
+            }
+            selectedFile = new File(folder, fileName);
+            selectedFormat = fmt.getLabel();
+        }
+        super.doOKAction();
     }
 
     public Map<String, List<TestCaseDto>> getSelectedTestCasesBySheet() {
@@ -247,6 +365,7 @@ public class ExportImportPreviewDialog extends DialogWrapper {
         }
         return selectedCasesBySheet;
     }
+
 
     private static class GroupMultiSelectEditor extends AbstractCellEditor implements TableCellEditor {
         private final JButton button = new JButton();

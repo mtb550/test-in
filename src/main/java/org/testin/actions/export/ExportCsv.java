@@ -30,10 +30,7 @@ import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +81,30 @@ public class ExportCsv extends ExportBase {
         if (wrapper != null) {
             File destFile = wrapper.getFile();
             processExport(project, destFile, targetDirectory, dirDto);
+        }
+    }
+
+    public void exportToFile(final @NotNull Project project, final File destFile,
+                             final Map<String, List<TestCaseDto>> sheetsData) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
+            List<String> headerNames = EXPORT_COLUMNS.stream()
+                    .map(TestEditorAttributes::getName)
+                    .toList();
+            writer.write(String.join(",", headerNames));
+            writer.newLine();
+
+            for (Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
+                List<TestCaseDto> testCases = entry.getValue();
+                for (TestCaseDto tc : testCases) {
+                    List<String> rowValues = new ArrayList<>();
+                    for (TestEditorAttributes attr : EXPORT_COLUMNS) {
+                        String val = attr.getValueExtractor().apply(tc, project);
+                        rowValues.add(escapeCsvField(val != null ? val : ""));
+                    }
+                    writer.write(String.join(",", rowValues));
+                    writer.newLine();
+                }
+            }
         }
     }
 

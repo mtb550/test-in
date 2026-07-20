@@ -14,7 +14,7 @@ import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.CreateTestProject;
+import org.testin.actions.crud.CreateTestProject;
 import org.testin.projectPanel.projectSelector.TestProjectSelector;
 import org.testin.projectPanel.tree.ProjectTree;
 import org.testin.projectPanel.tree.TestCaseTreeBuilder;

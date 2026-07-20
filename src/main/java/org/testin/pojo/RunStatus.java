@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.RunTestCase;
+import org.testin.actions.run.RunTestCase;
 import org.testin.pojo.dto.TestCaseDto;
 
 import javax.swing.*;

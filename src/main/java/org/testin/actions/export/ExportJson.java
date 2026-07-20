@@ -88,6 +88,14 @@ public class ExportJson extends DumbAwareAction {
         }
     }
 
+    public void exportToFile(final @NotNull Project project, final File destFile,
+                             final Map<String, List<TestCaseDto>> sheetsData) {
+        JsonExportDto exportDto = JsonExportDto.builder()
+                .data(sheetsData)
+                .build();
+        Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), exportDto);
+    }
+
     private void processExportWithJson(final @NotNull Project project, final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases", true) {
             @Override

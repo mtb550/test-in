@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
+import org.testin.actions.clipboard.CopyTestCase;
+import org.testin.actions.run.RunTestCase;
 import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.pojo.dto.TestCaseDto;
