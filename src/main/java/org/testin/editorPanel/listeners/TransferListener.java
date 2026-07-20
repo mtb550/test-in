@@ -1,7 +1,7 @@
 package org.testin.editorPanel.listeners;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.logger.Log;
 
@@ -14,11 +14,11 @@ import java.util.List;
 
 public class TransferListener extends TransferHandler {
     private static final DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
-    private final IEditorUI ui;
+    private final @NotNull IEditor editor;
     private int[] draggedIndices;
 
-    public TransferListener(final IEditorUI ui) {
-        this.ui = ui;
+    public TransferListener(final @NotNull IEditor editor) {
+        this.editor = editor;
     }
 
     @Override
@@ -74,14 +74,14 @@ public class TransferListener extends TransferHandler {
             if (items.isEmpty()) return false;
 
             final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
-            final int offset = (ui.getCurrentPage() - 1) * ui.getPageSize();
+            final int offset = (editor.getCurrentPage() - 1) * editor.getPageSize();
             int insertAtGlobal = offset + dl.getIndex();
 
             final int[] globalDraggedIndices = Arrays.stream(draggedIndices)
                     .map(i -> offset + i)
                     .toArray();
 
-            final List<TestCaseDto> allItems = ui.getAllTestCases();
+            final List<TestCaseDto> allItems = editor.getAllTestCases();
             final List<TestCaseDto> itemsToMove = new ArrayList<>();
 
             synchronized (allItems) {
@@ -99,11 +99,11 @@ public class TransferListener extends TransferHandler {
                 allItems.addAll(insertAtGlobal, itemsToMove);
             }
 
-            ui.updateSequenceAndSaveAll();
+            editor.updateSequenceAndSaveAll();
 
             itemsToMove.stream().findFirst().ifPresentOrElse(
-                    ui::selectTestCase,
-                    ui::refreshView
+                    editor::selectTestCase,
+                    editor::refreshView
             );
 
             return true;

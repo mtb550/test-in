@@ -7,12 +7,11 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testCase.TestCaseUpdateMenu;
 import org.testin.util.KeyboardSet;
-import org.testin.util.Tools;
 import org.testin.util.autoGenerator.GeneratorAction;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.autoGenerator.UpdateTestMethod;
@@ -29,41 +28,39 @@ import java.util.stream.Collectors;
 
 public class UpdateTestCase extends DumbAwareAction {
 
-    private final JBList<TestCaseDto> list;
-    private final Path path;
-    private final IEditorUI ui;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull Path path;
+    private final @NotNull IEditor editor;
 
-    public UpdateTestCase(final IEditorUI ui, final JBList<TestCaseDto> list, final Path path) {
+    public UpdateTestCase(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull Path path) {
         super("Update");
         this.list = list;
         this.path = path;
-        this.ui = ui;
+        this.editor = editor;
         this.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getCustomShortcut(), list);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final Project project = e.getProject();
-        if (list == null || project == null) return;
+        if (project == null) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         Log.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
-        new TestCaseUpdateMenu(project, selectedItems, (updatedItems, codeGenerator) -> {
+        new TestCaseUpdateMenu(project, selectedItems, (updatedItems, cg) -> {
 
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-            if (path != null) {
-                for (final TestCaseDto tc : updatedItems) {
-                    indexer.putTestCase(path, tc);
-                }
+            for (final TestCaseDto tc : updatedItems) {
+                indexer.putTestCase(path, tc);
             }
 
             Services.getInstance(project, Notifier.class).softShow(project, "Updated..");
 
-            if (ui instanceof IToolBar) {
-                ((IToolBar) ui).onToolBarFilterSelectionChanged();
+            if (editor instanceof IToolBar) {
+                ((IToolBar) editor).onToolBarFilterSelectionChanged();
             }
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -78,24 +75,17 @@ public class UpdateTestCase extends DumbAwareAction {
                     }
                 }
 
-                if (codeGenerator != null && codeGenerator.isSelected()) {
-                    final GeneratorType type = codeGenerator.getGeneratorType();
+                if (cg != null && cg.isSelected()) {
+                    final GeneratorType type = cg.getGeneratorType();
                     Log.trace("Code generator selected: " + type);
 
                     if (type != null) {
                         final GeneratorAction action = type.getAction();
                         final TestCaseDto firstItem = updatedItems.getFirst();
 
-                        final List<String> fqcn = Services.getInstance(project, Tools.class)
-                                .buildFqcnMethod(firstItem);
+                        if (action instanceof UpdateTestMethod utm) utm.setChangeType(type);
 
-                        if (action instanceof UpdateTestMethod utm) {
-                            utm.setChangeType(type);
-                        }
-
-                        ApplicationManager.getApplication().executeOnPooledThread(() ->
-                                action.execute(project, firstItem, fqcn)
-                        );
+                        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
                     }
                 } else {
                     Log.trace("Code generator is NOT selected or is null.");

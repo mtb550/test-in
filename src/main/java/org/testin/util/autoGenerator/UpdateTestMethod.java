@@ -23,10 +23,13 @@ public class UpdateTestMethod implements GeneratorAction {
     private GeneratorType changeType;
 
     @Override
-    public void execute(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
-        Log.trace("execute() called — tc=" + (tc != null ? tc.getId() : null) + ", fqcn=" + fqcn + ", changeType=" + changeType);
+    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+        if (!(obj instanceof TestCaseDto tc)) return;
+        final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
 
-        if (tc == null || fqcn.size() < 2) {
+        Log.trace("execute() called — tc=" + tc.getId() + ", fqcn=" + fqcn + ", changeType=" + changeType);
+
+        if (fqcn.size() < 2) {
             Log.warn("UpdateTestMethod: missing test case or FQCN");
             return;
         }

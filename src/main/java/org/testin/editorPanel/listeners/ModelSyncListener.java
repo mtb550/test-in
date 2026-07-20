@@ -2,7 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.ui.CollectionListModel;
 import lombok.Setter;
-import org.testin.editorPanel.testEditor.TestEditorUI;
+import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -13,15 +13,15 @@ import java.util.List;
 import java.util.Optional;
 
 public class ModelSyncListener implements ListDataListener {
-    private final TestEditorUI ui;
+    private final TestEditor editor;
     private final CollectionListModel<TestCaseDto> model;
     private boolean active = true;
 
     @Setter
     private IUpdateCallback onUpdateCallback;
 
-    public ModelSyncListener(final TestEditorUI ui, final CollectionListModel<TestCaseDto> model) {
-        this.ui = ui;
+    public ModelSyncListener(final TestEditor editor, final CollectionListModel<TestCaseDto> model) {
+        this.editor = editor;
         this.model = model;
     }
 
@@ -37,24 +37,24 @@ public class ModelSyncListener implements ListDataListener {
     public void intervalAdded(final ListDataEvent e) {
         if (!active) return;
 
-        int globalStart = (ui.getCurrentPage() - 1) * ui.getPageSize() + e.getIndex0();
+        int globalStart = (editor.getCurrentPage() - 1) * editor.getPageSize() + e.getIndex0();
         TestCaseDto newlyAdded = null;
 
         for (int i = e.getIndex0(); i <= e.getIndex1(); i++) {
             final TestCaseDto item = model.getElementAt(i);
-            if (!ui.getAllTestCases().contains(item)) {
-                ui.getAllTestCases().add(globalStart++, item);
+            if (!editor.getAllTestCases().contains(item)) {
+                editor.getAllTestCases().add(globalStart++, item);
                 newlyAdded = item;
             }
         }
 
-        ui.updateSequenceAndSaveAll();
+        editor.updateSequenceAndSaveAll();
 
         Optional.ofNullable(onUpdateCallback).ifPresent(cb -> SwingUtilities.invokeLater(cb::onUpdate));
 
         if (newlyAdded != null) {
             final TestCaseDto target = newlyAdded;
-            SwingUtilities.invokeLater(() -> ui.selectTestCase(target));
+            SwingUtilities.invokeLater(() -> editor.selectTestCase(target));
         }
     }
 
@@ -62,12 +62,12 @@ public class ModelSyncListener implements ListDataListener {
     public void intervalRemoved(final ListDataEvent e) {
         if (!active) return;
 
-        final int globalStart = (ui.getCurrentPage() - 1) * ui.getPageSize();
-        final List<TestCaseDto> allItems = ui.getAllTestCases();
+        final int globalStart = (editor.getCurrentPage() - 1) * editor.getPageSize();
+        final List<TestCaseDto> allItems = editor.getAllTestCases();
 
         if (globalStart >= allItems.size()) return;
 
-        final int pageEnd = Math.min(globalStart + ui.getPageSize(), allItems.size());
+        final int pageEnd = Math.min(globalStart + editor.getPageSize(), allItems.size());
         final List<TestCaseDto> pageInMaster;
 
         synchronized (allItems) {
@@ -82,7 +82,7 @@ public class ModelSyncListener implements ListDataListener {
 
         if (!toRemove.isEmpty()) {
             allItems.removeAll(toRemove);
-            ui.updateSequenceAndSaveAll();
+            editor.updateSequenceAndSaveAll();
         }
 
         Optional.ofNullable(onUpdateCallback).ifPresent(cb -> SwingUtilities.invokeLater(cb::onUpdate));

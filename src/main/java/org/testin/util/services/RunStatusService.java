@@ -7,8 +7,8 @@ import com.intellij.ui.components.JBList;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.runEditor.RunEditorUI;
+import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.TestStatus;
@@ -26,14 +26,14 @@ import java.util.UUID;
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
 
-    public void executeNext(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
-        if (!(ui instanceof RunEditorUI runUi)) return;
+    public void executeNext(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+        if (!(ui instanceof RunEditor editor)) return;
 
-        int executingIndex = runUi.getCurrentlyExecutingIndex();
+        int executingIndex = editor.getCurrentlyExecutingIndex();
         if (executingIndex == -1) return;
 
-        TestCaseDto currentTc = runUi.getCurrentTestCases().get(executingIndex);
-        TestRunItems item = runUi.getResultsMap().get(currentTc.getId());
+        TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
+        TestRunItems item = editor.getResultsMap().get(currentTc.getId());
 
         if (item != null) {
             item.setStatus(status);
@@ -42,27 +42,27 @@ public final class RunStatusService {
 
         Log.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
-        persistRunDataAsync(project, runUi);
+        persistRunDataAsync(project, editor);
         triggerFilterRefresh(ui, list);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             UUID currentId = currentTc.getId();
-            boolean stillInList = runUi.getCurrentTestCases().stream()
+            boolean stillInList = editor.getCurrentTestCases().stream()
                     .anyMatch(t -> t.getId().equals(currentId));
             int nextIndex = stillInList ? executingIndex + 1 : executingIndex;
-            runUi.startTimerForIndex(nextIndex);
+            editor.startTimerForIndex(nextIndex);
         });
     }
 
-    public void executeManual(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
-        if (!(ui instanceof RunEditorUI runUi)) return;
+    public void executeManual(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
+        if (!(ui instanceof RunEditor editor)) return;
 
-        TestRunItems item = runUi.getResultsMap().get(tc.getId());
+        TestRunItems item = editor.getResultsMap().get(tc.getId());
         if (item == null) return;
 
-        int tcIndex = runUi.getCurrentTestCases().indexOf(tc);
-        if (tcIndex != -1 && tcIndex == runUi.getCurrentlyExecutingIndex()) {
-            runUi.stopExecution();
+        int tcIndex = editor.getCurrentTestCases().indexOf(tc);
+        if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
+            editor.stopExecution();
         }
 
         item.setStatus(status);
@@ -70,63 +70,63 @@ public final class RunStatusService {
 
         Log.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
-        persistRunDataAsync(project, runUi);
+        persistRunDataAsync(project, editor);
         triggerFilterRefresh(ui, null);
     }
 
-    public void applyStatus(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
-        if (!(ui instanceof RunEditorUI runUi)) return;
+    public void applyStatus(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+        if (!(ui instanceof RunEditor editor)) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         if (selectedItems.size() == 1) {
             TestCaseDto tc = selectedItems.getFirst();
-            int globalIndex = runUi.getCurrentTestCases().indexOf(tc);
-            if (globalIndex == runUi.getCurrentlyExecutingIndex()) {
+            int globalIndex = editor.getCurrentTestCases().indexOf(tc);
+            if (globalIndex == editor.getCurrentlyExecutingIndex()) {
                 executeNext(project, ui, list, status);
             } else {
                 executeManual(project, ui, tc, status);
             }
         } else {
             for (TestCaseDto tc : selectedItems) {
-                TestRunItems item = runUi.getResultsMap().get(tc.getId());
+                TestRunItems item = editor.getResultsMap().get(tc.getId());
                 if (item != null) {
                     item.setStatus(status);
                     item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-                    int tcIndex = runUi.getCurrentTestCases().indexOf(tc);
-                    if (tcIndex != -1 && tcIndex == runUi.getCurrentlyExecutingIndex()) {
-                        runUi.stopExecution();
+                    int tcIndex = editor.getCurrentTestCases().indexOf(tc);
+                    if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
+                        editor.stopExecution();
                     }
                 }
             }
 
-            persistRunDataAsync(project, runUi);
+            persistRunDataAsync(project, editor);
             triggerFilterRefresh(ui, list);
         }
     }
 
-    private void persistRunDataAsync(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
-        if (runUi.getTr() == null || runUi.getParent() == null) return;
+    private void persistRunDataAsync(final @NotNull Project project, final @NotNull RunEditor editor) {
+        if (editor.getTr() == null || editor.getParent() == null) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Path dirPath = runUi.getParent().getPath();
-                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
+                Path dirPath = editor.getParent().getPath();
+                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
             } catch (final Exception ex) {
                 Log.error("Failed to persist test run data: " + ex.getMessage());
             }
         });
     }
 
-    private void triggerFilterRefresh(final @NotNull IEditorUI ui, final JBList<TestCaseDto> list) {
+    private void triggerFilterRefresh(final @NotNull IEditor editor, final JBList<TestCaseDto> list) {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (list != null) {
                 list.repaint();
             }
-            if (ui instanceof IToolBar) {
-                ((IToolBar) ui).onToolBarFilterSelectionChanged();
+            if (editor instanceof IToolBar) {
+                ((IToolBar) editor).onToolBarFilterSelectionChanged();
             }
         });
     }

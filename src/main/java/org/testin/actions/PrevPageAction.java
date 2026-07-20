@@ -6,30 +6,30 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 
 public class PrevPageAction extends DumbAwareAction {
-    private final IEditorUI ui;
+    private final @NotNull IEditor editor;
 
-    public PrevPageAction(final IEditorUI ui, final JBList<TestCaseDto> list) {
+    public PrevPageAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Previous Page", "Navigate to the previous page", AllIcons.Actions.Back);
-        this.ui = ui;
+        this.editor = editor;
         registerCustomShortcutSet(KeyboardSet.PreviousTestCase.getCustomShortcut(), list);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (ui.getCurrentPage() > 1) {
-            ui.setCurrentPage(ui.getCurrentPage() - 1);
-            ui.refreshView();
+        if (editor.getCurrentPage() > 1) {
+            editor.setCurrentPage(editor.getCurrentPage() - 1);
+            editor.refreshView();
         }
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        int current = ui.getCurrentPage();
+        int current = editor.getCurrentPage();
         e.getPresentation().setEnabled(current > 1);
     }
 

@@ -7,22 +7,22 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.runEditor.RunEditorUI;
+import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.ui.testRun.ActualResultUI;
+import org.testin.ui.testRun.ActualResultDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Log;
 
 public class SetActualResult extends DumbAwareAction {
 
-    private final IEditorUI ui;
-    private final JBList<TestCaseDto> list;
+    private final @NotNull IEditor editor;
+    private final @NotNull JBList<TestCaseDto> list;
 
-    public SetActualResult(final IEditorUI ui, final JBList<TestCaseDto> list) {
+    public SetActualResult(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Actual Result", "Set actual result for test case", AllIcons.Actions.Copy);
-        this.ui = ui;
+        this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.SetActualResult.getCustomShortcut(), list);
     }
@@ -30,19 +30,19 @@ public class SetActualResult extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final Project project = e.getProject();
-        if (list == null || project == null) return;
+        if (project == null) return;
 
         final TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;
 
-        if (!(ui instanceof RunEditorUI runUi)) return;
+        if (!(editor instanceof RunEditor runEditor)) return;
 
-        final TestRunItems runItem = runUi.getResultsMap().get(selected.getId());
+        final TestRunItems runItem = runEditor.getResultsMap().get(selected.getId());
         if (runItem == null) return;
 
         Log.trace("set actual result for: " + selected.getDescription());
 
-        new ActualResultUI(project, runItem).show();
+        new ActualResultDialog(project, runItem).show();
     }
 
     @Override

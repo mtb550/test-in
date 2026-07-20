@@ -8,17 +8,17 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.editorPanel.testEditor.TestEditorCM;
-import org.testin.editorPanel.testEditor.TestEditorUI;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
-import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.time.ZonedDateTime;
@@ -29,12 +29,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PasteTestCaseNode extends DumbAwareAction {
-    private final IEditorUI editorUI;
+    private final @NotNull IEditor editor;
 
-    public PasteTestCaseNode(final IEditorUI editorUI, final JComponent component) {
+    public PasteTestCaseNode(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
-        this.editorUI = editorUI;
-        this.registerCustomShortcutSet(KeyboardSet.PasteTestCaseNode.getCustomShortcut(), component);
+        this.editor = editor;
+        this.registerCustomShortcutSet(KeyboardSet.PasteTestCaseNode.getCustomShortcut(), list);
     }
 
     @Override
@@ -45,11 +45,11 @@ public class PasteTestCaseNode extends DumbAwareAction {
         if (pastedCases.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            TestEditorUI destUI = (editorUI instanceof TestEditorUI) ? (TestEditorUI) editorUI : null;
+            TestEditor destUI = (editor instanceof TestEditor) ? (TestEditor) editor : null;
             if (destUI == null) return;
 
             boolean isCut = TestEditorCM.isGlobalCutAction();
-            IEditorUI sourceUI = TestEditorCM.getGlobalSourceEditorUI();
+            IEditor sourceUI = TestEditorCM.getGlobalSourceEditorUI();
 
             if (isCut && sourceUI != null) {
 
@@ -61,8 +61,8 @@ public class PasteTestCaseNode extends DumbAwareAction {
                         RemoveTestCase.deletePhysicalFiles(cutItems, sourceUI.getParent().getPath(), this));
 
                 sourceUI.getAllTestCases().removeAll(cutItems);
-                if (sourceUI != destUI && sourceUI instanceof TestEditorUI) {
-                    ((TestEditorUI) sourceUI).sortAndIdentifyUnsorted();
+                if (sourceUI != destUI && sourceUI instanceof TestEditor) {
+                    ((TestEditor) sourceUI).sortAndIdentifyUnsorted();
                     sourceUI.updateSequenceAndSaveAll();
                 }
             }

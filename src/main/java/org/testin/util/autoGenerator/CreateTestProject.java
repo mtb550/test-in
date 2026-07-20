@@ -6,8 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
@@ -17,7 +16,9 @@ import java.util.List;
 public class CreateTestProject implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
+    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+        if (!(obj instanceof TestProjectDirectoryDto tp)) return;
+        final List<String> fqcn = tp.getPath2();
 
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {

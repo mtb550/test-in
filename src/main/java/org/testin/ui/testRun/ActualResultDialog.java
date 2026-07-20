@@ -17,14 +17,14 @@ import org.testin.util.KeyboardSet;
 import javax.swing.*;
 import java.awt.*;
 
-public class ActualResultUI {
+public class ActualResultDialog {
 
     private final Project project;
     private final TestRunItems runItem;
     private final ActualResultSection section;
     private final JBPopup popup;
 
-    public ActualResultUI(final @NotNull Project project, final @NotNull TestRunItems runItem) {
+    public ActualResultDialog(final @NotNull Project project, final @NotNull TestRunItems runItem) {
         this.project = project;
         this.runItem = runItem;
         this.section = new ActualResultSection();

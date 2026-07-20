@@ -17,25 +17,24 @@ import java.util.Optional;
 
 public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor {
 
-    private final IEditorUI ui;
-    private final UnifiedVirtualFile vf;
+    private final @NotNull IEditor editor;
+    private final @NotNull UnifiedVirtualFile vf;
+    private final @NotNull Project project;
 
-    private final Project project;
-
-    public UnifiedFileEditor(final @NotNull Project project, final UnifiedVirtualFile vf, final IEditorUI ui) {
+    public UnifiedFileEditor(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf, final @NotNull IEditor editor) {
         this.project = project;
         this.vf = vf;
-        this.ui = ui;
+        this.editor = editor;
     }
 
     @Override
     public @NotNull JComponent getComponent() {
-        return ui.getComponent();
+        return editor.getComponent();
     }
 
     @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
-        return ui.getPreferredFocusedComponent();
+        return editor.getPreferredFocusedComponent();
     }
 
     @Override
@@ -60,7 +59,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
 
     @Override
     public void dispose() {
-        ui.dispose();
+        editor.dispose();
     }
 
     @Override
@@ -77,7 +76,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
 
     @Override
     public void selectNotify() {
-        final List<TestCaseDto> selected = ui.getSelectedTestCases();
+        final List<TestCaseDto> selected = editor.getSelectedTestCases();
 
         Optional.ofNullable(ViewToolWindowFactory.getToolWindow(project))
                 .map(tw -> ViewToolWindowFactory.getViewPanel())
@@ -86,9 +85,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
                     if (selected != null && !selected.isEmpty())
                         viewer.show(selected, vf.getDir().getPath2());
 
-                    else
-                        viewer.reset();
-
+                    else viewer.reset();
                 });
     }
 }

@@ -8,8 +8,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.runEditor.RunEditorUI;
+import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.TestRunMarker;
@@ -28,21 +28,21 @@ import java.util.Map;
 import java.util.UUID;
 
 public class UpdateTestRunStatus extends DumbAwareAction {
-    private final IEditorUI ui;
-    private final JBList<TestCaseDto> list;
+    private final @NotNull IEditor editor;
+    private final @NotNull JBList<TestCaseDto> list;
 
-    public UpdateTestRunStatus(final IEditorUI ui, final JBList<TestCaseDto> list) {
+    public UpdateTestRunStatus(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Change Test Run Status", "Change the status of the current test run", AllIcons.Nodes.Test);
-        this.ui = ui;
+        this.editor = editor;
         this.list = list;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final Project project = e.getProject();
-        if (project == null || !(ui instanceof RunEditorUI runUi)) return;
+        if (project == null || !(editor instanceof RunEditor runEditor)) return;
 
-        TestRunStatus currentStatus = runUi.getParent().getMarker().getStatus();
+        TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
         TestRunStatus newStatus;
 
         if (currentStatus == TestRunStatus.CREATED || currentStatus == TestRunStatus.ASSIGNED) {
@@ -55,17 +55,17 @@ public class UpdateTestRunStatus extends DumbAwareAction {
             return;
         }
 
-        applyStatusChange(project, runUi, newStatus);
+        applyStatusChange(project, runEditor, newStatus);
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (!(ui instanceof RunEditorUI runUi)) {
+        if (!(editor instanceof RunEditor runEditor)) {
             e.getPresentation().setEnabled(false);
             return;
         }
 
-        TestRunStatus currentStatus = runUi.getParent().getMarker().getStatus();
+        TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
         boolean enabled = currentStatus == TestRunStatus.CREATED
                 || currentStatus == TestRunStatus.ASSIGNED
                 || currentStatus == TestRunStatus.IN_PROGRESS;
@@ -76,6 +76,7 @@ public class UpdateTestRunStatus extends DumbAwareAction {
             e.getPresentation().setText("Complete Test Run");
             e.getPresentation().setDescription("Mark test run as completed");
             e.getPresentation().setIcon(AllIcons.Actions.Checked);
+
         } else {
             e.getPresentation().setText("Start Execution");
             e.getPresentation().setDescription("Start execution of test cases");
@@ -88,66 +89,66 @@ public class UpdateTestRunStatus extends DumbAwareAction {
         return ActionUpdateThread.BGT;
     }
 
-    public void applyStatusChange(final @NotNull Project project, final @NotNull RunEditorUI runUi, final @NotNull TestRunStatus newStatus) {
-        TestRunMarker marker = runUi.getParent().getMarker();
+    public void applyStatusChange(final @NotNull Project project, final @NotNull RunEditor editor, final @NotNull TestRunStatus newStatus) {
+        TestRunMarker marker = editor.getParent().getMarker();
         TestRunStatus oldStatus = marker.getStatus();
 
         marker.setStatus(newStatus);
         marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         Log.trace("Test run status changed: "
-                + runUi.getParent().getName()
+                + editor.getParent().getName()
                 + " = " + newStatus.getLabel());
 
         if (newStatus == TestRunStatus.COMPLETED || newStatus == TestRunStatus.CLOSED) {
-            resetPendingToUntested(runUi);
+            resetPendingToUntested(editor);
         }
 
         if (newStatus == TestRunStatus.COMPLETED && oldStatus == TestRunStatus.IN_PROGRESS) {
-            runUi.stopExecution();
+            editor.stopExecution();
         }
 
-        persistMarker(project, runUi);
-        persistResults(project, runUi);
+        persistMarker(project, editor);
+        persistResults(project, editor);
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (list != null) list.repaint();
-            runUi.getStatusBar().updatePaginationState(
-                    runUi.getCurrentPage(),
-                    runUi.getTotalPageCount(),
-                    runUi.getCurrentTestCases().size(),
-                    runUi.getTotalItemsCount()
+            list.repaint();
+            editor.getStatusBar().updatePaginationState(
+                    editor.getCurrentPage(),
+                    editor.getTotalPageCount(),
+                    editor.getCurrentTestCases().size(),
+                    editor.getTotalItemsCount()
             );
-            updateStartButton(runUi);
+            updateStartButton(editor);
         });
     }
 
-    public void onExecutionFinished(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
-        runUi.stopExecution();
+    public void onExecutionFinished(final @NotNull Project project, final @NotNull RunEditor editor) {
+        editor.stopExecution();
 
-        TestRunMarker marker = runUi.getParent().getMarker();
+        TestRunMarker marker = editor.getParent().getMarker();
         marker.setStatus(TestRunStatus.COMPLETED);
         marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-        resetPendingToUntested(runUi);
+        resetPendingToUntested(editor);
 
-        persistMarker(project, runUi);
-        persistResults(project, runUi);
+        persistMarker(project, editor);
+        persistResults(project, editor);
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (list != null) list.repaint();
-            runUi.getStatusBar().updatePaginationState(
-                    runUi.getCurrentPage(),
-                    runUi.getTotalPageCount(),
-                    runUi.getCurrentTestCases().size(),
-                    runUi.getTotalItemsCount()
+            list.repaint();
+            editor.getStatusBar().updatePaginationState(
+                    editor.getCurrentPage(),
+                    editor.getTotalPageCount(),
+                    editor.getCurrentTestCases().size(),
+                    editor.getTotalItemsCount()
             );
-            updateStartButton(runUi);
+            updateStartButton(editor);
         });
     }
 
-    private void resetPendingToUntested(final @NotNull RunEditorUI runUi) {
-        Map<UUID, TestRunItems> resultsMap = runUi.getResultsMap();
+    private void resetPendingToUntested(final @NotNull RunEditor editor) {
+        Map<UUID, TestRunItems> resultsMap = editor.getResultsMap();
         for (TestRunItems item : resultsMap.values()) {
             if (item.getStatus() == TestStatus.PENDING) {
                 item.setStatus(TestStatus.UNTESTED);
@@ -156,18 +157,18 @@ public class UpdateTestRunStatus extends DumbAwareAction {
         }
     }
 
-    private void persistMarker(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
+    private void persistMarker(final @NotNull Project project, final @NotNull RunEditor editor) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-                final Path runPath = runUi.getParent().getPath();
+                final Path runPath = editor.getParent().getPath();
                 final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(runPath);
 
-                TestRunMarker marker = (trd != null) ? trd.getMarker() : runUi.getParent().getMarker();
+                TestRunMarker marker = (trd != null) ? trd.getMarker() : editor.getParent().getMarker();
 
                 if (marker != null) {
-                    marker.setStatus(runUi.getParent().getMarker().getStatus());
-                    marker.setCreatedAt(runUi.getParent().getMarker().getCreatedAt());
+                    marker.setStatus(editor.getParent().getMarker().getStatus());
+                    marker.setCreatedAt(editor.getParent().getMarker().getCreatedAt());
 
                     indexer.updateRunMarker(project, runPath, marker);
                     Log.trace("Marker persisted -> " + marker.getStatus().getLabel());
@@ -178,13 +179,13 @@ public class UpdateTestRunStatus extends DumbAwareAction {
         });
     }
 
-    private void persistResults(final @NotNull Project project, final @NotNull RunEditorUI runUi) {
-        if (runUi.getTr() == null) return;
+    private void persistResults(final @NotNull Project project, final @NotNull RunEditor editor) {
+        if (editor.getTr() == null) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Path dirPath = runUi.getParent().getPath();
-                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
+                Path dirPath = editor.getParent().getPath();
+                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
                 Log.trace("Results persisted");
             } catch (final Exception ex) {
                 Log.error("Failed to persist test run results: " + ex.getMessage());
@@ -192,8 +193,8 @@ public class UpdateTestRunStatus extends DumbAwareAction {
         });
     }
 
-    private void updateStartButton(final @NotNull RunEditorUI runUi) {
-        StartExecutionBtn startBtn = runUi.getToolBar().getToolbarItem(StartExecutionBtn.class);
+    private void updateStartButton(final @NotNull RunEditor editor) {
+        StartExecutionBtn startBtn = editor.getToolBar().getToolbarItem(StartExecutionBtn.class);
         if (startBtn != null) {
             startBtn.updateEnabledState();
         }

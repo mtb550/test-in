@@ -13,7 +13,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.UpdateTestRunStatus;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.listeners.MouseListenerImpl;
@@ -52,7 +52,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
+public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Getter
     private final Project project;
@@ -108,7 +108,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
     @Getter
     private int currentlyExecutingIndex = -1;
 
-    public RunEditorUI(final @NotNull Project project, final UnifiedVirtualFile vf) {
+    public RunEditor(final @NotNull Project project, final UnifiedVirtualFile vf) {
         this.project = project;
         this.parent = vf.getTestRun();
 
@@ -403,7 +403,7 @@ public class RunEditorUI implements Disposable, IToolBar, IEditorUI {
         resultsMap.clear();
         if (model != null) model.removeAll();
         if (mainPanel != null) mainPanel.removeAll();
-        IEditorUI.super.dispose();
+        IEditor.super.dispose();
     }
 
     @Override

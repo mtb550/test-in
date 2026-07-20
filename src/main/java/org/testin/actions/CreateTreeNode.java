@@ -42,34 +42,35 @@ public class CreateTreeNode extends DumbAwareAction {
         if (e.getProject() == null) return;
         final Project project = e.getProject();
 
-        final DirectoryDto parentDir = Services.getInstance(e.getProject(), Tools.class).getCurrentSelectedDirectory(tree);
+        final DirectoryDto parentDir = Services.getInstance(project, Tools.class).getCurrentSelectedDirectory(tree);
         final TreePath path = tree.getSelectionPath();
 
         if (path == null || parentDir == null) return;
 
         final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        new CreateNodesDialog(e.getProject(), parentDir.getMenu(), (name, directoryType, codeGenerator) -> {
+        new CreateNodesDialog(project, parentDir.getMenu(), (name, directoryType, cg) -> {
 
-            if (name == null || name.isEmpty()) return;
+            if (name.isEmpty()) return;
             DirectoryDto dir = null;
             final Path newDirPath = parentDir.getPath().resolve(name);
 
-            if (directoryType != null && directoryType.getAction() != null)
-                dir = directoryType.getAction().execute(this, e.getProject(), name, parentNode, parentDir, newDirPath);
+            if (directoryType.getAction() != null)
+                dir = directoryType.getAction().execute(this, project, name, parentNode, parentDir, newDirPath);
 
             else
                 Log.info("No creation logic defined for type: " + directoryType);
 
-            if (codeGenerator != null && codeGenerator.isSelected() && directoryType != null && directoryType.getAction() != null) {
+            if (cg.isSelected() && directoryType.getAction() != null) {
 
                 if (directoryType == DirectoryType.TSP) {
-                    GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(project, null, Services.getInstance(project, Tools.class).buildFqcnPackage(dir));
+                    GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(project, dir);
                     return;
                 }
 
                 if (directoryType == DirectoryType.TS) {
-                    GeneratorType.CREATE_JAVA_CLASS.getAction().execute(project, null, Services.getInstance(project, Tools.class).buildFqcnClass(dir, e.getProject()));
+                    GeneratorType.CREATE_JAVA_CLASS.getAction().execute(project, dir);
+                    //return;
                 }
 
             }

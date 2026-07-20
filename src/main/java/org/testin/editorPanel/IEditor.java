@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public interface IEditorUI extends Disposable {
+public interface IEditor extends Disposable {
     DirectoryDto getParent();
 
     StatusBar getStatusBar();

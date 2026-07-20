@@ -2,7 +2,8 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBList;
-import org.testin.editorPanel.testEditor.TestEditorUI;
+import org.jetbrains.annotations.NotNull;
+import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.indexer.ProjectIndexer;
@@ -20,12 +21,12 @@ import java.util.stream.Collectors;
 
 public class KeyListener extends KeyAdapter {
 
-    private final JBList<TestCaseDto> list;
-    private final TestEditorUI ui;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull TestEditor editor;
 
-    public KeyListener(final JBList<TestCaseDto> list, final TestEditorUI ui) {
+    public KeyListener(final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditor editor) {
         this.list = list;
-        this.ui = ui;
+        this.editor = editor;
     }
 
     @Override
@@ -49,12 +50,12 @@ public class KeyListener extends KeyAdapter {
             final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
 
             if (selectedCases != null && !selectedCases.isEmpty()) {
-                ui.getAllTestCases().removeAll(selectedCases);
-                ui.refreshView();
+                editor.getAllTestCases().removeAll(selectedCases);
+                editor.refreshView();
 
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    final Path dirPath = ui.getParent().getPath();
-                    final ProjectIndexer indexer = Services.getInstance(ui.getProject(), ProjectIndexer.class);
+                    final Path dirPath = editor.getParent().getPath();
+                    final ProjectIndexer indexer = Services.getInstance(editor.getProject(), ProjectIndexer.class);
 
                     selectedCases.forEach(tc -> {
                         try {
@@ -64,7 +65,7 @@ public class KeyListener extends KeyAdapter {
                         }
                     });
 
-                    ApplicationManager.getApplication().invokeLater(ui::updateSequenceAndSaveAll);
+                    ApplicationManager.getApplication().invokeLater(editor::updateSequenceAndSaveAll);
                 });
             }
         }

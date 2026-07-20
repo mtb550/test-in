@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
 import org.testin.editorPanel.EditorContextMenu;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 
@@ -25,9 +25,9 @@ public class RunEditorCM extends EditorContextMenu {
 
     @Getter
     @Setter
-    private static IEditorUI globalSourceEditorUI = null;
+    private static IEditor globalSourceEditorUI = null;
 
-    public RunEditorCM(final IEditorUI ui, final DirectoryDto dir, final JBList<TestCaseDto> list) {
+    public RunEditorCM(final IEditor ui, final DirectoryDto dir, final JBList<TestCaseDto> list) {
         super("Editor Context Menu", true);
 
         add(new SetStatusPassed(ui, list));

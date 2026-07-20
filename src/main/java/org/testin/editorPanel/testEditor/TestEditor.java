@@ -17,7 +17,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.CreateTestCase;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.listeners.*;
@@ -48,7 +48,7 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
+public class TestEditor implements Disposable, IToolBar, IEditor {
     @Getter
     private final Project project;
 
@@ -95,7 +95,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
     @Setter
     private int hoveredIndex = -1;
 
-    public TestEditorUI(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf) {
+    public TestEditor(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf) {
         this.project = project;
         this.parent = vf.getTestSet();
 
@@ -475,7 +475,7 @@ public class TestEditorUI implements Disposable, IToolBar, IEditorUI {
         }
         if (mainPanel != null) mainPanel.removeAll();
 
-        IEditorUI.super.dispose();
+        IEditor.super.dispose();
     }
 
     @Override

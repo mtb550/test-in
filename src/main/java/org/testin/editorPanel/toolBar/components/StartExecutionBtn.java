@@ -2,15 +2,16 @@ package org.testin.editorPanel.toolBar.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
-import org.testin.editorPanel.runEditor.RunEditorUI;
+import org.jetbrains.annotations.NotNull;
+import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.TestRunStatus;
 
 public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
 
-    private final IToolBar callbacks;
+    private final @NotNull IToolBar callbacks;
 
-    public StartExecutionBtn(final IToolBar callbacks, final Runnable onStartExecutionClicked) {
+    public StartExecutionBtn(final @NotNull IToolBar callbacks, final @NotNull Runnable onStartExecutionClicked) {
         super("Start Execution", AllIcons.Nodes.Services);
         this.callbacks = callbacks;
 
@@ -19,12 +20,14 @@ public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
 
 
     public void updateEnabledState() {
-        if (callbacks instanceof RunEditorUI runUi) {
-            TestRunStatus status = runUi.getParent().getMarker().getStatus();
+        if (callbacks instanceof RunEditor editor) {
+            TestRunStatus status = editor.getParent().getMarker().getStatus();
+
             if (status == TestRunStatus.CLOSED || status == TestRunStatus.COMPLETED) {
                 setEnabled(false);
                 setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Nodes.Services));
                 setToolTipText("Execution disabled — run status is " + status.getLabel());
+
             } else {
                 setEnabled(true);
                 setIcon(AllIcons.Nodes.Services);

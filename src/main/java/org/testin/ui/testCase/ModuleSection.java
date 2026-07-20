@@ -54,7 +54,7 @@ public class ModuleSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseUIBase base, final TestCaseUIBase.IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseDialogBase base, final TestCaseDialogBase.IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseModule.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -72,7 +72,7 @@ public class ModuleSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseUIBase.IUIAction repackAction) {
+    public void fillData(final TestCaseDto dto, final TestCaseDialogBase.IUIAction repackAction) {
         moduleField.setText(dto.getModule());
     }
 }

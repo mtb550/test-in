@@ -9,7 +9,6 @@ import org.testin.pojo.Config;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestCaseStatus;
-import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 
 import java.time.ZonedDateTime;
@@ -59,7 +58,7 @@ public final class TestCaseDto {
     @NonNull
     @Builder.Default
     @JsonIgnore
-    private volatile DirectoryDto parent = new TestSetDirectoryDto();
+    private volatile TestSetDirectoryDto parent = new TestSetDirectoryDto();
 
     @NonNull
     @Builder.Default

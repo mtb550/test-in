@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.NavigateToCode;
 import org.testin.actions.RunTestCase;
 import org.testin.editorPanel.EditorContextMenu;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.pojo.CardHoverAction;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
@@ -28,20 +28,20 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class MouseListenerImpl extends MouseAdapter {
-    private final Project project;
-    private final JBList<TestCaseDto> list;
-    private final CollectionListModel<TestCaseDto> model;
-    private final EditorContextMenu editorCm;
-    private final ArrayList<String> path;
-    private final IEditorUI ui;
+    private final @NotNull Project project;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull CollectionListModel<TestCaseDto> model;
+    private final @NotNull EditorContextMenu cm;
+    private final @NotNull ArrayList<String> path;
+    private final @NotNull IEditor editor;
 
-    public MouseListenerImpl(final @NotNull Project project, final IEditorUI ui, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model, final DirectoryDto dir, final EditorContextMenu editorCm) {
+    public MouseListenerImpl(final @NotNull Project project, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull EditorContextMenu cm) {
         this.project = project;
-        this.ui = ui;
+        this.editor = editor;
         this.list = list;
         this.path = dir.getPath2();
         this.model = model;
-        this.editorCm = editorCm;
+        this.cm = cm;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class MouseListenerImpl extends MouseAdapter {
 
             final ActionManager actionManager = ActionManager.getInstance();
             final String place = ActionPlaces.TOOLWINDOW_POPUP;
-            actionManager.createActionPopupMenu(place, editorCm).getComponent().show(e.getComponent(), e.getX(), e.getY());
+            actionManager.createActionPopupMenu(place, cm).getComponent().show(e.getComponent(), e.getX(), e.getY());
         }
     }
 
@@ -115,15 +115,15 @@ public class MouseListenerImpl extends MouseAdapter {
 
         boolean needsRepaint = false;
 
-        if (index != ui.getHoveredIndex()) {
-            ui.setHoveredIndex(index);
+        if (index != editor.getHoveredIndex()) {
+            editor.setHoveredIndex(index);
             needsRepaint = true;
         }
 
         final String actionName = currentAction != null ? currentAction.name() : null;
 
-        if (actionName == null ? ui.getHoveredIconAction() != null : !actionName.equals(ui.getHoveredIconAction())) {
-            ui.setHoveredIconAction(actionName);
+        if (actionName == null ? editor.getHoveredIconAction() != null : !actionName.equals(editor.getHoveredIconAction())) {
+            editor.setHoveredIconAction(actionName);
             needsRepaint = true;
 
             list.setToolTipText(Optional.ofNullable(currentAction).map(CardHoverAction::getHintText).orElse(null));
@@ -136,9 +136,9 @@ public class MouseListenerImpl extends MouseAdapter {
 
     @Override
     public void mouseExited(final MouseEvent e) {
-        if (ui.getHoveredIndex() != -1 || ui.getHoveredIconAction() != null) {
-            ui.setHoveredIndex(-1);
-            ui.setHoveredIconAction(null);
+        if (editor.getHoveredIndex() != -1 || editor.getHoveredIconAction() != null) {
+            editor.setHoveredIndex(-1);
+            editor.setHoveredIconAction(null);
             list.setToolTipText(null);
             list.repaint();
         }
@@ -170,7 +170,7 @@ public class MouseListenerImpl extends MouseAdapter {
 
         if (yInCell <= dynamicYBound) {
             final TestCaseDto tc = list.getModel().getElementAt(index);
-            final int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
+            final int globalIndex = ((editor.getCurrentPage() - 1) * editor.getPageSize()) + index;
             final String titleText = String.format(Locale.ENGLISH, "%d. %s", globalIndex + 1, tc.getDescription());
 
             final int titleWidth = fm.stringWidth(titleText);

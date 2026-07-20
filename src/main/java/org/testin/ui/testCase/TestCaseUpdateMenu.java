@@ -13,8 +13,8 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.ui.testCase.update.UpdateTestCaseDialog;
 import org.testin.ui.testCase.update.UpdateTestCaseFields;
-import org.testin.ui.testCase.update.UpdateTestCaseUI;
 import org.testin.util.autoGenerator.CodeGenerator;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.logger.Log;
@@ -49,7 +49,7 @@ public class TestCaseUpdateMenu {
             Log.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + targetChangeType);
 
             if (isSingle) {
-                new UpdateTestCaseUI(project, items.getFirst(), selectedItem, (tc, codeGenerator) -> {
+                new UpdateTestCaseDialog(project, items.getFirst(), selectedItem, (tc, codeGenerator) -> {
                     codeGenerator = new CodeGenerator(targetChangeType);
                     codeGenerator.setGeneratorType(targetChangeType);
 

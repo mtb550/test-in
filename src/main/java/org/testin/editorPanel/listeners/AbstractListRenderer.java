@@ -2,29 +2,29 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.pojo.dto.TestCaseDto;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
-public abstract class AbstractListRenderer<U extends IEditorUI> implements ListCellRenderer<TestCaseDto> {
+public abstract class AbstractListRenderer<U extends IEditor> implements ListCellRenderer<TestCaseDto> {
 
     private static final Border SELECTED_BORDER = JBUI.Borders.customLine(JBColor.blue, 1);
     private static final Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
-    protected final U ui;
+    protected final U editor;
 
-    public AbstractListRenderer(final U ui) {
-        this.ui = ui;
+    public AbstractListRenderer(final U editor) {
+        this.editor = editor;
     }
 
     @Override
     public Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
-        final int globalIndex = ((ui.getCurrentPage() - 1) * ui.getPageSize()) + index;
+        final int globalIndex = ((editor.getCurrentPage() - 1) * editor.getPageSize()) + index;
 
-        final boolean isRowHovered = (index == ui.getHoveredIndex());
-        final String hover = isRowHovered ? ui.getHoveredIconAction() : null;
+        final boolean isRowHovered = (index == editor.getHoveredIndex());
+        final String hover = isRowHovered ? editor.getHoveredIconAction() : null;
 
         final JComponent card = bindDataAndGetCard(list, tc, globalIndex, isSelected, isRowHovered, hover);
 

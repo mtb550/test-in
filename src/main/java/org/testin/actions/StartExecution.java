@@ -5,13 +5,13 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.runEditor.RunEditorUI;
+import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 
 public class StartExecution extends DumbAwareAction {
-    private final IToolBar callbacks;
+    private final @NotNull IToolBar callbacks;
 
-    public StartExecution(final IToolBar callbacks) {
+    public StartExecution(final @NotNull IToolBar callbacks) {
         super("Start Run", "Start execution of test cases", AllIcons.Nodes.Services);
         this.callbacks = callbacks;
     }
@@ -23,7 +23,7 @@ public class StartExecution extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(callbacks instanceof RunEditorUI);
+        e.getPresentation().setEnabled(callbacks instanceof RunEditor);
     }
 
     @Override

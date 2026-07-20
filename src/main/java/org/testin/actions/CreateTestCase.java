@@ -7,13 +7,12 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.testEditor.TestEditorUI;
+import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.ui.testCase.CreateTestCaseUI;
+import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.ui.testCase.CreateTestCaseDialog;
 import org.testin.util.KeyboardSet;
-import org.testin.util.Tools;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
@@ -26,12 +25,12 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CreateTestCase extends DumbAwareAction {
-    private final @NotNull IEditorUI ui;
-    private final @NotNull DirectoryDto dir;
+    private final @NotNull IEditor editor;
+    private final @NotNull TestSetDirectoryDto dir;
 
-    public CreateTestCase(final @NotNull IEditorUI ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
+    public CreateTestCase(final @NotNull IEditor editor, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         super("Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
-        this.ui = ui;
+        this.editor = editor;
         this.dir = dir;
         this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getCustomShortcut(), list);
     }
@@ -41,36 +40,36 @@ public class CreateTestCase extends DumbAwareAction {
         final Project project = e.getProject();
         if (project == null) return;
 
-        new CreateTestCaseUI(project, (newTc, codeGenerator) -> {
-            List<TestCaseDto> allCases = ui.getAllTestCases();
+        new CreateTestCaseDialog(project, (tc, cg) -> {
+            List<TestCaseDto> tcs = editor.getAllTestCases();
 
-            final boolean isEmpty = allCases.isEmpty();
-            newTc.setIsHead(isEmpty);
+            final boolean isEmpty = tcs.isEmpty();
+            tc.setIsHead(isEmpty);
 
-            final TestCaseDto lastTc = isEmpty ? null : allCases.getLast();
+            final TestCaseDto lastTc = isEmpty ? null : tcs.getLast();
             if (lastTc != null)
-                lastTc.setNext(newTc.getId());
+                lastTc.setNext(tc.getId());
 
-            newTc.setParent(dir);
-            ui.appendNewTestCase(newTc);
+            tc.setParent(dir);
+            editor.appendNewTestCase(tc);
 
-            final List<TestCaseDto> affectedNodes = Stream.of(newTc, lastTc).filter(Objects::nonNull).toList();
+            final List<TestCaseDto> affectedNodes = Stream.of(tc, lastTc).filter(Objects::nonNull).toList();
             Services.getInstance(project, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             Services.getInstance(project, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
             Services.getInstance(project, Notifier.class).softShow(project, "Created..");
 
-            if (codeGenerator != null && codeGenerator.isSelected())
-                GeneratorType.CREATE_TEST_METHOD.getAction().execute(project, newTc, Services.getInstance(project, Tools.class).buildFqcnMethod(newTc));
+            if (cg.isSelected())
+                GeneratorType.CREATE_TEST_METHOD.getAction().execute(project, tc);
 
-            SwingUtilities.invokeLater(() -> ui.selectTestCase(newTc));
+            SwingUtilities.invokeLater(() -> editor.selectTestCase(tc));
 
         }).show();
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(ui instanceof TestEditorUI);
+        e.getPresentation().setEnabled(editor instanceof TestEditor);
     }
 
     @Override

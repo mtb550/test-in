@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditorCM;
@@ -30,14 +29,13 @@ public class CopyTestCaseNode extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
-        final List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
+        final List<TestCaseDto> tcs = list.getSelectedValuesList();
 
-        if (!selectedTestCases.isEmpty()) {
+        if (!tcs.isEmpty()) {
             try {
                 TestEditorCM.clearCutState();
 
-                String json = Services.getInstance(project, Mapper.class).writeValueAsString(selectedTestCases);
+                String json = Services.getInstance(e.getProject(), Mapper.class).writeValueAsString(tcs);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
             } catch (final Exception ex) {

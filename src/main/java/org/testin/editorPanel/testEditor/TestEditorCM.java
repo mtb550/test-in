@@ -9,9 +9,9 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
 import org.testin.editorPanel.EditorContextMenu;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,9 +27,9 @@ public class TestEditorCM extends EditorContextMenu {
 
     @Getter
     @Setter
-    private static IEditorUI globalSourceEditorUI = null;
+    private static IEditor globalSourceEditorUI = null;
 
-    public TestEditorCM(final @NotNull Project project, final @NotNull IEditorUI ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    public TestEditorCM(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
 
         add(new CreateTestCase(ui, dir, list));

@@ -7,8 +7,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
-import org.testin.editorPanel.runEditor.RunEditorUI;
+import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.ui.testRun.update.RunItemUpdateMenu;
@@ -21,12 +21,12 @@ import java.nio.file.Path;
 
 public class UpdateRunItem extends DumbAwareAction {
 
-    private final IEditorUI ui;
+    private final @NotNull IEditor editor;
     private final JBList<TestCaseDto> list;
 
-    public UpdateRunItem(final IEditorUI ui, final JBList<TestCaseDto> list) {
+    public UpdateRunItem(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Update Test Run Item", "Update test run item attributes", AllIcons.Actions.Edit);
-        this.ui = ui;
+        this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.UpdateTestRunItem.getCustomShortcut(), list);
     }
@@ -39,9 +39,9 @@ public class UpdateRunItem extends DumbAwareAction {
         final TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;
 
-        if (!(ui instanceof RunEditorUI runUi)) return;
+        if (!(editor instanceof RunEditor runEditor)) return;
 
-        final TestRunItems runItem = runUi.getResultsMap().get(selected.getId());
+        final TestRunItems runItem = runEditor.getResultsMap().get(selected.getId());
         if (runItem == null) return;
 
         Log.trace("update test run item for: " + selected.getDescription());
@@ -49,9 +49,9 @@ public class UpdateRunItem extends DumbAwareAction {
         new RunItemUpdateMenu(project, runItem, updatedItem -> {
             Log.trace("run item updated, actual result: " + updatedItem.getActualResult());
 
-            if (runUi.getParent() != null) {
-                Path dirPath = runUi.getParent().getPath();
-                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runUi.getTr());
+            if (runEditor.getParent() != null) {
+                Path dirPath = runEditor.getParent().getPath();
+                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runEditor.getTr());
             }
 
             list.repaint();

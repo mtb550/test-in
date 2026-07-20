@@ -1,4 +1,4 @@
-package org.testin.ui.testCase;
+package org.testin.ui.testCase.update;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -9,38 +9,35 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.ui.testCase.*;
 import org.testin.util.KeyboardSet;
 import org.testin.util.autoGenerator.CodeGenerator;
-import org.testin.util.autoGenerator.GeneratorType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.BiConsumer;
 
-public class CreateTestCaseUI extends TestCaseUIBase {
+public class UpdateTestCaseDialog extends TestCaseDialogBase {
 
-    private final Project project;
-    private JBPopup popup;
+    private final @NotNull Project project;
+    private @NotNull JBPopup popup;
 
-    public CreateTestCaseUI(final @NotNull Project project, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
-        super(project, GeneratorType.CREATE_TEST_METHOD);
+    public UpdateTestCaseDialog(final @NotNull Project project, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull BiConsumer<@NotNull TestCaseDto, @NotNull CodeGenerator> onSave) {
+        super(project, selectedItem.getChangeType());
         this.project = project;
 
-        final TestCaseDto dto = new TestCaseDto();
-
         IUIAction repackPopup = () -> {
-            if (popup != null) {
-                popup.pack(false, true);
+            popup.pack(false, true);
 
-                // make focus on the new component if scroll pane appear.
-                SwingUtilities.invokeLater(() -> {
-                    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                    if (focusOwner instanceof JComponent jComp) {
-                        jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
-                    }
-                });
-            }
+            SwingUtilities.invokeLater(() -> {
+                Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                if (focusOwner instanceof JComponent jComp) {
+                    jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
+                }
+            });
         };
+
+        ICreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
 
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
@@ -58,8 +55,6 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 
-        initDynamicStatusBar(mainPanel);
-
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
@@ -67,12 +62,28 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         for (ICreateTestCaseSection section : getAllSections()) {
             JPanel slot = new JPanel(new BorderLayout());
             slot.setOpaque(false);
-            contentPanel.add(slot);
 
-            section.setupShortcut(mainPanel, slot, this, repackPopup);
+            section.fillData(existingDto, repackPopup);
 
-            if (section instanceof DescriptionSection) {
+            boolean isTarget = (section == targetSection);
+            section.setEditable(isTarget);
+
+            if (isTarget && section instanceof StepsSection s) {
+                if (s.getStepFields().isEmpty()) {
+                    s.addStepField("", repackPopup);
+                }
+            }
+
+            boolean showAlways = section instanceof DescriptionSection;
+            boolean showIfNotEmpty = section instanceof ExpectedResultSection && !existingDto.getExpectedResult().isEmpty();
+
+            if (showAlways || showIfNotEmpty || isTarget) {
                 section.showSection(slot);
+                contentPanel.add(slot);
+            }
+
+            if (isTarget) {
+                section.setupShortcut(mainPanel, slot, this, repackPopup);
             }
         }
 
@@ -80,43 +91,27 @@ public class CreateTestCaseUI extends TestCaseUIBase {
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
 
-        JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
+        JScrollPane scrollPane = new JBScrollPane(anchorPanel);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        statusBarSection.updateItems(selectedItem.getStatusBarItems());
 
-        scrollPane.addComponentListener(new java.awt.event.ComponentAdapter() {
-            @Override
-            public void componentResized(java.awt.event.ComponentEvent e) {
-                int viewHeight = anchorPanel.getPreferredSize().height;
-                int portHeight = scrollPane.getViewport().getHeight();
-
-                if (viewHeight > portHeight) {
-                    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-                } else {
-                    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-                }
-            }
-        });
-
-        // status bar
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
-        // Popup creation
         popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
-                .setTitle("Create Test Case")
+                .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
+                .setTitle("Update " + selectedItem.getName())
                 .setSettingButtons(codeGenerator)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)
-                .setMovable(true)
-                .setResizable(true)
+                .setMovable(false)
+                .setResizable(false)
                 .addListener(new JBPopupListener() {
                     @Override
                     public void onClosed(@NotNull LightweightWindowEvent event) {
@@ -125,15 +120,12 @@ public class CreateTestCaseUI extends TestCaseUIBase {
                 })
                 .createPopup();
 
-        Runnable saveAction = save(dto, onSave, new JBPopup[]{popup});
+        Runnable saveAction = save(existingDto, onSave, new JBPopup[]{popup});
 
-        // register enter shortcut
         registerShortcut(mainPanel, KeyboardSet.Enter.getCustomShortcut(), saveAction::run);
     }
 
     public void show() {
-        if (popup != null) {
-            popup.showCenteredInCurrentWindow(project);
-        }
+        popup.showCenteredInCurrentWindow(project);
     }
 }

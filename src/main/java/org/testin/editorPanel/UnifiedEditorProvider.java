@@ -7,8 +7,8 @@ import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.runEditor.RunEditorUI;
-import org.testin.editorPanel.testEditor.TestEditorUI;
+import org.testin.editorPanel.runEditor.RunEditor;
+import org.testin.editorPanel.testEditor.TestEditor;
 
 public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
 
@@ -21,18 +21,18 @@ public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
     public @NotNull FileEditor createEditor(final @NotNull Project project, final @NotNull VirtualFile file) {
         if (file instanceof UnifiedVirtualFile unifiedFile) {
 
-            final IEditorUI ui;
+            final IEditor editor;
 
             if (unifiedFile.getFileType() == FileType.TEST_RUN)
-                ui = new RunEditorUI(project, unifiedFile);
+                editor = new RunEditor(project, unifiedFile);
 
             else if (unifiedFile.getFileType() == FileType.TEST_CASE)
-                ui = new TestEditorUI(project, unifiedFile);
+                editor = new TestEditor(project, unifiedFile);
 
             else
                 throw new IllegalArgumentException("Unknown FileType: " + unifiedFile.getFileType());
 
-            return new UnifiedFileEditor(project, unifiedFile, ui);
+            return new UnifiedFileEditor(project, unifiedFile, editor);
         }
 
         throw new IllegalArgumentException("Unsupported virtual file type: " + file.getClass().getName());

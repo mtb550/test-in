@@ -11,7 +11,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editorPanel.runEditor.RunEditorUI;
+import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
@@ -201,7 +201,7 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
         };
         filterResetBtn.add(filterModuleMenu);
 
-        if (callbacks instanceof RunEditorUI) {
+        if (callbacks instanceof RunEditor) {
             DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
             Arrays.stream(TestStatus.values()).forEach(s ->
                     filterStatusMenu.add(new DumbAwareToggleAction(s.name()) {

@@ -20,7 +20,10 @@ import java.util.List;
 
 public class CreateTestMethod implements GeneratorAction {
 
-    public void execute(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
+    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+        if (!(obj instanceof TestCaseDto tc)) return;
+        final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+
         Log.info("Creating Test Case for: " + fqcn);
 
         if (fqcn.size() < 2) {

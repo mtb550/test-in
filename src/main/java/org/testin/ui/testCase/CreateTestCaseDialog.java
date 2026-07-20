@@ -1,4 +1,4 @@
-package org.testin.ui.testCase.update;
+package org.testin.ui.testCase;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
@@ -9,22 +9,24 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.ui.testCase.*;
 import org.testin.util.KeyboardSet;
 import org.testin.util.autoGenerator.CodeGenerator;
+import org.testin.util.autoGenerator.GeneratorType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.function.BiConsumer;
 
-public class UpdateTestCaseUI extends TestCaseUIBase {
+public class CreateTestCaseDialog extends TestCaseDialogBase {
 
     private final Project project;
     private JBPopup popup;
 
-    public UpdateTestCaseUI(final @NotNull Project project, final TestCaseDto existingDto, final UpdateTestCaseFields selectedItem, final BiConsumer<TestCaseDto, CodeGenerator> onSave) {
-        super(project, selectedItem.getChangeType());
+    public CreateTestCaseDialog(final @NotNull Project project, final BiConsumer<@NotNull TestCaseDto, @NotNull CodeGenerator> onSave) {
+        super(project, GeneratorType.CREATE_TEST_METHOD);
         this.project = project;
+
+        final TestCaseDto dto = new TestCaseDto();
 
         IUIAction repackPopup = () -> {
             if (popup != null) {
@@ -38,8 +40,6 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
                 });
             }
         };
-
-        ICreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
 
         JPanel mainPanel = new JPanel(new BorderLayout()) {
             @Override
@@ -57,6 +57,8 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 
+        initDynamicStatusBar(mainPanel);
+
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
@@ -64,28 +66,12 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
         for (ICreateTestCaseSection section : getAllSections()) {
             JPanel slot = new JPanel(new BorderLayout());
             slot.setOpaque(false);
+            contentPanel.add(slot);
 
-            section.fillData(existingDto, repackPopup);
+            section.setupShortcut(mainPanel, slot, this, repackPopup);
 
-            boolean isTarget = (section == targetSection);
-            section.setEditable(isTarget);
-
-            if (isTarget && section instanceof StepsSection s) {
-                if (s.getStepFields().isEmpty()) {
-                    s.addStepField("", repackPopup);
-                }
-            }
-
-            boolean showAlways = section instanceof DescriptionSection;
-            boolean showIfNotEmpty = section instanceof ExpectedResultSection && !existingDto.getExpectedResult().isEmpty();
-
-            if (showAlways || showIfNotEmpty || isTarget) {
+            if (section instanceof DescriptionSection) {
                 section.showSection(slot);
-                contentPanel.add(slot);
-            }
-
-            if (isTarget) {
-                section.setupShortcut(mainPanel, slot, this, repackPopup);
             }
         }
 
@@ -93,27 +79,43 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
 
-        JScrollPane scrollPane = new JBScrollPane(anchorPanel);
+        JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        statusBarSection.updateItems(selectedItem.getStatusBarItems());
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
+        scrollPane.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent e) {
+                int viewHeight = anchorPanel.getPreferredSize().height;
+                int portHeight = scrollPane.getViewport().getHeight();
+
+                if (viewHeight > portHeight) {
+                    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+                } else {
+                    scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+                }
+            }
+        });
+
+        // status bar
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         mainPanel.add(statusBarSection.getPanel(), BorderLayout.SOUTH);
 
+        // Popup creation
         popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
-                .setTitle("Update " + selectedItem.getName())
+                .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
+                .setTitle("Create Test Case")
                 .setSettingButtons(codeGenerator)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)
-                .setMovable(false)
-                .setResizable(false)
+                .setMovable(true)
+                .setResizable(true)
                 .addListener(new JBPopupListener() {
                     @Override
                     public void onClosed(@NotNull LightweightWindowEvent event) {
@@ -122,8 +124,9 @@ public class UpdateTestCaseUI extends TestCaseUIBase {
                 })
                 .createPopup();
 
-        Runnable saveAction = save(existingDto, onSave, new JBPopup[]{popup});
+        Runnable saveAction = save(dto, onSave, new JBPopup[]{popup});
 
+        // register enter shortcut
         registerShortcut(mainPanel, KeyboardSet.Enter.getCustomShortcut(), saveAction::run);
     }
 

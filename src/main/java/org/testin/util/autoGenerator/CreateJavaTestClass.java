@@ -5,8 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
@@ -17,7 +16,9 @@ import java.util.List;
 public class CreateJavaTestClass implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
+    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+        if (!(obj instanceof TestSetDirectoryDto dir)) return;
+        final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnClass(project, dir);
 
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final String className = fqcn.getLast();

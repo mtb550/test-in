@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
@@ -15,12 +15,12 @@ import org.testin.util.services.RunStatusService;
 import org.testin.util.services.Services;
 
 public class SetStatusFailed extends DumbAwareAction {
-    private final IEditorUI ui;
-    private final JBList<TestCaseDto> list;
+    private final @NotNull IEditor editor;
+    private final @NotNull JBList<TestCaseDto> list;
 
-    public SetStatusFailed(final IEditorUI ui, final JBList<TestCaseDto> list) {
+    public SetStatusFailed(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Failed", "Set test case status to Failed", AllIcons.Actions.Cancel);
-        this.ui = ui;
+        this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.SetStatusFailed.getCustomShortcut(), list);
     }
@@ -29,7 +29,7 @@ public class SetStatusFailed extends DumbAwareAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         Project project = e.getProject();
         if (project == null) return;
-        Services.getInstance(project, RunStatusService.class).applyStatus(project, ui, list, TestStatus.FAILED);
+        Services.getInstance(project, RunStatusService.class).applyStatus(project, editor, list, TestStatus.FAILED);
     }
 
     @Override

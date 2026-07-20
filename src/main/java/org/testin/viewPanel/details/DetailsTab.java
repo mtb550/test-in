@@ -19,7 +19,6 @@ import org.testin.settings.Setting;
 import org.testin.ui.testCase.TestCaseUpdateMenu;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.KeyboardSet;
-import org.testin.util.Tools;
 import org.testin.util.autoGenerator.GeneratorAction;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.autoGenerator.UpdateTestMethod;
@@ -183,16 +182,10 @@ public class DetailsTab {
                         final GeneratorAction action = type.getAction();
                         final TestCaseDto firstItem = updatedItems.getFirst();
 
-                        final List<String> fqcn = Services.getInstance(project, Tools.class)
-                                .buildFqcnMethod(firstItem);
-
-                        if (action instanceof UpdateTestMethod utm) {
+                        if (action instanceof UpdateTestMethod utm)
                             utm.setChangeType(type);
-                        }
 
-                        ApplicationManager.getApplication().executeOnPooledThread(() ->
-                                action.execute(project, firstItem, fqcn)
-                        );
+                        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
                     }
                 }
             });

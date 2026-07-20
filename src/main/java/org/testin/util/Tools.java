@@ -342,7 +342,7 @@ public final class Tools {
         return generatedFqcn;
     }
 
-    public @NotNull List<String> buildFqcnClass(DirectoryDto dir, Project project) {
+    public @NotNull List<String> buildFqcnClass(final @NotNull Project project, final @NotNull DirectoryDto dir) {
         ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
 
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
@@ -362,7 +362,7 @@ public final class Tools {
         return generatedFqcn;
     }
 
-    public @NotNull List<String> buildFqcnPackage(DirectoryDto dir) {
+    public @NotNull List<String> buildFqcnPackage(final @NotNull DirectoryDto dir) {
         ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
         if (generatedFqcn.isEmpty()) {

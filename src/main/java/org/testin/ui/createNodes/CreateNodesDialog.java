@@ -33,7 +33,7 @@ public class CreateNodesDialog {
     private final CodeGenerator codeGenerator;
     private final Project project;
 
-    public CreateNodesDialog(final @NotNull Project project, final CreateNodeMenu menu, final TriConsumer<String, DirectoryType, CodeGenerator> onSelected) {
+    public CreateNodesDialog(final @NotNull Project project, final @NotNull CreateNodeMenu menu, final TriConsumer<@NotNull String, @NotNull DirectoryType, @NotNull CodeGenerator> onSelected) {
         textField = new ExtendableTextField();
 
         textField.setFont(fieldFont);

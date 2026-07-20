@@ -1,50 +1,50 @@
 package org.testin.editorPanel.listeners;
 
-import org.testin.editorPanel.IEditorUI;
+import org.testin.editorPanel.IEditor;
 
 import javax.swing.*;
 import java.util.Optional;
 
 public class StatusBarListener {
 
-    public static void attach(final IEditorUI ui) {
-        ui.getStatusBar().getFirstButton().addActionListener(e -> {
-            ui.setCurrentPage(1);
-            ui.refreshView();
+    public static void attach(final IEditor editor) {
+        editor.getStatusBar().getFirstButton().addActionListener(e -> {
+            editor.setCurrentPage(1);
+            editor.refreshView();
         });
 
-        ui.getStatusBar().getPrevButton().addActionListener(e -> {
-            if (ui.getCurrentPage() > 1) {
-                ui.setCurrentPage(ui.getCurrentPage() - 1);
-                ui.refreshView();
+        editor.getStatusBar().getPrevButton().addActionListener(e -> {
+            if (editor.getCurrentPage() > 1) {
+                editor.setCurrentPage(editor.getCurrentPage() - 1);
+                editor.refreshView();
             }
         });
 
-        ui.getStatusBar().getNextButton().addActionListener(e -> {
-            if (ui.getCurrentPage() < ui.getTotalPageCount()) {
-                ui.setCurrentPage(ui.getCurrentPage() + 1);
-                ui.refreshView();
+        editor.getStatusBar().getNextButton().addActionListener(e -> {
+            if (editor.getCurrentPage() < editor.getTotalPageCount()) {
+                editor.setCurrentPage(editor.getCurrentPage() + 1);
+                editor.refreshView();
             }
         });
 
-        ui.getStatusBar().getLastButton().addActionListener(e -> {
-            ui.setCurrentPage(ui.getTotalPageCount());
-            ui.refreshView();
+        editor.getStatusBar().getLastButton().addActionListener(e -> {
+            editor.setCurrentPage(editor.getTotalPageCount());
+            editor.refreshView();
         });
 
-        ui.getStatusBar().getPageSizeField().addActionListener(e -> {
+        editor.getStatusBar().getPageSizeField().addActionListener(e -> {
             try {
-                final int newSize = Integer.parseInt(ui.getStatusBar().getPageSizeField().getText().trim());
+                final int newSize = Integer.parseInt(editor.getStatusBar().getPageSizeField().getText().trim());
                 if (newSize > 0) {
-                    ui.setPageSize(newSize);
-                    ui.setCurrentPage(1);
-                    ui.refreshView();
+                    editor.setPageSize(newSize);
+                    editor.setCurrentPage(1);
+                    editor.refreshView();
                 }
             } catch (final NumberFormatException ex) {
-                ui.getStatusBar().getPageSizeField().setText(String.valueOf(ui.getPageSize()));
+                editor.getStatusBar().getPageSizeField().setText(String.valueOf(editor.getPageSize()));
             }
 
-            Optional.ofNullable(ui.getPreferredFocusedComponent()).ifPresent(JComponent::requestFocusInWindow);
+            Optional.ofNullable(editor.getPreferredFocusedComponent()).ifPresent(JComponent::requestFocusInWindow);
         });
     }
 }

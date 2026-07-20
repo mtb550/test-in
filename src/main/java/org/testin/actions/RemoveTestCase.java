@@ -119,8 +119,8 @@ public class RemoveTestCase extends DumbAwareAction {
                 targetFile = dirVFile.createChildData(this, fileName);
             }
 
-            String jsonContent = Services.getInstance(project, Mapper.class).writeValueAsString(item);
-            VfsUtil.saveText(targetFile, jsonContent);
+            String json = Services.getInstance(project, Mapper.class).writeValueAsString(item);
+            VfsUtil.saveText(targetFile, json);
 
         } catch (final IOException ex) {
             throw new RuntimeException(ex);
