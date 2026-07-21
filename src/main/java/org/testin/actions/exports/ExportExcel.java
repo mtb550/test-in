@@ -1,88 +1,22 @@
 package org.testin.actions.exports;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.notification.NotificationAction;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileChooser.FileChooserFactory;
-import com.intellij.openapi.fileChooser.FileSaverDescriptor;
-import com.intellij.openapi.fileChooser.FileSaverDialog;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
-import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
-import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.util.Tools;
-import org.testin.util.logger.Log;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class ExportExcel extends ExportBase {
+public class ExportExcel extends Export {
 
     public ExportExcel(final @NotNull SimpleTree tree) {
-        super(tree, "Export to Excel", "Export test cases to an Excel file", AllIcons.FileTypes.MicrosoftWindows);
-    }
-
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        final TreePath path = tree.getSelectionPath();
-
-        if (path == null) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a directory in the Project Panel tree.");
-            return;
-        }
-
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = parentNode.getUserObject();
-
-        if (!(userObject instanceof DirectoryDto dirDto) ||
-                !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
-            return;
-        }
-
-        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
-
-        if (targetDirectory != null && !targetDirectory.isDirectory()) {
-            targetDirectory = targetDirectory.getParent();
-        }
-
-        if (targetDirectory == null) {
-            Services.getInstance(e.getProject(), Notifier.class).error(e.getProject(), "Export Error", "The selected path in the Project Panel is invalid.");
-            return;
-        }
-
-        FileSaverDescriptor descriptor = new FileSaverDescriptor("Export Excel", "Save test cases as an Excel file", "xlsx");
-        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, e.getProject());
-
-        String defaultFileName = targetDirectory.getName() + "_Export.xlsx";
-        VirtualFileWrapper wrapper = dialog.save((VirtualFile) null, defaultFileName);
-
-        if (wrapper != null) {
-            File destFile = wrapper.getFile();
-            processExportWithPoi(e.getProject(), destFile, targetDirectory, dirDto);
-        }
+        super(tree);
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile,
@@ -131,118 +65,5 @@ public class ExportExcel extends ExportBase {
                 workbook.write(fos);
             }
         }
-    }
-
-    private void processExportWithPoi(final @NotNull Project project, final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases", true) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-                indicator.setText("Gathering test cases...");
-
-                Map<String, List<TestCaseDto>> sheetsData = gatherData(project, targetDirectory, selectedDirDto);
-
-                if (indicator.isCanceled()) return;
-
-                if (sheetsData.isEmpty()) {
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).warn(project, "Export Empty", "No valid test cases found to export in the selected directory."));
-                    return;
-                }
-
-                indicator.setText("Generating Excel file...");
-
-                try (Workbook workbook = new XSSFWorkbook()) {
-                    CellStyle headerStyle = workbook.createCellStyle();
-                    Font headerFont = workbook.createFont();
-                    headerFont.setBold(true);
-                    headerStyle.setFont(headerFont);
-
-                    for (Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
-                        if (indicator.isCanceled()) return;
-
-                        String safeSheetName = entry.getKey().replaceAll("[\\\\/*?\\[\\]]", "_");
-                        if (safeSheetName.length() > 31) {
-                            safeSheetName = safeSheetName.substring(0, 31);
-                        }
-
-                        while (workbook.getSheet(safeSheetName) != null) {
-                            safeSheetName = safeSheetName.substring(0, 28) + "...";
-                        }
-
-                        Sheet sheet = workbook.createSheet(safeSheetName);
-                        List<TestCaseDto> testCases = entry.getValue();
-
-                        Row headerRow = sheet.createRow(0);
-                        for (int i = 0; i < EXPORT_COLUMNS.size(); i++) {
-                            Cell cell = headerRow.createCell(i);
-                            cell.setCellValue(EXPORT_COLUMNS.get(i).getName());
-                            cell.setCellStyle(headerStyle);
-                        }
-
-                        int rowIndex = 1;
-                        for (TestCaseDto tc : testCases) {
-                            Row row = sheet.createRow(rowIndex++);
-                            for (int i = 0; i < EXPORT_COLUMNS.size(); i++) {
-                                Cell cell = row.createCell(i);
-                                String val = EXPORT_COLUMNS.get(i).getValueExtractor().apply(tc, project);
-                                cell.setCellValue(val != null ? val : "");
-                            }
-                        }
-
-                        for (int i = 0; i < EXPORT_COLUMNS.size(); i++) {
-                            sheet.autoSizeColumn(i);
-                        }
-                    }
-
-                    indicator.setText("Saving file to disk...");
-                    try (FileOutputStream fos = new FileOutputStream(destFile)) {
-                        workbook.write(fos);
-                    }
-
-                    NotificationAction openAction = NotificationAction.createSimple("Open file", () -> {
-                        VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-                        if (vf != null) {
-                            Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
-                        }
-                    });
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).infoWithActions(project,
-                                    "Export Complete",
-                                    "Successfully exported test cases to:\n" + destFile.getName(),
-                                    openAction));
-
-                } catch (final Exception ex) {
-                    Log.error("Export crashed: " + ex.getMessage());
-
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).error(project, "Export Failed", "Failed to save the Excel file:\n" + ex.getMessage()));
-                }
-            }
-        });
-    }
-
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        final int selectionCount = tree.getSelectionCount();
-
-        if (selectionCount != 1 || path == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = selectedNode.getUserObject();
-
-        e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto ||
-                userObject instanceof TestSetPackageDirectoryDto ||
-                userObject instanceof TestCasesMainDirectoryDto
-        );
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
     }
 }

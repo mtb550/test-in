@@ -1,88 +1,21 @@
 package org.testin.actions.exports;
 
-import com.intellij.icons.AllIcons;
-import com.intellij.ide.BrowserUtil;
-import com.intellij.notification.NotificationAction;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.fileChooser.FileChooserFactory;
-import com.intellij.openapi.fileChooser.FileSaverDescriptor;
-import com.intellij.openapi.fileChooser.FileSaverDialog;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.ProgressManager;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
-import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
-import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.util.logger.Log;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
 import java.io.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
-public class ExportHtml extends ExportBase {
+public class ExportHtml extends Export {
 
     public ExportHtml(final @NotNull SimpleTree tree) {
-        super(tree, "Export to HTML", "Export test cases to an HTML file", AllIcons.FileTypes.Html);
-    }
-
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        final Project project = e.getProject();
-        final TreePath path = tree.getSelectionPath();
-
-        if (path == null) {
-            Services.getInstance(project, Notifier.class).error(project, "Export Error", "Please select a directory in the Project Panel tree.");
-            return;
-        }
-
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = parentNode.getUserObject();
-
-        if (!(userObject instanceof DirectoryDto dirDto) ||
-                !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Services.getInstance(project, Notifier.class).error(project, "Export Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
-            return;
-        }
-
-        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
-
-        if (targetDirectory != null && !targetDirectory.isDirectory()) {
-            targetDirectory = targetDirectory.getParent();
-        }
-
-        if (targetDirectory == null) {
-            Services.getInstance(project, Notifier.class).error(project, "Export Error", "The selected path in the Project Panel is invalid.");
-            return;
-        }
-
-        FileSaverDescriptor descriptor = new FileSaverDescriptor("Export HTML", "Save test cases as an HTML file", "html");
-        FileSaverDialog dialog = FileChooserFactory.getInstance().createSaveFileDialog(descriptor, project);
-
-        String defaultFileName = targetDirectory.getName() + "_Export.html";
-        VirtualFileWrapper wrapper = dialog.save((VirtualFile) null, defaultFileName);
-
-        if (wrapper != null) {
-            File destFile = wrapper.getFile();
-            processExport(project, destFile, targetDirectory, dirDto);
-        }
+        super(tree);
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile,
@@ -90,47 +23,6 @@ public class ExportHtml extends ExportBase {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
             writeHtmlDocument(writer, project, sheetsData);
         }
-    }
-
-    private void processExport(final @NotNull Project project, final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases to HTML", true) {
-            @Override
-            public void run(@NotNull ProgressIndicator indicator) {
-                indicator.setIndeterminate(true);
-                indicator.setText("Gathering test cases...");
-
-                Map<String, List<TestCaseDto>> sheetsData = gatherData(project, targetDirectory, selectedDirDto);
-
-                if (indicator.isCanceled()) return;
-
-                if (sheetsData.isEmpty()) {
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).warn(project, "Export Empty", "No valid test cases found to export in the selected directory."));
-                    return;
-                }
-
-                indicator.setText("Generating HTML file...");
-
-                try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
-                    writeHtmlDocument(writer, project, sheetsData);
-
-                    NotificationAction openAction = NotificationAction.createSimple("Open file", () ->
-                            BrowserUtil.browse(destFile.toURI().toString())
-                    );
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).infoWithActions(project,
-                                    "Export Complete",
-                                    "Successfully exported test cases to:\n" + destFile.getName(),
-                                    openAction));
-
-                } catch (final Exception ex) {
-                    Log.error("Export crashed: " + ex.getMessage());
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).error(project, "Export Failed",
-                                    "Failed to save the HTML file:\n" + ex.getMessage()));
-                }
-            }
-        });
     }
 
     private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project project,
@@ -150,8 +42,6 @@ public class ExportHtml extends ExportBase {
         writer.write("<style>");
         writer.newLine();
         writer.write("  body { font-family: Arial, sans-serif; margin: 20px; }");
-        writer.newLine();
-        writer.write("  h1 { color: #333; }");
         writer.newLine();
         writer.write("  h2 { color: #555; margin-top: 30px; }");
         writer.newLine();
@@ -196,7 +86,6 @@ public class ExportHtml extends ExportBase {
             writer.write("</tr>");
             writer.newLine();
 
-            // Data rows
             for (TestCaseDto tc : testCases) {
                 writer.write("<tr>");
                 for (TestEditorAttributes attr : EXPORT_COLUMNS) {
@@ -232,16 +121,16 @@ public class ExportHtml extends ExportBase {
             char c = value.charAt(i);
             switch (c) {
                 case '&':
-                    sb.append("&amp;");
+                    sb.append("&");
                     break;
                 case '<':
-                    sb.append("&lt;");
+                    sb.append("<");
                     break;
                 case '>':
-                    sb.append("&gt;");
+                    sb.append(">");
                     break;
                 case '"':
-                    sb.append("&quot;");
+                    sb.append("&#34;");
                     break;
                 case '\'':
                     sb.append("&#39;");
@@ -252,28 +141,5 @@ public class ExportHtml extends ExportBase {
             }
         }
         return sb.toString();
-    }
-
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        final int selectionCount = tree.getSelectionCount();
-
-        if (selectionCount != 1 || path == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = selectedNode.getUserObject();
-
-        e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto ||
-                userObject instanceof TestSetPackageDirectoryDto ||
-                userObject instanceof TestCasesMainDirectoryDto);
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
     }
 }
