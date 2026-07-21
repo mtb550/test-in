@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.FileTypes;
 import org.testin.pojo.Group;
@@ -23,6 +24,8 @@ import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.*;
@@ -37,6 +40,7 @@ import java.util.function.BiFunction;
 public class ImportPreviewDialog extends DialogWrapper {
     private final Map<String, DefaultTableModel> tableModelsMap = new LinkedHashMap<>();
     private final Project project;
+    @Getter
     private final CodeGenerator cg;
 
     private final List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
@@ -44,6 +48,7 @@ public class ImportPreviewDialog extends DialogWrapper {
             .toList();
     private final TextFieldWithBrowseButton fileField;
     private Map<String, List<TestCaseDto>> originalSheetsData;
+    @Getter
     private boolean dataLoaded;
     private JBTabbedPane tableTabbedPane;
     private BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader;
@@ -53,9 +58,10 @@ public class ImportPreviewDialog extends DialogWrapper {
         this.project = project;
         this.originalSheetsData = sheetsData;
         this.cg = new CodeGenerator(GeneratorType.CREATE_TEST_METHOD);
+        cg.setText("create test methods");
 
         setTitle("Import Test Cases");
-        setOKButtonText("Load");
+        setOKButtonText("Import Selected");
         dataLoaded = false;
 
         fileField = new TextFieldWithBrowseButton();
@@ -71,9 +77,77 @@ public class ImportPreviewDialog extends DialogWrapper {
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         );
 
+        fileField.getTextField().getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                triggerLoadIfValid();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                triggerLoadIfValid();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                triggerLoadIfValid();
+            }
+        });
+
         setCancelButtonText("Cancel");
         init();
         setSize(900, 600);
+    }
+
+    private void triggerLoadIfValid() {
+        String filePath = fileField.getText().trim();
+        if (filePath.isEmpty()) return;
+
+        File importFile = new File(filePath);
+        if (!importFile.exists() || !importFile.isFile()) return;
+
+        loadFile(importFile);
+    }
+
+    private void loadFile(final File importFile) {
+        String name = importFile.getName().toLowerCase();
+        FileTypes fmt;
+
+        // todo: move this logic to be an action in enum class.
+        if (name.endsWith(FileTypes.CSV.getExtension()))
+            fmt = FileTypes.CSV;
+
+        else if (name.endsWith(FileTypes.XLSX.getExtension()))
+            fmt = FileTypes.XLSX;
+
+        else if (name.endsWith(FileTypes.XLS.getExtension()))
+            fmt = FileTypes.XLS;
+
+        else if (name.endsWith(FileTypes.JSON.getExtension()))
+            fmt = FileTypes.JSON;
+
+        else if (name.endsWith(FileTypes.HTML.getExtension()))
+            fmt = FileTypes.HTML;
+
+        else {
+            return;
+        }
+
+        if (importLoader == null) return;
+
+        try {
+            Map<String, List<TestCaseDto>> parsedData = importLoader.apply(importFile, fmt);
+            if (parsedData == null || parsedData.isEmpty()) {
+                Services.getInstance(project, Notifier.class).warn(project, "No Data", "No test cases found in the selected file.");
+                return;
+            }
+            originalSheetsData = parsedData;
+            populateTableFromData();
+            dataLoaded = true;
+        } catch (final Exception ex) {
+            Log.error("Import parse failed: " + ex.getMessage());
+            Services.getInstance(project, Notifier.class).error(project, "Parse Error", ex.getMessage());
+        }
     }
 
     @Nullable
@@ -280,10 +354,6 @@ public class ImportPreviewDialog extends DialogWrapper {
         this.importLoader = loader;
     }
 
-    public CodeGenerator getCg() {
-        return cg;
-    }
-
     private void populateTableFromData() {
         List<String> columnNames = new ArrayList<>();
         columnNames.add("");
@@ -446,62 +516,6 @@ public class ImportPreviewDialog extends DialogWrapper {
 
     @Override
     protected void doOKAction() {
-        if (!dataLoaded) {
-            String filePath = fileField.getText().trim();
-            if (filePath.isEmpty()) {
-                fileField.getTextField().requestFocus();
-                return;
-            }
-            File importFile = new File(filePath);
-            if (!importFile.exists() || !importFile.isFile()) {
-                Services.getInstance(project, Notifier.class).error(project, "File Error", "File not found: " + importFile.getPath());
-                return;
-            }
-            String name = importFile.getName().toLowerCase();
-            FileTypes fmt;
-
-            // todo: move this logic to be an action in enum class.
-            if (name.endsWith(FileTypes.CSV.getExtension()))
-                fmt = FileTypes.CSV;
-
-            else if (name.endsWith(FileTypes.XLSX.getExtension()))
-                fmt = FileTypes.XLSX;
-
-            else if (name.endsWith(FileTypes.XLS.getExtension()))
-                fmt = FileTypes.XLS;
-
-            else if (name.endsWith(FileTypes.JSON.getExtension()))
-                fmt = FileTypes.JSON;
-
-            else if (name.endsWith(FileTypes.HTML.getExtension()))
-                fmt = FileTypes.HTML;
-
-            else {
-                Services.getInstance(project, Notifier.class).error(project, "Format Error",
-                        "Unrecognized file extension: " + importFile.getName());
-                return;
-            }
-
-            if (importLoader == null) {
-                Services.getInstance(project, Notifier.class).error(project, "Internal Error", "No import loader configured.");
-                return;
-            }
-            try {
-                Map<String, List<TestCaseDto>> parsedData = importLoader.apply(importFile, fmt);
-                if (parsedData == null || parsedData.isEmpty()) {
-                    Services.getInstance(project, Notifier.class).warn(project, "No Data", "No test cases found in the selected file.");
-                    return;
-                }
-                originalSheetsData = parsedData;
-                populateTableFromData();
-                dataLoaded = true;
-                setOKButtonText("Import Selected");
-            } catch (final Exception ex) {
-                Log.error("Import parse failed: " + ex.getMessage());
-                Services.getInstance(project, Notifier.class).error(project, "Parse Error", ex.getMessage());
-            }
-            return;
-        }
         super.doOKAction();
     }
 
@@ -528,7 +542,6 @@ public class ImportPreviewDialog extends DialogWrapper {
         }
         return selectedCasesBySheet;
     }
-
 
     private static class GroupMultiSelectEditor extends AbstractCellEditor implements TableCellEditor {
         private final JButton button = new JButton();
