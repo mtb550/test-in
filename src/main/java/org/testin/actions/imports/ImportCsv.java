@@ -1,11 +1,13 @@
 package org.testin.actions.imports;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.logger.Log;
+import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,10 +15,25 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class ImportCsv extends ImportBase {
+public class ImportCsv extends Import {
 
     public ImportCsv(final @NotNull SimpleTree tree) {
-        super(tree, "Import from CSV", "Import test cases from a CSV file", AllIcons.FileTypes.Csv);
+        super(tree);
+    }
+
+    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
+        Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+        try {
+            List<TestCaseDto> testCases = parseFile(project, file);
+            if (!testCases.isEmpty()) {
+                String name = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
+                result.put(name, testCases);
+            }
+        } catch (final Exception ex) {
+            Log.error("CSV import parse failed: " + ex.getMessage());
+            Services.getInstance(project, Notifier.class).error(project, "CSV Parse Error", ex.getMessage());
+        }
+        return result;
     }
 
     public List<TestCaseDto> parseFile(final @NotNull Project project, final File file) throws Exception {

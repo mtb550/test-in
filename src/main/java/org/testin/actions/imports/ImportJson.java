@@ -1,21 +1,34 @@
 package org.testin.actions.imports;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Mapper;
+import org.testin.util.logger.Log;
+import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
 import java.io.File;
 import java.util.*;
 
-public class ImportJson extends ImportBase {
+public class ImportJson extends Import {
 
     public ImportJson(final @NotNull SimpleTree tree) {
-        super(tree, "Import from JSON", "Import test cases from a JSON file", AllIcons.FileTypes.Json);
+        super(tree);
+    }
+
+    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
+        Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+        try {
+            Map<String, List<TestCaseDto>> parsed = parseFile(project, file);
+            result.putAll(parsed);
+        } catch (final Exception ex) {
+            Log.error("JSON import parse failed: " + ex.getMessage());
+            Services.getInstance(project, Notifier.class).error(project, "JSON Parse Error", ex.getMessage());
+        }
+        return result;
     }
 
     public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project project, final File file) {

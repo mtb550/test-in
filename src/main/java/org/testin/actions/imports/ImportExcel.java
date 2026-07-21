@@ -1,22 +1,36 @@
 package org.testin.actions.imports;
 
-import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.apache.poi.ss.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.logger.Log;
+import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 
-public class ImportExcel extends ImportBase {
+public class ImportExcel extends Import {
 
     public ImportExcel(final @NotNull SimpleTree tree) {
-        super(tree, "Import from Excel", "Import test cases from an excel file", AllIcons.FileTypes.MicrosoftWindows);
+        super(tree);
+    }
+
+    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
+        Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+        try {
+            Map<String, List<TestCaseDto>> parsed = parseFile(project, file);
+            result.putAll(parsed);
+        } catch (final Exception ex) {
+            Log.error("Excel import parse failed: " + ex.getMessage());
+            Services.getInstance(project, Notifier.class).error(project, "Excel Parse Error", ex.getMessage());
+        }
+        return result;
     }
 
     public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project project, final File file) throws Exception {
