@@ -171,7 +171,7 @@ public class ImportPreviewDialog extends DialogWrapper {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        topPanel.add(new JLabel("File:"), gbc);
+        topPanel.add(new JLabel("Source:"), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
