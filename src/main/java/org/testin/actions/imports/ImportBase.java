@@ -91,8 +91,7 @@ public abstract class ImportBase extends DumbAwareAction {
             final DirectoryDto selectedDirDto,
             final DefaultMutableTreeNode parentNode,
             final ImportPreviewDialog dialog,
-            final Map<String, List<TestCaseDto>> selectedCasesBySheet,
-            final String logPrefix) {
+            final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
         final ImportBase self = this;
 
@@ -106,7 +105,7 @@ public abstract class ImportBase extends DumbAwareAction {
                     self.linkAndSaveTestCases(project, targetDirectory, flatList, tail);
 
                     if (dialog.getCg().isSelected()) {
-                        Log.info(logPrefix + ": generating test methods for " + flatList.size() + " imported cases");
+                        Log.info("Import" + ": generating test methods for " + flatList.size() + " imported cases");
                         CreateTestMethod syncInjector = new CreateTestMethod();
                         for (TestCaseDto tc : flatList) {
                             tc.setParent(ts);
@@ -136,7 +135,7 @@ public abstract class ImportBase extends DumbAwareAction {
                                     .path2(Services.getInstance(project, Tools.class).buildPath2(selectedDirDto.getPath2(), sheetName))
                                     .parent(selectedDirDto)
                                     .build();
-                            Log.info(logPrefix + ": generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
+                            Log.info("Import" + ": generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
                             CreateTestMethod syncInjector = new CreateTestMethod();
                             for (TestCaseDto tc : sheetCases) {
                                 tc.setParent(sheetDto);
@@ -220,6 +219,11 @@ public abstract class ImportBase extends DumbAwareAction {
         e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto ||
                 userObject instanceof TestSetPackageDirectoryDto ||
                 userObject instanceof TestCasesMainDirectoryDto);
+    }
+
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        // default no-op — subclasses may override for standalone action use
     }
 
     @Override

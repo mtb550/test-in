@@ -47,7 +47,7 @@ public class Import extends ImportBase {
                 return;
             }
 
-            executeImportWriteAction(project, finalTargetDir, finalDirDto, parentNode, dialog, selectedCasesBySheet, "Import");
+            executeImportWriteAction(project, finalTargetDir, finalDirDto, parentNode, dialog, selectedCasesBySheet);
         } else {
             Services.getInstance(project, Notifier.class).softShow(project, "Import Cancelled", "Import was cancelled from preview dialog.");
         }

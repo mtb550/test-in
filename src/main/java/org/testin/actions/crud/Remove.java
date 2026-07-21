@@ -105,6 +105,8 @@ public class Remove extends DumbAwareAction {
             projectPanel.getProjectTree().updateNodes();
             Log.info("Removed " + nodesToRemove.size() + " node(s).");
         });
+
+        // todo, remove java method and packages once delete node, code generator to be added
     }
 
     @Override
