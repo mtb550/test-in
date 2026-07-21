@@ -1,4 +1,4 @@
-package org.testin.actions.export;
+package org.testin.actions.exports;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.notification.NotificationAction;

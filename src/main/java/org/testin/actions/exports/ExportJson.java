@@ -1,4 +1,4 @@
-package org.testin.actions.export;
+package org.testin.actions.exports;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.notification.NotificationAction;
@@ -18,7 +18,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileWrapper;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.JsonExportDto;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
@@ -90,10 +89,7 @@ public class ExportJson extends DumbAwareAction {
 
     public void exportToFile(final @NotNull Project project, final File destFile,
                              final Map<String, List<TestCaseDto>> sheetsData) {
-        JsonExportDto exportDto = JsonExportDto.builder()
-                .data(sheetsData)
-                .build();
-        Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), exportDto);
+        Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), sheetsData);
     }
 
     private void processExportWithJson(final @NotNull Project project, final File destFile, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto) {
@@ -115,11 +111,7 @@ public class ExportJson extends DumbAwareAction {
 
                 indicator.setText("Generating JSON file...");
 
-                JsonExportDto exportDto = JsonExportDto.builder()
-                        .data(directoryData)
-                        .build();
-
-                Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), exportDto);
+                Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), directoryData);
 
                 NotificationAction openAction = NotificationAction.createSimple("Open file", () -> {
                     VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());

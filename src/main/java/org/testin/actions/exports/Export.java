@@ -1,4 +1,4 @@
-package org.testin.actions.export;
+package org.testin.actions.exports;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.FileTypes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.ui.ExportImportPreviewDialog;
+import org.testin.ui.ExportPreviewDialog;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
@@ -60,7 +60,7 @@ public class Export extends ExportBase {
                     return;
                 }
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    ExportImportPreviewDialog dialog = new ExportImportPreviewDialog(project, sheets, targetDir);
+                    ExportPreviewDialog dialog = new ExportPreviewDialog(project, sheets, targetDir);
                     if (!dialog.showAndGet()) return;
 
                     String format = dialog.getSelectedFormat();
@@ -70,7 +70,7 @@ public class Export extends ExportBase {
                     try {
                         switch (FileTypes.fromLabel(format)) {
                             case CSV -> new ExportCsv(tree).exportToFile(project, destFile, sheets);
-                            case EXCEL -> new ExportExcel(tree).exportToFile(project, destFile, sheets);
+                            case XLSX, XLS -> new ExportExcel(tree).exportToFile(project, destFile, sheets);
                             case HTML -> new ExportHtml(tree).exportToFile(project, destFile, sheets);
                             case JSON -> new ExportJson(tree).exportToFile(project, destFile, sheets);
                         }

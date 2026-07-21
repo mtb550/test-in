@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -41,11 +42,12 @@ public class Rename extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
+        final Project project = e.getProject();
 
-        TreePath path = tree.getSelectionPath();
+        final TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 
         if (!(node.getUserObject() instanceof DirectoryDto dir)) return;
         if (dir instanceof TestCasesMainDirectoryDto || dir instanceof TestRunsMainDirectoryDto) return;
@@ -53,29 +55,32 @@ public class Rename extends DumbAwareAction {
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
         if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
 
-        Services.getInstance(e.getProject(), EditorUtil.class).closeEditor(e.getProject(), dir.getName());
+        Services.getInstance(project, EditorUtil.class).closeEditor(project, dir.getName());
 
         Path oldPath = dir.getPath();
         Path newPath = oldPath.getParent().resolve(newName);
 
-        Services.getInstance(e.getProject(), TreeUtilImpl.class).executeVfsAction(e.getProject(), oldPath, "Rename Failed", vf -> {
+        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, oldPath, "Rename Failed", vf -> {
             vf.rename(this, newName);
 
             dir.setName(newName);
             dir.setPath(newPath);
             dir.setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-            dir.setModifiedBy("Muteb almughyiri");
+            dir.setModifiedBy(System.getProperty("user.name", ""));
 
-            Services.getInstance(e.getProject(), Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
+            Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
             ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
-            Services.getInstance(e.getProject(), ProjectIndexer.class).renameNode(oldPath, newPath);
+            Services.getInstance(project, ProjectIndexer.class).renameNode(oldPath, newPath);
 
             if (dir instanceof TestProjectDirectoryDto) {
                 projectPanel.getTestProjectSelector().loadTestProjectList();
             }
 
             Log.info("Success! Renamed to: " + newName);
+
+            // todo: add code generator code to change the name in automation code.
+
         });
     }
 

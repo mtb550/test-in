@@ -1,4 +1,4 @@
-package org.testin.actions.export;
+package org.testin.actions.exports;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.NotificationAction;
@@ -35,6 +35,22 @@ public abstract class ExportBase extends DumbAwareAction {
         this.tree = tree;
     }
 
+    // todo: remove static
+    public static NotificationAction createOpenAction(final @NotNull Project project, final File destFile, final String format) {
+        FileTypes ef = FileTypes.fromLabel(format);
+        if (ef == FileTypes.HTML) {
+            return NotificationAction.createSimple("Open file", () ->
+                    BrowserUtil.browse(destFile.toURI().toString())
+            );
+        }
+        return NotificationAction.createSimple("Open file", () -> {
+            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+            if (vf != null) {
+                Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+            }
+        });
+    }
+
     public Map<String, List<TestCaseDto>> gatherData(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto dirDto) {
         Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
 
@@ -54,22 +70,6 @@ public abstract class ExportBase extends DumbAwareAction {
             }
         }
         return allSheets;
-    }
-
-    // todo: remove static
-    public static NotificationAction createOpenAction(final @NotNull Project project, final File destFile, final String format) {
-        FileTypes ef = FileTypes.fromLabel(format);
-        if (ef == FileTypes.HTML) {
-            return NotificationAction.createSimple("Open file", () ->
-                    BrowserUtil.browse(destFile.toURI().toString())
-            );
-        }
-        return NotificationAction.createSimple("Open file", () -> {
-            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-            if (vf != null) {
-                Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
-            }
-        });
     }
 
     public VirtualFile resolveTargetDir(final DirectoryDto dirDto) {
