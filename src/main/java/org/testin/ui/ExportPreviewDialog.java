@@ -71,6 +71,14 @@ public class ExportPreviewDialog extends DialogWrapper {
         setCancelButtonText("Cancel");
         init();
         setSize(900, 600);
+
+        triggerBrowseLater();
+    }
+
+    // todo: to be updated and remove SuppressWarnings
+    @SuppressWarnings("removal")
+    private void triggerBrowseLater() {
+        SwingUtilities.invokeLater(() -> folderField.getButton().doClick());
     }
 
     @Nullable
