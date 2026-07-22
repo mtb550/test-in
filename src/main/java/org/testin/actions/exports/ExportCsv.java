@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
@@ -18,16 +17,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ExportCsv extends Export {
+public class ExportCsv {
+    private final @NotNull Export export;
 
-    public ExportCsv(final @NotNull SimpleTree tree) {
-        super(tree);
+    public ExportCsv(final @NotNull Export export) {
+        this.export = export;
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile,
                              final Map<String, List<TestCaseDto>> sheetsData) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
-            List<String> headerNames = EXPORT_COLUMNS.stream()
+            List<String> headerNames = export.EXPORT_COLUMNS.stream()
                     .map(TestEditorAttributes::getName)
                     .toList();
             writer.write(String.join(",", headerNames));
@@ -37,7 +37,7 @@ public class ExportCsv extends Export {
                 List<TestCaseDto> testCases = entry.getValue();
                 for (TestCaseDto tc : testCases) {
                     List<String> rowValues = new ArrayList<>();
-                    for (TestEditorAttributes attr : EXPORT_COLUMNS) {
+                    for (TestEditorAttributes attr : export.EXPORT_COLUMNS) {
                         String val = attr.getValueExtractor().apply(tc, project);
                         rowValues.add(escapeCsvField(val != null ? val : ""));
                     }
@@ -48,12 +48,10 @@ public class ExportCsv extends Export {
         }
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(project, Notifier.class).infoWithActions(project,
-                        "Export Complete", "Exported to: " + destFile.getName(),
+                Services.getInstance(project, Notifier.class).infoWithActions(project, "Export Complete", "Exported to: " + destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
                             VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-                            if (vf != null)
-                                Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                            Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
                         }))
         );
     }

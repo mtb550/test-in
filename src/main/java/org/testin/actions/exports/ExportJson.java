@@ -5,7 +5,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.FilesUtil;
@@ -17,22 +16,21 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-public class ExportJson extends Export {
+public class ExportJson {
+    private final @NotNull Export export;
 
-    public ExportJson(final @NotNull SimpleTree tree) {
-        super(tree);
+    public ExportJson(final @NotNull Export export) {
+        this.export = export;
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
         Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), sheetsData);
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(project, Notifier.class).infoWithActions(project,
-                        "Export Complete", "Exported to: " + destFile.getName(),
+                Services.getInstance(project, Notifier.class).infoWithActions(project, "Export Complete", "Exported to: " + destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
                             VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-                            if (vf != null)
-                                Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                            Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
                         }))
         );
     }

@@ -31,10 +31,12 @@ import java.io.InputStream;
 import java.util.*;
 
 public class Export extends DumbAwareAction {
+
     protected final List<TestEditorAttributes> EXPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isExportable)
             .toList();
-    final @NotNull SimpleTree tree;
+
+    private final @NotNull SimpleTree tree;
 
     public Export(final @NotNull SimpleTree tree) {
         super("Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
@@ -55,10 +57,6 @@ public class Export extends DumbAwareAction {
         VirtualFile targetDir = resolveTargetDir(dirDto);
         if (targetDir == null) return;
 
-        processExport(project, targetDir, dirDto);
-    }
-
-    private void processExport(final @NotNull Project project, final VirtualFile targetDir, final DirectoryDto dirDto) {
         ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
@@ -73,22 +71,15 @@ public class Export extends DumbAwareAction {
                     ExportPreviewDialog dialog = new ExportPreviewDialog(project, sheets, targetDir);
                     if (!dialog.showAndGet()) return;
 
-                    String format = dialog.getSelectedFormat();
+                    FileTypes format = dialog.getSelectedFormat();
                     File destFile = dialog.getSelectedFile();
                     if (destFile == null) return;
 
                     try {
-                        switch (FileTypes.fromLabel(format)) {
-                            case CSV -> new ExportCsv(tree).exportToFile(project, destFile, sheets);
-                            case XLSX, XLS -> new ExportExcel(tree).exportToFile(project, destFile, sheets);
-                            case HTML -> new ExportHtml(tree).exportToFile(project, destFile, sheets);
-                            case JSON -> new ExportJson(tree).exportToFile(project, destFile, sheets);
-                        }
-
+                        format.exportToFile(project, Export.this, destFile, sheets);
                     } catch (final Exception ex) {
                         Log.error("Export crashed: " + ex.getMessage());
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(project, Notifier.class).error(project, "Export Failed", ex.getMessage()));
+                        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Export Failed", ex.getMessage()));
                     }
                 });
             }

@@ -4,7 +4,6 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
@@ -17,10 +16,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
-public class ExportHtml extends Export {
+public class ExportHtml {
+    private final @NotNull Export export;
 
-    public ExportHtml(final @NotNull SimpleTree tree) {
-        super(tree);
+    public ExportHtml(final @NotNull Export export) {
+        this.export = export;
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile,
@@ -30,9 +30,8 @@ public class ExportHtml extends Export {
         }
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(project, Notifier.class).infoWithActions(project,
-                        "Export Complete", "Exported to: " + destFile.getName(),
-                        NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
+                Services.getInstance(project, Notifier.class)
+                        .infoWithActions(project, "Export Complete", "Exported to: " + destFile.getName(), NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
     }
 
     private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project project,
@@ -90,7 +89,7 @@ public class ExportHtml extends Export {
             writer.newLine();
 
             writer.write("<tr>");
-            for (TestEditorAttributes attr : EXPORT_COLUMNS) {
+            for (TestEditorAttributes attr : export.EXPORT_COLUMNS) {
                 writer.write("<th>" + htmlEscape(attr.getName()) + "</th>");
             }
             writer.write("</tr>");
@@ -98,7 +97,7 @@ public class ExportHtml extends Export {
 
             for (TestCaseDto tc : testCases) {
                 writer.write("<tr>");
-                for (TestEditorAttributes attr : EXPORT_COLUMNS) {
+                for (TestEditorAttributes attr : export.EXPORT_COLUMNS) {
                     String val = attr.getValueExtractor().apply(tc, project);
                     writer.write("<td>" + htmlEscape(val != null ? val : "") + "</td>");
                 }

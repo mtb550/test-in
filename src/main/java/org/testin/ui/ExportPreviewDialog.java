@@ -25,22 +25,26 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class ExportPreviewDialog extends DialogWrapper {
+
     private static final FileTypes[] FORMATS = FileTypes.values();
-    private final Map<String, DefaultTableModel> tableModelsMap = new LinkedHashMap<>();
     private final Project project;
+
     private final List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportable)
             .toList();
+
     private final TextFieldWithBrowseButton folderField;
     private final JTextField fileNameField;
     private final JComboBox<String> formatCombo;
     private final Map<String, List<TestCaseDto>> originalSheetsData;
     @Getter
-    private String selectedFormat;
+    private FileTypes selectedFormat;
     @Getter
     private File selectedFile;
 
@@ -166,8 +170,6 @@ public class ExportPreviewDialog extends DialogWrapper {
                 model.addRow(rowData);
             }
 
-            tableModelsMap.put(sheetName, model);
-
             JBTable table = new JBTable(model);
             table.setFillsViewportHeight(true);
 
@@ -272,7 +274,7 @@ public class ExportPreviewDialog extends DialogWrapper {
             folderField.getTextField().requestFocus();
             return;
         }
-        FileTypes fmt = FileTypes.fromLabel((String) formatCombo.getSelectedItem());
+        FileTypes fmt = FileTypes.valueOf((String) formatCombo.getSelectedItem());
 
         String ext = fmt.getExtension();
         if (!fileName.endsWith(ext)) {
@@ -280,35 +282,10 @@ public class ExportPreviewDialog extends DialogWrapper {
             fileName = dot >= 0 ? fileName.substring(0, dot) + ext : fileName + ext;
         }
         selectedFile = new File(folder, fileName);
-        selectedFormat = fmt.getLabel();
+        selectedFormat = fmt;
 
         super.doOKAction();
     }
-
-    public Map<String, List<TestCaseDto>> getSelectedTestCasesBySheet() {
-        Map<String, List<TestCaseDto>> selectedCasesBySheet = new LinkedHashMap<>();
-
-        for (Map.Entry<String, List<TestCaseDto>> entry : originalSheetsData.entrySet()) {
-            String sheetName = entry.getKey();
-            List<TestCaseDto> allCasesInSheet = entry.getValue();
-            DefaultTableModel model = tableModelsMap.get(sheetName);
-
-            List<TestCaseDto> selectedCases = new ArrayList<>();
-            if (model != null) {
-                for (int row = 0; row < model.getRowCount(); row++) {
-                    Boolean isSelected = (Boolean) model.getValueAt(row, 0);
-                    if (Boolean.TRUE.equals(isSelected)) {
-                        selectedCases.add(allCasesInSheet.get(row));
-                    }
-                }
-            }
-            if (!selectedCases.isEmpty()) {
-                selectedCasesBySheet.put(sheetName, selectedCases);
-            }
-        }
-        return selectedCasesBySheet;
-    }
-
 
     private static class GroupMultiSelectEditor extends AbstractCellEditor implements TableCellEditor {
         private final JButton button = new JButton();
