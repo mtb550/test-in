@@ -1,7 +1,6 @@
 package org.testin.actions.imports;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.apache.poi.ss.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
@@ -15,10 +14,11 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 
-public class ImportExcel extends Import {
+public class ImportExcel {
+    private final Imports imports;
 
-    public ImportExcel(final @NotNull SimpleTree tree) {
-        super(tree);
+    public ImportExcel(final @NotNull Imports imports) {
+        this.imports = imports;
     }
 
     public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
@@ -58,7 +58,7 @@ public class ImportExcel extends Import {
 
             for (Cell cell : headerRow) {
                 String headerName = dataFormatter.formatCellValue(cell).trim();
-                for (String reqCol : IMPORT_COLUMNS) {
+                for (String reqCol : imports.IMPORT_COLUMNS) {
                     if (reqCol.equalsIgnoreCase(headerName)) {
                         headerIndexMap.put(reqCol.toLowerCase(), cell.getColumnIndex());
                     }

@@ -37,14 +37,16 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 
-public class Import extends DumbAwareAction {
+public class Imports extends DumbAwareAction {
+
     protected final List<String> IMPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportable)
             .map(TestEditorAttributes::getName)
             .toList();
+
     final @NotNull SimpleTree tree;
 
-    public Import(final @NotNull SimpleTree tree) {
+    public Imports(final @NotNull SimpleTree tree) {
         super("Import", "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
         this.tree = tree;
     }
@@ -78,9 +80,9 @@ public class Import extends DumbAwareAction {
 
     private Map<String, List<TestCaseDto>> delegateToFormat(final @NotNull Project project, final File importFile, final FileTypes format) {
         return switch (format) {
-            case CSV -> new ImportCsv(tree).processImport(project, importFile);
-            case XLS, XLSX -> new ImportExcel(tree).processImport(project, importFile);
-            case JSON -> new ImportJson(tree).processImport(project, importFile);
+            case CSV -> new ImportCsv(Imports.this).processImport(project, importFile);
+            case XLS, XLSX -> new ImportExcel(Imports.this).processImport(project, importFile);
+            case JSON -> new ImportJson(Imports.this).processImport(project, importFile);
             case HTML -> {
                 Services.getInstance(project, Notifier.class).warn(project, "Unsupported", "HTML import is not supported.");
                 yield new LinkedHashMap<>();
@@ -124,8 +126,6 @@ public class Import extends DumbAwareAction {
 
     private void executeImportWriteAction(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode, final ImportPreviewDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
-        final Import self = this;
-
         ApplicationManager.getApplication().runWriteAction(() -> {
             try {
                 if (selectedDirDto instanceof TestSetDirectoryDto ts) {
@@ -153,7 +153,7 @@ public class Import extends DumbAwareAction {
                         String rawSheetName = entry.getKey();
                         List<TestCaseDto> sheetCases = entry.getValue();
 
-                        VirtualFile sheetDir = new CreateTestSet().inBackground(project, self, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
+                        VirtualFile sheetDir = new CreateTestSet().inBackground(project, this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
 
                         TestCaseDto tail = findExistingTail(project, sheetDir);
                         linkAndSaveTestCases(project, sheetDir, sheetCases, tail);
@@ -166,6 +166,7 @@ public class Import extends DumbAwareAction {
                                     .path2(Services.getInstance(project, Tools.class).buildPath2(selectedDirDto.getPath2(), sheetName))
                                     .parent(selectedDirDto)
                                     .build();
+
                             Log.info("Import: generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
                             CreateTestMethod syncInjector = new CreateTestMethod();
                             for (TestCaseDto tc : sheetCases) {

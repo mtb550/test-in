@@ -2,7 +2,6 @@ package org.testin.actions.imports;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Mapper;
@@ -13,10 +12,11 @@ import org.testin.util.services.Services;
 import java.io.File;
 import java.util.*;
 
-public class ImportJson extends Import {
+public class ImportJson {
+    private final Imports imports;
 
-    public ImportJson(final @NotNull SimpleTree tree) {
-        super(tree);
+    public ImportJson(final @NotNull Imports imports) {
+        this.imports = imports;
     }
 
     public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {

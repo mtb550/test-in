@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ExportExcel {
-    private final @NotNull Export export;
+    private final @NotNull Exports exports;
 
-    public ExportExcel(final @NotNull Export export) {
-        this.export = export;
+    public ExportExcel(final @NotNull Exports exports) {
+        this.exports = exports;
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) throws IOException {
@@ -46,23 +46,23 @@ public class ExportExcel {
                 List<TestCaseDto> testCases = entry.getValue();
 
                 Row headerRow = sheet.createRow(0);
-                for (int i = 0; i < export.EXPORT_COLUMNS.size(); i++) {
+                for (int i = 0; i < exports.EXPORT_COLUMNS.size(); i++) {
                     Cell cell = headerRow.createCell(i);
-                    cell.setCellValue(export.EXPORT_COLUMNS.get(i).getName());
+                    cell.setCellValue(exports.EXPORT_COLUMNS.get(i).getName());
                     cell.setCellStyle(headerStyle);
                 }
 
                 int rowIndex = 1;
                 for (TestCaseDto tc : testCases) {
                     Row row = sheet.createRow(rowIndex++);
-                    for (int i = 0; i < export.EXPORT_COLUMNS.size(); i++) {
+                    for (int i = 0; i < exports.EXPORT_COLUMNS.size(); i++) {
                         Cell cell = row.createCell(i);
-                        String val = export.EXPORT_COLUMNS.get(i).getValueExtractor().apply(tc, project);
+                        String val = exports.EXPORT_COLUMNS.get(i).getValueExtractor().apply(tc, project);
                         cell.setCellValue(val != null ? val : "");
                     }
                 }
 
-                for (int i = 0; i < export.EXPORT_COLUMNS.size(); i++) {
+                for (int i = 0; i < exports.EXPORT_COLUMNS.size(); i++) {
                     sheet.autoSizeColumn(i);
                 }
             }

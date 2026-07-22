@@ -30,7 +30,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.*;
 
-public class Export extends DumbAwareAction {
+public class Exports extends DumbAwareAction {
 
     protected final List<TestEditorAttributes> EXPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isExportable)
@@ -38,7 +38,7 @@ public class Export extends DumbAwareAction {
 
     private final @NotNull SimpleTree tree;
 
-    public Export(final @NotNull SimpleTree tree) {
+    public Exports(final @NotNull SimpleTree tree) {
         super("Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
         this.tree = tree;
     }
@@ -76,7 +76,7 @@ public class Export extends DumbAwareAction {
                     if (destFile == null) return;
 
                     try {
-                        format.exportToFile(project, Export.this, destFile, sheets);
+                        format.exportToFile(project, Exports.this, destFile, sheets);
                     } catch (final Exception ex) {
                         Log.error("Export crashed: " + ex.getMessage());
                         ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Export Failed", ex.getMessage()));

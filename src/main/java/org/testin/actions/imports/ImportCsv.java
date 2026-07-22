@@ -1,7 +1,6 @@
 package org.testin.actions.imports;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
@@ -15,10 +14,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class ImportCsv extends Import {
+public class ImportCsv {
+    private final Imports imports;
 
-    public ImportCsv(final @NotNull SimpleTree tree) {
-        super(tree);
+    public ImportCsv(final @NotNull Imports imports) {
+        this.imports = imports;
     }
 
     public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
@@ -51,7 +51,7 @@ public class ImportCsv extends Import {
 
         for (int i = 0; i < headers.length; i++) {
             String headerName = headers[i].trim();
-            for (String reqCol : IMPORT_COLUMNS) {
+            for (String reqCol : imports.IMPORT_COLUMNS) {
                 if (reqCol.equalsIgnoreCase(headerName)) {
                     headerIndexMap.put(reqCol.toLowerCase(), i);
                 }

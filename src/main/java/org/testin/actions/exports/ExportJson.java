@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ExportJson {
-    private final @NotNull Export export;
+    private final @NotNull Exports exports;
 
-    public ExportJson(final @NotNull Export export) {
-        this.export = export;
+    public ExportJson(final @NotNull Exports exports) {
+        this.exports = exports;
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {

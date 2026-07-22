@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 public class ExportHtml {
-    private final @NotNull Export export;
+    private final @NotNull Exports exports;
 
-    public ExportHtml(final @NotNull Export export) {
-        this.export = export;
+    public ExportHtml(final @NotNull Exports exports) {
+        this.exports = exports;
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile,
@@ -89,7 +89,7 @@ public class ExportHtml {
             writer.newLine();
 
             writer.write("<tr>");
-            for (TestEditorAttributes attr : export.EXPORT_COLUMNS) {
+            for (TestEditorAttributes attr : exports.EXPORT_COLUMNS) {
                 writer.write("<th>" + htmlEscape(attr.getName()) + "</th>");
             }
             writer.write("</tr>");
@@ -97,7 +97,7 @@ public class ExportHtml {
 
             for (TestCaseDto tc : testCases) {
                 writer.write("<tr>");
-                for (TestEditorAttributes attr : export.EXPORT_COLUMNS) {
+                for (TestEditorAttributes attr : exports.EXPORT_COLUMNS) {
                     String val = attr.getValueExtractor().apply(tc, project);
                     writer.write("<td>" + htmlEscape(val != null ? val : "") + "</td>");
                 }

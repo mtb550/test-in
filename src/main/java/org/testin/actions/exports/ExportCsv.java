@@ -18,16 +18,16 @@ import java.util.List;
 import java.util.Map;
 
 public class ExportCsv {
-    private final @NotNull Export export;
+    private final @NotNull Exports exports;
 
-    public ExportCsv(final @NotNull Export export) {
-        this.export = export;
+    public ExportCsv(final @NotNull Exports exports) {
+        this.exports = exports;
     }
 
     public void exportToFile(final @NotNull Project project, final File destFile,
                              final Map<String, List<TestCaseDto>> sheetsData) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
-            List<String> headerNames = export.EXPORT_COLUMNS.stream()
+            List<String> headerNames = exports.EXPORT_COLUMNS.stream()
                     .map(TestEditorAttributes::getName)
                     .toList();
             writer.write(String.join(",", headerNames));
@@ -37,7 +37,7 @@ public class ExportCsv {
                 List<TestCaseDto> testCases = entry.getValue();
                 for (TestCaseDto tc : testCases) {
                     List<String> rowValues = new ArrayList<>();
-                    for (TestEditorAttributes attr : export.EXPORT_COLUMNS) {
+                    for (TestEditorAttributes attr : exports.EXPORT_COLUMNS) {
                         String val = attr.getValueExtractor().apply(tc, project);
                         rowValues.add(escapeCsvField(val != null ? val : ""));
                     }

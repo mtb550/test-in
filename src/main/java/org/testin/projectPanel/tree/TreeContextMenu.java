@@ -9,9 +9,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
 import org.testin.actions.clipboard.*;
 import org.testin.actions.crud.Remove;
-import org.testin.actions.exports.Export;
+import org.testin.actions.exports.Exports;
 import org.testin.actions.generateReport.*;
-import org.testin.actions.imports.Import;
+import org.testin.actions.imports.Imports;
 import org.testin.actions.nodeCreator.CreateTreeNode;
 import org.testin.actions.run.RunTestSet;
 import org.testin.pojo.ProjectStatus;
@@ -53,9 +53,9 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        add(new Export(tree));
+        add(new Exports(tree));
 
-        add(new Import(tree));
+        add(new Imports(tree));
 
         addSeparator();
 
