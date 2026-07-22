@@ -1,10 +1,15 @@
 package org.testin.actions.exports;
 
+import com.intellij.ide.BrowserUtil;
+import com.intellij.notification.NotificationAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.io.*;
 import java.time.ZonedDateTime;
@@ -23,6 +28,11 @@ public class ExportHtml extends Export {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
             writeHtmlDocument(writer, project, sheetsData);
         }
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Services.getInstance(project, Notifier.class).infoWithActions(project,
+                        "Export Complete", "Exported to: " + destFile.getName(),
+                        NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
     }
 
     private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project project,

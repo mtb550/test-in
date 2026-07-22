@@ -1,11 +1,18 @@
 package org.testin.actions.exports;
 
+import com.intellij.notification.NotificationAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.Tools;
+import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -65,5 +72,15 @@ public class ExportExcel extends Export {
                 workbook.write(fos);
             }
         }
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Services.getInstance(project, Notifier.class).infoWithActions(project,
+                        "Export Complete", "Exported to: " + destFile.getName(),
+                        NotificationAction.createSimple("Open file", () -> {
+                            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+                            if (vf != null)
+                                Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                        }))
+        );
     }
 }

@@ -1,8 +1,6 @@
 package org.testin.actions.exports;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.BrowserUtil;
-import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -22,7 +20,6 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.ui.ExportPreviewDialog;
 import org.testin.util.Mapper;
-import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
@@ -88,32 +85,12 @@ public class Export extends DumbAwareAction {
                             case JSON -> new ExportJson(tree).exportToFile(project, destFile, sheets);
                         }
 
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(project, Notifier.class).infoWithActions(project,
-                                        "Export Complete", "Exported to: " + destFile.getName(),
-                                        createOpenAction(project, destFile, format)));
-
                     } catch (final Exception ex) {
                         Log.error("Export crashed: " + ex.getMessage());
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(project, Notifier.class).error(project, "Export Failed", ex.getMessage()));
                     }
                 });
-            }
-        });
-    }
-
-    public NotificationAction createOpenAction(final @NotNull Project project, final File destFile, final String format) {
-        FileTypes ef = FileTypes.fromLabel(format);
-        if (ef == FileTypes.HTML) {
-            return NotificationAction.createSimple("Open file", () ->
-                    BrowserUtil.browse(destFile.toURI().toString())
-            );
-        }
-        return NotificationAction.createSimple("Open file", () -> {
-            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-            if (vf != null) {
-                Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
             }
         });
     }

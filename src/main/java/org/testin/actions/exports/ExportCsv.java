@@ -1,10 +1,17 @@
 package org.testin.actions.exports;
 
+import com.intellij.notification.NotificationAction;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.Tools;
+import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -39,6 +46,16 @@ public class ExportCsv extends Export {
                 }
             }
         }
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Services.getInstance(project, Notifier.class).infoWithActions(project,
+                        "Export Complete", "Exported to: " + destFile.getName(),
+                        NotificationAction.createSimple("Open file", () -> {
+                            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+                            if (vf != null)
+                                Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                        }))
+        );
     }
 
     private String escapeCsvField(final String value) {
