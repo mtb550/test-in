@@ -24,6 +24,7 @@ import org.testin.util.services.Services;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -61,7 +62,12 @@ public class Rename extends DumbAwareAction {
         Path newPath = oldPath.getParent().resolve(newName);
 
         Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, oldPath, "Rename Failed", vf -> {
-            vf.rename(this, newName);
+            try {
+                vf.rename(this, newName);
+            } catch (final IOException ex) {
+                Log.error(ex.getMessage());
+                throw new RuntimeException(ex);
+            }
 
             dir.setName(newName);
             dir.setPath(newPath);

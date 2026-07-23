@@ -11,6 +11,7 @@ import org.testin.util.services.Services;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
@@ -33,11 +34,15 @@ public class ImportExcel {
         return result;
     }
 
-    public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project project, final File file) throws Exception {
+    public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project project, final File file) {
         Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try (InputStream fis = new FileInputStream(file);
              Workbook workbook = WorkbookFactory.create(fis)) {
             parseWorkbook(workbook, project, result);
+
+        } catch (final IOException ex) {
+            Log.error(ex.getMessage());
+            throw new RuntimeException(ex);
         }
         return result;
     }

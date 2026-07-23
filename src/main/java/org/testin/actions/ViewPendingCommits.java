@@ -163,20 +163,12 @@ public class ViewPendingCommits extends DumbAwareAction {
                 indicator.setIndeterminate(true);
                 try {
                     GitCommandRunner.execute(repoPath, "git", "init");
+                    GitCommandRunner.execute(repoPath, "git", "checkout", "-b", "main");
+                    GitCommandRunner.execute(repoPath, "git", "config", "--local", "http.sslVerify", "false");
 
-                    try {
-                        GitCommandRunner.execute(repoPath, "git", "checkout", "-b", "main");
-                    } catch (Exception ignored) {
-                    }
 
-                    try {
-                        GitCommandRunner.execute(repoPath, "git", "config", "--local", "http.sslVerify", "false");
-                    } catch (Exception ignored) {
-                    }
+                    ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).info(project, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName()));
 
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).info(project, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName())
-                    );
                 } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(project, Notifier.class).error(project, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage())
@@ -187,11 +179,7 @@ public class ViewPendingCommits extends DumbAwareAction {
     }
 
     private void pushToRemote(final @NotNull Project project, final Path repoPath) {
-        String remoteUrl = "";
-        try {
-            remoteUrl = GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
-        } catch (Exception ignored) {
-        }
+        String remoteUrl = GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
 
         if (remoteUrl.isEmpty()) {
             remoteUrl = com.intellij.openapi.ui.Messages.showInputDialog(
@@ -231,39 +219,22 @@ public class ViewPendingCommits extends DumbAwareAction {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                try {
-                    try {
-                        GitCommandRunner.execute(repoPath, "git", "branch", "-M", "main");
-                    } catch (Exception ignored) {
+                GitCommandRunner.execute(repoPath, "git", "branch", "-M", "main");
+                indicator.setText("Syncing with remote (Pull --rebase)...");
+                GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "--autostash", "origin", "main");
+                GitCommandRunner.execute(repoPath, "git", "rebase", "--abort");
+
+                indicator.setText("Pushing commits...");
+                GitCommandRunner.execute(repoPath, "git", "push", "-u", "origin", "main");
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (pushNotification != null) {
+                        pushNotification.expire();
+                        pushNotification = null;
                     }
 
-                    indicator.setText("Syncing with remote (Pull --rebase)...");
-                    try {
-                        GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "--autostash", "origin", "main");
-                    } catch (final Exception ex1) {
-                        try {
-                            GitCommandRunner.execute(repoPath, "git", "rebase", "--abort");
-                        } catch (Exception ignored) {
-                        }
-                    }
-
-                    indicator.setText("Pushing commits...");
-                    GitCommandRunner.execute(repoPath, "git", "push", "-u", "origin", "main");
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (pushNotification != null) {
-                            pushNotification.expire();
-                            pushNotification = null;
-                        }
-
-                        Services.getInstance(project, Notifier.class).info(project, "Push Successful", "Test cases were successfully pushed to the remote repository!");
-                    });
-
-                } catch (final Exception ex) {
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).error(project, "Push Failed", "Could not push to remote:\n" + ex.getMessage())
-                    );
-                }
+                    Services.getInstance(project, Notifier.class).info(project, "Push Successful", "Test cases were successfully pushed to the remote repository!");
+                });
             }
         });
     }
@@ -274,13 +245,7 @@ public class ViewPendingCommits extends DumbAwareAction {
             VirtualFile vRepoPath = LocalFileSystem.getInstance().findFileByIoFile(repoPath.toFile());
             if (vRepoPath == null) return;
 
-            GitUserNameNotDefinedDialog dialog = new GitUserNameNotDefinedDialog(
-                    project,
-                    Collections.singletonList(vRepoPath),
-                    Collections.singletonList(vRepoPath),
-                    Collections.emptyMap(),
-                    "Set Identity and Commit"
-            );
+            GitUserNameNotDefinedDialog dialog = new GitUserNameNotDefinedDialog(project, Collections.singletonList(vRepoPath), Collections.singletonList(vRepoPath), Collections.emptyMap(), "Set Identity and Commit");
 
             if (dialog.showAndGet()) {
                 String name = dialog.getUserName();

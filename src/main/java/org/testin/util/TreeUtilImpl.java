@@ -25,15 +25,11 @@ public final class TreeUtilImpl {
 
     public void executeVfsAction(final @NotNull Project project, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
-            try {
-                VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
-                if (vf != null) {
-                    operation.execute(vf);
-                } else {
-                    Services.getInstance(project, Notifier.class).error(project, "Could not find path on disk:\n" + path, errorTitle);
-                }
-            } catch (final IOException ex) {
-                Services.getInstance(project, Notifier.class).error(project, "Operation failed: " + ex.getMessage(), errorTitle);
+            VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
+            if (vf != null) {
+                operation.execute(vf);
+            } else {
+                Services.getInstance(project, Notifier.class).error(project, "Could not find path on disk:\n" + path, errorTitle);
             }
         }));
     }
@@ -49,7 +45,7 @@ public final class TreeUtilImpl {
                 } else {
                     Services.getInstance(project, Notifier.class).error(project, "Could not find source or target path on disk.", errorTitle);
                 }
-            } catch (final IOException ex) {
+            } catch (final Exception ex) {
                 Services.getInstance(project, Notifier.class).error(project, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
@@ -122,10 +118,10 @@ public final class TreeUtilImpl {
     }
 
     public interface IVfsOperation {
-        void execute(VirtualFile vf) throws IOException;
+        void execute(VirtualFile vf);
     }
 
     public interface IVfsBiOperation {
-        void execute(VirtualFile sourceVf, VirtualFile targetVf) throws IOException;
+        void execute(VirtualFile sourceVf, VirtualFile targetVf);
     }
 }

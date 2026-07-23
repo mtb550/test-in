@@ -21,6 +21,7 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -151,7 +152,12 @@ public class TreeTransferHandler extends TransferHandler {
         final DirectoryDto sourceDir = (DirectoryDto) movedNode.getUserObject();
 
         Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
-            sourceVf.move(this, targetVf);
+            try {
+                sourceVf.move(this, targetVf);
+            } catch (final IOException ex) {
+                Log.error(ex.getMessage());
+                throw new RuntimeException(ex);
+            }
 
             Path oldPath = sourceDir.getPath();
             Path newPath = targetDir.getPath().resolve(sourceDir.getName());
@@ -166,7 +172,12 @@ public class TreeTransferHandler extends TransferHandler {
 
     private void persistCopy(final DirectoryDto source, final DirectoryDto target) {
         Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
-            sourceVf.copy(this, targetVf, sourceVf.getName());
+            try {
+                sourceVf.copy(this, targetVf, sourceVf.getName());
+            } catch (final IOException ex) {
+                Log.error("Failed to copy: " + ex.getMessage());
+                throw new RuntimeException(ex);
+            }
             Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
         });
     }
@@ -183,7 +194,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    public void exportToClipboard(final JComponent comp, final Clipboard clip, final int action) throws IllegalStateException {
+    public void exportToClipboard(final JComponent comp, final Clipboard clip, final int action) {
         super.exportToClipboard(comp, clip, action);
         this.lastAction = action;
 
@@ -211,27 +222,32 @@ public class TreeTransferHandler extends TransferHandler {
         }
 
         @Override
-        public @NotNull Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
-            if (NODE_FLAVOR.equals(flavor)) {
-                return nodes;
-            }
+        public @NotNull Object getTransferData(final DataFlavor flavor) {
+            try {
+                if (NODE_FLAVOR.equals(flavor))
+                    return nodes;
 
-            if (DataFlavor.javaFileListFlavor.equals(flavor)) {
-                List<File> files = new ArrayList<>();
-                for (DefaultMutableTreeNode node : nodes) {
-                    if (node.getUserObject() instanceof DirectoryDto dirDto) {
+                if (DataFlavor.javaFileListFlavor.equals(flavor)) {
+                    List<File> files = new ArrayList<>();
+                    for (DefaultMutableTreeNode node : nodes) {
+                        if (node.getUserObject() instanceof DirectoryDto dirDto) {
 
-                        if (dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestRunDirectoryDto) {
+                            if (dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestRunDirectoryDto) {
 
-                            Path nioPath = dirDto.getPath();
-                            files.add(nioPath.toFile());
+                                Path nioPath = dirDto.getPath();
+                                files.add(nioPath.toFile());
+                            }
                         }
                     }
+                    return files;
                 }
-                return files;
-            }
 
-            throw new UnsupportedFlavorException(flavor);
+
+                throw new UnsupportedFlavorException(flavor);
+            } catch (final UnsupportedFlavorException ex) {
+                Log.error(ex.getMessage());
+                throw new RuntimeException(ex);
+            }
         }
     }
 }

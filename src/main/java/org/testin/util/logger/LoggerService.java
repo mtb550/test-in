@@ -100,10 +100,11 @@ public final class LoggerService implements Disposable {
 
         try {
             Path logFile = getLogFile();
-            if (logFile != null && Files.exists(logFile)) {
+            if (logFile != null && Files.exists(logFile))
                 Files.delete(logFile);
-            }
-        } catch (Exception ignored) {
+
+        } catch (final Exception ex) {
+            Log.error("Failed to delete log file: " + ex.getMessage());
         }
     }
 }

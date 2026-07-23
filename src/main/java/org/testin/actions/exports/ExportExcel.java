@@ -10,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -26,7 +27,7 @@ public class ExportExcel {
         this.exports = exports;
     }
 
-    public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) throws IOException {
+    public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
         try (Workbook workbook = new XSSFWorkbook()) {
             CellStyle headerStyle = workbook.createCellStyle();
             Font headerFont = workbook.createFont();
@@ -70,6 +71,9 @@ public class ExportExcel {
             try (FileOutputStream fos = new FileOutputStream(destFile)) {
                 workbook.write(fos);
             }
+        } catch (final IOException ex) {
+            Log.error(ex.getMessage());
+            throw new RuntimeException(ex);
         }
 
         ApplicationManager.getApplication().invokeLater(() ->

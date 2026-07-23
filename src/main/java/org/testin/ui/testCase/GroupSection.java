@@ -107,8 +107,9 @@ public class GroupSection implements ICreateTestCaseSection {
                 try {
                     Group group = Group.valueOf(cb.getText());
                     cb.setSelected(selectedList.contains(group));
-                } catch (Exception ignored) {
-                    Log.info("setSelectedGroups ignored");
+
+                } catch (final Exception ex) {
+                    Log.error("setSelectedGroups ignored");
                 }
             }
         }

@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class GitDiffProcessor {
 
-    public static List<TestCaseDiff> getPendingChanges(final @NotNull Project project, Path repoRoot) throws Exception {
+    public static List<TestCaseDiff> getPendingChanges(final @NotNull Project project, Path repoRoot) {
         List<TestCaseDiff> allChanges = new ArrayList<>();
 
         String statusOutput = GitCommandRunner.execute(repoRoot, "git", "status", "--porcelain", "-uall");

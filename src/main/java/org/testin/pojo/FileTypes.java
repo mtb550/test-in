@@ -70,12 +70,12 @@ public enum FileTypes {
         this.handler = handler;
     }
 
-    public void exportToFile(final Project project, final Exports exports, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) throws Exception {
+    public void exportToFile(final Project project, final Exports exports, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
         handler.handle(project, exports, destFile, sheetsData);
     }
 
     @FunctionalInterface
     public interface ExportHandler {
-        void handle(Project project, Exports exports, File destFile, Map<String, List<TestCaseDto>> sheetsData) throws Exception;
+        void handle(Project project, Exports exports, File destFile, Map<String, List<TestCaseDto>> sheetsData);
     }
 }

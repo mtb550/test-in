@@ -36,11 +36,11 @@ public class ImportCsv {
         return result;
     }
 
-    public List<TestCaseDto> parseFile(final @NotNull Project project, final File file) throws Exception {
+    public List<TestCaseDto> parseFile(final @NotNull Project project, final File file) {
         return parseCsvFile(file, project);
     }
 
-    private List<TestCaseDto> parseCsvFile(final File file, final Project project) throws Exception {
+    private List<TestCaseDto> parseCsvFile(final File file, final Project project) {
         List<TestCaseDto> result = new ArrayList<>();
         List<String[]> records = parseCsvRecords(file);
 
@@ -92,7 +92,7 @@ public class ImportCsv {
         return result;
     }
 
-    private List<String[]> parseCsvRecords(final File file) throws IOException {
+    private List<String[]> parseCsvRecords(final File file) {
         List<String[]> records = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
@@ -116,6 +116,9 @@ public class ImportCsv {
                     records.add(fields);
                 }
             }
+        } catch (final IOException ex) {
+            Log.error("CSV parse failed: " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
         return records;
     }

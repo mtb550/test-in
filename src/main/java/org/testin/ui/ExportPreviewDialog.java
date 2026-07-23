@@ -18,6 +18,7 @@ import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -215,13 +216,14 @@ public class ExportPreviewDialog extends DialogWrapper {
                     priorityBox.addItem(p.getName());
                 }
                 priorityCol.setCellEditor(new DefaultCellEditor(priorityBox));
-            } catch (IllegalArgumentException ignored) {
-            }
 
-            try {
+
                 TableColumn groupCol = table.getColumn("Group");
                 groupCol.setCellEditor(new GroupMultiSelectEditor(project));
-            } catch (IllegalArgumentException ignored) {
+
+            } catch (final AssertionError ex) {
+                Log.error(ex.getMessage());
+                throw new AssertionError(ex.getMessage());
             }
 
             int tableTotalWidth = 0;

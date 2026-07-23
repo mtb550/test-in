@@ -20,16 +20,18 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TestRunPdfGenerator {
 
-    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) throws Exception {
+    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 
             PdfWriter writer = new PdfWriter(baos);
@@ -101,6 +103,10 @@ public final class TestRunPdfGenerator {
             document.close();
 
             return baos.toByteArray();
+
+        } catch (final IOException ex) {
+            Log.error("CSV parse failed: " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 

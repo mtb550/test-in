@@ -32,7 +32,6 @@ import org.testin.util.services.Services;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
@@ -127,69 +126,65 @@ public class Imports extends DumbAwareAction {
     private void executeImportWriteAction(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode, final ImportPreviewDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
-            try {
-                if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                    TestCaseDto tail = findExistingTail(project, targetDirectory);
-                    List<TestCaseDto> flatList = new ArrayList<>();
-                    selectedCasesBySheet.values().forEach(flatList::addAll);
+            if (selectedDirDto instanceof TestSetDirectoryDto ts) {
+                TestCaseDto tail = findExistingTail(project, targetDirectory);
+                List<TestCaseDto> flatList = new ArrayList<>();
+                selectedCasesBySheet.values().forEach(flatList::addAll);
 
-                    linkAndSaveTestCases(project, targetDirectory, flatList, tail);
+                linkAndSaveTestCases(project, targetDirectory, flatList, tail);
+
+                if (dialog.getCg().isSelected()) {
+                    Log.info("Import: generating test methods for " + flatList.size() + " imported cases");
+                    CreateTestMethod syncInjector = new CreateTestMethod();
+                    for (TestCaseDto tc : flatList) {
+                        tc.setParent(ts);
+                        List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+                        syncInjector.executeSync(project, tc, fqcn);
+                    }
+                }
+
+                Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
+                Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
+            } else {
+                int totalImported = 0;
+                for (Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
+                    String rawSheetName = entry.getKey();
+                    List<TestCaseDto> sheetCases = entry.getValue();
+
+                    VirtualFile sheetDir = new CreateTestSet().inBackground(project, this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
+
+                    TestCaseDto tail = findExistingTail(project, sheetDir);
+                    linkAndSaveTestCases(project, sheetDir, sheetCases, tail);
 
                     if (dialog.getCg().isSelected()) {
-                        Log.info("Import: generating test methods for " + flatList.size() + " imported cases");
+                        String sheetName = sheetDir.getName();
+                        TestSetDirectoryDto sheetDto = TestSetDirectoryDto.builder()
+                                .name(sheetName)
+                                .path(Path.of(sheetDir.getPath()))
+                                .path2(Services.getInstance(project, Tools.class).buildPath2(selectedDirDto.getPath2(), sheetName))
+                                .parent(selectedDirDto)
+                                .build();
+
+                        Log.info("Import: generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
                         CreateTestMethod syncInjector = new CreateTestMethod();
-                        for (TestCaseDto tc : flatList) {
-                            tc.setParent(ts);
+                        for (TestCaseDto tc : sheetCases) {
+                            tc.setParent(sheetDto);
                             List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
                             syncInjector.executeSync(project, tc, fqcn);
                         }
                     }
 
-                    Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
-                    Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
-                } else {
-                    int totalImported = 0;
-                    for (Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
-                        String rawSheetName = entry.getKey();
-                        List<TestCaseDto> sheetCases = entry.getValue();
-
-                        VirtualFile sheetDir = new CreateTestSet().inBackground(project, this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
-
-                        TestCaseDto tail = findExistingTail(project, sheetDir);
-                        linkAndSaveTestCases(project, sheetDir, sheetCases, tail);
-
-                        if (dialog.getCg().isSelected()) {
-                            String sheetName = sheetDir.getName();
-                            TestSetDirectoryDto sheetDto = TestSetDirectoryDto.builder()
-                                    .name(sheetName)
-                                    .path(Path.of(sheetDir.getPath()))
-                                    .path2(Services.getInstance(project, Tools.class).buildPath2(selectedDirDto.getPath2(), sheetName))
-                                    .parent(selectedDirDto)
-                                    .build();
-
-                            Log.info("Import: generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
-                            CreateTestMethod syncInjector = new CreateTestMethod();
-                            for (TestCaseDto tc : sheetCases) {
-                                tc.setParent(sheetDto);
-                                List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
-                                syncInjector.executeSync(project, tc, fqcn);
-                            }
-                        }
-
-                        totalImported += sheetCases.size();
-                    }
-                    Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
+                    totalImported += sheetCases.size();
                 }
-
-                targetDirectory.refresh(false, true);
-
-            } catch (final IOException ex) {
-                Log.error("Failed to write files: " + ex.getMessage());
+                Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
             }
+
+            targetDirectory.refresh(false, true);
+
         });
     }
 
-    private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail) throws IOException {
+    private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail) {
         final Path dirPath = Path.of(dir.getPath());
         final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
@@ -227,7 +222,8 @@ public class Imports extends DumbAwareAction {
                         if (tc != null && tc.getNext() == null) {
                             return tc;
                         }
-                    } catch (Exception ignored) {
+                    } catch (final Exception ex) {
+                        Log.error("Failed to read existing test case: " + ex.getMessage());
                     }
                 }
             }

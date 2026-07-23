@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -24,8 +25,7 @@ public class ExportCsv {
         this.exports = exports;
     }
 
-    public void exportToFile(final @NotNull Project project, final File destFile,
-                             final Map<String, List<TestCaseDto>> sheetsData) throws IOException {
+    public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
             List<String> headerNames = exports.EXPORT_COLUMNS.stream()
                     .map(TestEditorAttributes::getName)
@@ -45,6 +45,9 @@ public class ExportCsv {
                     writer.newLine();
                 }
             }
+        } catch (final IOException ex) {
+            Log.error(ex.getMessage());
+            throw new RuntimeException(ex);
         }
 
         ApplicationManager.getApplication().invokeLater(() ->

@@ -311,13 +311,12 @@ public class ImportPreviewDialog extends DialogWrapper {
                     priorityBox.addItem(p.getName());
                 }
                 priorityCol.setCellEditor(new DefaultCellEditor(priorityBox));
-            } catch (IllegalArgumentException ignored) {
-            }
 
-            try {
                 TableColumn groupCol = table.getColumn("Group");
                 groupCol.setCellEditor(new GroupMultiSelectEditor(project));
-            } catch (IllegalArgumentException ignored) {
+
+            } catch (final IllegalArgumentException ex) {
+                Log.error(ex.getMessage());
             }
 
             int tableTotalWidth = 0;
@@ -477,13 +476,12 @@ public class ImportPreviewDialog extends DialogWrapper {
                     priorityBox.addItem(p.getName());
                 }
                 priorityCol.setCellEditor(new DefaultCellEditor(priorityBox));
-            } catch (IllegalArgumentException ignored) {
-            }
 
-            try {
                 TableColumn groupCol = table.getColumn("Group");
                 groupCol.setCellEditor(new GroupMultiSelectEditor(project));
-            } catch (IllegalArgumentException ignored) {
+
+            } catch (final IllegalArgumentException ex) {
+                Log.error(ex.getMessage());
             }
 
             int tableTotalWidth = 0;

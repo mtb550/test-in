@@ -36,7 +36,7 @@ public class RunDetailsPopup extends AbstractButton implements IToolbarItem {
                 .forEach(s -> {
                     try {
                         selectedDetails.add(RunEditorAttributes.valueOf(s));
-                    } catch (IllegalArgumentException ignored) {
+                    } catch (final IllegalArgumentException ex) {
                         Log.error("Invalid run editor attributes: " + s);
                     }
                 });

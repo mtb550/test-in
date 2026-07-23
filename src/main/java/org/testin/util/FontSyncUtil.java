@@ -11,6 +11,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.ui.ZoomIndicator;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import java.awt.*;
@@ -73,7 +74,8 @@ public class FontSyncUtil {
                     }
                 }
             }
-        } catch (Exception ignored) {
+        } catch (final Exception ex) {
+            Log.error(ex.getMessage());
         }
     }
 

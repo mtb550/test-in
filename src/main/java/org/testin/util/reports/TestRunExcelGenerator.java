@@ -10,15 +10,17 @@ import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
+import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
 public final class TestRunExcelGenerator {
 
-    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) throws Exception {
+    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
             Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
@@ -83,6 +85,9 @@ public final class TestRunExcelGenerator {
             wb.finish();
 
             return os.toByteArray();
+        } catch (final IOException ex) {
+            Log.error("CSV parse failed: " + ex.getMessage());
+            throw new RuntimeException(ex);
         }
     }
 }

@@ -132,7 +132,8 @@ public class Exports extends DumbAwareAction {
                             head = tc;
                         }
                     }
-                } catch (Exception ignored) {
+                } catch (final Exception ex) {
+                    Log.error("Loading test cases failed: " + ex.getMessage());
                 }
             }
         }

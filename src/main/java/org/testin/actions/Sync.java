@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.GitCommandRunner;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -59,11 +60,7 @@ public class Sync extends DumbAwareAction {
 
                 try {
                     indicator.setText("Checking remote configuration...");
-                    String remoteUrl = "";
-                    try {
-                        remoteUrl = GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
-                    } catch (Exception ignored) {
-                    }
+                    String remoteUrl = GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
 
                     if (remoteUrl.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
@@ -88,8 +85,8 @@ public class Sync extends DumbAwareAction {
                     });
 
                 } catch (final Exception ex) {
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).error(project, "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
+                    Log.error(ex.getMessage());
+                    ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
                     );
                 }
             }

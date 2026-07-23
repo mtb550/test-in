@@ -18,10 +18,12 @@ import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.dnd.DnDConstants;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+// todo: to be removed if not required.
 public class ProjectTreeDnD {
 
     public static final DataFlavor DTO_LIST_FLAVOR;
@@ -63,20 +65,26 @@ public class ProjectTreeDnD {
 
         @NotNull
         @Override
-        public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
-            if (DTO_LIST_FLAVOR.equals(flavor)) {
-                return dtos;
-            }
-
-            if (DataFlavor.javaFileListFlavor.equals(flavor)) {
-                List<File> files = new ArrayList<>();
-                for (DirectoryDto dto : dtos) {
-                    files.add(dto.getPath().toFile());
+        public Object getTransferData(DataFlavor flavor) {
+            try {
+                if (DTO_LIST_FLAVOR.equals(flavor)) {
+                    return dtos;
                 }
-                return files;
-            }
 
-            throw new UnsupportedFlavorException(flavor);
+                if (DataFlavor.javaFileListFlavor.equals(flavor)) {
+                    List<File> files = new ArrayList<>();
+                    for (DirectoryDto dto : dtos) {
+                        files.add(dto.getPath().toFile());
+                    }
+                    return files;
+                }
+
+
+                throw new UnsupportedFlavorException(flavor);
+            } catch (final UnsupportedFlavorException ex) {
+                Log.error(ex.getMessage());
+                throw new RuntimeException(ex);
+            }
         }
     }
 
@@ -150,7 +158,12 @@ public class ProjectTreeDnD {
 
         private void persistMove(DirectoryDto sourceDir, DirectoryDto targetDir) {
             Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
-                sourceVf.move(this, targetVf);
+                try {
+                    sourceVf.move(this, targetVf);
+                } catch (final IOException ex) {
+                    Log.error(ex.getMessage());
+                    throw new RuntimeException(ex);
+                }
                 Path newPath = targetDir.getPath().resolve(sourceDir.getName());
                 sourceDir.setPath(newPath);
                 Log.info("Moved successfully to: " + newPath);
@@ -159,7 +172,13 @@ public class ProjectTreeDnD {
 
         private void persistCopy(DirectoryDto source, DirectoryDto target) {
             Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
-                sourceVf.copy(this, targetVf, sourceVf.getName());
+                try {
+                    sourceVf.copy(this, targetVf, sourceVf.getName());
+
+                } catch (final IOException ex) {
+                    Log.error(ex.getMessage());
+                    throw new RuntimeException(ex);
+                }
                 Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
             });
         }

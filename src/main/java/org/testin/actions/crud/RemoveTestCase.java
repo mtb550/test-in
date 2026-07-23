@@ -18,7 +18,6 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.ui.RemoveTestCaseDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
-import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
 import java.io.IOException;
@@ -69,16 +68,10 @@ public class RemoveTestCase extends DumbAwareAction {
             return;
         }
 
-        ApplicationManager.getApplication().runWriteAction(() -> {
-            try {
-                performDeletion(selectedItems);
-            } catch (final IOException ex) {
-                Log.error("Exception: " + ex.getMessage());
-            }
-        });
+        ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
     }
 
-    private void performDeletion(final List<TestCaseDto> selectedItems) throws IOException {
+    private void performDeletion(final List<TestCaseDto> selectedItems) {
         int firstIdx = model.getElementIndex(selectedItems.getFirst());
         int lastIdx = model.getElementIndex(selectedItems.getLast());
 

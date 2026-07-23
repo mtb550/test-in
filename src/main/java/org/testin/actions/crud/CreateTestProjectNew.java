@@ -16,9 +16,11 @@ import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.CodeGenerator;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.indexer.ProjectIndexer;
+import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -55,19 +57,24 @@ public class CreateTestProjectNew extends DumbAwareAction {
                 return;
             }
 
-            VirtualFile projectDir = vf.createChildDirectory(this, tpName);
+            try {
+                VirtualFile projectDir = vf.createChildDirectory(this, tpName);
 
-            projectDir.createChildData(this, DirectoryType.TP.getMarker());
+                projectDir.createChildData(this, DirectoryType.TP.getMarker());
 
-            String tcdName = tp.getTestCasesDirectory().getPath().getFileName().toString();
-            VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);
-            tcdDir.createChildData(this, DirectoryType.TCD.getMarker());
+                String tcdName = tp.getTestCasesDirectory().getPath().getFileName().toString();
+                VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);
+                tcdDir.createChildData(this, DirectoryType.TCD.getMarker());
 
-            String trdName = tp.getTestRunsDirectory().getPath().getFileName().toString();
-            VirtualFile trdDir = projectDir.createChildDirectory(this, trdName);
-            trdDir.createChildData(this, DirectoryType.TRD.getMarker());
+                String trdName = tp.getTestRunsDirectory().getPath().getFileName().toString();
+                VirtualFile trdDir = projectDir.createChildDirectory(this, trdName);
+                trdDir.createChildData(this, DirectoryType.TRD.getMarker());
 
-            projectDir.refresh(false, true);
+
+                projectDir.refresh(false, true);
+            } catch (final IOException ex) {
+                Log.error(ex.getMessage());
+            }
             projectPanel.getTestProjectSelector().addTestProject(tp);
 
             Services.getInstance(project, ProjectIndexer.class).addTestProject(tp);

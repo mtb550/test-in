@@ -43,14 +43,19 @@ public class CreateTestSet implements NodeCreator {
         return ts;
     }
 
-    public VirtualFile inBackground(final @NotNull Project project, final Object requestor, final VirtualFile targetDirectory, final DirectoryDto parentDirDto, final DefaultMutableTreeNode parentNode, final SimpleTree tree, final String name) throws IOException {
+    public VirtualFile inBackground(final @NotNull Project project, final Object requestor, final VirtualFile targetDirectory, final DirectoryDto parentDirDto, final DefaultMutableTreeNode parentNode, final SimpleTree tree, final String name) {
         String safeDirName = name.replaceAll("[\\\\/:*?\"<>|]", "_");
 
         VirtualFile sheetDir = targetDirectory.findChild(safeDirName);
         boolean isNewDirCreated = false;
 
         if (sheetDir == null) {
-            sheetDir = targetDirectory.createChildDirectory(requestor, safeDirName);
+            try {
+                sheetDir = targetDirectory.createChildDirectory(requestor, safeDirName);
+            } catch (final IOException ex) {
+                Log.error("Can't create directory: " + ex.getMessage());
+                throw new RuntimeException(ex);
+            }
             isNewDirCreated = true;
 
             final Tools tools = Services.getInstance(project, Tools.class);
@@ -69,7 +74,12 @@ public class CreateTestSet implements NodeCreator {
         }
 
         if (sheetDir.findChild(DirectoryType.TS.getMarker()) == null) {
-            sheetDir.createChildData(requestor, DirectoryType.TS.getMarker());
+            try {
+                sheetDir.createChildData(requestor, DirectoryType.TS.getMarker());
+            } catch (final IOException ex) {
+                Log.error("Can't create directory: " + ex.getMessage());
+                throw new RuntimeException(ex);
+            }
         }
 
         if (isNewDirCreated && tree != null && tree.getModel() instanceof DefaultTreeModel treeModel) {
