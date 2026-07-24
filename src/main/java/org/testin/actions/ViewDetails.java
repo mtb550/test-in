@@ -15,15 +15,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewDetails extends DumbAwareAction {
-    private final JBList<TestCaseDto> list;
-    private final ArrayList<String> path;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull ArrayList<String> path;
 
-    public ViewDetails(final JBList<TestCaseDto> list, final ArrayList<String> path) {
+    public ViewDetails(final @NotNull JBList<TestCaseDto> list, final @NotNull ArrayList<String> path) {
         super("View Details", "", AllIcons.Actions.PreviewDetails);
         this.list = list;
         this.path = path;
         this.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), list);
-
     }
 
     @Override

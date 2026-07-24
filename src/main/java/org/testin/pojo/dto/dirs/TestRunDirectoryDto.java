@@ -3,7 +3,7 @@ package org.testin.pojo.dto.dirs;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.testin.pojo.CreateNodeMenu;
-import org.testin.pojo.TestRunMarker;
+import org.testin.pojo.markers.TestRunMarker;
 
 @Setter
 @Getter

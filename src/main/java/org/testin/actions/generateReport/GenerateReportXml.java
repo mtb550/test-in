@@ -25,10 +25,12 @@ public class GenerateReportXml extends DumbAwareAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
         final Project project = e.getProject();
+
         DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-        if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto tr) {
+
+        if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto tr)
             new TestRunReport(project, tr).build().asXml();
-        }
+
     }
 
     @Override

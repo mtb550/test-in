@@ -58,17 +58,8 @@ public class CreateTestSet implements NodeCreator {
             }
             isNewDirCreated = true;
 
-            final Tools tools = Services.getInstance(project, Tools.class);
-            TestSetDirectoryDto newTsDto = TestSetDirectoryDto
-                    .builder()
-                    .name(safeDirName)
-                    .path(parentDirDto.getPath().resolve(safeDirName))
-                    .path2(tools.buildPath2(parentDirDto.getPath2(), safeDirName))
-                    .parent(parentDirDto)
-                    .build();
-
+            TestSetDirectoryDto newTsDto = Services.getInstance(project, DirectoryMapper.class).setTestSetNode(project, parentDirDto.getPath(), parentDirDto);
             Services.getInstance(project, ProjectIndexer.class).addTestSet(newTsDto);
-
             Services.getInstance(project, TreeUtilImpl.class).createNode(tree, parentNode, newTsDto);
             createJavaClassInTestRoot(project, parentDirDto.getName(), safeDirName);
         }

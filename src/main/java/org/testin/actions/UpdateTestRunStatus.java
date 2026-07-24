@@ -12,11 +12,11 @@ import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.pojo.TestRunItems;
-import org.testin.pojo.TestRunMarker;
 import org.testin.pojo.TestRunStatus;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
+import org.testin.pojo.markers.TestRunMarker;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
@@ -66,9 +66,9 @@ public class UpdateTestRunStatus extends DumbAwareAction {
         }
 
         TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
-        boolean enabled = currentStatus == TestRunStatus.CREATED
-                || currentStatus == TestRunStatus.ASSIGNED
-                || currentStatus == TestRunStatus.IN_PROGRESS;
+        boolean enabled = currentStatus == TestRunStatus.CREATED ||
+                currentStatus == TestRunStatus.ASSIGNED ||
+                currentStatus == TestRunStatus.IN_PROGRESS;
 
         e.getPresentation().setEnabled(enabled);
 
@@ -96,17 +96,13 @@ public class UpdateTestRunStatus extends DumbAwareAction {
         marker.setStatus(newStatus);
         marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-        Log.trace("Test run status changed: "
-                + editor.getParent().getName()
-                + " = " + newStatus.getLabel());
+        Log.trace("Test run status changed: " + editor.getParent().getName() + " = " + newStatus.getLabel());
 
-        if (newStatus == TestRunStatus.COMPLETED || newStatus == TestRunStatus.CLOSED) {
+        if (newStatus == TestRunStatus.COMPLETED || newStatus == TestRunStatus.CLOSED)
             resetPendingToUntested(editor);
-        }
 
-        if (newStatus == TestRunStatus.COMPLETED && oldStatus == TestRunStatus.IN_PROGRESS) {
+        if (newStatus == TestRunStatus.COMPLETED && oldStatus == TestRunStatus.IN_PROGRESS)
             editor.stopExecution();
-        }
 
         persistMarker(project, editor);
         persistResults(project, editor);
@@ -119,6 +115,7 @@ public class UpdateTestRunStatus extends DumbAwareAction {
                     editor.getCurrentTestCases().size(),
                     editor.getTotalItemsCount()
             );
+
             updateStartButton(editor);
         });
     }
@@ -137,12 +134,7 @@ public class UpdateTestRunStatus extends DumbAwareAction {
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
-            editor.getStatusBar().updatePaginationState(
-                    editor.getCurrentPage(),
-                    editor.getTotalPageCount(),
-                    editor.getCurrentTestCases().size(),
-                    editor.getTotalItemsCount()
-            );
+            editor.getStatusBar().updatePaginationState(editor.getCurrentPage(), editor.getTotalPageCount(), editor.getCurrentTestCases().size(), editor.getTotalItemsCount());
             updateStartButton(editor);
         });
     }

@@ -28,12 +28,11 @@ public class ProjectTree {
     private final TreeTransferHandler transferHandler;
     private final TreeContextMenu treeContextMenu;
 
-    public ProjectTree(final @NotNull Project project, final ProjectPanel projectPanel) {
+    public ProjectTree(final @NotNull Project project, final @NotNull ProjectPanel projectPanel) {
         this.project = project;
         this.projectPanel = projectPanel;
 
-        TestProjectDirectoryDto testProjectDirectory;
-        testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+        final TestProjectDirectoryDto testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
         this.mainRoot = new DefaultMutableTreeNode(testProjectDirectory != null ? testProjectDirectory : "Project");
         this.treeModel = new DefaultTreeModel(mainRoot);
@@ -70,8 +69,7 @@ public class ProjectTree {
     private void doRefreshTree() {
         mainRoot.removeAllChildren();
 
-        TestProjectDirectoryDto testProjectDirectory;
-        testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+        final TestProjectDirectoryDto testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
         if (testProjectDirectory != null) {
             mainRoot.setUserObject(testProjectDirectory);

@@ -7,9 +7,9 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CheckedTreeNode;
+import org.jetbrains.annotations.NotNull;
+import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.TestRunItems;
-import org.testin.pojo.TestRunMarker;
-import org.testin.pojo.TestRunStatus;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
@@ -17,11 +17,12 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.pojo.markers.MarkerMapper;
+import org.testin.pojo.markers.TestRunMarker;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.ui.RunCreationForm;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
-import org.testin.util.Tools;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
@@ -36,7 +37,7 @@ public class CreateTestRun implements NodeCreator {
     private TestRunDirectoryDto tr;
 
     @Override
-    public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+    public DirectoryDto execute(final CreateTreeNode action, final @NotNull Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         this.project = project;
         final TestProjectDirectoryDto tp = action.getProjectPanel().getTestProjectSelector().getSelectedTestProject().getItem();
 
@@ -60,15 +61,7 @@ public class CreateTestRun implements NodeCreator {
 
                 dialogBuilder.setOkOperation(() -> {
                     dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
-
-                    final String trName = newDirPath.getFileName().toString();
-                    final Tools tools = Services.getInstance(project, Tools.class);
-                    tr = TestRunDirectoryDto.builder()
-                            .name(trName)
-                            .path(newDirPath)
-                            .parent(parentDir)
-                            .path2(tools.buildPath2(parentDir.getPath2(), trName))
-                            .build();
+                    tr = Services.getInstance(project, DirectoryMapper.class).setTestRunNode(project, newDirPath, parentDir);
                     saveSelectedToJSON(form, root, newDirPath, action.getProjectPanel(), tr);
                 });
 
@@ -114,15 +107,18 @@ public class CreateTestRun implements NodeCreator {
 
         if (child != null) return child;
 
-        // Fallback: try direct lookups by path
         if (indexer.getTestSetPackageByPath(folder) != null)
             return indexer.getTestSetPackageByPath(folder);
+
         if (indexer.getTestSetByPath(folder) != null)
             return indexer.getTestSetByPath(folder);
+
         if (indexer.getTestCasesMainDirByPath(folder) != null)
             return indexer.getTestCasesMainDirByPath(folder);
+
         if (indexer.getTestRunDirByPath(folder) != null)
             return indexer.getTestRunDirByPath(folder);
+
         if (indexer.getTestRunsMainDirByPath(folder) != null)
             return indexer.getTestRunsMainDirByPath(folder);
 
@@ -155,11 +151,7 @@ public class CreateTestRun implements NodeCreator {
             Services.getInstance(project, FilesUtil.class).createDirectories(savePath);
             Services.getInstance(project, ProjectIndexer.class).putTestRun(savePath, run);
 
-            TestRunMarker marker = TestRunMarker.builder()
-                    .status(TestRunStatus.CREATED)
-                    .createdBy(System.getProperty("user.name", ""))
-                    .build();
-
+            TestRunMarker marker = Services.getInstance(project, MarkerMapper.class).setTestRunMarker();
             tr.setMarker(marker);
 
             Services.getInstance(project, ProjectIndexer.class).addTestRunDir(tr);

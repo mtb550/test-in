@@ -9,9 +9,7 @@ import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.*;
-import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.util.Mapper;
-import org.testin.util.Tools;
 import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 
@@ -43,64 +41,37 @@ final class IndexingScanner {
 
     private void scanProjectContents(final Path projectPath, final ProgressIndicator indicator) {
         try {
-            final Tools tools = Services.getInstance(project, Tools.class);
-            final Mapper mapper = Services.getInstance(project, Mapper.class);
-            final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
+            final TestProjectDirectoryDto tp = Services.getInstance(project, DirectoryMapper.class).getTestProjectNode(project, projectPath);
 
-            final TestProjectMarker marker = mapper.readValue(
-                    projectPath.resolve(DirectoryType.TP.getMarker()).toFile(),
-                    TestProjectMarker.class);
-            if (marker == null) return;
-
-            if (marker.getStatus() == ProjectStatus.ARCHIVED) {
+            if (tp.getMarker().getStatus() == ProjectStatus.ARCHIVED) {
                 Log.info("Skipping archived project: " + projectPath.getFileName());
                 return;
             }
-
-            final String fileName = projectPath.getFileName().toString();
-            final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
-                    .name(fileName)
-                    .path(projectPath)
-                    .pathName(fileName)
-                    .path2(tools.buildPath2(null, fileName))
-                    .marker(marker)
-                    .build();
 
             store.getTestProjectsByPath().put(projectPath.toString(), tp);
 
             if (indicator != null) {
                 indicator.setFraction(0.1);
-                indicator.setText(fileName + " - test sets...");
+                indicator.setText(tp.getName() + " - test sets...");
             }
 
-            final Path tcDir = projectPath.resolve(DirectoryType.TCD.getDisplayedName());
-            if (Files.exists(tcDir) && Files.isDirectory(tcDir)) {
-                final TestCasesMainDirectoryDto tcd = dirMapper.getTestCasesRootNode(project, tcDir, tp);
-                if (tcd != null) {
-                    tp.setTestCasesDirectory(tcd);
-                    store.getTestCasesMainDirsByPath().put(tcDir.toString(), tcd);
-                    scanTestSets(tcDir, tcd, indicator);
-                }
-            }
+            final TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
+            store.getTestCasesMainDirsByPath().put(tcd.getPath().toString(), tcd);
+            scanTestSets(tcd.getPath(), tcd, indicator);
+
 
             if (indicator != null) {
                 indicator.setFraction(0.5);
-                indicator.setText(fileName + " - test runs...");
+                indicator.setText(tp.getName() + " - test runs...");
             }
 
-            final Path trDir = projectPath.resolve(DirectoryType.TRD.getDisplayedName());
-            if (Files.exists(trDir) && Files.isDirectory(trDir)) {
-                final TestRunsMainDirectoryDto trd = dirMapper.getTestRunsRootNode(project, trDir, tp);
-                if (trd != null) {
-                    tp.setTestRunsDirectory(trd);
-                    store.getTestRunsMainDirsByPath().put(trDir.toString(), trd);
-                    scanTestRunDirs(trDir, trd, indicator);
-                }
-            }
+            final TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();
+            store.getTestRunsMainDirsByPath().put(trd.getPath().toString(), trd);
+            scanTestRunDirs(trd.getPath(), trd, indicator);
 
             if (indicator != null) {
                 indicator.setFraction(1.0);
-                indicator.setText(fileName + " - done.");
+                indicator.setText(tp.getName() + " - done.");
             }
 
         } catch (final Exception ex) {
@@ -108,14 +79,14 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestSets(final Path tcDir, final DirectoryDto parent,
-                              final ProgressIndicator indicator) {
+    private void scanTestSets(final Path tcDir, final DirectoryDto parent, final ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
             dirs.parallelStream().forEach(dirPath -> {
                 if (Files.exists(dirPath.resolve(DirectoryType.TS.getMarker()))) {
                     scanTestSet(dirPath, parent, indicator);
+
                 } else if (Files.exists(dirPath.resolve(DirectoryType.TSP.getMarker()))) {
                     scanTestSetPackage(dirPath, parent, indicator);
                 }

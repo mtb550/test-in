@@ -53,15 +53,13 @@ public class UpdateTestCase extends DumbAwareAction {
         new TestCaseUpdateMenu(project, selectedItems, (updatedItems, cg) -> {
 
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-            for (final TestCaseDto tc : updatedItems) {
+            for (final TestCaseDto tc : updatedItems)
                 indexer.putTestCase(path, tc);
-            }
 
             Services.getInstance(project, Notifier.class).softShow(project, "Updated..");
 
-            if (editor instanceof IToolBar) {
+            if (editor instanceof IToolBar)
                 ((IToolBar) editor).onToolBarFilterSelectionChanged();
-            }
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 list.repaint();

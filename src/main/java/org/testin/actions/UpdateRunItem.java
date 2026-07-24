@@ -22,7 +22,7 @@ import java.nio.file.Path;
 public class UpdateRunItem extends DumbAwareAction {
 
     private final @NotNull IEditor editor;
-    private final JBList<TestCaseDto> list;
+    private final @NotNull JBList<TestCaseDto> list;
 
     public UpdateRunItem(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Update Test Run Item", "Update test run item attributes", AllIcons.Actions.Edit);
@@ -34,7 +34,7 @@ public class UpdateRunItem extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final Project project = e.getProject();
-        if (list == null || project == null) return;
+        if (project == null) return;
 
         final TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;
