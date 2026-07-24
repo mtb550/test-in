@@ -51,9 +51,9 @@ public class ImportCsv {
 
         for (int i = 0; i < headers.length; i++) {
             String headerName = headers[i].trim();
-            for (String reqCol : imports.IMPORT_COLUMNS) {
-                if (reqCol.equalsIgnoreCase(headerName)) {
-                    headerIndexMap.put(reqCol.toLowerCase(), i);
+            for (TestEditorAttributes reqCol : imports.importAttributes) {
+                if (reqCol.getName().equalsIgnoreCase(headerName)) {
+                    headerIndexMap.put(reqCol.getName().toLowerCase(), i);
                 }
             }
         }

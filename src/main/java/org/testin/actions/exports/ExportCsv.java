@@ -27,9 +27,10 @@ public class ExportCsv {
 
     public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
-            List<String> headerNames = exports.EXPORT_COLUMNS.stream()
+            List<String> headerNames = exports.exportAttributes.stream()
                     .map(TestEditorAttributes::getName)
                     .toList();
+
             writer.write(String.join(",", headerNames));
             writer.newLine();
 
@@ -37,7 +38,7 @@ public class ExportCsv {
                 List<TestCaseDto> testCases = entry.getValue();
                 for (TestCaseDto tc : testCases) {
                     List<String> rowValues = new ArrayList<>();
-                    for (TestEditorAttributes attr : exports.EXPORT_COLUMNS) {
+                    for (TestEditorAttributes attr : exports.exportAttributes) {
                         String val = attr.getValueExtractor().apply(tc, project);
                         rowValues.add(escapeCsvField(val != null ? val : ""));
                     }
@@ -61,9 +62,14 @@ public class ExportCsv {
 
     private String escapeCsvField(final String value) {
         if (value == null) return "";
-        if (value.contains(",") || value.contains("\"") || value.contains("\n") || value.contains("\r")) {
+
+        if (value.contains(",") ||
+                value.contains("\"") ||
+                value.contains("\n") ||
+                value.contains("\r")
+        )
             return "\"" + value.replace("\"", "\"\"") + "\"";
-        }
+
         return value;
     }
 }

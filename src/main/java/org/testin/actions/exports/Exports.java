@@ -13,12 +13,12 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.Dialogs.importExport.ExportDialog;
 import org.testin.pojo.FileTypes;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
-import org.testin.ui.ExportPreviewDialog;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Log;
 import org.testin.util.notifications.Notifier;
@@ -32,7 +32,7 @@ import java.util.*;
 
 public class Exports extends DumbAwareAction {
 
-    protected final List<TestEditorAttributes> EXPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
+    protected final List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isExportable)
             .toList();
 
@@ -68,7 +68,7 @@ public class Exports extends DumbAwareAction {
                     return;
                 }
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    ExportPreviewDialog dialog = new ExportPreviewDialog(project, sheets, targetDir);
+                    ExportDialog dialog = new ExportDialog(project, exportAttributes, sheets, targetDir);
                     if (!dialog.showAndGet()) return;
 
                     FileTypes format = dialog.getSelectedFormat();

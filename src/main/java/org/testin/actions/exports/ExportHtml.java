@@ -92,7 +92,7 @@ public class ExportHtml {
                 writer.newLine();
 
                 writer.write("<tr>");
-                for (TestEditorAttributes attr : exports.EXPORT_COLUMNS) {
+                for (TestEditorAttributes attr : exports.exportAttributes) {
                     writer.write("<th>" + htmlEscape(attr.getName()) + "</th>");
                 }
                 writer.write("</tr>");
@@ -100,7 +100,7 @@ public class ExportHtml {
 
                 for (TestCaseDto tc : testCases) {
                     writer.write("<tr>");
-                    for (TestEditorAttributes attr : exports.EXPORT_COLUMNS) {
+                    for (TestEditorAttributes attr : exports.exportAttributes) {
                         String val = attr.getValueExtractor().apply(tc, project);
                         writer.write("<td>" + htmlEscape(val != null ? val : "") + "</td>");
                     }

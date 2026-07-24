@@ -6,11 +6,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.Dialogs.createNodes.CreateNodesDialog;
 import org.testin.pojo.CreateNodeMenu;
 import org.testin.pojo.DirectoryType;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
-import org.testin.ui.createNodes.CreateNodesDialog;
 import org.testin.util.Tools;
 import org.testin.util.services.Services;
 

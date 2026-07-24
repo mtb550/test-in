@@ -47,23 +47,23 @@ public class ExportExcel {
                 List<TestCaseDto> testCases = entry.getValue();
 
                 Row headerRow = sheet.createRow(0);
-                for (int i = 0; i < exports.EXPORT_COLUMNS.size(); i++) {
+                for (int i = 0; i < exports.exportAttributes.size(); i++) {
                     Cell cell = headerRow.createCell(i);
-                    cell.setCellValue(exports.EXPORT_COLUMNS.get(i).getName());
+                    cell.setCellValue(exports.exportAttributes.get(i).getName());
                     cell.setCellStyle(headerStyle);
                 }
 
                 int rowIndex = 1;
                 for (TestCaseDto tc : testCases) {
                     Row row = sheet.createRow(rowIndex++);
-                    for (int i = 0; i < exports.EXPORT_COLUMNS.size(); i++) {
+                    for (int i = 0; i < exports.exportAttributes.size(); i++) {
                         Cell cell = row.createCell(i);
-                        String val = exports.EXPORT_COLUMNS.get(i).getValueExtractor().apply(tc, project);
+                        String val = exports.exportAttributes.get(i).getValueExtractor().apply(tc, project);
                         cell.setCellValue(val != null ? val : "");
                     }
                 }
 
-                for (int i = 0; i < exports.EXPORT_COLUMNS.size(); i++) {
+                for (int i = 0; i < exports.exportAttributes.size(); i++) {
                     sheet.autoSizeColumn(i);
                 }
             }

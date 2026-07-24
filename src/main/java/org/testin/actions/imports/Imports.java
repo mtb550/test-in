@@ -11,15 +11,15 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.Dialogs.importExport.ImportDialog;
 import org.testin.actions.nodeCreator.CreateTestSet;
-import org.testin.pojo.FileTypes;
+import org.testin.pojo.DirectoryMapper;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
-import org.testin.ui.ImportPreviewDialog;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
@@ -31,16 +31,17 @@ import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class Imports extends DumbAwareAction {
 
-    protected final List<String> IMPORT_COLUMNS = Arrays.stream(TestEditorAttributes.values())
+    protected final List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportable)
-            .map(TestEditorAttributes::getName)
             .toList();
 
     final @NotNull SimpleTree tree;
@@ -52,16 +53,38 @@ public class Imports extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        ImportContext ctx = validateTreeSelection(e);
-        if (ctx == null) return;
+        if (e.getProject() == null) return;
+        final Project project = e.getProject();
+        final TreePath path = tree.getSelectionPath();
 
-        final Project project = ctx.project;
-        final VirtualFile targetDirectory = ctx.targetDirectory;
-        final DirectoryDto dirDto = ctx.dirDto;
-        final DefaultMutableTreeNode parentNode = ctx.parentNode;
+        if (path == null) {
+            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select a directory in the Project Panel tree.");
+            return;
+        }
 
-        ImportPreviewDialog dialog = new ImportPreviewDialog(project, new LinkedHashMap<>());
-        dialog.setImportFileLoader((file, format) -> delegateToFormat(project, file, format));
+        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final Object userObject = parentNode.getUserObject();
+
+        if (!(userObject instanceof DirectoryDto dirDto) ||
+                !(dirDto instanceof TestSetDirectoryDto ||
+                        dirDto instanceof TestSetPackageDirectoryDto ||
+                        dirDto instanceof TestCasesMainDirectoryDto)) {
+            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            return;
+        }
+
+        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
+
+        if (targetDirectory != null && !targetDirectory.isDirectory()) {
+            targetDirectory = targetDirectory.getParent();
+        }
+
+        if (targetDirectory == null) {
+            Services.getInstance(project, Notifier.class).error(project, "Import Error", "The selected path in the Project Panel is invalid.");
+            return;
+        }
+
+        ImportDialog dialog = new ImportDialog(project, importAttributes, (file, format) -> format.importToFile(project, Imports.this, file));
 
         if (dialog.showAndGet()) {
             Map<String, List<TestCaseDto>> selectedCasesBySheet = dialog.getSelectedTestCasesBySheet();
@@ -77,53 +100,7 @@ public class Imports extends DumbAwareAction {
         }
     }
 
-    private Map<String, List<TestCaseDto>> delegateToFormat(final @NotNull Project project, final File importFile, final FileTypes format) {
-        return switch (format) {
-            case CSV -> new ImportCsv(Imports.this).processImport(project, importFile);
-            case XLS, XLSX -> new ImportExcel(Imports.this).processImport(project, importFile);
-            case JSON -> new ImportJson(Imports.this).processImport(project, importFile);
-            case HTML -> {
-                Services.getInstance(project, Notifier.class).warn(project, "Unsupported", "HTML import is not supported.");
-                yield new LinkedHashMap<>();
-            }
-        };
-    }
-
-    @Nullable
-    private ImportContext validateTreeSelection(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return null;
-        final Project project = e.getProject();
-        final TreePath path = tree.getSelectionPath();
-
-        if (path == null) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select a directory in the Project Panel tree.");
-            return null;
-        }
-
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = parentNode.getUserObject();
-
-        if (!(userObject instanceof DirectoryDto dirDto) ||
-                !(dirDto instanceof TestSetDirectoryDto || dirDto instanceof TestSetPackageDirectoryDto || dirDto instanceof TestCasesMainDirectoryDto)) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
-            return null;
-        }
-
-        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
-
-        if (targetDirectory != null && !targetDirectory.isDirectory()) {
-            targetDirectory = targetDirectory.getParent();
-        }
-
-        if (targetDirectory == null) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "The selected path in the Project Panel is invalid.");
-            return null;
-        }
-
-        return new ImportContext(project, targetDirectory, dirDto, parentNode);
-    }
-
-    private void executeImportWriteAction(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode, final ImportPreviewDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
+    private void executeImportWriteAction(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode, final ImportDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
@@ -145,6 +122,7 @@ public class Imports extends DumbAwareAction {
 
                 Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
                 Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
+
             } else {
                 int totalImported = 0;
                 for (Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
@@ -158,12 +136,7 @@ public class Imports extends DumbAwareAction {
 
                     if (dialog.getCg().isSelected()) {
                         String sheetName = sheetDir.getName();
-                        TestSetDirectoryDto sheetDto = TestSetDirectoryDto.builder()
-                                .name(sheetName)
-                                .path(Path.of(sheetDir.getPath()))
-                                .path2(Services.getInstance(project, Tools.class).buildPath2(selectedDirDto.getPath2(), sheetName))
-                                .parent(selectedDirDto)
-                                .build();
+                        TestSetDirectoryDto sheetDto = Services.getInstance(project, DirectoryMapper.class).setTestSetNode(project, Path.of(sheetDir.getPath()), selectedDirDto);
 
                         Log.info("Import: generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
                         CreateTestMethod syncInjector = new CreateTestMethod();
@@ -193,6 +166,7 @@ public class Imports extends DumbAwareAction {
         for (TestCaseDto currentTestCase : testCases) {
             if (previousNode == null) {
                 currentTestCase.setIsHead(true);
+
             } else {
                 currentTestCase.setIsHead(null);
                 previousNode.setNext(currentTestCase.getId());
@@ -252,13 +226,5 @@ public class Imports extends DumbAwareAction {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.BGT;
-    }
-
-    private record ImportContext(
-            @NotNull Project project,
-            @NotNull VirtualFile targetDirectory,
-            @NotNull DirectoryDto dirDto,
-            @NotNull DefaultMutableTreeNode parentNode
-    ) {
     }
 }

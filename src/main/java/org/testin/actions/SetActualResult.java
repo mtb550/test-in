@@ -7,11 +7,11 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.Dialogs.testRun.ActualResultDialog;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.ui.testRun.ActualResultDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Log;
 

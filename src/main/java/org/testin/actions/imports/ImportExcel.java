@@ -63,9 +63,9 @@ public class ImportExcel {
 
             for (Cell cell : headerRow) {
                 String headerName = dataFormatter.formatCellValue(cell).trim();
-                for (String reqCol : imports.IMPORT_COLUMNS) {
-                    if (reqCol.equalsIgnoreCase(headerName)) {
-                        headerIndexMap.put(reqCol.toLowerCase(), cell.getColumnIndex());
+                for (TestEditorAttributes reqCol : imports.importAttributes) {
+                    if (reqCol.getName().equalsIgnoreCase(headerName)) {
+                        headerIndexMap.put(reqCol.getName().toLowerCase(), cell.getColumnIndex());
                     }
                 }
             }
