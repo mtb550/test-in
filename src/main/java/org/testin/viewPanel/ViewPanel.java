@@ -62,7 +62,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (testName, status, error) -> {
+        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
             final TestCaseDto currentDto = getCurrentTestCaseDto();
             Log.debug("ViewPanel subscription fired: testName='" + testName + "', status='" + status + "'");
 

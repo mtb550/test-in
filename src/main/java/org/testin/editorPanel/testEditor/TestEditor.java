@@ -162,8 +162,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.addKeyListener(new KeyListener(list, this));
 
         // Subscribe to test case execution broadcasts to update run/stop icons
-        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (testName, status, error) -> {
-            if (list == null) return;
+        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
             Log.debug("TestEditor subscription fired: testName='" + testName + "', status='" + status + "'");
             final ListModel<TestCaseDto> lm = list.getModel();
             boolean updated = false;
