@@ -116,11 +116,12 @@ public class PendingCommitsDialog extends DialogWrapper {
         if (diff.type() == TestCaseDiff.DiffType.ADDED) {
             TestCaseDto newState = diff.newState();
             return newState != null ? newState.getDescription() : fc.newValue();
+
         } else if (diff.type() == TestCaseDiff.DiffType.DELETED) {
             TestCaseDto oldState = diff.oldState();
             return oldState != null ? oldState.getDescription() : fc.oldValue();
+
         } else {
-            // MODIFIED: show the current (new) description from the DTO
             TestCaseDto newState = diff.newState();
             return newState != null ? newState.getDescription() : fc.newValue();
         }
@@ -149,20 +150,19 @@ public class PendingCommitsDialog extends DialogWrapper {
             } else if (diff.type() == TestCaseDiff.DiffType.MODIFIED) {
                 TestCaseDto currentDto = Services.getInstance(project, ProjectIndexer.class).getTestCaseById(UUID.fromString(testCaseId));
 
-                if (currentDto == null) return;
-
                 TestCaseDto oldDto = diff.oldState();
 
-                // Determine which field to revert based on the change type label
-                if (changeTypeLabel.contains("Description")) {
+                if (changeTypeLabel.contains("Description"))
                     currentDto.setDescription(oldDto.getDescription());
-                } else if (changeTypeLabel.contains("Expected Result")) {
+
+                else if (changeTypeLabel.contains("Expected Result"))
                     currentDto.setExpectedResult(oldDto.getExpectedResult());
-                } else if (changeTypeLabel.contains("Priority")) {
+
+                else if (changeTypeLabel.contains("Priority"))
                     currentDto.setPriority(oldDto.getPriority());
-                } else if (changeTypeLabel.contains("Group")) {
+
+                else if (changeTypeLabel.contains("Group"))
                     currentDto.setGroup(oldDto.getGroup());
-                }
 
                 Services.getInstance(project, ProjectIndexer.class).putTestCase(jsonFile.getParentFile().toPath(), currentDto);
                 model.removeRow(selectedRow);

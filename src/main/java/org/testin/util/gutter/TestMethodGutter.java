@@ -70,14 +70,6 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
                 final TestCaseDto dto = indexer.getTestCaseById(uuid);
 
-                if (dto == null) {
-                    Log.error("Test case not found in indexer: " + uuid);
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).warn(project, "Not Found", "No test case found in indexer for ID: " + uuid)
-                    );
-                    return;
-                }
-
                 Log.info("Found in indexer: " + dto.getDescription());
 
                 ApplicationManager.getApplication().invokeLater(() ->

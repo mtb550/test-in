@@ -234,7 +234,7 @@ public final class ProjectIndexer {
         return store.getTestRunForPath(testRunPath);
     }
 
-    public TestCaseDto getTestCaseById(final UUID id) {
+    public @NotNull TestCaseDto getTestCaseById(final @NotNull UUID id) {
         return store.getTestCaseById(id);
     }
 

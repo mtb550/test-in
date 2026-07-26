@@ -52,9 +52,7 @@ public class UpdateTestProjectStatus extends DumbAwareAction {
 
             Services.getInstance(project, ProjectIndexer.class).persistTestProjectMarker(project, tp);
 
-            final ProjectPanel projectPanel = Services.getInstance(project, ProjectPanel.class);
-            if (projectPanel != null)
-                projectPanel.getProjectTree().updateNodes();
+            Services.getInstance(project, ProjectPanel.class).getProjectTree().updateNodes();
 
             Services.getInstance(project, Notifier.class).info(project, "Test project '" + tp.getName() + "' is " + projectStatus.getDescription() + ".");
 

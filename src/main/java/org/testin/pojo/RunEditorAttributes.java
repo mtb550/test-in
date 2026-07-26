@@ -93,10 +93,7 @@ public enum RunEditorAttributes {
             true,
             (item, project) -> {
                 final TestCaseDto tc = Services.getInstance(project, ProjectIndexer.class).getTestCaseById(item.getId());
-                if (tc != null) {
-                    return String.join(" > ", tc.getParent().getPath2());
-                }
-                return "";
+                return String.join(" > ", tc.getParent().getPath2());
             },
             null
     ),

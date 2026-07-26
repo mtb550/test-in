@@ -25,12 +25,11 @@ public class TestRunInfoPopup {
 
                 panel.add(new JBLabel("Name: " + run.getRunName()));
 
-
                 return panel;
             }
 
-            private String safe(String value) {
-                return value != null ? value : "(not set)";
+            private String safe(final @NotNull String value) {
+                return value;
             }
         };
 

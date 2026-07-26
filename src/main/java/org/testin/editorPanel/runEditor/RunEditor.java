@@ -193,12 +193,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                     if (tr != null && !tr.getResults().isEmpty()) {
                         for (final TestRunItems item : tr.getResults()) {
                             final TestCaseDto tc = indexer.getTestCaseById(item.getId());
-                            if (tc != null) {
-                                loadedItems.add(tc);
-                                final TestRunItems runItem = resultsMap.get(item.getId());
-                                if (runItem != null) {
-                                    runItem.setTc(tc);
-                                }
+                            loadedItems.add(tc);
+                            final TestRunItems runItem = resultsMap.get(item.getId());
+                            if (runItem != null) {
+                                runItem.setTc(tc);
                             }
                         }
                     }

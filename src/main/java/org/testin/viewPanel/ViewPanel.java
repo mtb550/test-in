@@ -13,8 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.ViewTab;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.FontSyncUtil;
-import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
-import org.testin.util.logger.Log;
 import org.testin.viewPanel.details.DetailsTab;
 import org.testin.viewPanel.history.HistoryTab;
 import org.testin.viewPanel.openBugs.OpenBugsTab;
@@ -22,7 +20,6 @@ import org.testin.viewPanel.openBugs.OpenBugsTab;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ViewPanel implements Disposable {
     private final JBPanel<?> detailsTab;
@@ -39,9 +36,8 @@ public class ViewPanel implements Disposable {
     @Getter
     private final ViewPagination page;
 
+    @Getter
     private final Project project;
-
-    private final java.util.Map<String, UUID> uuidToDtoId = new java.util.HashMap<>();
 
     public ViewPanel(final @NotNull Project project) {
         this.project = project;
@@ -62,44 +58,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (ITestCaseExecutionListener) (testName, status, error) -> {
-            final TestCaseDto currentDto = getCurrentTestCaseDto();
-            Log.debug("ViewPanel subscription fired: testName='" + testName + "', status='" + status + "'");
-
-            if (currentDto == null) return;
-
-            boolean updated = false;
-
-            // 1. Try to match by DTO id (for RUNNING broadcast from RunTestCase which uses tc.getId())
-            if (testName.equals(currentDto.getId().toString().toLowerCase())) {
-                Log.debug("  ID match! Setting tempStatus='" + status + "'");
-                currentDto.setTempStatus(status);
-                currentDto.setTempError(error != null ? error : "");
-                updated = true;
-            }
-
-            // 2. Try to match by UUID map (for completion broadcasts from TestCaseExecutionTracker)
-            if (!updated) {
-                final UUID dtoId = uuidToDtoId.get(testName);
-                if (dtoId != null && dtoId.equals(currentDto.getId())) {
-                    Log.debug("  UUID map match! Setting tempStatus='" + status + "'");
-                    currentDto.setTempStatus(status);
-                    currentDto.setTempError(error != null ? error : "");
-                    updated = true;
-                }
-            }
-
-            // 3. If status is RUNNING and no match yet, this is a UUID broadcast from the tracker.
-            //    The DTO already has RUNNING from RunTestCase, so store the UUID -> DTO id mapping.
-            if (!updated && "RUNNING".equals(status) && "RUNNING".equals(currentDto.getTempStatus()) && !uuidToDtoId.containsKey(testName)) {
-                Log.debug("  Mapping UUID='" + testName + "' -> DTO id='" + currentDto.getId() + "'");
-                uuidToDtoId.put(testName, currentDto.getId());
-            }
-
-            if (updated) {
-                refreshCurrentView();
-            }
-        });
+        new ViewPanelExecutionSubscriber(this);
     }
 
     private JBScrollPane createScrollPane(Component view) {

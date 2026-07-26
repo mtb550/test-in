@@ -139,9 +139,7 @@ public final class TestRunReport {
 
         for (final TestRunItems item : tr.getResults()) {
             final TestCaseDto tc = indexer.getTestCaseById(item.getId());
-            if (tc != null) {
-                detailsMap.put(item.getId(), tc);
-            }
+            detailsMap.put(item.getId(), tc);
         }
 
         return detailsMap;
