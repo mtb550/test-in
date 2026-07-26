@@ -28,16 +28,14 @@ public final class EditorStateService {
     public EditorStateService(final @NotNull Project project) {
         this.project = project;
 
-        project.getMessageBus().connect(project)
-                .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER,
-                        new FileEditorManagerListener() {
-                            @Override
-                            public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
-                                if (file instanceof UnifiedVirtualFile) {
-                                    saveOpenEditors();
-                                }
-                            }
-                        });
+        project.getMessageBus().connect(project).subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER, new FileEditorManagerListener() {
+            @Override
+            public void fileClosed(@NotNull FileEditorManager source, @NotNull VirtualFile file) {
+                if (file instanceof UnifiedVirtualFile) {
+                    saveOpenEditors();
+                }
+            }
+        });
     }
 
     public void saveOpenEditors() {
