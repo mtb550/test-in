@@ -28,16 +28,16 @@ public class Shared {
         return new RoundedBadge(group.getName(), JBColor.darkGray);
     }
 
-    public static void drawDescriptionActionIcons(final Component c, final Graphics g, final int titleWidth, final int y, final String hoveredAction) {
-        final int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
+    public static void drawDescriptionActionIcons(final Component c, final Graphics g, final int x, final int y, final String hoveredAction, final boolean isRunning) {
+        final int startX = JBUI.scale(16) + x + JBUI.scale(10);
 
         final Icon navIcon = AllIcons.Nodes.Class;
-        final boolean isNavHovered = CardHoverAction.NAVIGATE.name().equals(hoveredAction);
+        final boolean isNavHovered = CardHoverAction.NAVIGATE_TO_TEST_METHOD.name().equals(hoveredAction);
         drawHoverableIcon(c, g, navIcon, startX, y, isNavHovered);
 
         final int runStartX = startX + navIcon.getIconWidth() + JBUI.scale(8);
-        final Icon runIcon = AllIcons.RunConfigurations.TestState.Run;
-        final boolean isRunHovered = CardHoverAction.RUN.name().equals(hoveredAction);
+        final Icon runIcon = isRunning ? AllIcons.Actions.Suspend : AllIcons.RunConfigurations.TestState.Run;
+        final boolean isRunHovered = CardHoverAction.RUN_TEST_CASE.name().equals(hoveredAction);
         drawHoverableIcon(c, g, runIcon, runStartX, y, isRunHovered);
     }
 

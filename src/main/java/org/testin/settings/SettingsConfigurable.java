@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.Refresh;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.settings.ui.TestinPathPanel;
+import org.testin.settings.Dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
 import org.testin.util.logger.Log;

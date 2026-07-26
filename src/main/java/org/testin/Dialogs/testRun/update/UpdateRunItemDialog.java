@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class RunItemUpdateUI {
+public class UpdateRunItemDialog {
 
     @Getter
     private final ActualResultSection actualResultSection;
@@ -36,9 +36,7 @@ public class RunItemUpdateUI {
     private final Consumer<TestRunItems> onSave;
     private final JBPopup popup;
 
-    public RunItemUpdateUI(final @NotNull Project project, final @NotNull TestRunItems runItem,
-                           final @NotNull RunItemUpdateFields selectedItem,
-                           final @NotNull Consumer<TestRunItems> onSave) {
+    public UpdateRunItemDialog(final @NotNull Project project, final @NotNull TestRunItems runItem, final @NotNull RunItemUpdateFields selectedItem, final @NotNull Consumer<TestRunItems> onSave) {
         this.project = project;
         this.runItem = runItem;
         this.selectedItem = selectedItem;

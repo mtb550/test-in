@@ -272,6 +272,6 @@ public enum TestEditorAttributes {
 
     @FunctionalInterface
     public interface DrawItem {
-        List<JComponent> apply(final TestCaseDto tc);
+        List<JComponent> apply(final @NotNull TestCaseDto tc);
     }
 }

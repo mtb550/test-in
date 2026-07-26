@@ -7,12 +7,12 @@ import org.testin.util.KeyboardSet;
 @Getter
 @AllArgsConstructor
 public enum CardHoverAction {
-    NAVIGATE("Navigate to Code",
+    NAVIGATE_TO_TEST_METHOD("Navigate to Code",
             KeyboardSet.NavigateToCode,
             "Navigate to Code Shift+F5"
     ),
 
-    RUN("Run Test Case",
+    RUN_TEST_CASE("Run Test Case",
             KeyboardSet.RunTestCase,
             "Run Test Case F5"
     );

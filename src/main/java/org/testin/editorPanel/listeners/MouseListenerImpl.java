@@ -45,7 +45,7 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mouseClicked(final MouseEvent e) {
+    public void mouseClicked(final @NotNull MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
         final boolean isClickOnItem = index >= 0 && list.getCellBounds(index, index).contains(e.getPoint());
 
@@ -71,7 +71,7 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mousePressed(final MouseEvent e) {
+    public void mousePressed(final @NotNull MouseEvent e) {
         if (!SwingUtilities.isLeftMouseButton(e)) return;
 
         final int index = list.locationToIndex(e.getPoint());
@@ -85,11 +85,11 @@ public class MouseListenerImpl extends MouseAdapter {
         if (action != null) {
             final TestCaseDto tc = list.getModel().getElementAt(index);
 
-            if (action == CardHoverAction.NAVIGATE) {
+            if (action == CardHoverAction.NAVIGATE_TO_TEST_METHOD) {
                 Log.trace("navigate action, tc: " + tc.getDescription());
                 new NavigateToCode(list).execute(project, tc);
 
-            } else if (action == CardHoverAction.RUN) {
+            } else if (action == CardHoverAction.RUN_TEST_CASE) {
                 Log.trace("run action, tc: " + tc.getDescription());
                 new RunTestCase(list).execute(project, tc);
             }
@@ -99,7 +99,7 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mouseMoved(final MouseEvent e) {
+    public void mouseMoved(final @NotNull MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
         CardHoverAction currentAction = null;
 
@@ -131,11 +131,10 @@ public class MouseListenerImpl extends MouseAdapter {
 
         if (needsRepaint)
             list.repaint();
-
     }
 
     @Override
-    public void mouseExited(final MouseEvent e) {
+    public void mouseExited(final @NotNull MouseEvent e) {
         if (editor.getHoveredIndex() != -1 || editor.getHoveredIconAction() != null) {
             editor.setHoveredIndex(-1);
             editor.setHoveredIconAction(null);
@@ -145,7 +144,7 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mouseWheelMoved(final MouseWheelEvent e) {
+    public void mouseWheelMoved(final @NotNull MouseWheelEvent e) {
         if (e.isControlDown() || e.isMetaDown())
             return;
 
@@ -180,8 +179,8 @@ public class MouseListenerImpl extends MouseAdapter {
             final int runStartX = startX + JBUI.scale(22);
             final int runEndX = runStartX + JBUI.scale(28);
 
-            if (xInCell >= navStartX && xInCell <= runStartX) return CardHoverAction.NAVIGATE;
-            if (xInCell > runStartX && xInCell <= runEndX) return CardHoverAction.RUN;
+            if (xInCell >= navStartX && xInCell <= runStartX) return CardHoverAction.NAVIGATE_TO_TEST_METHOD;
+            if (xInCell > runStartX && xInCell <= runEndX) return CardHoverAction.RUN_TEST_CASE;
         }
 
         return null;

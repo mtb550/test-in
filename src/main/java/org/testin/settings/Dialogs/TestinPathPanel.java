@@ -1,4 +1,4 @@
-package org.testin.settings.ui;
+package org.testin.settings.Dialogs;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;

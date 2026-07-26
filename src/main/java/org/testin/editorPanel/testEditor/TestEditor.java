@@ -34,7 +34,9 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
+import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
 import org.testin.util.indexer.ProjectIndexer;
+import org.testin.util.logger.Log;
 import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.viewPanel.ViewPanel;
@@ -94,6 +96,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Getter
     @Setter
     private int hoveredIndex = -1;
+
+    // Maps tracker broadcast UUID -> DTO id for matching completion broadcasts
+    private final Map<String, UUID> uuidToDtoId = new HashMap<>();
 
     public TestEditor(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf) {
         this.project = project;
@@ -155,6 +160,61 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.addListSelectionListener(new SelectionListener(project, list, this, parent.getPath2()));
 
         list.addKeyListener(new KeyListener(list, this));
+
+        // Subscribe to test case execution broadcasts to update run/stop icons
+        project.getMessageBus().connect(this).subscribe(ITestCaseExecutionListener.TOPIC, (testName, status, error) -> {
+            if (list == null) return;
+            Log.debug("TestEditor subscription fired: testName='" + testName + "', status='" + status + "'");
+            final ListModel<TestCaseDto> lm = list.getModel();
+            boolean updated = false;
+
+            // 1. Try to match by DTO id (for RUNNING broadcast from RunTestCase which uses tc.getId())
+            for (int i = 0; i < lm.getSize(); i++) {
+                final TestCaseDto tc = lm.getElementAt(i);
+                if (tc != null && testName.equals(tc.getId().toString().toLowerCase())) {
+                    Log.debug("  ID match DTO index=" + i + " desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
+                    tc.setTempStatus(status);
+                    tc.setTempError(error != null ? error : "");
+                    updated = true;
+                    break;
+                }
+            }
+
+            // 2. Try to match by UUID map (for completion broadcasts from TestCaseExecutionTracker)
+            if (!updated) {
+                final UUID dtoId = uuidToDtoId.get(testName);
+                if (dtoId != null) {
+                    for (int i = 0; i < lm.getSize(); i++) {
+                        final TestCaseDto tc = lm.getElementAt(i);
+                        if (tc != null && tc.getId().equals(dtoId)) {
+                            Log.debug("  UUID map match DTO index=" + i + " desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
+                            tc.setTempStatus(status);
+                            tc.setTempError(error != null ? error : "");
+                            updated = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 3. If status is RUNNING and no match yet, this is a UUID broadcast from the tracker.
+            //    Find the DTO that already has tempStatus=RUNNING (set by RunTestCase) and store the UUID -> DTO id mapping.
+            if (!updated && "RUNNING".equals(status)) {
+                Log.debug("  UUID RUNNING broadcast, searching for DTO with tempStatus=RUNNING to map UUID='" + testName + "'");
+                for (int i = 0; i < lm.getSize(); i++) {
+                    final TestCaseDto tc = lm.getElementAt(i);
+                    if (tc != null && "RUNNING".equals(tc.getTempStatus()) && !uuidToDtoId.containsKey(testName)) {
+                        Log.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");
+                        uuidToDtoId.put(testName, tc.getId());
+                        break;
+                    }
+                }
+            }
+
+            if (updated) {
+                list.repaint();
+            }
+        });
 
         loadDataAsync();
     }

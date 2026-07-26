@@ -38,7 +38,7 @@ public class RunItemUpdateMenu {
         showMenu("Update Test Run Item", selectedItem -> {
             Log.trace("Menu item selected -> " + selectedItem.getName());
 
-            new RunItemUpdateUI(project, runItem, selectedItem, updatedItem).show();
+            new UpdateRunItemDialog(project, runItem, selectedItem, updatedItem).show();
         });
     }
 

@@ -14,6 +14,10 @@ public enum TestCaseStatus {
             "Pending"
     ),
 
+    Disabled(
+            "Disabled"
+    ),
+
     TO_BE_UPDATED(
             "To Be Updated"
     );

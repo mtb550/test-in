@@ -1,5 +1,6 @@
 package org.testin.editorPanel.listeners;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.runEditor.RunCard;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.pojo.TestRunItems;
@@ -16,7 +17,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
     }
 
     @Override
-    protected JComponent bindDataAndGetCard(JList<? extends TestCaseDto> list, TestCaseDto tc, int globalIndex, boolean isSelected, boolean isRowHovered, String hover) {
+    protected JComponent bindDataAndGetCard(@NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final String hover) {
         final TestRunItems runItem = editor.getResultsMap().get(tc.getId());
 
         card.updateData(globalIndex, editor.getSelectedDetails(), runItem);

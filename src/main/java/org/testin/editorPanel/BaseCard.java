@@ -27,6 +27,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected boolean isSelected;
     protected boolean isRowHovered;
     protected String hoveredAction;
+    protected boolean isRunning;
 
     public BaseCard() {
         setLayout(new BorderLayout());
@@ -53,6 +54,17 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         wrapper.addToCenter(content);
 
         add(wrapper, BorderLayout.CENTER);
+    }
+
+    /**
+     * Adds a status badge (JLabel with run-status icon) to the badge panel.
+     * The badge shows the current tempStatus (RUNNING/PASSED/FAILED).
+     * Call this from subclasses in updateData() after clearing badges.
+     */
+    protected void addStatusBadge(final JLabel statusLabel) {
+        if (statusLabel != null) {
+            badgePanel.add(statusLabel);
+        }
     }
 
     public void applyListFont(final Font listFont) {
@@ -109,7 +121,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         if (isRowHovered) {
             final FontMetrics fm = descriptionLabel.getFontMetrics(descriptionLabel.getFont());
             final int titleWidth = fm.stringWidth(descriptionLabel.getText());
-            Shared.drawDescriptionActionIcons(this, g, titleWidth, JBUI.scale(12), hoveredAction);
+            Shared.drawDescriptionActionIcons(this, g, titleWidth, JBUI.scale(12), hoveredAction, isRunning);
         }
     }
 

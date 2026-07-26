@@ -9,6 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
+import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestNGRunnerByMethod;
 import org.testin.util.services.Services;
@@ -29,6 +30,8 @@ public class RunTestCase extends DumbAwareAction {
 
         for (TestCaseDto tc : testCases) {
             if (tc == null || "RUNNING".equals(tc.getTempStatus())) continue;
+
+            project.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(tc.getId().toString().toLowerCase(), "RUNNING", null);
 
             Services.getInstance(project, Notifier.class).softShow(project, "Running Test Case: ", tc.getDescription());
             Services.getInstance(project, TestNGRunnerByMethod.class).runTestMethod(project, tc);

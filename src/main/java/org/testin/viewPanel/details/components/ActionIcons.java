@@ -44,7 +44,7 @@ public class ActionIcons extends BaseDetails {
         navLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         new HelpTooltip()
-                .setDescription(HtmlChunk.text(CardHoverAction.NAVIGATE.getTooltip()))
+                .setDescription(HtmlChunk.text(CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip()))
                 .setShortcut(KeyboardSet.NavigateToCode.getShortcutText())
                 .installOn(navLabel);
 

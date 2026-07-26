@@ -7,6 +7,7 @@ import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.Shared;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,11 +25,11 @@ public class TestCard extends BaseCard {
         this.project = project;
     }
 
-    public void updateData(final int index, final TestCaseDto tc, final Set<?> activeDetails, final boolean isUnsorted) {
+    public void updateData(final int index, final @NotNull TestCaseDto tc, final Set<?> activeDetails, final boolean isUnsorted) {
         badges.clear();
         details.clear();
 
-        this.isPendingCut = TestEditorCM.isGlobalCutAction() && tc != null && TestEditorCM.getGlobalPendingCutIds().contains(tc.getId());
+        this.isPendingCut = TestEditorCM.isGlobalCutAction() && TestEditorCM.getGlobalPendingCutIds().contains(tc.getId());
 
         Arrays.stream(TestEditorAttributes.values())
                 .filter(activeDetails::contains)
@@ -36,6 +37,34 @@ public class TestCard extends BaseCard {
 
         if (isUnsorted) {
             badges.add(new Shared.RoundedBadge("Unsorted", new JBColor(new Color(255, 100, 100), new Color(130, 50, 50))));
+        }
+
+        this.isRunning = "RUNNING".equals(tc.getTempStatus());
+
+        final String tempStatus = tc.getTempStatus();
+        Log.debug("TestCard.updateData - tempStatus='" + tempStatus + "' for index=" + index + " desc=" + tc.getDescription());
+
+        if (!tempStatus.trim().isEmpty()) {
+            final Color badgeColor;
+            final String displayText = switch (tempStatus) {
+                case "RUNNING" -> {
+                    badgeColor = new JBColor(new Color(255, 200, 100), new Color(200, 150, 50));
+                    yield "Running";
+                }
+                case "PASSED" -> {
+                    badgeColor = new JBColor(new Color(100, 200, 100), new Color(50, 150, 50));
+                    yield "Passed";
+                }
+                case "FAILED" -> {
+                    badgeColor = new JBColor(new Color(255, 100, 100), new Color(180, 50, 50));
+                    yield "Failed";
+                }
+                default -> {
+                    badgeColor = new JBColor(new Color(180, 180, 180), new Color(120, 120, 120));
+                    yield tempStatus;
+                }
+            };
+            badges.add(new Shared.RoundedBadge(displayText, badgeColor));
         }
 
         updateUI(index, TestEditorAttributes.DESCRIPTION.getValueExtractor().apply(tc, project), badges, details);

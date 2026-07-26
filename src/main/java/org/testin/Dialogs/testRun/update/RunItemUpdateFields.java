@@ -26,7 +26,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
             AllIcons.Actions.Copy,
             new IStatusBarItem[]{SAVE},
             true,
-            RunItemUpdateUI::getActualResultSection
+            UpdateRunItemDialog::getActualResultSection
     ),
 
     STATUS(
@@ -35,7 +35,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
             AllIcons.General.Filter,
             new IStatusBarItem[]{SAVE},
             true,
-            RunItemUpdateUI::getStatusSection
+            UpdateRunItemDialog::getStatusSection
     ),
 
     ATTACHMENTS(
@@ -44,7 +44,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
             AllIcons.FileTypes.Text,
             new IStatusBarItem[]{SAVE},
             true,
-            RunItemUpdateUI::getAttachmentsSection
+            UpdateRunItemDialog::getAttachmentsSection
     );
 
     private final String name;
@@ -93,6 +93,6 @@ public enum RunItemUpdateFields implements IStatusBarItem {
     }
 
     public interface SectionExtractor {
-        RunItemEditSection create(final RunItemUpdateUI ui);
+        RunItemEditSection create(final UpdateRunItemDialog ui);
     }
 }

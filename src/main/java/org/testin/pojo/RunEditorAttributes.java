@@ -3,6 +3,7 @@ package org.testin.pojo;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.Shared;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
@@ -117,7 +118,7 @@ public enum RunEditorAttributes {
     private final ValueExtractor valueExtractor;
     private final DrawItem drawItem;
 
-    public void applyToUI(final TestRunItems runItem, final List<JComponent> badges, final Map<String, String> details, final Project project) {
+    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project project) {
         if (drawItem != null) badges.addAll(drawItem.apply(runItem));
         else details.put(name, valueExtractor.apply(runItem, project));
     }
