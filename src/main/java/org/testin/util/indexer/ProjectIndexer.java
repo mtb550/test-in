@@ -28,15 +28,14 @@ import java.util.stream.Stream;
 @Service(Service.Level.PROJECT)
 public final class ProjectIndexer {
 
-    private final Project project;
-    private final IndexerDataStore store;
-    private final IndexingScanner scanner;
+    private final @NotNull Project project;
+    private final @NotNull IndexerDataStore store;
+    private final @NotNull IndexingScanner scanner;
+    private final @NotNull AtomicBoolean indexed = new AtomicBoolean(false);
+    private final @NotNull AtomicBoolean indexing = new AtomicBoolean(false);
+    private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
 
-    private final AtomicBoolean indexed = new AtomicBoolean(false);
-    private final AtomicBoolean indexing = new AtomicBoolean(false);
-    private final AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
-
-    private volatile CountDownLatch indexingLatch = new CountDownLatch(1);
+    private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
     public ProjectIndexer(final @NotNull Project project) {
         this.project = project;
@@ -44,6 +43,7 @@ public final class ProjectIndexer {
         this.scanner = new IndexingScanner(project, store);
     }
 
+    // todo: why static
     private static long estimateBytes(final int testCases, final int testRuns, final int projects, final int testSets, final int testRunDirs, final int testSetPkgs, final int testRunPkgs, final int testSetCaseSets) {
         final long MAP_OVERHEAD = 256L;
         final long TC_SIZE = 2048L;
@@ -62,6 +62,7 @@ public final class ProjectIndexer {
         return total;
     }
 
+    // todo: why static
     private static String formatBytes(final long bytes) {
         final long kb = bytes / 1024;
         if (kb < 1024) {
@@ -184,7 +185,7 @@ public final class ProjectIndexer {
         Log.info("Indexer reset for re-indexing");
     }
 
-    private List<Path> collectValidProjects(final Path rootPath) {
+    private @NotNull List<Path> collectValidProjects(final @NotNull Path rootPath) {
         if (!Files.exists(rootPath) || !Files.isDirectory(rootPath)) return Collections.emptyList();
 
         final Path[] projectPaths;
@@ -226,11 +227,11 @@ public final class ProjectIndexer {
                 formatBytes(estimatedBytes));
     }
 
-    public List<TestCaseDto> getTestCasesForTestSet(final Path testSetPath) {
+    public @NotNull List<TestCaseDto> getTestCasesForTestSet(final @NotNull Path testSetPath) {
         return store.getTestCasesForTestSet(testSetPath);
     }
 
-    public TestRunDto getTestRunForPath(final Path testRunPath) {
+    public @NotNull TestRunDto getTestRunForPath(final @NotNull Path testRunPath) {
         return store.getTestRunForPath(testRunPath);
     }
 
@@ -238,51 +239,51 @@ public final class ProjectIndexer {
         return store.getTestCaseById(id);
     }
 
-    public TestSetDirectoryDto getTestSetByPath(final Path path) {
+    public @NotNull TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
         return store.getTestSetByPath(path);
     }
 
-    public TestSetPackageDirectoryDto getTestSetPackageByPath(final Path path) {
+    public @NotNull TestSetPackageDirectoryDto getTestSetPackageByPath(final @NotNull Path path) {
         return store.getTestSetPackageByPath(path);
     }
 
-    public TestCasesMainDirectoryDto getTestCasesMainDirByPath(final Path path) {
+    public @NotNull TestCasesMainDirectoryDto getTestCasesMainDirByPath(final @NotNull Path path) {
         return store.getTestCasesMainDirByPath(path);
     }
 
-    public TestRunsMainDirectoryDto getTestRunsMainDirByPath(final Path path) {
+    public @NotNull TestRunsMainDirectoryDto getTestRunsMainDirByPath(final @NotNull Path path) {
         return store.getTestRunsMainDirByPath(path);
     }
 
-    public TestRunDirectoryDto getTestRunDirByPath(final Path path) {
+    public @NotNull TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
         return store.getTestRunDirByPath(path);
     }
 
-    public Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
+    public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
         return store.getTestProjectsByPath();
     }
 
-    public List<DirectoryDto> getChildren(final Path parentPath) {
+    public @NotNull List<DirectoryDto> getChildren(final @NotNull Path parentPath) {
         return store.getChildren(parentPath);
     }
 
-    public void putTestCase(final Path testSetPath, final TestCaseDto tc) {
+    public void putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         store.putTestCase(testSetPath, tc);
     }
 
-    public void removeTestCase(final Path testSetPath, final UUID tcId) {
+    public void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         store.removeTestCase(testSetPath, tcId);
     }
 
-    public void updateSequence(final Path testSetPath, final List<TestCaseDto> sortedList) {
+    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList) {
         store.updateSequence(testSetPath, sortedList);
     }
 
-    public void putTestRun(final Path testRunPath, final TestRunDto tr) {
+    public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
         store.putTestRun(testRunPath, tr);
     }
 
-    public void removeTestProject(final Path path) {
+    public void removeTestProject(final @NotNull Path path) {
         store.removeTestProject(path);
     }
 
@@ -307,23 +308,23 @@ public final class ProjectIndexer {
         store.addTestProjectMarker(project, tp);
     }
 
-    public void addTestSet(final TestSetDirectoryDto ts) {
+    public void addTestSet(final @NotNull TestSetDirectoryDto ts) {
         store.addTestSet(ts);
     }
 
-    public void addTestSetPackage(final TestSetPackageDirectoryDto tsp) {
+    public void addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
         store.addTestSetPackage(tsp);
     }
 
-    public void addTestRunDir(final TestRunDirectoryDto trd) {
+    public void addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
         store.addTestRunDir(trd);
     }
 
-    public void addTestRunPackage(final TestRunPackageDirectoryDto trp) {
+    public void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
         store.addTestRunPackage(trp);
     }
 
-    public void scanSingleProject(final Path projectPath) {
+    public void scanSingleProject(final @NotNull Path projectPath) {
         Log.info("Scanning single project: " + projectPath.getFileName());
         try {
             scanner.scanProject(projectPath);
@@ -332,16 +333,15 @@ public final class ProjectIndexer {
         }
     }
 
-    public void persistTestProjectMarker(final Project project, final TestProjectDirectoryDto tp) {
+    public void persistTestProjectMarker(final @NotNull Project project, final @NotNull TestProjectDirectoryDto tp) {
         store.addTestProjectMarker(project, tp);
     }
 
-    public void updateRunMarker(final Project project, final Path runPath,
-                                final TestRunMarker marker) {
+    public void updateRunMarker(final @NotNull Project project, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
         store.updateRunMarker(project, runPath, marker);
     }
 
-    public void renameNode(final Path oldPath, final Path newPath) {
+    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
         store.renameNode(oldPath, newPath);
     }
 }

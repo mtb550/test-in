@@ -156,7 +156,7 @@ public class UpdateTestRunStatus extends DumbAwareAction {
                 final Path runPath = editor.getParent().getPath();
                 final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(runPath);
 
-                TestRunMarker marker = (trd != null) ? trd.getMarker() : editor.getParent().getMarker();
+                TestRunMarker marker = trd.getMarker();
 
                 if (marker != null) {
                     marker.setStatus(editor.getParent().getMarker().getStatus());

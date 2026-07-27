@@ -79,7 +79,7 @@ public class SetTestRunStatus extends DumbAwareAction {
                 final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
                 final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(tr.getPath());
 
-                TestRunMarker marker = (trd != null) ? trd.getMarker() : tr.getMarker();
+                TestRunMarker marker = trd.getMarker();
                 if (marker != null) {
                     marker.setStatus(newStatus);
 

@@ -78,21 +78,20 @@ public class GitDiffProcessor {
                 String gitPath = relativePathStr.replace("\\", "/");
                 String oldJsonString = GitCommandRunner.execute(repoRoot, "git", "show", "HEAD:" + gitPath);
                 TestCaseDto oldDto = Services.getInstance(project, Mapper.class).readValue(oldJsonString, TestCaseDto.class);
-                if (oldDto != null) {
-                    allChanges.add(new TestCaseDiff(
-                            oldDto.getId().toString(),
-                            relativePath,
-                            TestCaseDiff.DiffType.DELETED,
-                            oldDto,
-                            null,
-                            List.of(new TestCaseDiff.FieldChange(
-                                    "Test Case",
-                                    oldDto.getDescription(),
-                                    "",
-                                    TestCaseDiff.ChangeType.REMOVE_TEST_CASE
-                            ))
-                    ));
-                }
+
+                allChanges.add(new TestCaseDiff(
+                        oldDto.getId().toString(),
+                        relativePath,
+                        TestCaseDiff.DiffType.DELETED,
+                        oldDto,
+                        null,
+                        List.of(new TestCaseDiff.FieldChange(
+                                "Test Case",
+                                oldDto.getDescription(),
+                                "",
+                                TestCaseDiff.ChangeType.REMOVE_TEST_CASE
+                        ))
+                ));
             }
         }
         return allChanges;

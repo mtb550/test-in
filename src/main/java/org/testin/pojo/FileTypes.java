@@ -42,7 +42,7 @@ public enum FileTypes {
             ".json",
             null,
             (project, export, destFile, sheets) -> new ExportJson(export).exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportJson(imports).processImport(project, importFile)
+            (project, imports, importFile) -> new ImportJson().processImport(project, importFile)
     ),
 
     CSV(

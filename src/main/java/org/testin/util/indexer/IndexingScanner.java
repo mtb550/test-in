@@ -139,11 +139,9 @@ final class IndexingScanner {
                         .forEach(filePath -> {
                             try {
                                 final TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
-                                if (tc != null) {
-                                    tc.setParent(ts);
-                                    store.getTestCasesById().put(tc.getId(), tc);
-                                    caseIds.add(tc.getId());
-                                }
+                                tc.setParent(ts);
+                                store.getTestCasesById().put(tc.getId(), tc);
+                                caseIds.add(tc.getId());
                             } catch (final Exception ex) {
                                 Log.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + ex.getMessage());
@@ -215,9 +213,7 @@ final class IndexingScanner {
             if (Files.exists(jsonPath)) {
                 final Mapper mapper = Services.getInstance(project, Mapper.class);
                 final TestRunDto trr = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
-                if (trr != null) {
-                    store.getTestRunsByPath().put(path.toString(), trr);
-                }
+                store.getTestRunsByPath().put(path.toString(), trr);
             }
 
             indicator.setText("Test run: " + fileName);

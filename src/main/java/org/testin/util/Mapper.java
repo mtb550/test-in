@@ -22,55 +22,55 @@ public final class Mapper {
             .enable(SerializationFeature.INDENT_OUTPUT)
             .setTimeZone(TimeZone.getDefault());
 
-    public <T> T readValue(final @NotNull File src, final @NotNull Class<T> valueType) {
+    public @NotNull <T> T readValue(final @NotNull File src, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(src, valueType);
 
         } catch (final Exception ex) {
             Log.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + ex.getMessage());
-            return null;
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
-    public <T> T readValue(final @NotNull File src, final @NotNull TypeReference<T> valueTypeRef) {
+    public @NotNull <T> T readValue(final @NotNull File src, final @NotNull TypeReference<T> valueTypeRef) {
         try {
             return mapper.readValue(src, valueTypeRef);
 
         } catch (final Exception ex) {
             Log.error("Failed to read file path " + src + " to TypeReference");
             Log.error("Exception: " + ex.getMessage());
-            return null;
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
-    public <T> T readValue(final @NotNull String content, final @NotNull Class<T> valueType) {
+    public @NotNull <T> T readValue(final @NotNull String content, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(content, valueType);
 
         } catch (final Exception ex) {
             Log.error("Failed to parse JSON string to class " + valueType.getSimpleName());
-            return null;
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
-    public <T> T readValue(final @NotNull InputStream src, final @NotNull Class<T> valueType) {
+    public @NotNull <T> T readValue(final @NotNull InputStream src, final @NotNull Class<T> valueType) {
         try {
             return mapper.readValue(src, valueType);
 
         } catch (final Exception ex) {
             Log.error("Failed to read InputStream to class " + valueType.getSimpleName());
             Log.error("Exception: " + ex.getMessage());
-            return null;
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
-    public <T> T readValue(final @NotNull String content, final @NotNull TypeReference<T> valueTypeRef) {
+    public @NotNull <T> T readValue(final @NotNull String content, final @NotNull TypeReference<T> valueTypeRef) {
         try {
             return mapper.readValue(content, valueTypeRef);
 
         } catch (final Exception ex) {
             Log.error("Failed to parse JSON string to TypeReference.");
-            return null;
+            throw new RuntimeException(ex.getMessage());
         }
     }
 
@@ -85,7 +85,7 @@ public final class Mapper {
         }
     }
 
-    public String writeValueAsString(final @NotNull Object value) {
+    public @NotNull String writeValueAsString(final @NotNull Object value) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
 
@@ -95,13 +95,13 @@ public final class Mapper {
         }
     }
 
-    public <T> T convertValue(final @NotNull Object fromValue, final @NotNull Class<T> toValueType) {
+    public @NotNull <T> T convertValue(final @NotNull Object fromValue, final @NotNull Class<T> toValueType) {
         try {
             return mapper.convertValue(fromValue, toValueType);
 
         } catch (final Exception ex) {
             Log.error("Failed to convert value to class " + toValueType.getSimpleName());
-            return null;
+            throw new RuntimeException(ex.getMessage());
         }
     }
 }

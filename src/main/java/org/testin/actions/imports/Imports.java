@@ -73,7 +73,8 @@ public class Imports extends DumbAwareAction {
             return;
         }
 
-        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
+        String dirPathStr = dirDto.getPath().toString().replace('\\', '/');
+        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(dirPathStr);
 
         if (targetDirectory != null && !targetDirectory.isDirectory()) {
             targetDirectory = targetDirectory.getParent();
@@ -193,7 +194,7 @@ public class Imports extends DumbAwareAction {
                 if (!child.isDirectory() && child.getName().endsWith(".json")) {
                     try (InputStream is = child.getInputStream()) {
                         TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(is, TestCaseDto.class);
-                        if (tc != null && tc.getNext() == null) {
+                        if (tc.getNext() == null) {
                             return tc;
                         }
                     } catch (final Exception ex) {

@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.FileType;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Log;
 
@@ -74,20 +73,12 @@ public final class EditorStateService {
             final Path dirPath = Path.of(pathStr);
 
             DirectoryDto dir = indexer.getTestSetByPath(dirPath);
-            if (dir == null) {
-                dir = indexer.getTestRunDirByPath(dirPath);
-            }
 
-            if (dir != null) {
-                final FileType ft = dir instanceof TestRunDirectoryDto
-                        ? FileType.TEST_RUN : FileType.TEST_CASE;
-                final UnifiedVirtualFile vf = new UnifiedVirtualFile(dir, ft);
-                final FileEditorManager editorManager = FileEditorManager.getInstance(project);
-                if (editorManager != null) {
-                    editorManager.openFile(vf, true);
-                }
-            } else {
-                Log.warn("EditorStateService: directory not found in indexer: " + pathStr);
+            final FileType ft = FileType.TEST_CASE;
+            final UnifiedVirtualFile vf = new UnifiedVirtualFile(dir, ft);
+            final FileEditorManager editorManager = FileEditorManager.getInstance(project);
+            if (editorManager != null) {
+                editorManager.openFile(vf, true);
             }
         }
     }

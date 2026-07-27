@@ -13,11 +13,6 @@ import java.io.File;
 import java.util.*;
 
 public class ImportJson {
-    private final Imports imports;
-
-    public ImportJson(final @NotNull Imports imports) {
-        this.imports = imports;
-    }
 
     public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
         Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
@@ -35,18 +30,18 @@ public class ImportJson {
         Map<String, List<TestCaseDto>> data = Services.getInstance(project, Mapper.class).readValue(file, new TypeReference<>() {
         });
         Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
-        if (data != null) {
-            for (Map.Entry<String, List<TestCaseDto>> entry : data.entrySet()) {
-                List<TestCaseDto> sanitized = new ArrayList<>();
-                for (TestCaseDto tc : entry.getValue()) {
-                    tc.setId(UUID.randomUUID());
-                    tc.setIsHead(null);
-                    tc.setNext(null);
-                    sanitized.add(tc);
-                }
-                if (!sanitized.isEmpty()) {
-                    result.put(entry.getKey(), sanitized);
-                }
+        for (Map.Entry<String, List<TestCaseDto>> entry : data.entrySet()) {
+            List<TestCaseDto> sanitized = new ArrayList<>();
+
+            for (TestCaseDto tc : entry.getValue()) {
+                tc.setId(UUID.randomUUID());
+                tc.setIsHead(null);
+                tc.setNext(null);
+                sanitized.add(tc);
+            }
+
+            if (!sanitized.isEmpty()) {
+                result.put(entry.getKey(), sanitized);
             }
         }
         return result;

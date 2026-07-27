@@ -71,11 +71,6 @@ public final class TestRunReport {
                 final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
                 TestRunDto runData = indexer.getTestRunForPath(dirPath);
 
-                if (runData == null) {
-                    Services.getInstance(project, Notifier.class).error(project, "Report Error", "Test run data not found in indexer for: " + dirPath);
-                    return;
-                }
-
                 Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(runData);
 
                 byte[] fileBytes;

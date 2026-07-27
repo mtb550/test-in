@@ -14,10 +14,7 @@ import org.testin.pojo.TestRunItems;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
-import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.pojo.dto.dirs.*;
 import org.testin.pojo.markers.MarkerMapper;
 import org.testin.pojo.markers.TestRunMarker;
 import org.testin.projectPanel.ProjectPanel;
@@ -100,27 +97,25 @@ public class CreateTestRun implements NodeCreator {
     }
 
     private Object resolveDirectoryObject(final Path folder, final DirectoryDto parentDir, final ProjectIndexer indexer) {
-        final DirectoryDto child = indexer.getChildren(parentDir.getPath()).stream()
-                .filter(dto -> dto.getPath().equals(folder))
-                .findFirst()
-                .orElse(null);
+        Object obj;
 
-        if (child != null) return child;
+        if (parentDir instanceof TestProjectDirectoryDto) {
+            obj = indexer.getTestSetPackageByPath(folder);
+            return obj;
 
-        if (indexer.getTestSetPackageByPath(folder) != null)
-            return indexer.getTestSetPackageByPath(folder);
+        } else if (parentDir instanceof TestCasesMainDirectoryDto) {
+            obj = indexer.getTestSetByPath(folder);
+            return obj;
 
-        if (indexer.getTestSetByPath(folder) != null)
-            return indexer.getTestSetByPath(folder);
+        } else if (parentDir instanceof TestRunsMainDirectoryDto) {
+            obj = indexer.getTestRunDirByPath(folder);
+            return obj;
 
-        if (indexer.getTestCasesMainDirByPath(folder) != null)
-            return indexer.getTestCasesMainDirByPath(folder);
+        } else if (parentDir instanceof TestSetDirectoryDto || parentDir instanceof TestSetPackageDirectoryDto) {
+            obj = indexer.getTestSetByPath(folder);
+            return obj;
 
-        if (indexer.getTestRunDirByPath(folder) != null)
-            return indexer.getTestRunDirByPath(folder);
-
-        if (indexer.getTestRunsMainDirByPath(folder) != null)
-            return indexer.getTestRunsMainDirByPath(folder);
+        }
 
         throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + parentDir.getClass().getSimpleName());
     }

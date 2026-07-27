@@ -58,7 +58,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final JBPanel<?> mainPanel;
 
     @Getter
-    private final JBList<TestCaseDto> list;
+    private final @NotNull JBList<TestCaseDto> list;
 
     private final CollectionListModel<TestCaseDto> model;
 
@@ -171,10 +171,8 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
             if (items.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    if (list != null) {
-                        list.setPaintBusy(false);
-                        list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
-                    }
+                    list.setPaintBusy(false);
+                    list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
                 });
                 return;
             }
@@ -194,11 +192,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
                 result.sortedList().forEach(tc -> tc.setParent(parent));
 
-                if (list != null) {
-                    list.setPaintBusy(false);
-                    if (allTestCases.isEmpty()) {
-                        list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
-                    }
+                list.setPaintBusy(false);
+                if (allTestCases.isEmpty()) {
+                    list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
                 }
 
                 refreshView();
@@ -324,7 +320,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarDetailsSelectionChanged() {
-        if (list != null && model != null) {
+        if (model != null) {
             model.allContentsChanged();
         }
     }
@@ -375,7 +371,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
                 ? new ArrayList<>(currentTestCases.subList(startIndex, endIndex))
                 : new ArrayList<>();
 
-        final TestCaseDto selectedItem = list != null ? list.getSelectedValue() : null;
+        final TestCaseDto selectedItem = list.getSelectedValue();
 
         syncListener.pause();
         model.replaceAll(pageItems);
@@ -452,21 +448,18 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void dispose() {
-        if (list != null)
-            for (MouseListener listener : list.getMouseListeners())
-                list.removeMouseListener(listener);
+        for (MouseListener listener : list.getMouseListeners())
+            list.removeMouseListener(listener);
 
         if (toolBar != null) {
             toolBar.dispose();
         }
 
-        if (list != null) {
-            TestCaseDto selectedInThisFile = list.getSelectedValue();
+        TestCaseDto selectedInThisFile = list.getSelectedValue();
 
-            final ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
-            if (viewer != null) {
-                viewer.hide(selectedInThisFile);
-            }
+        final ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
+        if (viewer != null) {
+            viewer.hide(selectedInThisFile);
         }
         allTestCases.clear();
         currentTestCases.clear();
@@ -483,6 +476,6 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public List<TestCaseDto> getSelectedTestCases() {
-        return list != null ? list.getSelectedValuesList() : Collections.emptyList();
+        return list.getSelectedValuesList();
     }
 }

@@ -212,9 +212,7 @@ public class DetailsTab {
 
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             final TestSetDirectoryDto ts = indexer.getTestSetByPath(resolved);
-            if (ts != null) {
-                return ts.getPath();
-            }
+            return ts.getPath();
         }
 
         return null;

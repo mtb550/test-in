@@ -44,7 +44,6 @@ public final class DirectoryMapper {
         try {
             final Mapper mapper = Services.getInstance(project, Mapper.class);
             final TestProjectMarker marker = mapper.readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class);
-            if (marker == null) throw new IllegalArgumentException("Marker not found");
 
             final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
                     .name(fileName)

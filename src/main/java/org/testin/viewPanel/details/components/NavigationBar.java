@@ -87,12 +87,10 @@ public class NavigationBar extends BaseDetails {
                             }
 
                             final TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
-                            if (ts != null) {
-                                if (Services.getInstance(project, EditorUtil.class).isEditorOpen(project, ts.getName())) {
-                                    return;
-                                }
-                                Services.getInstance(project, EditorUtil.class).openEditor(project, ts);
+                            if (Services.getInstance(project, EditorUtil.class).isEditorOpen(project, ts.getName())) {
+                                return;
                             }
+                            Services.getInstance(project, EditorUtil.class).openEditor(project, ts);
                         }
                     }
                 });

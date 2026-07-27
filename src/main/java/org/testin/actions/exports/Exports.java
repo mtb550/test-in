@@ -126,11 +126,9 @@ public class Exports extends DumbAwareAction {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
                     TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(is, TestCaseDto.class);
-                    if (tc != null) {
-                        tcMap.put(tc.getId(), tc);
-                        if (Boolean.TRUE.equals(tc.getIsHead())) {
-                            head = tc;
-                        }
+                    tcMap.put(tc.getId(), tc);
+                    if (Boolean.TRUE.equals(tc.getIsHead())) {
+                        head = tc;
                     }
                 } catch (final Exception ex) {
                     Log.error("Loading test cases failed: " + ex.getMessage());

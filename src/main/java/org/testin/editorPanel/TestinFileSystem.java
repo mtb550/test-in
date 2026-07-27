@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
@@ -32,14 +31,9 @@ public final class TestinFileSystem extends DeprecatedVirtualFileSystem implemen
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
             DirectoryDto dir = indexer.getTestSetByPath(dirPath);
-            if (dir == null) {
-                dir = indexer.getTestRunDirByPath(dirPath);
-            }
 
-            if (dir != null) {
-                final FileType ft = dir instanceof TestRunDirectoryDto ? FileType.TEST_RUN : FileType.TEST_CASE;
-                return new UnifiedVirtualFile(dir, ft);
-            }
+            final FileType ft = FileType.TEST_CASE;
+            return new UnifiedVirtualFile(dir, ft);
         }
 
         return null;

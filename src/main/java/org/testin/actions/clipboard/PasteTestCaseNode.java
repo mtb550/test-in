@@ -72,7 +72,6 @@ public class PasteTestCaseNode extends DumbAwareAction {
                 if (tc == null) continue;
 
                 TestCaseDto clonedTc = cloneForPasting(project, tc, isCut);
-                if (clonedTc == null) continue;
 
                 if (destUI.getParent() != null) {
                     clonedTc.setParent(destUI.getParent());
@@ -104,7 +103,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
                 if (json.trim().startsWith("[")) {
                     List<TestCaseDto> parsedList = Services.getInstance(e.getProject(), Mapper.class).readValue(json, new TypeReference<>() {
                     });
-                    enabled = parsedList != null && !parsedList.isEmpty();
+                    enabled = !parsedList.isEmpty();
                 }
             } catch (final Exception ex) {
                 Log.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
@@ -124,9 +123,8 @@ public class PasteTestCaseNode extends DumbAwareAction {
             try {
                 String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
 
-                List<TestCaseDto> parsedList = Services.getInstance(project, Mapper.class).readValue(json, new TypeReference<>() {
+                return Services.getInstance(project, Mapper.class).readValue(json, new TypeReference<>() {
                 });
-                return parsedList != null ? parsedList : Collections.emptyList();
 
             } catch (final Exception ex) {
                 Log.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
@@ -140,15 +138,13 @@ public class PasteTestCaseNode extends DumbAwareAction {
 
         final TestCaseDto clonedTc = Services.getInstance(project, Mapper.class).convertValue(original, TestCaseDto.class);
 
-        if (clonedTc != null) {
-            if (isCut) {
-                clonedTc.setUpdatedAt(now);
-            } else {
-                clonedTc.setId(UUID.randomUUID())
-                        .setDescription(original.getDescription() + " (Copy)")
-                        .setCreatedAt(now)
-                        .setUpdatedAt(now);
-            }
+        if (isCut) {
+            clonedTc.setUpdatedAt(now);
+        } else {
+            clonedTc.setId(UUID.randomUUID())
+                    .setDescription(original.getDescription() + " (Copy)")
+                    .setCreatedAt(now)
+                    .setUpdatedAt(now);
         }
 
         return clonedTc;
