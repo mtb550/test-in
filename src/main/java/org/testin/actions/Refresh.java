@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
@@ -27,13 +27,13 @@ public class Refresh extends DumbAwareAction {
 
     public void execute() {
         if (!refreshGuard.compareAndSet(false, true)) {
-            Log.info("Refresh: already in progress, ignoring click");
+            Logger.info("Refresh: already in progress, ignoring click");
             return;
         }
 
         final Project project = projectPanel.getProject();
 
-        Log.info("Refresh: re-indexing started");
+        Logger.info("Refresh: re-indexing started");
 
         final TestProjectDirectoryDto previouslySelected = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
         final String previousProjectName = previouslySelected != null ? previouslySelected.getName() : null;
@@ -46,7 +46,7 @@ public class Refresh extends DumbAwareAction {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             indexer.awaitIndexing();
 
-            Log.info("Refresh: re-indexing complete, rebuilding tree");
+            Logger.info("Refresh: re-indexing complete, rebuilding tree");
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 projectPanel.getTestProjectSelector().loadTestProjectList();
@@ -65,7 +65,7 @@ public class Refresh extends DumbAwareAction {
                 }
 
                 refreshGuard.set(false);
-                Log.info("Refresh: tree rebuilt");
+                Logger.info("Refresh: tree rebuilt");
             });
         });
     }

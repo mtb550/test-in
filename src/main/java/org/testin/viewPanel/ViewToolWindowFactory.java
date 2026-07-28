@@ -12,7 +12,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.settings.StartupActivity;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(final @NotNull Project project, final @NotNull ToolWindow toolWindow) {
-        Log.info("ViewToolWindowFactory.createToolWindowContent()");
+        Logger.info("ViewToolWindowFactory.createToolWindowContent()");
 
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!project.isDisposed()) {

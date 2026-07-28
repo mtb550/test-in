@@ -14,7 +14,7 @@ import org.testin.pojo.TestRunItems;
 import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -40,7 +40,7 @@ public final class RunStatusService {
             item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
         }
 
-        Log.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
+        Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
         persistRunDataAsync(project, editor);
         triggerFilterRefresh(ui, list);
@@ -68,7 +68,7 @@ public final class RunStatusService {
         item.setStatus(status);
         item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-        Log.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
+        Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
         persistRunDataAsync(project, editor);
         triggerFilterRefresh(ui, null);
@@ -115,7 +115,7 @@ public final class RunStatusService {
                 Path dirPath = editor.getParent().getPath();
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
             } catch (final Exception ex) {
-                Log.error("Failed to persist test run data: " + ex.getMessage());
+                Logger.error("Failed to persist test run data: " + ex.getMessage());
             }
         });
     }

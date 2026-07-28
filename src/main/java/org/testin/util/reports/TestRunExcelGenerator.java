@@ -10,7 +10,7 @@ import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
@@ -86,7 +86,7 @@ public final class TestRunExcelGenerator {
 
             return os.toByteArray();
         } catch (final IOException ex) {
-            Log.error("CSV parse failed: " + ex.getMessage());
+            Logger.error("CSV parse failed: " + ex.getMessage());
             throw new RuntimeException(ex);
         }
     }

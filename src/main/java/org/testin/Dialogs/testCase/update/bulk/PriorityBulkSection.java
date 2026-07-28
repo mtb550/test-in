@@ -2,7 +2,7 @@ package org.testin.Dialogs.testCase.update.bulk;
 
 import org.testin.pojo.Priority;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class PriorityBulkSection extends JsonSplitBulkSection {
                     items.get(i).setPriority(Priority.valueOf(val.toUpperCase()));
 
                 } catch (final IllegalArgumentException ex) {
-                    Log.error(ex.getMessage());
+                    Logger.error(ex.getMessage());
                 }
             }
         }

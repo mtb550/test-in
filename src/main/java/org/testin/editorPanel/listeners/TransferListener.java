@@ -3,7 +3,7 @@ package org.testin.editorPanel.listeners;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -108,7 +108,7 @@ public class TransferListener extends TransferHandler {
 
             return true;
         } catch (final Exception ex) {
-            Log.error("Exception: " + ex.getMessage());
+            Logger.error("Exception: " + ex.getMessage());
             return false;
         }
     }

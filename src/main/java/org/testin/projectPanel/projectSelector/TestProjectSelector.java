@@ -11,7 +11,7 @@ import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
@@ -61,12 +61,12 @@ public class TestProjectSelector {
     }
 
     public void init() {
-        Log.info("TestProjectSelector.init()");
+        Logger.info("TestProjectSelector.init()");
         loadTestProjectList();
     }
 
     public void loadTestProjectList() {
-        Log.info("TestProjectSelector.loadTestProjectList()");
+        Logger.info("TestProjectSelector.loadTestProjectList()");
 
         final Object currentSelected = selectedTestProject.getSelectedItem();
         final String currentSelectedName = currentSelected instanceof TestProjectDirectoryDto ? ((TestProjectDirectoryDto) currentSelected).getName() : null;
@@ -135,7 +135,7 @@ public class TestProjectSelector {
     }
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
-        Log.info("TestProjectSelector.addTestProject()");
+        Logger.info("TestProjectSelector.addTestProject()");
         if (!selectedTestProject.isEnabled())
             projectPanel.showEmptyState();
 
@@ -157,7 +157,7 @@ public class TestProjectSelector {
     public void filterByTestProject(final @NotNull TestProjectDirectoryDto tp) {
         try {
 
-            Log.info("Panel.filterByProject(): " + tp.getName());
+            Logger.info("Panel.filterByProject(): " + tp.getName());
 
             if (!isLoading)
                 PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, tp.getName());
@@ -172,7 +172,7 @@ public class TestProjectSelector {
             projectPanel.getBranchSelector().updateProject(tp);
 
         } catch (final Exception ex) {
-            Log.error("filterByTestProject: Error for project '" + tp.getName() + "': " + ex.getMessage());
+            Logger.error("filterByTestProject: Error for project '" + tp.getName() + "': " + ex.getMessage());
         }
     }
 

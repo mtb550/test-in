@@ -15,7 +15,7 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.EditorUtil;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -103,7 +103,7 @@ public class Remove extends DumbAwareAction {
 
         ApplicationManager.getApplication().invokeLater(() -> {
             projectPanel.getProjectTree().updateNodes();
-            Log.info("Removed " + nodesToRemove.size() + " node(s).");
+            Logger.info("Removed " + nodesToRemove.size() + " node(s).");
         });
 
         // todo, remove java method and packages once delete node, code generator to be added

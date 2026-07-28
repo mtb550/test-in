@@ -23,7 +23,7 @@ public final class LoggerService implements Disposable {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private volatile boolean isRunning = true;
 
-    private volatile Log.Level currentLogLevel = Log.Level.DISABLED;
+    private volatile Logger.Level currentLogLevel = Logger.Level.DISABLED;
 
     private Thread writerThread;
 
@@ -31,7 +31,7 @@ public final class LoggerService implements Disposable {
         startWriterThread();
     }
 
-    public void setLogLevel(@NotNull Log.Level level) {
+    public void setLogLevel(@NotNull Logger.Level level) {
         this.currentLogLevel = level;
     }
 
@@ -63,7 +63,7 @@ public final class LoggerService implements Disposable {
 
     private Path getLogFile() {
         try {
-            Project project = Log.getProject();
+            Project project = Logger.getProject();
             Path projectDir;
             if (project != null && project.getBasePath() != null) {
                 projectDir = Path.of(project.getBasePath());
@@ -73,22 +73,20 @@ public final class LoggerService implements Disposable {
             if (!Files.exists(projectDir)) Files.createDirectories(projectDir);
             return projectDir.resolve("testin.log");
         } catch (final Exception ex) {
-            Log.error("Failed to initialize log file path: " + ex.getMessage());
+            Logger.error("Failed to initialize log file path: " + ex.getMessage());
             return null;
         }
     }
 
-    public void log(@NotNull Log.Level level, @NotNull String callerClass, @NotNull String message) {
+    public void log(@NotNull Logger.Level level, @NotNull String callerClass, @NotNull String message) {
 
-        if (!isRunning || currentLogLevel == Log.Level.DISABLED || level.priority < currentLogLevel.priority) return;
+        if (!isRunning || currentLogLevel == Logger.Level.DISABLED || level.priority < currentLogLevel.priority) return;
 
-        String formattedMessage = "[" + LocalDateTime.now().format(formatter) + "] " +
-                "[" + level.paddedName + "] " +
-                "[" + callerClass + "] " + message;
+        String formattedMessage = "[" + LocalDateTime.now().format(formatter) + "] " + "[" + level.paddedName + "] " + "[" + callerClass + "] " + message;
 
-        if (!logQueue.offer(formattedMessage)) {
-            Log.error("Testin Logger queue full! Dropped log: " + message);
-        }
+        if (!logQueue.offer(formattedMessage))
+            Logger.error("Testin Logger queue full! Dropped log: " + message);
+
     }
 
     @Override
@@ -104,7 +102,7 @@ public final class LoggerService implements Disposable {
                 Files.delete(logFile);
 
         } catch (final Exception ex) {
-            Log.error("Failed to delete log file: " + ex.getMessage());
+            Logger.error("Failed to delete log file: " + ex.getMessage());
         }
     }
 }

@@ -12,7 +12,7 @@ import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.pojo.markers.TestProjectMarker;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -57,8 +57,8 @@ public class UpdateTestProjectStatus extends DumbAwareAction {
             Services.getInstance(project, Notifier.class).info(project, "Test project '" + tp.getName() + "' is " + projectStatus.getDescription() + ".");
 
         } catch (final Exception ex) {
-            Log.error("Unable to update status to " + projectStatus.getDescription());
-            Log.error(ex.getMessage());
+            Logger.error("Unable to update status to " + projectStatus.getDescription());
+            Logger.error(ex.getMessage());
             Services.getInstance(project, Notifier.class).error(project, "Unable to update status to " + projectStatus.getDescription());
         }
     }

@@ -10,7 +10,7 @@ import org.testin.pojo.dto.dirs.*;
 import org.testin.pojo.markers.TestRunMarker;
 import org.testin.util.FilesUtil;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.nio.file.Files;
@@ -32,10 +32,10 @@ final class IndexerDataStore {
     private final Map<String, TestProjectDirectoryDto> testProjectsByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestSetDirectoryDto> testSetsByPath = new ConcurrentHashMap<>();
+    private final Map<String, TestSetDirectoryDto> testSetsDirByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestRunDirectoryDto> testRunDirsByPath = new ConcurrentHashMap<>();
+    private final Map<String, TestRunDirectoryDto> testRunsDirByPath = new ConcurrentHashMap<>();
 
     @Getter
     private final Map<String, TestSetPackageDirectoryDto> testSetPackagesByPath = new ConcurrentHashMap<>();
@@ -71,20 +71,20 @@ final class IndexerDataStore {
         return result;
     }
 
-    TestRunDto getTestRunForPath(final Path testRunPath) {
+    TestRunDto getTestRunByPath(final Path testRunPath) {
         return testRunsByPath.get(testRunPath.toString());
+    }
+
+    TestRunDirectoryDto getTestRunDirByPath(final Path path) {
+        return testRunsDirByPath.get(path.toString());
     }
 
     TestCaseDto getTestCaseById(final UUID id) {
         return testCasesById.get(id);
     }
 
-    TestSetDirectoryDto getTestSetByPath(final Path path) {
-        return testSetsByPath.get(path.toString());
-    }
-
-    TestRunDirectoryDto getTestRunDirByPath(final Path path) {
-        return testRunDirsByPath.get(path.toString());
+    TestSetDirectoryDto getTestSetDirByPath(final Path path) {
+        return testSetsDirByPath.get(path.toString());
     }
 
     TestSetPackageDirectoryDto getTestSetPackageByPath(final Path path) {
@@ -122,7 +122,7 @@ final class IndexerDataStore {
         try {
             Files.deleteIfExists(filePath);
         } catch (final Exception ex) {
-            Log.error("Failed to delete test case file: " + filePath);
+            Logger.error("Failed to delete test case file: " + filePath);
         }
     }
 
@@ -163,7 +163,7 @@ final class IndexerDataStore {
     }
 
     void addTestSet(final TestSetDirectoryDto ts) {
-        testSetsByPath.put(ts.getPath().toString(), ts);
+        testSetsDirByPath.put(ts.getPath().toString(), ts);
     }
 
     void addTestSetPackage(final TestSetPackageDirectoryDto tsp) {
@@ -171,7 +171,7 @@ final class IndexerDataStore {
     }
 
     void addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
-        testRunDirsByPath.put(trd.getPath().toString(), trd);
+        testRunsDirByPath.put(trd.getPath().toString(), trd);
     }
 
     void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
@@ -183,38 +183,38 @@ final class IndexerDataStore {
         testProjectsByPath.remove(pathStr);
         testCasesMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
         testRunsMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
-        Log.info("Removed test project at: " + pathStr);
+        Logger.info("Removed test project at: " + pathStr);
     }
 
     void removeTestSet(final @NotNull Path path) {
         final String pathStr = path.toString();
-        testSetsByPath.remove(pathStr);
+        testSetsDirByPath.remove(pathStr);
 
         final List<UUID> ids = testSetCaseIds.remove(pathStr);
         if (ids != null) {
             for (final UUID id : ids)
                 testCasesById.remove(id);
         }
-        Log.info("Removed test set at: " + pathStr);
+        Logger.info("Removed test set at: " + pathStr);
     }
 
     void removeTestRun(final @NotNull Path path) {
         final String pathStr = path.toString();
-        testRunDirsByPath.remove(pathStr);
+        testRunsDirByPath.remove(pathStr);
         testRunsByPath.remove(pathStr);
-        Log.info("Removed test run at: " + pathStr);
+        Logger.info("Removed test run at: " + pathStr);
     }
 
     void removeTestSetPackage(final @NotNull Path path) {
         final String pathStr = path.toString();
         testSetPackagesByPath.remove(pathStr);
-        Log.info("Removed test set package at: " + pathStr);
+        Logger.info("Removed test set package at: " + pathStr);
     }
 
     void removeTestRunPackage(final @NotNull Path path) {
         final String pathStr = path.toString();
         testRunPackagesByPath.remove(pathStr);
-        Log.info("Removed test run package at: " + pathStr);
+        Logger.info("Removed test run package at: " + pathStr);
     }
 
     void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
@@ -229,7 +229,7 @@ final class IndexerDataStore {
     }
 
     void updateRunMarker(final @NotNull Project project, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        final TestRunDirectoryDto trd = testRunDirsByPath.get(runPath.toString());
+        final TestRunDirectoryDto trd = testRunsDirByPath.get(runPath.toString());
         trd.setMarker(marker);
         Services.getInstance(project, FilesUtil.class).write(project, runPath.resolve(DirectoryType.TR.getMarker()), marker);
     }
@@ -239,8 +239,8 @@ final class IndexerDataStore {
         final String newStr = newPath.toString();
 
         renameMapEntry(testProjectsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
-        renameMapEntry(testSetsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
-        renameMapEntry(testRunDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testSetsDirByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        renameMapEntry(testRunsDirByPath, oldStr, newStr, dto -> dto.setPath(newPath));
         renameMapEntry(testSetPackagesByPath, oldStr, newStr, dto -> dto.setPath(newPath));
         renameMapEntry(testRunPackagesByPath, oldStr, newStr, dto -> dto.setPath(newPath));
         renameMapEntry(testCasesMainDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
@@ -251,8 +251,8 @@ final class IndexerDataStore {
         });
 
         updatePath2(testProjectsByPath.get(newStr), newPath);
-        updatePath2(testSetsByPath.get(newStr), newPath);
-        updatePath2(testRunDirsByPath.get(newStr), newPath);
+        updatePath2(testSetsDirByPath.get(newStr), newPath);
+        updatePath2(testRunsDirByPath.get(newStr), newPath);
         updatePath2(testSetPackagesByPath.get(newStr), newPath);
         updatePath2(testRunPackagesByPath.get(newStr), newPath);
     }
@@ -266,7 +266,7 @@ final class IndexerDataStore {
                 children.add(dto);
             }
         }
-        for (final TestSetDirectoryDto dto : testSetsByPath.values()) {
+        for (final TestSetDirectoryDto dto : testSetsDirByPath.values()) {
             if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
                 children.add(dto);
             }
@@ -276,7 +276,7 @@ final class IndexerDataStore {
                 children.add(dto);
             }
         }
-        for (final TestRunDirectoryDto dto : testRunDirsByPath.values()) {
+        for (final TestRunDirectoryDto dto : testRunsDirByPath.values()) {
             if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
                 children.add(dto);
             }
@@ -306,8 +306,8 @@ final class IndexerDataStore {
         testCasesById.clear();
         testRunsById.clear();
         testProjectsByPath.clear();
-        testSetsByPath.clear();
-        testRunDirsByPath.clear();
+        testSetsDirByPath.clear();
+        testRunsDirByPath.clear();
         testSetPackagesByPath.clear();
         testRunPackagesByPath.clear();
         testCasesMainDirsByPath.clear();
@@ -315,6 +315,6 @@ final class IndexerDataStore {
         testSetCaseIds.clear();
         testRunsByPath.clear();
 
-        Log.info("IndexerDataStore: all maps cleared");
+        Logger.info("IndexerDataStore: all maps cleared");
     }
 }

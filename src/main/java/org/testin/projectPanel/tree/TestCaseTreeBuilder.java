@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.ProjectStatus;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 public class TestCaseTreeBuilder extends AbstractTreeBuilder {
 
@@ -25,7 +25,7 @@ public class TestCaseTreeBuilder extends AbstractTreeBuilder {
             super.buildTree(selectedTestProjectDirectory.getTestCasesDirectory());
 
         } catch (final Exception ex) {
-            Log.error("TestCaseTreeBuilder.buildTree() error for directory '" + (selectedTestProjectDirectory != null ? selectedTestProjectDirectory.getName() : "null") + "': " + ex.getMessage());
+            Logger.error("TestCaseTreeBuilder.buildTree() error for directory '" + (selectedTestProjectDirectory != null ? selectedTestProjectDirectory.getName() : "null") + "': " + ex.getMessage());
             this.rootNode = null;
             ApplicationManager.getApplication().invokeLater(() -> projectPanel.getProjectTree().refreshTree());
         }

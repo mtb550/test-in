@@ -10,14 +10,14 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
 import org.testin.settings.StartupActivity;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 public class Main implements ToolWindowFactory, DumbAware {
 
     @Override
     public void createToolWindowContent(final @NotNull Project project, final @NotNull ToolWindow tw) {
-        Log.info("ToolWindowFactory.createToolWindowContent()");
+        Logger.info("ToolWindowFactory.createToolWindowContent()");
 
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!project.isDisposed())

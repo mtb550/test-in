@@ -8,7 +8,7 @@ import com.intellij.openapi.components.Service;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import java.io.File;
 import java.io.InputStream;
@@ -27,7 +27,7 @@ public final class Mapper {
             return mapper.readValue(src, valueType);
 
         } catch (final Exception ex) {
-            Log.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + ex.getMessage());
+            Logger.error("Mapper.readValue() failed for file '" + src.getAbsolutePath() + "' to class " + valueType.getSimpleName() + ": " + ex.getMessage());
             throw new RuntimeException(ex.getMessage());
         }
     }
@@ -37,8 +37,8 @@ public final class Mapper {
             return mapper.readValue(src, valueTypeRef);
 
         } catch (final Exception ex) {
-            Log.error("Failed to read file path " + src + " to TypeReference");
-            Log.error("Exception: " + ex.getMessage());
+            Logger.error("Failed to read file path " + src + " to TypeReference");
+            Logger.error("Exception: " + ex.getMessage());
             throw new RuntimeException(ex.getMessage());
         }
     }
@@ -48,7 +48,7 @@ public final class Mapper {
             return mapper.readValue(content, valueType);
 
         } catch (final Exception ex) {
-            Log.error("Failed to parse JSON string to class " + valueType.getSimpleName());
+            Logger.error("Failed to parse JSON string to class " + valueType.getSimpleName());
             throw new RuntimeException(ex.getMessage());
         }
     }
@@ -58,8 +58,8 @@ public final class Mapper {
             return mapper.readValue(src, valueType);
 
         } catch (final Exception ex) {
-            Log.error("Failed to read InputStream to class " + valueType.getSimpleName());
-            Log.error("Exception: " + ex.getMessage());
+            Logger.error("Failed to read InputStream to class " + valueType.getSimpleName());
+            Logger.error("Exception: " + ex.getMessage());
             throw new RuntimeException(ex.getMessage());
         }
     }
@@ -69,7 +69,7 @@ public final class Mapper {
             return mapper.readValue(content, valueTypeRef);
 
         } catch (final Exception ex) {
-            Log.error("Failed to parse JSON string to TypeReference.");
+            Logger.error("Failed to parse JSON string to TypeReference.");
             throw new RuntimeException(ex.getMessage());
         }
     }
@@ -79,8 +79,8 @@ public final class Mapper {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(value);
 
         } catch (final Exception ex) {
-            Log.error("Failed to serialize object to bytes: " + value.getClass().getSimpleName());
-            Log.error("Exception: " + ex.getMessage());
+            Logger.error("Failed to serialize object to bytes: " + value.getClass().getSimpleName());
+            Logger.error("Exception: " + ex.getMessage());
             return new byte[0];
         }
     }
@@ -90,7 +90,7 @@ public final class Mapper {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
 
         } catch (final Exception ex) {
-            Log.error("Failed to serialize object to string: " + value.getClass().getSimpleName());
+            Logger.error("Failed to serialize object to string: " + value.getClass().getSimpleName());
             return "";
         }
     }
@@ -100,7 +100,7 @@ public final class Mapper {
             return mapper.convertValue(fromValue, toValueType);
 
         } catch (final Exception ex) {
-            Log.error("Failed to convert value to class " + toValueType.getSimpleName());
+            Logger.error("Failed to convert value to class " + toValueType.getSimpleName());
             throw new RuntimeException(ex.getMessage());
         }
     }

@@ -13,8 +13,8 @@ import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.*;
 import org.testin.pojo.markers.TestRunMarker;
 import org.testin.settings.Setting;
-import org.testin.util.logger.Log;
-import org.testin.util.services.EditorStateService;
+import org.testin.util.EditorUtil;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.nio.file.Files;
@@ -96,12 +96,12 @@ public final class ProjectIndexer {
                 indexing.set(false);
                 indexed.set(true);
                 indexingLatch.countDown();
-                Log.warn("No valid projects found at '" + absoluteRoot.toAbsolutePath() + "'");
+                Logger.warn("No valid projects found at '" + absoluteRoot.toAbsolutePath() + "'");
                 return;
             }
 
             indexingLatch = new CountDownLatch(validProjects.size());
-            Log.info("Indexing " + validProjects.size() + " projects...");
+            Logger.info("Indexing " + validProjects.size() + " projects...");
 
             for (final Path projectPath : validProjects) {
                 final String projectName = projectPath.getFileName().toString();
@@ -117,7 +117,7 @@ public final class ProjectIndexer {
                                 try {
                                     scanner.scanProject(projectPath, indicator);
                                 } catch (final Exception ex) {
-                                    Log.error("Failed to index project: " + projectName + " - " + ex.getMessage());
+                                    Logger.error("Failed to index project: " + projectName + " - " + ex.getMessage());
                                 }
 
                                 indicator.setFraction(1.0);
@@ -127,7 +127,7 @@ public final class ProjectIndexer {
                             @Override
                             public void onSuccess() {
                                 indexingLatch.countDown();
-                                Log.info("Project '" + projectName + "' indexed.");
+                                Logger.info("Project '" + projectName + "' indexed.");
 
                                 if (indexingLatch.getCount() == 0 && indexed.compareAndSet(false, true)) {
                                     indexing.set(false);
@@ -136,12 +136,11 @@ public final class ProjectIndexer {
 
                                     ApplicationManager.getApplication().invokeLater(() -> {
                                         if (restoreEditorsOnComplete.compareAndSet(true, true)) {
-                                            Log.info("Indexing finished, restoring open editors.");
-                                            Services.getInstance(project, EditorStateService.class)
-                                                    .restoreOpenEditors();
-                                        } else {
-                                            Log.info("Indexing finished, skipping editor restore.");
-                                        }
+                                            Logger.info("Indexing finished, restoring open editors.");
+                                            Services.getInstance(project, EditorUtil.class).restoreOpenEditors(project);
+
+                                        } else
+                                            Logger.info("Indexing finished, skipping editor restore.");
                                     });
                                 }
                             }
@@ -149,14 +148,19 @@ public final class ProjectIndexer {
                             @Override
                             public void onThrowable(@NotNull Throwable error) {
                                 indexingLatch.countDown();
-                                Log.error("Error indexing '" + projectName + "': " + error.getMessage());
+                                Logger.error("Error indexing '" + projectName + "': " + error.getMessage());
                             }
                         });
             }
         } catch (final Exception ex) {
-            Log.error("indexWithProgress: " + ex.getMessage());
+            Logger.error("indexWithProgress: " + ex.getMessage());
             indexing.set(false);
         }
+    }
+
+    // todo: to be removed
+    public boolean isIndexed() {
+        return indexed.get();
     }
 
     public void awaitIndexing() {
@@ -173,7 +177,7 @@ public final class ProjectIndexer {
         indexed.set(false);
         indexing.set(false);
         indexingLatch = new CountDownLatch(1);
-        Log.info("Indexer disposed");
+        Logger.info("Indexer disposed");
     }
 
     public void resetForReindex() {
@@ -182,7 +186,7 @@ public final class ProjectIndexer {
         indexed.set(false);
         indexing.set(false);
         indexingLatch = new CountDownLatch(1);
-        Log.info("Indexer reset for re-indexing");
+        Logger.info("Indexer reset for re-indexing");
     }
 
     private @NotNull List<Path> collectValidProjects(final @NotNull Path rootPath) {
@@ -192,7 +196,7 @@ public final class ProjectIndexer {
         try (Stream<Path> dirs = Files.list(rootPath)) {
             projectPaths = dirs.filter(Files::isDirectory).toArray(Path[]::new);
         } catch (final Exception ex) {
-            Log.error("Failed to list root directory: " + ex.getMessage());
+            Logger.error("Failed to list root directory: " + ex.getMessage());
             return Collections.emptyList();
         }
 
@@ -207,8 +211,8 @@ public final class ProjectIndexer {
         final int tcCount = store.getTestCasesById().size();
         final int trCount = store.getTestRunsByPath().size();
         final int projCount = store.getTestProjectsByPath().size();
-        final int setCount = store.getTestSetsByPath().size();
-        final int runDirCount = store.getTestRunDirsByPath().size();
+        final int setCount = store.getTestSetsDirByPath().size();
+        final int runDirCount = store.getTestRunsDirByPath().size();
         final int setPkgCount = store.getTestSetPackagesByPath().size();
         final int runPkgCount = store.getTestRunPackagesByPath().size();
 
@@ -216,7 +220,7 @@ public final class ProjectIndexer {
                 tcCount, trCount, projCount, setCount, runDirCount,
                 setPkgCount, runPkgCount, store.getTestSetCaseIds().size());
 
-        Log.info("Indexing complete: " +
+        Logger.info("Indexing complete: " +
                 tcCount + " test cases, " +
                 trCount + " test runs, " +
                 projCount + " projects, " +
@@ -231,8 +235,8 @@ public final class ProjectIndexer {
         return store.getTestCasesForTestSet(testSetPath);
     }
 
-    public @NotNull TestRunDto getTestRunForPath(final @NotNull Path testRunPath) {
-        return store.getTestRunForPath(testRunPath);
+    public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
+        return store.getTestRunByPath(testRunPath);
     }
 
     public @NotNull TestCaseDto getTestCaseById(final @NotNull UUID id) {
@@ -240,7 +244,7 @@ public final class ProjectIndexer {
     }
 
     public @NotNull TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
-        return store.getTestSetByPath(path);
+        return store.getTestSetDirByPath(path);
     }
 
     public @NotNull TestSetPackageDirectoryDto getTestSetPackageByPath(final @NotNull Path path) {
@@ -325,11 +329,11 @@ public final class ProjectIndexer {
     }
 
     public void scanSingleProject(final @NotNull Path projectPath) {
-        Log.info("Scanning single project: " + projectPath.getFileName());
+        Logger.info("Scanning single project: " + projectPath.getFileName());
         try {
             scanner.scanProject(projectPath);
         } catch (final Exception ex) {
-            Log.error("Failed to scan single project: " + ex.getMessage());
+            Logger.error("Failed to scan single project: " + ex.getMessage());
         }
     }
 

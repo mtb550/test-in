@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Group;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.util.List;
@@ -24,10 +24,10 @@ public class CreateTestMethod implements GeneratorAction {
         if (!(obj instanceof TestCaseDto tc)) return;
         final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
 
-        Log.info("Creating Test Case for: " + fqcn);
+        Logger.info("Creating Test Case for: " + fqcn);
 
         if (fqcn.size() < 2) {
-            Log.error("FQCN list is too short to generate a method.");
+            Logger.error("FQCN list is too short to generate a method.");
             return;
         }
 
@@ -37,8 +37,8 @@ public class CreateTestMethod implements GeneratorAction {
         final List<String> packageList = fqcn.subList(0, fqcn.size() - 2);
         final String packageName = String.join(".", packageList);
 
-        Log.info("Class Path: " + path);
-        Log.info("MethodName: " + methodName);
+        Logger.info("Class Path: " + path);
+        Logger.info("MethodName: " + methodName);
 
         ApplicationManager.getApplication().invokeLater(() ->
                 WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () -> {
@@ -83,7 +83,7 @@ public class CreateTestMethod implements GeneratorAction {
                         }
 
                     } catch (final Exception ex) {
-                        Log.error("Failed to inject Java method: " + ex.getMessage());
+                        Logger.error("Failed to inject Java method: " + ex.getMessage());
                     }
                 }));
     }
@@ -93,7 +93,7 @@ public class CreateTestMethod implements GeneratorAction {
         try {
             VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
             if (sourceRoot == null) {
-                Log.error("retryInjectPhysically: sourceRoot is null, cannot inject method '" + methodName + "'");
+                Logger.error("retryInjectPhysically: sourceRoot is null, cannot inject method '" + methodName + "'");
                 return;
             }
 
@@ -107,24 +107,24 @@ public class CreateTestMethod implements GeneratorAction {
                     if (classes.length > 0) {
                         injectMethod(project, classes[0], methodName, tc);
                     } else {
-                        Log.error("retryInjectPhysically: no classes found in " + className + ".java for method '" + methodName + "'");
+                        Logger.error("retryInjectPhysically: no classes found in " + className + ".java for method '" + methodName + "'");
                     }
                 } else {
-                    Log.error("retryInjectPhysically: file " + className + ".java is not a valid Java file for method '" + methodName + "'");
+                    Logger.error("retryInjectPhysically: file " + className + ".java is not a valid Java file for method '" + methodName + "'");
                 }
             } else {
-                Log.error("retryInjectPhysically: file not found at " + relativePath + " for method '" + methodName + "'");
+                Logger.error("retryInjectPhysically: file not found at " + relativePath + " for method '" + methodName + "'");
             }
         } catch (final Exception ex) {
-            Log.error("retryInjectPhysically failed for method '" + methodName + "': " + ex.getMessage());
+            Logger.error("retryInjectPhysically failed for method '" + methodName + "': " + ex.getMessage());
         }
     }
 
     public void executeSync(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
-        Log.info("Creating Test Case (sync) for: " + fqcn);
+        Logger.info("Creating Test Case (sync) for: " + fqcn);
 
         if (fqcn.size() < 2) {
-            Log.error("FQCN list is too short to generate a method.");
+            Logger.error("FQCN list is too short to generate a method.");
             return;
         }
 
@@ -134,8 +134,8 @@ public class CreateTestMethod implements GeneratorAction {
         final List<String> packageList = fqcn.subList(0, fqcn.size() - 2);
         final String packageName = String.join(".", packageList);
 
-        Log.info("Class Path: " + path);
-        Log.info("MethodName: " + methodName);
+        Logger.info("Class Path: " + path);
+        Logger.info("MethodName: " + methodName);
 
         try {
             JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
@@ -183,9 +183,9 @@ public class CreateTestMethod implements GeneratorAction {
             }
 
         } catch (final Exception ex) {
-            Log.error("Failed to inject Java method '" + methodName + "': " + ex.getMessage());
+            Logger.error("Failed to inject Java method '" + methodName + "': " + ex.getMessage());
         }
-        Log.info("executeSync completed for method: " + methodName);
+        Logger.info("executeSync completed for method: " + methodName);
     }
 
     // todo, move to tools class
@@ -242,12 +242,12 @@ public class CreateTestMethod implements GeneratorAction {
                 PsiElement addedElement = targetClass.add(newMethod);
                 CodeStyleManager.getInstance(project).reformat(addedElement);
 
-                Log.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
+                Logger.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
             } else {
-                Log.info("Method already exists: " + methodName);
+                Logger.info("Method already exists: " + methodName);
             }
         } catch (final Exception ex) {
-            Log.error("injectMethod failed for '" + methodName + "': " + ex.getMessage());
+            Logger.error("injectMethod failed for '" + methodName + "': " + ex.getMessage());
         }
     }
 }

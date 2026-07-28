@@ -12,7 +12,7 @@ import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Dialogs.ZoomIndicator;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -75,7 +75,7 @@ public class FontSyncUtil {
                 }
             }
         } catch (final Exception ex) {
-            Log.error(ex.getMessage());
+            Logger.error(ex.getMessage());
         }
     }
 

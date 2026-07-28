@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.util.ArrayList;
@@ -39,14 +39,14 @@ public final class TestNGRunnerByMethod {
                     final String methodName = fqcn.getLast();
                     final String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-                    Log.info("Running Test - configName: " + configName);
-                    Log.info("Extracted  - classFqcn: " + classFqcn + ", methodName: " + methodName);
-                    Log.info("FQCN list size: " + fqcn.size() + ", elements: " + fqcn);
+                    Logger.info("Running Test - configName: " + configName);
+                    Logger.info("Extracted  - classFqcn: " + classFqcn + ", methodName: " + methodName);
+                    Logger.info("FQCN list size: " + fqcn.size() + ", elements: " + fqcn);
 
                     PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(classFqcn, GlobalSearchScope.projectScope(project));
 
                     if (targetClass == null) {
-                        Log.warn("Target class not found for FQCN: " + classFqcn);
+                        Logger.warn("Target class not found for FQCN: " + classFqcn);
                         return;
                     }
 
@@ -56,8 +56,8 @@ public final class TestNGRunnerByMethod {
                     final String simpleClassName = (dotIndex >= 0) ? classFqcn.substring(dotIndex + 1) : classFqcn;
                     final String configLabel = simpleClassName + "." + methodName;
 
-                    Log.info("finalFqcn: " + finalFqcn + ", simpleClass: " + simpleClassName);
-                    Log.info("Config label: " + configLabel);
+                    Logger.info("finalFqcn: " + finalFqcn + ", simpleClass: " + simpleClassName);
+                    Logger.info("Config label: " + configLabel);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
 
@@ -75,7 +75,7 @@ public final class TestNGRunnerByMethod {
                         } else
                             configuration = (TestNGConfiguration) settings.getConfiguration();
 
-                        Log.info("Setting TEST_OBJECT=" + TestType.METHOD.getType() + ", MAIN_CLASS=" + finalFqcn + ", METHOD=" + methodName);
+                        Logger.info("Setting TEST_OBJECT=" + TestType.METHOD.getType() + ", MAIN_CLASS=" + finalFqcn + ", METHOD=" + methodName);
 
                         configuration.getPersistantData().TEST_OBJECT = TestType.METHOD.getType();
                         configuration.getPersistantData().MAIN_CLASS_NAME = finalFqcn;

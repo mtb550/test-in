@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.EditorUtil;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -34,14 +34,14 @@ public class TreeDropHandler implements FileDropHandler {
                 for (DefaultMutableTreeNode node : nodes) {
 
                     if (node.getUserObject() instanceof TestSetDirectoryDto ts) {
-                        Log.info("dragged Test set: " + ts.getName());
+                        Logger.info("dragged Test set: " + ts.getName());
 
                         Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, ts);
                         continue;
                     }
 
                     if (node.getUserObject() instanceof TestRunDirectoryDto tr) {
-                        Log.info("dragged Test Run: " + tr.getName());
+                        Logger.info("dragged Test Run: " + tr.getName());
                         Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, tr);
                     }
                 }
@@ -49,7 +49,7 @@ public class TreeDropHandler implements FileDropHandler {
             return true;
 
         } catch (final Exception ex) {
-            Log.error("Exception: " + ex.getMessage());
+            Logger.error("Exception: " + ex.getMessage());
             return false;
         }
     }

@@ -7,7 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ public class CreateJavaTestClass implements GeneratorAction {
         final String className = fqcn.getLast();
         final String fileName = className + ".java";
 
-        Log.info("Ready to generate Test Class: " + className + " in package: " + fqcn);
+        Logger.info("Ready to generate Test Class: " + className + " in package: " + fqcn);
 
         WriteAction.run(() -> {
             try {
@@ -45,17 +45,17 @@ public class CreateJavaTestClass implements GeneratorAction {
                                     "}\n";
 
                             VfsUtil.saveText(javaFile, fileContent);
-                            Log.info("Test Class created physically at: " + javaFile.getPath());
+                            Logger.info("Test Class created physically at: " + javaFile.getPath());
                         } else {
-                            Log.info("File already exists: " + existingFile.getPath());
+                            Logger.info("File already exists: " + existingFile.getPath());
                         }
                     }
                 } else {
-                    Log.info("Could not find Main Source Root in the project modules.");
+                    Logger.info("Could not find Main Source Root in the project modules.");
                 }
 
             } catch (final IOException ex) {
-                Log.info("Error creating test class: " + ex.getMessage());
+                Logger.info("Error creating test class: " + ex.getMessage());
             }
         });
     }

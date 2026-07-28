@@ -13,7 +13,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestRunItems;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -36,7 +36,7 @@ public class RunItemUpdateMenu {
 
     public void show() {
         showMenu("Update Test Run Item", selectedItem -> {
-            Log.trace("Menu item selected -> " + selectedItem.getName());
+            Logger.trace("Menu item selected -> " + selectedItem.getName());
 
             new UpdateRunItemDialog(project, runItem, selectedItem, updatedItem).show();
         });

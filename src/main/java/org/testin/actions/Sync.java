@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.GitCommandRunner;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -85,7 +85,7 @@ public class Sync extends DumbAwareAction {
                     });
 
                 } catch (final Exception ex) {
-                    Log.error(ex.getMessage());
+                    Logger.error(ex.getMessage());
                     ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
                     );
                 }

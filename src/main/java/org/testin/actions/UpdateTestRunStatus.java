@@ -18,7 +18,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.markers.TestRunMarker;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.nio.file.Path;
@@ -96,7 +96,7 @@ public class UpdateTestRunStatus extends DumbAwareAction {
         marker.setStatus(newStatus);
         marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-        Log.trace("Test run status changed: " + editor.getParent().getName() + " = " + newStatus.getLabel());
+        Logger.trace("Test run status changed: " + editor.getParent().getName() + " = " + newStatus.getLabel());
 
         if (newStatus == TestRunStatus.COMPLETED || newStatus == TestRunStatus.CLOSED)
             resetPendingToUntested(editor);
@@ -163,10 +163,10 @@ public class UpdateTestRunStatus extends DumbAwareAction {
                     marker.setCreatedAt(editor.getParent().getMarker().getCreatedAt());
 
                     indexer.updateRunMarker(project, runPath, marker);
-                    Log.trace("Marker persisted -> " + marker.getStatus().getLabel());
+                    Logger.trace("Marker persisted -> " + marker.getStatus().getLabel());
                 }
             } catch (final Exception ex) {
-                Log.error("Failed to persist marker: " + ex.getMessage());
+                Logger.error("Failed to persist marker: " + ex.getMessage());
             }
         });
     }
@@ -178,9 +178,9 @@ public class UpdateTestRunStatus extends DumbAwareAction {
             try {
                 Path dirPath = editor.getParent().getPath();
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
-                Log.trace("Results persisted");
+                Logger.trace("Results persisted");
             } catch (final Exception ex) {
-                Log.error("Failed to persist test run results: " + ex.getMessage());
+                Logger.error("Failed to persist test run results: " + ex.getMessage());
             }
         });
     }

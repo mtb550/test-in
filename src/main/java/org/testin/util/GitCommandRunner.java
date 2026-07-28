@@ -1,6 +1,6 @@
 package org.testin.util;
 
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -28,11 +28,11 @@ public class GitCommandRunner {
                 return output;
 
             } catch (final Exception ex) {
-                Log.error("Git command failed: " + ex.getMessage());
+                Logger.error("Git command failed: " + ex.getMessage());
                 throw new RuntimeException(ex);
             }
         } catch (final Exception ex) {
-            Log.error("Git command interrupted: " + ex.getMessage());
+            Logger.error("Git command interrupted: " + ex.getMessage());
             throw new RuntimeException(ex);
         }
     }

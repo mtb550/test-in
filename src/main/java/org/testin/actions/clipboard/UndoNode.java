@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 public class UndoNode extends DumbAwareAction {
     public UndoNode(final @NotNull SimpleTree tree) {
@@ -17,7 +17,7 @@ public class UndoNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Log.info("Tree Undo triggered");
+        Logger.info("Tree Undo triggered");
     }
 
     @Override

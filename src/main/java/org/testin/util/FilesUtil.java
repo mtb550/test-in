@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -24,8 +24,8 @@ public final class FilesUtil {
 
         } catch (final IOException ex) {
             Services.getInstance(project, Notifier.class).error(project, "unable to write content: " + ex.getMessage());
-            Log.error("unable to write content: " + ex.getMessage());
-            Log.error("path" + path);
+            Logger.error("unable to write content: " + ex.getMessage());
+            Logger.error("path" + path);
             ex.printStackTrace(System.err);
         }
     }
@@ -34,7 +34,7 @@ public final class FilesUtil {
         try {
             Files.createDirectories(path);
         } catch (final IOException ex) {
-            Log.error("Exception: " + ex.getMessage());
+            Logger.error("Exception: " + ex.getMessage());
         }
     }
 

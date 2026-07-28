@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -51,7 +51,7 @@ public abstract class AbstractTreeBuilder {
                 });
 
             } catch (final Exception ex) {
-                Log.error("AbstractTreeBuilder.buildTree() error for directory '" + (rootDirectoryDto != null ? rootDirectoryDto.getName() : "null") + "': " + ex.getMessage());
+                Logger.error("AbstractTreeBuilder.buildTree() error for directory '" + (rootDirectoryDto != null ? rootDirectoryDto.getName() : "null") + "': " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
                     this.rootNode = null;
                     projectPanel.getProjectTree().refreshTree();
@@ -73,7 +73,7 @@ public abstract class AbstractTreeBuilder {
             return node;
 
         } catch (final Exception ex) {
-            Log.error("buildNodeFromIndexer() error for directory '" + currentDir.getName() + "': " + ex.getMessage());
+            Logger.error("buildNodeFromIndexer() error for directory '" + currentDir.getName() + "': " + ex.getMessage());
             return new DefaultMutableTreeNode(currentDir.getName());
         }
     }

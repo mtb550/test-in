@@ -7,7 +7,7 @@ import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.awt.*;
@@ -61,7 +61,7 @@ public class KeyListener extends KeyAdapter {
                         try {
                             indexer.removeTestCase(dirPath, tc.getId());
                         } catch (final Exception ex) {
-                            Log.error("Failed to delete test case: " + tc.getId());
+                            Logger.error("Failed to delete test case: " + tc.getId());
                         }
                     });
 

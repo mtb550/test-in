@@ -10,7 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -72,7 +72,7 @@ public class ExportExcel {
                 workbook.write(fos);
             }
         } catch (final IOException ex) {
-            Log.error(ex.getMessage());
+            Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
 

@@ -20,7 +20,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Mapper;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -78,7 +78,7 @@ public class Exports extends DumbAwareAction {
                     try {
                         format.exportToFile(project, Exports.this, destFile, sheets);
                     } catch (final Exception ex) {
-                        Log.error("Export crashed: " + ex.getMessage());
+                        Logger.error("Export crashed: " + ex.getMessage());
                         ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Export Failed", ex.getMessage()));
                     }
                 });
@@ -131,7 +131,7 @@ public class Exports extends DumbAwareAction {
                         head = tc;
                     }
                 } catch (final Exception ex) {
-                    Log.error("Loading test cases failed: " + ex.getMessage());
+                    Logger.error("Loading test cases failed: " + ex.getMessage());
                 }
             }
         }

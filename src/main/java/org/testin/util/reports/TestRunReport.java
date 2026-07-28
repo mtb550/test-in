@@ -16,7 +16,7 @@ import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -69,7 +69,7 @@ public final class TestRunReport {
                 String folderName = dirPath.getFileName().toString();
 
                 final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-                TestRunDto runData = indexer.getTestRunForPath(dirPath);
+                TestRunDto runData = indexer.getTestRunByPath(dirPath);
 
                 Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(runData);
 
@@ -118,7 +118,7 @@ public final class TestRunReport {
 
             } catch (final Exception ex) {
                 Services.getInstance(project, Notifier.class).error(project, "Report Error", "Failed to generate " + format.name() + " report: " + ex.getMessage());
-                Log.error("Exception: " + ex.getMessage());
+                Logger.error("Exception: " + ex.getMessage());
             }
         });
     }

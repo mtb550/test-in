@@ -8,7 +8,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.util.List;
@@ -30,14 +30,14 @@ public class CreateTestProject implements GeneratorAction {
                         VirtualFile vf = VfsUtil.createDirectoryIfMissing(sourceRoot, fqcn.getFirst());
 
                         if (vf != null) {
-                            Log.debug("Successfully created project package inside Source Root: " + vf.getPath());
+                            Logger.debug("Successfully created project package inside Source Root: " + vf.getPath());
                         }
                     } else {
-                        Log.warn("No Source Root found in the project. Please mark a directory as 'Sources Root'.");
+                        Logger.warn("No Source Root found in the project. Please mark a directory as 'Sources Root'.");
                     }
                 });
             } catch (final Exception ex) {
-                Log.error("Failed to create project package: " + ex.getMessage());
+                Logger.error("Failed to create project package: " + ex.getMessage());
             }
 
         }));

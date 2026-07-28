@@ -15,7 +15,7 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
@@ -33,7 +33,7 @@ public final class SettingsConfigurable implements Configurable {
 
     public SettingsConfigurable(final @NotNull Project project) {
         this.project = project;
-        this.logLevelComboBox = new ComboBox<>(Arrays.stream(Log.Level.values()).map(Log.Level::name).toArray(String[]::new));
+        this.logLevelComboBox = new ComboBox<>(Arrays.stream(Logger.Level.values()).map(Logger.Level::name).toArray(String[]::new));
     }
 
     @Override
@@ -78,7 +78,7 @@ public final class SettingsConfigurable implements Configurable {
         settings.readMode = readModeCheckBox.isSelected();
         settings.logLevel = (String) logLevelComboBox.getSelectedItem();
 
-        Log.setLogLevel(Log.Level.valueOf(settings.logLevel));
+        Logger.setLogLevel(Logger.Level.valueOf(settings.logLevel));
 
         Setting setting = Services.getInstance(project, Setting.class);
 

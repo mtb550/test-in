@@ -11,7 +11,7 @@ import org.testin.pojo.DirectoryType;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.util.ArrayList;
@@ -76,7 +76,7 @@ public class UpdateTestCaseDescription {
                                     }
 
                                     CodeStyleManager.getInstance(project).reformat(targetAnnotation);
-                                    Log.info("Successfully updated description and method name for: " + tc.getId());
+                                    Logger.info("Successfully updated description and method name for: " + tc.getId());
                                 } else {
                                     Messages.showWarningDialog("Could not find the Java method for this Test Case ID.", "Method Not Found");
                                 }

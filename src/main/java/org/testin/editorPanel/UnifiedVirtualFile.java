@@ -12,9 +12,9 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 @Getter
 public class UnifiedVirtualFile extends LightVirtualFile {
 
-    private final DirectoryDto dir;
+    private final @NotNull DirectoryDto dir;
 
-    public UnifiedVirtualFile(final DirectoryDto dir, final FileType ft) {
+    public UnifiedVirtualFile(final @NotNull DirectoryDto dir, final @NotNull EditorType ft) {
         super(dir.getName());
         this.dir = dir;
         this.setFileType(ft);
@@ -40,11 +40,11 @@ public class UnifiedVirtualFile extends LightVirtualFile {
         return VirtualFileManager.getInstance().getFileSystem(TestinFileSystem.PROTOCOL);
     }
 
-    public TestSetDirectoryDto getTestSet() {
+    public @NotNull TestSetDirectoryDto getTestSet() {
         return (TestSetDirectoryDto) dir;
     }
 
-    public TestRunDirectoryDto getTestRun() {
+    public @NotNull TestRunDirectoryDto getTestRun() {
         return (TestRunDirectoryDto) dir;
     }
 }

@@ -14,7 +14,7 @@ import org.testin.editorPanel.IEditor;
 import org.testin.pojo.CardHoverAction;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -86,11 +86,11 @@ public class MouseListenerImpl extends MouseAdapter {
             final TestCaseDto tc = list.getModel().getElementAt(index);
 
             if (action == CardHoverAction.NAVIGATE_TO_TEST_METHOD) {
-                Log.trace("navigate action, tc: " + tc.getDescription());
+                Logger.trace("navigate action, tc: " + tc.getDescription());
                 new NavigateToCode(list).execute(project, tc);
 
             } else if (action == CardHoverAction.RUN_TEST_CASE) {
-                Log.trace("run action, tc: " + tc.getDescription());
+                Logger.trace("run action, tc: " + tc.getDescription());
                 new RunTestCase(list).execute(project, tc);
             }
 

@@ -16,7 +16,7 @@ import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.CodeGenerator;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -73,7 +73,7 @@ public class CreateTestProjectNew extends DumbAwareAction {
 
                 projectDir.refresh(false, true);
             } catch (final IOException ex) {
-                Log.error(ex.getMessage());
+                Logger.error(ex.getMessage());
             }
             projectPanel.getTestProjectSelector().addTestProject(tp);
 

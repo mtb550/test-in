@@ -6,7 +6,7 @@ import com.intellij.util.ui.JBUI;
 import org.testin.pojo.Group;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.*;
@@ -109,7 +109,7 @@ public class GroupSection implements ICreateTestCaseSection {
                     cb.setSelected(selectedList.contains(group));
 
                 } catch (final Exception ex) {
-                    Log.error("setSelectedGroups ignored");
+                    Logger.error("setSelectedGroups ignored");
                 }
             }
         }

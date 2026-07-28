@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.testin.pojo.FileTypes;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -79,7 +79,7 @@ public class FileDocumentListener implements DocumentListener {
             onDataLoaded.accept(parsedData);
 
         } catch (final Exception ex) {
-            Log.error("Import parse failed: " + ex.getMessage());
+            Logger.error("Import parse failed: " + ex.getMessage());
             Services.getInstance(project, Notifier.class).error(
                     project, "Parse Error", ex.getMessage()
             );

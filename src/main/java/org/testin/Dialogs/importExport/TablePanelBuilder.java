@@ -8,7 +8,7 @@ import com.intellij.ui.table.JBTable;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -90,7 +90,7 @@ public class TablePanelBuilder {
             TableColumn groupCol = table.getColumn("Group");
             groupCol.setCellEditor(new GroupMultiSelectEditor(project));
         } catch (final IllegalArgumentException ex) {
-            Log.error(ex.getMessage());
+            Logger.error(ex.getMessage());
         }
 
         autoSizeColumns(table);

@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -28,7 +28,7 @@ public class ExportHtml {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
             writeHtmlDocument(writer, project, sheetsData);
         } catch (final IOException ex) {
-            Log.error(ex.getMessage());
+            Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
 
@@ -125,7 +125,7 @@ public class ExportHtml {
             writer.write("</html>");
             writer.newLine();
         } catch (final IOException ex) {
-            Log.error(ex.getMessage());
+            Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
     }

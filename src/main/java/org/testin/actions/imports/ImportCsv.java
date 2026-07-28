@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -30,7 +30,7 @@ public class ImportCsv {
                 result.put(name, testCases);
             }
         } catch (final Exception ex) {
-            Log.error("CSV import parse failed: " + ex.getMessage());
+            Logger.error("CSV import parse failed: " + ex.getMessage());
             Services.getInstance(project, Notifier.class).error(project, "CSV Parse Error", ex.getMessage());
         }
         return result;
@@ -117,7 +117,7 @@ public class ImportCsv {
                 }
             }
         } catch (final IOException ex) {
-            Log.error("CSV parse failed: " + ex.getMessage());
+            Logger.error("CSV parse failed: " + ex.getMessage());
             throw new RuntimeException(ex);
         }
         return records;

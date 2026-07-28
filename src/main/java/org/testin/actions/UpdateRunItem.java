@@ -14,7 +14,7 @@ import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.nio.file.Path;
@@ -44,10 +44,10 @@ public class UpdateRunItem extends DumbAwareAction {
         final TestRunItems runItem = runEditor.getResultsMap().get(selected.getId());
         if (runItem == null) return;
 
-        Log.trace("update test run item for: " + selected.getDescription());
+        Logger.trace("update test run item for: " + selected.getDescription());
 
         new RunItemUpdateMenu(project, runItem, updatedItem -> {
-            Log.trace("run item updated, actual result: " + updatedItem.getActualResult());
+            Logger.trace("run item updated, actual result: " + updatedItem.getActualResult());
 
             if (runEditor.getParent() != null) {
                 Path dirPath = runEditor.getParent().getPath();

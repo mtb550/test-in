@@ -5,7 +5,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -28,7 +28,7 @@ public class ImportExcel {
             Map<String, List<TestCaseDto>> parsed = parseFile(project, file);
             result.putAll(parsed);
         } catch (final Exception ex) {
-            Log.error("Excel import parse failed: " + ex.getMessage());
+            Logger.error("Excel import parse failed: " + ex.getMessage());
             Services.getInstance(project, Notifier.class).error(project, "Excel Parse Error", ex.getMessage());
         }
         return result;
@@ -41,7 +41,7 @@ public class ImportExcel {
             parseWorkbook(workbook, project, result);
 
         } catch (final IOException ex) {
-            Log.error(ex.getMessage());
+            Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
         return result;

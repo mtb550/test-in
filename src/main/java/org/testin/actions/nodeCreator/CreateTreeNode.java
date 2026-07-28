@@ -16,7 +16,7 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.autoGenerator.GeneratorType;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -59,7 +59,7 @@ public class CreateTreeNode extends DumbAwareAction {
                 dir = directoryType.getAction().execute(this, project, name, parentNode, parentDir, newDirPath);
 
             else
-                Log.info("No creation logic defined for type: " + directoryType);
+                Logger.info("No creation logic defined for type: " + directoryType);
 
             if (cg.isSelected() && directoryType.getAction() != null) {
 

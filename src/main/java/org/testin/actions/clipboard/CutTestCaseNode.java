@@ -12,7 +12,7 @@ import org.testin.editorPanel.testEditor.TestEditorCM;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.awt.datatransfer.StringSelection;
@@ -32,10 +32,10 @@ public class CutTestCaseNode extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        Log.debug("[DEBUG] CutTestCaseNode: actionPerformed triggered.");
+        Logger.debug("[DEBUG] CutTestCaseNode: actionPerformed triggered.");
 
         List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
-        Log.info("[DEBUG] CutTestCaseNode: Selected items count = " + selectedTestCases.size());
+        Logger.info("[DEBUG] CutTestCaseNode: Selected items count = " + selectedTestCases.size());
 
         if (!selectedTestCases.isEmpty()) {
             try {
@@ -51,7 +51,7 @@ public class CutTestCaseNode extends DumbAwareAction {
                 list.repaint();
 
             } catch (final Exception ex) {
-                Log.error("Exception: " + ex.getMessage());
+                Logger.error("Exception: " + ex.getMessage());
             }
         }
     }

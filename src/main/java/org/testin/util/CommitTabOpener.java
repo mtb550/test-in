@@ -6,7 +6,7 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import java.util.Collection;
 
@@ -16,10 +16,10 @@ public class CommitTabOpener {
         ChangeListManager changeListManager = ChangeListManager.getInstance(project);
         Collection<Change> allChanges = changeListManager.getAllChanges();
 
-        Log.info("--- Files with changes ---");
+        Logger.info("--- Files with changes ---");
         for (Change change : allChanges) {
             if (change.getVirtualFile() != null) {
-                Log.info("Changed: " + change.getVirtualFile().getPath());
+                Logger.info("Changed: " + change.getVirtualFile().getPath());
             }
         }
 

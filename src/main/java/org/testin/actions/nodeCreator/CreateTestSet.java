@@ -16,7 +16,7 @@ import org.testin.util.EditorUtil;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -53,7 +53,7 @@ public class CreateTestSet implements NodeCreator {
             try {
                 sheetDir = targetDirectory.createChildDirectory(requestor, safeDirName);
             } catch (final IOException ex) {
-                Log.error("Can't create directory: " + ex.getMessage());
+                Logger.error("Can't create directory: " + ex.getMessage());
                 throw new RuntimeException(ex);
             }
             isNewDirCreated = true;
@@ -68,7 +68,7 @@ public class CreateTestSet implements NodeCreator {
             try {
                 sheetDir.createChildData(requestor, DirectoryType.TS.getMarker());
             } catch (final IOException ex) {
-                Log.error("Can't create directory: " + ex.getMessage());
+                Logger.error("Can't create directory: " + ex.getMessage());
                 throw new RuntimeException(ex);
             }
         }
@@ -123,17 +123,17 @@ public class CreateTestSet implements NodeCreator {
                                     String classContent = buildClassContent(fullPackageDeclaration, safeClassName);
                                     VfsUtil.saveText(newClassFile, classContent);
 
-                                    Log.debug("Successfully created Java class: " + newClassFile.getPath());
+                                    Logger.debug("Successfully created Java class: " + newClassFile.getPath());
 
                                 } else {
-                                    Log.warn("Java class already exists: " + fileName);
+                                    Logger.warn("Java class already exists: " + fileName);
                                 }
                             }
                         } else {
-                            Log.info("No Test Source Root found in the project.");
+                            Logger.info("No Test Source Root found in the project.");
                         }
                     } catch (final Exception ex) {
-                        Log.error("Failed to create Java class: " + ex.getMessage());
+                        Logger.error("Failed to create Java class: " + ex.getMessage());
                     }
                 }));
     }

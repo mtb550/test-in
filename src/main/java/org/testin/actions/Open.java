@@ -12,7 +12,7 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -39,13 +39,13 @@ public class Open extends DumbAwareAction {
 
 
             if (directoryDto instanceof TestSetDirectoryDto ts) {
-                Log.info("open test set: " + ts.getPath());
+                Logger.info("open test set: " + ts.getPath());
                 Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, ts);
                 continue;
             }
 
             if (directoryDto instanceof TestRunDirectoryDto tr) {
-                Log.info("open test run: " + tr.getPath());
+                Logger.info("open test run: " + tr.getPath());
                 Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, tr);
             }
 

@@ -9,7 +9,7 @@ import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -53,7 +53,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             }
 
         } catch (final Exception ex) {
-            Log.error("Error rendering tree node: " + ex.getMessage());
+            Logger.error("Error rendering tree node: " + ex.getMessage());
             setIcon(AllIcons.General.Error);
             append(value != null ? value.toString() : "Error", SimpleTextAttributes.ERROR_ATTRIBUTES);
         }

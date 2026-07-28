@@ -9,7 +9,7 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.*;
@@ -142,8 +142,8 @@ public class TreeTransferHandler extends TransferHandler {
             return clonedNode;
 
         } catch (final Exception ex) {
-            Log.error("Failed to deep clone node: " + ex.getMessage());
-            Log.error("Exception: " + ex.getMessage());
+            Logger.error("Failed to deep clone node: " + ex.getMessage());
+            Logger.error("Exception: " + ex.getMessage());
             return new DefaultMutableTreeNode(userObject);
         }
     }
@@ -155,7 +155,7 @@ public class TreeTransferHandler extends TransferHandler {
             try {
                 sourceVf.move(this, targetVf);
             } catch (final IOException ex) {
-                Log.error(ex.getMessage());
+                Logger.error(ex.getMessage());
                 throw new RuntimeException(ex);
             }
 
@@ -166,7 +166,7 @@ public class TreeTransferHandler extends TransferHandler {
 
             Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(movedNode, oldPath, newPath);
 
-            Log.info("Moved successfully to: " + newPath);
+            Logger.info("Moved successfully to: " + newPath);
         });
     }
 
@@ -175,10 +175,10 @@ public class TreeTransferHandler extends TransferHandler {
             try {
                 sourceVf.copy(this, targetVf, sourceVf.getName());
             } catch (final IOException ex) {
-                Log.error("Failed to copy: " + ex.getMessage());
+                Logger.error("Failed to copy: " + ex.getMessage());
                 throw new RuntimeException(ex);
             }
-            Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
+            Logger.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
         });
     }
 
@@ -245,7 +245,7 @@ public class TreeTransferHandler extends TransferHandler {
 
                 throw new UnsupportedFlavorException(flavor);
             } catch (final UnsupportedFlavorException ex) {
-                Log.error(ex.getMessage());
+                Logger.error(ex.getMessage());
                 throw new RuntimeException(ex);
             }
         }

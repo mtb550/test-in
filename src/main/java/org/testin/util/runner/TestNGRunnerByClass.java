@@ -20,7 +20,7 @@ import com.theoryinpractice.testng.model.TestType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
@@ -35,7 +35,7 @@ public class TestNGRunnerByClass {
             return;
         }
 
-        Log.info("Running test class: " + fqcn);
+        Logger.info("Running test class: " + fqcn);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
@@ -50,7 +50,7 @@ public class TestNGRunnerByClass {
                     ApplicationManager.getApplication().invokeLater(() -> {
 
                         if (finalFqcn == null || finalFqcn.isEmpty()) {
-                            Log.warn("Cannot run test class: qualified name is null or empty");
+                            Logger.warn("Cannot run test class: qualified name is null or empty");
                             return;
                         }
 
@@ -79,7 +79,7 @@ public class TestNGRunnerByClass {
                         runManager.setTemporaryConfiguration(settings);
                         runManager.setSelectedConfiguration(settings);
 
-                        Log.info("Setting TEST_OBJECT=" + TestType.CLASS.getType() + ", MAIN_CLASS=" + finalFqcn + ", simpleClass=" + simpleClassName);
+                        Logger.info("Setting TEST_OBJECT=" + TestType.CLASS.getType() + ", MAIN_CLASS=" + finalFqcn + ", simpleClass=" + simpleClassName);
 
                         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
                     });

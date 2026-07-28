@@ -2,7 +2,7 @@ package org.testin.Dialogs.testCase.update.bulk;
 
 import org.testin.pojo.Group;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class GroupBulkSection extends JsonArraySplitBulkSection {
                             enumList.add(g);
                         }
                     } catch (final IllegalArgumentException ex) {
-                        Log.error(ex.getMessage());
+                        Logger.error(ex.getMessage());
                     }
                 }
             }

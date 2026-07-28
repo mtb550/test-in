@@ -18,7 +18,7 @@ import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.TreeUtilImpl;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -65,7 +65,7 @@ public class Rename extends DumbAwareAction {
             try {
                 vf.rename(this, newName);
             } catch (final IOException ex) {
-                Log.error(ex.getMessage());
+                Logger.error(ex.getMessage());
                 throw new RuntimeException(ex);
             }
 
@@ -83,7 +83,7 @@ public class Rename extends DumbAwareAction {
                 projectPanel.getTestProjectSelector().loadTestProjectList();
             }
 
-            Log.info("Success! Renamed to: " + newName);
+            Logger.info("Success! Renamed to: " + newName);
 
             // todo: add code generator code to change the name in automation code.
 

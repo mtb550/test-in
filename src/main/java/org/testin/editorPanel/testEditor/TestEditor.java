@@ -35,6 +35,7 @@ import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.indexer.ProjectIndexer;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 import org.testin.viewPanel.ViewPanel;
@@ -51,6 +52,8 @@ import java.util.stream.Collectors;
 public class TestEditor implements Disposable, IToolBar, IEditor {
     @Getter
     private final Project project;
+
+    private final Disposable projectDisposable;
 
     @Getter
     private final TestSetDirectoryDto parent;
@@ -95,10 +98,12 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Setter
     private int hoveredIndex = -1;
 
-
     public TestEditor(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf) {
         this.project = project;
         this.parent = vf.getTestSet();
+
+        this.projectDisposable = Disposer.newDisposable();
+        Disposer.register(project, projectDisposable);
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -120,8 +125,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
 
-        Disposer.register(project, this);
-        FontSyncUtil.syncWithNativeEditor(project, list, this);
+        FontSyncUtil.syncWithNativeEditor(project, list, projectDisposable);
 
         final JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);
@@ -157,7 +161,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         list.addKeyListener(new KeyListener(list, this));
 
-        new TestCaseExecutionSubscriber(this);
+        new TestCaseExecutionSubscriber(project, list, projectDisposable);
 
         loadDataAsync();
     }
@@ -451,16 +455,15 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         for (MouseListener listener : list.getMouseListeners())
             list.removeMouseListener(listener);
 
-        if (toolBar != null) {
+        if (toolBar != null)
             toolBar.dispose();
-        }
 
         TestCaseDto selectedInThisFile = list.getSelectedValue();
 
         final ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
-        if (viewer != null) {
+        if (viewer != null)
             viewer.hide(selectedInThisFile);
-        }
+
         allTestCases.clear();
         currentTestCases.clear();
         unsortedIds.clear();
@@ -469,9 +472,13 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             model.removeListDataListener(syncListener);
             model.removeAll();
         }
-        if (mainPanel != null) mainPanel.removeAll();
+
+        if (mainPanel != null)
+            mainPanel.removeAll();
 
         IEditor.super.dispose();
+
+        Logger.debug("dispose test editor: " + parent.getName() + " - " + parent.getPath());
     }
 
     @Override

@@ -13,7 +13,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 import org.testin.viewPanel.ViewPanel;
@@ -61,7 +61,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
     }
 
     private void openViewPanel(final @NotNull UUID uuid) {
-        Log.info("Searching for UUID: " + uuid);
+        Logger.info("Searching for UUID: " + uuid);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
@@ -70,14 +70,14 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
                 final TestCaseDto dto = indexer.getTestCaseById(uuid);
 
-                Log.info("Found in indexer: " + dto.getDescription());
+                Logger.info("Found in indexer: " + dto.getDescription());
 
                 ApplicationManager.getApplication().invokeLater(() ->
                         ViewToolWindowFactory.showPanel(project, List.of(dto), dto.getParent().getPath2(), ViewPanel::focusDetailsTab)
                 );
 
             } catch (final Exception ex) {
-                Log.error("Error: " + ex.getMessage());
+                Logger.error("Error: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() ->
                         Services.getInstance(project, Notifier.class).error(project, "Error", "Could not find test case: " + ex.getMessage())
                 );

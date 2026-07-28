@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 public class GenerateTestMethod extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
@@ -24,7 +24,7 @@ public class GenerateTestMethod extends DumbAwareAction {
         TestCaseDto tc = list.getSelectedValue();
 
         /// TODO: to be implemented
-        Log.info(tc.getDescription());
+        Logger.info(tc.getDescription());
     }
 
     @Override

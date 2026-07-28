@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.pojo.Group;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.util.List;
@@ -27,17 +27,17 @@ public class UpdateTestMethod implements GeneratorAction {
         if (!(obj instanceof TestCaseDto tc)) return;
         final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
 
-        Log.trace("execute() called — tc=" + tc.getId() + ", fqcn=" + fqcn + ", changeType=" + gt);
+        Logger.trace("execute() called — tc=" + tc.getId() + ", fqcn=" + fqcn + ", changeType=" + gt);
 
         if (fqcn.size() < 2) {
-            Log.warn("UpdateTestMethod: missing test case or FQCN");
+            Logger.warn("UpdateTestMethod: missing test case or FQCN");
             return;
         }
 
         final String methodName = fqcn.getLast();
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-        Log.info("Updating test method: " + methodName + " in " + path + " type=" + gt);
+        Logger.info("Updating test method: " + methodName + " in " + path + " type=" + gt);
 
         ApplicationManager.getApplication().invokeLater(() ->
                 WriteCommandAction.runWriteCommandAction(project, "Update Test Method", null, () -> {
@@ -47,18 +47,18 @@ public class UpdateTestMethod implements GeneratorAction {
 
                         PsiClass targetClass = psiFacade.findClass(path, scope);
                         if (targetClass == null) {
-                            Log.warn("UpdateTestMethod: class not found: " + path);
+                            Logger.warn("UpdateTestMethod: class not found: " + path);
                             return;
                         }
 
                         final PsiMethod targetMethod = findMethodByTestName(targetClass, tc);
 
                         if (targetMethod == null) {
-                            Log.warn("UpdateTestMethod: no method found with testName=" + tc.getId());
+                            Logger.warn("UpdateTestMethod: no method found with testName=" + tc.getId());
                             return;
                         }
 
-                        Log.trace("Found method: " + targetMethod.getName() + " by testName=" + tc.getId());
+                        Logger.trace("Found method: " + targetMethod.getName() + " by testName=" + tc.getId());
 
                         if (gt != null) {
                             switch (gt) {
@@ -77,17 +77,17 @@ public class UpdateTestMethod implements GeneratorAction {
                                 case UPDATE_TEST_CASE_TEST_DATA:
                                 case UPDATE_TEST_CASE_PRE_CONDITIONS:
                                 case UPDATE_TEST_CASE_STEPS:
-                                    Log.info("UpdateTestMethod: " + gt + " is data-only (no @Test annotation change)");
+                                    Logger.info("UpdateTestMethod: " + gt + " is data-only (no @Test annotation change)");
                                     break;
                                 default:
-                                    Log.warn("UpdateTestMethod: unsupported change type: " + gt);
+                                    Logger.warn("UpdateTestMethod: unsupported change type: " + gt);
                                     break;
                             }
                         }
 
-                        Log.info("Updated test method: " + methodName);
+                        Logger.info("Updated test method: " + methodName);
                     } catch (final Exception ex) {
-                        Log.error("Failed to update test method: " + ex.getMessage());
+                        Logger.error("Failed to update test method: " + ex.getMessage());
                     }
                 }));
     }
@@ -163,7 +163,7 @@ public class UpdateTestMethod implements GeneratorAction {
         final PsiModifierList modifierList = method.getModifierList();
         final PsiAnnotation annotation = modifierList.findAnnotation("org.testng.annotations.Test");
         if (annotation == null) {
-            Log.warn("UpdateTestMethod: method has no @Test annotation");
+            Logger.warn("UpdateTestMethod: method has no @Test annotation");
         }
         return annotation;
     }

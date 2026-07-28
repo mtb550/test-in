@@ -8,15 +8,15 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-public class FileType extends FakeFileType {
+public class EditorType extends FakeFileType {
 
-    public static final FileType TEST_RUN = new FileType(
+    public static final EditorType TEST_RUN = new EditorType(
             "Test Run",
             "Test Run Editor",
             AllIcons.Nodes.Services
     );
 
-    public static final FileType TEST_CASE = new FileType(
+    public static final EditorType TEST_CASE = new EditorType(
             "Test Case",
             "Test Case Editor",
             AllIcons.FileTypes.Text
@@ -34,7 +34,7 @@ public class FileType extends FakeFileType {
     @NotNull
     private final Icon icon;
 
-    private FileType(final @NotNull String name, final @NotNull String description, final @NotNull Icon icon) {
+    private EditorType(final @NotNull String name, final @NotNull String description, final @NotNull Icon icon) {
         this.name = name;
         this.description = description;
         this.icon = icon;

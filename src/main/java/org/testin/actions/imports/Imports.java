@@ -25,7 +25,7 @@ import org.testin.util.Mapper;
 import org.testin.util.Tools;
 import org.testin.util.autoGenerator.CreateTestMethod;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -112,7 +112,7 @@ public class Imports extends DumbAwareAction {
                 linkAndSaveTestCases(project, targetDirectory, flatList, tail);
 
                 if (dialog.getCg().isSelected()) {
-                    Log.info("Import: generating test methods for " + flatList.size() + " imported cases");
+                    Logger.info("Import: generating test methods for " + flatList.size() + " imported cases");
                     CreateTestMethod syncInjector = new CreateTestMethod();
                     for (TestCaseDto tc : flatList) {
                         tc.setParent(ts);
@@ -139,7 +139,7 @@ public class Imports extends DumbAwareAction {
                         String sheetName = sheetDir.getName();
                         TestSetDirectoryDto sheetDto = Services.getInstance(project, DirectoryMapper.class).setTestSetNode(project, Path.of(sheetDir.getPath()), selectedDirDto);
 
-                        Log.info("Import: generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
+                        Logger.info("Import: generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
                         CreateTestMethod syncInjector = new CreateTestMethod();
                         for (TestCaseDto tc : sheetCases) {
                             tc.setParent(sheetDto);
@@ -198,7 +198,7 @@ public class Imports extends DumbAwareAction {
                             return tc;
                         }
                     } catch (final Exception ex) {
-                        Log.error("Failed to read existing test case: " + ex.getMessage());
+                        Logger.error("Failed to read existing test case: " + ex.getMessage());
                     }
                 }
             }

@@ -13,7 +13,7 @@ import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 public class SetActualResult extends DumbAwareAction {
 
@@ -40,7 +40,7 @@ public class SetActualResult extends DumbAwareAction {
         final TestRunItems runItem = runEditor.getResultsMap().get(selected.getId());
         if (runItem == null) return;
 
-        Log.trace("set actual result for: " + selected.getDescription());
+        Logger.trace("set actual result for: " + selected.getDescription());
 
         new ActualResultDialog(project, runItem).show();
     }

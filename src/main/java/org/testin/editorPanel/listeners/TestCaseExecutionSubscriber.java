@@ -1,13 +1,13 @@
 package org.testin.editorPanel.listeners;
 
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.util.HashMap;
@@ -20,22 +20,21 @@ public class TestCaseExecutionSubscriber {
     private final ProjectIndexer indexer;
     private UUID runningDtoId = null;
 
-    public TestCaseExecutionSubscriber(final @NotNull TestEditor editor) {
-        final @NotNull Project project = editor.getProject();
-        this.list = editor.getList();
+    public TestCaseExecutionSubscriber(final @NotNull Project project, final @NotNull JBList<TestCaseDto> list, final @NotNull Disposable parentDisposable) {
+        this.list = list;
         this.indexer = Services.getInstance(project, ProjectIndexer.class);
 
-        project.getMessageBus().connect(editor).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
+        project.getMessageBus().connect(parentDisposable).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
             @Override
             public void onStatusChanged(final @NotNull String testName, final @NotNull String status, final String error) {
-                Log.debug("TestEditor subscription fired: testName='" + testName + "', status='" + status + "'");
+                Logger.debug("TestEditor subscription fired: testName='" + testName + "', status='" + status + "'");
 
                 boolean updated = false;
 
                 final UUID testUuid = parseUuid(testName);
                 if (testUuid != null) {
                     final TestCaseDto tc = indexer.getTestCaseById(testUuid);
-                    Log.debug("ID match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
+                    Logger.debug("ID match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
                     tc.setTempStatus(status);
                     tc.setTempError(error != null ? error : "");
                     runningDtoId = tc.getId();
@@ -46,7 +45,7 @@ public class TestCaseExecutionSubscriber {
                     final UUID dtoId = uuidToDtoId.get(testName);
                     if (dtoId != null) {
                         final TestCaseDto tc = indexer.getTestCaseById(dtoId);
-                        Log.debug("  UUID map match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
+                        Logger.debug("  UUID map match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
                         tc.setTempStatus(status);
                         tc.setTempError(error != null ? error : "");
                         updated = true;
@@ -55,7 +54,7 @@ public class TestCaseExecutionSubscriber {
 
                 if (!updated && "RUNNING".equals(status) && runningDtoId != null && !uuidToDtoId.containsKey(testName)) {
                     final TestCaseDto tc = indexer.getTestCaseById(runningDtoId);
-                    Log.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");
+                    Logger.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");
                     uuidToDtoId.put(testName, tc.getId());
                 }
 

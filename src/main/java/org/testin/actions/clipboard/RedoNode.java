@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 public class RedoNode extends DumbAwareAction {
     public RedoNode(final @NotNull SimpleTree tree) {
@@ -17,7 +17,7 @@ public class RedoNode extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Log.info("Tree Redo triggered");
+        Logger.info("Tree Redo triggered");
     }
 
     @Override

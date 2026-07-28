@@ -8,7 +8,7 @@ import kotlin.coroutines.Continuation;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.runner.TestCaseExecutionTracker;
 import org.testin.util.services.Services;
@@ -19,18 +19,18 @@ import java.util.Optional;
 public final class StartupActivity implements ProjectActivity {
 
     public static void execute(final @NotNull Project project) {
-        Log.setProject(project);
+        Logger.setProject(project);
 
         AppSettingsState settings = AppSettingsState.getInstance();
 
         if (settings.rootTestinPath == null || settings.rootTestinPath.isEmpty()) {
-            Log.info("First run detected — saving default settings to testinSettings.xml");
-            settings.logLevel = Log.Level.INFO.name();
+            Logger.info("First run detected — saving default settings to testinSettings.xml");
+            settings.logLevel = Logger.Level.INFO.name();
         }
 
-        Log.setLogLevel(Log.Level.valueOf(settings.logLevel));
+        Logger.setLogLevel(Logger.Level.valueOf(settings.logLevel));
 
-        Log.info("StartupActivity.execute()");
+        Logger.info("StartupActivity.execute()");
 
         Path testinPath = null;
 
@@ -64,8 +64,8 @@ public final class StartupActivity implements ProjectActivity {
 
         Services.getInstance(project, Setting.class).setAutomationPath(automationPath);
 
-        Log.info("testin Path: " + testinPath);
-        Log.info("automation Path: " + automationPath);
+        Logger.info("testin Path: " + testinPath);
+        Logger.info("automation Path: " + automationPath);
 
         if (testinPath != null) {
             Services.getInstance(project, ProjectIndexer.class).indexWithProgress();

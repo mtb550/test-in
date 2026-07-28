@@ -7,7 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.util.Tools;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.io.IOException;
@@ -27,14 +27,14 @@ public class CreateTestSetPackage implements GeneratorAction {
 
                 if (testSourceRoot != null) {
                     VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));
-                    Log.info("Package created physically at: " + vf.getPath());
+                    Logger.info("Package created physically at: " + vf.getPath());
 
                 } else {
-                    Log.info("Could not find Main Source Root in the project modules.");
+                    Logger.info("Could not find Main Source Root in the project modules.");
                 }
 
             } catch (final IOException ex) {
-                Log.info("Error creating package: " + ex.getMessage());
+                Logger.info("Error creating package: " + ex.getMessage());
             }
         });
     }

@@ -67,14 +67,25 @@
     <!-- ================================================================== -->
     <extensions defaultExtensionNs="com.intellij">
         <!-- First run activity -->
-        <postStartupActivity implementation="org.testin.settings.StartupActivity"/>
+        <postStartupActivity
+                implementation="org.testin.settings.StartupActivity"
+        />
 
         <!-- File editors -->
-        <virtualFileSystem key="testin" implementationClass="org.testin.editorPanel.TestinFileSystem" physical="false"/>
-        <fileEditorProvider implementation="org.testin.editorPanel.UnifiedEditorProvider"/>
+        <virtualFileSystem
+                key="testin"
+                implementationClass="org.testin.editorPanel.TestinFileSystem"
+                physical="false"
+        />
+
+        <fileEditorProvider
+                implementation="org.testin.editorPanel.UnifiedEditorProvider"
+        />
 
         <!-- Editor Drop Handler -->
-        <fileDropHandler implementation="org.testin.projectPanel.tree.TreeDropHandler"/>
+        <fileDropHandler
+                implementation="org.testin.projectPanel.tree.TreeDropHandler"
+        />
 
         <!-- Services -->
         <applicationService
@@ -125,5 +136,20 @@
         />
 
     </extensions>
+
+    <!-- close listeners -->
+    <applicationListeners>
+
+        <listener
+                class="org.testin.listener.IntellijCloseListenerImpl"
+                topic="com.intellij.ide.AppLifecycleListener"
+        />
+
+        <listener
+                class="org.testin.listener.ProjectCloseListenerImpl"
+                topic="com.intellij.openapi.project.ProjectCloseListener"
+        />
+
+    </applicationListeners>
 
 </idea-plugin>

@@ -23,7 +23,7 @@ import org.testin.util.autoGenerator.GeneratorAction;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.autoGenerator.UpdateTestMethod;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 import org.testin.viewPanel.ViewPanel;
@@ -176,7 +176,7 @@ public class DetailsTab {
 
                 if (cg.isSelected()) {
                     final GeneratorType gt = cg.getGt();
-                    Log.trace("Code generator selected: " + gt);
+                    Logger.trace("Code generator selected: " + gt);
 
                     if (gt != null) {
                         final GeneratorAction action = gt.getAction();
@@ -212,6 +212,10 @@ public class DetailsTab {
 
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             final TestSetDirectoryDto ts = indexer.getTestSetByPath(resolved);
+            if (ts == null) {
+                Logger.warn("DetailsTab: test set not found in indexer: " + resolved);
+                return null;
+            }
             return ts.getPath();
         }
 

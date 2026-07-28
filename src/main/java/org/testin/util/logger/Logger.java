@@ -8,7 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Log {
+// todo: rename it to Logger to prevent import incorrect package when name is Log.
+public final class Logger {
 
     private static final StackWalker WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
@@ -23,7 +24,7 @@ public final class Log {
     }
 
     public static void setProject(final @NotNull Project project) {
-        Log.project = project;
+        Logger.project = project;
     }
 
     public static void setLogLevel(final @NotNull Level level) {
@@ -38,6 +39,7 @@ public final class Log {
 
     public static void debug(final @NotNull String message) {
         log(Level.DEBUG, WALKER.getCallerClass().getSimpleName(), message);
+        System.out.println(WALKER.getCallerClass().getSimpleName() + " " + message);
     }
 
     public static void info(final @NotNull String message) {
@@ -67,11 +69,11 @@ public final class Log {
     private static void log(final Level level, final String callerClass, final String message) {
         LoggerService service = getService();
 
-        if (service != null) {
+        if (service != null)
             service.log(level, callerClass, message);
-        } else {
+        else
             System.out.println("[" + level.paddedName + "] [" + callerClass + "] " + message);
-        }
+
     }
 
     private static LoggerService getService() {

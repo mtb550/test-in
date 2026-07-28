@@ -10,7 +10,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -22,10 +22,10 @@ public class CodeNavigator {
         final String className = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final String methodName = fqcn.getLast();
 
-        Log.trace("navigate to method, className: " + className + ", methodName: " + methodName);
+        Logger.trace("navigate to method, className: " + className + ", methodName: " + methodName);
 
         if (DumbService.isDumb(project)) {
-            Log.trace("dumb mode detected, deferring navigation");
+            Logger.trace("dumb mode detected, deferring navigation");
             DumbService.getInstance(project).runWhenSmart(() -> toCode(project, fqcn));
             return;
         }
@@ -61,7 +61,7 @@ public class CodeNavigator {
                             ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).softShow(project, "Navigation Error: ", "Class Not Found: " + className));
 
                     } catch (final IndexNotReadyException ex) {
-                        Log.trace("index not ready, deferring navigation");
+                        Logger.trace("index not ready, deferring navigation");
                         Services.getInstance(project, Notifier.class).softShow(project, "index not ready, deferring navigation");
                         DumbService.getInstance(project).runWhenSmart(() -> toCode(project, fqcn));
                     }

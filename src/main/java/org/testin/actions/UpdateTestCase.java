@@ -16,7 +16,7 @@ import org.testin.util.autoGenerator.GeneratorAction;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.autoGenerator.UpdateTestMethod;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 import org.testin.viewPanel.ViewPanel;
@@ -48,7 +48,7 @@ public class UpdateTestCase extends DumbAwareAction {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        Log.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
+        Logger.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
         new TestCaseUpdateMenu(project, selectedItems, (updatedItems, cg) -> {
 
@@ -75,7 +75,7 @@ public class UpdateTestCase extends DumbAwareAction {
 
                 if (cg.isSelected()) {
                     final GeneratorType gt = cg.getGt();
-                    Log.trace("Code generator selected: " + gt);
+                    Logger.trace("Code generator selected: " + gt);
 
                     if (gt != null) {
                         final GeneratorAction action = gt.getAction();
@@ -86,7 +86,7 @@ public class UpdateTestCase extends DumbAwareAction {
                         ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
                     }
                 } else {
-                    Log.trace("Code generator is NOT selected or is null.");
+                    Logger.trace("Code generator is NOT selected or is null.");
                 }
             });
         }).show();

@@ -13,7 +13,7 @@ import org.testin.pojo.TestRunStatus;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.pojo.markers.TestRunMarker;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -47,7 +47,7 @@ public class SetTestRunStatus extends DumbAwareAction {
                 marker.setStatus(selectedStatus);
                 marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-                Log.trace("Status changed -> " + testRunDto.getName() + " = " + selectedStatus.getLabel());
+                Logger.trace("Status changed -> " + testRunDto.getName() + " = " + selectedStatus.getLabel());
 
                 persistMarker(project, testRunDto, selectedStatus);
 
@@ -86,7 +86,7 @@ public class SetTestRunStatus extends DumbAwareAction {
                     indexer.updateRunMarker(project, tr.getPath(), marker);
                 }
             } catch (final Exception ex) {
-                Log.error("Failed to persist marker: " + ex.getMessage());
+                Logger.error("Failed to persist marker: " + ex.getMessage());
             }
         });
     }

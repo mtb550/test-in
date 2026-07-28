@@ -8,7 +8,7 @@ import com.intellij.util.ui.tree.TreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.util.TreeUtilImpl;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.TreePath;
@@ -82,7 +82,7 @@ public class ProjectTreeDnD {
 
                 throw new UnsupportedFlavorException(flavor);
             } catch (final UnsupportedFlavorException ex) {
-                Log.error(ex.getMessage());
+                Logger.error(ex.getMessage());
                 throw new RuntimeException(ex);
             }
         }
@@ -161,12 +161,12 @@ public class ProjectTreeDnD {
                 try {
                     sourceVf.move(this, targetVf);
                 } catch (final IOException ex) {
-                    Log.error(ex.getMessage());
+                    Logger.error(ex.getMessage());
                     throw new RuntimeException(ex);
                 }
                 Path newPath = targetDir.getPath().resolve(sourceDir.getName());
                 sourceDir.setPath(newPath);
-                Log.info("Moved successfully to: " + newPath);
+                Logger.info("Moved successfully to: " + newPath);
             });
         }
 
@@ -176,10 +176,10 @@ public class ProjectTreeDnD {
                     sourceVf.copy(this, targetVf, sourceVf.getName());
 
                 } catch (final IOException ex) {
-                    Log.error(ex.getMessage());
+                    Logger.error(ex.getMessage());
                     throw new RuntimeException(ex);
                 }
-                Log.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
+                Logger.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
             });
         }
     }

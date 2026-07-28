@@ -35,7 +35,7 @@ import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 import org.testin.util.services.TestCaseCacheService;
 
@@ -56,6 +56,8 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Getter
     private final Project project;
+
+    private final Disposable projectDisposable;
     @Getter
     private final TestRunDirectoryDto parent;
 
@@ -112,6 +114,9 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         this.project = project;
         this.parent = vf.getTestRun();
 
+        this.projectDisposable = Disposer.newDisposable();
+        Disposer.register(project, projectDisposable);
+
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
 
@@ -120,8 +125,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         buildOpeningPanel();
         loadDataAsync();
 
-        Disposer.register(project, this);
-        FontSyncUtil.syncWithNativeEditor(project, list, this);
+        FontSyncUtil.syncWithNativeEditor(project, list, projectDisposable);
     }
 
     private void buildOpeningPanel() {
@@ -160,7 +164,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
                     final Path dirPath = parent.getPath();
 
-                    this.tr = indexer.getTestRunForPath(dirPath);
+                    this.tr = indexer.getTestRunByPath(dirPath);
                 }
 
                 if (this.tr != null) {
@@ -175,7 +179,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                     });
                 }
             } catch (final Exception ex) {
-                Log.error("Failed to load Test Run data from disk: " + ex.getMessage());
+                Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
             }
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -393,15 +397,17 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             for (MouseListener listener : list.getMouseListeners())
                 list.removeMouseListener(listener);
 
-        if (toolBar != null) {
+        if (toolBar != null)
             toolBar.dispose();
-        }
 
         allTestCases.clear();
         resultsMap.clear();
         if (model != null) model.removeAll();
         if (mainPanel != null) mainPanel.removeAll();
         IEditor.super.dispose();
+
+        Logger.debug("dispose run editor: " + parent.getName() + " - " + parent.getPath());
+
     }
 
     @Override
@@ -512,7 +518,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                 Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, tr);
 
             } catch (final Exception ex) {
-                Log.error("Failed to persist test run data: " + ex.getMessage());
+                Logger.error("Failed to persist test run data: " + ex.getMessage());
             }
         });
     }

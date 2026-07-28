@@ -17,7 +17,7 @@ import org.testin.Dialogs.testCase.update.UpdateTestCaseFields;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.autoGenerator.CodeGenerator;
 import org.testin.util.autoGenerator.GeneratorType;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -46,14 +46,14 @@ public class TestCaseUpdateMenu {
         showMenu(title, selectedItem -> {
 
             final GeneratorType gt = selectedItem.getGt();
-            Log.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
+            Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
 
             if (isSingle) {
                 new UpdateTestCaseDialog(project, items.getFirst(), selectedItem, (tc, cg) -> {
                     cg = new CodeGenerator(gt);
                     cg.setGt(gt);
 
-                    Log.trace("Single Edit Save -> Injecting changeType " + cg.getGt() + " into UI's CodeGenerator.");
+                    Logger.trace("Single Edit Save -> Injecting changeType " + cg.getGt() + " into UI's CodeGenerator.");
                     updatedItems.accept(items, cg);
 
                 }).show();
@@ -64,7 +64,7 @@ public class TestCaseUpdateMenu {
                     cg.setGt(gt);
 
 
-                    Log.trace("Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + cg.getGt());
+                    Logger.trace("Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + cg.getGt());
                     updatedItems.accept(list, cg);
                 });
             }

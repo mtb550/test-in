@@ -7,7 +7,6 @@ import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.Shared;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
-import org.testin.util.logger.Log;
 
 import javax.swing.*;
 import java.awt.*;
@@ -42,7 +41,6 @@ public class TestCard extends BaseCard {
         this.isRunning = "RUNNING".equals(tc.getTempStatus());
 
         final String tempStatus = tc.getTempStatus();
-        Log.debug("TestCard.updateData - tempStatus='" + tempStatus + "' for index=" + index + " desc=" + tc.getDescription());
 
         if (!tempStatus.trim().isEmpty()) {
             final Color badgeColor;

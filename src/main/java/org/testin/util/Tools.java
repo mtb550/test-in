@@ -24,7 +24,7 @@ import org.testin.pojo.Priority;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
 import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -169,12 +169,12 @@ public final class Tools {
                     .getSourceRoots(JavaSourceRootType.TEST_SOURCE);
 
             if (!sourceRoots.isEmpty()) {
-                Log.debug("[TRACE] Found test source root: " + sourceRoots.getFirst());
+                Logger.debug("[TRACE] Found test source root: " + sourceRoots.getFirst());
                 return sourceRoots.getFirst();
             }
         }
 
-        Log.warn("[WARNING] No Test Source Root found in the project.");
+        Logger.warn("[WARNING] No Test Source Root found in the project.");
         return null;
     }
 

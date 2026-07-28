@@ -17,7 +17,7 @@ import org.testin.editorPanel.testEditor.TestEditorCM;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
-import org.testin.util.logger.Log;
+import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import java.awt.datatransfer.DataFlavor;
@@ -106,7 +106,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
                     enabled = !parsedList.isEmpty();
                 }
             } catch (final Exception ex) {
-                Log.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
+                Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
             }
         }
         e.getPresentation().setEnabled(enabled);
@@ -127,7 +127,7 @@ public class PasteTestCaseNode extends DumbAwareAction {
                 });
 
             } catch (final Exception ex) {
-                Log.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
+                Logger.warn("[WARNING] Failed to parse clipboard JSON: " + ex.getMessage());
             }
         }
         return Collections.emptyList();
