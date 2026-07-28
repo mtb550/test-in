@@ -27,7 +27,7 @@ public class UnifiedVirtualFile extends LightVirtualFile {
 
     @Override
     public @NotNull String getUrl() {
-        return TestinFileSystem.PROTOCOL + "://" + dir.getPath().toAbsolutePath().toString().replace("\\", "/");
+        return "testin:///" + dir.getPath().toAbsolutePath().toString().replace("\\", "/");
     }
 
     @Override
@@ -37,7 +37,7 @@ public class UnifiedVirtualFile extends LightVirtualFile {
 
     @Override
     public @NotNull VirtualFileSystem getFileSystem() {
-        return VirtualFileManager.getInstance().getFileSystem(TestinFileSystem.PROTOCOL);
+        return VirtualFileManager.getInstance().getFileSystem("testin");
     }
 
     public @NotNull TestSetDirectoryDto getTestSet() {
