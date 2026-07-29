@@ -1,9 +1,11 @@
 package org.testin.Dialogs.testRun.update;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.util.KeyboardSet;
 import org.testin.util.statusBar.IStatusBarItem;
 
@@ -29,6 +31,23 @@ public enum RunItemUpdateFields implements IStatusBarItem {
             UpdateRunItemDialog::getActualResultSection
     ),
 
+    SEVERITY(
+            "Severity",
+            KeyboardSet.Severity,
+            AllIcons.Actions.Highlighting,
+            new IStatusBarItem[]{SAVE},
+            true,
+            UpdateRunItemDialog::getSeveritySection
+    ),
+
+    PRIORITY(
+            "Priority",
+            KeyboardSet.Priority,
+            AllIcons.Actions.Report,
+            new IStatusBarItem[]{SAVE},
+            true,
+            UpdateRunItemDialog::getPrioritySection
+    ),
     STATUS(
             "Status",
             KeyboardSet.SetStatus,
@@ -47,16 +66,14 @@ public enum RunItemUpdateFields implements IStatusBarItem {
             UpdateRunItemDialog::getAttachmentsSection
     );
 
-    private final String name;
-    private final KeyboardSet shortcut;
-    private final Icon icon;
-    private final IStatusBarItem[] statusBarItems;
+    private final @NotNull String name;
+    private final @Nullable KeyboardSet shortcut;
+    private final @Nullable Icon icon;
+    private final @NotNull IStatusBarItem[] statusBarItems;
     private final boolean updateMenuItem;
-    private final SectionExtractor sectionExtractor;
+    private final @Nullable SectionExtractor sectionExtractor;
 
-    RunItemUpdateFields(final String name, final KeyboardSet shortcut, final Icon icon,
-                        final IStatusBarItem[] statusBarItems, final boolean updateMenuItem,
-                        final SectionExtractor sectionExtractor) {
+    RunItemUpdateFields(final @NotNull String name, final @Nullable KeyboardSet shortcut, final @NotNull Icon icon, final @NotNull IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final @Nullable SectionExtractor sectionExtractor) {
         this.name = name;
         this.shortcut = shortcut;
         this.icon = icon;
@@ -65,9 +82,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
         this.sectionExtractor = sectionExtractor;
     }
 
-    RunItemUpdateFields(final String name, final KeyboardSet shortcut,
-                        final IStatusBarItem[] statusBarItems, final boolean updateMenuItem,
-                        final SectionExtractor sectionExtractor) {
+    RunItemUpdateFields(final @NotNull String name, final @NotNull KeyboardSet shortcut, final @NotNull IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final @Nullable SectionExtractor sectionExtractor) {
         this.name = name;
         this.shortcut = shortcut;
         this.icon = null;
@@ -81,11 +96,11 @@ public enum RunItemUpdateFields implements IStatusBarItem {
         return shortcut != null ? shortcut.getShortcutText() : "";
     }
 
-    public void bindShortcut(final JComponent component, final Runnable onTrigger) {
+    public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onTrigger) {
         if (this.shortcut != null) {
             new DumbAwareAction() {
                 @Override
-                public void actionPerformed(@NotNull com.intellij.openapi.actionSystem.AnActionEvent e) {
+                public void actionPerformed(@NotNull AnActionEvent e) {
                     onTrigger.run();
                 }
             }.registerCustomShortcutSet(this.shortcut.getCustomShortcut(), component);

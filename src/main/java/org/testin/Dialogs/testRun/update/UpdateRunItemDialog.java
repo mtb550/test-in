@@ -9,9 +9,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.Dialogs.testRun.ActualResultSection;
-import org.testin.Dialogs.testRun.AttachmentsSection;
-import org.testin.Dialogs.testRun.StatusSection;
+import org.testin.Dialogs.testRun.*;
 import org.testin.pojo.TestRunItems;
 import org.testin.util.KeyboardSet;
 
@@ -25,8 +23,16 @@ public class UpdateRunItemDialog {
 
     @Getter
     private final ActualResultSection actualResultSection;
+
     @Getter
     private final StatusSection statusSection;
+
+    @Getter
+    private final PrioritySection prioritySection;
+
+    @Getter
+    private final SeveritySection severitySection;
+
     @Getter
     private final AttachmentsSection attachmentsSection;
 
@@ -35,6 +41,7 @@ public class UpdateRunItemDialog {
     private final RunItemUpdateFields selectedItem;
     private final Consumer<TestRunItems> onSave;
     private final JBPopup popup;
+    private final List<RunItemEditSection> cachedSections;
 
     public UpdateRunItemDialog(final @NotNull Project project, final @NotNull TestRunItems runItem, final @NotNull RunItemUpdateFields selectedItem, final @NotNull Consumer<TestRunItems> onSave) {
         this.project = project;
@@ -44,12 +51,18 @@ public class UpdateRunItemDialog {
 
         this.actualResultSection = new ActualResultSection();
         this.statusSection = new StatusSection();
+        this.prioritySection = new PrioritySection();
+        this.severitySection = new SeveritySection();
         this.attachmentsSection = new AttachmentsSection();
 
-        List<RunItemEditSection> allSections = getAllSections();
+        this.cachedSections = Arrays.stream(RunItemUpdateFields.values())
+                .filter(RunItemUpdateFields::isUpdateMenuItem)
+                .map(field -> field.getSectionExtractor().create(this))
+                .toList();
+
+        List<RunItemEditSection> allSections = getCachedSections();
         RunItemEditSection targetSection = selectedItem.getSectionExtractor().create(this);
 
-        // Fill data from run item
         allSections.forEach(s -> s.fillData(runItem));
 
         JPanel mainPanel = new JPanel(new BorderLayout()) {
@@ -114,16 +127,15 @@ public class UpdateRunItemDialog {
                 })
                 .createPopup();
 
-        // Register Enter shortcut
         registerEnterShortcut(mainPanel);
     }
 
-    private List<RunItemEditSection> getAllSections() {
-        return Arrays.asList(actualResultSection, statusSection, attachmentsSection);
+    private List<RunItemEditSection> getCachedSections() {
+        return cachedSections;
     }
 
     private void applyChanges() {
-        getAllSections().forEach(s -> s.applyTo(runItem));
+        getCachedSections().forEach(s -> s.applyTo(runItem));
     }
 
     private void registerEnterShortcut(final JComponent component) {

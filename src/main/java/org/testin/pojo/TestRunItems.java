@@ -40,6 +40,14 @@ public class TestRunItems {
 
     @NotNull
     @Builder.Default
+    private Severity severity = Severity.MINOR;
+
+    @NotNull
+    @Builder.Default
+    private Priority Priority = org.testin.pojo.Priority.LOW;
+
+    @NotNull
+    @Builder.Default
     private Duration duration = Duration.ZERO;
 
     @NotNull

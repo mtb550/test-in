@@ -23,38 +23,37 @@ import java.util.function.Consumer;
 
 public class RunItemUpdateMenu {
 
-    private final Project project;
-    private final TestRunItems runItem;
-    private final Consumer<TestRunItems> updatedItem;
+    private final @NotNull Project project;
+    private final @NotNull TestRunItems runItem;
+    private final @NotNull Consumer<TestRunItems> updatedItem;
 
-    public RunItemUpdateMenu(final @NotNull Project project, final @NotNull TestRunItems runItem,
-                             final @NotNull Consumer<TestRunItems> updatedItem) {
+    public RunItemUpdateMenu(final @NotNull Project project, final @NotNull TestRunItems runItem, final @NotNull Consumer<TestRunItems> updatedItem) {
         this.project = project;
         this.runItem = runItem;
         this.updatedItem = updatedItem;
     }
 
     public void show() {
-        showMenu("Update Test Run Item", selectedItem -> {
+        showMenu(selectedItem -> {
             Logger.trace("Menu item selected -> " + selectedItem.getName());
-
             new UpdateRunItemDialog(project, runItem, selectedItem, updatedItem).show();
         });
     }
 
-    private void showMenu(final String title, final Consumer<RunItemUpdateFields> onSelection) {
-        RunItemUpdateFields[] fields = Arrays.stream(RunItemUpdateFields.values())
+    private void showMenu(final @NotNull Consumer<RunItemUpdateFields> onSelection) {
+        final RunItemUpdateFields[] fields = Arrays.stream(RunItemUpdateFields.values())
                 .filter(RunItemUpdateFields::isUpdateMenuItem)
                 .toArray(RunItemUpdateFields[]::new);
-        JBList<RunItemUpdateFields> list = buildMenuList(fields);
-        JBPopup popup = buildPopup(title, list);
+
+        final JBList<RunItemUpdateFields> list = buildMenuList(fields);
+        final JBPopup popup = buildPopup(list);
         registerShortcuts(list, popup, onSelection);
         popup.showCenteredInCurrentWindow(project);
     }
 
     @NotNull
     private JBList<RunItemUpdateFields> buildMenuList(final RunItemUpdateFields[] fields) {
-        JBList<RunItemUpdateFields> list = new JBList<>(fields);
+        final JBList<RunItemUpdateFields> list = new JBList<>(fields);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
         list.setCellRenderer(createCellRenderer());
@@ -75,19 +74,18 @@ public class RunItemUpdateMenu {
         };
     }
 
-    private JBPopup buildPopup(final String title, final JBList<RunItemUpdateFields> list) {
+    private JBPopup buildPopup(final JBList<RunItemUpdateFields> list) {
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(list), list)
-                .setTitle(title)
+                .setTitle("Update Test Run Item")
                 .setRequestFocus(true)
                 .setCancelOnClickOutside(true)
                 .setMovable(false)
                 .createPopup();
     }
 
-    private void registerShortcuts(final JBList<RunItemUpdateFields> list, final JBPopup popup,
-                                   final Consumer<RunItemUpdateFields> onSelection) {
-        Runnable triggerSelection = () -> {
+    private void registerShortcuts(final JBList<RunItemUpdateFields> list, final JBPopup popup, final Consumer<RunItemUpdateFields> onSelection) {
+        final Runnable triggerSelection = () -> {
             if (list.getSelectedValue() != null) {
                 onSelection.accept(list.getSelectedValue());
                 popup.closeOk(null);

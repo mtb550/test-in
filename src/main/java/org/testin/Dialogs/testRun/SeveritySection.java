@@ -6,29 +6,29 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Dialogs.testRun.update.RunItemEditSection;
+import org.testin.pojo.Severity;
 import org.testin.pojo.TestRunItems;
-import org.testin.pojo.TestStatus;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class StatusSection implements RunItemEditSection {
+public class SeveritySection implements RunItemEditSection {
 
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     @Getter
-    private final JComboBox<TestStatus> statusCombo;
+    private final JComboBox<Severity> severityCombo;
     private final JPanel wrapper;
 
-    public StatusSection() {
-        this.statusCombo = new JComboBox<>(TestStatus.values());
-        this.statusCombo.setFont(fieldFont);
-        this.statusCombo.setBorder(JBUI.Borders.empty(10));
+    public SeveritySection() {
+        this.severityCombo = new JComboBox<>(Severity.values());
+        this.severityCombo.setFont(fieldFont);
+        this.severityCombo.setBorder(JBUI.Borders.empty(10));
 
         this.wrapper = new JPanel(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(AllIcons.General.Filter), BorderLayout.WEST);
-        this.wrapper.add(statusCombo, BorderLayout.CENTER);
+        this.wrapper.add(severityCombo, BorderLayout.CENTER);
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
@@ -41,27 +41,27 @@ public class StatusSection implements RunItemEditSection {
     public void showSection(final JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
-        statusCombo.requestFocus();
+        severityCombo.requestFocus();
     }
 
     @Override
     public void fillData(final @NotNull TestRunItems runItem) {
-        statusCombo.setSelectedItem(runItem.getStatus());
+        severityCombo.setSelectedItem(runItem.getSeverity());
     }
 
     @Override
     public void applyTo(final @NotNull TestRunItems runItem) {
         if (wrapper.getParent() != null) {
-            Object selected = statusCombo.getSelectedItem();
-            if (selected instanceof TestStatus status) {
-                runItem.setStatus(status);
+            Object selected = severityCombo.getSelectedItem();
+            if (selected instanceof Severity severity) {
+                runItem.setSeverity(severity);
             }
         }
     }
 
     @Override
     public JComponent getFocusComponent() {
-        return statusCombo;
+        return severityCombo;
     }
 
 }

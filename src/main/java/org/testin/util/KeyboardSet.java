@@ -72,7 +72,9 @@ public enum KeyboardSet {
     StatusAssigned(KeyEvent.VK_1, 0),
     StatusCompleted(KeyEvent.VK_2, 0),
     StatusClosed(KeyEvent.VK_3, 0),
-    SetActualResult(KeyEvent.VK_A, 0);
+    SetActualResult(KeyEvent.VK_A, 0),
+    Severity(KeyEvent.VK_Q, 0),
+    Priority(KeyEvent.VK_T, 0);
 
     private final int keyCode;
     private final int modifiers;

@@ -18,7 +18,9 @@ import org.testin.pojo.FileTypes;
 import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.util.Mapper;
 import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
@@ -157,12 +159,27 @@ public class Exports extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
+//        final TreePath path = tree.getSelectionPath();
+//
+//        e.getPresentation().setEnabled(path != null &&
+//                tree.getSelectionCount() == 1 &&
+//                ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject() instanceof DirectoryDto
+//        );
         final TreePath path = tree.getSelectionPath();
+        final int selectionCount = tree.getSelectionCount();
 
-        e.getPresentation().setEnabled(path != null &&
-                tree.getSelectionCount() == 1 &&
-                ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject() instanceof DirectoryDto
-        );
+        if (selectionCount != 1 || path == null) {
+            e.getPresentation().setEnabled(false);
+            return;
+        }
+
+        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final Object userObject = selectedNode.getUserObject();
+
+        e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto ||
+                userObject instanceof TestSetPackageDirectoryDto ||
+                userObject instanceof TestCasesMainDirectoryDto);
+
     }
 
     @Override

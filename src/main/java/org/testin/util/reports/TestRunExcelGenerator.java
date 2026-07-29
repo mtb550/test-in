@@ -42,11 +42,14 @@ public final class TestRunExcelGenerator {
             ws.value(row, 0, "Test Case ID");
             ws.value(row, 1, "Description");
             ws.value(row, 2, "Status");
-            ws.value(row, 3, "Duration");
-            ws.value(row, 4, "Expected Result");
-            ws.value(row, 5, "Stacktrace");
+            ws.value(row, 3, "Actual Result");
+            ws.value(row, 4, "Severity");
+            ws.value(row, 5, "Priority");
+            ws.value(row, 6, "Duration");
+            ws.value(row, 7, "Expected Result");
+            ws.value(row, 8, "Stacktrace");
 
-            ws.range(row, 0, row, 5).style().bold().fillColor("E0E0E0").set();
+            ws.range(row, 0, row, 8).style().bold().fillColor("E0E0E0").set();
 
             row++;
             for (var result : tr.getResults()) {
@@ -63,14 +66,23 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 2, statusEnum.name());
                 ws.style(row, 2).fontColor(statusEnum.getHex()).bold().set();
 
+                ws.value(row, 3, result.getActualResult());
+                ws.style(row, 3).wrapText(true).set();
+
+                ws.value(row, 4, result.getSeverity().name());
+                ws.style(row, 4).bold().set();
+
+                ws.value(row, 5, result.getPriority().name());
+                ws.style(row, 5).bold().set();
+
                 String formattedDuration = Services.getInstance(project, Tools.class).getFormattedDuration(result.getDuration());
-                ws.value(row, 3, formattedDuration);
+                ws.value(row, 6, formattedDuration);
 
-                ws.value(row, 4, expectedResult);
-                ws.style(row, 4).wrapText(true).set();
+                ws.value(row, 7, expectedResult);
+                ws.style(row, 7).wrapText(true).set();
 
-                ws.value(row, 5, result.getStacktrace());
-                ws.style(row, 5).wrapText(true).set();
+                ws.value(row, 8, result.getStacktrace());
+                ws.style(row, 8).wrapText(true).set();
 
                 row++;
             }
@@ -78,9 +90,12 @@ public final class TestRunExcelGenerator {
             ws.width(0, 40); // ID
             ws.width(1, 30); // Title
             ws.width(2, 15); // Status
-            ws.width(3, 15); // Duration
-            ws.width(4, 40); // Expected Result
-            ws.width(5, 60); // Stacktrace
+            ws.width(3, 30); // Actual Result
+            ws.width(4, 15); // Severity
+            ws.width(5, 15); // Priority
+            ws.width(6, 15); // Duration
+            ws.width(7, 40); // Expected Result
+            ws.width(8, 60); // Stacktrace
 
             wb.finish();
 
