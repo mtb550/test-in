@@ -42,6 +42,9 @@ public final class TestRunHtmlGenerator {
                 .append(String.format("<th class='col-id'>%s</th>", TestEditorAttributes.ID.getName()))
                 .append(String.format("<th class='col-description'>%s</th>", TestEditorAttributes.DESCRIPTION.getName()))
                 .append(String.format("<th class='col-status'>%s</th>", RunEditorAttributes.RUN_STATUS.getName()))
+                .append(String.format("<th class='col-actual-result'>%s</th>", RunEditorAttributes.ACTUAL_RESULT.getName()))
+                .append(String.format("<th class='col-severity'>%s</th>", RunEditorAttributes.BUG_SEVERITY.getName()))
+                .append(String.format("<th class='col-bug-priority'>%s</th>", RunEditorAttributes.BUG_PRIORITY.getName()))
                 .append(String.format("<th class='col-duration'>%s</th>", RunEditorAttributes.DURATION.getName()))
                 .append(String.format("<th class='col-expected'>%s</th>", TestEditorAttributes.EXPECTED_RESULT.getName()))
                 .append(String.format("<th class='col-priority'>%s</th>", TestEditorAttributes.PRIORITY.getName()))
@@ -69,6 +72,9 @@ public final class TestRunHtmlGenerator {
                         .append(cell("col-id", id.toString(), "250px"))
                         .append(descriptionCell(d.getDescription()))
                         .append(statusCell(result.getStatus()))
+                        .append(cell("col-actual-result", result.getActualResult(), "300px"))
+                        .append(cell("col-severity", result.getSeverity().name(), "80px"))
+                        .append(cell("col-bug-priority", result.getPriority().name(), "80px"))
                         .append(durationCell(project, result.getDuration()))
                         .append(cell("col-expected", d.getExpectedResult(), "500px"))
                         .append(cell("col-priority", d.getPriority().name(), "80px"))
@@ -85,7 +91,7 @@ public final class TestRunHtmlGenerator {
                         .append("</tr>");
             });
         } else {
-            html.append("<tr><td colspan='17' style='text-align:center;'>No test results found.</td></tr>");
+            html.append("<tr><td colspan='20' style='text-align:center;'>No test results found.</td></tr>");
         }
 
         html.append("</table>");

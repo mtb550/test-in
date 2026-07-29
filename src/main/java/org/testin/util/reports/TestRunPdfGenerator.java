@@ -19,9 +19,9 @@ import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
-import org.testin.util.Tools;
+//import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
+//import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,12 +52,15 @@ public final class TestRunPdfGenerator {
             document.add(new Paragraph("Platform: " + tr.getPlatform()));
             document.add(new Paragraph("Status: " + trDir.getMarker().getStatus().name()).setMarginBottom(20));
 
-            Table table = new Table(UnitValue.createPercentArray(new float[]{10, 50, 20, 20})).useAllAvailableWidth();
+            Table table = new Table(UnitValue.createPercentArray(new float[]{3, 35, 10, 30, 12, 10/*, 10*/})).useAllAvailableWidth();
 
             table.addHeaderCell(createHeaderCell("#", boldFont));
             table.addHeaderCell(createHeaderCell("Title", boldFont));
             table.addHeaderCell(createHeaderCell("Status", boldFont));
-            table.addHeaderCell(createHeaderCell("Duration", boldFont));
+            table.addHeaderCell(createHeaderCell("Actual Result", boldFont));
+            table.addHeaderCell(createHeaderCell("Severity", boldFont));
+            table.addHeaderCell(createHeaderCell("Priority", boldFont));
+            //table.addHeaderCell(createHeaderCell("Duration", boldFont));
 
             if (!tr.getResults().isEmpty()) {
                 AtomicInteger seq = new AtomicInteger(1);
@@ -90,11 +93,15 @@ public final class TestRunPdfGenerator {
                     );
                     table.addCell(statusCell);
 
-                    String duration = Services.getInstance(project, Tools.class).getFormattedDuration(result.getDuration());
-                    table.addCell(new Cell().add(new Paragraph(duration)));
+                    table.addCell(new Cell().add(new Paragraph(result.getActualResult())));
+                    table.addCell(new Cell().add(new Paragraph(result.getSeverity().name())));
+                    table.addCell(new Cell().add(new Paragraph(result.getPriority().name())));
+
+                    //String duration = Services.getInstance(project, Tools.class).getFormattedDuration(result.getDuration());
+                    //table.addCell(new Cell().add(new Paragraph(duration)));
                 });
             } else {
-                Cell emptyCell = new Cell(1, 4).add(new Paragraph("No test results found."))
+                Cell emptyCell = new Cell(1, 7).add(new Paragraph("No test results found."))
                         .setTextAlignment(TextAlignment.CENTER);
                 table.addCell(emptyCell);
             }
