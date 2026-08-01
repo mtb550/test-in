@@ -1,9 +1,9 @@
-package org.testin.util.reports;
+package org.testin.actions.generateReport.generators;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.TestStatus;
 import org.testin.pojo.TestRunItems;
+import org.testin.pojo.TestStatus;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
@@ -18,15 +18,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public final class TestRunHtmlGenerator {
 
-    private  final String DARK_BLUE = "#1f3864";
-    private  final String MEDIUM_BLUE = "#2e5496";
-    private  final String GREEN = "#2e7d32";
-    private  final String RED = "#c0392b";
-    private  final String ORANGE = "#e46c0a";
-    private  final String GOLD = "#b8860b";
-    private  final String GRAY = "#595959";
-    private  final String LIGHT_BG = "#f2f5fa";
-    private  final String BORDER_COLOR = "#d0d7e5";
+    private final String DARK_BLUE = "#1f3864";
+    private final String MEDIUM_BLUE = "#2e5496";
+    private final String GREEN = "#2e7d32";
+    private final String RED = "#c0392b";
+    private final String ORANGE = "#e46c0a";
+    private final String GOLD = "#b8860b";
+    private final String GRAY = "#595959";
+    private final String LIGHT_BG = "#f2f5fa";
+    private final String BORDER_COLOR = "#d0d7e5";
 
     public String generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trdir,
                            final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
@@ -82,126 +82,126 @@ public final class TestRunHtmlGenerator {
                 .append(".footer a { color: #0052cc; text-decoration: none; }")
                 .append("</style></head><body>");
 
-            // ═══════════════════════════════════════════════════
-            // HEADER
-            // ═══════════════════════════════════════════════════
-            html.append("<div class='report-title'>TEST SUMMARY REPORT</div>")
+        // ═══════════════════════════════════════════════════
+        // HEADER
+        // ═══════════════════════════════════════════════════
+        html.append("<div class='report-title'>TEST SUMMARY REPORT</div>")
                 .append("<div class='report-subtitle'>").append(projectName).append("  |  ").append(runName).append("</div>")
                 .append("<div class='report-conf'>Confidential — QA Test Execution Summary</div>");
 
-            // ═══════════════════════════════════════════════════
-            // SECTION 1: Report Overview
-            // ═══════════════════════════════════════════════════
-            html.append("<div class='section-title-bar'><div class='section-title'>1. Report Overview</div></div>");
+        // ═══════════════════════════════════════════════════
+        // SECTION 1: Report Overview
+        // ═══════════════════════════════════════════════════
+        html.append("<div class='section-title-bar'><div class='section-title'>1. Report Overview</div></div>");
 
-            html.append("<table class='overview-table'>");
-            overviewRow(html, "Project", projectName);
-            overviewRow(html, "Sprint / Cycle", runName);
-            overviewRow(html, "Test Type", "API Functional Testing");
-            overviewRow(html, "Platform", platform);
-            overviewRow(html, "Executed By", executedBy);
-            overviewRow(html, "Execution Date", execDate);
-            overviewRow(html, "Run Status", runStatus);
-            html.append("</table>");
+        html.append("<table class='overview-table'>");
+        overviewRow(html, "Project", projectName);
+        overviewRow(html, "Sprint / Cycle", runName);
+        overviewRow(html, "Test Type", "API Functional Testing");
+        overviewRow(html, "Platform", platform);
+        overviewRow(html, "Executed By", executedBy);
+        overviewRow(html, "Execution Date", execDate);
+        overviewRow(html, "Run Status", runStatus);
+        html.append("</table>");
 
-            // ═══════════════════════════════════════════════════
-            // SECTION 2: Execution Summary
-            // ═══════════════════════════════════════════════════
-            html.append("<div class='section-title-bar'><div class='section-title'>2. Execution Summary</div></div>");
+        // ═══════════════════════════════════════════════════
+        // SECTION 2: Execution Summary
+        // ═══════════════════════════════════════════════════
+        html.append("<div class='section-title-bar'><div class='section-title'>2. Execution Summary</div></div>");
 
-            html.append("<div class='summary-text'>")
+        html.append("<div class='summary-text'>")
                 .append("A total of <b>").append(total).append("</b> API functional test cases were executed for ")
                 .append("<b>").append(runName).append("</b>. The run completed with a <b>").append(passRate).append("%</b> pass rate. ")
                 .append("The results below summarises the outcome across all executed cases.")
                 .append("</div>");
 
-            // Summary cards
-            html.append("<div class='summary-cards'>");
-            summaryCard(html, String.valueOf(total), "Total Cases", DARK_BLUE);
-            summaryCard(html, String.valueOf(passed), "Passed", GREEN);
-            summaryCard(html, String.valueOf(failed), "Failed", RED);
-            summaryCard(html, String.valueOf(blocked), "Blocked", ORANGE);
-            summaryCard(html, String.valueOf(pending), "Pending", GOLD);
-            summaryCard(html, passRate + "%", "Pass Rate", DARK_BLUE);
-            html.append("</div>");
+        // Summary cards
+        html.append("<div class='summary-cards'>");
+        summaryCard(html, String.valueOf(total), "Total Cases", DARK_BLUE);
+        summaryCard(html, String.valueOf(passed), "Passed", GREEN);
+        summaryCard(html, String.valueOf(failed), "Failed", RED);
+        summaryCard(html, String.valueOf(blocked), "Blocked", ORANGE);
+        summaryCard(html, String.valueOf(pending), "Pending", GOLD);
+        summaryCard(html, passRate + "%", "Pass Rate", DARK_BLUE);
+        html.append("</div>");
 
-            // ═══════════════════════════════════════════════════
-            // SECTION 3: Failed Test Cases
-            // ═══════════════════════════════════════════════════
-            if (failed > 0) {
-                html.append("<div class='section-title-bar'><div class='section-title'>3. Failed Test Cases</div></div>");
-                html.append("<div class='summary-text'>The following <b>").append(failed).append("</b> cases failed and require remediation.</div>");
-                html.append("<table class='detail-table'>")
+        // ═══════════════════════════════════════════════════
+        // SECTION 3: Failed Test Cases
+        // ═══════════════════════════════════════════════════
+        if (failed > 0) {
+            html.append("<div class='section-title-bar'><div class='section-title'>3. Failed Test Cases</div></div>");
+            html.append("<div class='summary-text'>The following <b>").append(failed).append("</b> cases failed and require remediation.</div>");
+            html.append("<table class='detail-table'>")
                     .append("<tr><th>#</th><th>Test Case</th><th>Priority</th></tr>");
 
-                final AtomicInteger seq = new AtomicInteger(1);
-                results.stream()
+            final AtomicInteger seq = new AtomicInteger(1);
+            results.stream()
                     .filter(r -> r.getStatus() == TestStatus.FAILED)
                     .forEach(item -> {
                         TestCaseDto d = detailsMap.get(item.getId());
                         String desc = d != null ? d.getDescription() : "";
                         String priority = item.getPriority().name();
                         html.append("<tr>")
-                            .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
-                            .append("<td>").append(escapedHtml(desc)).append("</td>")
-                            .append("<td>").append(priority).append("</td>")
-                            .append("</tr>");
+                                .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
+                                .append("<td>").append(escapedHtml(desc)).append("</td>")
+                                .append("<td>").append(priority).append("</td>")
+                                .append("</tr>");
                     });
-                html.append("</table>");
-            }
+            html.append("</table>");
+        }
 
-            // ═══════════════════════════════════════════════════
-            // SECTION 4: Pending Test Cases
-            // ═══════════════════════════════════════════════════
-            if (pending > 0) {
-                int sectionNum = failed > 0 ? 4 : 3;
-                html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNum).append(". Pending Test Cases</div></div>");
-                html.append("<div class='summary-text'>The following <b>").append(pending).append("</b> cases are pending execution.</div>");
-                html.append("<table class='detail-table'>")
+        // ═══════════════════════════════════════════════════
+        // SECTION 4: Pending Test Cases
+        // ═══════════════════════════════════════════════════
+        if (pending > 0) {
+            int sectionNum = failed > 0 ? 4 : 3;
+            html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNum).append(". Pending Test Cases</div></div>");
+            html.append("<div class='summary-text'>The following <b>").append(pending).append("</b> cases are pending execution.</div>");
+            html.append("<table class='detail-table'>")
                     .append("<tr><th>#</th><th>Test Case</th><th>Priority</th></tr>");
 
-                final AtomicInteger seq = new AtomicInteger(1);
-                results.stream()
+            final AtomicInteger seq = new AtomicInteger(1);
+            results.stream()
                     .filter(r -> r.getStatus() == TestStatus.PENDING)
                     .forEach(item -> {
                         TestCaseDto d = detailsMap.get(item.getId());
                         String desc = d != null ? d.getDescription() : "";
                         String priority = item.getPriority().name();
                         html.append("<tr>")
-                            .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
-                            .append("<td>").append(escapedHtml(desc)).append("</td>")
-                            .append("<td>").append(priority).append("</td>")
-                            .append("</tr>");
+                                .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
+                                .append("<td>").append(escapedHtml(desc)).append("</td>")
+                                .append("<td>").append(priority).append("</td>")
+                                .append("</tr>");
                     });
-                html.append("</table>");
-            }
+            html.append("</table>");
+        }
 
-            // ═══════════════════════════════════════════════════
-            // FOOTER
-            // ═══════════════════════════════════════════════════
-            html.append("<div class='footer'>")
+        // ═══════════════════════════════════════════════════
+        // FOOTER
+        // ═══════════════════════════════════════════════════
+        html.append("<div class='footer'>")
                 .append("<p>Prepared by <b>").append(escapedHtml(executedBy)).append("</b> — QA Engineering  |  ")
                 .append(execDate.isEmpty() ? "" : execDate)
                 .append("</p>")
                 .append("<p>Generated automatically by <a href='https://plugins.jetbrains.com/plugin/31514-testin' target='_blank'><strong>Testin</strong></a> IntelliJ plugin.</p>")
                 .append("</div>");
 
-            html.append("</body></html>");
-            return html.toString();
+        html.append("</body></html>");
+        return html.toString();
     }
 
     private void overviewRow(final StringBuilder html, final String label, final String value) {
         html.append("<tr>")
-            .append("<td class='label'>").append(label).append("</td>")
-            .append("<td class='value'>").append(escapedHtml(value)).append("</td>")
-            .append("</tr>");
+                .append("<td class='label'>").append(label).append("</td>")
+                .append("<td class='value'>").append(escapedHtml(value)).append("</td>")
+                .append("</tr>");
     }
 
     private void summaryCard(final StringBuilder html, final String value, final String label, final String color) {
         html.append("<div class='summary-card'>")
-            .append("<div class='card-value' style='color: ").append(color).append(";'>").append(value).append("</div>")
-            .append("<div class='card-label'>").append(label).append("</div>")
-            .append("</div>");
+                .append("<div class='card-value' style='color: ").append(color).append(";'>").append(value).append("</div>")
+                .append("<div class='card-label'>").append(label).append("</div>")
+                .append("</div>");
     }
 
     private String escapedHtml(final String text) {

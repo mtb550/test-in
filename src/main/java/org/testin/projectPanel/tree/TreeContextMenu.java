@@ -10,7 +10,7 @@ import org.testin.actions.*;
 import org.testin.actions.clipboard.*;
 import org.testin.actions.crud.Remove;
 import org.testin.actions.exports.Exports;
-import org.testin.actions.generateReport.*;
+import org.testin.actions.generateReport.GenerateReportAction;
 import org.testin.actions.imports.Imports;
 import org.testin.actions.nodeCreator.CreateTreeNode;
 import org.testin.actions.run.RunTestSet;
@@ -66,15 +66,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         add(new SetTestRunStatus(tree));
         addSeparator();
 
-        add(Services.getInstance(project, Tools.class).createSubGroup("Generate Report", AllIcons.ToolbarDecorator.Export,
-                List.of(
-                        new GenerateReportHtml(tree),
-                        new GenerateReportPdf(tree),
-                        new GenerateReportExcel(tree),
-                        new GenerateReportJson(tree),
-                        new GenerateReportXml(tree)
-                )
-        ));
+        add(new GenerateReportAction(tree));
 
         add(new ShowNodeDetails(tree));
 

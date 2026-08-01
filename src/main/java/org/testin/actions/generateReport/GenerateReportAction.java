@@ -1,14 +1,18 @@
-package org.testin.util.reports;
+package org.testin.actions.generateReport;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.Dialogs.generateReports.GenerateReportDialog;
 import org.testin.pojo.Config;
 import org.testin.pojo.FileTypes;
 import org.testin.pojo.TestRunItems;
@@ -20,6 +24,7 @@ import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.file.Files;
@@ -28,58 +33,60 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public final class TestRunReport {
-    private final Project project;
-    private final TestRunDirectoryDto tr;
+public class GenerateReportAction extends DumbAwareAction {
+    private final @NotNull SimpleTree tree;
 
-    public TestRunReport(final @NotNull Project project, final TestRunDirectoryDto tr) {
-        this.project = project;
-        this.tr = tr;
+    public GenerateReportAction(final @NotNull SimpleTree tree) {
+        super("Generate Report", "Generate test run report (HTML, PDF, XLSX)", AllIcons.ToolbarDecorator.Export);
+        this.tree = tree;
     }
 
-    public TestRunReport build() {
-        return this;
+    @Override
+    public void actionPerformed(final @NotNull AnActionEvent e) {
+        if (e.getProject() == null) return;
+        final Project project = e.getProject();
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto tr) {
+            String suggestedName = tr.getPath().getFileName().toString() + "_Report";
+            GenerateReportDialog dialog = new GenerateReportDialog(project, suggestedName);
+            if (dialog.showAndGet()) {
+                processAndSave(project, tr, dialog.getSelectedFormat(), dialog.getSelectedFile());
+            }
+        }
     }
 
-    public void asHtml() {
-        processAndSave(FileTypes.HTML);
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+        e.getPresentation().setEnabled(selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto);
     }
 
-    public void asPdf() {
-        processAndSave(FileTypes.PDF);
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.EDT;
     }
 
-    public void asExcel() {
-        processAndSave(FileTypes.XLSX);
-    }
-
-    public void asJson() {
-        // TODO: to be implemented
-    }
-
-    public void asXml() {
-        // TODO: to be implemented
-    }
-
-    private void processAndSave(final FileTypes format) {
+    private void processAndSave(final Project project, final TestRunDirectoryDto tr, final FileTypes format, final File outputFile) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = tr.getPath();
-                String folderName = dirPath.getFileName().toString();
 
                 final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
                 TestRunDto runData = indexer.getTestRunByPath(dirPath);
 
-                Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(runData);
+                Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(project, runData);
 
                 byte[] fileBytes = format.generateReport(project, tr, runData, detailsMap);
 
-                String cleanName = runData.getRunName().replace(".json", "");
-
-                String rawTimestamp = java.time.ZonedDateTime.now().format(Config.getDateFormatterPattern());
-                String safeTimestamp = rawTimestamp.replace(":", "-").replace("/", "-");
-
-                File reportFile = dirPath.resolve(cleanName + "_Report_" + safeTimestamp + format.getExtension()).toFile();
+                File reportFile;
+                if (outputFile != null) {
+                    reportFile = outputFile;
+                } else {
+                    String cleanName = runData.getRunName().replace(".json", "");
+                    String rawTimestamp = java.time.ZonedDateTime.now().format(Config.getDateFormatterPattern());
+                    String safeTimestamp = rawTimestamp.replace(":", "-").replace("/", "-");
+                    reportFile = dirPath.resolve(cleanName + "_Report_" + safeTimestamp + format.getExtension()).toFile();
+                }
 
                 Files.write(reportFile.toPath(), fileBytes);
 
@@ -109,7 +116,7 @@ public final class TestRunReport {
         });
     }
 
-    private Map<UUID, TestCaseDto> fetchTestCaseDetails(final TestRunDto tr) {
+    private Map<UUID, TestCaseDto> fetchTestCaseDetails(final Project project, final TestRunDto tr) {
         final Map<UUID, TestCaseDto> detailsMap = new ConcurrentHashMap<>();
 
         if (tr.getResults().isEmpty()) {

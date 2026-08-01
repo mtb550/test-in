@@ -1,4 +1,4 @@
-package org.testin.util.reports;
+package org.testin.actions.generateReport.generators;
 
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.DeviceRgb;

@@ -66,6 +66,7 @@ public class RunEditorCM extends EditorContextMenu {
         new Escape(list);
         new OpenCM(list, cm);
         new CloseTestCaseDetails(list);
+        // todo: add CTRL+P to generate reports
     }
 
     @Override

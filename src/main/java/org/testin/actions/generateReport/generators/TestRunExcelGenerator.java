@@ -1,4 +1,4 @@
-package org.testin.util.reports;
+package org.testin.actions.generateReport.generators;
 
 import com.intellij.openapi.project.Project;
 import org.dhatim.fastexcel.Workbook;

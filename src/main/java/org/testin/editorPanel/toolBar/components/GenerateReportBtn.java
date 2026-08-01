@@ -7,7 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
-import org.testin.actions.generateReport.GenerateReportPdf;
+import org.testin.actions.generateReport.GenerateReportAction;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.services.Services;
 
@@ -18,7 +18,7 @@ public class GenerateReportBtn extends AbstractButton implements IToolbarItem {
 
         addActionListener(e -> {
             final SimpleTree tree = Services.getInstance(project, ProjectPanel.class).getProjectTree().getMainTree();
-            final GenerateReportPdf action = new GenerateReportPdf(tree);
+            final GenerateReportAction action = new GenerateReportAction(tree);
 
             final AnActionEvent event = AnActionEvent.createEvent(
                     SimpleDataContext.builder().add(CommonDataKeys.PROJECT, project).build(),
