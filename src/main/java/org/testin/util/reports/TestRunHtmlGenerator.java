@@ -2,153 +2,210 @@ package org.testin.util.reports;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
-import org.testin.pojo.RunEditorAttributes;
-import org.testin.pojo.TestEditorAttributes;
 import org.testin.pojo.TestStatus;
+import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
 import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
-import org.testin.util.Tools;
-import org.testin.util.services.Services;
 
-import java.time.Duration;
-import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public final class TestRunHtmlGenerator {
 
-    public String generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trdir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    private  final String DARK_BLUE = "#1f3864";
+    private  final String MEDIUM_BLUE = "#2e5496";
+    private  final String GREEN = "#2e7d32";
+    private  final String RED = "#c0392b";
+    private  final String ORANGE = "#e46c0a";
+    private  final String GOLD = "#b8860b";
+    private  final String GRAY = "#595959";
+    private  final String LIGHT_BG = "#f2f5fa";
+    private  final String BORDER_COLOR = "#d0d7e5";
+
+    public String generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trdir,
+                           final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+        // Compute summary stats
+        final List<TestRunItems> results = tr.getResults();
+        final int total = results.size();
+        final long passed = results.stream().filter(r -> r.getStatus() == TestStatus.PASSED).count();
+        final long failed = results.stream().filter(r -> r.getStatus() == TestStatus.FAILED).count();
+        final long blocked = results.stream().filter(r -> r.getStatus() == TestStatus.BLOCKED).count();
+        final long pending = results.stream().filter(r -> r.getStatus() == TestStatus.PENDING).count();
+        final int passRate = total > 0 ? (int) (passed * 100 / total) : 0;
+
+        // Run-level metadata
+        final String runName = tr.getRunName().replace(".json", "");
+        final String platform = tr.getPlatform();
+        final String executedBy = trdir.getMarker().getCreatedBy();
+        final String execDate = trdir.getMarker().getCreatedAt().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.US));
+        final String runStatus = trdir.getMarker().getStatus().getLabel();
+
+        // Project name
+        final String projectName = project.getName();
+
         StringBuilder html = new StringBuilder();
 
-        html.append("<html><head><style>")
-                .append(".table-container { width: 100%; overflow-x: auto; border: 1px solid #ccc; margin-top: 10px; }")
-                .append("table { border-collapse: collapse; font-size: 12px; font-family: sans-serif; width: max-content; }")
-                .append("th { background-color: #f4f4f4; text-align: left; padding: 8px; border: 1px solid #ddd; }")
-                .append("td { padding: 0; border: 1px solid #ddd; vertical-align: top; }")
-                .append(".cell-content { padding: 8px; overflow-wrap: break-word; white-space: normal; }")
+        html.append("<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><style>")
+                .append("* { margin: 0; padding: 0; box-sizing: border-box; }")
+                .append("body { font-family: Calibri, Arial, sans-serif; color: #000; background: #fff; padding: 40px; }")
+                // Title
+                .append(".report-title { font-size: 26px; font-weight: bold; color: ").append(DARK_BLUE).append("; }")
+                .append(".report-subtitle { font-size: 16px; color: ").append(MEDIUM_BLUE).append("; margin-top: 4px; }")
+                .append(".report-conf { font-size: 11px; color: ").append(GRAY).append("; font-style: italic; margin-top: 2px; margin-bottom: 20px; }")
+                // Section heading
+                .append(".section-title { font-size: 18px; font-weight: bold; color: ").append(DARK_BLUE).append("; margin-top: 28px; margin-bottom: 10px; }")
+                .append(".section-title-bar { border-bottom: 2px solid ").append(MEDIUM_BLUE).append("; margin-bottom: 14px; }")
+                // Overview table
+                .append(".overview-table { border-collapse: collapse; width: 100%; max-width: 700px; }")
+                .append(".overview-table td { padding: 6px 12px; border: 1px solid ").append(BORDER_COLOR).append("; font-size: 13px; }")
+                .append(".overview-table td.label { background: ").append(LIGHT_BG).append("; font-weight: bold; color: ").append(DARK_BLUE).append("; width: 160px; }")
+                .append(".overview-table td.value { color: #000; }")
+                // Summary cards
+                .append(".summary-text { font-size: 14px; color: #000; margin-bottom: 18px; line-height: 1.5; }")
+                .append(".summary-cards { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }")
+                .append(".summary-card { flex: 1; min-width: 120px; text-align: center; background: ").append(LIGHT_BG).append("; border: 1px solid ").append(BORDER_COLOR).append("; border-radius: 6px; padding: 14px 8px; }")
+                .append(".summary-card .card-value { font-size: 28px; font-weight: bold; }")
+                .append(".summary-card .card-label { font-size: 12px; color: ").append(GRAY).append("; margin-top: 4px; }")
+                // Detail table (failed / pending)
+                .append(".detail-table { border-collapse: collapse; width: 100%; margin-top: 8px; }")
+                .append(".detail-table th { background: ").append(LIGHT_BG).append("; text-align: left; padding: 8px 12px; border: 1px solid ").append(BORDER_COLOR).append("; font-weight: bold; color: ").append(DARK_BLUE).append("; font-size: 13px; }")
+                .append(".detail-table td { padding: 8px 12px; border: 1px solid ").append(BORDER_COLOR).append("; font-size: 13px; vertical-align: top; }")
+                .append(".detail-table td.seq { text-align: center; width: 40px; color: ").append(GRAY).append("; }")
+                // Footer
+                .append(".footer { margin-top: 30px; text-align: center; font-size: 11px; color: #888; border-top: 1px solid ").append(BORDER_COLOR).append("; padding-top: 14px; }")
+                .append(".footer a { color: #0052cc; text-decoration: none; }")
                 .append("</style></head><body>");
 
-        html.append("<h2>Test Run Report: ").append(tr.getRunName().replace(".json", "")).append("</h2>");
-        html.append("<p><strong>Platform:</strong> ").append(tr.getPlatform()).append("</p>");
-        html.append("<p><strong>Status:</strong> ").append(trdir.getMarker().getStatus().name()).append("</p>");
+            // ═══════════════════════════════════════════════════
+            // HEADER
+            // ═══════════════════════════════════════════════════
+            html.append("<div class='report-title'>TEST SUMMARY REPORT</div>")
+                .append("<div class='report-subtitle'>").append(projectName).append("  |  ").append(runName).append("</div>")
+                .append("<div class='report-conf'>Confidential — QA Test Execution Summary</div>");
 
-        html.append("<div class='table-container'><table><tr>")
-                .append("<th class='col-seq'>#</th>")
-                .append(String.format("<th class='col-id'>%s</th>", TestEditorAttributes.ID.getName()))
-                .append(String.format("<th class='col-description'>%s</th>", TestEditorAttributes.DESCRIPTION.getName()))
-                .append(String.format("<th class='col-status'>%s</th>", RunEditorAttributes.RUN_STATUS.getName()))
-                .append(String.format("<th class='col-actual-result'>%s</th>", RunEditorAttributes.ACTUAL_RESULT.getName()))
-                .append(String.format("<th class='col-severity'>%s</th>", RunEditorAttributes.BUG_SEVERITY.getName()))
-                .append(String.format("<th class='col-bug-priority'>%s</th>", RunEditorAttributes.BUG_PRIORITY.getName()))
-                .append(String.format("<th class='col-duration'>%s</th>", RunEditorAttributes.DURATION.getName()))
-                .append(String.format("<th class='col-expected'>%s</th>", TestEditorAttributes.EXPECTED_RESULT.getName()))
-                .append(String.format("<th class='col-priority'>%s</th>", TestEditorAttributes.PRIORITY.getName()))
-                .append(String.format("<th class='col-module'>%s</th>", TestEditorAttributes.MODULE.getName()))
-                .append(String.format("<th class='col-groups'>%s</th>", TestEditorAttributes.GROUP.getName()))
-                .append(String.format("<th class='col-created-by'>%s</th>", TestEditorAttributes.CREATE_BY.getName()))
-                .append(String.format("<th class='col-updated-by'>%s</th>", TestEditorAttributes.UPDATE_BY.getName()))
-                .append(String.format("<th class='col-created-at'>%s</th>", TestEditorAttributes.CREATE_AT.getName()))
-                .append(String.format("<th class='col-updated-at'>%s</th>", TestEditorAttributes.UPDATE_AT.getName()))
-                .append(String.format("<th class='col-reference'>%s</th>", TestEditorAttributes.REFERENCE.getName()))
-                .append(String.format("<th class='col-steps'>%s</th>", TestEditorAttributes.STEPS.getName()))
-                .append(String.format("<th class='col-fqcn'>%s</th>", TestEditorAttributes.FQCN.getName()))
-                .append("<th class='col-code'>Code</th>")
-                .append("</tr>");
+            // ═══════════════════════════════════════════════════
+            // SECTION 1: Report Overview
+            // ═══════════════════════════════════════════════════
+            html.append("<div class='section-title-bar'><div class='section-title'>1. Report Overview</div></div>");
 
-        if (!tr.getResults().isEmpty()) {
-            AtomicInteger seq = new AtomicInteger(1);
+            html.append("<table class='overview-table'>");
+            overviewRow(html, "Project", projectName);
+            overviewRow(html, "Sprint / Cycle", runName);
+            overviewRow(html, "Test Type", "API Functional Testing");
+            overviewRow(html, "Platform", platform);
+            overviewRow(html, "Executed By", executedBy);
+            overviewRow(html, "Execution Date", execDate);
+            overviewRow(html, "Run Status", runStatus);
+            html.append("</table>");
 
-            tr.getResults().forEach(result -> {
-                UUID id = result.getId();
-                TestCaseDto d = detailsMap.get(id);
+            // ═══════════════════════════════════════════════════
+            // SECTION 2: Execution Summary
+            // ═══════════════════════════════════════════════════
+            html.append("<div class='section-title-bar'><div class='section-title'>2. Execution Summary</div></div>");
 
-                html.append("<tr>")
-                        .append(cell("col-seq", String.valueOf(seq.getAndIncrement()), "40px"))
-                        .append(cell("col-id", id.toString(), "250px"))
-                        .append(descriptionCell(d.getDescription()))
-                        .append(statusCell(result.getStatus()))
-                        .append(cell("col-actual-result", result.getActualResult(), "300px"))
-                        .append(cell("col-severity", result.getSeverity().name(), "80px"))
-                        .append(cell("col-bug-priority", result.getPriority().getName(), "80px"))
-                        .append(durationCell(project, result.getDuration()))
-                        .append(cell("col-expected", d.getExpectedResult(), "500px"))
-                        .append(cell("col-priority", d.getPriority().getName(), "80px"))
-                        .append(cell("col-module", d.getModule(), "150px"))
-                        .append(groupsCell(d.getGroup()))
-                        .append(cell("col-created-by", d.getCreatedBy(), "150px"))
-                        .append(cell("col-updated-by", d.getUpdatedBy(), "150px"))
-                        .append(dateCell("col-created-at", d.getCreatedAt()))
-                        .append(dateCell("col-updated-at", d.getUpdatedAt()))
-                        .append(cell("col-reference", d.getReference(), "150px"))
-                        .append(stepsCell(d.getSteps()))
-                        .append(fqcnCell(Services.getInstance(project, Tools.class).buildFqcnMethod(d)))
-                        .append(cell("col-code", "<a href='#'>Navigate</a>", "80px"))
-                        .append("</tr>");
-            });
-        } else {
-            html.append("<tr><td colspan='20' style='text-align:center;'>No test results found.</td></tr>");
-        }
-
-        html.append("</table>");
-        html.append("</div>");
-
-        html.append("<div style='margin-top: 25px; text-align: center; font-size: 11px; color: #888;'>")
-                .append("<p>This test run report was automatically generated by the <a href='https://plugins.jetbrains.com/plugin/31514-testin' target='_blank' style='color: #0052cc; text-decoration: none;'><strong>Testin</strong></a> IntelliJ plugin.</p>")
+            html.append("<div class='summary-text'>")
+                .append("A total of <b>").append(total).append("</b> API functional test cases were executed for ")
+                .append("<b>").append(runName).append("</b>. The run completed with a <b>").append(passRate).append("%</b> pass rate. ")
+                .append("The results below summarises the outcome across all executed cases.")
                 .append("</div>");
 
-        html.append("</body>");
-        html.append("</html>");
+            // Summary cards
+            html.append("<div class='summary-cards'>");
+            summaryCard(html, String.valueOf(total), "Total Cases", DARK_BLUE);
+            summaryCard(html, String.valueOf(passed), "Passed", GREEN);
+            summaryCard(html, String.valueOf(failed), "Failed", RED);
+            summaryCard(html, String.valueOf(blocked), "Blocked", ORANGE);
+            summaryCard(html, String.valueOf(pending), "Pending", GOLD);
+            summaryCard(html, passRate + "%", "Pass Rate", DARK_BLUE);
+            html.append("</div>");
 
-        return html.toString();
+            // ═══════════════════════════════════════════════════
+            // SECTION 3: Failed Test Cases
+            // ═══════════════════════════════════════════════════
+            if (failed > 0) {
+                html.append("<div class='section-title-bar'><div class='section-title'>3. Failed Test Cases</div></div>");
+                html.append("<div class='summary-text'>The following <b>").append(failed).append("</b> cases failed and require remediation.</div>");
+                html.append("<table class='detail-table'>")
+                    .append("<tr><th>#</th><th>Test Case</th><th>Priority</th></tr>");
+
+                final AtomicInteger seq = new AtomicInteger(1);
+                results.stream()
+                    .filter(r -> r.getStatus() == TestStatus.FAILED)
+                    .forEach(item -> {
+                        TestCaseDto d = detailsMap.get(item.getId());
+                        String desc = d != null ? d.getDescription() : "";
+                        String priority = item.getPriority().name();
+                        html.append("<tr>")
+                            .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
+                            .append("<td>").append(escapedHtml(desc)).append("</td>")
+                            .append("<td>").append(priority).append("</td>")
+                            .append("</tr>");
+                    });
+                html.append("</table>");
+            }
+
+            // ═══════════════════════════════════════════════════
+            // SECTION 4: Pending Test Cases
+            // ═══════════════════════════════════════════════════
+            if (pending > 0) {
+                int sectionNum = failed > 0 ? 4 : 3;
+                html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNum).append(". Pending Test Cases</div></div>");
+                html.append("<div class='summary-text'>The following <b>").append(pending).append("</b> cases are pending execution.</div>");
+                html.append("<table class='detail-table'>")
+                    .append("<tr><th>#</th><th>Test Case</th><th>Priority</th></tr>");
+
+                final AtomicInteger seq = new AtomicInteger(1);
+                results.stream()
+                    .filter(r -> r.getStatus() == TestStatus.PENDING)
+                    .forEach(item -> {
+                        TestCaseDto d = detailsMap.get(item.getId());
+                        String desc = d != null ? d.getDescription() : "";
+                        String priority = item.getPriority().name();
+                        html.append("<tr>")
+                            .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
+                            .append("<td>").append(escapedHtml(desc)).append("</td>")
+                            .append("<td>").append(priority).append("</td>")
+                            .append("</tr>");
+                    });
+                html.append("</table>");
+            }
+
+            // ═══════════════════════════════════════════════════
+            // FOOTER
+            // ═══════════════════════════════════════════════════
+            html.append("<div class='footer'>")
+                .append("<p>Prepared by <b>").append(escapedHtml(executedBy)).append("</b> — QA Engineering  |  ")
+                .append(execDate.isEmpty() ? "" : execDate)
+                .append("</p>")
+                .append("<p>Generated automatically by <a href='https://plugins.jetbrains.com/plugin/31514-testin' target='_blank'><strong>Testin</strong></a> IntelliJ plugin.</p>")
+                .append("</div>");
+
+            html.append("</body></html>");
+            return html.toString();
     }
 
-    private String descriptionCell(final String description) {
-        String content = description != null ? description : "";
-        return cell("col-description", "<b>" + content + "</b>", "500px");
+    private void overviewRow(final StringBuilder html, final String label, final String value) {
+        html.append("<tr>")
+            .append("<td class='label'>").append(label).append("</td>")
+            .append("<td class='value'>").append(escapedHtml(value)).append("</td>")
+            .append("</tr>");
     }
 
-    private String statusCell(final TestStatus status) {
-        if (status == null) return cell("col-status", "", "100px");
-
-        String colorHex = "#" + status.getHex();
-        return "<td class='col-status' style='color:" + colorHex + "; font-weight:bold;'>" +
-                "<div class='cell-content' style='max-width:100px;'>" + status.name() + "</div>" +
-                "</td>";
+    private void summaryCard(final StringBuilder html, final String value, final String label, final String color) {
+        html.append("<div class='summary-card'>")
+            .append("<div class='card-value' style='color: ").append(color).append(";'>").append(value).append("</div>")
+            .append("<div class='card-label'>").append(label).append("</div>")
+            .append("</div>");
     }
 
-    private String durationCell(final @NotNull Project project, final Duration duration) {
-        String formatted = Services.getInstance(project, Tools.class).getFormattedDuration(duration);
-        return cell("col-duration", formatted, "100px");
-    }
-
-    private String dateCell(final String colClass, final ZonedDateTime dateTime) {
-        String formatted = dateTime != null ? dateTime.format(Config.getDateFormatterPattern()) : "";
-        return cell(colClass, formatted, "250px");
-    }
-
-    private String groupsCell(final List<? extends Enum<?>> groups) {
-        String content = groups != null ? groups.stream().map(Enum::name).collect(Collectors.joining("<br>")) : "";
-        return cell("col-groups", content, "150px");
-    }
-
-    private String stepsCell(final List<String> steps) {
-        String content = steps != null ? String.join("<br>", steps) : "";
-        return cell("col-steps", content, "300px");
-    }
-
-    private String fqcnCell(final List<String> fqcn) {
-        String content = fqcn != null ? String.join("<br>", fqcn) : "";
-        return cell("col-fqcn", content, "250px");
-    }
-
-    private String cell(final String colClass, final String content, final String maxWidth) {
-        return "<td class='" + colClass + "'>" +
-                "<div class='cell-content' style='max-width:" + maxWidth + ";'>" + content + "</div>" +
-                "</td>";
+    private String escapedHtml(final String text) {
+        if (text == null || text.isEmpty()) return "";
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 }
