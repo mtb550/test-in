@@ -56,7 +56,7 @@ public class Rename extends DumbAwareAction {
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
         if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
 
-        Services.getInstance(project, EditorUtil.class).closeEditor(project, dir.getName());
+        Services.getInstance(project, EditorUtil.class).close(project, dir.getName());
 
         Path oldPath = dir.getPath();
         Path newPath = oldPath.getParent().resolve(newName);

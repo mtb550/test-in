@@ -40,13 +40,13 @@ public class Open extends DumbAwareAction {
 
             if (directoryDto instanceof TestSetDirectoryDto ts) {
                 Logger.info("open test set: " + ts.getPath());
-                Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, ts);
+                Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, ts);
                 continue;
             }
 
             if (directoryDto instanceof TestRunDirectoryDto tr) {
                 Logger.info("open test run: " + tr.getPath());
-                Services.getInstance(project, EditorUtil.class).openEditorIfNotOpen(project, tr);
+                Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, tr);
             }
 
         }

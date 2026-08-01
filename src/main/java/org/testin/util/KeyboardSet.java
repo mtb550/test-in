@@ -74,7 +74,8 @@ public enum KeyboardSet {
     StatusClosed(KeyEvent.VK_3, 0),
     SetActualResult(KeyEvent.VK_A, 0),
     Severity(KeyEvent.VK_Q, 0),
-    Priority(KeyEvent.VK_T, 0);
+    Priority(KeyEvent.VK_T, 0),
+    GenerateReports(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
 
     private final int keyCode;
     private final int modifiers;

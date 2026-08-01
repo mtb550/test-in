@@ -1,17 +1,37 @@
 package org.testin.editorPanel.toolBar.components;
 
 import com.intellij.icons.AllIcons;
-import org.testin.util.logger.Logger;
+import com.intellij.openapi.actionSystem.ActionUiKind;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
+import com.intellij.openapi.project.Project;
+import com.intellij.ui.treeStructure.SimpleTree;
+import org.testin.actions.generateReport.GenerateReportPdf;
+import org.testin.projectPanel.ProjectPanel;
+import org.testin.util.services.Services;
 
-// TODO: cange it to pop up and list the implemented actions, excel, pdf and html
 public class GenerateReportBtn extends AbstractButton implements IToolbarItem {
 
-    public GenerateReportBtn() {
+    public GenerateReportBtn(Project project) {
         super("Export Results", AllIcons.ToolbarDecorator.Export);
 
         addActionListener(e -> {
-            // TODO: JSON/Report export logic, use same action in action package.
-            Logger.info("Exporting results...");
+            final SimpleTree tree = Services.getInstance(project, ProjectPanel.class).getProjectTree().getMainTree();
+            final GenerateReportPdf action = new GenerateReportPdf(tree);
+
+            final AnActionEvent event = AnActionEvent.createEvent(
+                    SimpleDataContext.builder().add(CommonDataKeys.PROJECT, project).build(),
+                    action.getTemplatePresentation().clone(),
+                    "GenerateReportBtn",
+                    ActionUiKind.TOOLBAR,
+                    null);
+
+            action.update(event);
+            if (event.getPresentation().isEnabled()) {
+                action.actionPerformed(event);
+            }
+
         });
     }
 }

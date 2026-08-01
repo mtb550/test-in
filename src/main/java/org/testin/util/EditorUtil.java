@@ -29,13 +29,13 @@ import java.util.Optional;
 public final class EditorUtil {
     private final String OPEN_EDITORS_KEY = "testin.openEditors";
 
-    public boolean isEditorOpen(final @NotNull Project project, final String s) {
-        final FileEditorManager editorManager = FileEditorManager.getInstance(project);
-        final VirtualFile[] openFiles = editorManager.getOpenFiles();
+    public boolean isOpen(final @NotNull Project project, final @NotNull String s) {
+        final FileEditorManager fed = FileEditorManager.getInstance(project);
+        final VirtualFile[] openFiles = fed.getOpenFiles();
 
         for (VirtualFile vf : openFiles) {
             if (s.equals(vf.getName())) {
-                editorManager.openFile(vf, true);
+                fed.openFile(vf, true);
                 return true;
             }
         }
@@ -43,44 +43,43 @@ public final class EditorUtil {
         return false;
     }
 
-    public void closeEditor(final @NotNull Project project, final String s) {
-        final FileEditorManager editorManager = FileEditorManager.getInstance(project);
-        final VirtualFile[] openFiles = editorManager.getOpenFiles();
+    public void close(final @NotNull Project project, final @NotNull String s) {
+        final FileEditorManager fed = FileEditorManager.getInstance(project);
+        final VirtualFile[] openFiles = fed.getOpenFiles();
 
         for (VirtualFile vf : openFiles) {
             if (s.equals(vf.getName())) {
-                editorManager.closeFile(vf);
+                fed.closeFile(vf);
                 break;
             }
         }
 
     }
 
-    public void closeThenOpenEditor(final @NotNull Project project, final VirtualFile vf, final DirectoryDto dir) {
-        if (vf == null || dir == null) return;
-        final FileEditorManager editorManager = FileEditorManager.getInstance(project);
+    public void closeThenOpen(final @NotNull Project project, final @NotNull VirtualFile vf, final @NotNull DirectoryDto dir) {
+        final FileEditorManager fed = FileEditorManager.getInstance(project);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             VirtualFile targetVf = null;
 
-            for (VirtualFile openVf : editorManager.getOpenFiles()) {
+            for (VirtualFile openVf : fed.getOpenFiles()) {
                 if (openVf.getName().equals(vf.getName())) {
                     targetVf = openVf;
-                    editorManager.closeFile(openVf);
+                    fed.closeFile(openVf);
                     break;
                 }
             }
 
             if (targetVf == null) {
-                openEditor(project, dir);
+                open(project, dir);
                 return;
             }
 
-            editorManager.openFile(targetVf, true);
+            fed.openFile(targetVf, true);
         });
     }
 
-    public void openEditor(final @NotNull Project project, final DirectoryDto dir) {
+    public void open(final @NotNull Project project, final @NotNull DirectoryDto dir) {
         final EditorType ft = dir instanceof TestRunDirectoryDto ? EditorType.TEST_RUN : EditorType.TEST_CASE;
         final UnifiedVirtualFile newVf = new UnifiedVirtualFile(dir, ft);
 
@@ -89,17 +88,17 @@ public final class EditorUtil {
                         .ifPresent(editorManager -> editorManager.openFile(newVf, true)));
     }
 
-    public void openEditorIfNotOpen(final @NotNull Project project, final DirectoryDto dir) {
-        if (isEditorOpen(project, dir.getName())) {
+    public void openIfNotOpen(final @NotNull Project project, final @NotNull DirectoryDto dir) {
+        if (isOpen(project, dir.getName())) {
             Logger.info("Editor already open, focusing: " + dir.getName());
 
         } else {
             Logger.info("Opening Editor: " + dir.getPath());
-            openEditor(project, dir);
+            open(project, dir);
         }
     }
 
-    public void saveOpenEditors(final @NotNull Project project) {
+    public void saveOpen(final @NotNull Project project) {
         try {
             final FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
             final List<String> entries = getEntries(fileEditorManager);
@@ -114,8 +113,8 @@ public final class EditorUtil {
         }
     }
 
-    private @NonNull List<String> getEntries(final FileEditorManager fileEditorManager) {
-        final VirtualFile[] openFiles = fileEditorManager.getOpenFiles();
+    private @NonNull List<String> getEntries(final @NotNull FileEditorManager fed) {
+        final VirtualFile[] openFiles = fed.getOpenFiles();
 
         final List<String> entries = new ArrayList<>();
         for (final VirtualFile vf : openFiles) {
@@ -130,7 +129,7 @@ public final class EditorUtil {
         return entries;
     }
 
-    public void restoreOpenEditors(final @NotNull Project project) {
+    public void restoreLastOpened(final @NotNull Project project) {
         try {
             final String saved = PropertiesComponent.getInstance(project).getValue(OPEN_EDITORS_KEY);
 
@@ -156,12 +155,12 @@ public final class EditorUtil {
                     final TestSetDirectoryDto ts = indexer.getTestSetByPath(path);
                     Logger.debug("EditorStateService: lookup testSet by path '" + path + "' -> " + "found");
 
-                    openEditorIfNotOpen(project, ts);
+                    openIfNotOpen(project, ts);
 
                 } else if ("tr".equals(type)) {
                     final TestRunDirectoryDto tr = indexer.getTestRunDirByPath(path);
                     Logger.debug("EditorStateService: lookup testRun by path '" + path + "' -> " + "found");
-                    openEditorIfNotOpen(project, tr);
+                    openIfNotOpen(project, tr);
 
                 } else {
                     Logger.warn("EditorStateService: unknown directory type '" + type + "', skipping: " + path);

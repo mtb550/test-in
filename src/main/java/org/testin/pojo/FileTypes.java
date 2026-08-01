@@ -8,10 +8,17 @@ import org.testin.actions.imports.ImportExcel;
 import org.testin.actions.imports.ImportJson;
 import org.testin.actions.imports.Imports;
 import org.testin.pojo.dto.TestCaseDto;
+import org.testin.pojo.dto.TestRunDto;
+import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
+import org.testin.util.reports.TestRunExcelGenerator;
+import org.testin.util.reports.TestRunHtmlGenerator;
+import org.testin.util.reports.TestRunPdfGenerator;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Getter
 public enum FileTypes {
@@ -20,7 +27,8 @@ public enum FileTypes {
             ".xls",
             null,
             (project, export, destFile, sheets) -> new ExportExcel(export).exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportExcel(imports).processImport(project, importFile)
+            (project, imports, importFile) -> new ImportExcel(imports).processImport(project, importFile),
+            null
     ),
 
     XLSX(
@@ -34,7 +42,8 @@ public enum FileTypes {
                     Note: Missing columns will safely default to empty values.
                     You can also download a ready-to-use sample file using the button below.""",
             (project, export, destFile, sheets) -> new ExportExcel(export).exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportExcel(imports).processImport(project, importFile)
+            (project, imports, importFile) -> new ImportExcel(imports).processImport(project, importFile),
+            (project, trDir, tr, detailsMap) -> new TestRunExcelGenerator().generate(project, trDir, tr, detailsMap)
     ),
 
     JSON(
@@ -42,7 +51,8 @@ public enum FileTypes {
             ".json",
             null,
             (project, export, destFile, sheets) -> new ExportJson(export).exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportJson().processImport(project, importFile)
+            (project, imports, importFile) -> new ImportJson().processImport(project, importFile),
+            null
     ),
 
     CSV(
@@ -56,7 +66,8 @@ public enum FileTypes {
                     Note: Missing columns will safely default to empty values.
                     The CSV should use comma as delimiter. Values containing commas or newlines must be quoted with double quotes.""",
             (project, export, destFile, sheets) -> new ExportCsv(export).exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportCsv(imports).processImport(project, importFile)
+            (project, imports, importFile) -> new ImportCsv(imports).processImport(project, importFile),
+            null
     ),
 
     HTML(
@@ -64,21 +75,35 @@ public enum FileTypes {
             ".html",
             null,
             (project, export, destFile, sheets) -> new ExportHtml(export).exportToFile(project, destFile, sheets),
-            null
+            null,
+            (project, trDir, tr, detailsMap) -> new TestRunHtmlGenerator().generate(project, trDir, tr, detailsMap).getBytes(StandardCharsets.UTF_8)
+    ),
+
+    PDF(
+            "PDF",
+            ".pdf",
+            null,
+            null,
+            null,
+            (project, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(trDir, tr, detailsMap)
     );
+
+    // todo: add XML object.
 
     private final String label;
     private final String extension;
     private final String infoMessage;
     private final ExportHandler exportHandler;
     private final ImportHandler importHandler;
+    private final ReportHandler reportHandler;
 
-    FileTypes(final String label, final String extension, final String infoMessage, final ExportHandler exportHandler, final ImportHandler importHandler) {
+    FileTypes(final String label, final String extension, final String infoMessage, final ExportHandler exportHandler, final ImportHandler importHandler, final ReportHandler reportHandler) {
         this.label = label;
         this.extension = extension;
         this.infoMessage = infoMessage;
         this.exportHandler = exportHandler;
         this.importHandler = importHandler;
+        this.reportHandler = reportHandler;
     }
 
     public void exportToFile(final Project project, final Exports exports, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
@@ -87,6 +112,15 @@ public enum FileTypes {
 
     public Map<String, List<TestCaseDto>> importToFile(Project project, Imports imports, File importFile) {
         return importHandler.handle(project, imports, importFile);
+    }
+
+    public byte[] generateReport(final Project project, final TestRunDirectoryDto trDir, final TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+        return reportHandler.handle(project, trDir, tr, detailsMap);
+    }
+
+    @FunctionalInterface
+    public interface ReportHandler {
+        byte[] handle(Project project, TestRunDirectoryDto trDir, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap);
     }
 
     @FunctionalInterface

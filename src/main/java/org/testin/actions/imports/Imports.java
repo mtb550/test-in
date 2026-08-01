@@ -121,7 +121,7 @@ public class Imports extends DumbAwareAction {
                     }
                 }
 
-                Services.getInstance(project, EditorUtil.class).closeThenOpenEditor(project, targetDirectory, ts);
+                Services.getInstance(project, EditorUtil.class).closeThenOpen(project, targetDirectory, ts);
                 Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
             } else {

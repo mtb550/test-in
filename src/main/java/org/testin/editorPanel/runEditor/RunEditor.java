@@ -129,7 +129,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     private void buildOpeningPanel() {
-        toolBar = new RunToolBar(this);
+        toolBar = new RunToolBar(project, this);
         statusBar = new StatusBar();
         StatusBarListener.attach(this);
 

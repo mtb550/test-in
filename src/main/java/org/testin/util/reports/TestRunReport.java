@@ -8,9 +8,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.pojo.Config;
+import org.testin.pojo.FileTypes;
 import org.testin.pojo.TestRunItems;
 import org.testin.pojo.dto.TestCaseDto;
 import org.testin.pojo.dto.TestRunDto;
@@ -22,7 +22,6 @@ import org.testin.util.services.Services;
 
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -43,15 +42,15 @@ public final class TestRunReport {
     }
 
     public void asHtml() {
-        processAndSave(ReportFormat.HTML);
+        processAndSave(FileTypes.HTML);
     }
 
     public void asPdf() {
-        processAndSave(ReportFormat.PDF);
+        processAndSave(FileTypes.PDF);
     }
 
     public void asExcel() {
-        processAndSave(ReportFormat.EXCEL);
+        processAndSave(FileTypes.XLSX);
     }
 
     public void asJson() {
@@ -62,7 +61,7 @@ public final class TestRunReport {
         // TODO: to be implemented
     }
 
-    private void processAndSave(final ReportFormat format) {
+    private void processAndSave(final FileTypes format) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = tr.getPath();
@@ -73,20 +72,7 @@ public final class TestRunReport {
 
                 Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(runData);
 
-                byte[] fileBytes;
-
-                switch (format) {
-                    case HTML -> {
-                        String reportHtml = new TestRunHtmlGenerator().generate(project, tr, runData, detailsMap);
-                        fileBytes = reportHtml.getBytes(StandardCharsets.UTF_8);
-                    }
-
-                    case PDF -> fileBytes = new TestRunPdfGenerator().generate(project, tr, runData, detailsMap);
-
-                    case EXCEL -> fileBytes = new TestRunExcelGenerator().generate(project, tr, runData, detailsMap);
-
-                    default -> throw new UnsupportedOperationException("Unknown format: " + format.name());
-                }
+                byte[] fileBytes = format.generateReport(project, tr, runData, detailsMap);
 
                 String cleanName = runData.getRunName().replace(".json", "");
 
@@ -138,21 +124,5 @@ public final class TestRunReport {
         }
 
         return detailsMap;
-    }
-
-    @Getter // todo, move to separate class
-    public enum ReportFormat {
-        HTML(".html"),
-        PDF(".pdf"),
-        EXCEL(".xlsx"),
-        JSON(".json"),
-        XML(".xml");
-
-        private final String extension;
-
-        ReportFormat(String extension) {
-            this.extension = extension;
-        }
-
     }
 }

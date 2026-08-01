@@ -137,7 +137,7 @@ public final class ProjectIndexer {
                                     ApplicationManager.getApplication().invokeLater(() -> {
                                         if (restoreEditorsOnComplete.compareAndSet(true, true)) {
                                             Logger.info("Indexing finished, restoring open editors.");
-                                            Services.getInstance(project, EditorUtil.class).restoreOpenEditors(project);
+                                            Services.getInstance(project, EditorUtil.class).restoreLastOpened(project);
 
                                         } else
                                             Logger.info("Indexing finished, skipping editor restore.");
