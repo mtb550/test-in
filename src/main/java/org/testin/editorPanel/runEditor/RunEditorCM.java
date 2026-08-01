@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.*;
 import org.testin.actions.clipboard.CopyTestCase;
+import org.testin.actions.generateReport.GenerateReportAction;
 import org.testin.actions.run.RunTestCase;
 import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
@@ -29,8 +30,11 @@ public class RunEditorCM extends EditorContextMenu {
     @Setter
     private static IEditor globalSourceEditorUI = null;
 
+    private final IEditor ui;
+
     public RunEditorCM(final IEditor ui, final DirectoryDto dir, final JBList<TestCaseDto> list) {
         super("Editor Context Menu", true);
+        this.ui = ui;
 
         add(new SetStatusPassed(ui, list));
         add(new SetStatusFailed(ui, list));
@@ -66,7 +70,7 @@ public class RunEditorCM extends EditorContextMenu {
         new Escape(list);
         new OpenCM(list, cm);
         new CloseTestCaseDetails(list);
-        // todo: add CTRL+P to generate reports
+        new GenerateReportAction(ui, list);
     }
 
     @Override
