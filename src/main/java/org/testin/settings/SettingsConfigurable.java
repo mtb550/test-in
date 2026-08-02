@@ -10,8 +10,8 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.Refresh;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.projectPanel.toolBar.RefreshAction;
 import org.testin.settings.Dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
@@ -96,7 +96,7 @@ public final class SettingsConfigurable implements Configurable {
 
         ProjectPanel panel = Services.getInstance(project, ProjectPanel.class);
         if (panel != null) {
-            new Refresh(panel).execute();
+            new RefreshAction(panel).execute();
         }
     }
 

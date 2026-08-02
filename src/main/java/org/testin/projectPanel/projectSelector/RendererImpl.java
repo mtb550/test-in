@@ -3,8 +3,8 @@ package org.testin.projectPanel.projectSelector;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.ProjectStatus;
-import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
+import org.testin.enums.ProjectStatus;
+import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 
 import javax.swing.*;
 

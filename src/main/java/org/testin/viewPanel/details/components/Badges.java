@@ -6,8 +6,8 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.Shared;
-import org.testin.pojo.Group;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.enums.Group;
+import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +15,6 @@ import java.awt.*;
 public class Badges extends BaseDetails {
 
     private static final int FLOW_GAP = 6;
-    private static final int EMPTY_STRUT_HEIGHT = 20;
     private static final int INSETS_TOP = 8;
     private static final int INSETS_LEFT = 16;
     private static final int INSETS_BOTTOM = 16;

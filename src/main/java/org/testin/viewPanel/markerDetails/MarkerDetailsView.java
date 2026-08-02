@@ -10,12 +10,12 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
-import org.testin.pojo.markers.TestProjectMarker;
-import org.testin.pojo.markers.TestRunMarker;
+import org.testin.mappers.Config;
+import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
+import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.mappers.markers.TestProjectMarker;
+import org.testin.mappers.markers.TestRunMarker;
 import org.testin.util.FontSyncUtil;
 
 import javax.swing.*;

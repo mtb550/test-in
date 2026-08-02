@@ -5,7 +5,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.Nullable;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;

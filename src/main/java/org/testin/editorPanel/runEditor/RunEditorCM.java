@@ -5,14 +5,18 @@ import com.intellij.ui.components.JBList;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.*;
-import org.testin.actions.clipboard.CopyTestCase;
-import org.testin.actions.generateReport.GenerateReportAction;
-import org.testin.actions.run.RunTestCase;
+import org.testin.*;
+import org.testin.clipboard.CopyTestCase;
 import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.editorPanel.statusBar.NextPageAction;
+import org.testin.editorPanel.statusBar.PrevPageAction;
+import org.testin.generateReport.GenerateReportAction;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.run.RunTestCase;
+import org.testin.testRun.*;
+import org.testin.viewPanel.CloseTestCaseDetailsAction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,7 +44,7 @@ public class RunEditorCM extends EditorContextMenu {
         add(new SetStatusFailed(ui, list));
         add(new SetStatusBlocked(ui, list));
         addSeparator();
-        add(new SetActualResult(ui, list));
+        add(new SetActualResultAction(ui, list));
         add(new UpdateRunItem(ui, list));
         addSeparator();
         add(new ViewDetails(list, dir.getPath2()));
@@ -69,7 +73,7 @@ public class RunEditorCM extends EditorContextMenu {
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull RunEditorCM cm) {
         new Escape(list);
         new OpenCM(list, cm);
-        new CloseTestCaseDetails(list);
+        new CloseTestCaseDetailsAction(list);
         new GenerateReportAction(ui, list);
     }
 

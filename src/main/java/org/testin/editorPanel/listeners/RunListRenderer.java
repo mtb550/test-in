@@ -3,8 +3,8 @@ package org.testin.editorPanel.listeners;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.runEditor.RunCard;
 import org.testin.editorPanel.runEditor.RunEditor;
-import org.testin.pojo.TestRunItems;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.TestRunItems;
+import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 

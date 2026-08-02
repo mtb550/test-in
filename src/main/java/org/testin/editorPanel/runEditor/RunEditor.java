@@ -13,14 +13,13 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.Dialogs.RunOpeningForm;
-import org.testin.actions.UpdateTestRunStatus;
 import org.testin.editorPanel.IEditor;
-import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.listeners.MouseListenerImpl;
 import org.testin.editorPanel.listeners.RunListRenderer;
 import org.testin.editorPanel.listeners.SelectionListener;
 import org.testin.editorPanel.listeners.StatusBarListener;
+import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.RunToolBar;
@@ -28,10 +27,12 @@ import org.testin.editorPanel.toolBar.components.FilterPopupBtn;
 import org.testin.editorPanel.toolBar.components.RunDetailsPopupBtn;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
-import org.testin.pojo.*;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.TestRunDto;
-import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
+import org.testin.enums.*;
+import org.testin.mappers.TestRunItems;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.TestRunDto;
+import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.testRun.UpdateTestRunStatus;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.indexer.ProjectIndexer;
@@ -333,7 +334,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         }
 
         if (statusBar != null) {
-            statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), total);
+            statusBar.updatePaginationState(currentPage, totalPages, total);
         }
     }
 

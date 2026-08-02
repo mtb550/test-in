@@ -7,7 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
-import org.testin.actions.generateReport.GenerateReportAction;
+import org.testin.generateReport.GenerateReportAction;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.services.Services;
 

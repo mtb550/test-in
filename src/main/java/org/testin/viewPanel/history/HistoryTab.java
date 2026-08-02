@@ -4,8 +4,8 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.DB;
-import org.testin.pojo.dto.TestCaseHistoryDto;
+import org.testin.mappers.DB;
+import org.testin.mappers.dto.TestCaseHistoryDto;
 
 import javax.swing.*;
 import java.awt.*;

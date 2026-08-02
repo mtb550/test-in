@@ -2,7 +2,7 @@ package org.testin.viewPanel;
 
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Getter;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.ArrayList;
 import java.util.List;

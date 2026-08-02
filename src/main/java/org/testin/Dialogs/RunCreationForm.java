@@ -15,12 +15,12 @@ import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.TestRunConfiguration;
-import org.testin.pojo.TestRunItems;
-import org.testin.pojo.TestStatus;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.TestRunDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.enums.TestRunConfiguration;
+import org.testin.enums.TestStatus;
+import org.testin.mappers.TestRunItems;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.TestRunDto;
+import org.testin.mappers.dto.dirs.DirectoryDto;
 
 import javax.swing.*;
 import java.awt.*;

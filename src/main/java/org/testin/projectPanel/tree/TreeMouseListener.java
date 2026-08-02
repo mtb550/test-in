@@ -7,8 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.Open;
-import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.Open;
+import org.testin.mappers.dto.dirs.DirectoryDto;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;

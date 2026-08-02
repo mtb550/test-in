@@ -7,8 +7,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.ProjectStatus;
-import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
+import org.testin.enums.ProjectStatus;
+import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 
 import javax.swing.*;

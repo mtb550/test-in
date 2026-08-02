@@ -7,8 +7,8 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.testin.pojo.DirectoryType;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.enums.DirectoryType;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
@@ -46,42 +46,40 @@ public class UpdateTestCaseDescription {
 
                     if (targetClass != null) {
 
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            WriteCommandAction.runWriteCommandAction(project, "Update Test Case Description", "Testin Plugin", () -> {
+                        ApplicationManager.getApplication().invokeLater(() -> WriteCommandAction.runWriteCommandAction(project, "Update Test Case Description", "Testin Plugin", () -> {
 
-                                PsiMethod targetMethod = null;
-                                PsiAnnotation targetAnnotation = null;
+                            PsiMethod targetMethod = null;
+                            PsiAnnotation targetAnnotation = null;
 
-                                for (PsiMethod method : targetClass.getMethods()) {
-                                    PsiAnnotation annotation = method.getAnnotation("org.testng.annotations.Test");
-                                    if (annotation != null) {
-                                        PsiAnnotationMemberValue testNameAttr = annotation.findAttributeValue("testName");
-                                        if (testNameAttr != null && testNameAttr.getText().contains(tc.getId().toString())) {
-                                            targetMethod = method;
-                                            targetAnnotation = annotation;
-                                            break;
-                                        }
+                            for (PsiMethod method : targetClass.getMethods()) {
+                                PsiAnnotation annotation = method.getAnnotation("org.testng.annotations.Test");
+                                if (annotation != null) {
+                                    PsiAnnotationMemberValue testNameAttr = annotation.findAttributeValue("testName");
+                                    if (testNameAttr != null && testNameAttr.getText().contains(tc.getId().toString())) {
+                                        targetMethod = method;
+                                        targetAnnotation = annotation;
+                                        break;
                                     }
                                 }
+                            }
 
-                                if (targetMethod != null) {
-                                    PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+                            if (targetMethod != null) {
+                                PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
 
-                                    PsiAnnotationMemberValue newDesc = factory.createExpressionFromText("\"" + tc.getDescription() + "\"", null);
-                                    targetAnnotation.setDeclaredAttributeValue("description", newDesc);
+                                PsiAnnotationMemberValue newDesc = factory.createExpressionFromText("\"" + tc.getDescription() + "\"", null);
+                                targetAnnotation.setDeclaredAttributeValue("description", newDesc);
 
-                                    String newMethodName = Services.getInstance(project, Tools.class).toCamelCase(tc.getDescription());
-                                    if (!targetMethod.getName().equals(newMethodName)) {
-                                        targetMethod.setName(newMethodName);
-                                    }
-
-                                    CodeStyleManager.getInstance(project).reformat(targetAnnotation);
-                                    Logger.info("Successfully updated description and method name for: " + tc.getId());
-                                } else {
-                                    Messages.showWarningDialog("Could not find the Java method for this Test Case ID.", "Method Not Found");
+                                String newMethodName = Services.getInstance(project, Tools.class).toCamelCase(tc.getDescription());
+                                if (!targetMethod.getName().equals(newMethodName)) {
+                                    targetMethod.setName(newMethodName);
                                 }
-                            });
-                        });
+
+                                CodeStyleManager.getInstance(project).reformat(targetAnnotation);
+                                Logger.info("Successfully updated description and method name for: " + tc.getId());
+                            } else {
+                                Messages.showWarningDialog("Could not find the Java method for this Test Case ID.", "Method Not Found");
+                            }
+                        }));
                     }
                 })
         );

@@ -5,9 +5,9 @@ import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.testFramework.LightVirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
-import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 
 @Getter
 public class UnifiedVirtualFile extends LightVirtualFile {

@@ -5,8 +5,8 @@ import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.Shared;
-import org.testin.pojo.TestEditorAttributes;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.enums.TestEditorAttributes;
+import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;

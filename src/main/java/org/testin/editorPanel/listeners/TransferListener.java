@@ -2,7 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.logger.Logger;
 
 import javax.swing.*;

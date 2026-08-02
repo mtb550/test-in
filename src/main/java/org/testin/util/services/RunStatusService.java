@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
-import org.testin.pojo.TestRunItems;
-import org.testin.pojo.TestStatus;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.enums.TestStatus;
+import org.testin.mappers.TestRunItems;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
 

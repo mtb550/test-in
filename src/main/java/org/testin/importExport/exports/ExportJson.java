@@ -1,0 +1,35 @@
+package org.testin.importExport.exports;
+
+import com.intellij.notification.NotificationAction;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.util.FilesUtil;
+import org.testin.util.Tools;
+import org.testin.util.notifications.Notifier;
+import org.testin.util.services.Services;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+
+public class ExportJson {
+
+    public ExportJson() {
+    }
+
+    public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+        Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), sheetsData);
+
+        ApplicationManager.getApplication().invokeLater(() ->
+                Services.getInstance(project, Notifier.class).infoWithActions(project, "Export Complete", "Exported to: " + destFile.getName(),
+                        NotificationAction.createSimple("Open file", () -> {
+                            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+                            Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                        }))
+        );
+    }
+}

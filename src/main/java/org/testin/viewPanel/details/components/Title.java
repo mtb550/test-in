@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.Tools;
 import org.testin.util.services.Services;

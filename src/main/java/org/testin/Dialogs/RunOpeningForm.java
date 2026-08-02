@@ -6,9 +6,9 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
-import org.testin.editorPanel.StatusBar;
+import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;

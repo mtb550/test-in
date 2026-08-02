@@ -5,8 +5,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.BaseCard;
-import org.testin.pojo.RunEditorAttributes;
-import org.testin.pojo.TestRunItems;
+import org.testin.enums.RunEditorAttributes;
+import org.testin.mappers.TestRunItems;
 
 import javax.swing.*;
 import java.awt.*;

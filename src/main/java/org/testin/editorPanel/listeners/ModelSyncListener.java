@@ -3,7 +3,7 @@ package org.testin.editorPanel.listeners;
 import com.intellij.ui.CollectionListModel;
 import lombok.Setter;
 import org.testin.editorPanel.testEditor.TestEditor;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;

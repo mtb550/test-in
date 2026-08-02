@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;

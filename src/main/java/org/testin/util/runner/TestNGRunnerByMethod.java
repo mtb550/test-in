@@ -18,7 +18,7 @@ import com.theoryinpractice.testng.model.TestType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;

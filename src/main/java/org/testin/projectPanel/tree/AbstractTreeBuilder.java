@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;

@@ -2,8 +2,8 @@ package org.testin.util;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Group;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.enums.Group;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.services.Services;
 
 import java.nio.file.Path;

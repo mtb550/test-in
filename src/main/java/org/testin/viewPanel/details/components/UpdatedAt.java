@@ -1,12 +1,11 @@
 package org.testin.viewPanel.details.components;
 
 import com.intellij.openapi.project.Project;
-
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.Config;
-import org.testin.pojo.TestEditorAttributes;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.enums.TestEditorAttributes;
+import org.testin.mappers.Config;
+import org.testin.mappers.dto.TestCaseDto;
 
 import java.awt.*;
 

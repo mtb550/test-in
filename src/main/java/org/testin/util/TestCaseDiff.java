@@ -1,6 +1,6 @@
 package org.testin.util;
 
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 
 import java.nio.file.Path;
 import java.util.List;

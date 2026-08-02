@@ -1,6 +1,6 @@
 package org.testin.projectPanel.projectSelector;
 
-import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
+import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.logger.Logger;
 

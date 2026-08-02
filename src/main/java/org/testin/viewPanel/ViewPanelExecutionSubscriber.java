@@ -2,7 +2,7 @@ package org.testin.viewPanel;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;

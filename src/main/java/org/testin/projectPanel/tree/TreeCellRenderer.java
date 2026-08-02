@@ -4,11 +4,11 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.DirectoryType;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestCasesMainDirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunDirectoryDto;
-import org.testin.pojo.dto.dirs.TestRunsMainDirectoryDto;
+import org.testin.enums.DirectoryType;
+import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.mappers.dto.dirs.TestCasesMainDirectoryDto;
+import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.mappers.dto.dirs.TestRunsMainDirectoryDto;
 import org.testin.util.logger.Logger;
 
 import javax.swing.*;

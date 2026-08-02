@@ -7,11 +7,11 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.DirectoryType;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.TestRunDto;
-import org.testin.pojo.dto.dirs.*;
-import org.testin.pojo.markers.TestRunMarker;
+import org.testin.enums.DirectoryType;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.TestRunDto;
+import org.testin.mappers.dto.dirs.*;
+import org.testin.mappers.markers.TestRunMarker;
 import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
 import org.testin.util.logger.Logger;
@@ -158,11 +158,6 @@ public final class ProjectIndexer {
         }
     }
 
-    // todo: to be removed
-    public boolean isIndexed() {
-        return indexed.get();
-    }
-
     public void awaitIndexing() {
         if (indexed.get()) return;
         try {
@@ -249,14 +244,6 @@ public final class ProjectIndexer {
 
     public @NotNull TestSetPackageDirectoryDto getTestSetPackageByPath(final @NotNull Path path) {
         return store.getTestSetPackageByPath(path);
-    }
-
-    public @NotNull TestCasesMainDirectoryDto getTestCasesMainDirByPath(final @NotNull Path path) {
-        return store.getTestCasesMainDirByPath(path);
-    }
-
-    public @NotNull TestRunsMainDirectoryDto getTestRunsMainDirByPath(final @NotNull Path path) {
-        return store.getTestRunsMainDirByPath(path);
     }
 
     public @NotNull TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {

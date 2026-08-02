@@ -3,7 +3,7 @@ package org.testin.editorPanel.listeners;
 import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
 import org.testin.editorPanel.IEditor;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 import javax.swing.border.Border;

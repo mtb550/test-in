@@ -6,16 +6,18 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.*;
-import org.testin.actions.clipboard.*;
-import org.testin.actions.crud.Remove;
-import org.testin.actions.exports.Exports;
-import org.testin.actions.generateReport.GenerateReportAction;
-import org.testin.actions.imports.Imports;
-import org.testin.actions.nodeCreator.CreateTreeNode;
-import org.testin.actions.run.RunTestSet;
-import org.testin.pojo.ProjectStatus;
+import org.testin.*;
+import org.testin.clipboard.*;
+import org.testin.crud.Remove;
+import org.testin.enums.ProjectStatus;
+import org.testin.generateReport.GenerateReportAction;
+import org.testin.importExport.exports.ExportAction;
+import org.testin.importExport.imports.ImportAction;
+import org.testin.nodeCreator.CreateTreeNode;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.run.RunTestSet;
+import org.testin.testProject.UpdateTestProjectStatus;
+import org.testin.testRun.SetTestRunStatus;
 import org.testin.util.Tools;
 import org.testin.util.services.Services;
 
@@ -53,9 +55,9 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        add(new Exports(tree));
+        add(new ExportAction(tree));
 
-        add(new Imports(tree));
+        add(new ImportAction(tree));
 
         addSeparator();
 

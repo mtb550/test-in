@@ -8,10 +8,10 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.NavigateToCode;
-import org.testin.pojo.CardHoverAction;
-import org.testin.pojo.RunStatus;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.NavigateToCode;
+import org.testin.enums.CardHoverAction;
+import org.testin.enums.RunStatus;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;

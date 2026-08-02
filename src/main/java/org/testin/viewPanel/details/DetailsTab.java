@@ -12,11 +12,11 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.Dialogs.testCase.TestCaseUpdateMenu;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
-import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.settings.Setting;
+import org.testin.testCase.createDialog.TestCaseUpdateMenu;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.autoGenerator.GeneratorAction;
@@ -212,10 +212,6 @@ public class DetailsTab {
 
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             final TestSetDirectoryDto ts = indexer.getTestSetByPath(resolved);
-            if (ts == null) {
-                Logger.warn("DetailsTab: test set not found in indexer: " + resolved);
-                return null;
-            }
             return ts.getPath();
         }
 

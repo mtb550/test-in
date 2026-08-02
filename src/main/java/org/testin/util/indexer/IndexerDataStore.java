@@ -3,11 +3,11 @@ package org.testin.util.indexer;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.DirectoryType;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.TestRunDto;
-import org.testin.pojo.dto.dirs.*;
-import org.testin.pojo.markers.TestRunMarker;
+import org.testin.enums.DirectoryType;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.TestRunDto;
+import org.testin.mappers.dto.dirs.*;
+import org.testin.mappers.markers.TestRunMarker;
 import org.testin.util.FilesUtil;
 import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
@@ -89,14 +89,6 @@ final class IndexerDataStore {
 
     TestSetPackageDirectoryDto getTestSetPackageByPath(final Path path) {
         return testSetPackagesByPath.get(path.toString());
-    }
-
-    TestCasesMainDirectoryDto getTestCasesMainDirByPath(final Path path) {
-        return testCasesMainDirsByPath.get(path.toString());
-    }
-
-    TestRunsMainDirectoryDto getTestRunsMainDirByPath(final Path path) {
-        return testRunsMainDirsByPath.get(path.toString());
     }
 
     void putTestCase(final Path testSetPath, final TestCaseDto tc) {

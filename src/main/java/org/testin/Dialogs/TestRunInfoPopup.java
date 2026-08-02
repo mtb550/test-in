@@ -4,7 +4,7 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.TestRunDto;
+import org.testin.mappers.dto.TestRunDto;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,9 +28,6 @@ public class TestRunInfoPopup {
                 return panel;
             }
 
-            private String safe(final @NotNull String value) {
-                return value;
-            }
         };
 
         dialog.show();

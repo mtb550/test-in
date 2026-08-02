@@ -7,19 +7,26 @@ import com.intellij.ui.components.JBList;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.*;
-import org.testin.actions.clipboard.CopyTestCase;
-import org.testin.actions.clipboard.CopyTestCaseNode;
-import org.testin.actions.clipboard.CutTestCaseNode;
-import org.testin.actions.clipboard.PasteTestCaseNode;
-import org.testin.actions.crud.CreateTestCase;
-import org.testin.actions.crud.RemoveTestCase;
-import org.testin.actions.generateCode.GenerateTestMethod;
-import org.testin.actions.run.RunTestCase;
+import org.testin.Escape;
+import org.testin.NavigateToCode;
+import org.testin.OpenCM;
+import org.testin.ViewDetails;
+import org.testin.clipboard.CopyTestCase;
+import org.testin.clipboard.CopyTestCaseNode;
+import org.testin.clipboard.CutTestCaseNode;
+import org.testin.clipboard.PasteTestCaseNode;
 import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.editorPanel.statusBar.NextPageAction;
+import org.testin.editorPanel.statusBar.PrevPageAction;
+import org.testin.generateCode.GenerateTestMethod;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.run.RunTestCase;
+import org.testin.testCase.CreateTestCaseAction;
+import org.testin.testCase.RemoveTestCaseAction;
+import org.testin.testCase.UpdateTestCaseAction;
+import org.testin.viewPanel.CloseTestCaseDetailsAction;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,17 +47,17 @@ public class TestEditorCM extends EditorContextMenu {
     public TestEditorCM(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
 
-        add(new CreateTestCase(ui, dir, list));
+        add(new CreateTestCaseAction(ui, dir, list));
         add(new ViewDetails(list, dir.getPath2()));
 
         addSeparator();
 
-        add(new UpdateTestCase(ui, list, dir.getPath()));
+        add(new UpdateTestCaseAction(ui, list, dir.getPath()));
         add(new CopyTestCase(list));
         add(new CopyTestCaseNode(list));
         add(new CutTestCaseNode(ui, list));
         add(new PasteTestCaseNode(ui, list));
-        add(new RemoveTestCase(project, dir, list, model));
+        add(new RemoveTestCaseAction(project, dir, list, model));
 
         addSeparator();
 
@@ -77,7 +84,7 @@ public class TestEditorCM extends EditorContextMenu {
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditorCM testEditorCM) {
         new Escape(list);
         new OpenCM(list, testEditorCM);
-        new CloseTestCaseDetails(list);
+        new CloseTestCaseDetailsAction(list);
     }
 
     @Override

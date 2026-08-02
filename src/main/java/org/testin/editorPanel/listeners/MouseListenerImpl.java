@@ -7,13 +7,13 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.NavigateToCode;
-import org.testin.actions.run.RunTestCase;
+import org.testin.NavigateToCode;
 import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
-import org.testin.pojo.CardHoverAction;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.DirectoryDto;
+import org.testin.enums.CardHoverAction;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.run.RunTestCase;
 import org.testin.util.logger.Logger;
 import org.testin.viewPanel.ViewToolWindowFactory;
 

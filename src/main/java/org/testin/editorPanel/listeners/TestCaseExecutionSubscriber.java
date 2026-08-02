@@ -4,7 +4,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.dto.TestCaseDto;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
@@ -16,12 +16,10 @@ import java.util.UUID;
 
 public class TestCaseExecutionSubscriber {
     private final Map<String, UUID> uuidToDtoId = new HashMap<>();
-    private final @NotNull JBList<TestCaseDto> list;
     private final ProjectIndexer indexer;
     private UUID runningDtoId = null;
 
     public TestCaseExecutionSubscriber(final @NotNull Project project, final @NotNull JBList<TestCaseDto> list, final @NotNull Disposable parentDisposable) {
-        this.list = list;
         this.indexer = Services.getInstance(project, ProjectIndexer.class);
 
         project.getMessageBus().connect(parentDisposable).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {

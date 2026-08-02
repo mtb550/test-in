@@ -12,7 +12,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.TestRunStatus;
+import org.testin.enums.TestRunStatus;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;

@@ -3,8 +3,8 @@ package org.testin.projectPanel.tree;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.pojo.ProjectStatus;
-import org.testin.pojo.dto.dirs.TestProjectDirectoryDto;
+import org.testin.enums.ProjectStatus;
+import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.logger.Logger;
 

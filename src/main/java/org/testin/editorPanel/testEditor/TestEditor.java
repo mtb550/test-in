@@ -16,22 +16,22 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.crud.CreateTestCase;
 import org.testin.editorPanel.IEditor;
-import org.testin.editorPanel.StatusBar;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.listeners.*;
+import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.TestToolBar;
 import org.testin.editorPanel.toolBar.components.FilterPopupBtn;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
 import org.testin.editorPanel.toolBar.components.TestDetailsPopupBtn;
-import org.testin.pojo.Group;
-import org.testin.pojo.Priority;
-import org.testin.pojo.TestEditorAttributes;
-import org.testin.pojo.dto.TestCaseDto;
-import org.testin.pojo.dto.dirs.TestSetDirectoryDto;
+import org.testin.enums.Group;
+import org.testin.enums.Priority;
+import org.testin.enums.TestEditorAttributes;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.testCase.CreateTestCaseAction;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.indexer.ProjectIndexer;
@@ -293,7 +293,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        new CreateTestCase(this, parent, list);
+        new CreateTestCaseAction(this, parent, list);
     }
 
     @Override
@@ -383,7 +383,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             list.setSelectedValue(selectedItem, true);
         }
 
-        statusBar.updatePaginationState(currentPage, totalPages, pageItems.size(), totalItems);
+        statusBar.updatePaginationState(currentPage, totalPages, totalItems);
     }
 
     private int getTotalPages(final List<TestCaseDto> filtered) {
