@@ -4,10 +4,12 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.*;
+import com.intellij.ui.components.JBCheckBox;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
+import org.testin.settings.AppSettingsState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +30,8 @@ public class GenerateReportDialog extends DialogWrapper {
     @Getter
     private File selectedFile;
 
+    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
+
     public GenerateReportDialog(final @NotNull Project project, final String suggestedFileName) {
         super(project, true);
 
@@ -47,10 +51,15 @@ public class GenerateReportDialog extends DialogWrapper {
         init();
         setSize(450, 200);
 
-        ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(
-                folderField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
-        folderField.addActionListener(browseListener);
-        SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
+            folderField.setText(defaultFolder);
+        } else {
+            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(
+                    folderField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+            folderField.addActionListener(browseListener);
+            SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+        }
     }
 
     @Nullable
@@ -89,6 +98,18 @@ public class GenerateReportDialog extends DialogWrapper {
         gbc.weightx = 1.0;
         panel.add(formatCombo, gbc);
 
+        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            gbc.anchor = GridBagConstraints.WEST;
+            panel.add(new JPanel(), gbc);
+
+            gbc.gridx = 1;
+            gbc.weightx = 1.0;
+            panel.add(setDefaultCheckBox, gbc);
+        }
+
         return panel;
     }
 
@@ -116,6 +137,10 @@ public class GenerateReportDialog extends DialogWrapper {
 
         selectedFile = new File(folder, fileName);
         selectedFormat = fmt;
+
+        if (setDefaultCheckBox.isSelected()) {
+            AppSettingsState.getInstance().defaultDownloadFolder = folder;
+        }
 
         super.doOKAction();
     }

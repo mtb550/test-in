@@ -16,6 +16,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     public String rootAutomationPath = "";
     public boolean readMode = false;
     public String logLevel = "INFO";
+    public String defaultDownloadFolder = "";
 
     public static AppSettingsState getInstance() {
         return ApplicationManager.getApplication().getService(AppSettingsState.class);

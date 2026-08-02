@@ -5,6 +5,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.*;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.components.JBCheckBox;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,6 +13,7 @@ import org.testin.enums.FileTypes;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.importExport.shared.TablePanelBuilder;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.settings.AppSettingsState;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,6 +43,8 @@ public class ExportDialog extends DialogWrapper {
     @Getter
     private File selectedFile;
 
+    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
+
     public ExportDialog(final @NotNull Project project, final List<TestEditorAttributes> exportAttributes, final Map<String, List<TestCaseDto>> sheetsData, final VirtualFile exportTarget) {
         super(project, true);
         this.project = project;
@@ -65,9 +69,14 @@ public class ExportDialog extends DialogWrapper {
         init();
         setSize(900, 600);
 
-        ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(folderField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
-        folderField.addActionListener(browseListener);
-        SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
+            folderField.setText(defaultFolder);
+        } else {
+            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(folderField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+            folderField.addActionListener(browseListener);
+            SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+        }
     }
 
     @Nullable
@@ -107,6 +116,18 @@ public class ExportDialog extends DialogWrapper {
         gbc.weightx = 1.0;
         topPanel.add(formatCombo, gbc);
 
+        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
+            gbc.gridx = 0;
+            gbc.gridy = 3;
+            gbc.anchor = GridBagConstraints.WEST;
+            topPanel.add(new JPanel(), gbc);
+
+            gbc.gridx = 1;
+            gbc.weightx = 1.0;
+            topPanel.add(setDefaultCheckBox, gbc);
+        }
+
         panel.add(topPanel, BorderLayout.NORTH);
         panel.add(new TablePanelBuilder().createTabbedPane(originalSheetsData, exportAttributes, project, model -> {
         }), BorderLayout.CENTER);
@@ -136,6 +157,10 @@ public class ExportDialog extends DialogWrapper {
 
         selectedFile = new File(folder, fileName);
         selectedFormat = fmt;
+
+        if (setDefaultCheckBox.isSelected()) {
+            AppSettingsState.getInstance().defaultDownloadFolder = folder;
+        }
 
         super.doOKAction();
     }

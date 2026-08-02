@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTabbedPane;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +17,7 @@ import org.testin.importExport.shared.CellEditListener;
 import org.testin.importExport.shared.FileDocumentListener;
 import org.testin.importExport.shared.TablePanelBuilder;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.settings.AppSettingsState;
 import org.testin.util.autoGenerator.CodeGenerator;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.notifications.Notifier;
@@ -44,6 +46,8 @@ public class ImportDialog extends DialogWrapper {
 
     private final TextFieldWithBrowseButton fileField = new TextFieldWithBrowseButton();
 
+    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
+
     private Map<String, List<TestCaseDto>> originalSheetsData = new LinkedHashMap<>();
 
     private JBTabbedPane tableTabbedPane;
@@ -71,9 +75,14 @@ public class ImportDialog extends DialogWrapper {
         init();
         setSize(900, 600);
 
-        ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
-        fileField.addActionListener(browseListener);
-        SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(fileField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
+            fileField.setText(defaultFolder);
+        } else {
+            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+            fileField.addActionListener(browseListener);
+            SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(fileField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+        }
     }
 
     private void onDataLoaded(final Map<String, List<TestCaseDto>> parsedData) {
@@ -112,6 +121,18 @@ public class ImportDialog extends DialogWrapper {
         gbc.gridx = 1;
         gbc.weightx = 1.0;
         topPanel.add(cg, gbc);
+
+        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            gbc.anchor = GridBagConstraints.WEST;
+            topPanel.add(new JPanel(), gbc);
+
+            gbc.gridx = 1;
+            gbc.weightx = 1.0;
+            topPanel.add(setDefaultCheckBox, gbc);
+        }
 
         panel.add(topPanel, BorderLayout.NORTH);
 
@@ -163,6 +184,14 @@ public class ImportDialog extends DialogWrapper {
         if (!hasSelection) {
             Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select at least one test case to import.");
             return;
+        }
+
+        if (setDefaultCheckBox.isSelected()) {
+            File selectedFile = new File(filePath);
+            File parentFolder = selectedFile.getParentFile();
+            if (parentFolder != null) {
+                AppSettingsState.getInstance().defaultDownloadFolder = parentFolder.getAbsolutePath();
+            }
         }
 
         super.doOKAction();

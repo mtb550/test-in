@@ -1,8 +1,11 @@
 package org.testin.settings;
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.ui.TextComponentAccessor;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
@@ -27,6 +30,7 @@ public final class SettingsConfigurable implements Configurable {
 
     private final TestinPathPanel testinPathPanel = new TestinPathPanel();
     private final JBTextField rootAutomationPathField = new JBTextField();
+    private final TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
     private final ComboBox<String> logLevelComboBox;
     private final Project project;
@@ -48,6 +52,12 @@ public final class SettingsConfigurable implements Configurable {
         rootAutomationPathField.setToolTipText(
                 "Automatically detected base package path for your automation framework");
 
+        downloadFolderField.addBrowseFolderListener(project, FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                        .withTitle("Select Default Download Folder")
+                        .withDescription("Choose the default folder for imports, exports, and reports"),
+                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+        );
+
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("Root testin folder: "), testinPathPanel.getComponent(), 1, false)
                 .addLabeledComponent(new JBLabel("Root Automation folder: "), rootAutomationPathField, 1, false)
@@ -55,6 +65,8 @@ public final class SettingsConfigurable implements Configurable {
                 .addComponent(readModeCheckBox)
                 .addVerticalGap(5)
                 .addLabeledComponent("Log level: ", logLevelComboBox)
+                .addVerticalGap(5)
+                .addLabeledComponent(new JBLabel("Default download folder: "), downloadFolderField, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
     }
@@ -66,6 +78,7 @@ public final class SettingsConfigurable implements Configurable {
         modified |= !rootAutomationPathField.getText().equals(settings.rootAutomationPath);
         modified |= readModeCheckBox.isSelected() != settings.readMode;
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
+        modified |= !downloadFolderField.getText().equals(settings.defaultDownloadFolder);
         return modified;
     }
 
@@ -77,6 +90,7 @@ public final class SettingsConfigurable implements Configurable {
         settings.rootAutomationPath = rootAutomationPathField.getText();
         settings.readMode = readModeCheckBox.isSelected();
         settings.logLevel = (String) logLevelComboBox.getSelectedItem();
+        settings.defaultDownloadFolder = downloadFolderField.getText();
 
         Logger.setLogLevel(Logger.Level.valueOf(settings.logLevel));
 
@@ -117,6 +131,7 @@ public final class SettingsConfigurable implements Configurable {
 
         readModeCheckBox.setSelected(settings.readMode);
         logLevelComboBox.setSelectedItem(settings.logLevel);
+        downloadFolderField.setText(settings.defaultDownloadFolder);
     }
 
 }
