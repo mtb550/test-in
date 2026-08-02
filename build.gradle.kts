@@ -38,26 +38,19 @@ dependencies {
     }
 
     listOf(
-        "implementation", "compileOnly", "annotationProcessor",
-        "testCompileOnly", "testAnnotationProcessor"
+        "implementation", "compileOnly", "annotationProcessor", "testCompileOnly", "testAnnotationProcessor"
     ).forEach { configName ->
         add(configName, libs.lombok)
     }
 
     implementation(libs.jackson.databind)
     implementation(libs.jackson.datatype.jsr310)
-
     implementation(libs.json.path)
-
     implementation(libs.commons.io)
-
     testImplementation(libs.testng)
-
     implementation(libs.iText.kernel)
     implementation(libs.iText.layout)
-
     implementation(libs.fastexcel)
-
     implementation(libs.poi)
     implementation(libs.poi.ooxml)
 }

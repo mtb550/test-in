@@ -11,22 +11,24 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.SimpleTree;
-import git4idea.checkin.GitUserNameNotDefinedDialog;
+import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.util.*;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
+import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 // todo: to be refactored
@@ -242,11 +244,7 @@ public class ViewPendingCommits extends DumbAwareAction {
 
     private void promptAndSetGitIdentity(final @NotNull Project project, final Path repoPath, final String pendingCommitMessage) {
         ApplicationManager.getApplication().invokeLater(() -> {
-
-            VirtualFile vRepoPath = LocalFileSystem.getInstance().findFileByIoFile(repoPath.toFile());
-            if (vRepoPath == null) return;
-
-            GitUserNameNotDefinedDialog dialog = new GitUserNameNotDefinedDialog(project, Collections.singletonList(vRepoPath), Collections.singletonList(vRepoPath), Collections.emptyMap(), "Set Identity and Commit");
+            GitIdentityDialog dialog = new GitIdentityDialog(project);
 
             if (dialog.showAndGet()) {
                 String name = dialog.getUserName();
@@ -280,5 +278,43 @@ public class ViewPendingCommits extends DumbAwareAction {
                 });
             }
         });
+    }
+
+    private static class GitIdentityDialog extends DialogWrapper {
+        private final JBTextField nameField = new JBTextField();
+        private final JBTextField emailField = new JBTextField();
+        private final JBCheckBox globalCheckBox = new JBCheckBox("Set globally");
+
+        public GitIdentityDialog(@Nullable Project project) {
+            super(project, true);
+            setTitle("Set Git Identity and Commit");
+            init();
+        }
+
+        @Override
+        protected @Nullable JComponent createCenterPanel() {
+            return FormBuilder.createFormBuilder()
+                    .addLabeledComponent("Name:", nameField)
+                    .addLabeledComponent("Email:", emailField)
+                    .addComponent(globalCheckBox)
+                    .getPanel();
+        }
+
+        @Override
+        public @Nullable JComponent getPreferredFocusedComponent() {
+            return nameField;
+        }
+
+        public String getUserName() {
+            return nameField.getText();
+        }
+
+        public String getUserEmail() {
+            return emailField.getText();
+        }
+
+        public boolean isSetGlobalConfig() {
+            return globalCheckBox.isSelected();
+        }
     }
 }
