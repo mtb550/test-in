@@ -22,7 +22,7 @@ import org.testin.util.IconManager;
 import java.util.*;
 import java.util.function.Supplier;
 
-public class FilterPopup extends AbstractButton implements IToolbarItem {
+public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
     @Getter
     private final Set<Group> selectedGroup = new HashSet<>();
 
@@ -43,7 +43,7 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
 
     private final IToolBar callbacks;
 
-    public FilterPopup(final IToolBar callbacks, final Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final Supplier<Set<String>> availableModulesSupplier) {
+    public FilterPopupBtn(final IToolBar callbacks, final Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final Supplier<Set<String>> availableModulesSupplier) {
         super("Filter", AllIcons.General.Filter);
         this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;
@@ -157,7 +157,6 @@ public class FilterPopup extends AbstractButton implements IToolbarItem {
         });
         filterResetBtn.add(filterGroupMenu);
 
-        // module filter
         ActionGroup filterModuleMenu = new ActionGroup("Module", true) {
             @Override
             public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {

@@ -20,8 +20,10 @@ public class RunToolBar extends AbstractToolbarPanel {
                 new StartExecutionBtn(getCallbacks(), getCallbacks()::onStartExecutionClicked),
                 new GenerateReportBtn(project),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
-                new RunDetailsPopup(getCallbacks()::onToolBarDetailsSelectionChanged),
-                new FilterPopup(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules)
+                new RunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
+                new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules),
+                new ViewToggleBtn()
+                // todo, why tool bar search not here ?
         );
     }
 }

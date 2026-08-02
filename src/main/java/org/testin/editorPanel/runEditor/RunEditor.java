@@ -24,8 +24,8 @@ import org.testin.editorPanel.listeners.StatusBarListener;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.RunToolBar;
-import org.testin.editorPanel.toolBar.components.FilterPopup;
-import org.testin.editorPanel.toolBar.components.RunDetailsPopup;
+import org.testin.editorPanel.toolBar.components.FilterPopupBtn;
+import org.testin.editorPanel.toolBar.components.RunDetailsPopupBtn;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.pojo.*;
@@ -57,7 +57,6 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Getter
     private final Project project;
 
-    private final Disposable projectDisposable;
     @Getter
     private final TestRunDirectoryDto parent;
 
@@ -114,7 +113,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         this.project = project;
         this.parent = vf.getTestRun();
 
-        this.projectDisposable = Disposer.newDisposable();
+        final Disposable projectDisposable = Disposer.newDisposable();
         Disposer.register(project, projectDisposable);
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -261,7 +260,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarRefreshButtonClicked() {
-        FilterPopup toolBarFilter = toolBar.getToolbarItem(FilterPopup.class);
+        FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null)
             toolBarFilter.resetToolBarFilter();
 
@@ -290,7 +289,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     public Set<RunEditorAttributes> getSelectedDetails() {
         AbstractToolbarPanel baseToolBar = getToolBar();
         if (baseToolBar != null) {
-            RunDetailsPopup popup = baseToolBar.getToolbarItem(RunDetailsPopup.class);
+            RunDetailsPopupBtn popup = baseToolBar.getToolbarItem(RunDetailsPopupBtn.class);
             if (popup != null) {
                 return popup.getSelectedDetails();
             }
@@ -355,9 +354,9 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         final String query = (toolBar != null && toolBar.getSearchTxt() != null)
                 ? toolBar.getSearchTxt().getSearchQuery() : "";
 
-        FilterPopup filterPopup = null;
+        FilterPopupBtn filterPopup = null;
         if (toolBar != null) {
-            filterPopup = toolBar.getToolbarItem(FilterPopup.class);
+            filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
         }
 
         final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();

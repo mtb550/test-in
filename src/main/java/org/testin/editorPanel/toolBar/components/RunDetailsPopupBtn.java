@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class RunDetailsPopup extends AbstractButton implements IToolbarItem {
+public class RunDetailsPopupBtn extends AbstractButton implements IToolbarItem {
 
     private static final String KEY_DETAILS = "testin.selectedDetails.run.v4";
 
@@ -25,7 +25,7 @@ public class RunDetailsPopup extends AbstractButton implements IToolbarItem {
     @Getter
     private final Set<RunEditorAttributes> selectedDetails = new HashSet<>();
 
-    public RunDetailsPopup(final Runnable onToolBarDetailsSelectedChanged) {
+    public RunDetailsPopupBtn(final Runnable onToolBarDetailsSelectedChanged) {
         super("Details", AllIcons.Actions.PreviewDetailsVertically);
 
         final PropertiesComponent props = PropertiesComponent.getInstance();

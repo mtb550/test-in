@@ -16,8 +16,10 @@ public class TestToolBar extends AbstractToolbarPanel {
         return List.of(
                 new CreateTestCaseBtn(getCallbacks()::onToolBarCreateTestCaseClicked),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
-                new TestDetailsPopup(getCallbacks()::onToolBarDetailsSelectionChanged),
-                new FilterPopup(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules)
+                new TestDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
+                new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules),
+                new ViewToggleBtn()
+                // todo, why tool bar search not here ?
         );
     }
 }

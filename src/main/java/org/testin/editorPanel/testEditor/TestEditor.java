@@ -24,9 +24,9 @@ import org.testin.editorPanel.listeners.*;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.TestToolBar;
-import org.testin.editorPanel.toolBar.components.FilterPopup;
+import org.testin.editorPanel.toolBar.components.FilterPopupBtn;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
-import org.testin.editorPanel.toolBar.components.TestDetailsPopup;
+import org.testin.editorPanel.toolBar.components.TestDetailsPopupBtn;
 import org.testin.pojo.Group;
 import org.testin.pojo.Priority;
 import org.testin.pojo.TestEditorAttributes;
@@ -52,8 +52,6 @@ import java.util.stream.Collectors;
 public class TestEditor implements Disposable, IToolBar, IEditor {
     @Getter
     private final Project project;
-
-    private final Disposable projectDisposable;
 
     @Getter
     private final TestSetDirectoryDto parent;
@@ -102,7 +100,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.project = project;
         this.parent = vf.getTestSet();
 
-        this.projectDisposable = Disposer.newDisposable();
+        final Disposable projectDisposable = Disposer.newDisposable();
         Disposer.register(project, projectDisposable);
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -242,7 +240,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         if (tc == null) return;
 
         if (!currentTestCases.contains(tc)) {
-            FilterPopup popup = toolBar.getToolbarItem(FilterPopup.class);
+            FilterPopupBtn popup = toolBar.getToolbarItem(FilterPopupBtn.class);
             if (popup != null) popup.resetToolBarFilter();
 
             currentTestCases.clear();
@@ -331,7 +329,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarRefreshButtonClicked() {
-        FilterPopup toolBarFilter = toolBar.getToolbarItem(FilterPopup.class);
+        FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null) {
             toolBarFilter.resetToolBarFilter();
         }
@@ -355,7 +353,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     public Set<TestEditorAttributes> getSelectedDetails() {
         AbstractToolbarPanel baseToolBar = getToolBar();
         if (baseToolBar != null) {
-            TestDetailsPopup popup = baseToolBar.getToolbarItem(TestDetailsPopup.class);
+            TestDetailsPopupBtn popup = baseToolBar.getToolbarItem(TestDetailsPopupBtn.class);
             if (popup != null) {
                 return popup.getSelectedDetails();
             }
@@ -423,9 +421,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         final String query = (toolBar != null && toolBar.getSearchTxt() != null)
                 ? toolBar.getSearchTxt().getSearchQuery() : "";
 
-        FilterPopup filterPopup = null;
+        FilterPopupBtn filterPopup = null;
         if (toolBar != null) {
-            filterPopup = toolBar.getToolbarItem(FilterPopup.class);
+            filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
         }
 
         final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
