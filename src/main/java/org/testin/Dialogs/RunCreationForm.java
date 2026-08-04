@@ -36,6 +36,9 @@ public class RunCreationForm {
 
     private final Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
 
+    private final JBTextField descriptionField;
+    private final JBTextField commitIdField;
+
     public RunCreationForm(final String runName, final CheckedTreeNode root, final Map<UUID, TestRunItems> resultsMap) {
         mainPanel = new JBPanel<>(new BorderLayout());
 
@@ -59,6 +62,12 @@ public class RunCreationForm {
 
             formBuilder.addLabeledComponent(label, inputComponent);
         }
+
+        // Free-text fields for description and commit ID
+        descriptionField = new JBTextField();
+        commitIdField = new JBTextField();
+        formBuilder.addLabeledComponent("Description:", descriptionField);
+        formBuilder.addLabeledComponent("Commit ID:", commitIdField);
 
         JPanel configurationPanel = formBuilder.getPanel();
         configurationPanel.setBorder(JBUI.Borders.compound(
@@ -114,7 +123,9 @@ public class RunCreationForm {
                 .setLanguage(getFieldValue(TestRunConfiguration.LANGUAGE))
                 .setBrowser(getFieldValue(TestRunConfiguration.BROWSER))
                 .setDeviceType(getFieldValue(TestRunConfiguration.DEVICE_TYPE))
-                .setTestType(getFieldValue(TestRunConfiguration.TEST_TYPE));
+                .setTestType(getFieldValue(TestRunConfiguration.TEST_TYPE))
+                .setDescription(descriptionField.getText().trim())
+                .setCommitId(commitIdField.getText().trim());
     }
 
     public String getFieldValue(final TestRunConfiguration field) {
