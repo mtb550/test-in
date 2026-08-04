@@ -44,13 +44,9 @@ public final class TestRunHtmlGenerator {
         final String runName = tr.getRunName().replace(".json", "");
         final String platform = tr.getPlatform();
         final AppSettingsState settings = AppSettingsState.getInstance();
-        final String testerName = settings.testerName != null && !settings.testerName.trim().isEmpty()
-                ? settings.testerName.trim()
-                : trdir.getMarker().getCreatedBy();
-        final String testerRole = settings.testerRole != null && !settings.testerRole.trim().isEmpty()
-                ? settings.testerRole.trim()
-                : "Quality Expert";
-        final String executedBy = testerName;
+        final String testerName = settings.testerName;
+        final String testerRole = settings.testerRole;
+        final String executedBy = testerName; // todo, to be changed to be like pdf generator calss, get all executed by values.
         final String execDate = trdir.getMarker().getCreatedAt().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.US));
         final String runStatus = trdir.getMarker().getStatus().getLabel();
 

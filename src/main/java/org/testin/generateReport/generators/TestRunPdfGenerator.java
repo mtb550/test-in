@@ -1,5 +1,6 @@
 package org.testin.generateReport.generators;
 
+import com.intellij.openapi.project.Project;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
@@ -24,9 +25,12 @@ import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
+import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.AppSettingsState;
 import org.testin.util.logger.Logger;
+import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,7 +57,7 @@ public final class TestRunPdfGenerator {
     private final DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
     private final DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC); // #0052cc, matches HTML footer link
 
-    public byte[] generate(final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(baos);
             PdfDocument pdf = new PdfDocument(writer);
@@ -64,6 +68,14 @@ public final class TestRunPdfGenerator {
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
             String cleanName = tr.getRunName().replace(".json", "");
+
+            // Project name from the project selector combo box (selected value)
+            String projectName = "";
+            TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(project, ProjectPanel.class)
+                    .getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+            if (selectedProject != null) {
+                projectName = selectedProject.getName();
+            }
 
             // Tester identity from settings (fallback to marker / literal)
             AppSettingsState settings = AppSettingsState.getInstance();
@@ -106,7 +118,7 @@ public final class TestRunPdfGenerator {
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
-            addOverviewRow(overviewTable, "Project", cleanName, boldFont, regularFont);
+            addOverviewRow(overviewTable, "Project", projectName, boldFont, regularFont);
             addOverviewRow(overviewTable, "Sprint / Cycle", cleanName, boldFont, regularFont);
             addOverviewRow(overviewTable, "Test Type", !tr.getLanguage().isEmpty() ? tr.getLanguage() : "Functional Testing", boldFont, regularFont);
             addOverviewRow(overviewTable, "Platform", tr.getPlatform() + (!tr.getBrowser().isEmpty() ? " / " + tr.getBrowser() : ""), boldFont, regularFont);

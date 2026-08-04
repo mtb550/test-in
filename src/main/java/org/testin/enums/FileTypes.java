@@ -85,7 +85,7 @@ public enum FileTypes {
             null,
             null,
             null,
-            (project, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(trDir, tr, detailsMap)
+            (project, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(project, trDir, tr, detailsMap)
     );
 
     // todo: add XML object.
