@@ -92,7 +92,7 @@ public final class TestRunPdfGenerator {
             // ════════════════════════════════════════════════════════════════
             // SUBTITLE — 12pt, #2E5496, with bottom border #1F3864 (single, 8px)
             // ════════════════════════════════════════════════════════════════
-            Paragraph subtitle = new Paragraph(projectName + "  |  " + tr.getPlatform())
+            Paragraph subtitle = new Paragraph(projectName + "  |  " + "Web - Frontend")
                     .setFont(regularFont).setFontSize(10).setFontColor(MEDIUM_BLUE)
                     .setPaddingBottom(4)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 2f))
@@ -126,13 +126,16 @@ public final class TestRunPdfGenerator {
 
             addOverviewRow(overviewTable, "Project", projectName, boldFont, regularFont);
 
-            addOverviewRow(overviewTable, "Sprint / Cycle", tr.getDescription(), boldFont, regularFont);
+            addOverviewRow(overviewTable, "Sprint / Cycle", "DGA changes, Update Complaints SLA to 5 days", boldFont, regularFont);
+
+            addOverviewRow(overviewTable, "Branch ID", "n\\a", boldFont, regularFont);
+
 
             if (!tr.getTestType().isEmpty())
-                addOverviewRow(overviewTable, "Test Type", tr.getTestType(), boldFont, regularFont);
+                addOverviewRow(overviewTable, "Test Type", "Functional Test", boldFont, regularFont);
 
             if (!tr.getPlatform().isEmpty())
-                addOverviewRow(overviewTable, "Platform", tr.getPlatform() + (!tr.getBrowser().isEmpty() ? " / " + tr.getBrowser() : ""), boldFont, regularFont);
+                addOverviewRow(overviewTable, "Platform", "Web - Frontend", boldFont, regularFont);
 
             // Executed By: all distinct tester names across results, no repeats
             String executedByAll = tr.getResults().stream()
@@ -242,7 +245,7 @@ public final class TestRunPdfGenerator {
             // Page break before this section (per template)
             // ════════════════════════════════════════════════════════════════
             if (failed > 0) {
-                document.add(new AreaBreak());
+                //document.add(new AreaBreak());
                 buildCaseTable(document, "4", "Failed Test Cases",
                         "The following %d cases failed and require remediation. Real-user identification validation is the primary defect cluster.",
                         failed, tr, detailsMap, boldFont, regularFont, RED, true, true, true,
@@ -297,9 +300,9 @@ public final class TestRunPdfGenerator {
             footerCanvas.add(new Paragraph()
                     .setFont(regularFont).setFontSize(8).setFontColor(DARK_GRAY)
                     .setTextAlignment(TextAlignment.CENTER)
-                    .add(new Text("Prepared by "))
-                    .add(new Text(testerName))
-                    .add(new Text(" — " + testerRole + "  |  "))
+//                    .add(new Text("Prepared by "))
+//                    .add(new Text(testerName))
+//                    .add(new Text(" — " + testerRole + "  |  "))
                     .add(new Text(execDate))
                     .add(new Text("  |  Generated automatically by "))
                     .add(new Link("Testin", PdfAction.createURI("https://plugins.jetbrains.com/plugin/31514-testin"))
