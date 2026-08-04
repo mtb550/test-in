@@ -16,6 +16,7 @@ import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
+import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
@@ -210,7 +211,7 @@ public final class TestRunPdfGenerator {
                 document.add(new AreaBreak());
                 buildCaseTable(document, "4", "Failed Test Cases",
                         "The following %d cases failed and require remediation. Real-user identification validation is the primary defect cluster.",
-                        failed, tr, detailsMap, boldFont, regularFont, DARK_NAVY, true, true, true,
+                        failed, tr, detailsMap, boldFont, regularFont, RED, true, true, true,
                         item -> item.getStatus() == TestStatus.FAILED);
             }
 
@@ -312,18 +313,11 @@ public final class TestRunPdfGenerator {
 
         // Column widths depend on which extra columns are shown
         int extraCols = (withPriority ? 1 : 0) + (withSeverity ? 1 : 0);
-        float[] widths;
-        switch (extraCols) {
-            case 0:
-                widths = new float[]{7, 93};
-                break;
-            case 1:
-                widths = new float[]{7, 83, 10};
-                break;
-            default:
-                widths = new float[]{7, 73, 10, 10};
-                break;
-        }
+        float[] widths = switch (extraCols) {
+            case 0 -> new float[]{7, 93};
+            case 1 -> new float[]{7, 83, 10};
+            default -> new float[]{7, 73, 10, 10};
+        };
         Table table = new Table(UnitValue.createPercentArray(widths))
                 .useAllAvailableWidth()
                 .setBorder(Border.NO_BORDER);
@@ -389,6 +383,7 @@ public final class TestRunPdfGenerator {
                         .setBackgroundColor(rowBg)
                         .setBorder(new SolidBorder(BORDER_GRAY, 1))
                         .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
                         .add(new Paragraph(priText)
                                 .setFont(boldFont).setFontSize(9.5f).setFontColor(priColor)
                                 .setTextAlignment(TextAlignment.CENTER)));
@@ -406,6 +401,7 @@ public final class TestRunPdfGenerator {
                         .setBackgroundColor(rowBg)
                         .setBorder(new SolidBorder(BORDER_GRAY, 1))
                         .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
+                        .setVerticalAlignment(VerticalAlignment.MIDDLE)
                         .add(new Paragraph(sevText)
                                 .setFont(boldFont).setFontSize(9.5f).setFontColor(sevColor)
                                 .setTextAlignment(TextAlignment.CENTER)));
