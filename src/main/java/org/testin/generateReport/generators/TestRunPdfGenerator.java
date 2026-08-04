@@ -4,10 +4,12 @@ import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
+import com.itextpdf.kernel.geom.Rectangle;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.kernel.pdf.action.PdfAction;
-import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
+import com.itextpdf.kernel.pdf.canvas.PdfCanvas;
+import com.itextpdf.layout.Canvas;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
@@ -32,6 +34,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public final class TestRunPdfGenerator {
 
@@ -105,7 +108,14 @@ public final class TestRunPdfGenerator {
             addOverviewRow(overviewTable, "Sprint / Cycle", cleanName, boldFont, regularFont);
             addOverviewRow(overviewTable, "Test Type", !tr.getLanguage().isEmpty() ? tr.getLanguage() : "Functional Testing", boldFont, regularFont);
             addOverviewRow(overviewTable, "Platform", tr.getPlatform() + (!tr.getBrowser().isEmpty() ? " / " + tr.getBrowser() : ""), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Executed By", testerName, boldFont, regularFont);
+            // Executed By: all distinct tester names across results, no repeats
+            String executedByAll = tr.getResults().stream()
+                    .map(TestRunItems::getExecutedBy)
+                    .filter(s -> !s.trim().isEmpty())
+                    .distinct()
+                    .collect(Collectors.joining(", "));
+            addOverviewRow(overviewTable, "Executed By",
+                    executedByAll.isEmpty() ? "—" : executedByAll, boldFont, regularFont);
             addOverviewRow(overviewTable, "Execution Date", tr.getCreatedAt().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), boldFont, regularFont);
             addOverviewRow(overviewTable, "Run Status", trDir.getMarker().getStatus().name(), boldFont, regularFont);
 
@@ -225,34 +235,42 @@ public final class TestRunPdfGenerator {
             }
 
             // ════════════════════════════════════════════════════════════════
-            // FOOTER — matches the TestRunHtmlGenerator footer
+            // FOOTER — pinned to the bottom of the last page
             // ════════════════════════════════════════════════════════════════
-            // Horizontal rule (HTML footer's border-top: 1px solid #d0d7e5)
-            SolidLine solidLine = new SolidLine(1);
-            solidLine.setColor(BORDER_GRAY);
-            LineSeparator footerRule = new LineSeparator(solidLine);
-            footerRule.setMarginTop(30);
-            document.add(footerRule);
+            // Draw on the last page, in the bottom margin zone (below the content
+            // area) so it never overlaps body content even on a full page.
+            float pageWidth = pdf.getDefaultPageSize().getWidth();
+            float leftMargin = document.getLeftMargin();
+            float rightMargin = document.getRightMargin();
 
-            // Line 1: Prepared by <b>executedBy</b> — Quality Expert  |  execDate
+            Canvas footerCanvas = new Canvas(pdf.getLastPage(),
+                    new Rectangle(leftMargin, 0, pageWidth - leftMargin - rightMargin, 28));
+
+            // Horizontal rule above the footer text (HTML footer's border-top)
+            PdfCanvas pdfCanvas = footerCanvas.getPdfCanvas();
+            pdfCanvas.setStrokeColor(BORDER_GRAY);
+            pdfCanvas.setLineWidth(1.0f);
+            pdfCanvas.moveTo(leftMargin, 34);
+            pdfCanvas.lineTo(pageWidth - rightMargin, 34);
+            pdfCanvas.stroke();
+
+            // Footer — all text on a single line:
+            // Prepared by <b>executedBy</b> — Quality Expert  |  execDate  |  Generated automatically by <b>Testin</b> IntelliJ plugin
             String execDate = trDir.getMarker().getCreatedAt()
                     .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.US));
-            document.add(new Paragraph()
-                    .setFont(regularFont).setFontSize(9).setFontColor(DARK_GRAY)
+            footerCanvas.add(new Paragraph()
+                    .setFont(regularFont).setFontSize(8).setFontColor(DARK_GRAY)
                     .setTextAlignment(TextAlignment.CENTER)
                     .add(new Text("Prepared by "))
-                    .add(new Text(testerName).setFont(boldFont))
+                    .add(new Text(testerName))
                     .add(new Text(" — " + testerRole + "  |  "))
-                    .add(new Text(execDate)));
-
-            // Line 2: Generated automatically by <b>Testin</b> IntelliJ plugin (marketplace hyperlink)
-            document.add(new Paragraph()
-                    .setFont(regularFont).setFontSize(9).setFontColor(DARK_GRAY)
-                    .setTextAlignment(TextAlignment.CENTER)
-                    .add(new Text("Generated automatically by "))
+                    .add(new Text(execDate))
+                    .add(new Text("  |  Generated automatically by "))
                     .add(new Link("Testin", PdfAction.createURI("https://plugins.jetbrains.com/plugin/31514-testin"))
-                            .setFont(boldFont).setFontColor(LINK_BLUE))
+                            .setFontColor(LINK_BLUE))
                     .add(new Text(" IntelliJ plugin.")));
+
+            footerCanvas.close();
 
             document.close();
             return baos.toByteArray();
