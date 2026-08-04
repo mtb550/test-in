@@ -18,6 +18,7 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.BugPriority;
+import org.testin.enums.BugSeverity;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
@@ -209,7 +210,7 @@ public final class TestRunPdfGenerator {
                 document.add(new AreaBreak());
                 buildCaseTable(document, "4", "Failed Test Cases",
                         "The following %d cases failed and require remediation. Real-user identification validation is the primary defect cluster.",
-                        failed, tr, detailsMap, boldFont, regularFont, DARK_NAVY,
+                        failed, tr, detailsMap, boldFont, regularFont, DARK_NAVY, true, true, true,
                         item -> item.getStatus() == TestStatus.FAILED);
             }
 
@@ -219,7 +220,7 @@ public final class TestRunPdfGenerator {
             if (passed > 0) {
                 buildCaseTable(document, "5", "Passed Test Cases",
                         "The following %d cases passed validation and behaved as expected across all verification points.",
-                        passed, tr, detailsMap, boldFont, regularFont, GREEN,
+                        passed, tr, detailsMap, boldFont, regularFont, GREEN, false, false, false,
                         item -> item.getStatus() == TestStatus.PASSED);
             }
 
@@ -230,7 +231,7 @@ public final class TestRunPdfGenerator {
             if (pendingTotal > 0) {
                 buildCaseTable(document, "6", "Pending Test Cases",
                         "The following %d cases were not executed in this cycle, primarily blocked by environment/data dependencies. They are carried forward to the next run.",
-                        pendingTotal, tr, detailsMap, boldFont, regularFont, DARK_YELLOW,
+                        pendingTotal, tr, detailsMap, boldFont, regularFont, DARK_YELLOW, false, false, false,
                         item -> item.getStatus() == TestStatus.PENDING || item.getStatus() == TestStatus.UNTESTED || item.getStatus() == TestStatus.BLOCKED);
             }
 
@@ -284,7 +285,8 @@ public final class TestRunPdfGenerator {
     // ─── helpers ───────────────────────────────────────────────────────────
 
     /**
-     * Builds a 3-column table (#, Test Case, Priority) for a filtered set of results.
+     * Builds a filtered table of results.
+     * Columns: # | Test Case [ | Priority ] [ | Severity ] depending on flags.
      *
      * @param sectionNumber  the section number label (e.g. "4")
      * @param sectionTitle   the section heading text
@@ -293,9 +295,12 @@ public final class TestRunPdfGenerator {
      * @param tr             the TestRunDto containing results
      * @param detailsMap     map of UUID -> TestCaseDto for test case names
      * @param headerBg       background color for the header row
+     * @param withPriority   whether to include the Priority column
+     * @param withSeverity   whether to include the Severity column
+     * @param withActualResult whether to add an \"Actual result: ...\" line inside the Test Case cell
      * @param filter         predicate to select which items go into the table
      */
-    private void buildCaseTable(Document document, String sectionNumber, String sectionTitle, String descriptionFmt, long count, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap, PdfFont boldFont, PdfFont regularFont, DeviceRgb headerBg, Predicate<TestRunItems> filter) {
+    private void buildCaseTable(Document document, String sectionNumber, String sectionTitle, String descriptionFmt, long count, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap, PdfFont boldFont, PdfFont regularFont, DeviceRgb headerBg, boolean withPriority, boolean withSeverity, boolean withActualResult, Predicate<TestRunItems> filter) {
         document.add(new Paragraph(sectionNumber + ". " + sectionTitle)
                 .setFont(boldFont).setFontSize(13).setFontColor(DARK_NAVY)
                 .setMarginBottom(8).setMarginTop(16));
@@ -305,15 +310,29 @@ public final class TestRunPdfGenerator {
                 .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                 .setMarginBottom(12));
 
-        // 3-column table: # | Test Case | Priority
-        Table table = new Table(UnitValue.createPercentArray(new float[]{7, 79, 14}))
+        // Column widths depend on which extra columns are shown
+        int extraCols = (withPriority ? 1 : 0) + (withSeverity ? 1 : 0);
+        float[] widths;
+        switch (extraCols) {
+            case 0:
+                widths = new float[]{7, 93};
+                break;
+            case 1:
+                widths = new float[]{7, 83, 10};
+                break;
+            default:
+                widths = new float[]{7, 73, 10, 10};
+                break;
+        }
+        Table table = new Table(UnitValue.createPercentArray(widths))
                 .useAllAvailableWidth()
                 .setBorder(Border.NO_BORDER);
 
         // Header row
         addCaseTableHeader(table, "#", headerBg, boldFont);
         addCaseTableHeader(table, "Test Case", headerBg, boldFont);
-        addCaseTableHeader(table, "Priority", headerBg, boldFont);
+        if (withPriority) addCaseTableHeader(table, "Priority", headerBg, boldFont);
+        if (withSeverity) addCaseTableHeader(table, "Severity", headerBg, boldFont);
 
         // Data rows — alternating LIGHT_BG / WHITE
         int idx = 1;
@@ -344,27 +363,53 @@ public final class TestRunPdfGenerator {
             if (tcName.isEmpty()) {
                 tcName = "—";
             }
-            table.addCell(new Cell()
+            Cell testCaseCell = new Cell()
                     .setBackgroundColor(rowBg)
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
-                    .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
-                    .add(new Paragraph(tcName)
-                            .setFont(regularFont).setFontSize(9.5f).setFontColor(BLACK)));
+                    .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6);
+            testCaseCell.add(new Paragraph(tcName)
+                    .setFont(regularFont).setFontSize(9.5f).setFontColor(BLACK)
+                    .setMarginBottom(0));
+            if (withActualResult) {
+                String actualResult = item.getActualResult();
+                if (actualResult.isEmpty()) actualResult = "—";
+                testCaseCell.add(new Paragraph("Actual result: " + actualResult)
+                        .setFont(regularFont).setFontSize(9f).setFontColor(DARK_GRAY));
+            }
+            table.addCell(testCaseCell);
 
-            // Priority column
-            BugPriority pri = item.getBugPriority();
-            DeviceRgb priColor;
-            if (pri == BugPriority.HIGH) priColor = RED;
-            else if (pri == BugPriority.MEDIUM) priColor = DARK_YELLOW;
-            else priColor = DARK_GRAY;
-            String priText = pri.getName();
-            table.addCell(new Cell()
-                    .setBackgroundColor(rowBg)
-                    .setBorder(new SolidBorder(BORDER_GRAY, 1))
-                    .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
-                    .add(new Paragraph(priText)
-                            .setFont(boldFont).setFontSize(9.5f).setFontColor(priColor)
-                            .setTextAlignment(TextAlignment.CENTER)));
+            if (withPriority) {
+                BugPriority pri = item.getBugPriority();
+                DeviceRgb priColor;
+                if (pri == BugPriority.HIGH) priColor = RED;
+                else if (pri == BugPriority.MEDIUM) priColor = DARK_YELLOW;
+                else priColor = DARK_GRAY;
+                String priText = pri.getName();
+                table.addCell(new Cell()
+                        .setBackgroundColor(rowBg)
+                        .setBorder(new SolidBorder(BORDER_GRAY, 1))
+                        .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
+                        .add(new Paragraph(priText)
+                                .setFont(boldFont).setFontSize(9.5f).setFontColor(priColor)
+                                .setTextAlignment(TextAlignment.CENTER)));
+            }
+
+            if (withSeverity) {
+                BugSeverity sev = item.getBugSeverity();
+                DeviceRgb sevColor;
+                if (sev == BugSeverity.BLOCKER) sevColor = RED;
+                else if (sev == BugSeverity.MAJOR) sevColor = DARK_YELLOW;
+                else sevColor = DARK_GRAY;
+                String sevText = sev.getName();
+                if (sevText.isEmpty()) sevText = "—";
+                table.addCell(new Cell()
+                        .setBackgroundColor(rowBg)
+                        .setBorder(new SolidBorder(BORDER_GRAY, 1))
+                        .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6)
+                        .add(new Paragraph(sevText)
+                                .setFont(boldFont).setFontSize(9.5f).setFontColor(sevColor)
+                                .setTextAlignment(TextAlignment.CENTER)));
+            }
 
             idx++;
         }
