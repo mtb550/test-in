@@ -73,7 +73,7 @@ public enum RunEditorAttributes {
             "Bug Severity",
             true,
             true,
-            (item, project) -> item.getSeverity().name(),
+            (item, project) -> item.getBugSeverity().getName(),
             null
     ),
 
@@ -81,7 +81,7 @@ public enum RunEditorAttributes {
             "Bug Priority",
             true,
             true,
-            (item, project) -> item.getPriority().getName(),
+            (item, project) -> item.getBugPriority().getName(),
             null
     ),
 
@@ -89,7 +89,7 @@ public enum RunEditorAttributes {
             "Run Status",
             true,
             true,
-            (item, project) -> item.getStatus().name(),
+            (item, project) -> item.getStatus().getDisplayText(),
             null
     ),
 

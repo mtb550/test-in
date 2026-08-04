@@ -16,7 +16,7 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.Priority;
+import org.testin.enums.BugPriority;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
@@ -305,10 +305,10 @@ public final class TestRunPdfGenerator {
                             .setFont(regularFont).setFontSize(9.5f).setFontColor(BLACK)));
 
             // Priority column
-            Priority pri = item.getPriority();
+            BugPriority pri = item.getBugPriority();
             DeviceRgb priColor;
-            if (pri == Priority.HIGH) priColor = RED;
-            else if (pri == Priority.MEDIUM) priColor = DARK_YELLOW;
+            if (pri == BugPriority.HIGH) priColor = RED;
+            else if (pri == BugPriority.MEDIUM) priColor = DARK_YELLOW;
             else priColor = DARK_GRAY;
             String priText = pri.getName();
             table.addCell(new Cell()

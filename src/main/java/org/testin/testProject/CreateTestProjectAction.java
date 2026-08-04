@@ -31,16 +31,13 @@ public class CreateTestProjectAction extends DumbAwareAction {
             if (name.trim().isEmpty()) return;
 
             if (type == DirectoryType.IMPORT_TP) {
-                String gitUrl = name.trim();
-                String projectName = Services.getInstance(project, Tools.class).extractProjectNameFromUrl(gitUrl);
-                new CreateTestProjectCloneAction(gitUrl, projectName, projectPanel).actionPerformed(e);
+                String projectName = Services.getInstance(project, Tools.class).extractProjectNameFromUrl(name);
+                new CreateTestProjectCloneAction(name.trim(), projectName, projectPanel).actionPerformed(e);
                 return;
             }
 
             if (type == DirectoryType.TP) {
-                final String tpName = name.trim();
-                new CreateTestProjectNewAction(projectPanel, tpName, cg).actionPerformed(e);
-                //return;
+                new CreateTestProjectNewAction(projectPanel, name.trim(), cg).actionPerformed(e);
             }
 
         }).show();

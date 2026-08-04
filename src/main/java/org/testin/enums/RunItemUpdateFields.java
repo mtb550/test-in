@@ -33,39 +33,31 @@ public enum RunItemUpdateFields implements IStatusBarItem {
             UpdateRunItemDialog::getActualResultSection
     ),
 
-    SEVERITY(
-            "Severity",
-            KeyboardSet.Severity,
+    BUG_SEVERITY(
+            "Bug Severity",
+            KeyboardSet.BugSeverity,
             AllIcons.Actions.Highlighting,
             new IStatusBarItem[]{SAVE},
             true,
-            UpdateRunItemDialog::getSeveritySection
+            UpdateRunItemDialog::getBugSeveritySection
     ),
 
-    PRIORITY(
-            "Priority",
-            KeyboardSet.Priority,
+    BUG_PRIORITY(
+            "Bug Priority",
+            KeyboardSet.BugPriority,
             AllIcons.Actions.Report,
             new IStatusBarItem[]{SAVE},
             true,
-            UpdateRunItemDialog::getPrioritySection
-    ),
-    STATUS(
-            "Status",
-            KeyboardSet.SetStatus,
-            AllIcons.General.Filter,
-            new IStatusBarItem[]{SAVE},
-            true,
-            UpdateRunItemDialog::getStatusSection
+            UpdateRunItemDialog::getBugPrioritySection
     ),
 
-    ATTACHMENTS(
-            "Attachments",
+    ERROR_CAPTURE(
+            "Error Capture",
             null,
             AllIcons.FileTypes.Text,
             new IStatusBarItem[]{SAVE},
             true,
-            UpdateRunItemDialog::getAttachmentsSection
+            UpdateRunItemDialog::getErrorCaptureSection
     );
 
     private final @NotNull String name;

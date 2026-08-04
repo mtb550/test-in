@@ -11,6 +11,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.enums.Group;
@@ -24,26 +25,34 @@ import java.util.function.Supplier;
 
 public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
     @Getter
+    @NotNull
     private final Set<Group> selectedGroup = new HashSet<>();
 
     @Getter
+    @NotNull
     private final Set<Priority> selectedPriority = new HashSet<>();
 
     @Getter
+    @NotNull
     private final Set<String> selectedModule = new HashSet<>();
 
     @Getter
+    @NotNull
     private final Set<TestStatus> selectedStatus = new HashSet<>();
 
+    @NotNull
     private final Supplier<Set<String>> availableModulesSupplier;
 
+    @NotNull
     private final DefaultActionGroup cachedActionGroup;
 
+    @NotNull
     private final Runnable onToolBarFilterReset;
 
+    @NotNull
     private final IToolBar callbacks;
 
-    public FilterPopupBtn(final IToolBar callbacks, final Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final Supplier<Set<String>> availableModulesSupplier) {
+    public FilterPopupBtn(final @NonNull IToolBar callbacks, final @NonNull Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final @NonNull Supplier<Set<String>> availableModulesSupplier) {
         super("Filter", AllIcons.General.Filter);
         this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;
@@ -75,9 +84,7 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
         selectedModule.clear();
         selectedStatus.clear();
         updateToolBarFilterState();
-        if (onToolBarFilterReset != null) {
-            onToolBarFilterReset.run();
-        }
+        onToolBarFilterReset.run();
     }
 
     private DefaultActionGroup buildActionGroup(final Runnable onToolBarFilterSelectedChanged) {

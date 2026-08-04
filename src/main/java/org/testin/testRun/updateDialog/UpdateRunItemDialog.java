@@ -11,7 +11,10 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.RunItemUpdateFields;
 import org.testin.mappers.TestRunItems;
-import org.testin.testRun.createDialog.*;
+import org.testin.testRun.createDialog.ActualResultSection;
+import org.testin.testRun.createDialog.BugPrioritySection;
+import org.testin.testRun.createDialog.BugSeveritySection;
+import org.testin.testRun.createDialog.ErrorCaptureSection;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
@@ -23,19 +26,20 @@ import java.util.function.Consumer;
 public class UpdateRunItemDialog {
 
     @Getter
+    @NotNull
     private final ActualResultSection actualResultSection;
 
     @Getter
-    private final StatusSection statusSection;
+    @NotNull
+    private final BugPrioritySection bugPrioritySection;
 
     @Getter
-    private final PrioritySection prioritySection;
+    @NotNull
+    private final BugSeveritySection bugSeveritySection;
 
     @Getter
-    private final SeveritySection severitySection;
-
-    @Getter
-    private final AttachmentsSection attachmentsSection;
+    @NotNull
+    private final ErrorCaptureSection errorCaptureSection;
 
     private final Project project;
     private final TestRunItems runItem;
@@ -51,10 +55,9 @@ public class UpdateRunItemDialog {
         this.onSave = onSave;
 
         this.actualResultSection = new ActualResultSection();
-        this.statusSection = new StatusSection();
-        this.prioritySection = new PrioritySection();
-        this.severitySection = new SeveritySection();
-        this.attachmentsSection = new AttachmentsSection();
+        this.bugPrioritySection = new BugPrioritySection();
+        this.bugSeveritySection = new BugSeveritySection();
+        this.errorCaptureSection = new ErrorCaptureSection();
 
         this.cachedSections = Arrays.stream(RunItemUpdateFields.values())
                 .filter(RunItemUpdateFields::isUpdateMenuItem)

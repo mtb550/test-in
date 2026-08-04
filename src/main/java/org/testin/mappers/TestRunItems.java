@@ -7,8 +7,8 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.Priority;
-import org.testin.enums.Severity;
+import org.testin.enums.BugPriority;
+import org.testin.enums.BugSeverity;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.dto.TestCaseDto;
 
@@ -43,11 +43,11 @@ public class TestRunItems {
 
     @NotNull
     @Builder.Default
-    private Severity severity = Severity.MINOR;
+    private BugSeverity bugSeverity = BugSeverity.EMPTY;
 
     @NotNull
     @Builder.Default
-    private Priority Priority = org.testin.enums.Priority.LOW;
+    private BugPriority bugPriority = BugPriority.EMPTY;
 
     @NotNull
     @Builder.Default

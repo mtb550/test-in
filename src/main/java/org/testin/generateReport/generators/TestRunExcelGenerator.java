@@ -69,10 +69,10 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 3, result.getActualResult());
                 ws.style(row, 3).wrapText(true).set();
 
-                ws.value(row, 4, result.getSeverity().name());
+                ws.value(row, 4, result.getBugSeverity().name());
                 ws.style(row, 4).bold().set();
 
-                ws.value(row, 5, result.getPriority().getName());
+                ws.value(row, 5, result.getBugPriority().getName());
                 ws.style(row, 5).bold().set();
 
                 String formattedDuration = Services.getInstance(project, Tools.class).getFormattedDuration(result.getDuration());

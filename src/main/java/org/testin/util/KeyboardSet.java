@@ -60,6 +60,7 @@ public enum KeyboardSet {
     UpdateTestCaseSteps(KeyEvent.VK_S, 0),
     UpdateTestCasePriority(KeyEvent.VK_P, 0),
     UpdateTestCaseGroup(KeyEvent.VK_G, 0),
+    PriorityEmpty(KeyEvent.VK_E, 0),
     PriorityHigh(KeyEvent.VK_H, 0),
     PriorityMedium(KeyEvent.VK_M, 0),
     PriorityLow(KeyEvent.VK_L, 0),
@@ -72,9 +73,9 @@ public enum KeyboardSet {
     StatusAssigned(KeyEvent.VK_1, 0),
     StatusCompleted(KeyEvent.VK_2, 0),
     StatusClosed(KeyEvent.VK_3, 0),
-    SetActualResult(KeyEvent.VK_A, 0),
-    Severity(KeyEvent.VK_Q, 0),
-    Priority(KeyEvent.VK_T, 0),
+    SetActualResult(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK),
+    BugSeverity(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK),
+    BugPriority(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK),
     GenerateReports(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
 
     private final int keyCode;

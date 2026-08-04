@@ -47,7 +47,6 @@ public class GenerateReportAction extends DumbAwareAction {
         this.tree = tree;
         this.editor = null;
         this.list = null;
-        this.registerCustomShortcutSet(KeyboardSet.GenerateReports.getCustomShortcut(), tree);
     }
 
     public GenerateReportAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {

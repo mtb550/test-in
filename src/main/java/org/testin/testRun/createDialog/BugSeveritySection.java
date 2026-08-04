@@ -5,23 +5,23 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.Severity;
+import org.testin.enums.BugSeverity;
 import org.testin.mappers.TestRunItems;
 import org.testin.testRun.updateDialog.RunItemEditSection;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class SeveritySection implements RunItemEditSection {
+public class BugSeveritySection implements RunItemEditSection {
 
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     @Getter
-    private final JComboBox<Severity> severityCombo;
+    private final JComboBox<BugSeverity> severityCombo;
     private final JPanel wrapper;
 
-    public SeveritySection() {
-        this.severityCombo = new JComboBox<>(Severity.values());
+    public BugSeveritySection() {
+        this.severityCombo = new JComboBox<>(BugSeverity.values());
         this.severityCombo.setFont(fieldFont);
         this.severityCombo.setBorder(JBUI.Borders.empty(10));
 
@@ -46,15 +46,15 @@ public class SeveritySection implements RunItemEditSection {
 
     @Override
     public void fillData(final @NotNull TestRunItems runItem) {
-        severityCombo.setSelectedItem(runItem.getSeverity());
+        severityCombo.setSelectedItem(runItem.getBugSeverity());
     }
 
     @Override
     public void applyTo(final @NotNull TestRunItems runItem) {
         if (wrapper.getParent() != null) {
             Object selected = severityCombo.getSelectedItem();
-            if (selected instanceof Severity severity) {
-                runItem.setSeverity(severity);
+            if (selected instanceof BugSeverity bugSeverity) {
+                runItem.setBugSeverity(bugSeverity);
             }
         }
     }

@@ -11,15 +11,15 @@ import org.testin.testRun.updateDialog.RunItemEditSection;
 import javax.swing.*;
 import java.awt.*;
 
-public class AttachmentsSection implements RunItemEditSection {
+public class ErrorCaptureSection implements RunItemEditSection {
 
     final Font labelFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     private final JPanel wrapper;
     private final JBLabel placeholderLabel;
 
-    public AttachmentsSection() {
-        this.placeholderLabel = new JBLabel("Attachments support coming soon");
+    public ErrorCaptureSection() {
+        this.placeholderLabel = new JBLabel("Error Capture support coming soon");
         this.placeholderLabel.setFont(labelFont);
 
         this.wrapper = new JPanel(new BorderLayout());

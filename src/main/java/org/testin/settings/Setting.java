@@ -12,7 +12,10 @@ public final class Setting {
     @NotNull
     public Path getTestinPath() {
         String path = AppSettingsState.getInstance().rootTestinPath;
-        return path != null && !path.trim().isEmpty() ? Path.of(path.trim()) : Path.of("");
+        if (path == null || path.trim().isEmpty()) {
+            return Path.of("");
+        }
+        return Path.of(path.trim());
     }
 
     public void setTestinPath(final @Nullable Path path) {

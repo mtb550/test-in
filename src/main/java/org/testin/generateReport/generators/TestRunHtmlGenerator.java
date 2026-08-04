@@ -140,11 +140,11 @@ public final class TestRunHtmlGenerator {
                     .forEach(item -> {
                         TestCaseDto d = detailsMap.get(item.getId());
                         String desc = d != null ? d.getDescription() : "";
-                        String priority = item.getPriority().name();
+                        String bugPriority = item.getBugPriority().name();
                         html.append("<tr>")
                                 .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
                                 .append("<td>").append(escapedHtml(desc)).append("</td>")
-                                .append("<td>").append(priority).append("</td>")
+                                .append("<td>").append(bugPriority).append("</td>")
                                 .append("</tr>");
                     });
             html.append("</table>");
@@ -166,11 +166,11 @@ public final class TestRunHtmlGenerator {
                     .forEach(item -> {
                         TestCaseDto d = detailsMap.get(item.getId());
                         String desc = d != null ? d.getDescription() : "";
-                        String priority = item.getPriority().name();
+                        String bugPriority = item.getBugPriority().name();
                         html.append("<tr>")
                                 .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
                                 .append("<td>").append(escapedHtml(desc)).append("</td>")
-                                .append("<td>").append(priority).append("</td>")
+                                .append("<td>").append(bugPriority).append("</td>")
                                 .append("</tr>");
                     });
             html.append("</table>");
