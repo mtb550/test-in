@@ -113,7 +113,8 @@ public class RunCreationForm {
         tr.setPlatform(getFieldValue(TestRunConfiguration.PLATFORM))
                 .setLanguage(getFieldValue(TestRunConfiguration.LANGUAGE))
                 .setBrowser(getFieldValue(TestRunConfiguration.BROWSER))
-                .setDeviceType(getFieldValue(TestRunConfiguration.DEVICE_TYPE));
+                .setDeviceType(getFieldValue(TestRunConfiguration.DEVICE_TYPE))
+                .setTestType(getFieldValue(TestRunConfiguration.TEST_TYPE));
     }
 
     public String getFieldValue(final TestRunConfiguration field) {

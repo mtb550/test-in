@@ -67,7 +67,7 @@ public final class TestRunPdfGenerator {
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
-            String cleanName = tr.getRunName().replace(".json", "");
+            String cleanName = tr.getDescription().replace(".json", "");
 
             // Project name from the project selector combo box (selected value)
             String projectName = "";
@@ -86,15 +86,17 @@ public final class TestRunPdfGenerator {
             // TITLE — bold 20pt, #1F3864, Calibri
             // ════════════════════════════════════════════════════════════════
             document.add(new Paragraph("TEST SUMMARY REPORT")
-                    .setFont(boldFont).setFontSize(20).setFontColor(DARK_NAVY)
-                    .setMarginBottom(4));
+                    .setFont(boldFont).setFontSize(18).setFontColor(DARK_NAVY)
+                    .setMarginBottom(2));
 
             // ════════════════════════════════════════════════════════════════
             // SUBTITLE — 12pt, #2E5496, with bottom border #1F3864 (single, 8px)
             // ════════════════════════════════════════════════════════════════
-            Paragraph subtitle = new Paragraph(cleanName + "  |  " + tr.getPlatform())
-                    .setFont(regularFont).setFontSize(12).setFontColor(MEDIUM_BLUE)
-                    .setMarginBottom(6);
+            Paragraph subtitle = new Paragraph(projectName + "  |  " + tr.getPlatform())
+                    .setFont(regularFont).setFontSize(10).setFontColor(MEDIUM_BLUE)
+                    .setPaddingBottom(4)
+                    .setBorderBottom(new SolidBorder(DARK_NAVY, 2f))
+                    .setMarginBottom(1);
             // Add bottom border to subtitle (line after)
             document.add(subtitle);
 
@@ -102,14 +104,18 @@ public final class TestRunPdfGenerator {
             // CONFIDENTIAL — italic 9pt, #595959
             // ════════════════════════════════════════════════════════════════
             document.add(new Paragraph("Confidential — QA Test Execution Summary")
-                    .setFont(italicFont).setFontSize(9).setFontColor(DARK_GRAY)
-                    .setMarginBottom(30));
+                    .setFont(italicFont).setFontSize(8).setFontColor(DARK_GRAY)
+                    .setMarginBottom(20));
 
             // ════════════════════════════════════════════════════════════════
             // SECTION 1: REPORT OVERVIEW
             // ════════════════════════════════════════════════════════════════
             Paragraph sec1 = new Paragraph("1. Report Overview")
-                    .setFont(boldFont).setFontSize(13).setFontColor(DARK_NAVY)
+                    .setFont(boldFont)
+                    .setFontSize(13)
+                    .setFontColor(DARK_NAVY)
+                    .setPaddingBottom(3)
+                    .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
                     .setMarginBottom(12);
             document.add(sec1);
 
@@ -119,9 +125,15 @@ public final class TestRunPdfGenerator {
                     .setBorder(Border.NO_BORDER);
 
             addOverviewRow(overviewTable, "Project", projectName, boldFont, regularFont);
-            addOverviewRow(overviewTable, "Sprint / Cycle", cleanName, boldFont, regularFont);
-            addOverviewRow(overviewTable, "Test Type", !tr.getLanguage().isEmpty() ? tr.getLanguage() : "Functional Testing", boldFont, regularFont);
-            addOverviewRow(overviewTable, "Platform", tr.getPlatform() + (!tr.getBrowser().isEmpty() ? " / " + tr.getBrowser() : ""), boldFont, regularFont);
+
+            addOverviewRow(overviewTable, "Sprint / Cycle", tr.getDescription(), boldFont, regularFont);
+
+            if (!tr.getTestType().isEmpty())
+                addOverviewRow(overviewTable, "Test Type", tr.getTestType(), boldFont, regularFont);
+
+            if (!tr.getPlatform().isEmpty())
+                addOverviewRow(overviewTable, "Platform", tr.getPlatform() + (!tr.getBrowser().isEmpty() ? " / " + tr.getBrowser() : ""), boldFont, regularFont);
+
             // Executed By: all distinct tester names across results, no repeats
             String executedByAll = tr.getResults().stream()
                     .map(TestRunItems::getExecutedBy)
@@ -139,8 +151,13 @@ public final class TestRunPdfGenerator {
             // SECTION 2: EXECUTION SUMMARY
             // ════════════════════════════════════════════════════════════════
             Paragraph sec2 = new Paragraph("2. Execution Summary")
-                    .setFont(boldFont).setFontSize(13).setFontColor(DARK_NAVY)
-                    .setMarginBottom(8).setMarginTop(16);
+                    .setFont(boldFont)
+                    .setFontSize(13)
+                    .setFontColor(DARK_NAVY)
+                    .setPaddingBottom(3)
+                    .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
+                    .setMarginBottom(9)
+                    .setMarginTop(20);
             document.add(sec2);
 
             long total = tr.getResults().size();
@@ -163,7 +180,7 @@ public final class TestRunPdfGenerator {
             addStatCell(statsTable, String.valueOf(total), "Total Cases", DARK_NAVY, boldFont);
             addStatCell(statsTable, String.valueOf(passed), "Passed", GREEN, boldFont);
             addStatCell(statsTable, String.valueOf(failed), "Failed", RED, boldFont);
-            addStatCell(statsTable, String.valueOf(pending + blocked), "Pending", DARK_YELLOW, boldFont);
+            addStatCell(statsTable, String.valueOf(pending + blocked), "Blocked", DARK_YELLOW, boldFont);
             addStatCell(statsTable, passRate + "%", "Pass Rate", MEDIUM_BLUE, boldFont);
 
             document.add(statsTable);
@@ -172,8 +189,13 @@ public final class TestRunPdfGenerator {
             // SECTION 3: RESULT ANALYSIS
             // ════════════════════════════════════════════════════════════════
             Paragraph sec3 = new Paragraph("3. Result Analysis")
-                    .setFont(boldFont).setFontSize(13).setFontColor(DARK_NAVY)
-                    .setMarginBottom(8).setMarginTop(16);
+                    .setFont(boldFont)
+                    .setFontSize(13)
+                    .setFontColor(DARK_NAVY)
+                    .setPaddingBottom(3)
+                    .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
+                    .setMarginBottom(9)
+                    .setMarginTop(20);
             document.add(sec3);
 
             // Passed
@@ -301,22 +323,27 @@ public final class TestRunPdfGenerator {
      * Builds a filtered table of results.
      * Columns: # | Test Case [ | Priority ] [ | Severity ] depending on flags.
      *
-     * @param sectionNumber  the section number label (e.g. "4")
-     * @param sectionTitle   the section heading text
-     * @param descriptionFmt format string with one %d placeholder for the count
-     * @param count          the count to pass into the format string
-     * @param tr             the TestRunDto containing results
-     * @param detailsMap     map of UUID -> TestCaseDto for test case names
-     * @param headerBg       background color for the header row
-     * @param withPriority   whether to include the Priority column
-     * @param withSeverity   whether to include the Severity column
+     * @param sectionNumber    the section number label (e.g. "4")
+     * @param sectionTitle     the section heading text
+     * @param descriptionFmt   format string with one %d placeholder for the count
+     * @param count            the count to pass into the format string
+     * @param tr               the TestRunDto containing results
+     * @param detailsMap       map of UUID -> TestCaseDto for test case names
+     * @param headerBg         background color for the header row
+     * @param withPriority     whether to include the Priority column
+     * @param withSeverity     whether to include the Severity column
      * @param withActualResult whether to add an \"Actual result: ...\" line inside the Test Case cell
-     * @param filter         predicate to select which items go into the table
+     * @param filter           predicate to select which items go into the table
      */
     private void buildCaseTable(Document document, String sectionNumber, String sectionTitle, String descriptionFmt, long count, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap, PdfFont boldFont, PdfFont regularFont, DeviceRgb headerBg, boolean withPriority, boolean withSeverity, boolean withActualResult, Predicate<TestRunItems> filter) {
         document.add(new Paragraph(sectionNumber + ". " + sectionTitle)
-                .setFont(boldFont).setFontSize(13).setFontColor(DARK_NAVY)
-                .setMarginBottom(8).setMarginTop(16));
+                .setFont(boldFont)
+                .setFontSize(13)
+                .setFontColor(DARK_NAVY)
+                .setPaddingBottom(3)
+                .setBorderBottom(new SolidBorder(DARK_NAVY, 1f))
+                .setMarginBottom(9)
+                .setMarginTop(20));
 
         document.add(new Paragraph(
                 String.format(descriptionFmt, count))

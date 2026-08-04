@@ -23,7 +23,7 @@ public class TestRunInfoPopup {
                 JBPanel<?> panel = new JBPanel<>(new GridLayout(0, 1, 6, 6));
                 panel.setPreferredSize(new Dimension(400, 300));
 
-                panel.add(new JBLabel("Name: " + run.getRunName()));
+                panel.add(new JBLabel("Name: " + run.getDescription()));
 
                 return panel;
             }

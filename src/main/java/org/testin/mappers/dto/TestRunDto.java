@@ -27,7 +27,7 @@ public class TestRunDto {
 
     @NotNull
     @Builder.Default
-    private String runName = "";
+    private String description = "";
 
     @NotNull
     @Builder.Default
@@ -48,6 +48,10 @@ public class TestRunDto {
     @NotNull
     @Builder.Default
     private String deviceType = "";
+
+    @NotNull
+    @Builder.Default
+    private String testType = "";
 
     @NotNull
     @Builder.Default

@@ -4,7 +4,11 @@ import com.intellij.icons.AllIcons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.testin.mappers.dto.dirs.*;
-import org.testin.nodeCreator.*;
+import org.testin.nodeCreator.CreateTestRunPackage;
+import org.testin.nodeCreator.CreateTestSet;
+import org.testin.nodeCreator.CreateTestSetPackage;
+import org.testin.nodeCreator.NodeCreator;
+import org.testin.testRun.CreateTestRun;
 
 import javax.swing.*;
 

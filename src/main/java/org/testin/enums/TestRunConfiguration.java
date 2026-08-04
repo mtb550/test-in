@@ -10,28 +10,34 @@ import javax.swing.*;
 @AllArgsConstructor
 public enum TestRunConfiguration {
 
+    TEST_TYPE(
+            "Test Type",
+            AllIcons.Nodes.Type,
+            new String[]{"", "Functional Test", "Performance Test"}
+    ),
+
     PLATFORM(
             "Platform",
             AllIcons.Nodes.PpLib,
-            new String[]{"Windows", "Linux", "MacOS", "Android", "iOS"}
+            new String[]{"", "Windows", "Linux", "MacOS", "Android", "iOS"}
     ),
 
     LANGUAGE(
             "Language",
             AllIcons.Nodes.Lambda,
-            new String[]{"English", "Arabic", "French"}
+            new String[]{"", "English", "Arabic", "French"}
     ),
 
     BROWSER(
             "Browser",
             AllIcons.Nodes.WebFolder,
-            new String[]{"Chrome", "Firefox", "Safari", "Edge"}
+            new String[]{"", "Chrome", "Firefox", "Safari", "Edge"}
     ),
 
     DEVICE_TYPE(
             "Device Type",
             AllIcons.Nodes.Include,
-            new String[]{"Desktop", "Mobile", "Tablet"}
+            new String[]{"", "Desktop", "Mobile", "Tablet"}
     );
 
     private final String displayName;
