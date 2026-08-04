@@ -7,6 +7,7 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.settings.AppSettingsState;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -42,7 +43,14 @@ public final class TestRunHtmlGenerator {
         // Run-level metadata
         final String runName = tr.getRunName().replace(".json", "");
         final String platform = tr.getPlatform();
-        final String executedBy = trdir.getMarker().getCreatedBy();
+        final AppSettingsState settings = AppSettingsState.getInstance();
+        final String testerName = settings.testerName != null && !settings.testerName.trim().isEmpty()
+                ? settings.testerName.trim()
+                : trdir.getMarker().getCreatedBy();
+        final String testerRole = settings.testerRole != null && !settings.testerRole.trim().isEmpty()
+                ? settings.testerRole.trim()
+                : "Quality Expert";
+        final String executedBy = testerName;
         final String execDate = trdir.getMarker().getCreatedAt().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.US));
         final String runStatus = trdir.getMarker().getStatus().getLabel();
 
@@ -180,7 +188,9 @@ public final class TestRunHtmlGenerator {
         // FOOTER
         // ═══════════════════════════════════════════════════
         html.append("<div class='footer'>")
-                .append("<p>Prepared by <b>").append(escapedHtml(executedBy)).append("</b> — QA Engineering  |  ")
+                .append("<p>Prepared by <b>").append(escapedHtml(executedBy)).append("</b> — ")
+                .append(escapedHtml(testerRole))
+                .append("  |  ")
                 .append(execDate.isEmpty() ? "" : execDate)
                 .append("</p>")
                 .append("<p>Generated automatically by <a href='https://plugins.jetbrains.com/plugin/31514-testin' target='_blank'><strong>Testin</strong></a> IntelliJ plugin.</p>")

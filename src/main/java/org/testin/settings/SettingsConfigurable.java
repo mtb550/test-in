@@ -30,6 +30,8 @@ public final class SettingsConfigurable implements Configurable {
 
     private final TestinPathPanel testinPathPanel = new TestinPathPanel();
     private final JBTextField rootAutomationPathField = new JBTextField();
+    private final JBTextField testerNameField = new JBTextField();
+    private final JBTextField testerRoleField = new JBTextField();
     private final TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
     private final ComboBox<String> logLevelComboBox;
@@ -66,6 +68,10 @@ public final class SettingsConfigurable implements Configurable {
                 .addVerticalGap(5)
                 .addLabeledComponent("Log level: ", logLevelComboBox)
                 .addVerticalGap(5)
+                .addLabeledComponent(new JBLabel("Tester name: "), testerNameField, 1, false)
+                .addVerticalGap(5)
+                .addLabeledComponent(new JBLabel("Tester role: "), testerRoleField, 1, false)
+                .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel("Default download folder: "), downloadFolderField, 1, false)
                 .addComponentFillVertically(new JPanel(), 0)
                 .getPanel();
@@ -78,6 +84,8 @@ public final class SettingsConfigurable implements Configurable {
         modified |= !rootAutomationPathField.getText().equals(settings.rootAutomationPath);
         modified |= readModeCheckBox.isSelected() != settings.readMode;
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
+        modified |= !testerNameField.getText().equals(settings.testerName);
+        modified |= !testerRoleField.getText().equals(settings.testerRole);
         modified |= !downloadFolderField.getText().equals(settings.defaultDownloadFolder);
         return modified;
     }
@@ -90,6 +98,8 @@ public final class SettingsConfigurable implements Configurable {
         settings.rootAutomationPath = rootAutomationPathField.getText();
         settings.readMode = readModeCheckBox.isSelected();
         settings.logLevel = (String) logLevelComboBox.getSelectedItem();
+        settings.testerName = testerNameField.getText();
+        settings.testerRole = testerRoleField.getText();
         settings.defaultDownloadFolder = downloadFolderField.getText();
 
         Logger.setLogLevel(Logger.Level.valueOf(settings.logLevel));
@@ -131,6 +141,8 @@ public final class SettingsConfigurable implements Configurable {
 
         readModeCheckBox.setSelected(settings.readMode);
         logLevelComboBox.setSelectedItem(settings.logLevel);
+        testerNameField.setText(settings.testerName);
+        testerRoleField.setText(settings.testerRole);
         downloadFolderField.setText(settings.defaultDownloadFolder);
     }
 

@@ -6,13 +6,12 @@ import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.action.PdfAction;
+import com.itextpdf.kernel.pdf.canvas.draw.SolidLine;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.Border;
 import com.itextpdf.layout.borders.SolidBorder;
-import com.itextpdf.layout.element.AreaBreak;
-import com.itextpdf.layout.element.Cell;
-import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
+import com.itextpdf.layout.element.*;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import org.jetbrains.annotations.NotNull;
@@ -22,11 +21,14 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.settings.AppSettingsState;
 import org.testin.util.logger.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -44,6 +46,7 @@ public final class TestRunPdfGenerator {
     private final DeviceRgb BORDER_GRAY = new DeviceRgb(0xD0, 0xD7, 0xE5);
     private final DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
     private final DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
+    private final DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC); // #0052cc, matches HTML footer link
 
     public byte[] generate(final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -56,6 +59,11 @@ public final class TestRunPdfGenerator {
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
             String cleanName = tr.getRunName().replace(".json", "");
+
+            // Tester identity from settings (fallback to marker / literal)
+            AppSettingsState settings = AppSettingsState.getInstance();
+            String testerName = settings.testerName.trim();
+            String testerRole = settings.testerRole;
 
             // ════════════════════════════════════════════════════════════════
             // TITLE — bold 20pt, #1F3864, Calibri
@@ -97,7 +105,7 @@ public final class TestRunPdfGenerator {
             addOverviewRow(overviewTable, "Sprint / Cycle", cleanName, boldFont, regularFont);
             addOverviewRow(overviewTable, "Test Type", !tr.getLanguage().isEmpty() ? tr.getLanguage() : "Functional Testing", boldFont, regularFont);
             addOverviewRow(overviewTable, "Platform", tr.getPlatform() + (!tr.getBrowser().isEmpty() ? " / " + tr.getBrowser() : ""), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Executed By", tr.getResults().isEmpty() ? "—" : tr.getResults().getFirst().getExecutedBy(), boldFont, regularFont);
+            addOverviewRow(overviewTable, "Executed By", testerName, boldFont, regularFont);
             addOverviewRow(overviewTable, "Execution Date", tr.getCreatedAt().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), boldFont, regularFont);
             addOverviewRow(overviewTable, "Run Status", trDir.getMarker().getStatus().name(), boldFont, regularFont);
 
@@ -152,7 +160,7 @@ public final class TestRunPdfGenerator {
             document.add(passedHeading);
 
             Paragraph passedBody = new Paragraph(
-                    "Core validation flows — organization ID validation, representative and employee eligibility checks, authentication via IAM and fingerprint, MSISDN type handling, and success/error response schema — behaved as expected.")
+                    "n\\a")
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(6);
             document.add(passedBody);
@@ -165,7 +173,7 @@ public final class TestRunPdfGenerator {
             document.add(failedHeading);
 
             Paragraph failedBody = new Paragraph(
-                    "The majority of failures are concentrated in the real-user identification group (ID type acceptance, expiry, final exit, runaway, and outside-KSA checks). These represent a functional gap requiring development attention before sign-off.")
+                    "n\\a")
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(6);
             document.add(failedBody);
@@ -178,7 +186,7 @@ public final class TestRunPdfGenerator {
             document.add(pendingHeading);
 
             Paragraph pendingBody = new Paragraph(
-                    "These cases were not executed in this cycle, primarily blocked by environment/data dependencies (MSISDN limit thresholds, blacklist data, M2M Nafath App authentication, and boundary configuration). They are carried forward to the next run.")
+                    "n\\a")
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(6);
             document.add(pendingBody);
@@ -217,13 +225,34 @@ public final class TestRunPdfGenerator {
             }
 
             // ════════════════════════════════════════════════════════════════
-            // FOOTER
+            // FOOTER — matches the TestRunHtmlGenerator footer
             // ════════════════════════════════════════════════════════════════
-            document.add(new Paragraph(" ").setMarginTop(30));
-            document.add(new Paragraph(
-                    "This test run report was automatically generated by the Testin IntelliJ plugin.")
+            // Horizontal rule (HTML footer's border-top: 1px solid #d0d7e5)
+            SolidLine solidLine = new SolidLine(1);
+            solidLine.setColor(BORDER_GRAY);
+            LineSeparator footerRule = new LineSeparator(solidLine);
+            footerRule.setMarginTop(30);
+            document.add(footerRule);
+
+            // Line 1: Prepared by <b>executedBy</b> — Quality Expert  |  execDate
+            String execDate = trDir.getMarker().getCreatedAt()
+                    .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.US));
+            document.add(new Paragraph()
                     .setFont(regularFont).setFontSize(9).setFontColor(DARK_GRAY)
-                    .setTextAlignment(TextAlignment.CENTER));
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .add(new Text("Prepared by "))
+                    .add(new Text(testerName).setFont(boldFont))
+                    .add(new Text(" — " + testerRole + "  |  "))
+                    .add(new Text(execDate)));
+
+            // Line 2: Generated automatically by <b>Testin</b> IntelliJ plugin (marketplace hyperlink)
+            document.add(new Paragraph()
+                    .setFont(regularFont).setFontSize(9).setFontColor(DARK_GRAY)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .add(new Text("Generated automatically by "))
+                    .add(new Link("Testin", PdfAction.createURI("https://plugins.jetbrains.com/plugin/31514-testin"))
+                            .setFont(boldFont).setFontColor(LINK_BLUE))
+                    .add(new Text(" IntelliJ plugin.")));
 
             document.close();
             return baos.toByteArray();
