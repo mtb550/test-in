@@ -64,7 +64,7 @@ public final class TestRunWordGenerator {
 
                 // ── SUBTITLE ───────────────────────────────────────────────────
                 String subtitleText = projectName + "  |  " + tr.getPlatform() + ", " + tr.getComponent();
-                addText(doc, subtitleText, 10, false, MEDIUM_BLUE, DARK_NAVY, 6);
+                addText(doc, subtitleText, 10, false, MEDIUM_BLUE, DARK_NAVY, 5);
 
                 // ── CONFIDENTIAL ───────────────────────────────────────────────
                 XWPFParagraph conf = addText(doc, "Confidential — QA Test Execution Summary", 8, false, DARK_GRAY, null, 20);
@@ -73,7 +73,7 @@ public final class TestRunWordGenerator {
                 // ════════════════════════════════════════════════════════════════
                 // SECTION 1: REPORT OVERVIEW
                 // ════════════════════════════════════════════════════════════════
-                addHeading(doc, "1. Report Overview");
+                addHeading(doc, "1. Report Overview", 0, 15);
 
                 XWPFTable overviewTable = doc.createTable(1, 2);
                 overviewTable.setWidth("100%");
@@ -107,7 +107,7 @@ public final class TestRunWordGenerator {
                 // ════════════════════════════════════════════════════════════════
                 // SECTION 2: EXECUTION SUMMARY
                 // ════════════════════════════════════════════════════════════════
-                addHeading(doc, "2. Execution Summary");
+                addHeading(doc, "2. Execution Summary", 20, 12);
 
                 long total = tr.getResults().size();
                 long passed = tr.getResults().stream().filter(r -> r.getStatus() == TestStatus.PASSED).count();
@@ -118,7 +118,7 @@ public final class TestRunWordGenerator {
 
                 addText(doc, String.format(
                         "A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarise the outcome across all executed cases.",
-                        total, passRate), 11, false, BLACK, null, 6);
+                        total, passRate), 11, false, BLACK, null, 12);
 
                 XWPFTable statsTable = doc.createTable(1, 5);
                 statsTable.setWidth("100%");
@@ -135,7 +135,7 @@ public final class TestRunWordGenerator {
                 // ════════════════════════════════════════════════════════════════
                 // SECTION 3: RESULT ANALYSIS
                 // ════════════════════════════════════════════════════════════════
-                addHeading(doc, "3. Result Analysis");
+                addHeading(doc, "3. Result Analysis", 20, 12);
 
                 addColoredBody(doc, "Passed (" + passed + "): ", GREEN,
                         "All passed cases covered the core authentication flow end-to-end: login by username and by ID, credential validation and error handling (invalid username/password combinations, empty fields, special characters, SQL injection resistance), account lockout after max failed attempts and lockout-duration behavior, OTP generation, validation, expiry and resend logic, password change and the full password policy rule set (length, case, numeric, sequence, ID-portion, language checks), and session timeout and logout behavior. No deviations from expected behavior were observed across these cases.");
@@ -192,9 +192,11 @@ public final class TestRunWordGenerator {
 
     // ─── helpers ───────────────────────────────────────────────────────────
 
-    private XWPFParagraph addText(XWPFDocument doc, String text, int size, boolean bold, String color, String bottomBorder, int spacingAfter) {
+    // spacingAfterPt / bottomBorder match the PDF generator's point-based margins.
+    // POI paragraph spacing is in twips (1/20 pt), so multiply by 20.
+    private XWPFParagraph addText(XWPFDocument doc, String text, int size, boolean bold, String color, String bottomBorder, int spacingAfterPt) {
         XWPFParagraph p = doc.createParagraph();
-        p.setSpacingAfter(spacingAfter);
+        p.setSpacingAfter(spacingAfterPt * 20);
         XWPFRun run = p.createRun();
         run.setText(text);
         run.setFontSize(size);
@@ -205,7 +207,7 @@ public final class TestRunWordGenerator {
             org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder bottom =
                     p.getCTPPr().addNewPBdr().addNewBottom();
             bottom.setVal(STBorder.Enum.forString("single"));
-            bottom.setSz(java.math.BigInteger.valueOf(8));
+            bottom.setSz(java.math.BigInteger.valueOf(16)); // 2pt, matches PDF subtitle border
             bottom.setColor(bottomBorder);
         }
         return p;
@@ -217,10 +219,11 @@ public final class TestRunWordGenerator {
         }
     }
 
-    private XWPFParagraph addHeading(XWPFDocument doc, String text) {
+    // beforePt = marginTop, afterPt = paddingBottom(3pt) + marginBottom, matching the PDF.
+    private XWPFParagraph addHeading(XWPFDocument doc, String text, int beforePt, int afterPt) {
         XWPFParagraph p = doc.createParagraph();
-        p.setSpacingBefore(120);
-        p.setSpacingAfter(60);
+        p.setSpacingBefore(beforePt * 20);
+        p.setSpacingAfter(afterPt * 20);
         XWPFRun run = p.createRun();
         run.setText(text);
         run.setFontSize(13);
@@ -230,7 +233,7 @@ public final class TestRunWordGenerator {
         org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder headingBottom =
                 p.getCTPPr().addNewPBdr().addNewBottom();
         headingBottom.setVal(STBorder.Enum.forString("single"));
-        headingBottom.setSz(java.math.BigInteger.valueOf(8));
+        headingBottom.setSz(java.math.BigInteger.valueOf(8)); // 1pt, matches PDF heading border
         headingBottom.setColor(DARK_NAVY);
         return p;
     }
@@ -240,6 +243,8 @@ public final class TestRunWordGenerator {
         XWPFTableCell labelCell = row.getCell(0);
         XWPFTableCell valueCell = row.getCell(1);
         shadeCell(labelCell, LIGHT_BG);
+        setCellPadding(labelCell, 4, 8, 4, 8);
+        setCellPadding(valueCell, 4, 8, 4, 8);
         setCellText(labelCell, label, 10, true, DARK_NAVY);
         setCellText(valueCell, value, 10, false, BLACK);
     }
@@ -248,9 +253,11 @@ public final class TestRunWordGenerator {
         XWPFTableRow row = table.getRow(0);
         XWPFTableCell cell = row.getCell(col);
         shadeCell(cell, LIGHT_BG);
+        setCellPadding(cell, 8, 6, 8, 6);
         setCellText(cell, number, 20, true, numberColor);
-        // label line (9pt, #595959)
+        // label line (9pt, #595959), spaced 4pt below the number (matches PDF number marginBottom)
         XWPFParagraph lp = cell.addParagraph();
+        lp.setSpacingBefore(80);
         XWPFRun lrun = lp.createRun();
         lrun.setText(label);
         lrun.setFontSize(9);
@@ -270,7 +277,7 @@ public final class TestRunWordGenerator {
         hrun.setColor(headingColor);
 
         XWPFParagraph bp = doc.createParagraph();
-        bp.setSpacingAfter(60);
+        bp.setSpacingAfter(120); // 6pt, matches PDF analysis body marginBottom
         XWPFRun brun = bp.createRun();
         brun.setText(body);
         brun.setFontSize(11);
@@ -279,8 +286,8 @@ public final class TestRunWordGenerator {
     }
 
     private void buildCaseTable(XWPFDocument doc, String sectionNumber, String sectionTitle, String descriptionFmt, long count, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap, String headerBg, boolean withPriority, boolean withSeverity, boolean withActualResult, Predicate<TestRunItems> filter) {
-        addHeading(doc, sectionNumber + ". " + sectionTitle);
-        addText(doc, String.format(descriptionFmt, count), 11, false, BLACK, null, 6);
+        addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
+        addText(doc, String.format(descriptionFmt, count), 11, false, BLACK, null, 12);
 
         int cols = 1 + 1 + (withPriority ? 1 : 0) + (withSeverity ? 1 : 0); // # + Test Case + extra
         XWPFTable table = doc.createTable(1, cols);
@@ -306,10 +313,12 @@ public final class TestRunWordGenerator {
             XWPFTableRow row = table.createRow();
             XWPFTableCell numCell = row.getCell(0);
             shadeCell(numCell, rowBg);
+            setCellPadding(numCell, 4, 6, 4, 6);
             setCellText(numCell, String.valueOf(idx), 9, false, DARK_GRAY);
 
             XWPFTableCell tcCell = row.getCell(1);
             shadeCell(tcCell, rowBg);
+            setCellPadding(tcCell, 4, 6, 4, 6);
             String tcName = "";
             if (detailsMap != null) {
                 TestCaseDto tc = detailsMap.get(item.getId());
@@ -332,6 +341,7 @@ public final class TestRunWordGenerator {
             if (withPriority) {
                 XWPFTableCell priCell = row.getCell(2);
                 shadeCell(priCell, rowBg);
+                setCellPadding(priCell, 4, 6, 4, 6);
                 BugPriority pri = item.getBugPriority();
                 String priColor;
                 if (pri == BugPriority.HIGH) priColor = RED;
@@ -343,6 +353,7 @@ public final class TestRunWordGenerator {
             if (withSeverity) {
                 XWPFTableCell sevCell = row.getCell(3);
                 shadeCell(sevCell, rowBg);
+                setCellPadding(sevCell, 4, 6, 4, 6);
                 BugSeverity sev = item.getBugSeverity();
                 String sevColor;
                 if (sev == BugSeverity.BLOCKER) sevColor = RED;
@@ -363,6 +374,7 @@ public final class TestRunWordGenerator {
     private void addCaseHeader(XWPFTableRow headerRow, int col, String text, String bgColor) {
         XWPFTableCell cell = headerRow.getCell(col);
         shadeCell(cell, bgColor);
+        setCellPadding(cell, 5, 6, 5, 6);
         setCellText(cell, text, 9, true, WHITE);
     }
 
@@ -388,6 +400,23 @@ public final class TestRunWordGenerator {
 
     private void shadeCell(XWPFTableCell cell, String hex) {
         getTcPr(cell).addNewShd().setFill(hex);
+    }
+
+    // Cell padding in points (converted to twips), matching the PDF cell paddings.
+    private void setCellPadding(XWPFTableCell cell, int topPt, int leftPt, int bottomPt, int rightPt) {
+        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcMar mar = getTcPr(cell).addNewTcMar();
+        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth top = mar.addNewTop();
+        top.setW(topPt * 20);
+        top.setType(STTblWidth.Enum.forString("dxa"));
+        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth left = mar.addNewLeft();
+        left.setW(leftPt * 20);
+        left.setType(STTblWidth.Enum.forString("dxa"));
+        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth bottom = mar.addNewBottom();
+        bottom.setW(bottomPt * 20);
+        bottom.setType(STTblWidth.Enum.forString("dxa"));
+        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth right = mar.addNewRight();
+        right.setW(rightPt * 20);
+        right.setType(STTblWidth.Enum.forString("dxa"));
     }
 
     private org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr getTcPr(XWPFTableCell cell) {
