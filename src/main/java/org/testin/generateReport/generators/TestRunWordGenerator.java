@@ -255,8 +255,11 @@ public final class TestRunWordGenerator {
         shadeCell(cell, LIGHT_BG);
         setCellPadding(cell, 8, 6, 8, 6);
         setCellText(cell, number, 20, true, numberColor);
-        // label line (9pt, #595959), spaced 4pt below the number (matches PDF number marginBottom)
+        // number centered, matches PDF (TextAlignment.CENTER)
+        cell.getParagraphs().getFirst().setAlignment(ParagraphAlignment.CENTER);
+        // label line (9pt, #595959), centered, spaced 4pt below the number (matches PDF)
         XWPFParagraph lp = cell.addParagraph();
+        lp.setAlignment(ParagraphAlignment.CENTER);
         lp.setSpacingBefore(80);
         XWPFRun lrun = lp.createRun();
         lrun.setText(label);
@@ -315,6 +318,7 @@ public final class TestRunWordGenerator {
             shadeCell(numCell, rowBg);
             setCellPadding(numCell, 4, 6, 4, 6);
             setCellText(numCell, String.valueOf(idx), 9, false, DARK_GRAY);
+            numCell.getParagraphs().getFirst().setAlignment(ParagraphAlignment.CENTER);
 
             XWPFTableCell tcCell = row.getCell(1);
             shadeCell(tcCell, rowBg);
@@ -469,11 +473,13 @@ public final class TestRunWordGenerator {
         run.setColor(DARK_GRAY);
     }
 
+    // The # sequence column is halved (~3.5% -> 3) and unified across all case tables,
+    // with the freed width absorbed by the Test Case column.
     private int[] widthsFor(int cols, boolean withPriority, boolean withSeverity) {
         return switch (cols) {
-            case 2 -> new int[]{7, 93};
-            case 3 -> new int[]{7, 83, 10};
-            default -> new int[]{7, 73, 10, 10};
+            case 2 -> new int[]{3, 97};
+            case 3 -> new int[]{3, 87, 10};
+            default -> new int[]{3, 77, 10, 10};
         };
     }
 }
