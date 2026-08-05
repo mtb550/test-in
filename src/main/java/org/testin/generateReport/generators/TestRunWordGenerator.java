@@ -449,10 +449,12 @@ public final class TestRunWordGenerator {
         }
     }
 
+    // Column widths match the PDF generator's percent arrays.
+    // OOXML "pct" width values are in hundredths of a percent, so 30% -> 3000.
     private void setTableWidths(XWPFTable table, int... percents) {
         XWPFTableRow row = table.getRow(0);
         for (int i = 0; i < row.getTableCells().size() && i < percents.length; i++) {
-            getTcPr(row.getCell(i)).addNewTcW().setW(percents[i] * 1440 / 100 * 100);
+            getTcPr(row.getCell(i)).addNewTcW().setW(percents[i] * 100);
             getTcPr(row.getCell(i)).getTcW().setType(STTblWidth.Enum.forString("pct"));
         }
     }
