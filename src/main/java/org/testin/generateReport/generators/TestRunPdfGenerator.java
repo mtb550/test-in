@@ -21,6 +21,7 @@ import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
+import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.Config;
 import org.testin.mappers.TestRunItems;
@@ -70,8 +71,8 @@ public final class TestRunPdfGenerator {
 
             // Project name from the project selector combo box (selected value)
             String projectName = "";
-            TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(project, ProjectPanel.class)
-                    .getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+            TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(project, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+
             if (selectedProject != null) {
                 projectName = selectedProject.getName();
             }
@@ -126,15 +127,15 @@ public final class TestRunPdfGenerator {
             addOverviewRow(overviewTable, "Project", projectName, boldFont, regularFont);
 
             if (!tr.getReleaseNotes().isEmpty())
-                addOverviewRow(overviewTable, "Release Notes", tr.getReleaseNotes(), boldFont, regularFont);
+                addOverviewRow(overviewTable, TestRunConfiguration.RELEASE_NOTES.getDisplayName(), tr.getReleaseNotes(), boldFont, regularFont);
 
-            addOverviewRow(overviewTable, "Commit ID", tr.getCommitId().isEmpty() ? "n\\a" : tr.getCommitId(), boldFont, regularFont);
+            addOverviewRow(overviewTable, TestRunConfiguration.COMMIT_ID.getDisplayName(), tr.getCommitId().isEmpty() ? "n\\a" : tr.getCommitId(), boldFont, regularFont);
 
             if (!tr.getPlatform().isEmpty() || !tr.getComponent().isEmpty())
-                addOverviewRow(overviewTable, "Platform", tr.getPlatform() + ", " + tr.getComponent(), boldFont, regularFont);
+                addOverviewRow(overviewTable, TestRunConfiguration.PLATFORM.getDisplayName() + ", " + TestRunConfiguration.COMPONENT.getDisplayName(), tr.getPlatform() + ", " + tr.getComponent(), boldFont, regularFont);
 
             if (!tr.getTestType().isEmpty())
-                addOverviewRow(overviewTable, "Test Type", tr.getTestType(), boldFont, regularFont);
+                addOverviewRow(overviewTable, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType(), boldFont, regularFont);
 
 
             // Executed By: all distinct tester names across results, no repeats
@@ -211,7 +212,7 @@ public final class TestRunPdfGenerator {
             document.add(passedHeading);
 
             Paragraph passedBody = new Paragraph(
-                    "All passed cases covered the core authentication flow end-to-end: login by username and by ID, credential validation and error handling (invalid username/password combinations, empty fields, special characters, SQL injection resistance), account lockout after max failed attempts and lockout-duration behavior, OTP generation, validation, expiry and resend logic, password change and the full password policy rule set (length, case, numeric, sequence, ID-portion, language checks), and session timeout and logout behavior. No deviations from expected behavior were observed across these cases.")
+                    "n\\a")
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(6);
             document.add(passedBody);
@@ -224,7 +225,7 @@ public final class TestRunPdfGenerator {
             document.add(failedHeading);
 
             Paragraph failedBody = new Paragraph(
-                    "One case failed: \"Verify system redirects user to the provider website after successful authentication.\" Instead of redirecting to the provider website, the system redirected the user to the home page. This was logged as High priority / Major severity, as it affects the core post-authentication redirect flow and requires remediation before the next cycle.")
+                    "n\\a.")
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(6);
             document.add(failedBody);
@@ -237,7 +238,7 @@ public final class TestRunPdfGenerator {
             document.add(pendingHeading);
 
             Paragraph pendingBody = new Paragraph(
-                    "No test cases were left pending in this cycle — all 60 planned cases were executed to completion.")
+                    "n\\a")
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(6);
             document.add(pendingBody);

@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.testin.generateReport.generators.TestRunExcelGenerator;
 import org.testin.generateReport.generators.TestRunHtmlGenerator;
 import org.testin.generateReport.generators.TestRunPdfGenerator;
+import org.testin.generateReport.generators.TestRunWordGenerator;
 import org.testin.importExport.exports.*;
 import org.testin.importExport.imports.ImportAction;
 import org.testin.importExport.imports.ImportCsv;
@@ -86,6 +87,15 @@ public enum FileTypes {
             null,
             null,
             (project, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(project, trDir, tr, detailsMap)
+    ),
+
+    WORD(
+            "WORD",
+            ".docx",
+            null,
+            null,
+            null,
+            (project, trDir, tr, detailsMap) -> new TestRunWordGenerator().generate(project, trDir, tr, detailsMap)
     );
 
     // todo: add XML object.

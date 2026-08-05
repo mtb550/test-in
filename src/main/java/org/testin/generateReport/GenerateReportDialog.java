@@ -15,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Arrays;
 
 public class GenerateReportDialog extends DialogWrapper {
 
@@ -22,7 +23,10 @@ public class GenerateReportDialog extends DialogWrapper {
 
     private final JTextField fileNameField = new JTextField(30);
 
-    private final ComboBox<String> formatCombo = new ComboBox<>(new String[]{"HTML", "PDF", "XLSX"});
+    private final ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
+            .filter(type -> type.getReportHandler() != null)
+            .map(FileTypes::getLabel)
+            .toArray(String[]::new));
 
     @Getter
     private FileTypes selectedFormat;
