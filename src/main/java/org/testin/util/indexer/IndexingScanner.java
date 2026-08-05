@@ -96,8 +96,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestSetPackage(final Path path, final DirectoryDto parent,
-                                    final ProgressIndicator indicator) {
+    private void scanTestSetPackage(final Path path, final DirectoryDto parent, final ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
             final TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(project, path, parent);

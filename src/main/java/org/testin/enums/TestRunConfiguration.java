@@ -16,10 +16,28 @@ public enum TestRunConfiguration {
             new String[]{"", "Functional Test", "Performance Test"}
     ),
 
+    RELEASE_NOTES(
+            "Release Notes",
+            AllIcons.Nodes.Type,
+            null
+    ),
+
+    COMMIT_ID(
+            "Commit ID",
+            AllIcons.Nodes.Type,
+            null
+    ),
+
     PLATFORM(
             "Platform",
             AllIcons.Nodes.PpLib,
-            new String[]{"", "Windows", "Linux", "MacOS", "Android", "iOS"}
+            new String[]{"", "Web", "Mobile"}
+    ),
+
+    COMPONENT(
+            "Component",
+            AllIcons.Nodes.PpLib,
+            new String[]{"", "Frontend", "Backend"}
     ),
 
     LANGUAGE(

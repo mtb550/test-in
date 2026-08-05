@@ -14,11 +14,11 @@ import org.testin.util.KeyboardSet;
 import org.testin.util.services.RunStatusService;
 import org.testin.util.services.Services;
 
-public class SetStatusBlocked extends DumbAwareAction {
+public class SetTestCaseStatusBlocked extends DumbAwareAction {
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public SetStatusBlocked(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public SetTestCaseStatusBlocked(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Blocked", "Set test case status to Blocked", AllIcons.Actions.Pause);
         this.editor = editor;
         this.list = list;

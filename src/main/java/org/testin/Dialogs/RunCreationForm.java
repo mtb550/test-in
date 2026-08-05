@@ -19,7 +19,6 @@ import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 
 import javax.swing.*;
@@ -34,40 +33,33 @@ public class RunCreationForm {
     private final JBPanel<?> mainPanel;
     private final CheckboxTree checklistTree;
 
-    private final Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
-
     private final JBTextField descriptionField;
     private final JBTextField commitIdField;
+    private final Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
 
-    public RunCreationForm(final String runName, final CheckedTreeNode root, final Map<UUID, TestRunItems> resultsMap) {
+
+    public RunCreationForm(final @NotNull String runName, final CheckedTreeNode root, final @NotNull Map<UUID, TestRunItems> resultsMap) {
         mainPanel = new JBPanel<>(new BorderLayout());
 
         JBTextField runNameField = new JBTextField(runName);
         runNameField.setEditable(false);
         runNameField.setEnabled(false);
 
-        FormBuilder formBuilder = FormBuilder.createFormBuilder()
-                .addLabeledComponent("Run name:", runNameField);
+        FormBuilder formBuilder = FormBuilder.createFormBuilder().addLabeledComponent("Test Run name:", runNameField);
 
-        for (TestRunConfiguration field : TestRunConfiguration.values()) {
-
-            JComponent inputComponent = createEditableCombo(field.getOptions());
-            fieldMap.put(field, inputComponent);
-
-            JBLabel label = new JBLabel(field.getDisplayName() + ":", field.getIcon(), SwingConstants.LEFT);
-
-            if (field == TestRunConfiguration.PLATFORM) {
-                formBuilder.addSeparator();
-            }
-
-            formBuilder.addLabeledComponent(label, inputComponent);
-        }
-
-        // Free-text fields for description and commit ID
         descriptionField = new JBTextField();
         commitIdField = new JBTextField();
-        formBuilder.addLabeledComponent("Description:", descriptionField);
-        formBuilder.addLabeledComponent("Commit ID:", commitIdField);
+        formBuilder.addLabeledComponent(TestRunConfiguration.RELEASE_NOTES.getDisplayName(), descriptionField);
+        formBuilder.addLabeledComponent(TestRunConfiguration.COMMIT_ID.getDisplayName(), commitIdField);
+
+        for (TestRunConfiguration field : TestRunConfiguration.values()) {
+            if (field.getOptions() != null) {
+                JComponent inputComponent = createEditableCombo(field.getOptions());
+                fieldMap.put(field, inputComponent);
+                JBLabel label = new JBLabel(field.getDisplayName() + ":", field.getIcon(), SwingConstants.LEFT);
+                formBuilder.addLabeledComponent(label, inputComponent);
+            }
+        }
 
         JPanel configurationPanel = formBuilder.getPanel();
         configurationPanel.setBorder(JBUI.Borders.compound(
@@ -76,20 +68,18 @@ public class RunCreationForm {
         ));
 
         mainPanel.add(configurationPanel, BorderLayout.NORTH);
-
         checklistTree = new CheckboxTree(createTreeRenderer(resultsMap), root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
         TreeUtil.expandAll(checklistTree);
-
         mainPanel.add(new JBScrollPane(checklistTree), BorderLayout.CENTER);
     }
 
-    private ComboBox<String> createEditableCombo(final String[] items) {
-        ComboBox<String> comboBox = new ComboBox<>(items != null ? items : new String[0]);
+    private ComboBox<String> createEditableCombo(final @NotNull String[] items) {
+        ComboBox<String> comboBox = new ComboBox<>(items);
         comboBox.setEditable(true);
         return comboBox;
     }
 
-    private CheckboxTree.CheckboxTreeCellRenderer createTreeRenderer(final Map<UUID, TestRunItems> resultsMap) {
+    private CheckboxTree.CheckboxTreeCellRenderer createTreeRenderer(final @NotNull Map<UUID, TestRunItems> resultsMap) {
         return new CheckboxTree.CheckboxTreeCellRenderer() {
             @Override
             public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected,
@@ -118,24 +108,13 @@ public class RunCreationForm {
         };
     }
 
-    public void populateConfiguration(final TestRunDto tr) {
-        tr.setPlatform(getFieldValue(TestRunConfiguration.PLATFORM))
-                .setLanguage(getFieldValue(TestRunConfiguration.LANGUAGE))
-                .setBrowser(getFieldValue(TestRunConfiguration.BROWSER))
-                .setDeviceType(getFieldValue(TestRunConfiguration.DEVICE_TYPE))
-                .setTestType(getFieldValue(TestRunConfiguration.TEST_TYPE))
-                .setDescription(descriptionField.getText().trim())
-                .setCommitId(commitIdField.getText().trim());
-    }
-
-    public String getFieldValue(final TestRunConfiguration field) {
+    public String getFieldValue(final @NotNull TestRunConfiguration field) {
         JComponent comp = fieldMap.get(field);
 
-        if (comp instanceof JBTextField textField)
-            return textField.getText().trim();
-
-        else if (comp instanceof ComboBox<?> comboBox)
-            return String.valueOf(comboBox.getSelectedItem()).trim();
+        if (comp instanceof ComboBox<?> comboBox) {
+            Object selected = comboBox.getSelectedItem();
+            return selected != null ? selected.toString().trim() : "";
+        }
 
         return "";
     }

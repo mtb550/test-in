@@ -17,6 +17,7 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.settings.AppSettingsState;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
@@ -144,6 +145,7 @@ public class UpdateTestRunStatus extends DumbAwareAction {
             if (item.getStatus() == TestStatus.PENDING) {
                 item.setStatus(TestStatus.UNTESTED);
                 item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+                item.setExecutedBy(AppSettingsState.getInstance().testerName);
             }
         }
     }

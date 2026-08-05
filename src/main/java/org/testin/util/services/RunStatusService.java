@@ -13,6 +13,7 @@ import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.settings.AppSettingsState;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
 
@@ -38,6 +39,7 @@ public final class RunStatusService {
         if (item != null) {
             item.setStatus(status);
             item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+            item.setExecutedBy(AppSettingsState.getInstance().testerName);
         }
 
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
@@ -67,6 +69,7 @@ public final class RunStatusService {
 
         item.setStatus(status);
         item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        item.setExecutedBy(AppSettingsState.getInstance().testerName);
 
         Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
@@ -94,6 +97,7 @@ public final class RunStatusService {
                 if (item != null) {
                     item.setStatus(status);
                     item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+                    item.setExecutedBy(AppSettingsState.getInstance().testerName);
 
                     int tcIndex = editor.getCurrentTestCases().indexOf(tc);
                     if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {

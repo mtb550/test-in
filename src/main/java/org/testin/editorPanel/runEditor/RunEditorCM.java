@@ -40,9 +40,9 @@ public class RunEditorCM extends EditorContextMenu {
         super("Editor Context Menu", true);
         this.ui = ui;
 
-        add(new SetStatusPassed(ui, list));
-        add(new SetStatusFailed(ui, list));
-        add(new SetStatusBlocked(ui, list));
+        add(new SetTestCaseStatusPassed(ui, list));
+        add(new SetTestCaseStatusFailed(ui, list));
+        add(new SetTestCaseStatusBlocked(ui, list));
         addSeparator();
         add(new SetActualResultAction(ui, list));
         add(new UpdateRunItem(ui, list));

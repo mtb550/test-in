@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
 import org.testin.enums.TestStatus;
+import org.testin.mappers.Config;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
@@ -34,9 +35,7 @@ import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Locale;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -67,7 +66,7 @@ public final class TestRunPdfGenerator {
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
-            String cleanName = tr.getDescription().replace(".json", "");
+            String cleanName = tr.getReleaseNotes().replace(".json", "");
 
             // Project name from the project selector combo box (selected value)
             String projectName = "";
@@ -92,7 +91,7 @@ public final class TestRunPdfGenerator {
             // ════════════════════════════════════════════════════════════════
             // SUBTITLE — 12pt, #2E5496, with bottom border #1F3864 (single, 8px)
             // ════════════════════════════════════════════════════════════════
-            Paragraph subtitle = new Paragraph(projectName + "  |  " + "Web - Frontend")
+            Paragraph subtitle = new Paragraph(projectName + "  |  " + tr.getPlatform() + ", " + tr.getComponent())
                     .setFont(regularFont).setFontSize(10).setFontColor(MEDIUM_BLUE)
                     .setPaddingBottom(4)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 2f))
@@ -126,16 +125,17 @@ public final class TestRunPdfGenerator {
 
             addOverviewRow(overviewTable, "Project", projectName, boldFont, regularFont);
 
-            addOverviewRow(overviewTable, "Sprint / Cycle", "DGA changes, Update Complaints SLA to 5 days", boldFont, regularFont);
+            if (!tr.getReleaseNotes().isEmpty())
+                addOverviewRow(overviewTable, "Release Notes", tr.getReleaseNotes(), boldFont, regularFont);
 
-            addOverviewRow(overviewTable, "Branch ID", "n\\a", boldFont, regularFont);
+            addOverviewRow(overviewTable, "Commit ID", tr.getCommitId().isEmpty() ? "n\\a" : tr.getCommitId(), boldFont, regularFont);
 
+            if (!tr.getPlatform().isEmpty() || !tr.getComponent().isEmpty())
+                addOverviewRow(overviewTable, "Platform", tr.getPlatform() + ", " + tr.getComponent(), boldFont, regularFont);
 
             if (!tr.getTestType().isEmpty())
-                addOverviewRow(overviewTable, "Test Type", "Functional Test", boldFont, regularFont);
+                addOverviewRow(overviewTable, "Test Type", tr.getTestType(), boldFont, regularFont);
 
-            if (!tr.getPlatform().isEmpty())
-                addOverviewRow(overviewTable, "Platform", "Web - Frontend", boldFont, regularFont);
 
             // Executed By: all distinct tester names across results, no repeats
             String executedByAll = tr.getResults().stream()
@@ -143,9 +143,11 @@ public final class TestRunPdfGenerator {
                     .filter(s -> !s.trim().isEmpty())
                     .distinct()
                     .collect(Collectors.joining(", "));
-            addOverviewRow(overviewTable, "Executed By",
-                    executedByAll.isEmpty() ? "Muteb Almughyiri" : executedByAll, boldFont, regularFont);
-            addOverviewRow(overviewTable, "Execution Date", tr.getCreatedAt().format(DateTimeFormatter.ofPattern("dd MMMM yyyy")), boldFont, regularFont);
+
+            addOverviewRow(overviewTable, "Executed By", executedByAll, boldFont, regularFont);
+
+            // todo, execution date value to be updated.
+            addOverviewRow(overviewTable, "Execution Date", tr.getCreatedAt().format(Config.getDateFormatterPattern()), boldFont, regularFont);
             addOverviewRow(overviewTable, "Run Status", trDir.getMarker().getStatus().name(), boldFont, regularFont);
 
             document.add(overviewTable);
@@ -294,16 +296,11 @@ public final class TestRunPdfGenerator {
             pdfCanvas.stroke();
 
             // Footer — all text on a single line:
-            // Prepared by <b>executedBy</b> — Quality Expert  |  execDate  |  Generated automatically by <b>Testin</b> IntelliJ plugin
-            String execDate = trDir.getMarker().getCreatedAt()
-                    .format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.US));
+
             footerCanvas.add(new Paragraph()
                     .setFont(regularFont).setFontSize(8).setFontColor(DARK_GRAY)
                     .setTextAlignment(TextAlignment.CENTER)
-//                    .add(new Text("Prepared by "))
-//                    .add(new Text(testerName))
-//                    .add(new Text(" — " + testerRole + "  |  "))
-                    .add(new Text(execDate))
+                    .add(new Text(ZonedDateTime.now().format(Config.getDateFormatterPattern())))
                     .add(new Text("  |  Generated automatically by "))
                     .add(new Link("Testin", PdfAction.createURI("https://plugins.jetbrains.com/plugin/31514-testin"))
                             .setFontColor(LINK_BLUE))
@@ -497,6 +494,4 @@ public final class TestRunPdfGenerator {
 
         table.addCell(cell);
     }
-
-
 }

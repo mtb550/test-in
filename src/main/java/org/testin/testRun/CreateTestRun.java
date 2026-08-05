@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CheckedTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Dialogs.RunCreationForm;
+import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.TestRunItems;
@@ -20,6 +21,7 @@ import org.testin.mappers.markers.TestRunMarker;
 import org.testin.nodeCreator.CreateTreeNode;
 import org.testin.nodeCreator.NodeCreator;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.settings.AppSettingsState;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
 import org.testin.util.indexer.ProjectIndexer;
@@ -136,22 +138,30 @@ public class CreateTestRun implements NodeCreator {
     }
 
 
-    private void saveSelectedToJSON(final RunCreationForm form, final CheckedTreeNode root, final Path savePath, final ProjectPanel projectPanel, final TestRunDirectoryDto tr) {
-        final TestRunDto run = new TestRunDto();
-        form.populateConfiguration(run);
+    private void saveSelectedToJSON(final RunCreationForm form, final CheckedTreeNode root, final Path savePath, final ProjectPanel projectPanel, final TestRunDirectoryDto trDir) {
+        final TestRunDto tr = new TestRunDto()
+                .setCreatedBy(AppSettingsState.getInstance().testerName)
+                .setReleaseNotes(form.getDescriptionField().getText().trim())
+                .setCommitId(form.getCommitIdField().getText().trim())
+                .setPlatform(form.getFieldValue(TestRunConfiguration.PLATFORM))
+                .setComponent(form.getFieldValue(TestRunConfiguration.COMPONENT))
+                .setTestType(form.getFieldValue(TestRunConfiguration.TEST_TYPE))
+                .setLanguage(form.getFieldValue(TestRunConfiguration.LANGUAGE))
+                .setBrowser(form.getFieldValue(TestRunConfiguration.BROWSER))
+                .setDeviceType(form.getFieldValue(TestRunConfiguration.DEVICE_TYPE));
 
         final List<TestRunItems> items = new ArrayList<>();
         collectCheckedItems(root, items);
-        run.setResults(items);
+        tr.setResults(items);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Services.getInstance(project, FilesUtil.class).createDirectories(savePath);
-            Services.getInstance(project, ProjectIndexer.class).putTestRun(savePath, run);
+            Services.getInstance(project, ProjectIndexer.class).putTestRun(savePath, tr);
 
             TestRunMarker marker = Services.getInstance(project, MarkerMapper.class).setTestRunMarker();
-            tr.setMarker(marker);
+            trDir.setMarker(marker);
 
-            Services.getInstance(project, ProjectIndexer.class).addTestRunDir(tr);
+            Services.getInstance(project, ProjectIndexer.class).addTestRunDir(trDir);
             Services.getInstance(project, ProjectIndexer.class).updateRunMarker(project, savePath, marker);
 
             VirtualFile virtualDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(savePath.toFile());
@@ -160,7 +170,7 @@ public class CreateTestRun implements NodeCreator {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 projectPanel.getTestRunTreeBuilder().buildTree(projectPanel.getTestProjectSelector().getSelectedTestProject().getItem());
-                Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, tr);
+                Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, trDir);
 
             });
 

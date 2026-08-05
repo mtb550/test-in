@@ -16,7 +16,6 @@ import java.awt.*;
 public class ActualResultSection implements RunItemEditSection {
 
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
-    final Font labelFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     @Getter
     private final JBTextField actualResultField;
@@ -30,46 +29,42 @@ public class ActualResultSection implements RunItemEditSection {
         this.actualResultField.setBorder(JBUI.Borders.empty(10));
 
         this.descriptionLabel = new JBLabel();
-        this.descriptionLabel.setFont(labelFont);
+        this.descriptionLabel.setFont(fieldFont);
 
         this.expectedResultLabel = new JBLabel();
-        this.expectedResultLabel.setFont(labelFont);
+        this.expectedResultLabel.setFont(fieldFont);
 
         this.wrapper = buildPanel();
     }
 
     private JPanel buildPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.empty(12));
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = JBUI.insets(4, 0, 4, 0);
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        gbc.gridwidth = 2;
+        // Description row — same pattern as ExpectedResultSection
+        JPanel descRow = new JPanel(new BorderLayout());
+        descRow.setOpaque(false);
+        descRow.add(createIconPanel(AllIcons.Actions.Edit), BorderLayout.WEST);
+        descRow.add(descriptionLabel, BorderLayout.CENTER);
+        descRow.setBorder(JBUI.Borders.emptyTop(8));
+        panel.add(descRow);
 
-        // Description row
-        JPanel descPanel = new JPanel(new BorderLayout());
-        descPanel.setOpaque(false);
-        descPanel.add(createIconPanel(AllIcons.Actions.Edit), BorderLayout.WEST);
-        descPanel.add(descriptionLabel, BorderLayout.CENTER);
-        panel.add(descPanel, gbc);
+        // Expected Result row — same pattern as ExpectedResultSection
+        JPanel expRow = new JPanel(new BorderLayout());
+        expRow.setOpaque(false);
+        expRow.add(createIconPanel(AllIcons.General.InspectionsOK), BorderLayout.WEST);
+        expRow.add(expectedResultLabel, BorderLayout.CENTER);
+        expRow.setBorder(JBUI.Borders.emptyTop(8));
+        panel.add(expRow);
 
-        // Expected result row
-        JPanel expPanel = new JPanel(new BorderLayout());
-        expPanel.setOpaque(false);
-        expPanel.add(createIconPanel(AllIcons.General.InspectionsOK), BorderLayout.WEST);
-        expPanel.add(expectedResultLabel, BorderLayout.CENTER);
-        panel.add(expPanel, gbc);
-
-        // Actual result row
-        JPanel actualPanel = new JPanel(new BorderLayout());
-        actualPanel.setOpaque(false);
-        actualPanel.add(createIconPanel(AllIcons.Actions.Copy), BorderLayout.WEST);
-        actualPanel.add(actualResultField, BorderLayout.CENTER);
-        panel.add(actualPanel, gbc);
+        // Actual Result row — same pattern as ExpectedResultSection
+        JPanel actRow = new JPanel(new BorderLayout());
+        actRow.setOpaque(false);
+        actRow.add(createIconPanel(AllIcons.Actions.Copy), BorderLayout.WEST);
+        actRow.add(actualResultField, BorderLayout.CENTER);
+        actRow.setBorder(JBUI.Borders.emptyTop(8));
+        panel.add(actRow);
 
         return panel;
     }

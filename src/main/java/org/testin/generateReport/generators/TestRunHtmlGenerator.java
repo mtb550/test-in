@@ -41,7 +41,7 @@ public final class TestRunHtmlGenerator {
         final int passRate = total > 0 ? (int) (passed * 100 / total) : 0;
 
         // Run-level metadata
-        final String runName = tr.getDescription().replace(".json", "");
+        final String runName = tr.getReleaseNotes().replace(".json", "");
         final String platform = tr.getPlatform();
         final AppSettingsState settings = AppSettingsState.getInstance();
         final String testerName = settings.testerName;

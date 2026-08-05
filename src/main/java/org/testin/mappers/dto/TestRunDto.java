@@ -27,7 +27,7 @@ public class TestRunDto {
 
     @NotNull
     @Builder.Default
-    private String description = "";
+    private String releaseNotes = "";
 
     @NotNull
     @Builder.Default
@@ -36,6 +36,10 @@ public class TestRunDto {
     @NotNull
     @Builder.Default
     private String platform = "";
+
+    @NotNull
+    @Builder.Default
+    private String component = "";
 
     @NotNull
     @Builder.Default
@@ -52,6 +56,10 @@ public class TestRunDto {
     @NotNull
     @Builder.Default
     private String testType = "";
+
+    @NotNull
+    @Builder.Default
+    private String createdBy = "";
 
     @NotNull
     @Builder.Default

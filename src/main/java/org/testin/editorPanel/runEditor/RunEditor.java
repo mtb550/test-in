@@ -32,6 +32,7 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.settings.AppSettingsState;
 import org.testin.testRun.UpdateTestRunStatus;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
@@ -502,6 +503,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         if (item != null) {
             item.setStatus(status);
             item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+            item.setExecutedBy(AppSettingsState.getInstance().testerName);
         }
 
         persistRunDataAsync();

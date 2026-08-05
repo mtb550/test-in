@@ -111,7 +111,7 @@ public class GenerateReportAction extends DumbAwareAction {
                 if (outputFile != null) {
                     reportFile = outputFile;
                 } else {
-                    String cleanName = runData.getDescription().replace(".json", "");
+                    String cleanName = runData.getReleaseNotes().replace(".json", "");
                     String rawTimestamp = java.time.ZonedDateTime.now().format(Config.getDateFormatterPattern());
                     String safeTimestamp = rawTimestamp.replace(":", "-").replace("/", "-");
                     reportFile = dirPath.resolve(cleanName + "_Report_" + safeTimestamp + format.getExtension()).toFile();

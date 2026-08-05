@@ -11,24 +11,37 @@ import org.testin.testRun.updateDialog.RunItemEditSection;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Enumeration;
 
 public class BugPrioritySection implements RunItemEditSection {
 
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     @Getter
-    private final JComboBox<BugPriority> bugPriorityCombo;
+    private final ButtonGroup buttonGroup;
     private final JPanel wrapper;
+    private BugPriority selected;
 
     public BugPrioritySection() {
-        this.bugPriorityCombo = new JComboBox<>(BugPriority.values());
-        this.bugPriorityCombo.setFont(fieldFont);
-        this.bugPriorityCombo.setBorder(JBUI.Borders.empty(10));
+        this.buttonGroup = new ButtonGroup();
+
+        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        radioPanel.setOpaque(false);
+
+        for (BugPriority bp : BugPriority.values()) {
+            JRadioButton rb = new JRadioButton(bp.getName());
+            rb.setFont(fieldFont);
+            rb.setOpaque(false);
+            rb.setActionCommand(bp.name());
+            rb.addActionListener(e -> selected = BugPriority.valueOf(e.getActionCommand()));
+            buttonGroup.add(rb);
+            radioPanel.add(rb);
+        }
 
         this.wrapper = new JPanel(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(AllIcons.General.Filter), BorderLayout.WEST);
-        this.wrapper.add(bugPriorityCombo, BorderLayout.CENTER);
+        this.wrapper.add(radioPanel, BorderLayout.CENTER);
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
@@ -41,27 +54,32 @@ public class BugPrioritySection implements RunItemEditSection {
     public void showSection(final JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
-        bugPriorityCombo.requestFocus();
     }
 
     @Override
     public void fillData(final @NotNull TestRunItems runItem) {
-        bugPriorityCombo.setSelectedItem(runItem.getBugPriority());
-    }
-
-    @Override
-    public void applyTo(final @NotNull TestRunItems runItem) {
-        if (wrapper.getParent() != null) {
-            Object selected = bugPriorityCombo.getSelectedItem();
-            if (selected instanceof BugPriority bugPriority) {
-                runItem.setBugPriority(bugPriority);
+        BugPriority bp = runItem.getBugPriority();
+        selected = bp;
+        Enumeration<AbstractButton> e = buttonGroup.getElements();
+        while (e.hasMoreElements()) {
+            AbstractButton b = e.nextElement();
+            if (b.getActionCommand().equals(bp.name())) {
+                b.setSelected(true);
+                break;
             }
         }
     }
 
     @Override
+    public void applyTo(final @NotNull TestRunItems runItem) {
+        if (wrapper.getParent() != null && selected != null) {
+            runItem.setBugPriority(selected);
+        }
+    }
+
+    @Override
     public JComponent getFocusComponent() {
-        return bugPriorityCombo;
+        return wrapper;
     }
 
 }

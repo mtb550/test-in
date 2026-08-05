@@ -11,24 +11,37 @@ import org.testin.testRun.updateDialog.RunItemEditSection;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Enumeration;
 
 public class BugSeveritySection implements RunItemEditSection {
 
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     @Getter
-    private final JComboBox<BugSeverity> severityCombo;
+    private final ButtonGroup buttonGroup;
     private final JPanel wrapper;
+    private BugSeverity selected;
 
     public BugSeveritySection() {
-        this.severityCombo = new JComboBox<>(BugSeverity.values());
-        this.severityCombo.setFont(fieldFont);
-        this.severityCombo.setBorder(JBUI.Borders.empty(10));
+        this.buttonGroup = new ButtonGroup();
+
+        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        radioPanel.setOpaque(false);
+
+        for (BugSeverity bs : BugSeverity.values()) {
+            JRadioButton rb = new JRadioButton(bs.getName());
+            rb.setFont(fieldFont);
+            rb.setOpaque(false);
+            rb.setActionCommand(bs.name());
+            rb.addActionListener(e -> selected = BugSeverity.valueOf(e.getActionCommand()));
+            buttonGroup.add(rb);
+            radioPanel.add(rb);
+        }
 
         this.wrapper = new JPanel(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(AllIcons.General.Filter), BorderLayout.WEST);
-        this.wrapper.add(severityCombo, BorderLayout.CENTER);
+        this.wrapper.add(radioPanel, BorderLayout.CENTER);
         this.wrapper.setBorder(JBUI.Borders.emptyTop(8));
     }
 
@@ -41,27 +54,32 @@ public class BugSeveritySection implements RunItemEditSection {
     public void showSection(final JPanel contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
-        severityCombo.requestFocus();
     }
 
     @Override
     public void fillData(final @NotNull TestRunItems runItem) {
-        severityCombo.setSelectedItem(runItem.getBugSeverity());
-    }
-
-    @Override
-    public void applyTo(final @NotNull TestRunItems runItem) {
-        if (wrapper.getParent() != null) {
-            Object selected = severityCombo.getSelectedItem();
-            if (selected instanceof BugSeverity bugSeverity) {
-                runItem.setBugSeverity(bugSeverity);
+        BugSeverity bs = runItem.getBugSeverity();
+        selected = bs;
+        Enumeration<AbstractButton> e = buttonGroup.getElements();
+        while (e.hasMoreElements()) {
+            AbstractButton b = e.nextElement();
+            if (b.getActionCommand().equals(bs.name())) {
+                b.setSelected(true);
+                break;
             }
         }
     }
 
     @Override
+    public void applyTo(final @NotNull TestRunItems runItem) {
+        if (wrapper.getParent() != null && selected != null) {
+            runItem.setBugSeverity(selected);
+        }
+    }
+
+    @Override
     public JComponent getFocusComponent() {
-        return severityCombo;
+        return wrapper;
     }
 
 }
