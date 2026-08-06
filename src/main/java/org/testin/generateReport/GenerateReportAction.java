@@ -1,7 +1,6 @@
 package org.testin.generateReport;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -124,9 +123,14 @@ public class GenerateReportAction extends DumbAwareAction {
 
                 Files.write(reportFile.toPath(), fileBytes);
 
-                NotificationAction openAction = NotificationAction.createSimple("Open report", () ->
-                        BrowserUtil.browse(reportFile.toURI().toString())
-                );
+                NotificationAction openAction = NotificationAction.createSimple("Open report", () -> {
+                    // Open directly in the OS default app (Word/Office) - not the IDE browser.
+                    try {
+                        java.awt.Desktop.getDesktop().open(reportFile);
+                    } catch (final Exception openEx) {
+                        Logger.error("Failed to open report: " + openEx.getMessage());
+                    }
+                });
 
                 NotificationAction copyAction = new NotificationAction("Copy path") {
                     @Override

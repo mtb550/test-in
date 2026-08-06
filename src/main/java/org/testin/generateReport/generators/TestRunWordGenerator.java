@@ -78,7 +78,6 @@ public final class TestRunWordGenerator {
                 XWPFTable overviewTable = doc.createTable(1, 2);
                 overviewTable.setWidth("100%");
                 overviewTable.setWidthType(TableWidthType.PCT);
-                setTableBorders(overviewTable);
                 setTableWidths(overviewTable, 30, 70);
 
                 addOverviewRow(overviewTable, 0, "Project", projectName);
@@ -103,6 +102,10 @@ public final class TestRunWordGenerator {
 
                 addOverviewRow(overviewTable, 6, "Execution Date", tr.getCreatedAt().format(Config.getDateFormatterPattern()));
                 addOverviewRow(overviewTable, 7, "Run Status", trDir.getMarker().getStatus().name());
+
+                // Borders applied after every row exists so the whole overview table (including
+                // the first row) is bordered.
+                setTableBorders(overviewTable);
 
                 // ════════════════════════════════════════════════════════════════
                 // SECTION 2: EXECUTION SUMMARY
