@@ -141,6 +141,11 @@ final class IndexingScanner {
                         .forEach(filePath -> {
                             try {
                                 final TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
+                                if (tc == null || tc.getId() == null) {
+                                    Logger.warn("Skipping non-test-case json '" + filePath.getFileName() +
+                                            "' in " + path);
+                                    return;
+                                }
                                 tc.setParent(ts);
                                 store.getTestCasesById().put(tc.getId(), tc);
                                 caseIds.add(tc.getId());
