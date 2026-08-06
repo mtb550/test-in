@@ -89,6 +89,9 @@ final class IndexingScanner {
 
                 } else if (Files.exists(dirPath.resolve(DirectoryType.TSP.getMarker()))) {
                     scanTestSetPackage(dirPath, parent, indicator);
+
+                } else {
+                    Logger.warn("Skipping unmarked directory under test cases (missing .ts/.tsp): " + dirPath);
                 }
             });
         } catch (final Exception ex) {
@@ -167,6 +170,8 @@ final class IndexingScanner {
                     scanTestRun(dirPath, parent, indicator);
                 } else if (Files.exists(dirPath.resolve(DirectoryType.TRP.getMarker()))) {
                     scanTestRunPackageDir(dirPath, parent, indicator);
+                } else {
+                    Logger.warn("Skipping unmarked directory under test runs (missing .tr/.trp): " + dirPath);
                 }
             });
         } catch (final Exception ex) {

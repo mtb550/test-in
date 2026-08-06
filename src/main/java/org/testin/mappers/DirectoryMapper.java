@@ -15,6 +15,7 @@ import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
+import java.io.File;
 import java.nio.file.Path;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -44,7 +45,9 @@ public final class DirectoryMapper {
         final String fileName = path.getFileName().toString();
         try {
             final Mapper mapper = Services.getInstance(project, Mapper.class);
-            final TestProjectMarker marker = mapper.readValue(path.resolve(DirectoryType.TP.getMarker()).toFile(), TestProjectMarker.class);
+            final TestProjectMarker marker = readMarkerSafe(mapper,
+                    path.resolve(DirectoryType.TP.getMarker()).toFile(),
+                    TestProjectMarker.class, "project", fileName);
 
             final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
                     .name(fileName)
@@ -219,7 +222,8 @@ public final class DirectoryMapper {
         final String fileName = path.getFileName().toString();
         try {
             final Path markerPath = path.resolve(DirectoryType.TR.getMarker());
-            final TestRunMarker marker = Services.getInstance(project, Mapper.class).readValue(markerPath.toFile(), TestRunMarker.class);
+            final TestRunMarker marker = readMarkerSafe(Services.getInstance(project, Mapper.class),
+                    markerPath.toFile(), TestRunMarker.class, "run", fileName);
 
 
             TestRunDirectoryDto testRunDirectoryDto = TestRunDirectoryDto
@@ -238,6 +242,24 @@ public final class DirectoryMapper {
             Services.getInstance(project, Notifier.class).error(project, "Read Test Run Failed", "Failed to parse directory: " + fileName);
             Logger.error("readTestRunNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
             throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * Reads a marker file, falling back to a default marker when the file is
+     * missing or empty/corrupt, so a single bad marker can never kill the scan
+     * of a whole project or run. Markers are optional metadata.
+     */
+    private <M> M readMarkerSafe(final @NotNull Mapper mapper, final @NotNull File file, final @NotNull Class<M> type, final String kind, final String name) {
+        try {
+            return mapper.readValue(file, type);
+        } catch (final Exception ex) {
+            Logger.warn("Missing/empty " + kind + " marker '" + name + "', using defaults: " + ex.getMessage());
+            try {
+                return type.getDeclaredConstructor().newInstance();
+            } catch (final Exception fallbackEx) {
+                throw new RuntimeException("Cannot create default " + kind + " marker", fallbackEx);
+            }
         }
     }
 }
