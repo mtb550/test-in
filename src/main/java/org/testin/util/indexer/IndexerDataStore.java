@@ -9,7 +9,6 @@ import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.mappers.markers.TestRunMarker;
 import org.testin.util.FilesUtil;
-import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
@@ -348,23 +347,78 @@ final class IndexerDataStore {
         final String oldStr = oldPath.toString();
         final String newStr = newPath.toString();
 
-        renameMapEntry(testProjectsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
-        renameMapEntry(testSetsDirByPath, oldStr, newStr, dto -> dto.setPath(newPath));
-        renameMapEntry(testRunsDirByPath, oldStr, newStr, dto -> dto.setPath(newPath));
-        renameMapEntry(testSetPackagesByPath, oldStr, newStr, dto -> dto.setPath(newPath));
-        renameMapEntry(testRunPackagesByPath, oldStr, newStr, dto -> dto.setPath(newPath));
-        renameMapEntry(testCasesMainDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
-        renameMapEntry(testRunsMainDirsByPath, oldStr, newStr, dto -> dto.setPath(newPath));
+        // 1. Rename the exact node in each map and rebuild its path/path2.
+        renameMapEntry(testProjectsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
+        renameMapEntry(testSetsDirByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
+        renameMapEntry(testRunsDirByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
+        renameMapEntry(testSetPackagesByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
+        renameMapEntry(testRunPackagesByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
+        renameMapEntry(testCasesMainDirsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
+        renameMapEntry(testRunsMainDirsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
         renameMapEntry(testSetCaseIds, oldStr, newStr, ids -> {
         });
         renameMapEntry(testRunsByPath, oldStr, newStr, tr -> {
         });
 
-        updatePath2(testProjectsByPath.get(newStr), newPath);
-        updatePath2(testSetsDirByPath.get(newStr), newPath);
-        updatePath2(testRunsDirByPath.get(newStr), newPath);
-        updatePath2(testSetPackagesByPath.get(newStr), newPath);
-        updatePath2(testRunPackagesByPath.get(newStr), newPath);
+        // 2. Cascade: rewrite the path prefix for every descendant so children stay
+        //    discoverable under the new parent (getChildren matches parent paths).
+        renameDescendants(testProjectsByPath, oldPath, newPath);
+        renameDescendants(testSetsDirByPath, oldPath, newPath);
+        renameDescendants(testRunsDirByPath, oldPath, newPath);
+        renameDescendants(testSetPackagesByPath, oldPath, newPath);
+        renameDescendants(testRunPackagesByPath, oldPath, newPath);
+        renameDescendants(testCasesMainDirsByPath, oldPath, newPath);
+        renameDescendants(testRunsMainDirsByPath, oldPath, newPath);
+        renameDescendantKeys(testSetCaseIds, oldPath, newPath);
+        renameDescendantKeys(testRunsByPath, oldPath, newPath);
+    }
+
+    private void updatePathAndPath2(final @NotNull DirectoryDto dto, final Path newPath) {
+        dto.setPath(newPath);
+        rebuildPath2(dto);
+    }
+
+    private <V extends DirectoryDto> void renameDescendants(final Map<String, V> map, final Path oldPath, final Path newPath) {
+        final List<Map.Entry<String, V>> toUpdate = new ArrayList<>();
+        for (final Map.Entry<String, V> e : map.entrySet()) {
+            final Path p = e.getValue().getPath();
+            if (p.startsWith(oldPath) && !p.equals(oldPath)) {
+                toUpdate.add(e);
+            }
+        }
+        for (final Map.Entry<String, V> e : toUpdate) {
+            final V dto = e.getValue();
+            final Path newChildPath = newPath.resolve(oldPath.relativize(dto.getPath()));
+            map.remove(e.getKey());
+            map.put(newChildPath.toString(), dto);
+            dto.setPath(newChildPath);
+            rebuildPath2(dto);
+        }
+    }
+
+    private void renameDescendantKeys(final Map<String, ?> map, final Path oldPath, final Path newPath) {
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> m = (Map<String, Object>) (Map<?, ?>) map;
+        final List<String> toMove = new ArrayList<>();
+        for (final String key : m.keySet()) {
+            final Path p = Path.of(key);
+            if (p.startsWith(oldPath) && !p.equals(oldPath)) {
+                toMove.add(key);
+            }
+        }
+        for (final String key : toMove) {
+            final Object v = m.remove(key);
+            final Path newKey = newPath.resolve(oldPath.relativize(Path.of(key)));
+            m.put(newKey.toString(), v);
+        }
+    }
+
+    private void rebuildPath2(final @NotNull DirectoryDto dto) {
+        final ArrayList<String> path2 = new ArrayList<>();
+        for (DirectoryDto cur = dto; cur != null; cur = cur.getParent()) {
+            path2.add(0, cur.getName());
+        }
+        dto.setPath2(path2);
     }
 
     List<DirectoryDto> getChildren(final Path parentPath) {
@@ -405,12 +459,7 @@ final class IndexerDataStore {
         }
     }
 
-    private void updatePath2(final @NotNull DirectoryDto dto, final Path newPath) {
-        final String newName = newPath.getFileName().toString();
-        final Tools tools = Services.getInstance(project, Tools.class);
-        dto.setPath2(tools.buildPath2(
-                dto.getParent() != null ? dto.getParent().getPath2() : null, newName));
-    }
+
 
     void clearAll() {
         testCasesById.clear();
