@@ -18,12 +18,12 @@ public class CreateTestSetPackage implements NodeCreator {
     public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
         TestSetPackageDirectoryDto tsp = Services.getInstance(project, DirectoryMapper.class).getTestSetPackageNode(project, newDirPath, parentDir);
 
+        // The indexer owns all file/dir I/O: it creates the directory + .tsp marker
+        // (with JSON content) and registers the node.
         Services.getInstance(project, ProjectIndexer.class).addTestSetPackage(tsp);
 
         TreeUtilImpl util = Services.getInstance(project, TreeUtilImpl.class);
-        util.createVf(project, this, parentDir.getPath(), name);
         util.createNode(action.getTree(), parentNode, tsp);
-        util.createDataVf(project, this, newDirPath, DirectoryType.TSP.getMarker());
 
         return tsp;
     }

@@ -77,35 +77,6 @@ public final class TreeUtilImpl {
         });
     }
 
-    public void createVf(final @NotNull Project project, final Object requester, final Path parentPath, final String folderName) {
-        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
-            try {
-                VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
-                if (parentVf != null && parentVf.isDirectory()) {
-                    parentVf.createChildDirectory(requester, folderName);
-                }
-            } catch (final IOException ex) {
-                Services.getInstance(project, Notifier.class).error(project, "Could not create directory: " + ex.getMessage(), "Error");
-            }
-        }));
-    }
-
-    public void createDataVf(final @NotNull Project project, final Object requester, final Path parentPath, final String fileName) {
-        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
-            try {
-                VirtualFile parentVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(parentPath);
-
-                if (parentVf != null && parentVf.isDirectory()) {
-                    if (parentVf.findChild(fileName) == null) {
-                        parentVf.createChildData(requester, fileName);
-                    }
-                }
-            } catch (final IOException ex) {
-                Services.getInstance(project, Notifier.class).error(project, "Could not create marker file: " + ex.getMessage(), "Error");
-            }
-        }));
-    }
-
     public void removeVf(final @NotNull Project project, final Object requester, final Path path) {
         try {
             VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
