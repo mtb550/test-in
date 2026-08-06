@@ -425,6 +425,17 @@ final class IndexerDataStore {
         final String parentStr = parentPath.toString();
         final List<DirectoryDto> children = new ArrayList<>();
 
+        // Main 'Test Cases' / 'Test Runs' dirs are children of a project node.
+        for (final TestCasesMainDirectoryDto dto : testCasesMainDirsByPath.values()) {
+            if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
+                children.add(dto);
+            }
+        }
+        for (final TestRunsMainDirectoryDto dto : testRunsMainDirsByPath.values()) {
+            if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
+                children.add(dto);
+            }
+        }
         for (final TestSetPackageDirectoryDto dto : testSetPackagesByPath.values()) {
             if (dto.getParent() != null && dto.getParent().getPath().toString().equals(parentStr)) {
                 children.add(dto);
