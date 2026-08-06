@@ -109,22 +109,27 @@ final class IndexerDataStore {
         return result;
     }
 
+    @org.jetbrains.annotations.Nullable
     TestRunDto getTestRunByPath(final Path testRunPath) {
         return testRunsByPath.get(testRunPath.toString());
     }
 
+    @org.jetbrains.annotations.Nullable
     TestRunDirectoryDto getTestRunDirByPath(final Path path) {
         return testRunsDirByPath.get(path.toString());
     }
 
+    @org.jetbrains.annotations.Nullable
     TestCaseDto getTestCaseById(final UUID id) {
         return testCasesById.get(id);
     }
 
+    @org.jetbrains.annotations.Nullable
     TestSetDirectoryDto getTestSetDirByPath(final Path path) {
         return testSetsDirByPath.get(path.toString());
     }
 
+    @org.jetbrains.annotations.Nullable
     TestSetPackageDirectoryDto getTestSetPackageByPath(final Path path) {
         return testSetPackagesByPath.get(path.toString());
     }

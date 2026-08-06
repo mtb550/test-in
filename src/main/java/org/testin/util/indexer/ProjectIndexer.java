@@ -7,6 +7,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
@@ -230,23 +231,23 @@ public final class ProjectIndexer {
         return store.getTestCasesForTestSet(testSetPath);
     }
 
-    public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
+    public @Nullable TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
         return store.getTestRunByPath(testRunPath);
     }
 
-    public @NotNull TestCaseDto getTestCaseById(final @NotNull UUID id) {
+    public @Nullable TestCaseDto getTestCaseById(final @NotNull UUID id) {
         return store.getTestCaseById(id);
     }
 
-    public @NotNull TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
+    public @Nullable TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
         return store.getTestSetDirByPath(path);
     }
 
-    public @NotNull TestSetPackageDirectoryDto getTestSetPackageByPath(final @NotNull Path path) {
+    public @Nullable TestSetPackageDirectoryDto getTestSetPackageByPath(final @NotNull Path path) {
         return store.getTestSetPackageByPath(path);
     }
 
-    public @NotNull TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
+    public @Nullable TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
         return store.getTestRunDirByPath(path);
     }
 

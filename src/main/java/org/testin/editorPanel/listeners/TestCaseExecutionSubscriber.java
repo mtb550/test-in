@@ -32,28 +32,34 @@ public class TestCaseExecutionSubscriber {
                 final UUID testUuid = parseUuid(testName);
                 if (testUuid != null) {
                     final TestCaseDto tc = indexer.getTestCaseById(testUuid);
-                    Logger.debug("ID match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
-                    tc.setTempStatus(status);
-                    tc.setTempError(error != null ? error : "");
-                    runningDtoId = tc.getId();
-                    updated = true;
+                    if (tc != null) {
+                        Logger.debug("ID match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
+                        tc.setTempStatus(status);
+                        tc.setTempError(error != null ? error : "");
+                        runningDtoId = tc.getId();
+                        updated = true;
+                    }
                 }
 
                 if (!updated) {
                     final UUID dtoId = uuidToDtoId.get(testName);
                     if (dtoId != null) {
                         final TestCaseDto tc = indexer.getTestCaseById(dtoId);
-                        Logger.debug("  UUID map match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
-                        tc.setTempStatus(status);
-                        tc.setTempError(error != null ? error : "");
-                        updated = true;
+                        if (tc != null) {
+                            Logger.debug("  UUID map match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
+                            tc.setTempStatus(status);
+                            tc.setTempError(error != null ? error : "");
+                            updated = true;
+                        }
                     }
                 }
 
                 if (!updated && "RUNNING".equals(status) && runningDtoId != null && !uuidToDtoId.containsKey(testName)) {
                     final TestCaseDto tc = indexer.getTestCaseById(runningDtoId);
-                    Logger.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");
-                    uuidToDtoId.put(testName, tc.getId());
+                    if (tc != null) {
+                        Logger.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");
+                        uuidToDtoId.put(testName, tc.getId());
+                    }
                 }
 
                 if (updated)

@@ -102,6 +102,11 @@ public class GenerateReportAction extends DumbAwareAction {
 
                 final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
                 TestRunDto runData = indexer.getTestRunByPath(dirPath);
+                if (runData == null) {
+                    Services.getInstance(project, Notifier.class).error(project, "Report Error",
+                            "No test run data found at: " + dirPath);
+                    return;
+                }
 
                 Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(project, runData);
 
@@ -156,7 +161,9 @@ public class GenerateReportAction extends DumbAwareAction {
 
         for (final TestRunItems item : tr.getResults()) {
             final TestCaseDto tc = indexer.getTestCaseById(item.getId());
-            detailsMap.put(item.getId(), tc);
+            if (tc != null) {
+                detailsMap.put(item.getId(), tc);
+            }
         }
 
         return detailsMap;
