@@ -19,7 +19,7 @@ import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.statusBar.NextPageAction;
 import org.testin.editorPanel.statusBar.PrevPageAction;
-import org.testin.generateJavaCode.method.GenerateTestMethod;
+import org.testin.generateJavaCode.method.AutomateTestCase;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.run.RunTestCase;
@@ -61,7 +61,7 @@ public class TestEditorCM extends EditorContextMenu {
 
         addSeparator();
 
-        add(new GenerateTestMethod(list));
+        add(new AutomateTestCase(list));
         add(new RunTestCase(list));
         add(new NavigateToCode(list));
 

@@ -10,11 +10,11 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Logger;
 
-public class GenerateTestMethod extends DumbAwareAction {
+public class AutomateTestCase extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
 
-    public GenerateTestMethod(final JBList<TestCaseDto> list) {
-        super("Generate", "", AllIcons.Actions.IntentionBulb);
+    public AutomateTestCase(final JBList<TestCaseDto> list) {
+        super("Automate Test Case ", "", AllIcons.Actions.IntentionBulb);
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.GenerateTestCase.getCustomShortcut(), list);
     }
@@ -23,7 +23,7 @@ public class GenerateTestMethod extends DumbAwareAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         TestCaseDto tc = list.getSelectedValue();
 
-        /// TODO: to be implemented
+        /// TODO: to be implemented by integrating to pi agent automatic, next release
         Logger.info(tc.getDescription());
     }
 
