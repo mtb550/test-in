@@ -282,7 +282,12 @@ final class IndexerDataStore {
 
     void updateRunMarker(final @NotNull Project project, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
         final TestRunDirectoryDto trd = testRunsDirByPath.get(runPath.toString());
-        trd.setMarker(marker);
+        if (trd != null) {
+            trd.setMarker(marker);
+        } else {
+            Logger.warn("updateRunMarker: run dir not indexed, updating marker on disk only: " + runPath);
+        }
+        // Always persist the marker file even when the run dir is not (yet) in memory.
         Services.getInstance(project, FilesUtil.class).write(project, runPath.resolve(DirectoryType.TR.getMarker()), marker);
     }
 
