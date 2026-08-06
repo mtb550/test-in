@@ -15,9 +15,11 @@ import org.testin.mappers.dto.dirs.*;
 import org.testin.mappers.markers.TestRunMarker;
 import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
+import org.testin.util.TreeUtilImpl;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -355,6 +357,15 @@ public final class ProjectIndexer {
     }
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
+        // The indexer owns file I/O: rename the directory on disk first, then update the store.
+        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, oldPath, "Rename Failed", vf -> {
+            try {
+                vf.rename(this, newPath.getFileName().toString());
+            } catch (final IOException ex) {
+                Logger.error(ex.getMessage());
+                throw new RuntimeException(ex);
+            }
+        });
         store.renameNode(oldPath, newPath);
     }
 }

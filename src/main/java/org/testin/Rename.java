@@ -16,7 +16,6 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
-import org.testin.util.TreeUtilImpl;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
@@ -24,10 +23,7 @@ import org.testin.util.services.Services;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import java.io.IOException;
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 
 public class Rename extends DumbAwareAction {
     private final @NotNull ProjectPanel projectPanel;
@@ -61,33 +57,21 @@ public class Rename extends DumbAwareAction {
         Path oldPath = dir.getPath();
         Path newPath = oldPath.getParent().resolve(newName);
 
-        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, oldPath, "Rename Failed", vf -> {
-            try {
-                vf.rename(this, newName);
-            } catch (final IOException ex) {
-                Logger.error(ex.getMessage());
-                throw new RuntimeException(ex);
-            }
+        // The indexer owns file I/O + in-memory state: rename the directory on disk and
+        // update the store (paths, name, path2, modified metadata).
+        Services.getInstance(project, ProjectIndexer.class).renameNode(oldPath, newPath);
 
-            dir.setName(newName);
-            dir.setPath(newPath);
-            dir.setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-            dir.setModifiedBy(System.getProperty("user.name", ""));
+        // UI-only updates, after the store is consistent.
+        Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
+        ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
-            Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
-            ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+        if (dir instanceof TestProjectDirectoryDto) {
+            projectPanel.getTestProjectSelector().loadTestProjectList();
+        }
 
-            Services.getInstance(project, ProjectIndexer.class).renameNode(oldPath, newPath);
+        Logger.info("Success! Renamed to: " + newName);
 
-            if (dir instanceof TestProjectDirectoryDto) {
-                projectPanel.getTestProjectSelector().loadTestProjectList();
-            }
-
-            Logger.info("Success! Renamed to: " + newName);
-
-            // todo: add code generator code to change the name in automation code.
-
-        });
+        // todo: add code generator code to change the name in automation code.
     }
 
     @Override

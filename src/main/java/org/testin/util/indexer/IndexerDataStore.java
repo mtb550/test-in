@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 final class IndexerDataStore {
 
@@ -388,6 +390,9 @@ final class IndexerDataStore {
 
     private void updatePathAndPath2(final @NotNull DirectoryDto dto, final Path newPath) {
         dto.setPath(newPath);
+        dto.setName(newPath.getFileName().toString());
+        dto.setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        dto.setModifiedBy(System.getProperty("user.name", ""));
         rebuildPath2(dto);
     }
 
