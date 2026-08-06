@@ -4,6 +4,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.mappers.markers.TestRunPackageMarker;
+import org.testin.util.indexer.ProjectIndexer;
+
+import java.nio.file.Path;
 
 @Setter
 @Getter
@@ -18,6 +21,11 @@ public class TestRunPackageDirectoryDto extends DirectoryDto {
     @Override
     public @NonNull CreateNodeMenu getMenu() {
         return CreateNodeMenu.TEST_RUN_PACKAGE;
+    }
+
+    @Override
+    public @NonNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
+        throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + getClass().getSimpleName());
     }
 
 }

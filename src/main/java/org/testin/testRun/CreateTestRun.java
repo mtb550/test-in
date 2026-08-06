@@ -76,7 +76,7 @@ public class CreateTestRun implements NodeCreator {
         final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
         indexer.awaitIndexing();
 
-        final Object label = isRoot ? parentOfThisNode : resolveDirectoryObject(folder, parentOfThisNode, indexer);
+        final Object label = isRoot ? parentOfThisNode : parentOfThisNode.resolveDirectoryObject(folder, indexer);
         final DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
         final DirectoryDto thisNodeDto = (label instanceof DirectoryDto) ? (DirectoryDto) label : null;
 
@@ -97,30 +97,6 @@ public class CreateTestRun implements NodeCreator {
         }
 
         return node;
-    }
-
-    private Object resolveDirectoryObject(final Path folder, final DirectoryDto parentDir, final ProjectIndexer indexer) {
-        Object obj;
-
-        if (parentDir instanceof TestProjectDirectoryDto) {
-            obj = indexer.getTestSetPackageByPath(folder);
-            return obj;
-
-        } else if (parentDir instanceof TestCasesMainDirectoryDto) {
-            obj = indexer.getTestSetByPath(folder);
-            return obj;
-
-        } else if (parentDir instanceof TestRunsMainDirectoryDto) {
-            obj = indexer.getTestRunDirByPath(folder);
-            return obj;
-
-        } else if (parentDir instanceof TestSetDirectoryDto || parentDir instanceof TestSetPackageDirectoryDto) {
-            obj = indexer.getTestSetByPath(folder);
-            return obj;
-
-        }
-
-        throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + parentDir.getClass().getSimpleName());
     }
 
     private void collectCheckedItems(final CheckedTreeNode node, final List<TestRunItems> items) {

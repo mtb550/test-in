@@ -5,6 +5,9 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.mappers.markers.TestProjectMarker;
+import org.testin.util.indexer.ProjectIndexer;
+
+import java.nio.file.Path;
 
 @Setter
 @Getter
@@ -32,6 +35,11 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     @Override
     public @NonNull CreateNodeMenu getMenu() {
         return CreateNodeMenu.TEST_PROJECT;
+    }
+
+    @Override
+    public @NonNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
+        return indexer.getTestSetPackageByPath(folder);
     }
 
 }

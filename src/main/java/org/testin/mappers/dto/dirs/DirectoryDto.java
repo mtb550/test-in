@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.mappers.Config;
+import org.testin.util.indexer.ProjectIndexer;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
@@ -55,4 +56,9 @@ public abstract class DirectoryDto {
 
     @NonNull
     public abstract CreateNodeMenu getMenu();
+
+    // Polymorphic directory-object resolution: each concrete directory knows how to resolve
+    // the object at a child folder, replacing the instanceof/if-chain in CreateTestRun.
+    @NonNull
+    public abstract Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer);
 }
