@@ -44,8 +44,7 @@ public final class ProjectIndexer {
         this.scanner = new IndexingScanner(project, store);
     }
 
-    // todo: why static
-    private static long estimateBytes(final int testCases, final int testRuns, final int projects, final int testSets, final int testRunDirs, final int testSetPkgs, final int testRunPkgs, final int testSetCaseSets) {
+    private long estimateBytes(final int testCases, final int testRuns, final int projects, final int testSets, final int testRunDirs, final int testSetPkgs, final int testRunPkgs, final int testSetCaseSets) {
         final long MAP_OVERHEAD = 256L;
         final long TC_SIZE = 2048L;
         final long TR_SIZE = 1024L;
@@ -63,8 +62,7 @@ public final class ProjectIndexer {
         return total;
     }
 
-    // todo: why static
-    private static String formatBytes(final long bytes) {
+    private String formatBytes(final long bytes) {
         final long kb = bytes / 1024;
         if (kb < 1024) {
             return "~" + kb + " KB";
