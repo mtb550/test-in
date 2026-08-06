@@ -67,7 +67,7 @@ public final class TestRunPdfGenerator {
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
-            String cleanName = tr.getReleaseNotes().replace(".json", "");
+            String cleanName = tr.getChangeLog().replace(".json", "");
 
             // Project name from the project selector combo box (selected value)
             String projectName = "";
@@ -126,8 +126,8 @@ public final class TestRunPdfGenerator {
 
             addOverviewRow(overviewTable, "Project", projectName, boldFont, regularFont);
 
-            if (!tr.getReleaseNotes().isEmpty())
-                addOverviewRow(overviewTable, TestRunConfiguration.RELEASE_NOTES.getDisplayName(), tr.getReleaseNotes(), boldFont, regularFont);
+            if (!tr.getChangeLog().isEmpty())
+                addOverviewRow(overviewTable, TestRunConfiguration.CHANGE_LOG.getDisplayName(), tr.getChangeLog(), boldFont, regularFont);
 
             addOverviewRow(overviewTable, TestRunConfiguration.COMMIT_ID.getDisplayName(), tr.getCommitId().isEmpty() ? "n\\a" : tr.getCommitId(), boldFont, regularFont);
 

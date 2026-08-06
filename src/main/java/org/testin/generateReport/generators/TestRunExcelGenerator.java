@@ -28,7 +28,7 @@ public final class TestRunExcelGenerator {
 
             ws.value(0, 0, "Test Run Report:");
             ws.style(0, 0).bold().fontSize(14).set();
-            ws.value(0, 1, tr.getReleaseNotes().replace(".json", ""));
+            ws.value(0, 1, tr.getChangeLog().replace(".json", ""));
 
             ws.value(1, 0, "Platform:");
             ws.style(1, 0).bold().set();

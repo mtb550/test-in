@@ -27,7 +27,7 @@ public class TestRunDto {
 
     @NotNull
     @Builder.Default
-    private String releaseNotes = "";
+    private String changeLog = "";
 
     @NotNull
     @Builder.Default

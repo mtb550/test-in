@@ -49,7 +49,7 @@ public class RunCreationForm {
 
         descriptionField = new JBTextField();
         commitIdField = new JBTextField();
-        formBuilder.addLabeledComponent(TestRunConfiguration.RELEASE_NOTES.getDisplayName(), descriptionField);
+        formBuilder.addLabeledComponent(TestRunConfiguration.CHANGE_LOG.getDisplayName(), descriptionField);
         formBuilder.addLabeledComponent(TestRunConfiguration.COMMIT_ID.getDisplayName(), commitIdField);
 
         for (TestRunConfiguration field : TestRunConfiguration.values()) {

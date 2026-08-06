@@ -46,7 +46,7 @@ public final class TestRunWordGenerator {
     public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
-                String cleanName = tr.getReleaseNotes().replace(".json", "");
+                String cleanName = tr.getChangeLog().replace(".json", "");
 
                 String projectName = "";
                 TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(project, ProjectPanel.class)
@@ -82,8 +82,8 @@ public final class TestRunWordGenerator {
 
                 addOverviewRow(overviewTable, 0, "Project", projectName);
 
-                if (!tr.getReleaseNotes().isEmpty())
-                    addOverviewRow(overviewTable, 1, TestRunConfiguration.RELEASE_NOTES.getDisplayName(), tr.getReleaseNotes());
+                if (!tr.getChangeLog().isEmpty())
+                    addOverviewRow(overviewTable, 1, TestRunConfiguration.CHANGE_LOG.getDisplayName(), tr.getChangeLog());
 
                 addOverviewRow(overviewTable, 2, TestRunConfiguration.COMMIT_ID.getDisplayName(), tr.getCommitId().isEmpty() ? "n/a" : tr.getCommitId());
 

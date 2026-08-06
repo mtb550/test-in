@@ -16,8 +16,8 @@ public enum TestRunConfiguration {
             new String[]{"", "Functional Test", "Performance Test"}
     ),
 
-    RELEASE_NOTES(
-            "Release Notes",
+    CHANGE_LOG(
+            "Change Log",
             AllIcons.Nodes.Type,
             null
     ),
