@@ -8,7 +8,7 @@ import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Tools;
-import org.testin.util.TreeUtilImpl;
+import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
@@ -21,7 +21,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -150,36 +149,22 @@ public class TreeTransferHandler extends TransferHandler {
 
     private void persistMove(final DefaultMutableTreeNode movedNode, final DirectoryDto targetDir) {
         final DirectoryDto sourceDir = (DirectoryDto) movedNode.getUserObject();
+        Path oldPath = sourceDir.getPath();
+        Path newPath = targetDir.getPath().resolve(sourceDir.getName());
 
-        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, sourceDir.getPath(), targetDir.getPath(), "Move Failed", (sourceVf, targetVf) -> {
-            try {
-                sourceVf.move(this, targetVf);
-            } catch (final IOException ex) {
-                Logger.error(ex.getMessage());
-                throw new RuntimeException(ex);
-            }
+        // The indexer owns file I/O + in-memory store (VFS move + path updates).
+        Services.getInstance(project, ProjectIndexer.class).moveNode(oldPath, newPath);
 
-            Path oldPath = sourceDir.getPath();
-            Path newPath = targetDir.getPath().resolve(sourceDir.getName());
+        // UI-only: refresh the moved subtree paths.
+        Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(movedNode, oldPath, newPath);
 
-            sourceDir.setPath(newPath);
-
-            Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(movedNode, oldPath, newPath);
-
-            Logger.info("Moved successfully to: " + newPath);
-        });
+        Logger.info("Moved successfully to: " + newPath);
     }
 
     private void persistCopy(final DirectoryDto source, final DirectoryDto target) {
-        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, source.getPath(), target.getPath(), "Copy Failed", (sourceVf, targetVf) -> {
-            try {
-                sourceVf.copy(this, targetVf, sourceVf.getName());
-            } catch (final IOException ex) {
-                Logger.error("Failed to copy: " + ex.getMessage());
-                throw new RuntimeException(ex);
-            }
-            Logger.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
-        });
+        // The indexer owns the file I/O (VFS copy).
+        Services.getInstance(project, ProjectIndexer.class).copyNode(source.getPath(), target.getPath());
+        Logger.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
     }
 
     @Override

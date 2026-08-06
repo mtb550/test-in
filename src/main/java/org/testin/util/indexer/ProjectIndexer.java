@@ -340,6 +340,29 @@ public final class ProjectIndexer {
         Services.getInstance(project, TreeUtilImpl.class).removeNode(node, tree);
     }
 
+    public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
+        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, oldPath, newPath, "Move Failed", (sourceVf, targetVf) -> {
+            try {
+                sourceVf.move(this, targetVf);
+            } catch (final IOException ex) {
+                Logger.error(ex.getMessage());
+                throw new RuntimeException(ex);
+            }
+        });
+        store.renameNode(oldPath, newPath);
+    }
+
+    public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath) {
+        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
+            try {
+                sourceVf.copy(this, targetVf, sourceVf.getName());
+            } catch (final IOException ex) {
+                Logger.error(ex.getMessage());
+                throw new RuntimeException(ex);
+            }
+        });
+    }
+
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         store.addTestProject(tp);
         store.addTestProjectMarker(project, tp);

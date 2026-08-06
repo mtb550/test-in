@@ -70,13 +70,6 @@ public final class TreeUtilImpl {
         });
     }
 
-    public void removeRootNode(final SimpleTree tree) {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-            model.setRoot(null);
-        });
-    }
-
     public void removeVf(final @NotNull Project project, final Object requester, final Path path) {
         try {
             VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
