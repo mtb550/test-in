@@ -215,9 +215,15 @@ public final class ProjectIndexer {
 
         if (projectPaths.length == 0) return Collections.emptyList();
 
-        return Arrays.stream(projectPaths)
-                .filter(p -> Files.exists(p.resolve(DirectoryType.TP.getMarker())))
-                .collect(Collectors.toList());
+        final List<Path> valid = new ArrayList<>();
+        Arrays.stream(projectPaths).forEach(p -> {
+            if (Files.exists(p.resolve(DirectoryType.TP.getMarker()))) {
+                valid.add(p);
+            } else {
+                Logger.warn("Skipping directory without .tp marker (not a test project): " + p);
+            }
+        });
+        return valid;
     }
 
     private void logSummary() {
