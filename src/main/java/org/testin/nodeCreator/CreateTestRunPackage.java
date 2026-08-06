@@ -5,7 +5,6 @@ import org.testin.enums.DirectoryType;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunPackageDirectoryDto;
-import org.testin.util.TreeUtilImpl;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
@@ -22,8 +21,8 @@ public class CreateTestRunPackage implements NodeCreator {
         // (with JSON content) and registers the node.
         Services.getInstance(project, ProjectIndexer.class).addTestRunPackage(tr);
 
-        TreeUtilImpl util = Services.getInstance(project, TreeUtilImpl.class);
-        util.createNode(action.getTree(), parentNode, tr);
+        // Tree-node insertion is routed through the indexer (TreeUtilImpl stays indexer-only).
+        Services.getInstance(project, ProjectIndexer.class).createNode(action.getTree(), parentNode, tr);
 
         return tr;
     }

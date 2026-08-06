@@ -7,20 +7,17 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.EditorUtil;
-import org.testin.util.TreeUtilImpl;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -76,29 +73,21 @@ public class Remove extends DumbAwareAction {
             if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
                 Services.getInstance(project, EditorUtil.class).close(project, pkg.getName());
 
-            TreeUtilImpl util = Services.getInstance(project, TreeUtilImpl.class);
-            util.removeVf(project, this, pkg.getPath());
+            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
 
-            if (node.getParent() != null)
-                util.removeNode(node, tree);
-        }
-
-        VirtualFileManager.getInstance().syncRefresh();
-
-        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-        for (final DefaultMutableTreeNode node : nodesToRemove) {
-            final DirectoryDto dir = (DirectoryDto) node.getUserObject();
-            final Path path = dir.getPath();
-
-            switch (dir) {
-                case TestProjectDirectoryDto ignored -> indexer.removeTestProject(path);
-                case TestSetDirectoryDto ignored -> indexer.removeTestSet(path);
-                case TestRunDirectoryDto ignored -> indexer.removeTestRun(path);
-                case TestSetPackageDirectoryDto ignored -> indexer.removeTestSetPackage(path);
-                case TestRunPackageDirectoryDto ignored -> indexer.removeTestRunPackage(path);
+            // The indexer owns the file/dir removal + in-memory store.
+            switch (pkg) {
+                case TestProjectDirectoryDto ignored -> indexer.removeTestProject(pkg.getPath());
+                case TestSetDirectoryDto ignored -> indexer.removeTestSet(pkg.getPath());
+                case TestRunDirectoryDto ignored -> indexer.removeTestRun(pkg.getPath());
+                case TestSetPackageDirectoryDto ignored -> indexer.removeTestSetPackage(pkg.getPath());
+                case TestRunPackageDirectoryDto ignored -> indexer.removeTestRunPackage(pkg.getPath());
                 default -> {
                 }
             }
+
+            if (node.getParent() != null)
+                indexer.removeNode(node, tree);
         }
 
         ApplicationManager.getApplication().invokeLater(() -> {

@@ -14,7 +14,6 @@ import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.settings.AppSettingsState;
 import org.testin.util.EditorUtil;
 import org.testin.util.Tools;
-import org.testin.util.TreeUtilImpl;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
@@ -35,8 +34,8 @@ public class CreateTestSet implements NodeCreator {
         // (with JSON content) and registers the node.
         Services.getInstance(project, ProjectIndexer.class).addTestSet(ts);
 
-        TreeUtilImpl util = Services.getInstance(project, TreeUtilImpl.class);
-        util.createNode(action.getTree(), parentNode, ts);
+        // Tree-node insertion is routed through the indexer (TreeUtilImpl stays indexer-only).
+        Services.getInstance(project, ProjectIndexer.class).createNode(action.getTree(), parentNode, ts);
 
         createJavaClassInTestRoot(project, parentDir.getName(), name);
         Services.getInstance(project, EditorUtil.class).open(project, ts);
@@ -61,7 +60,7 @@ public class CreateTestSet implements NodeCreator {
 
             TestSetDirectoryDto newTsDto = Services.getInstance(project, DirectoryMapper.class).setTestSetNode(project, Path.of(sheetDir.getPath()), parentDirDto);
             Services.getInstance(project, ProjectIndexer.class).addTestSet(newTsDto);
-            Services.getInstance(project, TreeUtilImpl.class).createNode(tree, parentNode, newTsDto);
+            Services.getInstance(project, ProjectIndexer.class).createNode(tree, parentNode, newTsDto);
             createJavaClassInTestRoot(project, parentDirDto.getName(), safeDirName);
         }
 

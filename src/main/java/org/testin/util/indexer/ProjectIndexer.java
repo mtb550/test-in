@@ -6,6 +6,8 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
@@ -19,6 +21,7 @@ import org.testin.util.TreeUtilImpl;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
+import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -299,23 +302,42 @@ public final class ProjectIndexer {
     }
 
     public void removeTestProject(final @NotNull Path path) {
+        removeVf(path);
         store.removeTestProject(path);
     }
 
     public void removeTestSet(final @NotNull Path path) {
+        removeVf(path);
         store.removeTestSet(path);
     }
 
     public void removeTestRun(final @NotNull Path path) {
+        removeVf(path);
         store.removeTestRun(path);
     }
 
     public void removeTestSetPackage(final @NotNull Path path) {
+        removeVf(path);
         store.removeTestSetPackage(path);
     }
 
     public void removeTestRunPackage(final @NotNull Path path) {
+        removeVf(path);
         store.removeTestRunPackage(path);
+    }
+
+    private void removeVf(final @NotNull Path path) {
+        Services.getInstance(project, TreeUtilImpl.class).removeVf(project, this, path);
+        VirtualFileManager.getInstance().syncRefresh();
+    }
+
+    // UI helpers - routed through the indexer so TreeUtilImpl stays indexer-only.
+    public void createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object dto) {
+        Services.getInstance(project, TreeUtilImpl.class).createNode(tree, parentNode, dto);
+    }
+
+    public void removeNode(final DefaultMutableTreeNode node, final SimpleTree tree) {
+        Services.getInstance(project, TreeUtilImpl.class).removeNode(node, tree);
     }
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
