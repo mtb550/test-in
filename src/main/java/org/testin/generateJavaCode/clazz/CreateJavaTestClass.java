@@ -1,10 +1,11 @@
-package org.testin.generateJavaCode.autoGenerator;
+package org.testin.generateJavaCode.clazz;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Logger;

@@ -1,4 +1,4 @@
-package org.testin.generateJavaCode.autoGenerator;
+package org.testin.generateJavaCode.method;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -11,6 +11,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.Group;
+import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Logger;

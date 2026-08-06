@@ -10,8 +10,8 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
-import org.testin.generateJavaCode.autoGenerator.CodeGenerator;
-import org.testin.generateJavaCode.autoGenerator.GeneratorType;
+import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.statusBar.IStatusBarItem;
 

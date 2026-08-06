@@ -1,6 +1,11 @@
-package org.testin.generateJavaCode.autoGenerator;
+package org.testin.generateJavaCode;
 
 import lombok.Getter;
+import org.testin.generateJavaCode.clazz.CreateJavaTestClass;
+import org.testin.generateJavaCode.method.CreateTestMethod;
+import org.testin.generateJavaCode.method.update.UpdateTestMethod;
+import org.testin.generateJavaCode.pkg.CreateTestProject;
+import org.testin.generateJavaCode.pkg.CreateTestSetPackage;
 
 @Getter
 public enum GeneratorType {

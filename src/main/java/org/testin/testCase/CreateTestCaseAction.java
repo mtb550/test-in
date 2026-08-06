@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditor;
-import org.testin.generateJavaCode.autoGenerator.GeneratorType;
+import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.testCase.createDialog.CreateTestCaseDialog;

@@ -1,4 +1,4 @@
-package org.testin.generateJavaCode.autoGenerator;
+package org.testin.generateJavaCode.method.update;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
@@ -10,6 +10,8 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.Group;
+import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
