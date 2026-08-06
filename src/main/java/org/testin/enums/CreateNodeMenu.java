@@ -2,8 +2,8 @@ package org.testin.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.testin.generateJavaCode.autoGenerator.GeneratorType;
 import org.testin.mappers.dto.dirs.*;
-import org.testin.util.autoGenerator.GeneratorType;
 
 import java.util.List;
 

@@ -1,7 +1,6 @@
 package org.testin.nodeCreator;
 
 import com.intellij.openapi.project.Project;
-import org.testin.enums.DirectoryType;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunPackageDirectoryDto;

@@ -14,7 +14,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
-import org.testin.util.autoGenerator.CodeGenerator;
+import org.testin.generateJavaCode.autoGenerator.CodeGenerator;
 
 import javax.swing.*;
 import javax.swing.border.Border;

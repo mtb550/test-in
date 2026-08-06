@@ -55,6 +55,7 @@ public final class Tools {
     private final Pattern STEP_MUSH_PATTERN = Pattern.compile(".*\\s\\d+[-.].*");
     private final Pattern STEP_LINE_PATTERN = Pattern.compile("(\\s)(?=\\d+[-.])");
     private final Pattern STEP_CLEAN_PATTERN = Pattern.compile("^\\d+[-.]\\s*");
+    private final List<Character> SPECIAL_CHARS = Arrays.asList('!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~');
 
     public String sanitizePackageName(final @NotNull String name) {
         String removeKeyword = name.replace("-test-cases", "");
@@ -96,6 +97,16 @@ public final class Tools {
         if (Character.isDigit(result.charAt(0))) result = "_" + result;
         result += "Test";
         return result;
+    }
+
+    public String removeSpecialChars(final @NotNull String s) {
+        if (s.isEmpty()) return "";
+
+        StringBuilder sb = new StringBuilder(s.length());
+        for (char c : s.toCharArray()) {
+            sb.append(SPECIAL_CHARS.contains(c) ? '_' : c);
+        }
+        return sb.toString();
     }
 
     public Path getProjectPath(final SimpleTree tree) {

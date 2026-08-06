@@ -1,4 +1,4 @@
-package org.testin.util.autoGenerator;
+package org.testin.generateJavaCode.autoGenerator;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
@@ -13,7 +13,7 @@ import org.testin.util.services.Services;
 import java.io.IOException;
 import java.util.List;
 
-// todo, is @CreateTestSetPackage and @org.testin.util.autoGenerator.CreateTestProject are same? then merge it to CreateJavaPackage
+// todo, is @CreateTestSetPackage and @org.testin.generateJavaCode.autoGenerator.CreateTestProject are same? then merge it to CreateJavaPackage
 public class CreateTestSetPackage implements GeneratorAction {
 
     @Override

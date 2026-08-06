@@ -13,13 +13,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.generateJavaCode.autoGenerator.CodeGenerator;
+import org.testin.generateJavaCode.autoGenerator.GeneratorType;
 import org.testin.importExport.shared.CellEditListener;
 import org.testin.importExport.shared.FileDocumentListener;
 import org.testin.importExport.shared.TablePanelBuilder;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.settings.AppSettingsState;
-import org.testin.util.autoGenerator.CodeGenerator;
-import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 

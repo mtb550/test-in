@@ -8,10 +8,10 @@ import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.generateJavaCode.autoGenerator.CodeGenerator;
+import org.testin.generateJavaCode.autoGenerator.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
-import org.testin.util.autoGenerator.CodeGenerator;
-import org.testin.util.autoGenerator.GeneratorType;
 
 import javax.swing.*;
 import java.awt.*;

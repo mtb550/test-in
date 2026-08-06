@@ -37,13 +37,13 @@ public class ExportDialog extends DialogWrapper {
 
     private final Map<String, List<TestCaseDto>> originalSheetsData;
 
+    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
+
     @Getter
     private FileTypes selectedFormat;
 
     @Getter
     private File selectedFile;
-
-    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
 
     public ExportDialog(final @NotNull Project project, final List<TestEditorAttributes> exportAttributes, final Map<String, List<TestCaseDto>> sheetsData, final VirtualFile exportTarget) {
         super(project, true);

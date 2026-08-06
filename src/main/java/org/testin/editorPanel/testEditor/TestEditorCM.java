@@ -19,7 +19,7 @@ import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.statusBar.NextPageAction;
 import org.testin.editorPanel.statusBar.PrevPageAction;
-import org.testin.generateCode.GenerateTestMethod;
+import org.testin.generateJavaCode.method.GenerateTestMethod;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.run.RunTestCase;

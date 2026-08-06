@@ -27,14 +27,11 @@ public class GenerateReportDialog extends DialogWrapper {
             .filter(type -> type.getReportHandler() != null)
             .map(FileTypes::getLabel)
             .toArray(String[]::new));
-
+    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
     @Getter
     private FileTypes selectedFormat;
-
     @Getter
     private File selectedFile;
-
-    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
 
     public GenerateReportDialog(final @NotNull Project project, final String suggestedFileName) {
         super(project, true);

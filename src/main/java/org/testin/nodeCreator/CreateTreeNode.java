@@ -9,13 +9,13 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
+import org.testin.generateJavaCode.autoGenerator.GeneratorType;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.nodeCreator.dialogs.CreateNodesDialog;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
-import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 

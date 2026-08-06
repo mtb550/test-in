@@ -1,4 +1,4 @@
-package org.testin.util.autoGenerator;
+package org.testin.generateJavaCode.autoGenerator;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.ui.components.JBCheckBox;

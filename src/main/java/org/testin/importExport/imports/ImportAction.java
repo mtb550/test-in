@@ -12,6 +12,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.generateJavaCode.autoGenerator.CreateTestMethod;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -22,7 +23,6 @@ import org.testin.nodeCreator.CreateTestSet;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
-import org.testin.util.autoGenerator.CreateTestMethod;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
@@ -129,7 +129,7 @@ public class ImportAction extends DumbAwareAction {
                     String rawSheetName = entry.getKey();
                     List<TestCaseDto> sheetCases = entry.getValue();
 
-                    VirtualFile sheetDir = new CreateTestSet().inBackground(project, this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
+                    VirtualFile sheetDir = new CreateTestSet().execute(project, this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
 
                     TestCaseDto tail = findExistingTail(project, sheetDir);
                     linkAndSaveTestCases(project, sheetDir, sheetCases, tail);

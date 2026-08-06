@@ -16,11 +16,11 @@ import org.testin.util.services.Services;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 
 final class IndexerDataStore {
 
@@ -415,8 +415,7 @@ final class IndexerDataStore {
     }
 
     private void renameDescendantKeys(final Map<String, ?> map, final Path oldPath, final Path newPath) {
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> m = (Map<String, Object>) (Map<?, ?>) map;
+        @SuppressWarnings("unchecked") final Map<String, Object> m = (Map<String, Object>) map;
         final List<String> toMove = new ArrayList<>();
         for (final String key : m.keySet()) {
             final Path p = Path.of(key);
@@ -487,7 +486,6 @@ final class IndexerDataStore {
             map.put(newKey, value);
         }
     }
-
 
 
     void clearAll() {

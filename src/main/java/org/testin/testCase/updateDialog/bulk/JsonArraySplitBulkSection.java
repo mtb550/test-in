@@ -26,8 +26,8 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.generateJavaCode.autoGenerator.CodeGenerator;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.autoGenerator.CodeGenerator;
 
 import javax.swing.*;
 import java.awt.*;

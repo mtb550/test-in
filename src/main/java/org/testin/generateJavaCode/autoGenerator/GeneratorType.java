@@ -1,4 +1,4 @@
-package org.testin.util.autoGenerator;
+package org.testin.generateJavaCode.autoGenerator;
 
 import lombok.Getter;
 

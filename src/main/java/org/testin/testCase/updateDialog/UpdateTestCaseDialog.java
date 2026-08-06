@@ -9,10 +9,10 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.UpdateTestCaseFields;
+import org.testin.generateJavaCode.autoGenerator.CodeGenerator;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.*;
 import org.testin.util.KeyboardSet;
-import org.testin.util.autoGenerator.CodeGenerator;
 
 import javax.swing.*;
 import java.awt.*;
