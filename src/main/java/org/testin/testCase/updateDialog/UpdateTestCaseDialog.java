@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.UpdateTestCaseFields;
-import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.*;
 import org.testin.util.KeyboardSet;
@@ -23,7 +23,7 @@ public class UpdateTestCaseDialog extends TestCaseDialogBase {
     private final @NotNull Project project;
     private @NotNull JBPopup popup;
 
-    public UpdateTestCaseDialog(final @NotNull Project project, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull BiConsumer<@NotNull TestCaseDto, @NotNull CodeGenerator> onSave) {
+    public UpdateTestCaseDialog(final @NotNull Project project, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull BiConsumer<@NotNull TestCaseDto, @NotNull CodeGeneratorDialog> onSave) {
         super(project, selectedItem.getGt());
         this.project = project;
 

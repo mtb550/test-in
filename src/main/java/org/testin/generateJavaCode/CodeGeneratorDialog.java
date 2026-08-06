@@ -8,7 +8,7 @@ import lombok.Setter;
 
 import java.awt.*;
 
-public class CodeGenerator extends JBCheckBox {
+public class CodeGeneratorDialog extends JBCheckBox {
     // todo, put all stored props in separate class.
     private final String PROP_KEY = "testin.automation.generateCode";
 
@@ -16,7 +16,7 @@ public class CodeGenerator extends JBCheckBox {
     @Setter
     private GeneratorType gt;
 
-    public CodeGenerator(final GeneratorType gt) {
+    public CodeGeneratorDialog(final GeneratorType gt) {
         if (gt != null)
             setToolTipText(gt.getTooltip());
 

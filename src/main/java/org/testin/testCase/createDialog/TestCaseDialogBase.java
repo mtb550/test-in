@@ -10,7 +10,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
-import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.statusBar.IStatusBarItem;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public abstract class TestCaseDialogBase {
-    protected final CodeGenerator cg;
+    protected final CodeGeneratorDialog cg;
     protected final DescriptionSection DescriptionSection;
     protected final ExpectedResultSection expectedResultSection;
     protected final ModuleSection moduleSection;
@@ -41,7 +41,7 @@ public abstract class TestCaseDialogBase {
     private PropertyChangeListener focusListener;
 
     public TestCaseDialogBase(final @NotNull Project project, final @NotNull GeneratorType gt) {
-        this.cg = new CodeGenerator(gt);
+        this.cg = new CodeGeneratorDialog(gt);
         this.DescriptionSection = new DescriptionSection(project);
         this.expectedResultSection = new ExpectedResultSection(project);
         this.moduleSection = new ModuleSection(project);
@@ -120,7 +120,7 @@ public abstract class TestCaseDialogBase {
         }.registerCustomShortcutSet(shortcutSet, component);
     }
 
-    public Runnable save(final TestCaseDto dto, final BiConsumer<TestCaseDto, CodeGenerator> onSave, final JBPopup[] popupWrapper) {
+    public Runnable save(final TestCaseDto dto, final BiConsumer<TestCaseDto, CodeGeneratorDialog> onSave, final JBPopup[] popupWrapper) {
         return () -> {
             getAllSections().forEach(section -> section.applyTo(dto));
 

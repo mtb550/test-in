@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.generateJavaCode.GeneratorType;
-import org.testin.generateJavaCode.method.update.UpdateTestMethod;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
@@ -181,9 +180,6 @@ public class DetailsTab {
                     if (gt != null) {
                         final GeneratorAction action = gt.getAction();
                         final TestCaseDto firstItem = tcs.getFirst();
-
-                        if (action instanceof UpdateTestMethod utm)
-                            utm.setGt(gt);
 
                         ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
                     }

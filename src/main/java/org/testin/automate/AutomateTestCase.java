@@ -1,4 +1,4 @@
-package org.testin.generateJavaCode.method;
+package org.testin.automate;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;

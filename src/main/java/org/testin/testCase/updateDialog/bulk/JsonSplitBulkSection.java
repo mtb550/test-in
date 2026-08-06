@@ -26,7 +26,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -48,7 +48,7 @@ public abstract class JsonSplitBulkSection {
 
     protected abstract void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges);
 
-    public void show(final @NotNull Project project, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems) {
+    public void show(final @NotNull Project project, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
         this.project = project;
         StringBuilder leftSb = new StringBuilder();
         StringBuilder rightSb = new StringBuilder();

@@ -13,7 +13,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.UpdateTestCaseFields;
-import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.updateDialog.UpdateTestCaseDialog;
@@ -31,9 +31,9 @@ public class TestCaseUpdateMenu {
 
     private final @NotNull Project project;
     private final @NotNull List<TestCaseDto> items;
-    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGenerator> updatedItems;
+    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems;
 
-    public TestCaseUpdateMenu(final @NotNull Project project, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGenerator> updatedItems) {
+    public TestCaseUpdateMenu(final @NotNull Project project, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems) {
         this.project = project;
         this.items = items;
         this.updatedItems = updatedItems;
@@ -50,7 +50,7 @@ public class TestCaseUpdateMenu {
 
             if (isSingle) {
                 new UpdateTestCaseDialog(project, items.getFirst(), selectedItem, (tc, cg) -> {
-                    cg = new CodeGenerator(gt);
+                    cg = new CodeGeneratorDialog(gt);
                     cg.setGt(gt);
 
                     Logger.trace("Single Edit Save -> Injecting changeType " + cg.getGt() + " into UI's CodeGenerator.");
@@ -60,7 +60,7 @@ public class TestCaseUpdateMenu {
 
             } else {
                 selectedItem.getBulkAction().show(project, items, (list, cg) -> {
-                    cg = new CodeGenerator(gt);
+                    cg = new CodeGeneratorDialog(gt);
                     cg.setGt(gt);
 
 

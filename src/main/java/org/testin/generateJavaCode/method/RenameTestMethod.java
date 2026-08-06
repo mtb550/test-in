@@ -16,7 +16,7 @@ import org.testin.util.services.Services;
 
 import java.util.List;
 
-public class RemoveTestMethod implements GeneratorAction {
+public class RenameTestMethod implements GeneratorAction {
 
     @Override
     public void execute(final @NotNull Project project, final @NotNull Object obj) {
@@ -26,10 +26,10 @@ public class RemoveTestMethod implements GeneratorAction {
         if (fqcn.size() < 2) return;
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-        WriteCommandAction.runWriteCommandAction(project, "Remove Test Method", null, () -> {
+        WriteCommandAction.runWriteCommandAction(project, "Rename Test Method", null, () -> {
             final PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(path, GlobalSearchScope.projectScope(project));
             if (targetClass == null) {
-                Logger.warn("RemoveTestMethod: class not found: " + path);
+                Logger.warn("RenameTestMethod: class not found: " + path);
                 return;
             }
 
@@ -37,13 +37,18 @@ public class RemoveTestMethod implements GeneratorAction {
             for (PsiMethod m : targetClass.getMethods()) {
                 final PsiAnnotation annotation = m.getModifierList().findAnnotation("org.testng.annotations.Test");
                 if (annotation != null && annotation.getText().contains("testName") && annotation.getText().contains(targetId)) {
-                    m.delete();
-                    Logger.info("Removed test method: " + m.getName());
+                    final String newName = Services.getInstance(project, Tools.class).sanitizeMethodName(tc.getDescription());
+                    if (!m.getName().equals(newName)) {
+                        m.setName(newName);
+                    }
+                    Logger.info("Renamed test method to: " + newName);
                     return;
                 }
             }
-            Logger.warn("RemoveTestMethod: no method found with testName=" + tc.getId());
+            Logger.warn("RenameTestMethod: no method found with testName=" + tc.getId());
         });
+
     }
+
 
 }

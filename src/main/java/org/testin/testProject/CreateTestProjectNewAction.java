@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
@@ -22,9 +22,9 @@ import java.nio.file.Path;
 public class CreateTestProjectNewAction extends DumbAwareAction {
     private final @NotNull ProjectPanel projectPanel;
     private final @NotNull String tpName;
-    private final @NotNull CodeGenerator cg;
+    private final @NotNull CodeGeneratorDialog cg;
 
-    public CreateTestProjectNewAction(final @NotNull ProjectPanel projectPanel, final @NotNull String name, final @NotNull CodeGenerator cg) {
+    public CreateTestProjectNewAction(final @NotNull ProjectPanel projectPanel, final @NotNull String name, final @NotNull CodeGeneratorDialog cg) {
         super("New Test Project", "Create a new test project", AllIcons.General.Add);
         this.projectPanel = projectPanel;
         this.tpName = name;

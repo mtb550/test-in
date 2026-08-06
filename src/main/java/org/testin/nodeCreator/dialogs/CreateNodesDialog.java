@@ -14,7 +14,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
-import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.CodeGeneratorDialog;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -30,10 +30,10 @@ public class CreateNodesDialog {
     private final ExtendableTextField textField;
     private final JBList<DirectoryType> list;
     private final JBPopup popup;
-    private final CodeGenerator cg;
+    private final CodeGeneratorDialog cg;
     private final Project project;
 
-    public CreateNodesDialog(final @NotNull Project project, final @NotNull CreateNodeMenu menu, final TriConsumer<@NotNull String, @NotNull DirectoryType, @NotNull CodeGenerator> onSelected) {
+    public CreateNodesDialog(final @NotNull Project project, final @NotNull CreateNodeMenu menu, final TriConsumer<@NotNull String, @NotNull DirectoryType, @NotNull CodeGeneratorDialog> onSelected) {
         textField = new ExtendableTextField();
 
         textField.setFont(fieldFont);
@@ -57,7 +57,7 @@ public class CreateNodesDialog {
         mainPanel.add(textField, BorderLayout.NORTH);
 
         this.project = project;
-        this.cg = new CodeGenerator(menu.getGeneratorType());
+        this.cg = new CodeGeneratorDialog(menu.getGeneratorType());
 
         JPanel listWrapper = new JPanel(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
@@ -105,7 +105,7 @@ public class CreateNodesDialog {
         });
     }
 
-    private void executeSubmitAction(final TriConsumer<String, DirectoryType, CodeGenerator> onSelected) {
+    private void executeSubmitAction(final TriConsumer<String, DirectoryType, CodeGeneratorDialog> onSelected) {
         final String text = textField.getText().trim();
 
         if (!text.isEmpty()) {

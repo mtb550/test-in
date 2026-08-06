@@ -11,7 +11,6 @@ import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.generateJavaCode.GeneratorType;
-import org.testin.generateJavaCode.method.update.UpdateTestMethod;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.TestCaseUpdateMenu;
 import org.testin.util.KeyboardSet;
@@ -80,8 +79,6 @@ public class UpdateTestCaseAction extends DumbAwareAction {
                     if (gt != null) {
                         final GeneratorAction action = gt.getAction();
                         final TestCaseDto firstItem = updatedItems.getFirst();
-
-                        if (action instanceof UpdateTestMethod utm) utm.setGt(gt);
 
                         ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
                     }

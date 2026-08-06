@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
 import org.testin.enums.TestEditorAttributes;
-import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.importExport.shared.CellEditListener;
 import org.testin.importExport.shared.FileDocumentListener;
@@ -40,7 +40,7 @@ public class ImportDialog extends DialogWrapper {
     private final Project project;
 
     @Getter
-    private final CodeGenerator cg = new CodeGenerator(GeneratorType.CREATE_TEST_METHOD);
+    private final CodeGeneratorDialog cg = new CodeGeneratorDialog(GeneratorType.CREATE_TEST_METHOD);
 
     private final List<TestEditorAttributes> importAttributes;
 

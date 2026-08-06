@@ -5,7 +5,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.CodeGenerator;
+import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
@@ -251,6 +251,6 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     }
 
     public interface IBulkEditorAction {
-        void show(final @NotNull Project project, final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGenerator> updatedItems);
+        void show(final @NotNull Project project, final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems);
     }
 }
