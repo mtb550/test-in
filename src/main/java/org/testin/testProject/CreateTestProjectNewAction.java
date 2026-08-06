@@ -5,22 +5,17 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.DirectoryType;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.Setting;
-import org.testin.util.TreeUtilImpl;
 import org.testin.util.autoGenerator.CodeGenerator;
 import org.testin.util.autoGenerator.GeneratorType;
 import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -50,42 +45,15 @@ public class CreateTestProjectNewAction extends DumbAwareAction {
 
         final TestProjectDirectoryDto tp = Services.getInstance(project, DirectoryMapper.class).setTestProjectNode(project, tpPath);
 
-        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, Services.getInstance(project, Setting.class).getTestinPath(), "IO Error", vf -> {
+        // The indexer owns all dir/file creation: it creates the project dir, the
+        // Test Cases/Test Runs main dirs and writes their marker JSON.
+        Services.getInstance(project, ProjectIndexer.class).addTestProject(tp);
+        projectPanel.getTestProjectSelector().addTestProject(tp);
+        projectPanel.getProjectTree().updateNodes();
+        Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", tpName));
 
-            if (vf.findChild(tpName) != null) {
-                Services.getInstance(project, Notifier.class).error(project, "Creation Failed", "The directory '" + tpName + "' already exists in the IDE's Virtual File System.");
-                return;
-            }
-
-            try {
-                VirtualFile projectDir = vf.createChildDirectory(this, tpName);
-
-                projectDir.createChildData(this, DirectoryType.TP.getMarker());
-
-                String tcdName = tp.getTestCasesDirectory().getPath().getFileName().toString();
-                VirtualFile tcdDir = projectDir.createChildDirectory(this, tcdName);
-                tcdDir.createChildData(this, DirectoryType.TCD.getMarker());
-
-                String trdName = tp.getTestRunsDirectory().getPath().getFileName().toString();
-                VirtualFile trdDir = projectDir.createChildDirectory(this, trdName);
-                trdDir.createChildData(this, DirectoryType.TRD.getMarker());
-
-
-                projectDir.refresh(false, true);
-            } catch (final IOException ex) {
-                Logger.error(ex.getMessage());
-            }
-            projectPanel.getTestProjectSelector().addTestProject(tp);
-
-            Services.getInstance(project, ProjectIndexer.class).addTestProject(tp);
-
-            projectPanel.getProjectTree().updateNodes();
-            Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", tpName));
-
-            if (cg.isSelected())
-                GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, tp);
-
-        });
+        if (cg.isSelected())
+            GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, tp);
     }
 
 

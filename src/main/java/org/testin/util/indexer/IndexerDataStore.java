@@ -1,6 +1,8 @@
 package org.testin.util.indexer;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
@@ -197,18 +199,39 @@ final class IndexerDataStore {
 
     void addTestSet(final TestSetDirectoryDto ts) {
         testSetsDirByPath.put(ts.getPath().toString(), ts);
+        writeMarker(ts.getPath(), DirectoryType.TS.getMarker(), ts.getMarker());
+        refreshDir(ts.getPath());
     }
 
     void addTestSetPackage(final TestSetPackageDirectoryDto tsp) {
         testSetPackagesByPath.put(tsp.getPath().toString(), tsp);
+        writeMarker(tsp.getPath(), DirectoryType.TSP.getMarker(), tsp.getMarker());
+        refreshDir(tsp.getPath());
     }
 
     void addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
         testRunsDirByPath.put(trd.getPath().toString(), trd);
+        if (trd.getMarker() != null) {
+            writeMarker(trd.getPath(), DirectoryType.TR.getMarker(), trd.getMarker());
+        }
+        refreshDir(trd.getPath());
     }
 
     void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
         testRunPackagesByPath.put(trp.getPath().toString(), trp);
+        writeMarker(trp.getPath(), DirectoryType.TRP.getMarker(), trp.getMarker());
+        refreshDir(trp.getPath());
+    }
+
+    private void writeMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
+        Services.getInstance(project, FilesUtil.class).write(project, dirPath.resolve(markerFileName), marker);
+    }
+
+    private void refreshDir(final @NotNull Path dirPath) {
+        final VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(dirPath);
+        if (vf != null) {
+            vf.refresh(false, true);
+        }
     }
 
     void removeTestProject(final @NotNull Path path) {
@@ -307,6 +330,14 @@ final class IndexerDataStore {
         testProjectsByPath.put(tp.getPath().toString(), tp);
         testCasesMainDirsByPath.put(tp.getTestCasesDirectory().getPath().toString(), tp.getTestCasesDirectory());
         testRunsMainDirsByPath.put(tp.getTestRunsDirectory().getPath().toString(), tp.getTestRunsDirectory());
+
+        // The indexer owns all file/dir creation: write the main-dir markers (which also
+        // creates the project + main dirs on disk) and refresh the VFS so the IDE sees them.
+        writeMarker(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
+        writeMarker(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
+        refreshDir(tp.getPath());
+        refreshDir(tp.getTestCasesDirectory().getPath());
+        refreshDir(tp.getTestRunsDirectory().getPath());
     }
 
     void addTestProjectMarker(final @NotNull Project project, final @NotNull TestProjectDirectoryDto tp) {
