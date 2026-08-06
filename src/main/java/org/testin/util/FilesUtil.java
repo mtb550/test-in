@@ -20,6 +20,10 @@ public final class FilesUtil {
     public <T> void write(final @NotNull Project project, final @NotNull Path path, final @NotNull T content) {
         try {
             byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(content);
+            final Path parent = path.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
             Files.write(path, jsonBytes);
 
         } catch (final IOException ex) {
