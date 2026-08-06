@@ -63,11 +63,45 @@ final class IndexerDataStore {
         final List<UUID> ids = testSetCaseIds.get(testSetPath.toString());
         if (ids == null || ids.isEmpty()) return Collections.emptyList();
 
-        final List<TestCaseDto> result = new ArrayList<>(ids.size());
+        // Build a per-set id -> dto map so we can walk the linked list (next/isHead)
+        // exactly as it was authored, instead of relying on global-map iteration order.
+        final Map<UUID, TestCaseDto> byId = new HashMap<>(ids.size());
         for (final UUID id : ids) {
             final TestCaseDto tc = testCasesById.get(id);
-            if (tc != null) result.add(tc);
+            if (tc != null) byId.put(id, tc);
         }
+
+        final List<TestCaseDto> result = new ArrayList<>(byId.size());
+        final Set<UUID> visited = new HashSet<>();
+
+        TestCaseDto head = null;
+        for (final TestCaseDto tc : byId.values()) {
+            if (Boolean.TRUE.equals(tc.getIsHead())) {
+                head = tc;
+                break;
+            }
+        }
+
+        if (head != null) {
+            TestCaseDto current = head;
+            while (current != null && !visited.contains(current.getId())) {
+                result.add(current);
+                visited.add(current.getId());
+                final UUID nextUuid = current.getNext();
+                current = (nextUuid != null) ? byId.get(nextUuid) : null;
+            }
+        }
+
+        // Fallback: append any case not reachable from the head so a set is never
+        // silently truncated when the linked-list is incomplete/broken.
+        for (final UUID id : ids) {
+            final TestCaseDto tc = testCasesById.get(id);
+            if (tc != null && !visited.contains(tc.getId())) {
+                result.add(tc);
+                visited.add(tc.getId());
+            }
+        }
+
         return result;
     }
 
