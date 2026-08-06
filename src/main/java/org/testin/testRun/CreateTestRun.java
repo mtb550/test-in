@@ -23,7 +23,6 @@ import org.testin.nodeCreator.NodeCreator;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.AppSettingsState;
 import org.testin.util.EditorUtil;
-import org.testin.util.FilesUtil;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.services.Services;
 
@@ -155,7 +154,8 @@ public class CreateTestRun implements NodeCreator {
         tr.setResults(items);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            Services.getInstance(project, FilesUtil.class).createDirectories(savePath);
+            // The indexer owns all dir/file creation: putTestRun writes the run json (creating
+            // the dir) and addTestRunDir writes the .tr marker + refreshes the VFS.
             Services.getInstance(project, ProjectIndexer.class).putTestRun(savePath, tr);
 
             TestRunMarker marker = Services.getInstance(project, MarkerMapper.class).setTestRunMarker();
