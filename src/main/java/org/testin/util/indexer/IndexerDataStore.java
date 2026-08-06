@@ -26,9 +26,6 @@ final class IndexerDataStore {
     private final Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<UUID, TestRunDto> testRunsById = new ConcurrentHashMap<>();
-
-    @Getter
     private final Map<String, TestProjectDirectoryDto> testProjectsByPath = new ConcurrentHashMap<>();
 
     @Getter
@@ -474,7 +471,6 @@ final class IndexerDataStore {
 
     void clearAll() {
         testCasesById.clear();
-        testRunsById.clear();
         testProjectsByPath.clear();
         testSetsDirByPath.clear();
         testRunsDirByPath.clear();
