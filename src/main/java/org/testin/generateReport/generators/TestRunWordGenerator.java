@@ -1,10 +1,10 @@
 package org.testin.generateReport.generators;
 
 import com.intellij.openapi.project.Project;
+import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
 import org.testin.enums.TestRunConfiguration;
@@ -22,6 +22,7 @@ import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -41,7 +42,6 @@ public final class TestRunWordGenerator {
     private static final String BORDER_GRAY = "D0D7E5";
     private static final String WHITE = "FFFFFF";
     private static final String BLACK = "000000";
-    private static final String LINK_BLUE = "0052CC";
 
     public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -178,7 +178,11 @@ public final class TestRunWordGenerator {
                 }
 
                 // ── FOOTER ─────────────────────────────────────────────────────
+                // Official footer: repeats on every page and sits within the page margins.
                 addFooter(doc, ZonedDateTime.now().format(Config.getDateFormatterPattern()));
+
+                // Symmetric page margins: left margin = current right margin.
+                applyPageMargins(doc);
 
                 doc.write(baos);
             }
@@ -204,10 +208,9 @@ public final class TestRunWordGenerator {
         run.setBold(bold);
         run.setColor(color);
         if (bottomBorder != null) {
-            org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder bottom =
-                    p.getCTPPr().addNewPBdr().addNewBottom();
+            CTBorder bottom = p.getCTPPr().addNewPBdr().addNewBottom();
             bottom.setVal(STBorder.Enum.forString("single"));
-            bottom.setSz(java.math.BigInteger.valueOf(16)); // 2pt, matches PDF subtitle border
+            bottom.setSz(BigInteger.valueOf(16)); // 2pt, matches PDF subtitle border
             bottom.setColor(bottomBorder);
         }
         return p;
@@ -220,7 +223,7 @@ public final class TestRunWordGenerator {
     }
 
     // beforePt = marginTop, afterPt = paddingBottom(3pt) + marginBottom, matching the PDF.
-    private XWPFParagraph addHeading(XWPFDocument doc, String text, int beforePt, int afterPt) {
+    private void addHeading(XWPFDocument doc, String text, int beforePt, int afterPt) {
         XWPFParagraph p = doc.createParagraph();
         p.setSpacingBefore(beforePt * 20);
         p.setSpacingAfter(afterPt * 20);
@@ -230,16 +233,15 @@ public final class TestRunWordGenerator {
         run.setFontFamily("Calibri");
         run.setBold(true);
         run.setColor(DARK_NAVY);
-        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder headingBottom =
-                p.getCTPPr().addNewPBdr().addNewBottom();
+        CTBorder headingBottom = p.getCTPPr().addNewPBdr().addNewBottom();
         headingBottom.setVal(STBorder.Enum.forString("single"));
-        headingBottom.setSz(java.math.BigInteger.valueOf(8)); // 1pt, matches PDF heading border
+        headingBottom.setSz(BigInteger.valueOf(8)); // 1pt, matches PDF heading border
         headingBottom.setColor(DARK_NAVY);
-        return p;
     }
 
     private void addOverviewRow(XWPFTable table, int rowIdx, String label, String value) {
-        XWPFTableRow row = table.createRow();
+        // Reuse the table's first row (createTable(1,2) already created it); otherwise append.
+        XWPFTableRow row = rowIdx == 0 ? table.getRow(0) : table.createRow();
         XWPFTableCell labelCell = row.getCell(0);
         XWPFTableCell valueCell = row.getCell(1);
         shadeCell(labelCell, LIGHT_BG);
@@ -328,12 +330,12 @@ public final class TestRunWordGenerator {
                 TestCaseDto tc = detailsMap.get(item.getId());
                 if (tc != null) tcName = tc.getDescription();
             }
-            if (tcName.isEmpty()) tcName = "\u2014";
+            if (tcName.isEmpty()) tcName = "—";
             setCellText(tcCell, tcName, 9, false, BLACK);
 
             if (withActualResult) {
                 String actualResult = item.getActualResult();
-                if (actualResult.isEmpty()) actualResult = "\u2014";
+                if (actualResult.isEmpty()) actualResult = "—";
                 XWPFParagraph ap = tcCell.addParagraph();
                 XWPFRun arun = ap.createRun();
                 arun.setText("Actual result: " + actualResult);
@@ -364,7 +366,7 @@ public final class TestRunWordGenerator {
                 else if (sev == BugSeverity.MAJOR) sevColor = DARK_YELLOW;
                 else sevColor = DARK_GRAY;
                 String sevText = sev.getName();
-                if (sevText.isEmpty()) sevText = "\u2014";
+                if (sevText.isEmpty()) sevText = "—";
                 setCellText(sevCell, sevText, 9, true, sevColor);
             }
 
@@ -383,7 +385,7 @@ public final class TestRunWordGenerator {
     }
 
     private void setCellText(XWPFTableCell cell, String text, int size, boolean bold, String color) {
-        XWPFParagraph p = cell.getParagraphs().get(0);
+        XWPFParagraph p = cell.getParagraphs().getFirst();
         if (p.getRuns().isEmpty()) {
             XWPFRun run = p.createRun();
             run.setText(text);
@@ -393,7 +395,7 @@ public final class TestRunWordGenerator {
             run.setColor(color);
         } else {
             // Replace the existing run text (first run)
-            XWPFRun run = p.getRuns().get(0);
+            XWPFRun run = p.getRuns().getFirst();
             run.setText(text, 0);
             run.setFontSize(size);
             run.setFontFamily("Calibri");
@@ -408,46 +410,45 @@ public final class TestRunWordGenerator {
 
     // Cell padding in points (converted to twips), matching the PDF cell paddings.
     private void setCellPadding(XWPFTableCell cell, int topPt, int leftPt, int bottomPt, int rightPt) {
-        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcMar mar = getTcPr(cell).addNewTcMar();
-        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth top = mar.addNewTop();
+        CTTcMar mar = getTcPr(cell).addNewTcMar();
+        CTTblWidth top = mar.addNewTop();
         top.setW(topPt * 20);
         top.setType(STTblWidth.Enum.forString("dxa"));
-        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth left = mar.addNewLeft();
+        CTTblWidth left = mar.addNewLeft();
         left.setW(leftPt * 20);
         left.setType(STTblWidth.Enum.forString("dxa"));
-        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth bottom = mar.addNewBottom();
+        CTTblWidth bottom = mar.addNewBottom();
         bottom.setW(bottomPt * 20);
         bottom.setType(STTblWidth.Enum.forString("dxa"));
-        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth right = mar.addNewRight();
+        CTTblWidth right = mar.addNewRight();
         right.setW(rightPt * 20);
         right.setType(STTblWidth.Enum.forString("dxa"));
     }
 
-    private org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcPr getTcPr(XWPFTableCell cell) {
-        org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTc ct = cell.getCTTc();
+    private CTTcPr getTcPr(XWPFTableCell cell) {
+        CTTc ct = cell.getCTTc();
         return ct.isSetTcPr() ? ct.getTcPr() : ct.addNewTcPr();
     }
 
     private void setTableBorders(XWPFTable table) {
         for (XWPFTableRow row : table.getRows()) {
             for (XWPFTableCell cell : row.getTableCells()) {
-                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTcBorders borders =
-                        getTcPr(cell).addNewTcBorders();
-                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder top = borders.addNewTop();
+                CTTcBorders borders = getTcPr(cell).addNewTcBorders();
+                CTBorder top = borders.addNewTop();
                 top.setColor(BORDER_GRAY);
-                top.setSz(java.math.BigInteger.valueOf(4));
+                top.setSz(BigInteger.valueOf(4));
                 top.setVal(STBorder.Enum.forString("single"));
-                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder bottom = borders.addNewBottom();
+                CTBorder bottom = borders.addNewBottom();
                 bottom.setColor(BORDER_GRAY);
-                bottom.setSz(java.math.BigInteger.valueOf(4));
+                bottom.setSz(BigInteger.valueOf(4));
                 bottom.setVal(STBorder.Enum.forString("single"));
-                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder left = borders.addNewLeft();
+                CTBorder left = borders.addNewLeft();
                 left.setColor(BORDER_GRAY);
-                left.setSz(java.math.BigInteger.valueOf(4));
+                left.setSz(BigInteger.valueOf(4));
                 left.setVal(STBorder.Enum.forString("single"));
-                org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBorder right = borders.addNewRight();
+                CTBorder right = borders.addNewRight();
                 right.setColor(BORDER_GRAY);
-                right.setSz(java.math.BigInteger.valueOf(4));
+                right.setSz(BigInteger.valueOf(4));
                 right.setVal(STBorder.Enum.forString("single"));
             }
         }
@@ -464,13 +465,26 @@ public final class TestRunWordGenerator {
     }
 
     private void addFooter(XWPFDocument doc, String date) {
-        XWPFParagraph p = doc.createParagraph();
+        // A real Word footer part (repeats on every page, inside the page margins) instead
+        // of a plain paragraph at the end of the body.
+        XWPFFooter footer = doc.createFooter(HeaderFooterType.DEFAULT);
+        XWPFParagraph p = footer.createParagraph();
         p.setAlignment(ParagraphAlignment.CENTER);
         XWPFRun run = p.createRun();
         run.setText(date + "  |  Generated automatically by Testin IntelliJ plugin.");
         run.setFontSize(8);
         run.setFontFamily("Calibri");
         run.setColor(DARK_GRAY);
+    }
+
+    // Makes the page margins symmetric: left margin = current right margin (twips).
+    private void applyPageMargins(XWPFDocument doc) {
+        CTBody body = doc.getDocument().getBody();
+        CTSectPr sectPr = body.isSetSectPr() ? body.getSectPr() : body.addNewSectPr();
+        CTPageMar pgMar = sectPr.isSetPgMar() ? sectPr.getPgMar() : sectPr.addNewPgMar();
+        Object right = pgMar.getRight();
+        long rightTwips = (right instanceof Number) ? ((Number) right).longValue() : 1440L; // 1440 twips = 1 inch (Word default)
+        pgMar.setLeft(rightTwips);
     }
 
     // The # sequence column is halved (~3.5% -> 3) and unified across all case tables,
