@@ -1,6 +1,8 @@
 package org.testin.nodeCreator;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.treeStructure.SimpleTree;
+import org.jspecify.annotations.NonNull;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
@@ -13,15 +15,11 @@ import java.nio.file.Path;
 public class CreateTestSetPackage implements NodeCreator {
 
     @Override
-    public DirectoryDto execute(final CreateTreeNode action, final Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NonNull Project project, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
         TestSetPackageDirectoryDto tsp = Services.getInstance(project, DirectoryMapper.class).getTestSetPackageNode(project, newDirPath, parentDir);
 
-        // The indexer owns all file/dir I/O: it creates the directory + .tsp marker
-        // (with JSON content) and registers the node.
         Services.getInstance(project, ProjectIndexer.class).addTestSetPackage(tsp);
-
-        // Tree-node insertion is routed through the indexer (TreeUtilImpl stays indexer-only).
-        Services.getInstance(project, ProjectIndexer.class).createNode(action.getTree(), parentNode, tsp);
+        Services.getInstance(project, ProjectIndexer.class).createNode(tree, parentNode, tsp);
 
         return tsp;
     }

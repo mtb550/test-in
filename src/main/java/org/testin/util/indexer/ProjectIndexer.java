@@ -330,7 +330,6 @@ public final class ProjectIndexer {
         VirtualFileManager.getInstance().syncRefresh();
     }
 
-    // UI helpers - routed through the indexer so TreeUtilImpl stays indexer-only.
     public void createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object dto) {
         Services.getInstance(project, TreeUtilImpl.class).createNode(tree, parentNode, dto);
     }

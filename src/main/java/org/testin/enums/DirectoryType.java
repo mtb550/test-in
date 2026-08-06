@@ -3,6 +3,8 @@ package org.testin.enums;
 import com.intellij.icons.AllIcons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.testin.generateJavaCode.autoGenerator.GeneratorAction;
+import org.testin.generateJavaCode.autoGenerator.GeneratorType;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.nodeCreator.CreateTestRunPackage;
 import org.testin.nodeCreator.CreateTestSet;
@@ -21,7 +23,8 @@ public enum DirectoryType {
             AllIcons.Nodes.Project,
             TestProjectDirectoryDto.class,
             ".tp",
-            null
+            null,
+            (project, dir) -> GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(project, dir)
     ),
 
     TCD(
@@ -30,6 +33,7 @@ public enum DirectoryType {
             AllIcons.Nodes.Bookmark,
             TestCasesMainDirectoryDto.class,
             ".tcd",
+            null,
             null
     ),
 
@@ -39,6 +43,7 @@ public enum DirectoryType {
             AllIcons.Nodes.Bookmark,
             TestRunsMainDirectoryDto.class,
             ".trd",
+            null,
             null
     ),
 
@@ -48,7 +53,8 @@ public enum DirectoryType {
             AllIcons.Nodes.WebFolder,
             TestSetPackageDirectoryDto.class,
             ".tsp",
-            new CreateTestSetPackage()
+            new CreateTestSetPackage(),
+            (project, dir) -> GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(project, dir)
     ),
 
     TRP(
@@ -57,7 +63,8 @@ public enum DirectoryType {
             AllIcons.Nodes.WebFolder,
             TestRunPackageDirectoryDto.class,
             ".trp",
-            new CreateTestRunPackage()
+            new CreateTestRunPackage(),
+            null
     ),
 
     TS(
@@ -66,7 +73,8 @@ public enum DirectoryType {
             AllIcons.FileTypes.Text,
             TestSetDirectoryDto.class,
             ".ts",
-            new CreateTestSet()
+            new CreateTestSet(),
+            (project, dir) -> GeneratorType.CREATE_JAVA_CLASS.getAction().execute(project, dir)
     ),
 
     TR(
@@ -75,7 +83,8 @@ public enum DirectoryType {
             AllIcons.Nodes.Services,
             TestRunDirectoryDto.class,
             ".tr",
-            new CreateTestRun()
+            new CreateTestRun(),
+            null
     ),
 
     IMPORT_TP(
@@ -83,6 +92,7 @@ public enum DirectoryType {
             null,
             AllIcons.Vcs.Clone,
             TestProjectDirectoryDto.class,
+            null,
             null,
             null
     );
@@ -93,4 +103,5 @@ public enum DirectoryType {
     private final Class<? extends DirectoryDto> clazz;
     private final String marker;
     private final NodeCreator action;
+    private final GeneratorAction codeGenerator;
 }

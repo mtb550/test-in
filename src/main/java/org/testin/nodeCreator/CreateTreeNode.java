@@ -9,11 +9,11 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
-import org.testin.generateJavaCode.autoGenerator.GeneratorType;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.nodeCreator.dialogs.CreateNodesDialog;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
@@ -40,8 +40,8 @@ public class CreateTreeNode extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
 
+        final Project project = e.getProject();
         final DirectoryDto parentDir = Services.getInstance(project, Tools.class).getCurrentSelectedDirectory(tree);
         final TreePath path = tree.getSelectionPath();
 
@@ -49,31 +49,23 @@ public class CreateTreeNode extends DumbAwareAction {
 
         final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        new CreateNodesDialog(project, parentDir.getMenu(), (name, directoryType, cg) -> {
+        new CreateNodesDialog(project, parentDir.getMenu(), (s, dt, cg) -> {
 
-            if (name.isEmpty()) return;
-            DirectoryDto dir = null;
-            final Path newDirPath = parentDir.getPath().resolve(name);
+            if (s.isEmpty()) return;
+            final Path newDirPath = parentDir.getPath().resolve(s);
 
-            if (directoryType.getAction() != null)
-                dir = directoryType.getAction().execute(this, project, name, parentNode, parentDir, newDirPath);
-
-            else
-                Logger.info("No creation logic defined for type: " + directoryType);
-
-            if (cg.isSelected() && directoryType.getAction() != null) {
-
-                if (directoryType == DirectoryType.TSP) {
-                    GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(project, dir);
-                    return;
-                }
-
-                if (directoryType == DirectoryType.TS) {
-                    GeneratorType.CREATE_JAVA_CLASS.getAction().execute(project, dir);
-                    //return;
-                }
-
+            if (dt.getAction() == null) {
+                Logger.info("No creation logic defined for type: " + dt);
+                return;
             }
+
+            DirectoryDto dir = dt.getAction().execute(tree, project, s, parentNode, parentDir, newDirPath);
+
+            if (dt == DirectoryType.TS)
+                Services.getInstance(project, EditorUtil.class).open(project, dir);
+
+            if (cg.isSelected() && dt.getCodeGenerator() != null)
+                dt.getCodeGenerator().execute(project, dir);
 
         }).show();
     }

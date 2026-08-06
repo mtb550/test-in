@@ -11,14 +11,13 @@ import org.testin.util.Tools;
 import org.testin.util.logger.Logger;
 import org.testin.util.services.Services;
 
-import java.util.List;
-
 public class CreateTestProject implements GeneratorAction {
 
     @Override
     public void execute(final @NotNull Project project, final @NotNull Object obj) {
         if (!(obj instanceof TestProjectDirectoryDto tp)) return;
-        final List<String> fqcn = tp.getPath2();
+
+        final String s = Services.getInstance(project, Tools.class).sanitizePackageName(tp.getName());
 
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
             try {
@@ -27,7 +26,7 @@ public class CreateTestProject implements GeneratorAction {
                     VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
 
                     if (sourceRoot != null) {
-                        VirtualFile vf = VfsUtil.createDirectoryIfMissing(sourceRoot, fqcn.getFirst());
+                        VirtualFile vf = VfsUtil.createDirectoryIfMissing(sourceRoot, s);
 
                         if (vf != null) {
                             Logger.debug("Successfully created project package inside Source Root: " + vf.getPath());

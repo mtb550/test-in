@@ -57,8 +57,8 @@ public final class Tools {
     private final Pattern STEP_CLEAN_PATTERN = Pattern.compile("^\\d+[-.]\\s*");
     private final List<Character> SPECIAL_CHARS = Arrays.asList('!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~');
 
-    public String sanitizePackageName(final @NotNull String name) {
-        String removeKeyword = name.replace("-test-cases", "");
+    public String sanitizePackageName(final @NotNull String s) {
+        String removeKeyword = s.replace("-test-cases", "");
         String cleanName = SANITIZE_PATTERN.matcher(removeKeyword).replaceAll("").trim();
         String[] split = cleanName.split("[\\s_]+");
 

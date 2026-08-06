@@ -51,12 +51,12 @@ public final class TreeUtilImpl {
         }));
     }
 
-    public void createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object newTestPackage) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(newTestPackage);
+    public void createNode(final SimpleTree tree, final DefaultMutableTreeNode node, final Object obj) {
+        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(obj);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-            model.insertNodeInto(newNode, parentNode, parentNode.getChildCount());
+            model.insertNodeInto(newNode, node, node.getChildCount());
             TreeUtil.selectNode(tree, newNode);
         });
     }

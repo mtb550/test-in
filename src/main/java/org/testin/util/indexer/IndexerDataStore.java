@@ -1,5 +1,7 @@
 package org.testin.util.indexer;
 
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -229,11 +231,15 @@ final class IndexerDataStore {
         Services.getInstance(project, FilesUtil.class).write(project, dirPath.resolve(markerFileName), marker);
     }
 
+    // VFS refresh is a write-intent + slow operation, so it must run inside a write action
+    // (off the current EDT call). invokeLater is enough - no pooled thread needed.
     private void refreshDir(final @NotNull Path dirPath) {
-        final VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(dirPath);
-        if (vf != null) {
-            vf.refresh(false, true);
-        }
+        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
+            final VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(dirPath);
+            if (vf != null) {
+                vf.refresh(false, true);
+            }
+        }));
     }
 
     void removeTestProject(final @NotNull Path path) {

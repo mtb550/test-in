@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.generateJavaCode.autoGenerator.CreateTestMethod;
-import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestCasesMainDirectoryDto;
@@ -129,16 +128,20 @@ public class ImportAction extends DumbAwareAction {
                     String rawSheetName = entry.getKey();
                     List<TestCaseDto> sheetCases = entry.getValue();
 
-                    VirtualFile sheetDir = new CreateTestSet().execute(project, this, targetDirectory, selectedDirDto, parentNode, tree, rawSheetName);
+                    String cName = Services.getInstance(project, Tools.class).removeSpecialChars(rawSheetName);
+                    Path newDirPath = Path.of(targetDirectory.getPath()).resolve(cName);
+                    DirectoryDto dir = new CreateTestSet().execute(tree, project, cName, parentNode, selectedDirDto, newDirPath);
+
+                    // todo, to be enhanced later
+                    VirtualFile sheetDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(newDirPath);
 
                     TestCaseDto tail = findExistingTail(project, sheetDir);
                     linkAndSaveTestCases(project, sheetDir, sheetCases, tail);
 
                     if (dialog.getCg().isSelected()) {
-                        String sheetName = sheetDir.getName();
-                        TestSetDirectoryDto sheetDto = Services.getInstance(project, DirectoryMapper.class).setTestSetNode(project, Path.of(sheetDir.getPath()), selectedDirDto);
+                        TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
 
-                        Logger.info("Import: generating test methods for sheet '" + sheetName + "' with " + sheetCases.size() + " cases");
+                        Logger.info("Import: generating test methods for sheet '" + cName + "' with " + sheetCases.size() + " cases");
                         CreateTestMethod syncInjector = new CreateTestMethod();
                         for (TestCaseDto tc : sheetCases) {
                             tc.setParent(sheetDto);

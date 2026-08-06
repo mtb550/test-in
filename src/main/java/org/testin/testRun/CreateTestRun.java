@@ -7,7 +7,9 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CheckedTreeNode;
+import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.testin.Dialogs.RunCreationForm;
 import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
@@ -21,7 +23,6 @@ import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.mappers.markers.MarkerMapper;
 import org.testin.mappers.markers.TestRunMarker;
-import org.testin.nodeCreator.CreateTreeNode;
 import org.testin.nodeCreator.NodeCreator;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.settings.AppSettingsState;
@@ -40,9 +41,9 @@ public class CreateTestRun implements NodeCreator {
     private TestRunDirectoryDto tr;
 
     @Override
-    public DirectoryDto execute(final CreateTreeNode action, final @NotNull Project project, final String name, final DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final Path newDirPath) {
+    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NotNull Project project, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
         this.project = project;
-        final TestProjectDirectoryDto tp = action.getProjectPanel().getTestProjectSelector().getSelectedTestProject().getItem();
+        final TestProjectDirectoryDto tp = Services.getInstance(project, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
 
         final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
 
@@ -65,7 +66,7 @@ public class CreateTestRun implements NodeCreator {
                 dialogBuilder.setOkOperation(() -> {
                     dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
                     tr = Services.getInstance(project, DirectoryMapper.class).setTestRunNode(project, newDirPath, parentDir);
-                    saveSelectedToJSON(form, root, newDirPath, action.getProjectPanel(), tr);
+                    saveSelectedToJSON(form, root, newDirPath, Services.getInstance(project, ProjectPanel.class), tr);
                 });
 
                 dialogBuilder.show();
