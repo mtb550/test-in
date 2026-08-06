@@ -52,6 +52,10 @@ final class IndexerDataStore {
     @Getter
     private final Map<String, List<UUID>> testSetCaseIds = new ConcurrentHashMap<>();
 
+    // Ownership: case id -> owning test-set path. Guards the global testCasesById map so
+    // one test set's removals can never delete a case that still belongs to another set.
+    private final Map<UUID, String> testCaseOwner = new ConcurrentHashMap<>();
+
     @Getter
     private final Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
 
@@ -126,10 +130,12 @@ final class IndexerDataStore {
     }
 
     void putTestCase(final Path testSetPath, final TestCaseDto tc) {
+        final String pathStr = testSetPath.toString();
         testCasesById.put(tc.getId(), tc);
+        testCaseOwner.put(tc.getId(), pathStr);
 
         final List<UUID> ids = testSetCaseIds.computeIfAbsent(
-                testSetPath.toString(), k -> Collections.synchronizedList(new ArrayList<>()));
+                pathStr, k -> Collections.synchronizedList(new ArrayList<>()));
         if (!ids.contains(tc.getId())) {
             ids.add(tc.getId());
         }
@@ -139,9 +145,14 @@ final class IndexerDataStore {
     }
 
     void removeTestCase(final Path testSetPath, final UUID tcId) {
-        testCasesById.remove(tcId);
+        final String pathStr = testSetPath.toString();
+        // Only touch the global map if this set actually owns the case (UUID-collision guard).
+        if (pathStr.equals(testCaseOwner.get(tcId))) {
+            testCasesById.remove(tcId);
+            testCaseOwner.remove(tcId);
+        }
 
-        final List<UUID> ids = testSetCaseIds.get(testSetPath.toString());
+        final List<UUID> ids = testSetCaseIds.get(pathStr);
         if (ids != null) ids.remove(tcId);
 
         final Path filePath = testSetPath.resolve(tcId + ".json");
@@ -173,7 +184,12 @@ final class IndexerDataStore {
         if (oldIds != null) {
             for (final UUID oldId : oldIds) {
                 if (!newIds.contains(oldId)) {
-                    testCasesById.remove(oldId);
+                    // Only evict from the global map if this set owns the id; never
+                    // delete a case that still belongs to another test set.
+                    if (pathStr.equals(testCaseOwner.get(oldId))) {
+                        testCasesById.remove(oldId);
+                        testCaseOwner.remove(oldId);
+                    }
                 }
             }
         }
@@ -218,8 +234,13 @@ final class IndexerDataStore {
 
         final List<UUID> ids = testSetCaseIds.remove(pathStr);
         if (ids != null) {
-            for (final UUID id : ids)
-                testCasesById.remove(id);
+            for (final UUID id : ids) {
+                // Remove only cases actually owned by this set.
+                if (pathStr.equals(testCaseOwner.get(id))) {
+                    testCasesById.remove(id);
+                    testCaseOwner.remove(id);
+                }
+            }
         }
         Logger.info("Removed test set at: " + pathStr);
     }
@@ -339,6 +360,7 @@ final class IndexerDataStore {
         testCasesMainDirsByPath.clear();
         testRunsMainDirsByPath.clear();
         testSetCaseIds.clear();
+        testCaseOwner.clear();
         testRunsByPath.clear();
 
         Logger.info("IndexerDataStore: all maps cleared");
