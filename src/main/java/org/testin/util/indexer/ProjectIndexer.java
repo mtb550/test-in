@@ -129,27 +129,14 @@ public final class ProjectIndexer {
                             public void onSuccess() {
                                 indexingLatch.countDown();
                                 Logger.info("Project '" + projectName + "' indexed.");
-
-                                if (indexingLatch.getCount() == 0 && indexed.compareAndSet(false, true)) {
-                                    indexing.set(false);
-
-                                    logSummary();
-
-                                    ApplicationManager.getApplication().invokeLater(() -> {
-                                        if (restoreEditorsOnComplete.compareAndSet(true, true)) {
-                                            Logger.info("Indexing finished, restoring open editors.");
-                                            Services.getInstance(project, EditorUtil.class).restoreLastOpened(project);
-
-                                        } else
-                                            Logger.info("Indexing finished, skipping editor restore.");
-                                    });
-                                }
+                                finishSuccessfully();
                             }
 
                             @Override
                             public void onThrowable(@NotNull Throwable error) {
                                 indexingLatch.countDown();
                                 Logger.error("Error indexing '" + projectName + "': " + error.getMessage());
+                                finishWithFailure();
                             }
                         });
             }
@@ -157,6 +144,36 @@ public final class ProjectIndexer {
             Logger.error("indexWithProgress: " + ex.getMessage());
             indexing.set(false);
         }
+    }
+
+    private void finishSuccessfully() {
+        if (indexingLatch.getCount() == 0 && indexed.compareAndSet(false, true)) {
+            indexing.set(false);
+            logSummary();
+            restoreOpenEditorsOnce();
+        }
+    }
+
+    private void finishWithFailure() {
+        // Un-stick the indexer: leave indexed=false so the next indexWithProgress() can
+        // retry, but clear the in-progress flag so calls no longer bail out on it.
+        if (indexingLatch.getCount() == 0) {
+            indexing.set(false);
+            Logger.warn("Indexing finished with errors; will retry on the next request.");
+        }
+    }
+
+    private void restoreOpenEditorsOnce() {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            // getAndSet(false) makes this a proper one-shot: restore exactly once and
+            // clear the flag (resetForReindex() pre-clears it to skip the restore).
+            if (restoreEditorsOnComplete.getAndSet(false)) {
+                Logger.info("Indexing finished, restoring open editors.");
+                Services.getInstance(project, EditorUtil.class).restoreLastOpened(project);
+            } else {
+                Logger.info("Indexing finished, skipping editor restore.");
+            }
+        });
     }
 
     public void awaitIndexing() {
