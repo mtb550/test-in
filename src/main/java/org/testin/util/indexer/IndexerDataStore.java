@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 final class IndexerDataStore {
 
@@ -230,7 +231,49 @@ final class IndexerDataStore {
         testProjectsByPath.remove(pathStr);
         testCasesMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
         testRunsMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
+
+        // Cascade so no orphaned sets/packages/runs or their cases survive under the project.
+        removeTestSetPackagesUnder(path);
+        removeTestRunPackagesUnder(path);
+        removeTestSetsUnder(path);
+        removeTestRunsUnder(path);
+
         Logger.info("Removed test project at: " + pathStr);
+    }
+
+    private void removeTestSetPackagesUnder(final @NotNull Path path) {
+        testSetPackagesByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
+    }
+
+    private void removeTestRunPackagesUnder(final @NotNull Path path) {
+        testRunPackagesByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
+    }
+
+    private void removeTestSetsUnder(final @NotNull Path path) {
+        final List<String> toRemove = testSetsDirByPath.entrySet().stream()
+                .filter(entry -> entry.getValue().getPath().startsWith(path))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        for (final String setPath : toRemove) {
+            removeTestSet(Path.of(setPath));
+        }
+    }
+
+    private void removeTestRunsUnder(final @NotNull Path path) {
+        final List<String> toRemove = testRunsDirByPath.entrySet().stream()
+                .filter(entry -> entry.getValue().getPath().startsWith(path))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        for (final String key : toRemove) {
+            testRunsDirByPath.remove(key);
+        }
+
+        final List<String> toRemoveRuns = testRunsByPath.keySet().stream()
+                .filter(key -> Path.of(key).startsWith(path))
+                .collect(Collectors.toList());
+        for (final String key : toRemoveRuns) {
+            testRunsByPath.remove(key);
+        }
     }
 
     void removeTestSet(final @NotNull Path path) {
@@ -260,12 +303,22 @@ final class IndexerDataStore {
     void removeTestSetPackage(final @NotNull Path path) {
         final String pathStr = path.toString();
         testSetPackagesByPath.remove(pathStr);
+
+        // A package may contain nested packages and test sets - cascade them too.
+        removeTestSetPackagesUnder(path);
+        removeTestSetsUnder(path);
+
         Logger.info("Removed test set package at: " + pathStr);
     }
 
     void removeTestRunPackage(final @NotNull Path path) {
         final String pathStr = path.toString();
         testRunPackagesByPath.remove(pathStr);
+
+        // A package may contain nested packages and test runs - cascade them too.
+        removeTestRunPackagesUnder(path);
+        removeTestRunsUnder(path);
+
         Logger.info("Removed test run package at: " + pathStr);
     }
 
