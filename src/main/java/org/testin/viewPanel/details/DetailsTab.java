@@ -14,17 +14,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.generateJavaCode.GeneratorType;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.testCase.createDialog.TestCaseUpdateMenuDialog;
-import org.testin.util.FontSyncUtil;
+import org.testin.util.FontSync;
 import org.testin.util.KeyboardSet;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 import org.testin.viewPanel.details.components.*;
@@ -77,7 +77,7 @@ public class DetailsTab {
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
         final JLabel placeholder = new JLabel(PLACEHOLDER_TEXT);
         placeholder.setForeground(JBColor.GRAY);
-        placeholder.setFont(JBFont.label().deriveFont(FontSyncUtil.getBaseFontSize() + 5.0f));
+        placeholder.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize() + 5.0f));
         panel.add(placeholder, BorderLayout.NORTH);
     }
 

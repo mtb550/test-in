@@ -7,11 +7,11 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.util.Tools;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
 import java.io.*;
 import java.util.ArrayList;

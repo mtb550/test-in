@@ -8,8 +8,8 @@ import org.testin.editorPanel.Shared;
 import org.testin.importExport.imports.ImportSetter;
 import org.testin.mappers.Config;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.services.Services;
 import org.testin.util.Tools;
-import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.util.List;

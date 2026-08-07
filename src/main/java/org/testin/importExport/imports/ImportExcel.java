@@ -4,10 +4,10 @@ import com.intellij.openapi.project.Project;
 import org.apache.poi.ss.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 
 import java.io.File;
 import java.io.FileInputStream;

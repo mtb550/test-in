@@ -11,13 +11,13 @@ import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.generateJavaCode.GeneratorType;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.testCase.createDialog.TestCaseUpdateMenuDialog;
 import org.testin.util.KeyboardSet;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 

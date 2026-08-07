@@ -9,8 +9,8 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.services.Services;
 import org.testin.util.Tools;
-import org.testin.util.services.Services;
 
 public class UpdateTestDescription extends UpdateTestBase implements GeneratorAction {
 

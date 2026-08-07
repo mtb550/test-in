@@ -19,9 +19,9 @@ import org.testin.importExport.shared.CellEditListener;
 import org.testin.importExport.shared.FileDocumentListener;
 import org.testin.importExport.shared.TablePanelBuilder;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

@@ -8,13 +8,13 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
-import org.testin.util.FontSyncUtil;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.services.Services;
+import org.testin.util.FontSync;
 
 import javax.swing.*;
 import java.awt.*;
@@ -51,7 +51,7 @@ public class NavigationBar extends BaseDetails {
         final JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
-        float navFontSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 1.0f);
+        float navFontSize = Math.max(8.0f, FontSync.getBaseFontSize() - 1.0f);
 
         if (currentPath != null) {
             for (int i = 0; i < currentPath.size(); i++) {

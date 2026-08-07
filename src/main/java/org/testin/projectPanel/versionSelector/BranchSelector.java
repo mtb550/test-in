@@ -7,11 +7,11 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.GitCommandRunner;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
+import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.util.GitCommandRunner;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
+import org.testin.services.Services;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

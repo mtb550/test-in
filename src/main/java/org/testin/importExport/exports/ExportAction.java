@@ -15,15 +15,15 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.FileTypes;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.util.Mapper;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;

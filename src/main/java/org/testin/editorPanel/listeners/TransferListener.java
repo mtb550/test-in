@@ -2,8 +2,8 @@ package org.testin.editorPanel.listeners;
 
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;

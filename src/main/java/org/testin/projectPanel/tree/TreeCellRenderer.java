@@ -5,11 +5,11 @@ import com.intellij.ui.ColoredTreeCellRenderer;
 import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunsMainDirectoryDto;
-import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;

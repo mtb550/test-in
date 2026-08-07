@@ -13,13 +13,13 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.logger.Logger;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.toolBar.RefreshAction;
+import org.testin.services.Services;
 import org.testin.settings.Dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 import org.testin.util.Tools;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.nio.file.Path;

@@ -9,9 +9,9 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
+import org.testin.services.Services;
 import org.testin.settings.StartupActivity;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 public class Main implements ToolWindowFactory, DumbAware {
 

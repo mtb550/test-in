@@ -13,7 +13,7 @@ import org.testin.enums.CreateTestCaseFields;
 import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.statusBar.IStatusBarItem;
+import org.testin.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 import java.awt.*;

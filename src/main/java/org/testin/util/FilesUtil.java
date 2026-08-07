@@ -5,9 +5,9 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
+import org.testin.logger.Logger;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 
 import java.io.IOException;
 import java.nio.file.Files;

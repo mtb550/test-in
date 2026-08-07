@@ -13,8 +13,8 @@ import org.testin.enums.FileTypes;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.importExport.shared.TablePanelBuilder;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
-import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.*;

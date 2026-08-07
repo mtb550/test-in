@@ -6,8 +6,8 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.util.logger.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;

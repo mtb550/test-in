@@ -3,7 +3,7 @@ package org.testin.generateJavaCode.method.update;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.GeneratorAction;
-import org.testin.util.logger.Logger;
+import org.testin.logger.Logger;
 
 public class UpdateTestTestData extends UpdateTestBase implements GeneratorAction {
 

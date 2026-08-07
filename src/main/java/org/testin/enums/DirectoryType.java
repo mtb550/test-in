@@ -7,11 +7,7 @@ import lombok.Getter;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.dirs.*;
-import org.testin.nodeCreator.CreateTestRunPackage;
-import org.testin.nodeCreator.CreateTestSet;
-import org.testin.nodeCreator.CreateTestSetPackage;
-import org.testin.nodeCreator.NodeCreator;
-import org.testin.testRun.CreateTestRun;
+import org.testin.nodeCreator.*;
 
 import javax.swing.*;
 import java.util.function.Function;

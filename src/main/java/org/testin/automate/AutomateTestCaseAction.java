@@ -7,9 +7,9 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Logger;
 
 public class AutomateTestCaseAction extends DumbAwareAction {
     private final @NotNull Project p;

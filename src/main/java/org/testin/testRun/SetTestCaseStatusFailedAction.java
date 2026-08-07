@@ -12,10 +12,10 @@ import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.services.RunStatusService;
+import org.testin.services.Services;
 import org.testin.testRun.createDialog.FailedResultDialog;
 import org.testin.util.KeyboardSet;
-import org.testin.util.services.RunStatusService;
-import org.testin.util.services.Services;
 
 import java.util.List;
 

@@ -9,6 +9,7 @@ import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
 import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
+import org.testin.logger.Logger;
 import org.testin.mappers.Config;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
@@ -16,9 +17,8 @@ import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

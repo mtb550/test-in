@@ -12,13 +12,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.testin.git.GitCommandRunner;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
+import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.services.Services;
 import org.testin.settings.Setting;
-import org.testin.util.GitCommandRunner;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
 import java.nio.file.Path;
 

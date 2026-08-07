@@ -9,7 +9,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.FontSyncUtil;
+import org.testin.util.FontSync;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,11 +27,11 @@ public abstract class BaseDetails {
     final int VALUE_INSETS_RIGHT = 16;
 
     protected float getLabelFontSize() {
-        return FontSyncUtil.getBaseFontSize() + 5.0f; // Roughly 20.0f default
+        return FontSync.getBaseFontSize() + 5.0f; // Roughly 20.0f default
     }
 
     protected float getValueFontSize() {
-        return FontSyncUtil.getBaseFontSize() + 8.0f; // Roughly 23.0f default
+        return FontSync.getBaseFontSize() + 8.0f; // Roughly 23.0f default
     }
 
     public abstract int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);

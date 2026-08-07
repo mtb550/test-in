@@ -10,11 +10,11 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Dialogs.TestRunStatusMenuDialog;
 import org.testin.enums.TestRunStatus;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
+import org.testin.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;

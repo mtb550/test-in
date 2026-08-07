@@ -4,9 +4,9 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.ProjectStatus;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.util.logger.Logger;
 
 public class TestRunTreeBuilder extends AbstractTreeBuilder {
 

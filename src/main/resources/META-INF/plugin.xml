@@ -132,7 +132,7 @@
         <!-- gutter -->
         <codeInsight.lineMarkerProvider
                 language="JAVA"
-                implementationClass="org.testin.util.gutter.TestMethodGutter"
+                implementationClass="org.testin.gutter.TestMethodGutter"
         />
 
     </extensions>

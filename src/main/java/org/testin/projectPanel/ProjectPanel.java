@@ -14,18 +14,18 @@ import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testin.projectPanel.projectSelector.TestProjectSelector;
 import org.testin.projectPanel.tree.ProjectTree;
 import org.testin.projectPanel.tree.TestCaseTreeBuilder;
 import org.testin.projectPanel.tree.TestProjectTreeBuilder;
 import org.testin.projectPanel.tree.TestRunTreeBuilder;
 import org.testin.projectPanel.versionSelector.BranchSelector;
+import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.settings.SettingsConfigurable;
 import org.testin.testProject.CreateTestProjectAction;
 import org.testin.util.Bundle;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 import java.awt.*;
 

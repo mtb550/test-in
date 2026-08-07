@@ -4,10 +4,10 @@ import com.intellij.icons.AllIcons;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.testin.statusBar.IStatusBarItem;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
 import org.testin.util.KeyboardSet;
-import org.testin.util.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 import java.util.function.Function;

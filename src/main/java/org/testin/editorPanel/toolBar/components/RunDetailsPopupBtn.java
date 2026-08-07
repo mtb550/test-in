@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.testin.enums.RunEditorAttributes;
-import org.testin.util.logger.Logger;
+import org.testin.logger.Logger;
 
 import java.util.Arrays;
 import java.util.HashSet;

@@ -12,12 +12,12 @@ import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
+import org.testin.services.TestCaseCacheService;
+import org.testin.services.TestCasePersistService;
 import org.testin.testCase.createDialog.CreateTestCaseDialog;
 import org.testin.util.KeyboardSet;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
-import org.testin.util.services.TestCaseCacheService;
-import org.testin.util.services.TestCasePersistService;
 
 import javax.swing.*;
 import java.util.List;

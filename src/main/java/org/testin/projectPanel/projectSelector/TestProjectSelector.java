@@ -7,12 +7,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.ProjectStatus;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.services.Services;
 import org.testin.settings.Setting;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.nio.file.Files;

@@ -10,9 +10,9 @@ import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
 import org.testin.nodeCreator.dialogs.CreateNodesDialog;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.util.Tools;
-import org.testin.util.services.Services;
 
 public class CreateTestProjectAction extends DumbAwareAction {
     private final @NotNull Project p;

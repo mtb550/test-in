@@ -5,9 +5,9 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.testin.enums.CreateTestCaseFields;
 import org.testin.enums.Group;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.*;

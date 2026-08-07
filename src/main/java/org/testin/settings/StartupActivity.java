@@ -7,11 +7,11 @@ import com.intellij.openapi.startup.ProjectActivity;
 import kotlin.coroutines.Continuation;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.runner.TestCaseExecutionTracker;
-import org.testin.util.services.Services;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
+import org.testin.notifications.Notifier;
+import org.testin.runner.TestCaseExecutionTracker;
+import org.testin.services.Services;
 
 import java.nio.file.Path;
 import java.util.Optional;

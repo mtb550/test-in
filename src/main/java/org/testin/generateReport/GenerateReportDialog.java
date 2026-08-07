@@ -9,8 +9,8 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
+import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
-import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.*;

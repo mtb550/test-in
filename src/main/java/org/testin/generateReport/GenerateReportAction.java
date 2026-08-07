@@ -16,16 +16,16 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.FileTypes;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.Config;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.util.KeyboardSet;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.datatransfer.StringSelection;
@@ -125,7 +125,7 @@ public class GenerateReportAction extends DumbAwareAction {
                 Files.write(reportFile.toPath(), fileBytes);
 
                 NotificationAction openAction = NotificationAction.createSimple("Open report", () -> {
-                    
+
                     try {
                         java.awt.Desktop.getDesktop().open(reportFile);
                     } catch (final Exception openEx) {

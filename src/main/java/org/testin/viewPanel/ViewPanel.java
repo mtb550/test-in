@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.ViewTab;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.FontSyncUtil;
+import org.testin.util.FontSync;
 import org.testin.viewPanel.details.DetailsTab;
 import org.testin.viewPanel.history.HistoryTab;
 import org.testin.viewPanel.openBugs.OpenBugsTab;
@@ -46,9 +46,9 @@ public class ViewPanel implements Disposable {
         historyTab = new JBPanel<>(new BorderLayout());
         openBugsTab = new JBPanel<>(new BorderLayout());
 
-        FontSyncUtil.syncWithNativeEditor(p, detailsTab, this);
-        FontSyncUtil.syncWithNativeEditor(p, historyTab, this);
-        FontSyncUtil.syncWithNativeEditor(p, openBugsTab, this);
+        FontSync.syncWithNativeEditor(p, detailsTab, this);
+        FontSync.syncWithNativeEditor(p, historyTab, this);
+        FontSync.syncWithNativeEditor(p, openBugsTab, this);
 
         detailsScrollPane = createScrollPane(detailsTab);
         historyScrollPane = createScrollPane(historyTab);

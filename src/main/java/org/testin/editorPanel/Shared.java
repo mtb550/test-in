@@ -9,7 +9,7 @@ import com.intellij.util.ui.UIUtil;
 import org.testin.enums.CardHoverAction;
 import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.FontSyncUtil;
+import org.testin.util.FontSync;
 
 import javax.swing.*;
 import java.awt.*;
@@ -62,7 +62,7 @@ public class Shared {
             setBackground(bg);
             setForeground(JBColor.WHITE);
 
-            float badgeSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 2.0f);
+            float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
             setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
 
             setBorder(JBUI.Borders.empty(2, 10));

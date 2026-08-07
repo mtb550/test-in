@@ -7,8 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.OpenActionAction;
 import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.open.OpenAction;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -52,7 +52,7 @@ public class TreeMouseListener extends PopupHandler {
             return;
 
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-            new OpenActionAction(p, tree).execute(p);
+            new OpenAction(p, tree).execute(p);
             e.consume();
         }
     }

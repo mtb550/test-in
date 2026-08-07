@@ -6,10 +6,10 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.statusBar.IStatusBarItem;
 import org.testin.testRun.updateDialog.RunItemEditSection;
 import org.testin.testRun.updateDialog.UpdateRunItemDialog;
 import org.testin.util.KeyboardSet;
-import org.testin.util.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 

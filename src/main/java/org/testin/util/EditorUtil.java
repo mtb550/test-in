@@ -13,12 +13,12 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 import org.testin.editorPanel.EditorType;
 import org.testin.editorPanel.UnifiedVirtualFile;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
+import org.testin.services.Services;
 
 import java.nio.file.Path;
 import java.util.ArrayList;

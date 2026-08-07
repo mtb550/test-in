@@ -1,8 +1,8 @@
 package org.testin.projectPanel.projectSelector;
 
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

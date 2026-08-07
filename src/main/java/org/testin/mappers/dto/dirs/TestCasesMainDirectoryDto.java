@@ -3,8 +3,8 @@ package org.testin.mappers.dto.dirs;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.testin.enums.CreateNodeMenu;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestCasesMainDirectoryMarker;
-import org.testin.util.indexer.ProjectIndexer;
 
 import java.nio.file.Path;
 

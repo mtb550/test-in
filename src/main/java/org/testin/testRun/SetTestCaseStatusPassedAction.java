@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.services.RunStatusService;
+import org.testin.services.Services;
 import org.testin.util.KeyboardSet;
-import org.testin.util.services.RunStatusService;
-import org.testin.util.services.Services;
 
 public class SetTestCaseStatusPassedAction extends DumbAwareAction {
     private final @NotNull Project p;

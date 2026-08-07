@@ -10,9 +10,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.services.Services;
+import org.testin.services.TestCaseCacheService;
 import org.testin.util.KeyboardSet;
-import org.testin.util.services.Services;
-import org.testin.util.services.TestCaseCacheService;
 
 import javax.swing.*;
 import java.awt.*;

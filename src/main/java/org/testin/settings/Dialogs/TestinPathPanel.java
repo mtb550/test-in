@@ -8,8 +8,8 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

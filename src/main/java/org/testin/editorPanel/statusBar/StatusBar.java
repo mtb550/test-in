@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
-import org.testin.util.FontSyncUtil;
+import org.testin.util.FontSync;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
@@ -54,7 +54,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         ));
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        float smallSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 2.0f);
+        float smallSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
         Font dynamicSmallFont = JBUI.Fonts.smallFont().deriveFont(smallSize);
 
         statusLabel.setFont(dynamicSmallFont);

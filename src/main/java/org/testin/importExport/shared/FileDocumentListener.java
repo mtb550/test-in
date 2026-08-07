@@ -4,10 +4,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.FileTypes;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;

@@ -6,10 +6,10 @@ import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.services.Services;
 import org.testin.util.Tools;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 import java.io.IOException;
 import java.util.List;

@@ -6,20 +6,26 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.*;
+import org.testin.EscapeAction;
+import org.testin.ShowNodeDetailsAction;
 import org.testin.clipboard.*;
-import org.testin.crud.RemoveAction;
 import org.testin.enums.ProjectStatus;
 import org.testin.generateReport.GenerateReportAction;
+import org.testin.git.SyncActionAction;
+import org.testin.git.ViewPendingCommitsAction;
 import org.testin.importExport.exports.ExportAction;
 import org.testin.importExport.imports.ImportAction;
 import org.testin.nodeCreator.CreateTreeNodeAction;
+import org.testin.open.OpenAction;
+import org.testin.open.OpenContextMenuAction;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.remove.RemoveAction;
+import org.testin.rename.RenameAction;
 import org.testin.run.RunTestSetAction;
+import org.testin.services.Services;
 import org.testin.testProject.UpdateTestProjectStatusAction;
 import org.testin.testRun.SetTestRunStatusAction;
 import org.testin.util.Tools;
-import org.testin.util.services.Services;
 
 import java.util.List;
 
@@ -30,7 +36,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         super("Tree Popup Menu", true);
         this.p = p;
 
-        add(new OpenActionAction(p, tree));
+        add(new OpenAction(p, tree));
         add(new CreateTreeNodeAction(p, pp, tree));
 
         addSeparator();

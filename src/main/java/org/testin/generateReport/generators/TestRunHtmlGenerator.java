@@ -7,8 +7,8 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
-import org.testin.util.services.Services;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;

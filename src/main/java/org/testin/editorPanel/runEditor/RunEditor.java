@@ -28,18 +28,18 @@ import org.testin.editorPanel.toolBar.components.RunDetailsPopupBtn;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.enums.*;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.services.Services;
+import org.testin.services.TestCaseCacheService;
 import org.testin.settings.AppSettingsState;
+import org.testin.testCase.TestCaseSorter;
 import org.testin.testRun.UpdateTestRunStatusAction;
-import org.testin.util.FontSyncUtil;
-import org.testin.util.TestCaseSorter;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
-import org.testin.util.services.TestCaseCacheService;
+import org.testin.util.FontSync;
 
 import javax.swing.*;
 import javax.swing.Timer;
@@ -125,7 +125,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         buildOpeningPanel();
         loadDataAsync();
 
-        FontSyncUtil.syncWithNativeEditor(p, list, projectDisposable);
+        FontSync.syncWithNativeEditor(p, list, projectDisposable);
     }
 
     private void buildOpeningPanel() {

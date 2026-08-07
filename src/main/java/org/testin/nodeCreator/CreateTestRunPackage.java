@@ -4,11 +4,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunPackageDirectoryDto;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.services.Services;
+import org.testin.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;

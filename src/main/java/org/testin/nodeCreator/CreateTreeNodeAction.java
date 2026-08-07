@@ -9,15 +9,15 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.nodeCreator.dialogs.CreateNodesDialog;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;

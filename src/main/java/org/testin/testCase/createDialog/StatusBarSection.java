@@ -1,7 +1,7 @@
 package org.testin.testCase.createDialog;
 
 import org.testin.enums.CreateTestCaseFields;
-import org.testin.util.statusBar.StatusBarBase;
+import org.testin.statusBar.StatusBarBase;
 
 public class StatusBarSection extends StatusBarBase {
 

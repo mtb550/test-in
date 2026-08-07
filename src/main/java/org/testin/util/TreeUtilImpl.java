@@ -11,8 +11,8 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;

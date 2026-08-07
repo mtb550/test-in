@@ -11,10 +11,10 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.projectPanel.tree.TreeTransferHandler;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Logger;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.awt.datatransfer.StringSelection;

@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.Shared;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.services.Services;
 import org.testin.util.Tools;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.util.List;

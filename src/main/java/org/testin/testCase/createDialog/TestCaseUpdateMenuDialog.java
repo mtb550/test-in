@@ -15,9 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.enums.UpdateTestCaseFields;
 import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.updateDialog.UpdateTestCaseDialog;
-import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;

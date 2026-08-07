@@ -8,14 +8,14 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
 import org.testin.util.Tools;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;

@@ -8,7 +8,7 @@ import com.intellij.openapi.components.Service;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.logger.Logger;
+import org.testin.logger.Logger;
 
 import java.io.File;
 import java.io.InputStream;

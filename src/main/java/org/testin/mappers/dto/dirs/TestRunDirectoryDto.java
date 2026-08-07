@@ -4,8 +4,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateNodeMenu;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestRunMarker;
-import org.testin.util.indexer.ProjectIndexer;
 
 import java.nio.file.Path;
 

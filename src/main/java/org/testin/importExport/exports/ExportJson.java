@@ -7,10 +7,10 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.util.FilesUtil;
 import org.testin.util.Tools;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.services.Services;
 
 import java.io.File;
 import java.util.List;

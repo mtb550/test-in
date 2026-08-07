@@ -7,11 +7,11 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
-import org.testin.util.logger.Logger;
-import org.testin.util.notifications.Notifier;
-import org.testin.util.runner.TestNGRunnerByClass;
-import org.testin.util.services.Services;
+import org.testin.notifications.Notifier;
+import org.testin.runner.TestNGRunnerByClass;
+import org.testin.services.Services;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;

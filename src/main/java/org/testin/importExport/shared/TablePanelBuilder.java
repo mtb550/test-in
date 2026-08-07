@@ -7,8 +7,8 @@ import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
 import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

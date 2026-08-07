@@ -1,15 +1,14 @@
 package org.testin.viewPanel.details.components;
 
 import com.intellij.openapi.project.Project;
-
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.FontSyncUtil;
+import org.testin.services.Services;
+import org.testin.util.FontSync;
 import org.testin.util.Tools;
-import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,7 +28,7 @@ public class Title extends BaseDetails {
 
         final JTextArea mainTitleArea = new JTextArea(finalValue);
 
-        float titleFontSize = FontSyncUtil.getBaseFontSize() + 11.0f;
+        float titleFontSize = FontSync.getBaseFontSize() + 11.0f;
         mainTitleArea.setFont(JBFont.label().deriveFont(Font.BOLD, titleFontSize));
 
         mainTitleArea.setLineWrap(true);

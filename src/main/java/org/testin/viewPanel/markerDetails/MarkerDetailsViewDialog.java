@@ -16,7 +16,7 @@ import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestProjectMarker;
 import org.testin.mappers.markers.TestRunMarker;
-import org.testin.util.FontSyncUtil;
+import org.testin.util.FontSync;
 
 import javax.swing.*;
 import java.awt.*;
@@ -101,7 +101,7 @@ public class MarkerDetailsViewDialog {
             return row;
 
         JTextArea valueArea = new JTextArea(valueText);
-        valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, FontSyncUtil.getBaseFontSize() + VALUE_FONT_SIZE_OFFSET));
+        valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, FontSync.getBaseFontSize() + VALUE_FONT_SIZE_OFFSET));
         valueArea.setLineWrap(true);
         valueArea.setWrapStyleWord(true);
         valueArea.setOpaque(false);
@@ -123,7 +123,7 @@ public class MarkerDetailsViewDialog {
 
         JLabel label = new JLabel(labelText);
         label.setForeground(JBColor.GRAY);
-        label.setFont(JBFont.label().deriveFont(Font.BOLD, FontSyncUtil.getBaseFontSize() + LABEL_FONT_SIZE_OFFSET));
+        label.setFont(JBFont.label().deriveFont(Font.BOLD, FontSync.getBaseFontSize() + LABEL_FONT_SIZE_OFFSET));
 
         Dimension prefSize = label.getPreferredSize();
         label.setPreferredSize(new Dimension(LABEL_WIDTH, prefSize.height));

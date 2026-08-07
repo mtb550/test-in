@@ -29,15 +29,15 @@ import org.testin.editorPanel.toolBar.components.TestDetailsPopupBtn;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.services.Services;
+import org.testin.services.TestCaseCacheService;
 import org.testin.testCase.CreateTestCaseAction;
-import org.testin.util.FontSyncUtil;
-import org.testin.util.TestCaseSorter;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
-import org.testin.util.services.TestCaseCacheService;
+import org.testin.testCase.TestCaseSorter;
+import org.testin.util.FontSync;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
@@ -123,7 +123,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
 
-        FontSyncUtil.syncWithNativeEditor(p, list, projectDisposable);
+        FontSync.syncWithNativeEditor(p, list, projectDisposable);
 
         final JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);

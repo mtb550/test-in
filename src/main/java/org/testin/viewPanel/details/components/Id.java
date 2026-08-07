@@ -11,7 +11,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.FontSyncUtil;
+import org.testin.util.FontSync;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,7 +48,7 @@ public class Id extends BaseDetails {
             }
         };
 
-        float badgeSize = Math.max(8.0f, FontSyncUtil.getBaseFontSize() - 3.0f);
+        float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 3.0f);
         idBadge.setFont(JBFont.label().deriveFont(Font.BOLD, badgeSize));
 
         idBadge.setForeground(FG_COLOR);

@@ -5,8 +5,8 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 import org.testin.enums.CreateNodeMenu;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestProjectMarker;
-import org.testin.util.indexer.ProjectIndexer;
 
 import java.nio.file.Path;
 

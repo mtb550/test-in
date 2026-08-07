@@ -9,11 +9,11 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
+import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testRun.createDialog.ActualResultDialog;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Logger;
 
 public class SetActualResultAction extends DumbAwareAction {
 

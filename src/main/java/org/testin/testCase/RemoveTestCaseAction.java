@@ -15,9 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.services.Services;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
-import org.testin.util.services.Services;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -86,7 +86,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             saveToFile(predecessor);
         }
 
-        final var indexer = Services.getInstance(p, org.testin.util.indexer.ProjectIndexer.class);
+        final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
         for (final TestCaseDto tc : selectedItems) {
             indexer.removeTestCase(dir.getPath(), tc.getId());
         }

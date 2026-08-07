@@ -8,11 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.statusBar.IStatusBarItem;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
 import org.testin.testCase.updateDialog.bulk.*;
 import org.testin.util.KeyboardSet;
-import org.testin.util.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 import java.util.List;

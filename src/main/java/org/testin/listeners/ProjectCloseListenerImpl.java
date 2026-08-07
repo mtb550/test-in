@@ -3,8 +3,8 @@ package org.testin.listeners;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectCloseListener;
 import org.jetbrains.annotations.NotNull;
+import org.testin.services.Services;
 import org.testin.util.EditorUtil;
-import org.testin.util.services.Services;
 
 
 public final class ProjectCloseListenerImpl implements ProjectCloseListener {

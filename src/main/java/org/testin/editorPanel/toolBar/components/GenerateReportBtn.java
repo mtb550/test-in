@@ -10,7 +10,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateReport.GenerateReportAction;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.util.services.Services;
+import org.testin.services.Services;
 
 public class GenerateReportBtn extends AbstractButton implements IToolbarItem {
 

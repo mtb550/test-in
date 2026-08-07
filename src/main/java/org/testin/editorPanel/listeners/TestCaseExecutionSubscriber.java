@@ -4,11 +4,11 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.listeners.ITestCaseExecutionListener;
+import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.broadcasts.listeners.ITestCaseExecutionListener;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
+import org.testin.services.Services;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -13,8 +13,8 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.RunItemUpdateFields;
+import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
-import org.testin.util.logger.Logger;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;

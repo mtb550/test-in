@@ -13,14 +13,14 @@ import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.enums.TestRunStatus;
 import org.testin.enums.TestStatus;
+import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
-import org.testin.util.indexer.ProjectIndexer;
-import org.testin.util.logger.Logger;
-import org.testin.util.services.Services;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
