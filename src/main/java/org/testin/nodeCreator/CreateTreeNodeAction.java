@@ -28,15 +28,15 @@ public class CreateTreeNodeAction extends DumbAwareAction {
     private final @NotNull Project p;
 
     @Getter
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
 
     @Getter
     private final @NotNull SimpleTree tree;
 
-    public CreateTreeNodeAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
+    public CreateTreeNodeAction(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull SimpleTree tree) {
         super("Create", "Create new node", AllIcons.General.Add);
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
         this.tree = tree;
         this.registerCustomShortcutSet(KeyboardSet.CreateNode.getCustomShortcut(), tree);
     }

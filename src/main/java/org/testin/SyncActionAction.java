@@ -29,13 +29,13 @@ public class SyncActionAction extends DumbAwareAction {
 
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
 
-    public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
+    public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel pp) {
         super("Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
         this.p = p;
         this.tree = tree;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
     }
 
     @Override
@@ -81,8 +81,8 @@ public class SyncActionAction extends DumbAwareAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         Services.getInstance(p, Notifier.class).info(p, "Sync Successful", "Your project is now up to date with the remote repository.");
-                        projectPanel.getTestProjectSelector().loadTestProjectList();
-                        projectPanel.setupMainLayout();
+                        pp.getTestProjectSelector().loadTestProjectList();
+                        pp.setupMainLayout();
                     });
 
                 } catch (final Exception ex) {

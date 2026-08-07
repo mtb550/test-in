@@ -28,13 +28,13 @@ import java.nio.file.Path;
 public class RenameAction extends DumbAwareAction {
     private final @NotNull Project p;
     // todo: rename projectPanel to pp @ all classes
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
     private final @NotNull SimpleTree tree;
 
-    public RenameAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
+    public RenameAction(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull SimpleTree tree) {
         super("Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
         this.tree = tree;
         this.registerCustomShortcutSet(KeyboardSet.RenameNode.getCustomShortcut(), tree);
     }
@@ -67,7 +67,7 @@ public class RenameAction extends DumbAwareAction {
         ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
         if (dir instanceof TestProjectDirectoryDto) {
-            projectPanel.getTestProjectSelector().loadTestProjectList();
+            pp.getTestProjectSelector().loadTestProjectList();
         }
 
         Logger.info("Success! Renamed to: " + newName);

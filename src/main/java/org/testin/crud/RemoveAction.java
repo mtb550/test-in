@@ -26,13 +26,13 @@ import static org.testin.util.KeyboardSet.DeletePackage;
 public class RemoveAction extends DumbAwareAction {
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
 
-    public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
+    public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel pp) {
         super("Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.p = p;
         this.tree = tree;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
 
@@ -91,7 +91,7 @@ public class RemoveAction extends DumbAwareAction {
         }
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            projectPanel.getProjectTree().updateNodes();
+            pp.getProjectTree().updateNodes();
             Logger.info("Removed " + nodesToRemove.size() + " node(s).");
         });
 
