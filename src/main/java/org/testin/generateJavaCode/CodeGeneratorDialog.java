@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.awt.*;
 
 public class CodeGeneratorDialog extends JBCheckBox {
-    // todo, put all stored props in separate class.
     private final String PROP_KEY = "testin.automation.generateCode";
 
     @Getter

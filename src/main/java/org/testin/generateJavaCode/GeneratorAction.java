@@ -5,5 +5,5 @@ import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
 public interface GeneratorAction {
-    void execute(final @NotNull Project project, final @NotNull Object obj);
+    void execute(final @NotNull Project p, final @NotNull Object obj);
 }

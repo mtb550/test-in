@@ -44,7 +44,7 @@ public enum CreateNodeMenu {
             TestSetPackageDirectoryDto.class,
             DirectoryType.TSP,
             "set name..",
-            GeneratorType.CREATE_JAVA_PACKAGE
+            GeneratorType.CREATE_TEST_SET_PACKAGE
     ),
 
     TEST_RUN_PACKAGE(
@@ -62,7 +62,7 @@ public enum CreateNodeMenu {
             TestSetDirectoryDto.class,
             DirectoryType.TS,
             "set name..",
-            GeneratorType.CREATE_JAVA_CLASS
+            GeneratorType.CREATE_TEST_SET
     ),
 
     TEST_RUN(

@@ -24,7 +24,7 @@ public enum DirectoryType {
             TestProjectDirectoryDto.class,
             ".tp",
             null,
-            (project, dir) -> GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(project, dir)
+            (project, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(project, dir)
     ),
 
     TCD(
@@ -54,7 +54,7 @@ public enum DirectoryType {
             TestSetPackageDirectoryDto.class,
             ".tsp",
             new CreateTestSetPackage(),
-            (project, dir) -> GeneratorType.CREATE_JAVA_PACKAGE.getAction().execute(project, dir)
+            (project, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(project, dir)
     ),
 
     TRP(
@@ -74,7 +74,7 @@ public enum DirectoryType {
             TestSetDirectoryDto.class,
             ".ts",
             new CreateTestSet(),
-            (project, dir) -> GeneratorType.CREATE_JAVA_CLASS.getAction().execute(project, dir)
+            (project, dir) -> GeneratorType.CREATE_TEST_SET.getAction().execute(project, dir)
     ),
 
     TR(

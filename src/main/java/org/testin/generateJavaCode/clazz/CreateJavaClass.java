@@ -17,9 +17,9 @@ import java.util.List;
 public class CreateJavaClass implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestSetDirectoryDto dir)) return;
-        final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnClass(project, dir);
+        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnClass(p, dir);
 
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final String className = fqcn.getLast();
@@ -29,7 +29,7 @@ public class CreateJavaClass implements GeneratorAction {
 
         WriteAction.run(() -> {
             try {
-                VirtualFile testSourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
+                VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
 
                 if (testSourceRoot != null) {
                     VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, path.replace(".", "/"));

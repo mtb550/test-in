@@ -59,7 +59,7 @@ public class CreateTestCaseAction extends DumbAwareAction {
             Services.getInstance(project, Notifier.class).softShow(project, "Created..");
 
             if (cg.isSelected())
-                GeneratorType.CREATE_TEST_METHOD.getAction().execute(project, tc);
+                GeneratorType.CREATE_TEST_CASE.getAction().execute(project, tc);
 
             SwingUtilities.invokeLater(() -> editor.selectTestCase(tc));
 

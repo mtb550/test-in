@@ -40,7 +40,7 @@ public class ImportDialog extends DialogWrapper {
     private final Project project;
 
     @Getter
-    private final CodeGeneratorDialog cg = new CodeGeneratorDialog(GeneratorType.CREATE_TEST_METHOD);
+    private final CodeGeneratorDialog cg = new CodeGeneratorDialog(GeneratorType.CREATE_TEST_CASE);
 
     private final List<TestEditorAttributes> importAttributes;
 

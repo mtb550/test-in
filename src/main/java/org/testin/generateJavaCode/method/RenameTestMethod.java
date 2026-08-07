@@ -19,15 +19,15 @@ import java.util.List;
 public class RenameTestMethod implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
         if (fqcn.size() < 2) return;
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-        WriteCommandAction.runWriteCommandAction(project, "Rename Test Method", null, () -> {
-            final PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(path, GlobalSearchScope.projectScope(project));
+        WriteCommandAction.runWriteCommandAction(p, "Rename Test Method", null, () -> {
+            final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p));
             if (targetClass == null) {
                 Logger.warn("RenameTestMethod: class not found: " + path);
                 return;
@@ -37,7 +37,7 @@ public class RenameTestMethod implements GeneratorAction {
             for (PsiMethod m : targetClass.getMethods()) {
                 final PsiAnnotation annotation = m.getModifierList().findAnnotation("org.testng.annotations.Test");
                 if (annotation != null && annotation.getText().contains("testName") && annotation.getText().contains(targetId)) {
-                    final String newName = Services.getInstance(project, Tools.class).sanitizeMethodName(tc.getDescription());
+                    final String newName = Services.getInstance(p, Tools.class).sanitizeMethodName(tc.getDescription());
                     if (!m.getName().equals(newName)) {
                         m.setName(newName);
                     }

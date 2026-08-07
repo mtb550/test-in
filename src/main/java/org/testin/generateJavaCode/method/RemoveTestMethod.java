@@ -19,15 +19,15 @@ import java.util.List;
 public class RemoveTestMethod implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
         if (fqcn.size() < 2) return;
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 
-        WriteCommandAction.runWriteCommandAction(project, "Remove Test Method", null, () -> {
-            final PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(path, GlobalSearchScope.projectScope(project));
+        WriteCommandAction.runWriteCommandAction(p, "Remove Test Method", null, () -> {
+            final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p));
             if (targetClass == null) {
                 Logger.warn("RemoveTestMethod: class not found: " + path);
                 return;

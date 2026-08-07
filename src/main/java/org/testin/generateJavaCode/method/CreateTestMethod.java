@@ -23,9 +23,10 @@ import java.util.List;
 public class CreateTestMethod implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
-        final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+
+        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
         final String methodName = fqcn.getLast();
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final List<String> packageList = fqcn.subList(0, fqcn.size() - 2);
@@ -34,13 +35,12 @@ public class CreateTestMethod implements GeneratorAction {
         Logger.info("Creating Test Case for: " + fqcn);
 
         ApplicationManager.getApplication().invokeLater(() ->
-                WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () ->
-                        createMethod(project, path, packageList, className, methodName, tc)
+                WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
+                        createMethod(p, path, packageList, className, methodName, tc)
                 ));
     }
 
-    // Synchronous variant used by the import flow (already off-EDT).
-    public void executeSync(final @NotNull Project project, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
+    public void executeSync(final @NotNull Project p, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
         if (fqcn.size() < 2) {
             Logger.error("FQCN list is too short to generate a method.");
             return;
@@ -54,40 +54,37 @@ public class CreateTestMethod implements GeneratorAction {
         Logger.info("Creating Test Case (sync) for: " + fqcn);
 
         try {
-            WriteCommandAction.runWriteCommandAction(project, "Create Test Method", null, () ->
-                    createMethod(project, path, packageList, className, methodName, tc)
+            WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
+                    createMethod(p, path, packageList, className, methodName, tc)
             );
         } catch (final Exception ex) {
             Logger.error("Failed to inject Java method '" + methodName + "': " + ex.getMessage());
         }
     }
 
-    // Shared core: find the target class (creating its package dir + class file if missing),
-    // then inject the @Test method. Runs inside a write-command action.
-    private void createMethod(final @NotNull Project project, final @NotNull String path, final @NotNull List<String> packageList, final @NotNull String className, final @NotNull String methodName, final @Nullable TestCaseDto tc) {
+    private void createMethod(final @NotNull Project p, final @NotNull String path, final @NotNull List<String> packageList, final @NotNull String className, final @NotNull String methodName, final @Nullable TestCaseDto tc) {
         try {
-            final PsiClass targetClass = findOrCreateClass(project, path, packageList, className);
+            final PsiClass targetClass = findOrCreateClass(p, path, packageList, className);
             if (targetClass != null) {
-                injectMethod(project, targetClass, methodName, tc);
-            } else {
-                retryInjectPhysically(project, packageList, className, methodName, tc);
-            }
+                injectMethod(p, targetClass, methodName, tc);
+            } else
+                retryInjectPhysically(p, packageList, className, methodName, tc);
+
         } catch (final Exception ex) {
             Logger.error("Failed to inject Java method: " + ex.getMessage());
         }
     }
 
-    // Locate the class by FQCN, creating its package dir + empty class file on disk when absent.
     @Nullable
-    private PsiClass findOrCreateClass(final @NotNull Project project, final @NotNull String path, final @NotNull List<String> packageList, final @NotNull String className) {
-        JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(project);
-        GlobalSearchScope scope = GlobalSearchScope.projectScope(project);
+    private PsiClass findOrCreateClass(final @NotNull Project p, final @NotNull String path, final @NotNull List<String> packageList, final @NotNull String className) {
+        JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(p);
+        GlobalSearchScope scope = GlobalSearchScope.projectScope(p);
 
         PsiClass targetClass = psiFacade.findClass(path, scope);
         if (targetClass != null) return targetClass;
 
         try {
-            VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
+            VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
             if (sourceRoot != null) {
                 VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", packageList).toLowerCase());
                 if (packageDir != null) {
@@ -104,17 +101,18 @@ public class CreateTestMethod implements GeneratorAction {
                     }
                 }
             }
+
         } catch (final IOException ex) {
             Logger.error("Failed to create class file for '" + className + "': " + ex.getMessage());
         }
 
-        PsiDocumentManager.getInstance(project).commitAllDocuments();
+        PsiDocumentManager.getInstance(p).commitAllDocuments();
         return psiFacade.findClass(path, scope);
     }
 
-    private void retryInjectPhysically(final Project project, final List<String> packageList, final String className, final String methodName, final TestCaseDto tc) {
+    private void retryInjectPhysically(final Project p, final List<String> packageList, final String className, final String methodName, final TestCaseDto tc) {
         try {
-            VirtualFile sourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
+            VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
             if (sourceRoot == null) {
                 Logger.error("retryInjectPhysically: sourceRoot is null, cannot inject method '" + methodName + "'");
                 return;
@@ -124,17 +122,19 @@ public class CreateTestMethod implements GeneratorAction {
             VirtualFile javaFile = sourceRoot.findFileByRelativePath(relativePath);
 
             if (javaFile != null) {
-                PsiFile psiFile = PsiManager.getInstance(project).findFile(javaFile);
+                PsiFile psiFile = PsiManager.getInstance(p).findFile(javaFile);
                 if (psiFile instanceof PsiJavaFile javaPsiFile) {
                     PsiClass[] classes = javaPsiFile.getClasses();
+
                     if (classes.length > 0) {
-                        injectMethod(project, classes[0], methodName, tc);
-                    } else {
+                        injectMethod(p, classes[0], methodName, tc);
+
+                    } else
                         Logger.error("retryInjectPhysically: no classes found in " + className + ".java for method '" + methodName + "'");
-                    }
-                } else {
+
+                } else
                     Logger.error("retryInjectPhysically: file " + className + ".java is not a valid Java file for method '" + methodName + "'");
-                }
+
             } else {
                 Logger.error("retryInjectPhysically: file not found at " + relativePath + " for method '" + methodName + "'");
             }
@@ -143,15 +143,15 @@ public class CreateTestMethod implements GeneratorAction {
         }
     }
 
-    private void injectMethod(final Project project, final PsiClass targetClass, final String methodName, final TestCaseDto tc) {
+    private void injectMethod(final Project p, final PsiClass targetClass, final String methodName, final TestCaseDto tc) {
         try {
-            PsiElementFactory factory = JavaPsiFacade.getElementFactory(project);
+            PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             PsiFile file = targetClass.getContainingFile();
 
             if (file instanceof PsiJavaFile javaFile) {
                 PsiImportList importList = javaFile.getImportList();
                 if (importList != null && importList.findSingleClassImportStatement("org.testng.annotations.Test") == null) {
-                    PsiClass testClass = JavaPsiFacade.getInstance(project).findClass("org.testng.annotations.Test", GlobalSearchScope.allScope(project));
+                    PsiClass testClass = JavaPsiFacade.getInstance(p).findClass("org.testng.annotations.Test", GlobalSearchScope.allScope(p));
                     if (testClass != null) {
                         importList.add(factory.createImportStatement(testClass));
                     }
@@ -193,12 +193,12 @@ public class CreateTestMethod implements GeneratorAction {
 
                 PsiMethod newMethod = factory.createMethodFromText(methodText, targetClass);
                 PsiElement addedElement = targetClass.add(newMethod);
-                CodeStyleManager.getInstance(project).reformat(addedElement);
+                CodeStyleManager.getInstance(p).reformat(addedElement);
 
                 Logger.info("Injected method: " + methodName + " with Priority: " + tc.getPriority().getName());
-            } else {
+            } else
                 Logger.info("Method already exists: " + methodName);
-            }
+
         } catch (final Exception ex) {
             Logger.error("injectMethod failed for '" + methodName + "': " + ex.getMessage());
         }

@@ -15,7 +15,7 @@ import java.nio.file.Path;
 public class RenameJavaClass implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
         final Path javaPath = dir.getPath().resolveSibling(dir.getPath().getFileName() + ".java");
         final VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(javaPath);

@@ -17,13 +17,13 @@ import java.util.List;
 public class CreateJavaPackage implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
-        final List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnPackage(dir);
+        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnPackage(dir);
 
         WriteAction.run(() -> {
             try {
-                VirtualFile testSourceRoot = Services.getInstance(project, Tools.class).getTestSourceRoot(project);
+                VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
                 if (testSourceRoot == null) {
                     Logger.info("Could not find Main Source Root in the project modules.");
                     return;

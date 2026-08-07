@@ -14,7 +14,7 @@ import java.io.IOException;
 public class RenameJavaPackage implements GeneratorAction {
 
     @Override
-    public void execute(final @NotNull Project project, final @NotNull Object obj) {
+    public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
         final VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(dir.getPath());
 
