@@ -61,8 +61,8 @@ public final class SettingsConfigurable implements Configurable {
         );
 
         return FormBuilder.createFormBuilder()
-                .addLabeledComponent(new JBLabel("Root testin folder: "), testinPathPanel.getComponent(), 1, false)
-                .addLabeledComponent(new JBLabel("Root Automation folder: "), rootAutomationPathField, 1, false)
+                .addLabeledComponent(new JBLabel("Testin source root: "), testinPathPanel.getComponent(), 1, false)
+                .addLabeledComponent(new JBLabel("Java test source root"), rootAutomationPathField, 1, false)
                 .addVerticalGap(5)
                 .addComponent(readModeCheckBox)
                 .addVerticalGap(5)
