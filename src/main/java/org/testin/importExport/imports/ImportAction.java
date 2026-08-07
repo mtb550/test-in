@@ -41,18 +41,17 @@ public class ImportAction extends DumbAwareAction {
     protected final List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportable)
             .toList();
+    private final @NotNull Project p;
+    private final @NotNull SimpleTree tree;
 
-    final @NotNull SimpleTree tree;
-
-    public ImportAction(final @NotNull SimpleTree tree) {
+    public ImportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Import", "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
+        this.p = p;
         this.tree = tree;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        final Project p = e.getProject();
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
@@ -136,6 +135,7 @@ public class ImportAction extends DumbAwareAction {
                     VirtualFile sheetDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(newDirPath);
 
                     TestCaseDto tail = findExistingTail(p, sheetDir);
+                    // todo: change sheetDir from vf to directoryDto
                     linkAndSaveTestCases(p, sheetDir, sheetCases, tail);
 
                     if (dialog.getCg().isSelected()) {

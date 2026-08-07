@@ -16,10 +16,12 @@ import org.testin.util.services.Services;
 import java.util.ArrayList;
 
 public class NavigateToCodeAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final JBList<TestCaseDto> list;
 
-    public NavigateToCodeAction(final JBList<TestCaseDto> list) {
+    public NavigateToCodeAction(final @NotNull Project p, final JBList<TestCaseDto> list) {
         super("Navigate to Code", "Jump to the automated test case", AllIcons.General.ArrowRight);
+        this.p = p;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.NavigateToCode.getCustomShortcut(), list);
     }
@@ -31,8 +33,7 @@ public class NavigateToCodeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        execute(e.getProject(), list.getSelectedValue());
+        execute(p, list.getSelectedValue());
     }
 
     @Override

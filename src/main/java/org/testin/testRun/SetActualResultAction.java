@@ -17,11 +17,13 @@ import org.testin.util.logger.Logger;
 
 public class SetActualResultAction extends DumbAwareAction {
 
+    private final @NotNull Project p;
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public SetActualResultAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public SetActualResultAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Actual Result", "Set actual result for test case", AllIcons.Actions.Copy);
+        this.p = p;
         this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.SetActualResult.getCustomShortcut(), list);
@@ -29,8 +31,6 @@ public class SetActualResultAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project p = e.getProject();
-        if (p == null) return;
 
         final TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;

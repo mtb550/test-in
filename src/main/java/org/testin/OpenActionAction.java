@@ -19,10 +19,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class OpenActionAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
-    public OpenActionAction(final @NotNull SimpleTree tree) {
+    public OpenActionAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Open", "Open selected test sets or runs", AllIcons.Actions.MenuOpen);
+        this.p = p;
         this.tree = tree;
 
         this.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), tree);
@@ -54,8 +56,7 @@ public class OpenActionAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        execute(e.getProject());
+        execute(p);
     }
 
     @Override

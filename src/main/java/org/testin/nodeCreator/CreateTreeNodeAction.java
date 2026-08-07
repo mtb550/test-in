@@ -24,14 +24,18 @@ import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
 public class CreateTreeNodeAction extends DumbAwareAction {
+
+    private final @NotNull Project p;
+
     @Getter
     private final @NotNull ProjectPanel projectPanel;
 
     @Getter
     private final @NotNull SimpleTree tree;
 
-    public CreateTreeNodeAction(final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
+    public CreateTreeNodeAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
         super("Create", "Create new node", AllIcons.General.Add);
+        this.p = p;
         this.projectPanel = projectPanel;
         this.tree = tree;
         this.registerCustomShortcutSet(KeyboardSet.CreateNode.getCustomShortcut(), tree);
@@ -39,9 +43,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
 
-        final Project p = e.getProject();
         final DirectoryDto parentDir = Services.getInstance(p, Tools.class).getCurrentSelectedDirectory(tree);
         final TreePath path = tree.getSelectionPath();
 
@@ -72,9 +74,8 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
 
-        DirectoryDto parentDir = Services.getInstance(e.getProject(), Tools.class).getCurrentSelectedDirectory(tree);
+        DirectoryDto parentDir = Services.getInstance(p, Tools.class).getCurrentSelectedDirectory(tree);
 
         if (parentDir == null || parentDir instanceof TestProjectDirectoryDto) {
             e.getPresentation().setEnabled(false);

@@ -34,8 +34,8 @@ The Plugin does not integrate with or send your data to any external third-party
 services.
 
 **4. Changes to This Privacy Policy**
-The Developer reserves the right to update this Privacy Policy at any time. Any changes will be reflected by an
-updated "Effective Date" at the top of this document. Continued use of the Plugin after any modifications indicates your
+The Developer reserves the right to update this Privacy Policy at any time. Any changes will be reflected by an updated
+"Effective Date" at the top of this document. Continued use of the Plugin after any modifications indicates your
 acknowledgment of the updated Privacy Policy.
 
 **5. Contact Information**

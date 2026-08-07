@@ -24,11 +24,13 @@ import java.util.List;
 import static org.testin.util.KeyboardSet.DeletePackage;
 
 public class RemoveAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
     private final @NotNull ProjectPanel projectPanel;
 
-    public RemoveAction(final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
+    public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
         super("Remove", "Remove selected nodes", AllIcons.Actions.GC);
+        this.p = p;
         this.tree = tree;
         this.projectPanel = projectPanel;
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
@@ -51,8 +53,6 @@ public class RemoveAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Project p = e.getProject();
-        if (p == null) return;
 
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null || paths.length == 0) return;

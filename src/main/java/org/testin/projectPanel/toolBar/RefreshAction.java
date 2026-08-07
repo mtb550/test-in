@@ -77,10 +77,6 @@ public class RefreshAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
 
         boolean hasTree = projectPanel.getProjectTree().getMainTree() != null;
         e.getPresentation().setEnabled(hasTree);

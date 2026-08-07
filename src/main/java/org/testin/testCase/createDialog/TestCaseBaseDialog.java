@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Getter
 public abstract class TestCaseBaseDialog {
+    protected final @NotNull Project p;
     protected final CodeGeneratorDialog cg;
     protected final DescriptionSection DescriptionSection;
     protected final ExpectedResultSection expectedResultSection;
@@ -41,6 +42,7 @@ public abstract class TestCaseBaseDialog {
     private PropertyChangeListener focusListener;
 
     public TestCaseBaseDialog(final @NotNull Project p, final @NotNull GeneratorType gt) {
+        this.p = p;
         this.cg = new CodeGeneratorDialog(gt);
         this.DescriptionSection = new DescriptionSection(p);
         this.expectedResultSection = new ExpectedResultSection(p);
@@ -101,7 +103,7 @@ public abstract class TestCaseBaseDialog {
 
             @Override
             public void update(final @NotNull AnActionEvent e) {
-                if (e.getProject() != null && LookupManager.getInstance(e.getProject()).getActiveLookup() != null) {
+                if (LookupManager.getInstance(p).getActiveLookup() != null) {
                     e.getPresentation().setEnabled(false);
                     return;
                 }

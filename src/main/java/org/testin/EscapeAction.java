@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -19,20 +20,23 @@ import org.testin.viewPanel.ViewToolWindowFactory;
 import java.awt.datatransfer.StringSelection;
 
 public class EscapeAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final SimpleTree tree;
     private final TreeTransferHandler transferHandler;
     private final JBList<TestCaseDto> list;
 
-    public EscapeAction(final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
+    public EscapeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
+        this.p = p;
         this.tree = tree;
         this.transferHandler = transferHandler;
         this.list = null;
         this.registerCustomShortcutSet(KeyboardSet.Escape.getCustomShortcut(), tree);
     }
 
-    public EscapeAction(final @NotNull JBList<TestCaseDto> list) {
+    public EscapeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
+        this.p = p;
         this.list = list;
         this.tree = null;
         this.transferHandler = null;
@@ -56,7 +60,7 @@ public class EscapeAction extends DumbAwareAction {
 
             CopyPasteManager.getInstance().setContents(new StringSelection(""));
 
-            ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow(e.getProject());
+            ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow(p);
 
             if (toolWindow != null && toolWindow.isVisible()) {
                 toolWindow.hide(null);

@@ -64,6 +64,6 @@ public enum RunStatus {
     }
 
     public void executeAction(final @NotNull Project p, final TestCaseDto dto, final JBList<TestCaseDto> list) {
-        new RunTestCaseAction(list).execute(p, dto);
+        new RunTestCaseAction(p, list).execute(dto);
     }
 }

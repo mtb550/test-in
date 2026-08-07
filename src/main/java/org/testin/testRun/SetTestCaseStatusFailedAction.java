@@ -20,11 +20,13 @@ import org.testin.util.services.Services;
 import java.util.List;
 
 public class SetTestCaseStatusFailedAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public SetTestCaseStatusFailedAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public SetTestCaseStatusFailedAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Failed", "Set test case status to Failed", AllIcons.Actions.Cancel);
+        this.p = p;
         this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.SetStatusFailed.getCustomShortcut(), list);
@@ -32,8 +34,6 @@ public class SetTestCaseStatusFailedAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Project p = e.getProject();
-        if (p == null) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;

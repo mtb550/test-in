@@ -30,18 +30,18 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PasteTestCaseNodeAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull IEditor editor;
 
-    public PasteTestCaseNodeAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public PasteTestCaseNodeAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
+        this.p = p;
         this.editor = editor;
         this.registerCustomShortcutSet(KeyboardSet.PasteTestCaseNode.getCustomShortcut(), list);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        final Project p = e.getProject();
         List<TestCaseDto> pastedCases = getFromClipboard(p);
         if (pastedCases.isEmpty()) return;
 
@@ -90,10 +90,6 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
 
         boolean enabled = false;
         Transferable contents = CopyPasteManager.getInstance().getContents();
@@ -101,7 +97,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             try {
                 String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
                 if (json.trim().startsWith("[")) {
-                    List<TestCaseDto> parsedList = Services.getInstance(e.getProject(), Mapper.class).readValue(json, new TypeReference<>() {
+                    List<TestCaseDto> parsedList = Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
                     });
                     enabled = !parsedList.isEmpty();
                 }

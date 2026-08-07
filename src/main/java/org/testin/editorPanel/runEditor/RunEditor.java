@@ -140,7 +140,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         list.setCellRenderer(new RunListRenderer(p, this));
 
-        final RunEditorCM cm = new RunEditorCM(this, parent, list);
+        final RunEditorContextMenu cm = new RunEditorContextMenu(p, this, parent, list);
         final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, cm);
 
         list.addMouseListener(mouseListenerImpl);
@@ -453,7 +453,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(this, list);
+            UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(p, this, list);
             changeStatus.onExecutionFinished(p, this);
             return;
         }
@@ -537,7 +537,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onStartExecutionClicked() {
-        UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(this, list);
+        UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(p, this, list);
         changeStatus.applyStatusChange(p, this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
     }

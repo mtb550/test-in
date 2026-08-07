@@ -114,7 +114,7 @@ public final class ProjectPanel implements Disposable {
                     "Create your first test project",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
                     e -> {
-                        final CreateTestProjectAction action = new CreateTestProjectAction(this);
+                        final CreateTestProjectAction action = new CreateTestProjectAction(p, this);
                         final AnActionEvent event = AnActionEvent.createEvent(
                                 SimpleDataContext.getProjectContext(p),
                                 action.getTemplatePresentation().clone(),

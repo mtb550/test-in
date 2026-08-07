@@ -21,11 +21,13 @@ import java.nio.file.Path;
 
 public class UpdateRunItemAction extends DumbAwareAction {
 
+    private final @NotNull Project p;
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public UpdateRunItemAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public UpdateRunItemAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Update Test Run Item", "Update test run item attributes", AllIcons.Actions.Edit);
+        this.p = p;
         this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.UpdateTestRunItem.getCustomShortcut(), list);
@@ -33,8 +35,6 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project p = e.getProject();
-        if (p == null) return;
 
         final TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;

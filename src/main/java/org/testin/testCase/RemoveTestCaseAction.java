@@ -56,14 +56,13 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         boolean isCutAndSelected = TestEditorContextMenu.isGlobalCutAction() &&
                 selectedItems.stream().allMatch(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()));
 
-        if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(e.getProject(), selectedItems)) {
+        if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(p, selectedItems)) {
             return;
         }
 

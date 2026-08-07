@@ -24,16 +24,16 @@ import java.time.temporal.ChronoUnit;
 // todo, to be refactored
 public class SetTestRunStatusAction extends DumbAwareAction {
     final @NotNull SimpleTree tree;
+    private final @NotNull Project p;
 
-    public SetTestRunStatusAction(final @NotNull SimpleTree tree) {
+    public SetTestRunStatusAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Set Status", "Set test run status", AllIcons.Nodes.Test);
+        this.p = p;
         this.tree = tree;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project p = e.getProject();
-        if (p == null) return;
 
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
@@ -66,7 +66,6 @@ public class SetTestRunStatusAction extends DumbAwareAction {
         final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
         final Object userObject = parentNode.getUserObject();
         boolean enabled = userObject instanceof TestRunDirectoryDto dir &&
-                dir.getMarker() != null &&
                 dir.getMarker().getStatus() != TestRunStatus.COMPLETED &&
                 dir.getMarker().getStatus() != TestRunStatus.CLOSED;
 
@@ -79,12 +78,11 @@ public class SetTestRunStatusAction extends DumbAwareAction {
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(tr.getPath());
 
+                if (trd == null) return;
                 TestRunMarker marker = trd.getMarker();
-                if (marker != null) {
-                    marker.setStatus(newStatus);
+                marker.setStatus(newStatus);
 
-                    indexer.updateRunMarker(p, tr.getPath(), marker);
-                }
+                indexer.updateRunMarker(p, tr.getPath(), marker);
             } catch (final Exception ex) {
                 Logger.error("Failed to persist marker: " + ex.getMessage());
             }

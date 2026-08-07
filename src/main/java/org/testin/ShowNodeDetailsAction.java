@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -13,16 +14,17 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class ShowNodeDetailsAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
-    public ShowNodeDetailsAction(final @NotNull SimpleTree tree) {
+    public ShowNodeDetailsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Details", "Show node details", AllIcons.General.IndentDetected);
+        this.p = p;
         this.tree = tree;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
 
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
@@ -32,7 +34,7 @@ public class ShowNodeDetailsAction extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dir)) return;
 
-        MarkerDetailsViewDialog.show(e.getProject(), dir);
+        MarkerDetailsViewDialog.show(p, dir);
     }
 
     @Override

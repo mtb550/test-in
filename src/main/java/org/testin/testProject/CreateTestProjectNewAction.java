@@ -20,12 +20,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class CreateTestProjectNewAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull ProjectPanel projectPanel;
     private final @NotNull String tpName;
     private final @NotNull CodeGeneratorDialog cg;
 
-    public CreateTestProjectNewAction(final @NotNull ProjectPanel projectPanel, final @NotNull String name, final @NotNull CodeGeneratorDialog cg) {
+    public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel, final @NotNull String name, final @NotNull CodeGeneratorDialog cg) {
         super("New Test Project", "Create a new test project", AllIcons.General.Add);
+        this.p = p;
         this.projectPanel = projectPanel;
         this.tpName = name;
         this.cg = cg;
@@ -33,8 +35,6 @@ public class CreateTestProjectNewAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project p = e.getProject();
-        if (p == null) return;
 
         final Path tpPath = Services.getInstance(p, Setting.class).getTestinPath().resolve(tpName);
 
@@ -59,7 +59,7 @@ public class CreateTestProjectNewAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null || Services.getInstance(e.getProject(), Setting.class).getTestinPath().toString().isEmpty())
+        if (Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty())
             e.getPresentation().setEnabled(false);
     }
 

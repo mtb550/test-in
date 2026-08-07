@@ -33,11 +33,13 @@ import java.util.List;
 
 // todo: to be refactored
 public class ViewPendingCommitsAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
     private Notification pushNotification;
 
-    public ViewPendingCommitsAction(final @NotNull SimpleTree tree) {
+    public ViewPendingCommitsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
+        this.p = p;
         this.tree = tree;
     }
 
@@ -58,8 +60,6 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        final Project p = e.getProject();
 
         final Path path = Services.getInstance(p, Tools.class).getProjectPath(tree);
         if (path == null) return;

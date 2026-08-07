@@ -27,19 +27,20 @@ import java.nio.file.Path;
 
 public class SyncActionAction extends DumbAwareAction {
 
+    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
     private final @NotNull ProjectPanel projectPanel;
 
-    public SyncActionAction(final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
+    public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
         super("Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
+        this.p = p;
         this.tree = tree;
         this.projectPanel = projectPanel;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        final Project p = e.getProject();
+
         Path repoPath = getActiveProjectPath();
 
         if (repoPath == null) {
@@ -53,7 +54,7 @@ public class SyncActionAction extends DumbAwareAction {
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(e.getProject(), "Syncing with remote", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Syncing with remote", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);

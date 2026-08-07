@@ -36,18 +36,18 @@ public class ExportAction extends DumbAwareAction {
     protected final List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isExportable)
             .toList();
-
+    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
-    public ExportAction(final @NotNull SimpleTree tree) {
+    public ExportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
+        this.p = p;
         this.tree = tree;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        final Project p = e.getProject();
+
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
@@ -62,7 +62,7 @@ public class ExportAction extends DumbAwareAction {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                Map<String, List<TestCaseDto>> sheets = gatherData(p, targetDir, dirDto);
+                Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
                 if (sheets.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(p, Notifier.class).warn(p, "Export Empty", "No test cases found."));
@@ -87,7 +87,7 @@ public class ExportAction extends DumbAwareAction {
         });
     }
 
-    public Map<String, List<TestCaseDto>> gatherData(final @NotNull Project p, final VirtualFile targetDirectory, final DirectoryDto dirDto) {
+    public Map<String, List<TestCaseDto>> gatherData(final VirtualFile targetDirectory, final DirectoryDto dirDto) {
         Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
 
         if (dirDto instanceof TestSetDirectoryDto) {

@@ -17,10 +17,12 @@ import org.testin.util.services.Services;
 import java.util.List;
 
 public class RunTestCaseAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final JBList<TestCaseDto> list;
 
-    public RunTestCaseAction(final JBList<TestCaseDto> list) {
+    public RunTestCaseAction(final @NotNull Project p, final JBList<TestCaseDto> list) {
         super("Run Test", "Run selected test cases", AllIcons.RunConfigurations.TestState.Run);
+        this.p = p;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.RunTestCase.getCustomShortcut(), list);
     }
@@ -38,16 +40,14 @@ public class RunTestCaseAction extends DumbAwareAction {
         }
     }
 
-    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+    public void execute(final @NotNull TestCaseDto tc) {
         execute(p, List.of(tc));
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-
         List<TestCaseDto> selectedValues = list.getSelectedValuesList();
-        execute(e.getProject(), selectedValues);
+        execute(p, selectedValues);
     }
 
     @Override

@@ -37,19 +37,22 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GenerateReportAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @Nullable SimpleTree tree;
     private final @Nullable IEditor editor;
     private final @Nullable JBList<TestCaseDto> list;
 
-    public GenerateReportAction(final @NotNull SimpleTree tree) {
+    public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
+        this.p = p;
         this.tree = tree;
         this.editor = null;
         this.list = null;
     }
 
-    public GenerateReportAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public GenerateReportAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Generate Report", "Generate test run report", null);
+        this.p = p;
         this.tree = null;
         this.editor = editor;
         this.list = list;
@@ -58,8 +61,6 @@ public class GenerateReportAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
-        final Project p = e.getProject();
 
         TestRunDirectoryDto tr = null;
 

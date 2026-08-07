@@ -30,53 +30,53 @@ public class TreeContextMenu extends DefaultActionGroup {
         super("Tree Popup Menu", true);
         this.p = p;
 
-        add(new OpenActionAction(tree));
-        add(new CreateTreeNodeAction(projectPanel, tree));
+        add(new OpenActionAction(p, tree));
+        add(new CreateTreeNodeAction(p, projectPanel, tree));
 
         addSeparator();
 
         add(Services.getInstance(p, Tools.class).createSubGroup("Actions", AllIcons.Actions.Edit,
                 List.of(
-                        new UpdateTestProjectStatusAction(tree, ProjectStatus.ACTIVE),
-                        new UpdateTestProjectStatusAction(tree, ProjectStatus.INACTIVE),
-                        new UpdateTestProjectStatusAction(tree, ProjectStatus.ARCHIVED),
-                        new UndoNodeAction(tree),
-                        new RedoNodeAction(tree),
-                        new RemoveAction(tree, projectPanel),
-                        new RenameAction(projectPanel, tree),
-                        new CopyNodeAction(tree),
-                        new CutNodeAction(tree),
-                        new PasteNodeAction(tree))
+                        new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ACTIVE),
+                        new UpdateTestProjectStatusAction(p, tree, ProjectStatus.INACTIVE),
+                        new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ARCHIVED),
+                        new UndoNodeAction(p, tree),
+                        new RedoNodeAction(p, tree),
+                        new RemoveAction(p, tree, projectPanel),
+                        new RenameAction(p, projectPanel, tree),
+                        new CopyNodeAction(p, tree),
+                        new CutNodeAction(p, tree),
+                        new PasteNodeAction(p, tree))
         ));
 
         addSeparator();
 
-        add(new RunTestSetAction(tree));
+        add(new RunTestSetAction(p, tree));
 
         addSeparator();
 
-        add(new ExportAction(tree));
+        add(new ExportAction(p, tree));
 
-        add(new ImportAction(tree));
-
-        addSeparator();
-
-        add(new SyncActionAction(tree, projectPanel));
-        add(new ViewPendingCommitsAction(tree));
+        add(new ImportAction(p, tree));
 
         addSeparator();
-        add(new SetTestRunStatusAction(tree));
+
+        add(new SyncActionAction(p, tree, projectPanel));
+        add(new ViewPendingCommitsAction(p, tree));
+
+        addSeparator();
+        add(new SetTestRunStatusAction(p, tree));
         addSeparator();
 
-        add(new GenerateReportAction(tree));
+        add(new GenerateReportAction(p, tree));
 
-        add(new ShowNodeDetailsAction(tree));
+        add(new ShowNodeDetailsAction(p, tree));
 
     }
 
     public void registerShortcuts(final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
-        new EscapeAction(tree, transferHandler);
-        new OpenContextMenuAction(tree, this);
+        new EscapeAction(p, tree, transferHandler);
+        new OpenContextMenuAction(p, tree, this);
 
     }
 

@@ -87,11 +87,11 @@ public class MouseListenerImpl extends MouseAdapter {
 
             if (action == CardHoverAction.NAVIGATE_TO_TEST_METHOD) {
                 Logger.trace("navigate action, tc: " + tc.getDescription());
-                new NavigateToCodeAction(list).execute(p, tc);
+                new NavigateToCodeAction(p, list).execute(p, tc);
 
             } else if (action == CardHoverAction.RUN_TEST_CASE) {
                 Logger.trace("run action, tc: " + tc.getDescription());
-                new RunTestCaseAction(list).execute(p, tc);
+                new RunTestCaseAction(p, list).execute(tc);
             }
 
             e.consume();

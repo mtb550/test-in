@@ -15,11 +15,11 @@ public class ProjectPanelActions {
 
     public static List<AnAction> create(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
         return List.of(
-                new OpenSettingsAction(),
-                new ExpandAllAction(projectPanel),
-                new CollapseAllAction(projectPanel),
+                new OpenSettingsAction(p),
+                new ExpandAllAction(p, projectPanel),
+                new CollapseAllAction(p, projectPanel),
                 new RefreshAction(p, projectPanel),
-                new CreateTestProjectAction(projectPanel)
+                new CreateTestProjectAction(p, projectPanel)
         );
     }
 }

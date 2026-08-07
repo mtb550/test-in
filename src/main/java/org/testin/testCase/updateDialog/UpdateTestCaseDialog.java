@@ -20,12 +20,10 @@ import java.util.function.BiConsumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
-    private final @NotNull Project p;
     private @NotNull JBPopup popup;
 
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull BiConsumer<@NotNull TestCaseDto, @NotNull CodeGeneratorDialog> onSave) {
         super(p, selectedItem.getGt());
-        this.p = p;
 
         IUIAction repackPopup = () -> {
             popup.pack(false, true);

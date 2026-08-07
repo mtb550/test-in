@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
@@ -19,11 +20,13 @@ import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
 public class CutTestCaseNodeAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final IEditor editor;
     private final JBList<TestCaseDto> list;
 
-    public CutTestCaseNodeAction(final IEditor editor, final JBList<TestCaseDto> list) {
+    public CutTestCaseNodeAction(final @NotNull Project p, final IEditor editor, final JBList<TestCaseDto> list) {
         super("Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
+        this.p = p;
         this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.CutTestCaseNode.getCustomShortcut(), list);
@@ -31,7 +34,6 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null) return;
         Logger.debug("[DEBUG] CutTestCaseNode: actionPerformed triggered.");
 
         List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
@@ -45,7 +47,7 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
                 selectedTestCases.forEach(tc -> TestEditorContextMenu.getGlobalPendingCutIds().add(tc.getId()));
                 TestEditorContextMenu.setGlobalSourceEditorUI(editor);
 
-                String json = Services.getInstance(e.getProject(), Mapper.class).writeValueAsString(selectedTestCases);
+                String json = Services.getInstance(p, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
                 list.repaint();

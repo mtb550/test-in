@@ -23,13 +23,14 @@ import org.testin.util.services.Services;
 import java.nio.file.Path;
 
 public class CreateTestProjectCloneAction extends DumbAwareAction {
-
+    private final @NotNull Project p;
     private final @NotNull String gitUrl;
     private final @NotNull String projectName;
     private final @NotNull ProjectPanel projectPanel;
 
-    public CreateTestProjectCloneAction(final @NotNull String gitUrl, final @NotNull String name, final @NotNull ProjectPanel projectPanel) {
+    public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull ProjectPanel projectPanel) {
         super("Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
+        this.p = p;
         this.gitUrl = gitUrl;
         this.projectName = name;
         this.projectPanel = projectPanel;
@@ -37,8 +38,6 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project p = e.getProject();
-        if (p == null) return;
 
         if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {
             Services.getInstance(p, Notifier.class).error(p, "Clone Error", "Missing parameters for cloning the project.");

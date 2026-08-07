@@ -67,7 +67,7 @@ public class ActionIcons extends BaseDetails {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                new NavigateToCodeAction(null).execute(p, dto);
+                new NavigateToCodeAction(p, null).execute(p, dto);
             }
         });
 

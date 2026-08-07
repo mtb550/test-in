@@ -27,12 +27,14 @@ import java.util.stream.Collectors;
 
 public class UpdateTestCaseAction extends DumbAwareAction {
 
+    private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull Path path;
     private final @NotNull IEditor editor;
 
-    public UpdateTestCaseAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull Path path) {
+    public UpdateTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull Path path) {
         super("Update");
+        this.p = p;
         this.list = list;
         this.path = path;
         this.editor = editor;
@@ -41,8 +43,6 @@ public class UpdateTestCaseAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project p = e.getProject();
-        if (p == null) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;

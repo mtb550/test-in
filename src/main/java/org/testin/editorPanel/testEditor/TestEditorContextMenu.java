@@ -35,40 +35,40 @@ import java.util.UUID;
 public class TestEditorContextMenu extends EditorContextMenu {
     @Getter
     private static final Set<UUID> globalPendingCutIds = new HashSet<>();
-
     @Getter
     @Setter
     private static boolean globalCutAction = false;
-
     @Getter
     @Setter
     private static IEditor globalSourceEditorUI = null;
+    private final @NotNull Project p;
 
     public TestEditorContextMenu(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
+        this.p = p;
 
         add(new CreateTestCaseAction(p, ui, dir, list));
-        add(new ViewDetailsAction(list, dir.getPath2()));
+        add(new ViewDetailsAction(p, list, dir.getPath2()));
 
         addSeparator();
 
-        add(new UpdateTestCaseAction(ui, list, dir.getPath()));
-        add(new CopyTestCaseAction(list));
-        add(new CopyTestCaseNodeAction(list));
-        add(new CutTestCaseNodeAction(ui, list));
-        add(new PasteTestCaseNodeAction(ui, list));
+        add(new UpdateTestCaseAction(p, ui, list, dir.getPath()));
+        add(new CopyTestCaseAction(p, list));
+        add(new CopyTestCaseNodeAction(p, list));
+        add(new CutTestCaseNodeAction(p, ui, list));
+        add(new PasteTestCaseNodeAction(p, ui, list));
         add(new RemoveTestCaseAction(p, dir, list, model));
 
         addSeparator();
 
-        add(new AutomateTestCaseAction(list));
-        add(new RunTestCaseAction(list));
-        add(new NavigateToCodeAction(list));
+        add(new AutomateTestCaseAction(p, list));
+        add(new RunTestCaseAction(p, list));
+        add(new NavigateToCodeAction(p, list));
 
         addSeparator();
 
-        add(new NextPageAction(ui, list));
-        add(new PrevPageAction(ui, list));
+        add(new NextPageAction(p, ui, list));
+        add(new PrevPageAction(p, ui, list));
     }
 
     public static void clearCutState() {
@@ -82,9 +82,9 @@ public class TestEditorContextMenu extends EditorContextMenu {
     }
 
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditorContextMenu testEditorContextMenu) {
-        new EscapeAction(list);
-        new OpenContextMenuAction(list, testEditorContextMenu);
-        new CloseTestCaseDetailsAction(list);
+        new EscapeAction(p, list);
+        new OpenContextMenuAction(p, list, testEditorContextMenu);
+        new CloseTestCaseDetailsAction(p, list);
     }
 
     @Override

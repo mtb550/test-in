@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
@@ -11,10 +12,12 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 
 public class NextPageAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull IEditor editor;
 
-    public NextPageAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public NextPageAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Next Page", "Navigate to the next page", AllIcons.Actions.Forward);
+        this.p = p;
         this.editor = editor;
         registerCustomShortcutSet(KeyboardSet.NextTestCase.getCustomShortcut(), list);
     }

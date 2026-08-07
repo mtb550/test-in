@@ -5,17 +5,20 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.DumbAwareAction;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 
 public class OpenSettingsAction extends DumbAwareAction {
+    private final @NotNull Project p;
 
-    public OpenSettingsAction() {
+    public OpenSettingsAction(final @NotNull Project p) {
         super("Settings", "Configure Testin settings", AllIcons.General.Settings);
+        this.p = p;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        ShowSettingsUtil.getInstance().showSettingsDialog(e.getProject(), SettingsConfigurable.class);
+        ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class);
     }
 
     @Override

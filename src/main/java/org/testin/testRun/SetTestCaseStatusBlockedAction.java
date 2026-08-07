@@ -15,11 +15,13 @@ import org.testin.util.services.RunStatusService;
 import org.testin.util.services.Services;
 
 public class SetTestCaseStatusBlockedAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public SetTestCaseStatusBlockedAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public SetTestCaseStatusBlockedAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Blocked", "Set test case status to Blocked", AllIcons.Actions.Pause);
+        this.p = p;
         this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.SetStatusBlocked.getCustomShortcut(), list);
@@ -27,8 +29,6 @@ public class SetTestCaseStatusBlockedAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Project p = e.getProject();
-        if (p == null) return;
         Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, list, TestStatus.BLOCKED);
     }
 

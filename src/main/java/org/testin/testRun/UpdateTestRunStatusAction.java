@@ -29,19 +29,20 @@ import java.util.Map;
 import java.util.UUID;
 
 public class UpdateTestRunStatusAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public UpdateTestRunStatusAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public UpdateTestRunStatusAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Change Test Run Status", "Change the status of the current test run", AllIcons.Nodes.Test);
+        this.p = p;
         this.editor = editor;
         this.list = list;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project p = e.getProject();
-        if (p == null || !(editor instanceof RunEditor runEditor)) return;
+        if (!(editor instanceof RunEditor runEditor)) return;
 
         TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
         TestRunStatus newStatus;

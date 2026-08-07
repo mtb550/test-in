@@ -19,7 +19,7 @@ public class GenerateReportBtn extends AbstractButton implements IToolbarItem {
 
         addActionListener(e -> {
             final SimpleTree tree = Services.getInstance(p, ProjectPanel.class).getProjectTree().getMainTree();
-            final GenerateReportAction action = new GenerateReportAction(tree);
+            final GenerateReportAction action = new GenerateReportAction(p, tree);
 
             final AnActionEvent event = AnActionEvent.createEvent(
                     SimpleDataContext.builder().add(CommonDataKeys.PROJECT, p).build(),

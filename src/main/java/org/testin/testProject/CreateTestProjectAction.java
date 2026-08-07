@@ -15,29 +15,29 @@ import org.testin.util.Tools;
 import org.testin.util.services.Services;
 
 public class CreateTestProjectAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull ProjectPanel projectPanel;
 
-    public CreateTestProjectAction(final @NotNull ProjectPanel projectPanel) {
+    public CreateTestProjectAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
         super("New Test Project", "Create or Clone test project", AllIcons.General.Add);
+        this.p = p;
         this.projectPanel = projectPanel;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project p = e.getProject();
-        if (p == null) return;
 
         new CreateNodesDialog(p, CreateNodeMenu.TEST_PROJECT, (name, type, cg) -> {
             if (name.trim().isEmpty()) return;
 
             if (type == DirectoryType.IMPORT_TP) {
                 String projectName = Services.getInstance(p, Tools.class).extractProjectNameFromUrl(name);
-                new CreateTestProjectCloneAction(name.trim(), projectName, projectPanel).actionPerformed(e);
+                new CreateTestProjectCloneAction(p, name.trim(), projectName, projectPanel).actionPerformed(e);
                 return;
             }
 
             if (type == DirectoryType.TP) {
-                new CreateTestProjectNewAction(projectPanel, name.trim(), cg).actionPerformed(e);
+                new CreateTestProjectNewAction(p, projectPanel, name.trim(), cg).actionPerformed(e);
             }
 
         }).show();
@@ -45,7 +45,7 @@ public class CreateTestProjectAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (e.getProject() == null || Services.getInstance(e.getProject(), Setting.class).getTestinPath().toString().isEmpty())
+        if (Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty())
             e.getPresentation().setEnabled(false);
     }
 

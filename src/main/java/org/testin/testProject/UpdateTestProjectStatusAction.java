@@ -22,11 +22,13 @@ import java.time.ZonedDateTime;
 
 public class UpdateTestProjectStatusAction extends DumbAwareAction {
 
+    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
     private final @NotNull ProjectStatus projectStatus;
 
-    public UpdateTestProjectStatusAction(final @NotNull SimpleTree tree, final @NotNull ProjectStatus projectStatus) {
+    public UpdateTestProjectStatusAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectStatus projectStatus) {
         super(projectStatus.getButtonName(), projectStatus.getButtonDescription(), AllIcons.Actions.Edit);
+        this.p = p;
         this.tree = tree;
         this.projectStatus = projectStatus;
     }
@@ -39,9 +41,6 @@ public class UpdateTestProjectStatusAction extends DumbAwareAction {
         final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
         final Object userObject = node.getUserObject();
         if (!(userObject instanceof TestProjectDirectoryDto tp)) return;
-
-        final Project p = e.getProject();
-        if (p == null) return;
 
         try {
             final TestProjectMarker marker = tp.getMarker();
