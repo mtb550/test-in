@@ -87,15 +87,16 @@ public final class TestRunExcelGenerator {
                 row++;
             }
 
-            ws.width(0, 40); 
-            ws.width(1, 30); 
-            ws.width(2, 15); 
-            ws.width(3, 30); 
-            ws.width(4, 15); 
-            ws.width(5, 15); 
-            ws.width(6, 15); 
-            ws.width(7, 40); 
-            ws.width(8, 60); 
+            ws.width(0, 40); // ID
+            ws.width(1, 30); // Title
+            ws.width(2, 15); // Status
+            ws.width(3, 30); // Actual Result
+            ws.width(4, 15); // Severity
+            ws.width(5, 15); // Priority
+            ws.width(6, 15); // Duration
+            ws.width(7, 40); // Expected Result
+            ws.width(8, 60); // Stacktrace
+
 
             wb.finish();
 

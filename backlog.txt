@@ -186,3 +186,9 @@ reduce arrow padding &
 * fix issue: after change testin path, should update the tree and project list to reads the new path.
 
 remove @SuppressWarnings
+apply tree async model
+update tree dialogs to apply rename, remove from automation
+add separate grid view button.
+
+
+

@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 public final class TestRunPdfGenerator {
 
-    
+
     private final DeviceRgb DARK_NAVY = new DeviceRgb(0x1F, 0x38, 0x64);
     private final DeviceRgb MEDIUM_BLUE = new DeviceRgb(0x2E, 0x54, 0x96);
     private final DeviceRgb DARK_GRAY = new DeviceRgb(0x59, 0x59, 0x59);
@@ -55,7 +55,7 @@ public final class TestRunPdfGenerator {
     private final DeviceRgb BORDER_GRAY = new DeviceRgb(0xD0, 0xD7, 0xE5);
     private final DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
     private final DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
-    private final DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC); 
+    private final DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC);
 
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -69,7 +69,7 @@ public final class TestRunPdfGenerator {
 
             String cleanName = tr.getChangeLog().replace(".json", "");
 
-            
+
             String projectName = "";
             TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
@@ -77,39 +77,31 @@ public final class TestRunPdfGenerator {
                 projectName = selectedProject.getName();
             }
 
-            
+
             AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
             String testerName = settings.testerName.trim();
             String testerRole = settings.testerRole;
 
-            
-            
-            
+            // TITLE
             document.add(new Paragraph("TEST SUMMARY REPORT")
                     .setFont(boldFont).setFontSize(18).setFontColor(DARK_NAVY)
                     .setMarginBottom(2));
 
-            
-            
-            
+            // SUBTITLE
             Paragraph subtitle = new Paragraph(projectName + "  |  " + tr.getPlatform() + ", " + tr.getComponent())
                     .setFont(regularFont).setFontSize(10).setFontColor(MEDIUM_BLUE)
                     .setPaddingBottom(4)
                     .setBorderBottom(new SolidBorder(DARK_NAVY, 2f))
                     .setMarginBottom(1);
-            
+
             document.add(subtitle);
 
-            
-            
-            
+
             document.add(new Paragraph("Confidential — QA Test Execution Summary")
                     .setFont(italicFont).setFontSize(8).setFontColor(DARK_GRAY)
                     .setMarginBottom(20));
 
-            
-            
-            
+            // SECTION 1: REPORT OVERVIEW
             Paragraph sec1 = new Paragraph("1. Report Overview")
                     .setFont(boldFont)
                     .setFontSize(13)
@@ -119,7 +111,7 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(12);
             document.add(sec1);
 
-            
+
             Table overviewTable = new Table(UnitValue.createPercentArray(new float[]{30, 70}))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
@@ -138,7 +130,6 @@ public final class TestRunPdfGenerator {
                 addOverviewRow(overviewTable, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType(), boldFont, regularFont);
 
 
-            
             String executedByAll = tr.getResults().stream()
                     .map(TestRunItems::getExecutedBy)
                     .filter(s -> !s.trim().isEmpty())
@@ -147,15 +138,14 @@ public final class TestRunPdfGenerator {
 
             addOverviewRow(overviewTable, "Executed By", executedByAll, boldFont, regularFont);
 
-            
+
+            // todo, execution date value to be updated.
             addOverviewRow(overviewTable, "Execution Date", tr.getCreatedAt().format(Config.getDateFormatterPattern()), boldFont, regularFont);
             addOverviewRow(overviewTable, "Run Status", trDir.getMarker().getStatus().name(), boldFont, regularFont);
 
             document.add(overviewTable);
 
-            
-            
-            
+            // SECTION 2: EXECUTION SUMMARY
             Paragraph sec2 = new Paragraph("2. Execution Summary")
                     .setFont(boldFont)
                     .setFontSize(13)
@@ -178,7 +168,7 @@ public final class TestRunPdfGenerator {
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(12));
 
-            
+
             Table statsTable = new Table(UnitValue.createPercentArray(new float[]{20, 20, 20, 20, 20}))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
@@ -191,9 +181,7 @@ public final class TestRunPdfGenerator {
 
             document.add(statsTable);
 
-            
-            
-            
+            // SECTION 3: RESULT ANALYSIS
             Paragraph sec3 = new Paragraph("3. Result Analysis")
                     .setFont(boldFont)
                     .setFontSize(13)
@@ -204,7 +192,7 @@ public final class TestRunPdfGenerator {
                     .setMarginTop(20);
             document.add(sec3);
 
-            
+            // Passed
             Paragraph passedHeading = new Paragraph()
                     .add(new Paragraph("Passed (" + passed + "): ")
                             .setFont(boldFont).setFontSize(11).setFontColor(GREEN)
@@ -217,7 +205,7 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(6);
             document.add(passedBody);
 
-            
+            // Failed
             Paragraph failedHeading = new Paragraph()
                     .add(new Paragraph("Failed (" + failed + "): ")
                             .setFont(boldFont).setFontSize(11).setFontColor(RED)
@@ -230,7 +218,7 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(6);
             document.add(failedBody);
 
-            
+            // Pending
             Paragraph pendingHeading = new Paragraph()
                     .add(new Paragraph("Pending (" + (pending + blocked) + "): ")
                             .setFont(boldFont).setFontSize(11).setFontColor(DARK_YELLOW)
@@ -243,21 +231,16 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(6);
             document.add(pendingBody);
 
-            
-            
-            
-            
+            // SECTION 4: FAILED TEST CASES (only if any failures exist)
             if (failed > 0) {
-                
+
                 buildCaseTable(document, "4", "Failed Test Cases",
                         "The following %d cases failed and require remediation. Real-user identification validation is the primary defect cluster.",
                         failed, tr, detailsMap, boldFont, regularFont, RED, true, true, true,
                         item -> item.getStatus() == TestStatus.FAILED);
             }
 
-            
-            
-            
+            // SECTION 5: PASSED TEST CASES (only if any passed exist)
             if (passed > 0) {
                 buildCaseTable(document, "5", "Passed Test Cases",
                         "The following %d cases passed validation and behaved as expected across all verification points.",
@@ -265,9 +248,7 @@ public final class TestRunPdfGenerator {
                         item -> item.getStatus() == TestStatus.PASSED);
             }
 
-            
-            
-            
+            // SECTION 6: PENDING TEST CASES (only if any pending exist)
             long pendingTotal = pending + blocked;
             if (pendingTotal > 0) {
                 buildCaseTable(document, "6", "Pending Test Cases",
@@ -276,11 +257,7 @@ public final class TestRunPdfGenerator {
                         item -> item.getStatus() == TestStatus.PENDING || item.getStatus() == TestStatus.UNTESTED || item.getStatus() == TestStatus.BLOCKED);
             }
 
-            
-            
-            
-            
-            
+
             float pageWidth = pdf.getDefaultPageSize().getWidth();
             float leftMargin = document.getLeftMargin();
             float rightMargin = document.getRightMargin();
@@ -288,7 +265,7 @@ public final class TestRunPdfGenerator {
             Canvas footerCanvas = new Canvas(pdf.getLastPage(),
                     new Rectangle(leftMargin, 0, pageWidth - leftMargin - rightMargin, 28));
 
-            
+            // Horizontal rule above the footer text (HTML footer's border-top)
             PdfCanvas pdfCanvas = footerCanvas.getPdfCanvas();
             pdfCanvas.setStrokeColor(BORDER_GRAY);
             pdfCanvas.setLineWidth(1.0f);
@@ -296,8 +273,8 @@ public final class TestRunPdfGenerator {
             pdfCanvas.lineTo(pageWidth - rightMargin, 34);
             pdfCanvas.stroke();
 
-            
 
+            // Footer — all text on a single line:
             footerCanvas.add(new Paragraph()
                     .setFont(regularFont).setFontSize(8).setFontColor(DARK_GRAY)
                     .setTextAlignment(TextAlignment.CENTER)
@@ -318,23 +295,6 @@ public final class TestRunPdfGenerator {
         }
     }
 
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private void buildCaseTable(Document document, String sectionNumber, String sectionTitle, String descriptionFmt, long count, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap, PdfFont boldFont, PdfFont regularFont, DeviceRgb headerBg, boolean withPriority, boolean withSeverity, boolean withActualResult, Predicate<TestRunItems> filter) {
         document.add(new Paragraph(sectionNumber + ". " + sectionTitle)
@@ -351,7 +311,8 @@ public final class TestRunPdfGenerator {
                 .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                 .setMarginBottom(12));
 
-        
+
+        // Column widths depend on which extra columns are shown
         int extraCols = (withPriority ? 1 : 0) + (withSeverity ? 1 : 0);
         float[] widths = switch (extraCols) {
             case 0 -> new float[]{7, 93};
@@ -362,13 +323,13 @@ public final class TestRunPdfGenerator {
                 .useAllAvailableWidth()
                 .setBorder(Border.NO_BORDER);
 
-        
+        // Header row
         addCaseTableHeader(table, "#", headerBg, boldFont);
         addCaseTableHeader(table, "Test Case", headerBg, boldFont);
         if (withPriority) addCaseTableHeader(table, "Priority", headerBg, boldFont);
         if (withSeverity) addCaseTableHeader(table, "Severity", headerBg, boldFont);
 
-        
+        // Data rows — alternating LIGHT_BG / WHITE
         int idx = 1;
         boolean alt = true;
         for (TestRunItems item : tr.getResults()) {
@@ -377,7 +338,7 @@ public final class TestRunPdfGenerator {
             DeviceRgb rowBg = alt ? LIGHT_BG : WHITE;
             alt = !alt;
 
-            
+            // # column
             table.addCell(new Cell()
                     .setBackgroundColor(rowBg)
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
@@ -386,7 +347,7 @@ public final class TestRunPdfGenerator {
                             .setFont(regularFont).setFontSize(9.5f).setFontColor(DARK_GRAY)
                             .setTextAlignment(TextAlignment.CENTER)));
 
-            
+            // Test Case column
             String tcName = "";
             if (detailsMap != null) {
                 TestCaseDto tc = detailsMap.get(item.getId());
