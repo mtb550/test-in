@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public abstract class JsonArraySplitBulkSection {
+public abstract class JsonArraySplitBulkSectionDialog {
     protected Project project;
 
     protected abstract void applyValues(final List<TestCaseDto> items, final List<List<String>> newValues);

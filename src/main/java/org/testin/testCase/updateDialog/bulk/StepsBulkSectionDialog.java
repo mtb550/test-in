@@ -5,7 +5,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StepsBulkSection extends JsonArraySplitBulkSection {
+public class StepsBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     @Override
     protected String getPopupTitle() {

@@ -27,13 +27,13 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class TestCaseUpdateMenu {
+public class TestCaseUpdateMenuDialog {
 
     private final @NotNull Project project;
     private final @NotNull List<TestCaseDto> items;
     private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems;
 
-    public TestCaseUpdateMenu(final @NotNull Project project, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems) {
+    public TestCaseUpdateMenuDialog(final @NotNull Project project, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems) {
         this.project = project;
         this.items = items;
         this.updatedItems = updatedItems;

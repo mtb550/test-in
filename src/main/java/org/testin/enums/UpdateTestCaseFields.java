@@ -9,7 +9,7 @@ import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
-import org.testin.testCase.createDialog.TestCaseDialogBase;
+import org.testin.testCase.createDialog.TestCaseBaseDialog;
 import org.testin.testCase.updateDialog.bulk.*;
 import org.testin.util.KeyboardSet;
 import org.testin.util.statusBar.IStatusBarItem;
@@ -83,8 +83,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_DESCRIPTION,
-            (project, items, updatedItems) -> new DescriptionBulkSection().show(project, items, updatedItems),
-            TestCaseDialogBase::getDescriptionSection
+            (project, items, updatedItems) -> new DescriptionBulkSectionDialog().show(project, items, updatedItems),
+            TestCaseBaseDialog::getDescriptionSection
     ),
 
     EXPECTED_RESULT(
@@ -94,8 +94,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT,
-            (project, items, updatedItems) -> new ExpectedResultBulkSection().show(project, items, updatedItems),
-            TestCaseDialogBase::getExpectedResultSection
+            (project, items, updatedItems) -> new ExpectedResultBulkSectionDialog().show(project, items, updatedItems),
+            TestCaseBaseDialog::getExpectedResultSection
     ),
 
     MODULE(
@@ -105,8 +105,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_MODULE,
-            (project, items, updatedItems) -> new ModuleBulkSection().show(project, items, updatedItems),
-            TestCaseDialogBase::getModuleSection
+            (project, items, updatedItems) -> new ModuleBulkSectionDialog().show(project, items, updatedItems),
+            TestCaseBaseDialog::getModuleSection
     ),
 
     TEST_DATA(
@@ -116,8 +116,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_TEST_DATA,
-            (project, items, updatedItems) -> new TestDataBulkSection().show(project, items, updatedItems),
-            TestCaseDialogBase::getTestDataSection
+            (project, items, updatedItems) -> new TestDataBulkSectionDialog().show(project, items, updatedItems),
+            TestCaseBaseDialog::getTestDataSection
     ),
 
     PRE_CONDITIONS(
@@ -127,8 +127,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_PRE_CONDITIONS,
-            (project, items, updatedItems) -> new PreConditionsBulkSection().show(project, items, updatedItems),
-            TestCaseDialogBase::getPreConditionsSection
+            (project, items, updatedItems) -> new PreConditionsBulkSectionDialog().show(project, items, updatedItems),
+            TestCaseBaseDialog::getPreConditionsSection
     ),
 
     AUTO_COMPLETE(
@@ -149,8 +149,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
             true,
             GeneratorType.UPDATE_TEST_CASE_STEPS,
-            (project, items, updatedItems) -> new StepsBulkSection().show(project, items, updatedItems),
-            TestCaseDialogBase::getStepsSection
+            (project, items, updatedItems) -> new StepsBulkSectionDialog().show(project, items, updatedItems),
+            TestCaseBaseDialog::getStepsSection
     ),
 
     SET_PRIORITY(
@@ -171,8 +171,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
             true,
             GeneratorType.UPDATE_TEST_CASE_PRIORITY,
-            (project, items, updatedItems) -> new PriorityBulkSection().show(project, items, updatedItems),
-            TestCaseDialogBase::getPrioritySection
+            (project, items, updatedItems) -> new PriorityBulkSectionDialog().show(project, items, updatedItems),
+            TestCaseBaseDialog::getPrioritySection
     ),
 
     SELECT_GROUP(
@@ -193,8 +193,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
             GeneratorType.UPDATE_TEST_CASE_GROUP,
-            (project, items, updatedItems) -> new GroupBulkSection().show(project, items, updatedItems),
-            TestCaseDialogBase::getGroupSection
+            (project, items, updatedItems) -> new GroupBulkSectionDialog().show(project, items, updatedItems),
+            TestCaseBaseDialog::getGroupSection
     );
 
     private final String name;
@@ -205,9 +205,9 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     private final boolean updateMenuItem;
     private final GeneratorType gt;
     private final IBulkEditorAction bulkAction;
-    private final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor;
+    private final Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
 
-    UpdateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final GeneratorType gt, final IBulkEditorAction bulkAction, final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String name, final KeyboardSet shortcut, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final GeneratorType gt, final IBulkEditorAction bulkAction, final Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = shortcut;
         this.customShortcutText = null;
@@ -219,7 +219,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
         this.sectionExtractor = sectionExtractor;
     }
 
-    UpdateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final GeneratorType gt, final IBulkEditorAction bulkAction, final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor) {
+    UpdateTestCaseFields(final String name, final String customShortcutText, final Icon icon, final IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final GeneratorType gt, final IBulkEditorAction bulkAction, final Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor) {
         this.name = name;
         this.shortcut = null;
         this.customShortcutText = customShortcutText;

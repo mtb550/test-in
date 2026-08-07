@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
-import org.testin.testCase.createDialog.TestCaseDialogBase;
+import org.testin.testCase.createDialog.TestCaseBaseDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.statusBar.IStatusBarItem;
 
@@ -154,7 +154,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Actions.Edit,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, DESCRIPTION_SHORTCUT, EXPECTED_RESULT_SHORTCUT, STEPS_SHORTCUT, PRIORITY_SHORTCUT, GROUP_SHORTCUT},
             true,
-            TestCaseDialogBase::getDescriptionSection,
+            TestCaseBaseDialog::getDescriptionSection,
             "set description"
     ),
 
@@ -165,7 +165,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.General.InspectionsOK,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
-            TestCaseDialogBase::getExpectedResultSection,
+            TestCaseBaseDialog::getExpectedResultSection,
             "set expected result"
     ),
 
@@ -176,7 +176,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.General.ContextHelp,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
-            TestCaseDialogBase::getModuleSection,
+            TestCaseBaseDialog::getModuleSection,
             "set module"
     ),
 
@@ -187,7 +187,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Nodes.DataTables,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
-            TestCaseDialogBase::getTestDataSection,
+            TestCaseBaseDialog::getTestDataSection,
             "set test data"
     ),
 
@@ -198,7 +198,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Actions.StepOut,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
             true,
-            TestCaseDialogBase::getPreConditionsSection,
+            TestCaseBaseDialog::getPreConditionsSection,
             "set pre conditions"
     ),
 
@@ -209,7 +209,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Actions.ListFiles,
             new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
             true,
-            TestCaseDialogBase::getStepsSection,
+            TestCaseBaseDialog::getStepsSection,
             "set step"
     ),
 
@@ -220,7 +220,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Nodes.Favorite,
             new IStatusBarItem[]{SAVE, SET_PRIORITY, NAVIGATE_ARROWS},
             true,
-            TestCaseDialogBase::getPrioritySection,
+            TestCaseBaseDialog::getPrioritySection,
             null
     ),
 
@@ -242,7 +242,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             AllIcons.Nodes.Tag,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
-            TestCaseDialogBase::getGroupSection,
+            TestCaseBaseDialog::getGroupSection,
             null
     );
 
@@ -252,7 +252,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     private final Icon icon;
     private final IStatusBarItem[] statusBarItems;
     private final boolean createMenuItem;
-    private final Function<TestCaseDialogBase, ICreateTestCaseSection> sectionExtractor;
+    private final Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
     private final String placeholder;
 
     // todo, to be removed.

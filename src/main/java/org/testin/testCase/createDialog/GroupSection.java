@@ -75,7 +75,7 @@ public class GroupSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseDialogBase base, final TestCaseDialogBase.IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final TestCaseBaseDialog.IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseGroup.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -117,7 +117,7 @@ public class GroupSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseDialogBase.IUIAction repackAction) {
+    public void fillData(final TestCaseDto dto, final TestCaseBaseDialog.IUIAction repackAction) {
         setSelectedGroup(dto.getGroup());
     }
 }

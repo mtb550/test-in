@@ -22,13 +22,13 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
-public class RunItemUpdateMenu {
+public class RunItemUpdateMenuDialog {
 
     private final @NotNull Project project;
     private final @NotNull TestRunItems runItem;
     private final @NotNull Consumer<TestRunItems> updatedItem;
 
-    public RunItemUpdateMenu(final @NotNull Project project, final @NotNull TestRunItems runItem, final @NotNull Consumer<TestRunItems> updatedItem) {
+    public RunItemUpdateMenuDialog(final @NotNull Project project, final @NotNull TestRunItems runItem, final @NotNull Consumer<TestRunItems> updatedItem) {
         this.project = project;
         this.runItem = runItem;
         this.updatedItem = updatedItem;

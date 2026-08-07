@@ -17,7 +17,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.BiConsumer;
 
-public class CreateTestCaseDialog extends TestCaseDialogBase {
+public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
     private final Project project;
     private JBPopup popup;

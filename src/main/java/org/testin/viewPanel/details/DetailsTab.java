@@ -18,7 +18,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.settings.Setting;
-import org.testin.testCase.createDialog.TestCaseUpdateMenu;
+import org.testin.testCase.createDialog.TestCaseUpdateMenuDialog;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.indexer.ProjectIndexer;
@@ -151,7 +151,7 @@ public class DetailsTab {
     private void openUpdateMenu(final @NotNull Project project, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         final List<TestCaseDto> items = List.of(dto);
 
-        new TestCaseUpdateMenu(project, items, (tcs, cg) -> {
+        new TestCaseUpdateMenuDialog(project, items, (tcs, cg) -> {
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             final Path editPath = resolveEditPath(project, dto, currentPath);
 

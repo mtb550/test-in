@@ -22,7 +22,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.time.ZonedDateTime;
 
-public class MarkerDetailsView {
+public class MarkerDetailsViewDialog {
 
     private static final int LABEL_WIDTH = 255;
     private static final float LABEL_FONT_SIZE_OFFSET = 5.0f;

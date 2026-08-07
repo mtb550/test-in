@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.viewPanel.markerDetails.MarkerDetailsView;
+import org.testin.viewPanel.markerDetails.MarkerDetailsViewDialog;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
@@ -32,7 +32,7 @@ public class ShowNodeDetailsAction extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dir)) return;
 
-        MarkerDetailsView.show(e.getProject(), dir);
+        MarkerDetailsViewDialog.show(e.getProject(), dir);
     }
 
     @Override

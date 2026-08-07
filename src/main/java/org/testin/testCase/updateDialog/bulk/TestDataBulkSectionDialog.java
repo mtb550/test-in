@@ -4,7 +4,7 @@ import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.List;
 
-public class TestDataBulkSection extends JsonSplitBulkSection {
+public class TestDataBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
     @Override
     protected String getPopupTitle() {

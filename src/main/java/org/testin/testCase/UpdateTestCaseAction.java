@@ -12,7 +12,7 @@ import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.testCase.createDialog.TestCaseUpdateMenu;
+import org.testin.testCase.createDialog.TestCaseUpdateMenuDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
@@ -49,7 +49,7 @@ public class UpdateTestCaseAction extends DumbAwareAction {
 
         Logger.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
-        new TestCaseUpdateMenu(project, selectedItems, (updatedItems, cg) -> {
+        new TestCaseUpdateMenuDialog(project, selectedItems, (updatedItems, cg) -> {
 
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             for (final TestCaseDto tc : updatedItems)

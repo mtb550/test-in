@@ -25,7 +25,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 @Getter
-public abstract class TestCaseDialogBase {
+public abstract class TestCaseBaseDialog {
     protected final CodeGeneratorDialog cg;
     protected final DescriptionSection DescriptionSection;
     protected final ExpectedResultSection expectedResultSection;
@@ -40,7 +40,7 @@ public abstract class TestCaseDialogBase {
     protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
-    public TestCaseDialogBase(final @NotNull Project project, final @NotNull GeneratorType gt) {
+    public TestCaseBaseDialog(final @NotNull Project project, final @NotNull GeneratorType gt) {
         this.cg = new CodeGeneratorDialog(gt);
         this.DescriptionSection = new DescriptionSection(project);
         this.expectedResultSection = new ExpectedResultSection(project);

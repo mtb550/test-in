@@ -8,7 +8,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.Dialogs.TestRunStatusMenu;
+import org.testin.Dialogs.TestRunStatusMenuDialog;
 import org.testin.enums.TestRunStatus;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
@@ -42,7 +42,7 @@ public class SetTestRunStatusAction extends DumbAwareAction {
         final Object userObject = parentNode.getUserObject();
 
         if (userObject instanceof TestRunDirectoryDto testRunDto) {
-            new TestRunStatusMenu(project, selectedStatus -> {
+            new TestRunStatusMenuDialog(project, selectedStatus -> {
                 TestRunMarker marker = testRunDto.getMarker();
                 marker.setStatus(selectedStatus);
                 marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));

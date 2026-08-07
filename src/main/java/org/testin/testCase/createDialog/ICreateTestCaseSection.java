@@ -13,13 +13,13 @@ public interface ICreateTestCaseSection {
 
     void applyTo(final TestCaseDto dto);
 
-    void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseDialogBase base, final TestCaseDialogBase.IUIAction repackAction);
+    void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final TestCaseBaseDialog.IUIAction repackAction);
 
     JComponent getFocusComponent();
 
     void setEditable(final boolean editable);
 
-    void fillData(final TestCaseDto dto, final TestCaseDialogBase.IUIAction repackAction);
+    void fillData(final TestCaseDto dto, final TestCaseBaseDialog.IUIAction repackAction);
 
     default JPanel createIconPanel(final Icon icon) {
         JPanel iconPanel = new JPanel(new GridBagLayout());

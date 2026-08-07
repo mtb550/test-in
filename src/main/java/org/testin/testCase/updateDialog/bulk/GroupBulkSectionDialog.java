@@ -7,7 +7,7 @@ import org.testin.util.logger.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupBulkSection extends JsonArraySplitBulkSection {
+public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     @Override
     protected String getPopupTitle() {

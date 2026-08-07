@@ -11,7 +11,7 @@ import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.Dialogs.ZoomIndicator;
+import org.testin.Dialogs.ZoomIndicatorDialog;
 import org.testin.util.logger.Logger;
 
 import javax.swing.*;
@@ -93,7 +93,7 @@ public class FontSyncUtil {
                     .globalSchemeChange(globalScheme);
 
             updateComponentFontSize(component);
-            ZoomIndicator.show(project, component, newSize);
+            ZoomIndicatorDialog.show(project, component, newSize);
         });
     }
 

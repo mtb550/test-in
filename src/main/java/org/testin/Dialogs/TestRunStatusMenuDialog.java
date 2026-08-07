@@ -21,13 +21,13 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 // todo, to be refactored
-public class TestRunStatusMenu {
+public class TestRunStatusMenuDialog {
 
     private final Project project;
 
     private final Consumer<TestRunStatus> onStatusSelected;
 
-    public TestRunStatusMenu(final @NotNull Project project, final Consumer<TestRunStatus> onStatusSelected) {
+    public TestRunStatusMenuDialog(final @NotNull Project project, final Consumer<TestRunStatus> onStatusSelected) {
         this.project = project;
         this.onStatusSelected = onStatusSelected;
     }

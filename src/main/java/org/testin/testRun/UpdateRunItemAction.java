@@ -11,7 +11,7 @@ import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.testRun.updateDialog.RunItemUpdateMenu;
+import org.testin.testRun.updateDialog.RunItemUpdateMenuDialog;
 import org.testin.util.KeyboardSet;
 import org.testin.util.indexer.ProjectIndexer;
 import org.testin.util.logger.Logger;
@@ -46,7 +46,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
         Logger.trace("update test run item for: " + selected.getDescription());
 
-        new RunItemUpdateMenu(project, runItem, updatedItem -> {
+        new RunItemUpdateMenuDialog(project, runItem, updatedItem -> {
             Logger.trace("run item updated, actual result: " + updatedItem.getActualResult());
 
             if (runEditor.getParent() != null) {

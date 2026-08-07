@@ -4,32 +4,34 @@ import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.List;
 
-public class DescriptionBulkSection extends JsonSplitBulkSection {
+public class ModuleBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
     @Override
     protected String getPopupTitle() {
-        return "Bulk Edit Descriptions (Enter to Save | Tab/Arrows to Navigate)";
+        return "Bulk Edit Modules (Enter to Save | Tab/Arrows to Navigate)";
     }
 
     @Override
     protected String getOriginalValue(final TestCaseDto tc) {
-        return tc.getDescription();
+        return tc.getModule();
     }
 
     @Override
     protected void appendJsonItem(final TestCaseDto tc, int index, boolean isLast, StringBuilder leftSb, StringBuilder rightSb, List<int[]> rightEditableRanges) {
         String id = escapeJson(tc.getId().toString());
-        String escapedTitle = escapeJson(tc.getDescription());
+        String escapedDescription = escapeJson(tc.getDescription());
+        // todo, add expected result to be shown once update bulk modules
+        String escapedModule = escapeJson(tc.getModule());
 
-        String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"description\": \"";
+        String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"description\": \"" + escapedDescription + "\",\n    \"module\": \"";
         String suffix = "\"\n  }";
         String comma = isLast ? "\n" : ",\n";
 
-        leftSb.append(prefix).append(escapedTitle).append(suffix).append(comma);
+        leftSb.append(prefix).append(escapedModule).append(suffix).append(comma);
 
         rightSb.append(prefix);
         int startOffset = rightSb.length();
-        rightSb.append(escapedTitle);
+        rightSb.append(escapedModule);
         int endOffset = rightSb.length();
         rightEditableRanges.add(new int[]{startOffset, endOffset});
         rightSb.append(suffix).append(comma);
@@ -38,8 +40,8 @@ public class DescriptionBulkSection extends JsonSplitBulkSection {
     @Override
     protected void applyValues(final List<TestCaseDto> items, final List<String> newValues) {
         for (int i = 0; i < items.size(); i++) {
-            if (newValues.get(i) != null && !newValues.get(i).trim().isEmpty()) {
-                items.get(i).setDescription(newValues.get(i).trim());
+            if (newValues.get(i) != null) {
+                items.get(i).setModule(newValues.get(i).trim());
             }
         }
     }
