@@ -18,13 +18,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RefreshAction extends DumbAwareAction {
     private final @NotNull Project p;
-    private final ProjectPanel projectPanel;
+    private final ProjectPanel pp;
     private final AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
-    public RefreshAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+    public RefreshAction(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         super("Refresh", "Re-index and reload tree", AllIcons.Actions.Refresh);
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
     }
 
     public void execute() {
@@ -35,7 +35,7 @@ public class RefreshAction extends DumbAwareAction {
 
         Logger.info("Refresh: re-indexing started");
 
-        final TestProjectDirectoryDto previouslySelected = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+        final TestProjectDirectoryDto previouslySelected = (TestProjectDirectoryDto) pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
         final String previousProjectName = previouslySelected != null ? previouslySelected.getName() : null;
 
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -49,16 +49,16 @@ public class RefreshAction extends DumbAwareAction {
             Logger.info("Refresh: re-indexing complete, rebuilding tree");
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                projectPanel.getTestProjectSelector().loadTestProjectList();
-                projectPanel.setupMainLayout();
+                pp.getTestProjectSelector().loadTestProjectList();
+                pp.setupMainLayout();
 
                 if (previousProjectName != null) {
-                    final DefaultComboBoxModel<TestProjectDirectoryDto> list = projectPanel.getTestProjectSelector().getTestProjectList();
+                    final DefaultComboBoxModel<TestProjectDirectoryDto> list = pp.getTestProjectSelector().getTestProjectList();
                     for (int i = 0; i < list.getSize(); i++) {
                         TestProjectDirectoryDto tp = list.getElementAt(i);
                         if (tp.getName().equals(previousProjectName)) {
-                            projectPanel.getTestProjectSelector().getSelectedTestProject().setSelectedItem(tp);
-                            projectPanel.getTestProjectSelector().filterByTestProject(tp);
+                            pp.getTestProjectSelector().getSelectedTestProject().setSelectedItem(tp);
+                            pp.getTestProjectSelector().filterByTestProject(tp);
                             break;
                         }
                     }
@@ -78,7 +78,7 @@ public class RefreshAction extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
 
-        boolean hasTree = projectPanel.getProjectTree().getMainTree() != null;
+        boolean hasTree = pp.getProjectTree().getMainTree() != null;
         e.getPresentation().setEnabled(hasTree);
     }
 

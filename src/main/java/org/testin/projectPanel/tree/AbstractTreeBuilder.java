@@ -16,14 +16,14 @@ import java.util.List;
 
 public abstract class AbstractTreeBuilder {
     protected final @NotNull Project p;
-    protected final ProjectPanel projectPanel;
+    protected final ProjectPanel pp;
 
     @Getter
     protected DefaultMutableTreeNode rootNode;
 
-    public AbstractTreeBuilder(final @NotNull Project p, final ProjectPanel projectPanel) {
+    public AbstractTreeBuilder(final @NotNull Project p, final ProjectPanel pp) {
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
         this.rootNode = new DefaultMutableTreeNode("loading..");
     }
 
@@ -47,14 +47,14 @@ public abstract class AbstractTreeBuilder {
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     this.rootNode = localRoot;
-                    projectPanel.getProjectTree().refreshTree();
+                    pp.getProjectTree().refreshTree();
                 });
 
             } catch (final Exception ex) {
                 Logger.error("AbstractTreeBuilder.buildTree() error for directory '" + (rootDirectoryDto != null ? rootDirectoryDto.getName() : "null") + "': " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
                     this.rootNode = null;
-                    projectPanel.getProjectTree().refreshTree();
+                    pp.getProjectTree().refreshTree();
                 });
             }
         });

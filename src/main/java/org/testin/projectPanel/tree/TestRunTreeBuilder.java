@@ -10,15 +10,15 @@ import org.testin.util.logger.Logger;
 
 public class TestRunTreeBuilder extends AbstractTreeBuilder {
 
-    public TestRunTreeBuilder(final @NotNull Project p, final ProjectPanel projectPanel) {
-        super(p, projectPanel);
+    public TestRunTreeBuilder(final @NotNull Project p, final ProjectPanel pp) {
+        super(p, pp);
     }
 
     public void buildTree(final TestProjectDirectoryDto selectedTestProjectDirectory) {
         try {
             if (selectedTestProjectDirectory == null || selectedTestProjectDirectory.getMarker().getStatus() != ProjectStatus.ACTIVE) {
                 this.rootNode = null;
-                ApplicationManager.getApplication().invokeLater(() -> projectPanel.getProjectTree().refreshTree());
+                ApplicationManager.getApplication().invokeLater(() -> pp.getProjectTree().refreshTree());
                 return;
             }
 
@@ -27,7 +27,7 @@ public class TestRunTreeBuilder extends AbstractTreeBuilder {
         } catch (final Exception ex) {
             Logger.error("TestRunTreeBuilder.buildTree() error for directory '" + (selectedTestProjectDirectory != null ? selectedTestProjectDirectory.getName() : "null") + "': " + ex.getMessage());
             this.rootNode = null;
-            ApplicationManager.getApplication().invokeLater(() -> projectPanel.getProjectTree().refreshTree());
+            ApplicationManager.getApplication().invokeLater(() -> pp.getProjectTree().refreshTree());
         }
     }
 

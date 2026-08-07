@@ -6,8 +6,8 @@ import org.testin.projectPanel.ProjectPanel;
 
 public class TestProjectTreeBuilder extends AbstractTreeBuilder {
 
-    public TestProjectTreeBuilder(final @NotNull Project p, final ProjectPanel projectPanel) {
-        super(p, projectPanel);
+    public TestProjectTreeBuilder(final @NotNull Project p, final ProjectPanel pp) {
+        super(p, pp);
     }
 
 }
