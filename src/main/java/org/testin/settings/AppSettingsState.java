@@ -1,6 +1,5 @@
 package org.testin.settings;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.components.State;
@@ -20,17 +19,13 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     public String testerName = "";
     public String testerRole = "";
 
-    public static AppSettingsState getInstance() {
-        return ApplicationManager.getApplication().getService(AppSettingsState.class);
-    }
-
     @Override
     public @NotNull AppSettingsState getState() {
         return this;
     }
 
     @Override
-    public void loadState(@NotNull AppSettingsState state) {
+    public void loadState(final @NotNull AppSettingsState state) {
         XmlSerializerUtil.copyBean(state, this);
     }
 }

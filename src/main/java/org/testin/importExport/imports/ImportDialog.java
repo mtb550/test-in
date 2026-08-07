@@ -75,7 +75,7 @@ public class ImportDialog extends DialogWrapper {
         init();
         setSize(900, 600);
 
-        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
             fileField.setText(defaultFolder);
         } else {
@@ -122,7 +122,7 @@ public class ImportDialog extends DialogWrapper {
         gbc.weightx = 1.0;
         topPanel.add(cg, gbc);
 
-        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
             gbc.gridx = 0;
             gbc.gridy = 2;
@@ -190,7 +190,7 @@ public class ImportDialog extends DialogWrapper {
             File selectedFile = new File(filePath);
             File parentFolder = selectedFile.getParentFile();
             if (parentFolder != null) {
-                AppSettingsState.getInstance().defaultDownloadFolder = parentFolder.getAbsolutePath();
+                Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = parentFolder.getAbsolutePath();
             }
         }
 

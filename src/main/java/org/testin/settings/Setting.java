@@ -1,17 +1,25 @@
 package org.testin.settings;
 
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.util.services.Services;
 
 import java.nio.file.Path;
 
 @Service(Service.Level.PROJECT)
 public final class Setting {
 
+    private final @NotNull Project p;
+
+    public Setting(final @NotNull Project p) {
+        this.p = p;
+    }
+
     @NotNull
     public Path getTestinPath() {
-        String path = AppSettingsState.getInstance().rootTestinPath;
+        String path = Services.getInstance(p, AppSettingsState.class).rootTestinPath;
         if (path == null || path.trim().isEmpty()) {
             return Path.of("");
         }
@@ -19,12 +27,12 @@ public final class Setting {
     }
 
     public void setTestinPath(final @Nullable Path path) {
-        AppSettingsState settings = AppSettingsState.getInstance();
+        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         settings.rootTestinPath = path != null ? path.toString() : "";
     }
 
     public void setAutomationPath(final @Nullable Path path) {
-        AppSettingsState settings = AppSettingsState.getInstance();
+        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         settings.rootAutomationPath = path != null ? path.toString() : "";
     }
 

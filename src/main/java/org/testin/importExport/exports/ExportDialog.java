@@ -14,6 +14,7 @@ import org.testin.enums.TestEditorAttributes;
 import org.testin.importExport.shared.TablePanelBuilder;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.settings.AppSettingsState;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.*;
@@ -69,7 +70,7 @@ public class ExportDialog extends DialogWrapper {
         init();
         setSize(900, 600);
 
-        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
             folderField.setText(defaultFolder);
         } else {
@@ -116,7 +117,7 @@ public class ExportDialog extends DialogWrapper {
         gbc.weightx = 1.0;
         topPanel.add(formatCombo, gbc);
 
-        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
             gbc.gridx = 0;
             gbc.gridy = 3;
@@ -159,7 +160,7 @@ public class ExportDialog extends DialogWrapper {
         selectedFormat = fmt;
 
         if (setDefaultCheckBox.isSelected()) {
-            AppSettingsState.getInstance().defaultDownloadFolder = folder;
+            Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder;
         }
 
         super.doOKAction();
