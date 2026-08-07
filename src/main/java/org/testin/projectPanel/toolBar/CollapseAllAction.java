@@ -12,17 +12,17 @@ import org.testin.projectPanel.ProjectPanel;
 
 public class CollapseAllAction extends DumbAwareAction {
     private final @NotNull Project p;
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
 
-    public CollapseAllAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+    public CollapseAllAction(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         super("Collapse All", "Collapse all nodes", AllIcons.Actions.Collapseall);
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final SimpleTree tree = projectPanel.getProjectTree().getMainTree();
+        final SimpleTree tree = pp.getProjectTree().getMainTree();
 
         if (tree != null)
             TreeUtil.collapseAll(tree, 0);
@@ -30,7 +30,7 @@ public class CollapseAllAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(projectPanel.getProjectTree().getMainTree() != null);
+        e.getPresentation().setEnabled(pp.getProjectTree().getMainTree() != null);
     }
 
     @Override

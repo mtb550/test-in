@@ -13,13 +13,13 @@ import java.util.List;
 
 public class ProjectPanelActions {
 
-    public List<AnAction> create(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+    public List<AnAction> create(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         return List.of(
                 new OpenSettingsAction(p),
-                new ExpandAllAction(p, projectPanel),
-                new CollapseAllAction(p, projectPanel),
-                new RefreshAction(p, projectPanel),
-                new CreateTestProjectAction(p, projectPanel)
+                new ExpandAllAction(p, pp),
+                new CollapseAllAction(p, pp),
+                new RefreshAction(p, pp),
+                new CreateTestProjectAction(p, pp)
         );
     }
 }

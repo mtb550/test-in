@@ -26,7 +26,7 @@ public class TestProjectSelector {
     private static final String SELECTED_PROJECT_KEY = "org.testin.selectedTestProject";
 
     private final @NotNull Project p;
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
 
     @Getter
     private boolean isLoading = false;
@@ -41,16 +41,16 @@ public class TestProjectSelector {
     @NotNull
     private ComboBox<TestProjectDirectoryDto> selectedTestProject;
 
-    public TestProjectSelector(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+    public TestProjectSelector(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
         testProjectList = new DefaultComboBoxModel<>();
         selectedTestProject = new ComboBox<>(testProjectList);
 
         selectedTestProject.setFocusable(false);
         selectedTestProject.setRenderer(new RendererImpl());
 
-        selectedTestProject.addActionListener(new ListenerImpl(projectPanel));
+        selectedTestProject.addActionListener(new ListenerImpl(pp));
         selectedTestProject.addActionListener(e -> {
             if (isLoading) return;
 
@@ -90,7 +90,7 @@ public class TestProjectSelector {
             }
 
             if (!Files.exists(root) || testProjectList.getSize() == 0) {
-                projectPanel.showEmptyState();
+                pp.showEmptyState();
                 selectedTestProject.setEnabled(false);
                 selectedTestProject.setSelectedItem(null);
                 return;
@@ -127,8 +127,8 @@ public class TestProjectSelector {
         }
 
         if (projectToSelect != null) {
-            if (projectPanel.getPanel().getComponentCount() == 0) {
-                projectPanel.setupMainLayout();
+            if (pp.getPanel().getComponentCount() == 0) {
+                pp.setupMainLayout();
             }
             filterByTestProject(projectToSelect);
         }
@@ -137,7 +137,7 @@ public class TestProjectSelector {
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         Logger.info("TestProjectSelector.addTestProject()");
         if (!selectedTestProject.isEnabled())
-            projectPanel.showEmptyState();
+            pp.showEmptyState();
 
         isLoading = true;
         try {
@@ -163,13 +163,13 @@ public class TestProjectSelector {
                 PropertiesComponent.getInstance(p).setValue(SELECTED_PROJECT_KEY, tp.getName());
 
             if (tp.getMarker().getStatus() == ProjectStatus.ACTIVE) {
-                projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
-                projectPanel.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
+                pp.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
+                pp.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
             } else {
-                projectPanel.getProjectTree().refreshTree();
+                pp.getProjectTree().refreshTree();
             }
 
-            projectPanel.getBranchSelector().updateProject(tp);
+            pp.getBranchSelector().updateProject(tp);
 
         } catch (final Exception ex) {
             Logger.error("filterByTestProject: Error for project '" + tp.getName() + "': " + ex.getMessage());

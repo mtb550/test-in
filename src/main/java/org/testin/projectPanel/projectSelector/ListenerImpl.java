@@ -9,11 +9,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ListenerImpl implements ActionListener {
-    private final ProjectPanel projectPanel;
+    private final ProjectPanel pp;
     private TestProjectDirectoryDto lastSelected = null;
 
-    public ListenerImpl(final ProjectPanel projectPanel) {
-        this.projectPanel = projectPanel;
+    public ListenerImpl(final ProjectPanel pp) {
+        this.pp = pp;
     }
 
     @Override
@@ -25,13 +25,13 @@ public class ListenerImpl implements ActionListener {
                     return;
                 }
 
-                if (projectPanel.getTestProjectSelector().isLoading())
+                if (pp.getTestProjectSelector().isLoading())
                     return;
 
                 lastSelected = selected;
 
                 Logger.info("Selection changed to: " + selected.getName());
-                projectPanel.getTestProjectSelector().filterByTestProject(selected);
+                pp.getTestProjectSelector().filterByTestProject(selected);
             }
         }
     }
