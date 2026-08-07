@@ -119,10 +119,8 @@ public final class SettingsConfigurable implements Configurable {
             setting.setAutomationPath(null);
         }
 
-        ProjectPanel panel = Services.getInstance(p, ProjectPanel.class);
-        if (panel != null) {
-            new RefreshAction(p, panel).execute();
-        }
+        final ProjectPanel pp = Services.getInstance(p, ProjectPanel.class);
+        if (pp != null) new RefreshAction(p, pp).execute();
     }
 
     @Override
