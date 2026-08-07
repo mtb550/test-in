@@ -125,7 +125,7 @@ public class GenerateReportAction extends DumbAwareAction {
                 Files.write(reportFile.toPath(), fileBytes);
 
                 NotificationAction openAction = NotificationAction.createSimple("Open report", () -> {
-                    // Open directly in the OS default app (Word/Office) - not the IDE browser.
+                    
                     try {
                         java.awt.Desktop.getDesktop().open(reportFile);
                     } catch (final Exception openEx) {

@@ -45,7 +45,7 @@ public final class TestRunWordGenerator {
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
-                // todo, why clean name not used to naming the word file.
+                
                 String cleanName = tr.getChangeLog().replace(".json", "");
 
                 String projectName = "";
