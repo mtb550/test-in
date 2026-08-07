@@ -31,91 +31,92 @@ import java.util.UUID;
 public class RunCreationForm {
 
     private final JBPanel<?> mainPanel;
-    private final CheckboxTree checklistTree;
+    private final CheckboxTree tree;
 
     private final JBTextField descriptionField;
     private final JBTextField commitIdField;
     private final Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
 
-
-    public RunCreationForm(final @NotNull String runName, final CheckedTreeNode root, final @NotNull Map<UUID, TestRunItems> resultsMap) {
+    public RunCreationForm(final @NotNull String runName, final CheckedTreeNode root, final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
         mainPanel = new JBPanel<>(new BorderLayout());
-
-        JBTextField runNameField = new JBTextField(runName);
-        runNameField.setEditable(false);
-        runNameField.setEnabled(false);
-
-        FormBuilder formBuilder = FormBuilder.createFormBuilder().addLabeledComponent("Test Run name:", runNameField);
-
         descriptionField = new JBTextField();
         commitIdField = new JBTextField();
+        mainPanel.add(buildConfigurationPanel(runName), BorderLayout.NORTH);
+
+        tree = new CheckboxTree(createTreeRenderer(resultsMap), root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
+        TreeUtil.expandAll(tree);
+
+        mainPanel.add(new JBScrollPane(tree), BorderLayout.CENTER);
+
+        mainPanel.setPreferredSize(new Dimension(JBUI.scale(900), JBUI.scale(600)));
+    }
+
+    private JPanel buildConfigurationPanel(final @NotNull String runName) {
+        final FormBuilder formBuilder = FormBuilder.createFormBuilder();
+
+        final JBTextField runNameField = new JBTextField(runName);
+        runNameField.setEditable(false);
+        runNameField.setEnabled(false);
+        formBuilder.addLabeledComponent("Test Run name:", runNameField);
+
         formBuilder.addLabeledComponent(TestRunConfiguration.CHANGE_LOG.getDisplayName(), descriptionField);
         formBuilder.addLabeledComponent(TestRunConfiguration.COMMIT_ID.getDisplayName(), commitIdField);
 
-        for (TestRunConfiguration field : TestRunConfiguration.values()) {
+        for (final TestRunConfiguration field : TestRunConfiguration.values()) {
             if (field.getOptions() != null) {
-                JComponent inputComponent = createEditableCombo(field.getOptions());
-                fieldMap.put(field, inputComponent);
-                JBLabel label = new JBLabel(field.getDisplayName() + ":", field.getIcon(), SwingConstants.LEFT);
-                formBuilder.addLabeledComponent(label, inputComponent);
+                final ComboBox<String> comboBox = new ComboBox<>(field.getOptions());
+
+                comboBox.setEditable(true);
+                fieldMap.put(field, comboBox);
+                formBuilder.addLabeledComponent(new JBLabel(field.getDisplayName() + ":", field.getIcon(), SwingConstants.LEFT), comboBox);
             }
         }
 
-        JPanel configurationPanel = formBuilder.getPanel();
+        final JPanel configurationPanel = formBuilder.getPanel();
         configurationPanel.setBorder(JBUI.Borders.compound(
                 JBUI.Borders.customLine(UIUtil.getBoundsColor(), 0, 0, 1, 0),
                 JBUI.Borders.empty(10)
         ));
 
-        mainPanel.add(configurationPanel, BorderLayout.NORTH);
-        checklistTree = new CheckboxTree(createTreeRenderer(resultsMap), root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
-        TreeUtil.expandAll(checklistTree);
-        mainPanel.add(new JBScrollPane(checklistTree), BorderLayout.CENTER);
+        return configurationPanel;
     }
 
-    private ComboBox<String> createEditableCombo(final @NotNull String[] items) {
-        ComboBox<String> comboBox = new ComboBox<>(items);
-        comboBox.setEditable(true);
-        return comboBox;
-    }
-
-    private CheckboxTree.CheckboxTreeCellRenderer createTreeRenderer(final @NotNull Map<UUID, TestRunItems> resultsMap) {
+    // todo, move to separate class
+    private CheckboxTree.CheckboxTreeCellRenderer createTreeRenderer(final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
         return new CheckboxTree.CheckboxTreeCellRenderer() {
             @Override
-            public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected,
-                                          final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-                if (!(value instanceof CheckedTreeNode node)) return;
-                final Object userObj = node.getUserObject();
+            public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+                if (value instanceof CheckedTreeNode node) {
+                    final Object userObj = node.getUserObject();
 
-                if (userObj instanceof DirectoryDto dir) {
-                    getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                    if (userObj instanceof DirectoryDto dir)
+                        getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
 
-                } else if (userObj instanceof TestCaseDto tc) {
-                    final TestRunItems result = resultsMap.get(tc.getId());
-                    if (result != null) {
-                        final TestStatus status = result.getStatus();
-                        getTextRenderer().append(tc.getDescription(), status.getStyle());
-                        getTextRenderer().append(status.getDisplayText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
+                    else if (userObj instanceof TestCaseDto tc) {
+                        final TestRunItems result = resultsMap.get(tc.getId());
 
-                    } else {
-                        getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-                    }
+                        if (result != null) {
+                            final TestStatus status = result.getStatus();
+                            getTextRenderer().append(tc.getDescription(), status.getStyle());
+                            getTextRenderer().append(status.getDisplayText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
 
-                } else if (userObj instanceof String str) {
-                    getTextRenderer().append(str, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
+                        } else
+                            getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
+
+
+                    } else if (userObj instanceof String str)
+                        getTextRenderer().append(str, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
                 }
             }
         };
     }
 
-    public String getFieldValue(final @NotNull TestRunConfiguration field) {
-        JComponent comp = fieldMap.get(field);
-
+    public @NotNull String getFieldValue(final @NotNull TestRunConfiguration field) {
+        final JComponent comp = fieldMap.get(field);
         if (comp instanceof ComboBox<?> comboBox) {
-            Object selected = comboBox.getSelectedItem();
+            final Object selected = comboBox.getSelectedItem();
             return selected != null ? selected.toString().trim() : "";
         }
-
         return "";
     }
 }

@@ -16,15 +16,15 @@ import java.awt.*;
 
 public abstract class BaseDetails {
 
-    protected static final int LABEL_WIDTH = 255;
-    private static final int LABEL_INSETS_TOP = 12;
-    private static final int LABEL_INSETS_LEFT = 16;
-    private static final int LABEL_INSETS_BOTTOM = 12;
-    private static final int LABEL_INSETS_RIGHT = 8;
-    private static final int VALUE_INSETS_TOP = 12;
-    private static final int VALUE_INSETS_LEFT = 0;
-    private static final int VALUE_INSETS_BOTTOM = 12;
-    private static final int VALUE_INSETS_RIGHT = 16;
+    final int LABEL_WIDTH = 255;
+    final int LABEL_INSETS_TOP = 12;
+    final int LABEL_INSETS_LEFT = 16;
+    final int LABEL_INSETS_BOTTOM = 12;
+    final int LABEL_INSETS_RIGHT = 8;
+    final int VALUE_INSETS_TOP = 12;
+    final int VALUE_INSETS_LEFT = 0;
+    final int VALUE_INSETS_BOTTOM = 12;
+    final int VALUE_INSETS_RIGHT = 16;
 
     protected float getLabelFontSize() {
         return FontSyncUtil.getBaseFontSize() + 5.0f; // Roughly 20.0f default

@@ -110,7 +110,7 @@ public class CreateTestMethod implements GeneratorAction {
         return psiFacade.findClass(path, scope);
     }
 
-    private void retryInjectPhysically(final Project p, final List<String> packageList, final String className, final String methodName, final TestCaseDto tc) {
+    private void retryInjectPhysically(final @NotNull Project p, final List<String> packageList, final String className, final String methodName, final TestCaseDto tc) {
         try {
             VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
             if (sourceRoot == null) {
@@ -143,7 +143,7 @@ public class CreateTestMethod implements GeneratorAction {
         }
     }
 
-    private void injectMethod(final Project p, final PsiClass targetClass, final String methodName, final TestCaseDto tc) {
+    private void injectMethod(final @NotNull Project p, final PsiClass targetClass, final String methodName, final TestCaseDto tc) {
         try {
             PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             PsiFile file = targetClass.getContainingFile();

@@ -12,8 +12,6 @@ import org.testin.util.services.Services;
 import java.awt.*;
 import java.util.ArrayList;
 
-
-// todo, to be removed, not important (commented-001)
 public class Fqcn extends BaseDetails {
 
     @Override

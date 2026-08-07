@@ -14,11 +14,11 @@ import java.awt.*;
 
 public class Badges extends BaseDetails {
 
-    private static final int FLOW_GAP = 6;
-    private static final int INSETS_TOP = 8;
-    private static final int INSETS_LEFT = 16;
-    private static final int INSETS_BOTTOM = 16;
-    private static final int INSETS_RIGHT = 16;
+    final int FLOW_GAP = 6;
+    final int INSETS_TOP = 8;
+    final int INSETS_LEFT = 16;
+    final int INSETS_BOTTOM = 16;
+    final int INSETS_RIGHT = 16;
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {

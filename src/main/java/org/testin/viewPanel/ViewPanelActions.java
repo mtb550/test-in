@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ViewPanelActions {
 
-    public static List<AnAction> create(final ViewPagination page, final JComponent component) {
+    public List<AnAction> create(final ViewPagination page, final JComponent component) {
         return List.of(
                 new PreviousTestCaseAction(page, component),
                 new NextTestCaseAction(page, component)

@@ -10,12 +10,10 @@ import org.testin.mappers.dto.TestCaseDto;
 import javax.swing.*;
 
 public class TestListRenderer extends AbstractListRenderer<IEditor> {
-    private final Project p;
     private final @NotNull TestCard card;
 
     public TestListRenderer(final @NotNull Project p, final @NotNull TestEditor editor) {
         super(editor);
-        this.p = p;
         this.card = new TestCard(p);
     }
 

@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
 import org.testin.editorPanel.EditorType;
 import org.testin.editorPanel.UnifiedVirtualFile;
@@ -29,12 +30,12 @@ import java.util.Optional;
 public final class EditorUtil {
     private final String OPEN_EDITORS_KEY = "testin.openEditors";
 
-    public boolean isOpen(final @NotNull Project p, final @NotNull String s) {
+    public boolean isOpen(final @NotNull Project p, final @Nullable String s) {
         final FileEditorManager fed = FileEditorManager.getInstance(p);
         final VirtualFile[] openFiles = fed.getOpenFiles();
 
         for (VirtualFile vf : openFiles) {
-            if (s.equals(vf.getName())) {
+            if (s != null && s.equals(vf.getName())) {
                 fed.openFile(vf, true);
                 return true;
             }
@@ -88,7 +89,9 @@ public final class EditorUtil {
                         .ifPresent(editorManager -> editorManager.openFile(newVf, true)));
     }
 
-    public void openIfNotOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+    public void openIfNotOpen(final @NotNull Project p, final @Nullable DirectoryDto dir) {
+        if (dir == null) return;
+
         if (isOpen(p, dir.getName())) {
             Logger.info("Editor already open, focusing: " + dir.getName());
 

@@ -23,17 +23,21 @@ import java.awt.*;
 import java.time.ZonedDateTime;
 
 public class MarkerDetailsViewDialog {
+    final @NotNull Project p;
+    final int LABEL_WIDTH = 255;
+    final float LABEL_FONT_SIZE_OFFSET = 5.0f;
+    final float VALUE_FONT_SIZE_OFFSET = 8.0f;
+    final int INSETS_TOP = 12;
+    final int INSETS_LEFT = 16;
+    final int INSETS_BOTTOM = 12;
+    final int INSETS_RIGHT = 8;
+    final int VALUE_INSETS_RIGHT = 16;
 
-    private static final int LABEL_WIDTH = 255;
-    private static final float LABEL_FONT_SIZE_OFFSET = 5.0f;
-    private static final float VALUE_FONT_SIZE_OFFSET = 8.0f;
-    private static final int INSETS_TOP = 12;
-    private static final int INSETS_LEFT = 16;
-    private static final int INSETS_BOTTOM = 12;
-    private static final int INSETS_RIGHT = 8;
-    private static final int VALUE_INSETS_RIGHT = 16;
+    public MarkerDetailsViewDialog(final @NotNull Project p) {
+        this.p = p;
+    }
 
-    public static void show(final @NotNull Project p, final @NotNull DirectoryDto dto) {
+    public void show(final @NotNull DirectoryDto dto) {
         JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
         panel.setOpaque(false);
         panel.setBorder(JBUI.Borders.empty(10));
@@ -61,11 +65,9 @@ public class MarkerDetailsViewDialog {
 
         } else if (dto instanceof TestRunDirectoryDto runDto) {
             TestRunMarker marker = runDto.getMarker();
-            if (marker != null) {
-                row = addRow(panel, gbc, "Status:", marker.getStatus().getLabel(), row);
-                row = addRow(panel, gbc, "Marker Created By:", marker.getCreatedBy(), row);
-                row = addRow(panel, gbc, "Marker Created At:", formatDate(marker.getCreatedAt()), row);
-            }
+            row = addRow(panel, gbc, "Status:", marker.getStatus().getLabel(), row);
+            row = addRow(panel, gbc, "Marker Created By:", marker.getCreatedBy(), row);
+            row = addRow(panel, gbc, "Marker Created At:", formatDate(marker.getCreatedAt()), row);
         }
         // todo: add TestSetMarker support when implemented
 
@@ -93,8 +95,8 @@ public class MarkerDetailsViewDialog {
         popup.showCenteredInCurrentWindow(p);
     }
 
-    private static int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,
-                              final @NotNull String labelText, final @NotNull String valueText, final int row) {
+    private int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,
+                       final @NotNull String labelText, final @NotNull String valueText, final int row) {
         if (valueText.trim().isEmpty())
             return row;
 
@@ -109,7 +111,7 @@ public class MarkerDetailsViewDialog {
         return addRow(panel, gbc, labelText, valueArea, row);
     }
 
-    private static int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull JComponent valueComponent, final int row) {
+    private int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull JComponent valueComponent, final int row) {
         gbc.gridy = row;
         gbc.gridwidth = 1;
 
@@ -140,7 +142,7 @@ public class MarkerDetailsViewDialog {
         return row + 1;
     }
 
-    private static String formatDate(final ZonedDateTime dateTime) {
+    private String formatDate(final ZonedDateTime dateTime) {
         if (dateTime == null) return "";
         return dateTime.format(Config.getDateFormatterPattern());
     }

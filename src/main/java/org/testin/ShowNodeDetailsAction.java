@@ -34,7 +34,7 @@ public class ShowNodeDetailsAction extends DumbAwareAction {
 
         if (!(userObject instanceof DirectoryDto dir)) return;
 
-        MarkerDetailsViewDialog.show(p, dir);
+        new MarkerDetailsViewDialog(p).show(dir);
     }
 
     @Override

@@ -21,7 +21,7 @@ import java.nio.file.Path;
 
 public final class TestinPathPanel {
 
-    private final Project p;
+    private final @NotNull Project p;
     private final TextFieldWithBrowseButton pathField = new TextFieldWithBrowseButton();
     private final JButton openFolderBtn = new JButton("Open");
 

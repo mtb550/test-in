@@ -28,17 +28,17 @@ import java.util.Map;
 
 public class NavigationBar extends BaseDetails {
 
-    private static final Color DEFAULT_TEXT_COLOR = Gray._120;
-    private static final int SEPARATOR_BORDER_V = 0;
-    private static final int SEPARATOR_BORDER_H = 6;
-    private static final int PANEL_BORDER_TOP = 10;
-    private static final int PANEL_BORDER_LEFT = 16;
-    private static final int PANEL_BORDER_BOTTOM = 5;
-    private static final int PANEL_BORDER_RIGHT = 0;
-    private static final int GBC_INSETS_TOP = 12;
-    private static final int GBC_INSETS_LEFT = 16;
-    private static final int GBC_INSETS_BOTTOM = 0;
-    private static final int GBC_INSETS_RIGHT = 16;
+    final Color DEFAULT_TEXT_COLOR = Gray._120;
+    final int SEPARATOR_BORDER_V = 0;
+    final int SEPARATOR_BORDER_H = 6;
+    final int PANEL_BORDER_TOP = 10;
+    final int PANEL_BORDER_LEFT = 16;
+    final int PANEL_BORDER_BOTTOM = 5;
+    final int PANEL_BORDER_RIGHT = 0;
+    final int GBC_INSETS_TOP = 12;
+    final int GBC_INSETS_LEFT = 16;
+    final int GBC_INSETS_BOTTOM = 0;
+    final int GBC_INSETS_RIGHT = 16;
 
     private final ArrayList<String> currentPath;
 
@@ -87,7 +87,7 @@ public class NavigationBar extends BaseDetails {
                             }
 
                             final TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
-                            if (Services.getInstance(p, EditorUtil.class).isOpen(p, ts.getName()))
+                            if (ts == null || Services.getInstance(p, EditorUtil.class).isOpen(p, ts.getName()))
                                 return;
 
                             Services.getInstance(p, EditorUtil.class).open(p, ts);

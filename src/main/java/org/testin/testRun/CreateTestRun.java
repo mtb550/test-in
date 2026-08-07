@@ -54,6 +54,7 @@ public class CreateTestRun implements NodeCreator {
 
             final Path testCasesPath = testCasesRoot.getPath();
             final DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesPath, true, testCasesRoot);
+
             final CheckedTreeNode root = convertToCheckedNodes(fullModelNode);
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -79,13 +80,11 @@ public class CreateTestRun implements NodeCreator {
         return tr;
     }
 
-    private DefaultMutableTreeNode buildDirectoryTree(final Path folder, final boolean isRoot, final DirectoryDto parentOfThisNode) {
+    private DefaultMutableTreeNode buildDirectoryTree(final Path folder, final boolean isRoot, final DirectoryDto thisNodeDto) {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.awaitIndexing();
 
-        final Object label = isRoot ? parentOfThisNode : parentOfThisNode.resolveDirectoryObject(folder, indexer);
-        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(label);
-        final DirectoryDto thisNodeDto = (label instanceof DirectoryDto) ? (DirectoryDto) label : null;
+        final DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);
 
         if (thisNodeDto == null) return node;
 
@@ -93,14 +92,18 @@ public class CreateTestRun implements NodeCreator {
 
         if (isTestSet) {
             final List<TestCaseDto> testCases = indexer.getTestCasesForTestSet(folder);
+            if (testCases.isEmpty()) return null;
             for (final TestCaseDto tc : testCases) {
                 node.add(new DefaultMutableTreeNode(tc));
             }
         } else {
             final List<DirectoryDto> children = indexer.getChildren(folder);
             for (final DirectoryDto child : children) {
-                node.add(buildDirectoryTree(child.getPath(), false, child));
+                final DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), false, child);
+                if (childNode != null) node.add(childNode);
             }
+            // Hide empty containers (e.g. a test-set package with no test sets/cases) so they don't clutter the tree.
+            if (node.getChildCount() == 0 && !isRoot) return null;
         }
 
         return node;
@@ -137,8 +140,6 @@ public class CreateTestRun implements NodeCreator {
         tr.setResults(items);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            // The indexer owns all dir/file creation: putTestRun writes the run json (creating
-            // the dir) and addTestRunDir writes the .tr marker + refreshes the VFS.
             Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
 
             TestRunMarker marker = Services.getInstance(p, MarkerMapper.class).setTestRunMarker();
@@ -160,7 +161,7 @@ public class CreateTestRun implements NodeCreator {
         });
     }
 
-    private CheckedTreeNode convertToCheckedNodes(final DefaultMutableTreeNode node) {
+    private @NotNull CheckedTreeNode convertToCheckedNodes(final DefaultMutableTreeNode node) {
         final Object userObj = node.getUserObject();
         final CheckedTreeNode newNode = new CheckedTreeNode(userObj);
         for (int i = 0; i < node.getChildCount(); i++) {

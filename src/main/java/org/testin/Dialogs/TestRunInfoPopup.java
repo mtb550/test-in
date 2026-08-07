@@ -11,7 +11,7 @@ import java.awt.*;
 
 public class TestRunInfoPopup {
 
-    public static void show(TestRunDto run) {
+    public void show(final @NotNull TestRunDto run) {
         DialogWrapper dialog = new DialogWrapper(true) {
             {
                 init();

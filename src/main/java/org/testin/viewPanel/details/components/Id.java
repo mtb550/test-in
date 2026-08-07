@@ -21,18 +21,18 @@ import java.awt.event.MouseEvent;
 
 public class Id extends BaseDetails {
 
-    private static final int BADGE_ARC_SIZE = 16;
-    private static final int BADGE_BORDER_V = 3;
-    private static final int BADGE_BORDER_H = 10;
-    private static final int FLOW_GAP = 8;
-    private static final int COPY_SUCCESS_DELAY_MS = 1500;
-    private static final String COPY_TOOLTIP = "Copy ID";
-    private static final Color BG_COLOR = new JBColor(Gray._230, Gray._80);
-    private static final Color FG_COLOR = new JBColor(Gray._130, Gray._170);
-    private static final int INSETS_TOP = 5;
-    private static final int INSETS_LEFT = 16;
-    private static final int INSETS_BOTTOM = 0;
-    private static final int INSETS_RIGHT = 16;
+    final int BADGE_ARC_SIZE = 16;
+    final int BADGE_BORDER_V = 3;
+    final int BADGE_BORDER_H = 10;
+    final int FLOW_GAP = 8;
+    final int COPY_SUCCESS_DELAY_MS = 1500;
+    final String COPY_TOOLTIP = "Copy ID";
+    final Color BG_COLOR = new JBColor(Gray._230, Gray._80);
+    final Color FG_COLOR = new JBColor(Gray._130, Gray._170);
+    final int INSETS_TOP = 5;
+    final int INSETS_LEFT = 16;
+    final int INSETS_BOTTOM = 0;
+    final int INSETS_RIGHT = 16;
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {

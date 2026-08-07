@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ProjectPanelActions {
 
-    public static List<AnAction> create(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+    public List<AnAction> create(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
         return List.of(
                 new OpenSettingsAction(p),
                 new ExpandAllAction(p, projectPanel),
