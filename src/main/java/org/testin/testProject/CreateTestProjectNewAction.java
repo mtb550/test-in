@@ -21,14 +21,14 @@ import java.nio.file.Path;
 
 public class CreateTestProjectNewAction extends DumbAwareAction {
     private final @NotNull Project p;
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
     private final @NotNull String tpName;
     private final @NotNull CodeGeneratorDialog cg;
 
-    public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel, final @NotNull String name, final @NotNull CodeGeneratorDialog cg) {
+    public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull String name, final @NotNull CodeGeneratorDialog cg) {
         super("New Test Project", "Create a new test project", AllIcons.General.Add);
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
         this.tpName = name;
         this.cg = cg;
     }
@@ -48,8 +48,8 @@ public class CreateTestProjectNewAction extends DumbAwareAction {
         // The indexer owns all dir/file creation: it creates the project dir, the
         // Test Cases/Test Runs main dirs and writes their marker JSON.
         Services.getInstance(p, ProjectIndexer.class).addTestProject(tp);
-        projectPanel.getTestProjectSelector().addTestProject(tp);
-        projectPanel.getProjectTree().updateNodes();
+        pp.getTestProjectSelector().addTestProject(tp);
+        pp.getProjectTree().updateNodes();
         Services.getInstance(p, Notifier.class).info(p, "New Test Project", String.format("Test Project %s has been added", tpName));
 
         if (cg.isSelected())

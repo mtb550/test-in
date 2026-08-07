@@ -123,7 +123,7 @@ public class CreateTestRun implements NodeCreator {
     }
 
 
-    private void saveSelectedToJSON(final RunCreationForm form, final CheckedTreeNode root, final Path savePath, final ProjectPanel projectPanel, final TestRunDirectoryDto trDir) {
+    private void saveSelectedToJSON(final RunCreationForm form, final CheckedTreeNode root, final Path savePath, final ProjectPanel pp, final TestRunDirectoryDto trDir) {
         final TestRunDto tr = new TestRunDto()
                 .setCreatedBy(AppSettingsState.getInstance().testerName)
                 .setChangeLog(form.getDescriptionField().getText().trim())
@@ -153,7 +153,7 @@ public class CreateTestRun implements NodeCreator {
                 virtualDir.refresh(false, true);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                projectPanel.getTestRunTreeBuilder().buildTree(projectPanel.getTestProjectSelector().getSelectedTestProject().getItem());
+                pp.getTestRunTreeBuilder().buildTree(pp.getTestProjectSelector().getSelectedTestProject().getItem());
                 Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, trDir);
 
             });
