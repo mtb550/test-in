@@ -1,4 +1,4 @@
-package org.testin.testRun;
+package org.testin;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -7,29 +7,32 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditor;
-import org.testin.enums.TestStatus;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.util.CodeNavigator;
 import org.testin.util.KeyboardSet;
-import org.testin.util.services.RunStatusService;
+import org.testin.util.Tools;
 import org.testin.util.services.Services;
 
-public class SetTestCaseStatusBlocked extends DumbAwareAction {
-    private final @NotNull IEditor editor;
-    private final @NotNull JBList<TestCaseDto> list;
+import java.util.ArrayList;
 
-    public SetTestCaseStatusBlocked(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super("Blocked", "Set test case status to Blocked", AllIcons.Actions.Pause);
-        this.editor = editor;
+public class NavigateToCodeAction extends DumbAwareAction {
+    private final JBList<TestCaseDto> list;
+
+    public NavigateToCodeAction(final JBList<TestCaseDto> list) {
+        super("Navigate to Code", "Jump to the automated test case", AllIcons.General.ArrowRight);
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.SetStatusBlocked.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(KeyboardSet.NavigateToCode.getCustomShortcut(), list);
+    }
+
+    public void execute(final @NotNull Project project, final @NotNull TestCaseDto tc) {
+        ArrayList<String> generatedFqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+        new CodeNavigator().toCode(project, generatedFqcn);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        if (project == null) return;
-        Services.getInstance(project, RunStatusService.class).applyStatus(project, editor, list, TestStatus.BLOCKED);
+        if (e.getProject() == null) return;
+        execute(e.getProject(), list.getSelectedValue());
     }
 
     @Override

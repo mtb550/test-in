@@ -8,10 +8,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 
-public class StartExecution extends DumbAwareAction {
+public class StartExecutionAction extends DumbAwareAction {
     private final @NotNull IToolBar callbacks;
 
-    public StartExecution(final @NotNull IToolBar callbacks) {
+    public StartExecutionAction(final @NotNull IToolBar callbacks) {
         super("Start Run", "Start execution of test cases", AllIcons.Nodes.Services);
         this.callbacks = callbacks;
     }

@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.NavigateToCode;
+import org.testin.NavigateToCodeAction;
 import org.testin.enums.CardHoverAction;
 import org.testin.enums.RunStatus;
 import org.testin.mappers.dto.TestCaseDto;
@@ -67,7 +67,7 @@ public class ActionIcons extends BaseDetails {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                new NavigateToCode(null).execute(project, dto);
+                new NavigateToCodeAction(null).execute(project, dto);
             }
         });
 

@@ -8,16 +8,16 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.*;
 import org.testin.clipboard.*;
-import org.testin.crud.Remove;
+import org.testin.crud.RemoveAction;
 import org.testin.enums.ProjectStatus;
 import org.testin.generateReport.GenerateReportAction;
 import org.testin.importExport.exports.ExportAction;
 import org.testin.importExport.imports.ImportAction;
-import org.testin.nodeCreator.CreateTreeNode;
+import org.testin.nodeCreator.CreateTreeNodeAction;
 import org.testin.projectPanel.ProjectPanel;
-import org.testin.run.RunTestSet;
-import org.testin.testProject.UpdateTestProjectStatus;
-import org.testin.testRun.SetTestRunStatus;
+import org.testin.run.RunTestSetAction;
+import org.testin.testProject.UpdateTestProjectStatusAction;
+import org.testin.testRun.SetTestRunStatusAction;
 import org.testin.util.Tools;
 import org.testin.util.services.Services;
 
@@ -30,28 +30,28 @@ public class TreeContextMenu extends DefaultActionGroup {
         super("Tree Popup Menu", true);
         this.project = project;
 
-        add(new Open(tree));
-        add(new CreateTreeNode(projectPanel, tree));
+        add(new OpenActionAction(tree));
+        add(new CreateTreeNodeAction(projectPanel, tree));
 
         addSeparator();
 
         add(Services.getInstance(project, Tools.class).createSubGroup("Actions", AllIcons.Actions.Edit,
                 List.of(
-                        new UpdateTestProjectStatus(tree, ProjectStatus.ACTIVE),
-                        new UpdateTestProjectStatus(tree, ProjectStatus.INACTIVE),
-                        new UpdateTestProjectStatus(tree, ProjectStatus.ARCHIVED),
-                        new UndoNode(tree),
-                        new RedoNode(tree),
-                        new Remove(tree, projectPanel),
-                        new Rename(projectPanel, tree),
-                        new CopyNode(tree),
-                        new CutNode(tree),
-                        new PasteNode(tree))
+                        new UpdateTestProjectStatusAction(tree, ProjectStatus.ACTIVE),
+                        new UpdateTestProjectStatusAction(tree, ProjectStatus.INACTIVE),
+                        new UpdateTestProjectStatusAction(tree, ProjectStatus.ARCHIVED),
+                        new UndoNodeAction(tree),
+                        new RedoNodeAction(tree),
+                        new RemoveAction(tree, projectPanel),
+                        new RenameAction(projectPanel, tree),
+                        new CopyNodeAction(tree),
+                        new CutNodeAction(tree),
+                        new PasteNodeAction(tree))
         ));
 
         addSeparator();
 
-        add(new RunTestSet(tree));
+        add(new RunTestSetAction(tree));
 
         addSeparator();
 
@@ -61,22 +61,22 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        add(new Sync(tree, projectPanel));
-        add(new ViewPendingCommits(tree));
+        add(new SyncActionAction(tree, projectPanel));
+        add(new ViewPendingCommitsAction(tree));
 
         addSeparator();
-        add(new SetTestRunStatus(tree));
+        add(new SetTestRunStatusAction(tree));
         addSeparator();
 
         add(new GenerateReportAction(tree));
 
-        add(new ShowNodeDetails(tree));
+        add(new ShowNodeDetailsAction(tree));
 
     }
 
     public void registerShortcuts(final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
-        new Escape(tree, transferHandler);
-        new OpenCM(tree, this);
+        new EscapeAction(tree, transferHandler);
+        new OpenContextMenuAction(tree, this);
 
     }
 

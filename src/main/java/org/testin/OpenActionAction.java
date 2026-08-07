@@ -18,10 +18,10 @@ import org.testin.util.services.Services;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-public class Open extends DumbAwareAction {
+public class OpenActionAction extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
 
-    public Open(final @NotNull SimpleTree tree) {
+    public OpenActionAction(final @NotNull SimpleTree tree) {
         super("Open", "Open selected test sets or runs", AllIcons.Actions.MenuOpen);
         this.tree = tree;
 

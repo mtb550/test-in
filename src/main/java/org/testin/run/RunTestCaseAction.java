@@ -16,10 +16,10 @@ import org.testin.util.services.Services;
 
 import java.util.List;
 
-public class RunTestCase extends DumbAwareAction {
+public class RunTestCaseAction extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
 
-    public RunTestCase(final JBList<TestCaseDto> list) {
+    public RunTestCaseAction(final JBList<TestCaseDto> list) {
         super("Run Test", "Run selected test cases", AllIcons.RunConfigurations.TestState.Run);
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.RunTestCase.getCustomShortcut(), list);

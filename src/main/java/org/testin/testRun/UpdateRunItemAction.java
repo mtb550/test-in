@@ -19,12 +19,12 @@ import org.testin.util.services.Services;
 
 import java.nio.file.Path;
 
-public class UpdateRunItem extends DumbAwareAction {
+public class UpdateRunItemAction extends DumbAwareAction {
 
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public UpdateRunItem(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public UpdateRunItemAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Update Test Run Item", "Update test run item attributes", AllIcons.Actions.Edit);
         this.editor = editor;
         this.list = list;

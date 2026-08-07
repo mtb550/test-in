@@ -25,11 +25,11 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
-public class Rename extends DumbAwareAction {
+public class RenameAction extends DumbAwareAction {
     private final @NotNull ProjectPanel projectPanel;
     private final @NotNull SimpleTree tree;
 
-    public Rename(final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
+    public RenameAction(final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
         super("Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.projectPanel = projectPanel;
         this.tree = tree;

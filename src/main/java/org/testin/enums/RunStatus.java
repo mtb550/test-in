@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.run.RunTestCase;
+import org.testin.run.RunTestCaseAction;
 
 import javax.swing.*;
 import java.util.function.BiConsumer;
@@ -64,6 +64,6 @@ public enum RunStatus {
     }
 
     public void executeAction(final @NotNull Project project, final TestCaseDto dto, final JBList<TestCaseDto> list) {
-        new RunTestCase(list).execute(project, dto);
+        new RunTestCaseAction(list).execute(project, dto);
     }
 }

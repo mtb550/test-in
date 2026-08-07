@@ -19,11 +19,11 @@ import org.testin.util.services.Services;
 
 import java.util.List;
 
-public class SetTestCaseStatusFailed extends DumbAwareAction {
+public class SetTestCaseStatusFailedAction extends DumbAwareAction {
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public SetTestCaseStatusFailed(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public SetTestCaseStatusFailedAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Failed", "Set test case status to Failed", AllIcons.Actions.Cancel);
         this.editor = editor;
         this.list = list;

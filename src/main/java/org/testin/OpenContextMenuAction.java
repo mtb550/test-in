@@ -9,12 +9,12 @@ import org.testin.util.KeyboardSet;
 
 import java.awt.*;
 
-public class OpenCM extends DumbAwareAction {
+public class OpenContextMenuAction extends DumbAwareAction {
     private final SimpleTree tree;
     private final JBList<?> list;
     private final DefaultActionGroup cm;
 
-    public OpenCM(final SimpleTree tree, final DefaultActionGroup cm) {
+    public OpenContextMenuAction(final SimpleTree tree, final DefaultActionGroup cm) {
         super("Show Context Menu");
         this.tree = tree;
         this.cm = cm;
@@ -22,7 +22,7 @@ public class OpenCM extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.OpenContextMenu.getCustomShortcut(), tree);
     }
 
-    public OpenCM(final JBList<?> list, final DefaultActionGroup cm) {
+    public OpenContextMenuAction(final JBList<?> list, final DefaultActionGroup cm) {
         super("Show Context Menu");
         this.list = list;
         this.cm = cm;

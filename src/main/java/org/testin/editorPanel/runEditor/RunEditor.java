@@ -33,7 +33,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.settings.AppSettingsState;
-import org.testin.testRun.UpdateTestRunStatus;
+import org.testin.testRun.UpdateTestRunStatusAction;
 import org.testin.util.FontSyncUtil;
 import org.testin.util.TestCaseSorter;
 import org.testin.util.indexer.ProjectIndexer;
@@ -454,7 +454,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            UpdateTestRunStatus changeStatus = new UpdateTestRunStatus(this, list);
+            UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(this, list);
             changeStatus.onExecutionFinished(project, this);
             return;
         }
@@ -538,7 +538,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onStartExecutionClicked() {
-        UpdateTestRunStatus changeStatus = new UpdateTestRunStatus(this, list);
+        UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(this, list);
         changeStatus.applyStatusChange(project, this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
     }

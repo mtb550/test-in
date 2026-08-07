@@ -15,10 +15,10 @@ import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class CopyTestCase extends DumbAwareAction {
+public class CopyTestCaseAction extends DumbAwareAction {
     private final @NotNull JBList<TestCaseDto> list;
 
-    public CopyTestCase(final @NotNull JBList<TestCaseDto> list) {
+    public CopyTestCaseAction(final @NotNull JBList<TestCaseDto> list) {
         super("Copy", "Copy test case", AllIcons.Actions.Copy);
         this.list = list;
         registerCustomShortcutSet(KeyboardSet.CopyTestCase.getCustomShortcut(), list);

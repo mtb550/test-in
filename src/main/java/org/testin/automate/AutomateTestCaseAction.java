@@ -10,10 +10,10 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Logger;
 
-public class AutomateTestCase extends DumbAwareAction {
+public class AutomateTestCaseAction extends DumbAwareAction {
     private final JBList<TestCaseDto> list;
 
-    public AutomateTestCase(final JBList<TestCaseDto> list) {
+    public AutomateTestCaseAction(final JBList<TestCaseDto> list) {
         super("Automate Test Case ", "", AllIcons.Actions.IntentionBulb);
         this.list = list;
         this.registerCustomShortcutSet(KeyboardSet.GenerateTestCase.getCustomShortcut(), list);

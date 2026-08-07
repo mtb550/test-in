@@ -7,6 +7,7 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditorCM;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
@@ -17,26 +18,37 @@ import org.testin.util.services.Services;
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
-public class CopyTestCaseNode extends DumbAwareAction {
-    private final @NotNull JBList<TestCaseDto> list;
+public class CutTestCaseNodeAction extends DumbAwareAction {
+    private final IEditor editor;
+    private final JBList<TestCaseDto> list;
 
-    public CopyTestCaseNode(final @NotNull JBList<TestCaseDto> list) {
-        super("Copy Node", "Copy selected test case(s) to clipboard", AllIcons.Actions.Copy);
+    public CutTestCaseNodeAction(final IEditor editor, final JBList<TestCaseDto> list) {
+        super("Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
+        this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.CopyTestCaseNode.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(KeyboardSet.CutTestCaseNode.getCustomShortcut(), list);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final List<TestCaseDto> tcs = list.getSelectedValuesList();
+        Logger.debug("[DEBUG] CutTestCaseNode: actionPerformed triggered.");
 
-        if (!tcs.isEmpty()) {
+        List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
+        Logger.info("[DEBUG] CutTestCaseNode: Selected items count = " + selectedTestCases.size());
+
+        if (!selectedTestCases.isEmpty()) {
             try {
-                TestEditorCM.clearCutState();
+                TestEditorCM.setGlobalCutAction(true);
 
-                String json = Services.getInstance(e.getProject(), Mapper.class).writeValueAsString(tcs);
+                TestEditorCM.getGlobalPendingCutIds().clear();
+                selectedTestCases.forEach(tc -> TestEditorCM.getGlobalPendingCutIds().add(tc.getId()));
+                TestEditorCM.setGlobalSourceEditorUI(editor);
+
+                String json = Services.getInstance(e.getProject(), Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
+
+                list.repaint();
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());

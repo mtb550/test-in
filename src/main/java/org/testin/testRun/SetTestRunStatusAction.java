@@ -22,10 +22,10 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 // todo, to be refactored
-public class SetTestRunStatus extends DumbAwareAction {
+public class SetTestRunStatusAction extends DumbAwareAction {
     final @NotNull SimpleTree tree;
 
-    public SetTestRunStatus(final @NotNull SimpleTree tree) {
+    public SetTestRunStatusAction(final @NotNull SimpleTree tree) {
         super("Set Status", "Set test run status", AllIcons.Nodes.Test);
         this.tree = tree;
     }

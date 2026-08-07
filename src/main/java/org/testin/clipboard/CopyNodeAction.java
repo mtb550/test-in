@@ -7,17 +7,26 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.KeyboardSet;
-import org.testin.util.logger.Logger;
 
-public class UndoNode extends DumbAwareAction {
-    public UndoNode(final @NotNull SimpleTree tree) {
-        super("Undo", "Undo last action", AllIcons.Actions.Undo);
-        this.registerCustomShortcutSet(KeyboardSet.Undo.getCustomShortcut(), tree);
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+
+
+public class CopyNodeAction extends DumbAwareAction {
+    private final @NotNull SimpleTree tree;
+
+    public CopyNodeAction(final @NotNull SimpleTree tree) {
+        super("Copy", "Copy selected items", AllIcons.Actions.Copy);
+        this.tree = tree;
+        this.registerCustomShortcutSet(KeyboardSet.CopyNode.getCustomShortcut(), tree);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Logger.info("Tree Undo triggered");
+        Action action = tree.getActionMap().get("copy");
+
+        if (action != null)
+            action.actionPerformed(new ActionEvent(tree, ActionEvent.ACTION_PERFORMED, "copy"));
     }
 
     @Override

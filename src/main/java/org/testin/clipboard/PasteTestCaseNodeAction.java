@@ -29,10 +29,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class PasteTestCaseNode extends DumbAwareAction {
+public class PasteTestCaseNodeAction extends DumbAwareAction {
     private final @NotNull IEditor editor;
 
-    public PasteTestCaseNode(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public PasteTestCaseNodeAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
         this.editor = editor;
         this.registerCustomShortcutSet(KeyboardSet.PasteTestCaseNode.getCustomShortcut(), list);

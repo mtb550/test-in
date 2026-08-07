@@ -28,11 +28,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 
-public class UpdateTestRunStatus extends DumbAwareAction {
+public class UpdateTestRunStatusAction extends DumbAwareAction {
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public UpdateTestRunStatus(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public UpdateTestRunStatusAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Change Test Run Status", "Change the status of the current test run", AllIcons.Nodes.Test);
         this.editor = editor;
         this.list = list;

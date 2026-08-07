@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.*;
-import org.testin.clipboard.CopyTestCase;
+import org.testin.clipboard.CopyTestCaseAction;
 import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.statusBar.NextPageAction;
@@ -14,7 +14,7 @@ import org.testin.editorPanel.statusBar.PrevPageAction;
 import org.testin.generateReport.GenerateReportAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.run.RunTestCase;
+import org.testin.run.RunTestCaseAction;
 import org.testin.testRun.*;
 import org.testin.viewPanel.CloseTestCaseDetailsAction;
 
@@ -40,20 +40,20 @@ public class RunEditorCM extends EditorContextMenu {
         super("Editor Context Menu", true);
         this.ui = ui;
 
-        add(new SetTestCaseStatusPassed(ui, list));
-        add(new SetTestCaseStatusFailed(ui, list));
-        add(new SetTestCaseStatusBlocked(ui, list));
+        add(new SetTestCaseStatusPassedAction(ui, list));
+        add(new SetTestCaseStatusFailedAction(ui, list));
+        add(new SetTestCaseStatusBlockedAction(ui, list));
         addSeparator();
         add(new SetActualResultAction(ui, list));
-        add(new UpdateRunItem(ui, list));
+        add(new UpdateRunItemAction(ui, list));
         addSeparator();
-        add(new ViewDetails(list, dir.getPath2()));
-        add(new StartExecution(ui.getToolBar().getCallbacks()));
+        add(new ViewDetailsAction(list, dir.getPath2()));
+        add(new StartExecutionAction(ui.getToolBar().getCallbacks()));
         addSeparator();
-        add(new CopyTestCase(list));
+        add(new CopyTestCaseAction(list));
         addSeparator();
-        add(new RunTestCase(list));
-        add(new NavigateToCode(list));
+        add(new RunTestCaseAction(list));
+        add(new NavigateToCodeAction(list));
         addSeparator();
         add(new NextPageAction(ui, list));
         add(new PrevPageAction(ui, list));
@@ -71,8 +71,8 @@ public class RunEditorCM extends EditorContextMenu {
     }
 
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull RunEditorCM cm) {
-        new Escape(list);
-        new OpenCM(list, cm);
+        new EscapeAction(list);
+        new OpenContextMenuAction(list, cm);
         new CloseTestCaseDetailsAction(list);
         new GenerateReportAction(ui, list);
     }

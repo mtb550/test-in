@@ -23,11 +23,11 @@ import java.util.List;
 
 import static org.testin.util.KeyboardSet.DeletePackage;
 
-public class Remove extends DumbAwareAction {
+public class RemoveAction extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
     private final @NotNull ProjectPanel projectPanel;
 
-    public Remove(final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
+    public RemoveAction(final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
         super("Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.tree = tree;
         this.projectPanel = projectPanel;

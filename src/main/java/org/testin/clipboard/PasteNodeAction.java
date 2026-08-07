@@ -12,20 +12,20 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 
-public class CutNode extends DumbAwareAction {
+public class PasteNodeAction extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
 
-    public CutNode(final @NotNull SimpleTree tree) {
-        super("Cut", "Cut selected items", AllIcons.Actions.MenuCut);
+    public PasteNodeAction(final @NotNull SimpleTree tree) {
+        super("Paste", "Paste items", AllIcons.Actions.MenuPaste);
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.CutNode.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(KeyboardSet.PasteNode.getCustomShortcut(), tree);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Action action = tree.getActionMap().get("cut");
+        Action action = tree.getActionMap().get("paste");
         if (action != null) {
-            action.actionPerformed(new ActionEvent(tree, ActionEvent.ACTION_PERFORMED, "cut"));
+            action.actionPerformed(new ActionEvent(tree, ActionEvent.ACTION_PERFORMED, "paste"));
         }
     }
 

@@ -25,12 +25,12 @@ import javax.swing.tree.TreePath;
 import java.io.File;
 import java.nio.file.Path;
 
-public class Sync extends DumbAwareAction {
+public class SyncActionAction extends DumbAwareAction {
 
     private final @NotNull SimpleTree tree;
     private final @NotNull ProjectPanel projectPanel;
 
-    public Sync(final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
+    public SyncActionAction(final @NotNull SimpleTree tree, final @NotNull ProjectPanel projectPanel) {
         super("Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
         this.tree = tree;
         this.projectPanel = projectPanel;

@@ -12,10 +12,10 @@ import org.testin.viewPanel.markerDetails.MarkerDetailsView;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-public class ShowNodeDetails extends DumbAwareAction {
+public class ShowNodeDetailsAction extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
 
-    public ShowNodeDetails(final @NotNull SimpleTree tree) {
+    public ShowNodeDetailsAction(final @NotNull SimpleTree tree) {
         super("Details", "Show node details", AllIcons.General.IndentDetected);
         this.tree = tree;
     }

@@ -20,12 +20,12 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.time.ZonedDateTime;
 
-public class UpdateTestProjectStatus extends DumbAwareAction {
+public class UpdateTestProjectStatusAction extends DumbAwareAction {
 
     private final @NotNull SimpleTree tree;
     private final @NotNull ProjectStatus projectStatus;
 
-    public UpdateTestProjectStatus(final @NotNull SimpleTree tree, final @NotNull ProjectStatus projectStatus) {
+    public UpdateTestProjectStatusAction(final @NotNull SimpleTree tree, final @NotNull ProjectStatus projectStatus) {
         super(projectStatus.getButtonName(), projectStatus.getButtonDescription(), AllIcons.Actions.Edit);
         this.tree = tree;
         this.projectStatus = projectStatus;

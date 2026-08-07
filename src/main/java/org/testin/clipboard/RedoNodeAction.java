@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.KeyboardSet;
 import org.testin.util.logger.Logger;
 
-public class RedoNode extends DumbAwareAction {
-    public RedoNode(final @NotNull SimpleTree tree) {
+public class RedoNodeAction extends DumbAwareAction {
+    public RedoNodeAction(final @NotNull SimpleTree tree) {
         super("Redo", "Redo last action", AllIcons.Actions.Redo);
         this.registerCustomShortcutSet(KeyboardSet.Redo.getCustomShortcut(), tree);
     }

@@ -14,11 +14,11 @@ import org.testin.util.KeyboardSet;
 import org.testin.util.services.RunStatusService;
 import org.testin.util.services.Services;
 
-public class SetTestCaseStatusPassed extends DumbAwareAction {
+public class SetTestCaseStatusPassedAction extends DumbAwareAction {
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public SetTestCaseStatusPassed(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public SetTestCaseStatusPassedAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super("Passed", "Set test case status to Passed", AllIcons.Actions.Checked);
         this.editor = editor;
         this.list = list;

@@ -14,11 +14,11 @@ import org.testin.viewPanel.ViewToolWindowFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ViewDetails extends DumbAwareAction {
+public class ViewDetailsAction extends DumbAwareAction {
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull ArrayList<String> path;
 
-    public ViewDetails(final @NotNull JBList<TestCaseDto> list, final @NotNull ArrayList<String> path) {
+    public ViewDetailsAction(final @NotNull JBList<TestCaseDto> list, final @NotNull ArrayList<String> path) {
         super("View Details", "", AllIcons.Actions.PreviewDetails);
         this.list = list;
         this.path = path;

@@ -7,13 +7,13 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.NavigateToCode;
+import org.testin.NavigateToCodeAction;
 import org.testin.editorPanel.EditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.enums.CardHoverAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.run.RunTestCase;
+import org.testin.run.RunTestCaseAction;
 import org.testin.util.logger.Logger;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
@@ -87,11 +87,11 @@ public class MouseListenerImpl extends MouseAdapter {
 
             if (action == CardHoverAction.NAVIGATE_TO_TEST_METHOD) {
                 Logger.trace("navigate action, tc: " + tc.getDescription());
-                new NavigateToCode(list).execute(project, tc);
+                new NavigateToCodeAction(list).execute(project, tc);
 
             } else if (action == CardHoverAction.RUN_TEST_CASE) {
                 Logger.trace("run action, tc: " + tc.getDescription());
-                new RunTestCase(list).execute(project, tc);
+                new RunTestCaseAction(list).execute(project, tc);
             }
 
             e.consume();

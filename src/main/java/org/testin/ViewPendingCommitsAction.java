@@ -32,11 +32,11 @@ import java.nio.file.Path;
 import java.util.List;
 
 // todo: to be refactored
-public class ViewPendingCommits extends DumbAwareAction {
+public class ViewPendingCommitsAction extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
     private Notification pushNotification;
 
-    public ViewPendingCommits(final @NotNull SimpleTree tree) {
+    public ViewPendingCommitsAction(final @NotNull SimpleTree tree) {
         super("View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
         this.tree = tree;
     }

@@ -15,10 +15,10 @@ import org.testin.util.services.Services;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
-public class RunTestSet extends DumbAwareAction {
+public class RunTestSetAction extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
 
-    public RunTestSet(final @NotNull SimpleTree tree) {
+    public RunTestSetAction(final @NotNull SimpleTree tree) {
         super("Run Test Set", "Run selected test set", AllIcons.RunConfigurations.TestState.Run);
         this.tree = tree;
     }
