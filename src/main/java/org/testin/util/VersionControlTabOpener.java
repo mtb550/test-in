@@ -12,8 +12,8 @@ import java.util.Collection;
 
 public class VersionControlTabOpener {
 
-    public static void openCommitTabAndListFiles(Project project) {
-        ChangeListManager changeListManager = ChangeListManager.getInstance(project);
+    public static void openCommitTabAndListFiles(Project p) {
+        ChangeListManager changeListManager = ChangeListManager.getInstance(p);
         Collection<Change> allChanges = changeListManager.getAllChanges();
 
         Logger.info("Files with changes:");
@@ -24,14 +24,14 @@ public class VersionControlTabOpener {
         }
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            ToolWindow commitWindow = ToolWindowManager.getInstance(project).getToolWindow("commit");
+            ToolWindow commitWindow = ToolWindowManager.getInstance(p).getToolWindow("commit");
 
             if (commitWindow != null) {
                 commitWindow.activate(() -> {
                     Logger.info("Commit tab is now visible.");
                 }, true);
             } else {
-                ToolWindow vcsWindow = ToolWindowManager.getInstance(project).getToolWindow("Version Control");
+                ToolWindow vcsWindow = ToolWindowManager.getInstance(p).getToolWindow("Version Control");
                 if (vcsWindow != null) {
                     vcsWindow.activate(null);
                 }

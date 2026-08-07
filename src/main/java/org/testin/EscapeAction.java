@@ -9,7 +9,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.testEditor.TestEditorCM;
+import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.projectPanel.tree.TreeTransferHandler;
 import org.testin.util.KeyboardSet;
@@ -50,8 +50,8 @@ public class EscapeAction extends DumbAwareAction {
         }
 
         if (list != null) {
-            if (TestEditorCM.isGlobalCutAction()) {
-                TestEditorCM.clearCutState();
+            if (TestEditorContextMenu.isGlobalCutAction()) {
+                TestEditorContextMenu.clearCutState();
             }
 
             CopyPasteManager.getInstance().setContents(new StringSelection(""));

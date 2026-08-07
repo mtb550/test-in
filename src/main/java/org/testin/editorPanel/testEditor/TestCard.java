@@ -14,25 +14,25 @@ import java.util.*;
 import java.util.List;
 
 public class TestCard extends BaseCard {
-    private final Project project;
+    private final @NotNull Project p;
     private final List<JComponent> badges = new ArrayList<>();
     private final Map<String, String> details = new LinkedHashMap<>();
     private boolean isPendingCut = false;
 
     public TestCard(final @NotNull Project p) {
         super();
-        this.project = p;
+        this.p = p;
     }
 
     public void updateData(final int index, final @NotNull TestCaseDto tc, final Set<?> activeDetails, final boolean isUnsorted) {
         badges.clear();
         details.clear();
 
-        this.isPendingCut = TestEditorCM.isGlobalCutAction() && TestEditorCM.getGlobalPendingCutIds().contains(tc.getId());
+        this.isPendingCut = TestEditorContextMenu.isGlobalCutAction() && TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId());
 
         Arrays.stream(TestEditorAttributes.values())
                 .filter(activeDetails::contains)
-                .forEach(attr -> attr.applyToUI(tc, badges, details, project));
+                .forEach(attr -> attr.applyToUI(tc, badges, details, p));
 
         if (isUnsorted) {
             badges.add(new Shared.RoundedBadge("Unsorted", new JBColor(new Color(255, 100, 100), new Color(130, 50, 50))));
@@ -65,7 +65,7 @@ public class TestCard extends BaseCard {
             badges.add(new Shared.RoundedBadge(displayText, badgeColor));
         }
 
-        updateUI(index, TestEditorAttributes.DESCRIPTION.getValueExtractor().apply(tc, project), badges, details);
+        updateUI(index, TestEditorAttributes.DESCRIPTION.getValueExtractor().apply(tc, p), badges, details);
     }
 
     @Override

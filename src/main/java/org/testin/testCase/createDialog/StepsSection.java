@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StepsSection implements ICreateTestCaseSection {
-    private final Project project;
+    private final @NotNull Project p;
     @Getter
     private final List<TextFieldWithAutoCompletion<String>> stepFields;
     private final JPanel stepsContainer;
@@ -32,7 +32,7 @@ public class StepsSection implements ICreateTestCaseSection {
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public StepsSection(final @NotNull Project p) {
-        this.project = p;
+        this.p = p;
         this.stepFields = new ArrayList<>();
 
         this.stepsContainer = new JPanel();
@@ -71,8 +71,8 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     public void addStepField(final String text, final TestCaseBaseDialog.IUIAction repackAction) {
-        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(project, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
-        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(project, provider, false, text != null ? text : "");
+        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
+        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(p, provider, false, text != null ? text : "");
 
         stepField.setFont(fieldFont);
         stepField.setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (stepFields.size() + 1));

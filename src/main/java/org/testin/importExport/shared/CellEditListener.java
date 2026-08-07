@@ -1,6 +1,7 @@
 package org.testin.importExport.shared;
 
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.mappers.dto.TestCaseDto;
 
@@ -11,13 +12,13 @@ import java.util.List;
 
 public class CellEditListener implements TableModelListener {
     private final List<TestEditorAttributes> importAttributes;
-    private final Project project;
+    private final @NotNull Project p;
     private final List<TestCaseDto> testCases;
     private boolean isUpdating = false;
 
-    public CellEditListener(List<TestEditorAttributes> importAttributes, Project project, List<TestCaseDto> testCases) {
+    public CellEditListener(List<TestEditorAttributes> importAttributes, Project p, List<TestCaseDto> testCases) {
         this.importAttributes = importAttributes;
-        this.project = project;
+        this.p = p;
         this.testCases = testCases;
     }
 
@@ -37,9 +38,9 @@ public class CellEditListener implements TableModelListener {
                     TestEditorAttributes currentAttr = importAttributes.get(col - 2);
                     TestCaseDto tc = testCases.get(row);
 
-                    currentAttr.getImportSetter().accept(project, tc, updatedValue);
+                    currentAttr.getImportSetter().accept(p, tc, updatedValue);
 
-                    String formattedValue = currentAttr.getValueExtractor().apply(tc, project);
+                    String formattedValue = currentAttr.getValueExtractor().apply(tc, p);
                     model.setValueAt(formattedValue, row, col);
                 } finally {
                     isUpdating = false;

@@ -1,5 +1,6 @@
 package org.testin.editorPanel.listeners;
 
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.runEditor.RunCard;
 import org.testin.editorPanel.runEditor.RunEditor;
@@ -9,11 +10,13 @@ import org.testin.mappers.dto.TestCaseDto;
 import javax.swing.*;
 
 public class RunListRenderer extends AbstractListRenderer<RunEditor> {
-    private final RunCard card;
+    private final @NotNull Project p;
+    private final @NotNull RunCard card;
 
-    public RunListRenderer(final RunEditor editor) {
+    public RunListRenderer(final @NotNull Project p, final @NotNull RunEditor editor) {
         super(editor);
-        this.card = new RunCard(editor.getProject());
+        this.p = p;
+        this.card = new RunCard(p);
     }
 
     @Override

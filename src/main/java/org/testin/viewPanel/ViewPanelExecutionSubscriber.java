@@ -17,11 +17,10 @@ public class ViewPanelExecutionSubscriber {
     private final ProjectIndexer indexer;
     private UUID runningDtoId = null;
 
-    public ViewPanelExecutionSubscriber(final @NotNull ViewPanel viewPanel) {
-        Project project = viewPanel.getProject();
-        this.indexer = Services.getInstance(project, ProjectIndexer.class);
+    public ViewPanelExecutionSubscriber(final @NotNull Project p, final @NotNull ViewPanel viewPanel) {
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        project.getMessageBus().connect(viewPanel).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
+        p.getMessageBus().connect(viewPanel).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
             @Override
             public void onStatusChanged(@NotNull String testName, @NotNull String status, String error) {
                 Logger.debug("ViewPanel subscription fired: testName='" + testName + "', status='" + status + "'");
@@ -31,6 +30,9 @@ public class ViewPanelExecutionSubscriber {
                 final UUID testUuid = parseUuid(testName);
                 if (testUuid != null) {
                     final TestCaseDto tc = indexer.getTestCaseById(testUuid);
+
+                    if (tc == null) return;
+
                     Logger.debug("  ID match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
                     tc.setTempStatus(status);
                     tc.setTempError(error != null ? error : "");
@@ -42,6 +44,9 @@ public class ViewPanelExecutionSubscriber {
                     final UUID dtoId = uuidToDtoId.get(testName);
                     if (dtoId != null) {
                         final TestCaseDto tc = indexer.getTestCaseById(dtoId);
+
+                        if (tc == null) return;
+
                         Logger.debug("  UUID map match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
                         tc.setTempStatus(status);
                         tc.setTempError(error != null ? error : "");
@@ -51,6 +56,8 @@ public class ViewPanelExecutionSubscriber {
 
                 if (!updated && "RUNNING".equals(status) && runningDtoId != null && !uuidToDtoId.containsKey(testName)) {
                     final TestCaseDto tc = indexer.getTestCaseById(runningDtoId);
+                    if (tc == null) return;
+
                     Logger.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");
                     uuidToDtoId.put(testName, tc.getId());
                 }

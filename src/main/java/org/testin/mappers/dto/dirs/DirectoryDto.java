@@ -3,6 +3,7 @@ package org.testin.mappers.dto.dirs;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.mappers.Config;
 import org.testin.util.indexer.ProjectIndexer;
@@ -59,6 +60,6 @@ public abstract class DirectoryDto {
 
     // Polymorphic directory-object resolution: each concrete directory knows how to resolve
     // the object at a child folder, replacing the instanceof/if-chain in CreateTestRun.
-    @NonNull
+    @Nullable
     public abstract Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer);
 }

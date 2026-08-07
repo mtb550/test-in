@@ -32,14 +32,14 @@ public class SetTestCaseStatusFailedAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        if (project == null) return;
+        Project p = e.getProject();
+        if (p == null) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         if (!(editor instanceof RunEditor runEditor)) {
-            Services.getInstance(project, RunStatusService.class).applyStatus(project, editor, list, TestStatus.FAILED);
+            Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, list, TestStatus.FAILED);
             return;
         }
 
@@ -48,17 +48,17 @@ public class SetTestCaseStatusFailedAction extends DumbAwareAction {
             TestCaseDto tc = selectedItems.getFirst();
             TestRunItems runItem = runEditor.getResultsMap().get(tc.getId());
             if (runItem == null) {
-                Services.getInstance(project, RunStatusService.class).applyStatus(project, editor, list, TestStatus.FAILED);
+                Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, list, TestStatus.FAILED);
                 return;
             }
 
-            FailedResultDialog dialog = new FailedResultDialog(project, runItem, () ->
-                    Services.getInstance(project, RunStatusService.class).applyStatus(project, editor, list, TestStatus.FAILED)
+            FailedResultDialog dialog = new FailedResultDialog(p, runItem, () ->
+                    Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, list, TestStatus.FAILED)
             );
             dialog.show();
         } else {
             // Multiple selections: apply status directly without dialog
-            Services.getInstance(project, RunStatusService.class).applyStatus(project, editor, list, TestStatus.FAILED);
+            Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, list, TestStatus.FAILED);
         }
     }
 

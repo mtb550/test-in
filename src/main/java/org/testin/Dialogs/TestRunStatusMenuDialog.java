@@ -23,12 +23,12 @@ import java.util.function.Consumer;
 // todo, to be refactored
 public class TestRunStatusMenuDialog {
 
-    private final Project project;
+    private final @NotNull Project p;
 
     private final Consumer<TestRunStatus> onStatusSelected;
 
     public TestRunStatusMenuDialog(final @NotNull Project p, final Consumer<TestRunStatus> onStatusSelected) {
-        this.project = p;
+        this.p = p;
         this.onStatusSelected = onStatusSelected;
     }
 
@@ -39,7 +39,7 @@ public class TestRunStatusMenuDialog {
 
         registerShortcuts(list, popup, onStatusSelected);
 
-        popup.showCenteredInCurrentWindow(project);
+        popup.showCenteredInCurrentWindow(p);
     }
 
     @NotNull

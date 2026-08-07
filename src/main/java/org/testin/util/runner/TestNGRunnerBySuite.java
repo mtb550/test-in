@@ -1,5 +1,4 @@
 package org.testin.util.runner;
-import org.jetbrains.annotations.NotNull;
 
 import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
@@ -9,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.theoryinpractice.testng.configuration.TestNGConfiguration;
 import com.theoryinpractice.testng.configuration.TestNGConfigurationType;
 import com.theoryinpractice.testng.model.TestType;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.logger.Logger;
 
 public class TestNGRunnerBySuite {

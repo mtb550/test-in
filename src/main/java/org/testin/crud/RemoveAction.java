@@ -51,8 +51,8 @@ public class RemoveAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        if (project == null) return;
+        Project p = e.getProject();
+        if (p == null) return;
 
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null || paths.length == 0) return;
@@ -71,9 +71,9 @@ public class RemoveAction extends DumbAwareAction {
             DirectoryDto pkg = (DirectoryDto) node.getUserObject();
 
             if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
-                Services.getInstance(project, EditorUtil.class).close(project, pkg.getName());
+                Services.getInstance(p, EditorUtil.class).close(p, pkg.getName());
 
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             // The indexer owns the file/dir removal + in-memory store.
             switch (pkg) {

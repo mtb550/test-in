@@ -41,21 +41,21 @@ public class UpdateTestCaseAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null) return;
+        final Project p = e.getProject();
+        if (p == null) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         Logger.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
-        new TestCaseUpdateMenuDialog(project, selectedItems, (updatedItems, cg) -> {
+        new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, cg) -> {
 
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             for (final TestCaseDto tc : updatedItems)
                 indexer.putTestCase(path, tc);
 
-            Services.getInstance(project, Notifier.class).softShow(project, "Updated..");
+            Services.getInstance(p, Notifier.class).softShow(p, "Updated..");
 
             if (editor instanceof IToolBar)
                 ((IToolBar) editor).onToolBarFilterSelectionChanged();
@@ -80,7 +80,7 @@ public class UpdateTestCaseAction extends DumbAwareAction {
                         final GeneratorAction action = gt.getAction();
                         final TestCaseDto firstItem = updatedItems.getFirst();
 
-                        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
+                        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, firstItem));
                     }
                 } else {
                     Logger.trace("Code generator is NOT selected or is null.");

@@ -26,6 +26,7 @@ import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
 public class RenameAction extends DumbAwareAction {
+    // todo: rename projectPanel to pp @ all classes
     private final @NotNull ProjectPanel projectPanel;
     private final @NotNull SimpleTree tree;
 
@@ -39,7 +40,7 @@ public class RenameAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
+        final Project p = e.getProject();
 
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
@@ -52,17 +53,17 @@ public class RenameAction extends DumbAwareAction {
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
         if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
 
-        Services.getInstance(project, EditorUtil.class).close(project, dir.getName());
+        Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 
         Path oldPath = dir.getPath();
         Path newPath = oldPath.getParent().resolve(newName);
 
         // The indexer owns file I/O + in-memory state: rename the directory on disk and
         // update the store (paths, name, path2, modified metadata).
-        Services.getInstance(project, ProjectIndexer.class).renameNode(oldPath, newPath);
+        Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath);
 
         // UI-only updates, after the store is consistent.
-        Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
+        Services.getInstance(p, Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
         ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
         if (dir instanceof TestProjectDirectoryDto) {

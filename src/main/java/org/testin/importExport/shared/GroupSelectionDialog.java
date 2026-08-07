@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.Group;
 
@@ -16,8 +17,8 @@ import java.util.List;
 public class GroupSelectionDialog extends DialogWrapper {
     private final JBList<String> list;
 
-    public GroupSelectionDialog(Project project, String currentSelection) {
-        super(project, true);
+    public GroupSelectionDialog(final @NotNull Project p, String currentSelection) {
+        super(p, true);
         setTitle("Select Groups");
 
         DefaultListModel<String> model = new DefaultListModel<>();

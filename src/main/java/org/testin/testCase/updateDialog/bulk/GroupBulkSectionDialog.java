@@ -1,5 +1,7 @@
 package org.testin.testCase.updateDialog.bulk;
 
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.logger.Logger;
@@ -8,6 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
+
+    public GroupBulkSectionDialog(final @NotNull Project p) {
+        super(p);
+    }
 
     @Override
     protected String getPopupTitle() {

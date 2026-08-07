@@ -1,16 +1,17 @@
 package org.testin.editorPanel.toolBar;
 
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.toolBar.components.*;
 
 import java.util.List;
 
 public class RunToolBar extends AbstractToolbarPanel {
-    final Project project;
+    private final @NotNull Project p;
 
-    public RunToolBar(Project project, final IToolBar callbacks) {
+    public RunToolBar(final @NotNull Project p, final IToolBar callbacks) {
         super(callbacks);
-        this.project = project;
+        this.p = p;
         layoutComponents();
     }
 
@@ -18,7 +19,7 @@ public class RunToolBar extends AbstractToolbarPanel {
     public List<IToolbarItem> getCustomComponents() {
         return List.of(
                 new StartExecutionBtn(getCallbacks(), getCallbacks()::onStartExecutionClicked),
-                new GenerateReportBtn(project),
+                new GenerateReportBtn(p),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
                 new RunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
                 new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules),

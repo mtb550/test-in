@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 public class TestEditor implements Disposable, IToolBar, IEditor {
     @Getter
-    private final Project project;
+    private final @NotNull Project p;
 
     @Getter
     private final TestSetDirectoryDto parent;
@@ -97,7 +97,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private int hoveredIndex = -1;
 
     public TestEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
-        this.project = p;
+        this.p = p;
         this.parent = vf.getTestSet();
 
         final Disposable projectDisposable = Disposer.newDisposable();
@@ -139,7 +139,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.syncListener.setOnUpdateCallback(this::onDataSynced);
         this.model.addListDataListener(syncListener);
 
-        final TestEditorCM cm = new TestEditorCM(p, this, parent, list, model);
+        final TestEditorContextMenu cm = new TestEditorContextMenu(p, this, parent, list, model);
         final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, cm);
 
         list.addMouseListener(mouseListenerImpl);
@@ -147,7 +147,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.addMouseMotionListener(mouseListenerImpl);
 
         list.setTransferHandler(new TransferListener(this));
-        list.setCellRenderer(new TestListRenderer(this));
+        list.setCellRenderer(new TestListRenderer(p, this));
 
         cm.registerShortcuts(list, cm);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
@@ -157,7 +157,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         StatusBarListener.attach(this);
         list.addListSelectionListener(new SelectionListener(p, list, this, parent.getPath2()));
 
-        list.addKeyListener(new KeyListener(list, this));
+        list.addKeyListener(new KeyListener(p, list, this));
 
         new TestCaseExecutionSubscriber(p, list, projectDisposable);
 
@@ -166,7 +166,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     private void loadDataAsync() {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             indexer.awaitIndexing();
 
             final List<TestCaseDto> items = indexer.getTestCasesForTestSet(parent.getPath());
@@ -179,9 +179,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
                 return;
             }
 
-            Services.getInstance(project, TestCaseCacheService.class).load(items);
+            Services.getInstance(p, TestCaseCacheService.class).load(items);
 
-            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(project, items);
+            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(p, items);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 allTestCases.clear();
@@ -229,7 +229,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
                 current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
             }
 
-            Services.getInstance(project, ProjectIndexer.class).updateSequence(dirPath, snapshot);
+            Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot);
 
             ApplicationManager.getApplication().invokeLater(this::refreshView);
         });
@@ -293,7 +293,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        new CreateTestCaseAction(this, parent, list);
+        new CreateTestCaseAction(p, this, parent, list);
     }
 
     @Override
@@ -394,7 +394,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         if (allTestCases.isEmpty()) return;
 
         synchronized (allTestCases) {
-            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(project, new ArrayList<>(allTestCases));
+            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(p, new ArrayList<>(allTestCases));
 
             this.allTestCases.clear();
             this.allTestCases.addAll(result.sortedList());
@@ -406,7 +406,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public Set<String> getAvailableModules() {
-        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final Set<String> modules = new HashSet<>();
         for (final TestCaseDto tc : indexer.getTestCasesForTestSet(parent.getPath())) {
             final String module = tc.getModule();

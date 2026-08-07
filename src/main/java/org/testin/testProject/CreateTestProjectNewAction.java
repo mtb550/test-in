@@ -33,27 +33,27 @@ public class CreateTestProjectNewAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null) return;
+        final Project p = e.getProject();
+        if (p == null) return;
 
-        final Path tpPath = Services.getInstance(project, Setting.class).getTestinPath().resolve(tpName);
+        final Path tpPath = Services.getInstance(p, Setting.class).getTestinPath().resolve(tpName);
 
         if (Files.exists(tpPath)) {
-            Services.getInstance(project, Notifier.class).error(project, "Creation Failed", "A test project named '" + tpName + "' already exists.");
+            Services.getInstance(p, Notifier.class).error(p, "Creation Failed", "A test project named '" + tpName + "' already exists.");
             return;
         }
 
-        final TestProjectDirectoryDto tp = Services.getInstance(project, DirectoryMapper.class).setTestProjectNode(project, tpPath);
+        final TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
 
         // The indexer owns all dir/file creation: it creates the project dir, the
         // Test Cases/Test Runs main dirs and writes their marker JSON.
-        Services.getInstance(project, ProjectIndexer.class).addTestProject(tp);
+        Services.getInstance(p, ProjectIndexer.class).addTestProject(tp);
         projectPanel.getTestProjectSelector().addTestProject(tp);
         projectPanel.getProjectTree().updateNodes();
-        Services.getInstance(project, Notifier.class).info(project, "New Test Project", String.format("Test Project %s has been added", tpName));
+        Services.getInstance(p, Notifier.class).info(p, "New Test Project", String.format("Test Project %s has been added", tpName));
 
         if (cg.isSelected())
-            GeneratorType.CREATE_TEST_PROJECT.getAction().execute(project, tp);
+            GeneratorType.CREATE_TEST_PROJECT.getAction().execute(p, tp);
     }
 
 

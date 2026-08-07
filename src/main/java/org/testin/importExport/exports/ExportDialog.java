@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class ExportDialog extends DialogWrapper {
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
 
     private final List<TestEditorAttributes> exportAttributes;
 
@@ -47,7 +47,7 @@ public class ExportDialog extends DialogWrapper {
 
     public ExportDialog(final @NotNull Project p, final List<TestEditorAttributes> exportAttributes, final Map<String, List<TestCaseDto>> sheetsData, final VirtualFile exportTarget) {
         super(p, true);
-        this.project = p;
+        this.p = p;
         this.exportAttributes = exportAttributes;
         this.originalSheetsData = sheetsData;
 
@@ -129,7 +129,7 @@ public class ExportDialog extends DialogWrapper {
         }
 
         panel.add(topPanel, BorderLayout.NORTH);
-        panel.add(new TablePanelBuilder().createTabbedPane(originalSheetsData, exportAttributes, project, model -> {
+        panel.add(new TablePanelBuilder().createTabbedPane(originalSheetsData, exportAttributes, p, model -> {
         }), BorderLayout.CENTER);
 
         return panel;

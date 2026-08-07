@@ -25,7 +25,7 @@ public class TestProjectSelector {
 
     private static final String SELECTED_PROJECT_KEY = "org.testin.selectedTestProject";
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private final @NotNull ProjectPanel projectPanel;
 
     @Getter
@@ -42,7 +42,7 @@ public class TestProjectSelector {
     private ComboBox<TestProjectDirectoryDto> selectedTestProject;
 
     public TestProjectSelector(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
-        this.project = p;
+        this.p = p;
         this.projectPanel = projectPanel;
         testProjectList = new DefaultComboBoxModel<>();
         selectedTestProject = new ComboBox<>(testProjectList);
@@ -74,13 +74,13 @@ public class TestProjectSelector {
         isLoading = true;
         TestProjectDirectoryDto projectToSelect;
         try {
-            String savedProjectName = PropertiesComponent.getInstance(project).getValue(SELECTED_PROJECT_KEY);
+            final String savedProjectName = PropertiesComponent.getInstance(p).getValue(SELECTED_PROJECT_KEY);
 
             testProjectList.removeAllElements();
-            final Path root = Services.getInstance(project, Setting.class).getTestinPath();
+            final Path root = Services.getInstance(p, Setting.class).getTestinPath();
 
             if (Files.exists(root) && Files.isDirectory(root)) {
-                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
                 final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
                 projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
@@ -147,7 +147,7 @@ public class TestProjectSelector {
             isLoading = false;
         }
 
-        PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, tp.getName());
+        PropertiesComponent.getInstance(p).setValue(SELECTED_PROJECT_KEY, tp.getName());
 
         if (testProjectList.getSize() == 1) {
             selectedTestProject.setEnabled(true);
@@ -160,7 +160,7 @@ public class TestProjectSelector {
             Logger.info("Panel.filterByProject(): " + tp.getName());
 
             if (!isLoading)
-                PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, tp.getName());
+                PropertiesComponent.getInstance(p).setValue(SELECTED_PROJECT_KEY, tp.getName());
 
             if (tp.getMarker().getStatus() == ProjectStatus.ACTIVE) {
                 projectPanel.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());

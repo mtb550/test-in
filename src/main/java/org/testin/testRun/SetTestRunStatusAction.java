@@ -32,8 +32,8 @@ public class SetTestRunStatusAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null) return;
+        final Project p = e.getProject();
+        if (p == null) return;
 
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
@@ -42,14 +42,14 @@ public class SetTestRunStatusAction extends DumbAwareAction {
         final Object userObject = parentNode.getUserObject();
 
         if (userObject instanceof TestRunDirectoryDto testRunDto) {
-            new TestRunStatusMenuDialog(project, selectedStatus -> {
+            new TestRunStatusMenuDialog(p, selectedStatus -> {
                 TestRunMarker marker = testRunDto.getMarker();
                 marker.setStatus(selectedStatus);
                 marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
                 Logger.trace("Status changed -> " + testRunDto.getName() + " = " + selectedStatus.getLabel());
 
-                persistMarker(project, testRunDto, selectedStatus);
+                persistMarker(p, testRunDto, selectedStatus);
 
                 tree.repaint();
             }).show();

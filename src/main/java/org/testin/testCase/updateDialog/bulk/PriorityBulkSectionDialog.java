@@ -1,5 +1,7 @@
 package org.testin.testCase.updateDialog.bulk;
 
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.testin.enums.Priority;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.logger.Logger;
@@ -7,6 +9,10 @@ import org.testin.util.logger.Logger;
 import java.util.List;
 
 public class PriorityBulkSectionDialog extends JsonSplitBulkSectionDialog {
+
+    public PriorityBulkSectionDialog(final @NotNull Project p) {
+        super(p);
+    }
 
     @Override
     protected String getPopupTitle() {

@@ -19,12 +19,12 @@ import java.util.function.BiConsumer;
 
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
-    private final Project project;
+    private final @NotNull Project p;
     private JBPopup popup;
 
     public CreateTestCaseDialog(final @NotNull Project p, final BiConsumer<@NotNull TestCaseDto, @NotNull CodeGeneratorDialog> onSave) {
         super(p, GeneratorType.CREATE_TEST_CASE);
-        this.project = p;
+        this.p = p;
 
         final TestCaseDto dto = new TestCaseDto();
 
@@ -132,7 +132,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
     public void show() {
         if (popup != null) {
-            popup.showCenteredInCurrentWindow(project);
+            popup.showCenteredInCurrentWindow(p);
         }
     }
 }

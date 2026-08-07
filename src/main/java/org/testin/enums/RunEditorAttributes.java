@@ -25,7 +25,7 @@ public enum RunEditorAttributes {
             "Description",
             true,
             true,
-            (item, project) -> item.getTc().getDescription(),
+            (item, p) -> item.getTc().getDescription(),
             null
     ),
 
@@ -33,7 +33,7 @@ public enum RunEditorAttributes {
             "Expected Result",
             true,
             true,
-            (item, project) -> item.getTc().getExpectedResult(),
+            (item, p) -> item.getTc().getExpectedResult(),
             null
     ),
 
@@ -41,7 +41,7 @@ public enum RunEditorAttributes {
             "Steps",
             true,
             true,
-            (item, project) -> String.join(", ", item.getTc().getSteps()),
+            (item, p) -> String.join(", ", item.getTc().getSteps()),
             null
     ),
 
@@ -49,7 +49,7 @@ public enum RunEditorAttributes {
             "Priority",
             true,
             true,
-            (item, project) -> item.getTc().getPriority().getName(),
+            (item, p) -> item.getTc().getPriority().getName(),
             item -> List.of(Shared.createPriorityBadge(item.getTc()))
     ),
 
@@ -57,7 +57,7 @@ public enum RunEditorAttributes {
             "Group",
             true,
             true,
-            (item, project) -> item.getTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
+            (item, p) -> item.getTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             item -> item.getTc().getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList())
     ),
 
@@ -65,7 +65,7 @@ public enum RunEditorAttributes {
             "Actual Result",
             true,
             true,
-            (item, project) -> item.getActualResult(),
+            (item, p) -> item.getActualResult(),
             null
     ),
 
@@ -73,7 +73,7 @@ public enum RunEditorAttributes {
             "Bug Severity",
             true,
             true,
-            (item, project) -> item.getBugSeverity().getName(),
+            (item, p) -> item.getBugSeverity().getName(),
             null
     ),
 
@@ -81,7 +81,7 @@ public enum RunEditorAttributes {
             "Bug Priority",
             true,
             true,
-            (item, project) -> item.getBugPriority().getName(),
+            (item, p) -> item.getBugPriority().getName(),
             null
     ),
 
@@ -89,7 +89,7 @@ public enum RunEditorAttributes {
             "Run Status",
             true,
             true,
-            (item, project) -> item.getStatus().getDisplayText(),
+            (item, p) -> item.getStatus().getDisplayText(),
             null
     ),
 
@@ -97,7 +97,7 @@ public enum RunEditorAttributes {
             "Duration",
             true,
             true,
-            (item, project) -> {
+            (item, p) -> {
                 long s = item.getDuration().getSeconds();
                 return String.format(Locale.ENGLISH, "%02d:%02d", (s % 3600) / 60, (s % 60));
             },
@@ -108,9 +108,11 @@ public enum RunEditorAttributes {
             "Path",
             true,
             true,
-            (item, project) -> {
-                final TestCaseDto tc = Services.getInstance(project, ProjectIndexer.class).getTestCaseById(item.getId());
-                return String.join(" > ", tc.getParent().getPath2());
+            (item, p) -> {
+                final TestCaseDto tc = Services.getInstance(p, ProjectIndexer.class).getTestCaseById(item.getId());
+                if (tc != null)
+                    return String.join(" > ", tc.getParent().getPath2());
+                return "";
             },
             null
     ),
@@ -119,9 +121,9 @@ public enum RunEditorAttributes {
             "FQCN",
             true,
             true,
-            (item, project) -> {
+            (item, p) -> {
                 final TestCaseDto tc = item.getTc();
-                return String.join(" > ", Services.getInstance(project, Tools.class).buildFqcnMethod(tc));
+                return String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc));
             },
             null
     );

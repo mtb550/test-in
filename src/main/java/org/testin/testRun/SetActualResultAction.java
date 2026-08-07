@@ -29,8 +29,8 @@ public class SetActualResultAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null) return;
+        final Project p = e.getProject();
+        if (p == null) return;
 
         final TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;
@@ -42,7 +42,7 @@ public class SetActualResultAction extends DumbAwareAction {
 
         Logger.trace("set actual result for: " + selected.getDescription());
 
-        new ActualResultDialog(project, runItem).show();
+        new ActualResultDialog(p, runItem).show();
     }
 
     @Override

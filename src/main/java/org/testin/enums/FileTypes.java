@@ -1,8 +1,8 @@
 package org.testin.enums;
-import org.jetbrains.annotations.NotNull;
 
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.generateReport.generators.TestRunExcelGenerator;
 import org.testin.generateReport.generators.TestRunHtmlGenerator;
 import org.testin.generateReport.generators.TestRunPdfGenerator;
@@ -28,8 +28,8 @@ public enum FileTypes {
             "XLS",
             ".xls",
             null,
-            (project, export, destFile, sheets) -> new ExportExcel(export).exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportExcel(imports).processImport(project, importFile),
+            (p, export, destFile, sheets) -> new ExportExcel(export).exportToFile(p, destFile, sheets),
+            (p, imports, importFile) -> new ImportExcel(imports).processImport(p, importFile),
             null
     ),
 
@@ -43,17 +43,17 @@ public enum FileTypes {
                     
                     Note: Missing columns will safely default to empty values.
                     You can also download a ready-to-use sample file using the button below.""",
-            (project, export, destFile, sheets) -> new ExportExcel(export).exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportExcel(imports).processImport(project, importFile),
-            (project, trDir, tr, detailsMap) -> new TestRunExcelGenerator().generate(project, trDir, tr, detailsMap)
+            (p, export, destFile, sheets) -> new ExportExcel(export).exportToFile(p, destFile, sheets),
+            (p, imports, importFile) -> new ImportExcel(imports).processImport(p, importFile),
+            (p, trDir, tr, detailsMap) -> new TestRunExcelGenerator().generate(p, trDir, tr, detailsMap)
     ),
 
     JSON(
             "JSON",
             ".json",
             null,
-            (project, export, destFile, sheets) -> new ExportJson().exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportJson().processImport(project, importFile),
+            (p, export, destFile, sheets) -> new ExportJson().exportToFile(p, destFile, sheets),
+            (p, imports, importFile) -> new ImportJson().processImport(p, importFile),
             null
     ),
 
@@ -67,8 +67,8 @@ public enum FileTypes {
                     
                     Note: Missing columns will safely default to empty values.
                     The CSV should use comma as delimiter. Values containing commas or newlines must be quoted with double quotes.""",
-            (project, export, destFile, sheets) -> new ExportCsv(export).exportToFile(project, destFile, sheets),
-            (project, imports, importFile) -> new ImportCsv(imports).processImport(project, importFile),
+            (p, export, destFile, sheets) -> new ExportCsv(export).exportToFile(p, destFile, sheets),
+            (p, imports, importFile) -> new ImportCsv(imports).processImport(p, importFile),
             null
     ),
 
@@ -76,9 +76,9 @@ public enum FileTypes {
             "HTML",
             ".html",
             null,
-            (project, export, destFile, sheets) -> new ExportHtml(export).exportToFile(project, destFile, sheets),
+            (p, export, destFile, sheets) -> new ExportHtml(export).exportToFile(p, destFile, sheets),
             null,
-            (project, trDir, tr, detailsMap) -> new TestRunHtmlGenerator().generate(project, trDir, tr, detailsMap).getBytes(StandardCharsets.UTF_8)
+            (p, trDir, tr, detailsMap) -> new TestRunHtmlGenerator().generate(p, trDir, tr, detailsMap).getBytes(StandardCharsets.UTF_8)
     ),
 
     PDF(
@@ -87,7 +87,7 @@ public enum FileTypes {
             null,
             null,
             null,
-            (project, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(project, trDir, tr, detailsMap)
+            (p, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(p, trDir, tr, detailsMap)
     ),
 
     WORD(
@@ -96,7 +96,7 @@ public enum FileTypes {
             null,
             null,
             null,
-            (project, trDir, tr, detailsMap) -> new TestRunWordGenerator().generate(project, trDir, tr, detailsMap)
+            (p, trDir, tr, detailsMap) -> new TestRunWordGenerator().generate(p, trDir, tr, detailsMap)
     );
 
     // todo: add XML object.
@@ -121,8 +121,8 @@ public enum FileTypes {
         exportHandler.handle(p, exportAction, destFile, sheetsData);
     }
 
-    public Map<String, List<TestCaseDto>> importToFile(Project project, ImportAction importAction, File importFile) {
-        return importHandler.handle(project, importAction, importFile);
+    public Map<String, List<TestCaseDto>> importToFile(Project p, ImportAction importAction, File importFile) {
+        return importHandler.handle(p, importAction, importFile);
     }
 
     public byte[] generateReport(final @NotNull Project p, final TestRunDirectoryDto trDir, final TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
@@ -131,16 +131,16 @@ public enum FileTypes {
 
     @FunctionalInterface
     public interface ReportHandler {
-        byte[] handle(Project project, TestRunDirectoryDto trDir, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap);
+        byte[] handle(Project p, TestRunDirectoryDto trDir, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap);
     }
 
     @FunctionalInterface
     public interface ExportHandler {
-        void handle(Project project, ExportAction exportAction, File destFile, Map<String, List<TestCaseDto>> sheetsData);
+        void handle(Project p, ExportAction exportAction, File destFile, Map<String, List<TestCaseDto>> sheetsData);
     }
 
     @FunctionalInterface
     public interface ImportHandler {
-        Map<String, List<TestCaseDto>> handle(Project project, ImportAction importAction, File importFile);
+        Map<String, List<TestCaseDto>> handle(Project p, ImportAction importAction, File importFile);
     }
 }

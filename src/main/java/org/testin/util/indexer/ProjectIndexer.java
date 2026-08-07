@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @Service(Service.Level.PROJECT)
 public final class ProjectIndexer {
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
     private final @NotNull IndexingScanner scanner;
     private final @NotNull AtomicBoolean indexed = new AtomicBoolean(false);
@@ -43,7 +43,7 @@ public final class ProjectIndexer {
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
     public ProjectIndexer(final @NotNull Project p) {
-        this.project = p;
+        this.p = p;
         this.store = new IndexerDataStore(p);
         this.scanner = new IndexingScanner(p, store);
     }
@@ -80,7 +80,7 @@ public final class ProjectIndexer {
                 return;
             }
 
-            final Path rootPath = Services.getInstance(project, Setting.class).getTestinPath();
+            final Path rootPath = Services.getInstance(p, Setting.class).getTestinPath();
             if (rootPath.toString().isEmpty()) {
                 indexing.set(false);
                 indexed.set(true);
@@ -90,8 +90,8 @@ public final class ProjectIndexer {
 
             final Path absoluteRoot = rootPath.isAbsolute()
                     ? rootPath
-                    : (project.getBasePath() != null
-                    ? Path.of(project.getBasePath(), rootPath.toString())
+                    : (p.getBasePath() != null
+                    ? Path.of(p.getBasePath(), rootPath.toString())
                     : rootPath);
 
             final List<Path> validProjects = collectValidProjects(absoluteRoot);
@@ -110,7 +110,7 @@ public final class ProjectIndexer {
                 final String projectName = projectPath.getFileName().toString();
 
                 ProgressManager.getInstance()
-                        .run(new Task.Backgroundable(project, "Testin indexing - " + projectName, true) {
+                        .run(new Task.Backgroundable(p, "Testin indexing - " + projectName, true) {
                             @Override
                             public void run(@NotNull ProgressIndicator indicator) {
                                 indicator.setIndeterminate(false);
@@ -171,7 +171,7 @@ public final class ProjectIndexer {
             // clear the flag (resetForReindex() pre-clears it to skip the restore).
             if (restoreEditorsOnComplete.getAndSet(false)) {
                 Logger.info("Indexing finished, restoring open editors.");
-                Services.getInstance(project, EditorUtil.class).restoreLastOpened(project);
+                Services.getInstance(p, EditorUtil.class).restoreLastOpened(p);
             } else {
                 Logger.info("Indexing finished, skipping editor restore.");
             }
@@ -326,20 +326,20 @@ public final class ProjectIndexer {
     }
 
     private void removeVf(final @NotNull Path path) {
-        Services.getInstance(project, TreeUtilImpl.class).removeVf(project, this, path);
+        Services.getInstance(p, TreeUtilImpl.class).removeVf(p, this, path);
         VirtualFileManager.getInstance().syncRefresh();
     }
 
     public void createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object dto) {
-        Services.getInstance(project, TreeUtilImpl.class).createNode(tree, parentNode, dto);
+        Services.getInstance(p, TreeUtilImpl.class).createNode(tree, parentNode, dto);
     }
 
     public void removeNode(final DefaultMutableTreeNode node, final SimpleTree tree) {
-        Services.getInstance(project, TreeUtilImpl.class).removeNode(node, tree);
+        Services.getInstance(p, TreeUtilImpl.class).removeNode(node, tree);
     }
 
     public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
-        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, oldPath, newPath, "Move Failed", (sourceVf, targetVf) -> {
+        Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, newPath, "Move Failed", (sourceVf, targetVf) -> {
             try {
                 sourceVf.move(this, targetVf);
             } catch (final IOException ex) {
@@ -351,7 +351,7 @@ public final class ProjectIndexer {
     }
 
     public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath) {
-        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
+        Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
             try {
                 sourceVf.copy(this, targetVf, sourceVf.getName());
             } catch (final IOException ex) {
@@ -363,7 +363,7 @@ public final class ProjectIndexer {
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         store.addTestProject(tp);
-        store.addTestProjectMarker(project, tp);
+        store.addTestProjectMarker(p, tp);
     }
 
     public void addTestSet(final @NotNull TestSetDirectoryDto ts) {
@@ -401,7 +401,7 @@ public final class ProjectIndexer {
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
         // The indexer owns file I/O: rename the directory on disk first, then update the store.
-        Services.getInstance(project, TreeUtilImpl.class).executeVfsAction(project, oldPath, "Rename Failed", vf -> {
+        Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, "Rename Failed", vf -> {
             try {
                 vf.rename(this, newPath.getFileName().toString());
             } catch (final IOException ex) {

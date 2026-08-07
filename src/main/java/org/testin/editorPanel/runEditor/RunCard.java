@@ -14,13 +14,13 @@ import java.util.*;
 import java.util.List;
 
 public class RunCard extends BaseCard {
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private final @NotNull List<JComponent> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
 
     public RunCard(final @NotNull Project p) {
         super();
-        this.project = p;
+        this.p = p;
     }
 
     @Override
@@ -34,9 +34,9 @@ public class RunCard extends BaseCard {
 
         Arrays.stream(RunEditorAttributes.values())
                 .filter(activeDetails::contains)
-                .forEach(attr -> attr.applyToUI(runItem, badges, details, project));
+                .forEach(attr -> attr.applyToUI(runItem, badges, details, p));
 
-        updateUI(index, RunEditorAttributes.DESCRIPTION.getValueExtractor().apply(runItem, project), badges, details);
+        updateUI(index, RunEditorAttributes.DESCRIPTION.getValueExtractor().apply(runItem, p), badges, details);
 
         final JBLabel statusLabel = attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName());
 

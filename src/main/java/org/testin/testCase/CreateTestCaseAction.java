@@ -25,11 +25,13 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CreateTestCaseAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final @NotNull IEditor editor;
     private final @NotNull TestSetDirectoryDto dir;
 
-    public CreateTestCaseAction(final @NotNull IEditor editor, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
+    public CreateTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         super("Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
+        this.p = p;
         this.editor = editor;
         this.dir = dir;
         this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getCustomShortcut(), list);
@@ -37,10 +39,8 @@ public class CreateTestCaseAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null) return;
 
-        new CreateTestCaseDialog(project, (tc, cg) -> {
+        new CreateTestCaseDialog(p, (tc, cg) -> {
             List<TestCaseDto> tcs = editor.getAllTestCases();
 
             final boolean isEmpty = tcs.isEmpty();
@@ -53,13 +53,13 @@ public class CreateTestCaseAction extends DumbAwareAction {
             editor.appendNewTestCase(tc);
 
             final List<TestCaseDto> affectedNodes = Stream.of(tc, lastTc).filter(Objects::nonNull).toList();
-            Services.getInstance(project, TestCaseCacheService.class).addNewItems(affectedNodes);
+            Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
-            Services.getInstance(project, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
-            Services.getInstance(project, Notifier.class).softShow(project, "Created..");
+            Services.getInstance(p, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
+            Services.getInstance(p, Notifier.class).softShow(p, "Created..");
 
             if (cg.isSelected())
-                GeneratorType.CREATE_TEST_CASE.getAction().execute(project, tc);
+                GeneratorType.CREATE_TEST_CASE.getAction().execute(p, tc);
 
             SwingUtilities.invokeLater(() -> editor.selectTestCase(tc));
 

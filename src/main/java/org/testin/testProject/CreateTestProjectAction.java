@@ -24,14 +24,14 @@ public class CreateTestProjectAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null) return;
+        final Project p = e.getProject();
+        if (p == null) return;
 
-        new CreateNodesDialog(project, CreateNodeMenu.TEST_PROJECT, (name, type, cg) -> {
+        new CreateNodesDialog(p, CreateNodeMenu.TEST_PROJECT, (name, type, cg) -> {
             if (name.trim().isEmpty()) return;
 
             if (type == DirectoryType.IMPORT_TP) {
-                String projectName = Services.getInstance(project, Tools.class).extractProjectNameFromUrl(name);
+                String projectName = Services.getInstance(p, Tools.class).extractProjectNameFromUrl(name);
                 new CreateTestProjectCloneAction(name.trim(), projectName, projectPanel).actionPerformed(e);
                 return;
             }

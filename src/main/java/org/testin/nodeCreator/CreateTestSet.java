@@ -22,9 +22,14 @@ import java.nio.file.Path;
 import java.util.Arrays;
 
 public class CreateTestSet implements NodeCreator {
+    private final @NotNull Project p;
+
+    public CreateTestSet(final @NotNull Project p) {
+        this.p = p;
+    }
 
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NotNull Project p, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
         final TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
 
         Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);

@@ -37,12 +37,15 @@ import java.util.Collections;
 import java.util.List;
 
 public class CreateTestRun implements NodeCreator {
-    private Project project;
+    private final @NotNull Project p;
     private TestRunDirectoryDto tr;
 
+    public CreateTestRun(final @NotNull Project p) {
+        this.p = p;
+    }
+
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NotNull Project p, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
-        this.project = p;
+    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
         final TestProjectDirectoryDto tp = Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
 
         final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
@@ -77,7 +80,7 @@ public class CreateTestRun implements NodeCreator {
     }
 
     private DefaultMutableTreeNode buildDirectoryTree(final Path folder, final boolean isRoot, final DirectoryDto parentOfThisNode) {
-        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.awaitIndexing();
 
         final Object label = isRoot ? parentOfThisNode : parentOfThisNode.resolveDirectoryObject(folder, indexer);
@@ -136,13 +139,13 @@ public class CreateTestRun implements NodeCreator {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             // The indexer owns all dir/file creation: putTestRun writes the run json (creating
             // the dir) and addTestRunDir writes the .tr marker + refreshes the VFS.
-            Services.getInstance(project, ProjectIndexer.class).putTestRun(savePath, tr);
+            Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
 
-            TestRunMarker marker = Services.getInstance(project, MarkerMapper.class).setTestRunMarker();
+            TestRunMarker marker = Services.getInstance(p, MarkerMapper.class).setTestRunMarker();
             trDir.setMarker(marker);
 
-            Services.getInstance(project, ProjectIndexer.class).addTestRunDir(trDir);
-            Services.getInstance(project, ProjectIndexer.class).updateRunMarker(project, savePath, marker);
+            Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir);
+            Services.getInstance(p, ProjectIndexer.class).updateRunMarker(p, savePath, marker);
 
             VirtualFile virtualDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(savePath.toFile());
             if (virtualDir != null)
@@ -150,7 +153,7 @@ public class CreateTestRun implements NodeCreator {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 projectPanel.getTestRunTreeBuilder().buildTree(projectPanel.getTestProjectSelector().getSelectedTestProject().getItem());
-                Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, trDir);
+                Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, trDir);
 
             });
 

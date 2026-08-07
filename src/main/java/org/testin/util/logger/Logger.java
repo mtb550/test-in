@@ -8,23 +8,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-// todo: rename it to Logger to prevent import incorrect package when name is Log.
 public final class Logger {
 
     private static final StackWalker WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
+    // todo: why nullable and static ?
     @Nullable
-    private static volatile Project project;
+    private static volatile Project p;
 
     private static volatile LoggerService backendService;
 
     @Nullable
     public static Project getProject() {
-        return project;
+        return p;
     }
 
     public static void setProject(final @NotNull Project p) {
-        Logger.project = p;
+        Logger.p = p;
     }
 
     public static void setLogLevel(final @NotNull Level level) {
@@ -39,7 +39,7 @@ public final class Logger {
 
     public static void debug(final @NotNull String message) {
         log(Level.DEBUG, WALKER.getCallerClass().getSimpleName(), message);
-        System.out.println(WALKER.getCallerClass().getSimpleName() + " " + message);
+        //System.out.println(WALKER.getCallerClass().getSimpleName() + " " + message);
     }
 
     public static void info(final @NotNull String message) {

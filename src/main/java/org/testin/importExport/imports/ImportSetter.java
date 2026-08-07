@@ -1,7 +1,7 @@
 package org.testin.importExport.imports;
-import org.jetbrains.annotations.NotNull;
 
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
 
 @FunctionalInterface

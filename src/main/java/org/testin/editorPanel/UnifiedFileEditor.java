@@ -19,10 +19,10 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
 
     private final @NotNull IEditor editor;
     private final @NotNull UnifiedVirtualFile vf;
-    private final @NotNull Project project;
+    private final @NotNull Project p;
 
     public UnifiedFileEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf, final @NotNull IEditor editor) {
-        this.project = p;
+        this.p = p;
         this.vf = vf;
         this.editor = editor;
     }
@@ -78,7 +78,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     public void selectNotify() {
         final List<TestCaseDto> selected = editor.getSelectedTestCases();
 
-        Optional.ofNullable(ViewToolWindowFactory.getToolWindow(project))
+        Optional.ofNullable(ViewToolWindowFactory.getToolWindow(p))
                 .map(tw -> ViewToolWindowFactory.getViewPanel())
                 .ifPresent(viewer -> {
 

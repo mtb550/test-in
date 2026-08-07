@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Getter
 public class ProjectTree {
-    private final Project project;
+    private final @NotNull Project p;
     private final ProjectPanel projectPanel;
     private final JBScrollPane scrollPane;
     private final DefaultMutableTreeNode mainRoot;
@@ -29,7 +29,7 @@ public class ProjectTree {
     private final TreeContextMenu treeContextMenu;
 
     public ProjectTree(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
-        this.project = p;
+        this.p = p;
         this.projectPanel = projectPanel;
 
         final TestProjectDirectoryDto testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();

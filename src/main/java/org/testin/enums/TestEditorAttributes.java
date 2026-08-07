@@ -32,9 +32,9 @@ public enum TestEditorAttributes {
             false,
             false,
             true,
-            (tc, project) -> String.valueOf(tc.getId()),
+            (tc, p) -> String.valueOf(tc.getId()),
             null,
-            (project, tc, v) -> {
+            (p, tc, v) -> {
             }
     ),
 
@@ -47,9 +47,9 @@ public enum TestEditorAttributes {
             true,
             true,
             true,
-            (tc, project) -> tc.getDescription(),
+            (tc, p) -> tc.getDescription(),
             null,
-            (project, tc, v) -> tc.setDescription(Services.getInstance(project, Tools.class).sanitizeDescription(v))
+            (p, tc, v) -> tc.setDescription(Services.getInstance(p, Tools.class).sanitizeDescription(v))
     ),
 
     EXPECTED_RESULT(
@@ -60,9 +60,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getExpectedResult(),
+            (tc, p) -> tc.getExpectedResult(),
             null,
-            (project, tc, v) -> tc.setExpectedResult(v)
+            (p, tc, v) -> tc.setExpectedResult(v)
     ),
 
     STEPS(
@@ -73,9 +73,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> String.join(", ", tc.getSteps()),
+            (tc, p) -> String.join(", ", tc.getSteps()),
             null,
-            (project, tc, v) -> tc.setSteps(Services.getInstance(project, Tools.class).parseStepsSafe(v))
+            (p, tc, v) -> tc.setSteps(Services.getInstance(p, Tools.class).parseStepsSafe(v))
     ),
 
     PRIORITY(
@@ -86,9 +86,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getPriority().getName(),
+            (tc, p) -> tc.getPriority().getName(),
             tc -> List.of(Shared.createPriorityBadge(tc)),
-            (project, tc, v) -> tc.setPriority(Services.getInstance(project, Tools.class).parsePrioritySafe(v))
+            (p, tc, v) -> tc.setPriority(Services.getInstance(p, Tools.class).parsePrioritySafe(v))
     ),
 
     FQCN(
@@ -99,9 +99,9 @@ public enum TestEditorAttributes {
             false,
             false,
             true,
-            (tc, project) -> String.join(" > ", Services.getInstance(project, Tools.class).buildFqcnMethod(tc)),
+            (tc, p) -> String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc)),
             null,
-            (project, tc, v) -> {
+            (p, tc, v) -> {
             }
     ),
 
@@ -113,9 +113,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getReference(),
+            (tc, p) -> tc.getReference(),
             null,
-            (project, tc, v) -> tc.setReference(v)
+            (p, tc, v) -> tc.setReference(v)
     ),
 
     TEST_DATA(
@@ -126,9 +126,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getTestData(),
+            (tc, p) -> tc.getTestData(),
             null,
-            (project, tc, v) -> tc.setTestData(v)
+            (p, tc, v) -> tc.setTestData(v)
     ),
 
     PRE_CONDITIONS(
@@ -139,9 +139,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getPreConditions(),
+            (tc, p) -> tc.getPreConditions(),
             null,
-            (project, tc, v) -> tc.setPreConditions(v)
+            (p, tc, v) -> tc.setPreConditions(v)
     ),
 
     GROUP(
@@ -152,9 +152,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
+            (tc, p) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList()),
-            (project, tc, v) -> tc.setGroup(Services.getInstance(project, Tools.class).parseGroupsSafe(v))
+            (p, tc, v) -> tc.setGroup(Services.getInstance(p, Tools.class).parseGroupsSafe(v))
     ),
 
     PATH(
@@ -165,9 +165,9 @@ public enum TestEditorAttributes {
             false,
             false,
             true,
-            (tc, project) -> String.join(" > ", tc.getParent().getPath2()),
+            (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
             null,
-            (project, tc, v) -> {
+            (p, tc, v) -> {
             }
     ),
 
@@ -181,9 +181,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getModule(),
+            (tc, p) -> tc.getModule(),
             null,
-            (project, tc, v) -> tc.setModule(v)
+            (p, tc, v) -> tc.setModule(v)
     ),
 
     STATUS(
@@ -194,9 +194,9 @@ public enum TestEditorAttributes {
             false,
             false,
             true,
-            (tc, project) -> tc.getStatus().getDisplayText(),
+            (tc, p) -> tc.getStatus().getDisplayText(),
             null,
-            (project, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v))
+            (p, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v))
     ),
 
     CREATE_BY(
@@ -207,9 +207,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getCreatedBy(),
+            (tc, p) -> tc.getCreatedBy(),
             null,
-            (project, tc, v) -> tc.setCreatedBy(v)
+            (p, tc, v) -> tc.setCreatedBy(v)
     ),
 
     UPDATE_BY(
@@ -220,9 +220,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getUpdatedBy(),
+            (tc, p) -> tc.getUpdatedBy(),
             null,
-            (project, tc, v) -> tc.setUpdatedBy(v)
+            (p, tc, v) -> tc.setUpdatedBy(v)
     ),
 
     CREATE_AT(
@@ -233,9 +233,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
+            (tc, p) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
             null,
-            (project, tc, v) -> tc.setCreatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
+            (p, tc, v) -> tc.setCreatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v))
     ),
 
     UPDATE_AT(
@@ -246,9 +246,9 @@ public enum TestEditorAttributes {
             true,
             false,
             true,
-            (tc, project) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
+            (tc, p) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
             null,
-            (project, tc, v) -> tc.setUpdatedAt(Services.getInstance(project, Tools.class).parseDateSafe(v))
+            (p, tc, v) -> tc.setUpdatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v))
     );
 
     private final String name;

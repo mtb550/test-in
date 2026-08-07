@@ -38,7 +38,11 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 public abstract class JsonSplitBulkSectionDialog {
-    protected Project project;
+    protected final @NotNull Project p;
+
+    public JsonSplitBulkSectionDialog(final @NotNull Project p) {
+        this.p = p;
+    }
 
     protected abstract void applyValues(final List<TestCaseDto> items, final List<String> newValues);
 
@@ -48,8 +52,7 @@ public abstract class JsonSplitBulkSectionDialog {
 
     protected abstract void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges);
 
-    public void show(final @NotNull Project p, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
-        this.project = p;
+    public void show(final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
         StringBuilder leftSb = new StringBuilder();
         StringBuilder rightSb = new StringBuilder();
         List<int[]> rightEditableRanges = new ArrayList<>();

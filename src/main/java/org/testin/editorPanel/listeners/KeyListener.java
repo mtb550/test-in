@@ -1,6 +1,7 @@
 package org.testin.editorPanel.listeners;
 
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditor;
@@ -20,11 +21,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class KeyListener extends KeyAdapter {
-
+    private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull TestEditor editor;
 
-    public KeyListener(final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditor editor) {
+    public KeyListener(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditor editor) {
+        this.p = p;
         this.list = list;
         this.editor = editor;
     }
@@ -55,7 +57,7 @@ public class KeyListener extends KeyAdapter {
 
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
                     final Path dirPath = editor.getParent().getPath();
-                    final ProjectIndexer indexer = Services.getInstance(editor.getProject(), ProjectIndexer.class);
+                    final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
                     selectedCases.forEach(tc -> {
                         try {

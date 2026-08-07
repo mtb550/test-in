@@ -12,7 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.testEditor.TestEditorCM;
+import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.util.KeyboardSet;
@@ -27,11 +27,11 @@ public class RemoveTestCaseAction extends DumbAwareAction {
     private final DirectoryDto dir;
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
-    private final Project project;
+    private final @NotNull Project p;
 
     public RemoveTestCaseAction(final @NotNull Project p, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
-        this.project = p;
+        this.p = p;
         this.dir = dir;
         this.list = list;
         this.model = model;
@@ -60,8 +60,8 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        boolean isCutAndSelected = TestEditorCM.isGlobalCutAction() &&
-                selectedItems.stream().allMatch(tc -> TestEditorCM.getGlobalPendingCutIds().contains(tc.getId()));
+        boolean isCutAndSelected = TestEditorContextMenu.isGlobalCutAction() &&
+                selectedItems.stream().allMatch(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()));
 
         if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(e.getProject(), selectedItems)) {
             return;
@@ -87,7 +87,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             saveToFile(predecessor);
         }
 
-        final var indexer = Services.getInstance(project, org.testin.util.indexer.ProjectIndexer.class);
+        final var indexer = Services.getInstance(p, org.testin.util.indexer.ProjectIndexer.class);
         for (final TestCaseDto tc : selectedItems) {
             indexer.removeTestCase(dir.getPath(), tc.getId());
         }
@@ -111,7 +111,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
                 targetFile = dirVFile.createChildData(this, fileName);
             }
 
-            String json = Services.getInstance(project, Mapper.class).writeValueAsString(item);
+            String json = Services.getInstance(p, Mapper.class).writeValueAsString(item);
             VfsUtil.saveText(targetFile, json);
 
         } catch (final IOException ex) {

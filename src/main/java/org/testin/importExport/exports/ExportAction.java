@@ -47,7 +47,7 @@ public class ExportAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
+        final Project p = e.getProject();
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
@@ -58,18 +58,18 @@ public class ExportAction extends DumbAwareAction {
         VirtualFile targetDir = resolveTargetDir(dirDto);
         if (targetDir == null) return;
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Exporting test cases", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Exporting test cases", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                Map<String, List<TestCaseDto>> sheets = gatherData(project, targetDir, dirDto);
+                Map<String, List<TestCaseDto>> sheets = gatherData(p, targetDir, dirDto);
                 if (sheets.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).warn(project, "Export Empty", "No test cases found."));
+                            Services.getInstance(p, Notifier.class).warn(p, "Export Empty", "No test cases found."));
                     return;
                 }
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    ExportDialog dialog = new ExportDialog(project, exportAttributes, sheets, targetDir);
+                    ExportDialog dialog = new ExportDialog(p, exportAttributes, sheets, targetDir);
                     if (!dialog.showAndGet()) return;
 
                     FileTypes format = dialog.getSelectedFormat();
@@ -77,10 +77,10 @@ public class ExportAction extends DumbAwareAction {
                     if (destFile == null) return;
 
                     try {
-                        format.exportToFile(project, ExportAction.this, destFile, sheets);
+                        format.exportToFile(p, ExportAction.this, destFile, sheets);
                     } catch (final Exception ex) {
                         Logger.error("Export crashed: " + ex.getMessage());
-                        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Export Failed", ex.getMessage()));
+                        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).error(p, "Export Failed", ex.getMessage()));
                     }
                 });
             }

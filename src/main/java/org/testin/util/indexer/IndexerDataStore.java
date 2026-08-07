@@ -22,7 +22,6 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 final class IndexerDataStore {
 
@@ -269,7 +268,7 @@ final class IndexerDataStore {
         final List<String> toRemove = testSetsDirByPath.entrySet().stream()
                 .filter(entry -> entry.getValue().getPath().startsWith(path))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
         for (final String setPath : toRemove) {
             removeTestSet(Path.of(setPath));
         }
@@ -279,14 +278,14 @@ final class IndexerDataStore {
         final List<String> toRemove = testRunsDirByPath.entrySet().stream()
                 .filter(entry -> entry.getValue().getPath().startsWith(path))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
         for (final String key : toRemove) {
             testRunsDirByPath.remove(key);
         }
 
         final List<String> toRemoveRuns = testRunsByPath.keySet().stream()
                 .filter(key -> Path.of(key).startsWith(path))
-                .collect(Collectors.toList());
+                .toList();
         for (final String key : toRemoveRuns) {
             testRunsByPath.remove(key);
         }
@@ -439,7 +438,7 @@ final class IndexerDataStore {
     private void rebuildPath2(final @NotNull DirectoryDto dto) {
         final ArrayList<String> path2 = new ArrayList<>();
         for (DirectoryDto cur = dto; cur != null; cur = cur.getParent()) {
-            path2.add(0, cur.getName());
+            path2.addFirst(cur.getName());
         }
         dto.setPath2(path2);
     }

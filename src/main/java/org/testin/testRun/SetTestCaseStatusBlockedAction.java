@@ -27,9 +27,9 @@ public class SetTestCaseStatusBlockedAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Project project = e.getProject();
-        if (project == null) return;
-        Services.getInstance(project, RunStatusService.class).applyStatus(project, editor, list, TestStatus.BLOCKED);
+        Project p = e.getProject();
+        if (p == null) return;
+        Services.getInstance(p, RunStatusService.class).applyStatus(p, editor, list, TestStatus.BLOCKED);
     }
 
     @Override

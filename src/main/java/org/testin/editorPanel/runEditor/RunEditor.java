@@ -56,8 +56,7 @@ import java.util.stream.Collectors;
 
 public class RunEditor implements Disposable, IToolBar, IEditor {
 
-    @Getter
-    private final Project project;
+    private final @NotNull Project p;
 
     @Getter
     private final TestRunDirectoryDto parent;
@@ -112,7 +111,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private int currentlyExecutingIndex = -1;
 
     public RunEditor(final @NotNull Project p, final UnifiedVirtualFile vf) {
-        this.project = p;
+        this.p = p;
         this.parent = vf.getTestRun();
 
         final Disposable projectDisposable = Disposer.newDisposable();
@@ -130,7 +129,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     private void buildOpeningPanel() {
-        toolBar = new RunToolBar(project, this);
+        toolBar = new RunToolBar(p, this);
         statusBar = new StatusBar();
         StatusBarListener.attach(this);
 
@@ -139,10 +138,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         list = openingForm.getList();
         model = openingForm.getModel();
 
-        list.setCellRenderer(new RunListRenderer(this));
+        list.setCellRenderer(new RunListRenderer(p, this));
 
         final RunEditorCM cm = new RunEditorCM(this, parent, list);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, parent, cm);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, cm);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
@@ -151,7 +150,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         cm.registerShortcuts(list, cm);
 
         ArrayList<String> selectionPath = parent.getPath2();
-        list.addListSelectionListener(new SelectionListener(project, list, this, selectionPath));
+        list.addListSelectionListener(new SelectionListener(p, list, this, selectionPath));
 
         refreshView();
     }
@@ -160,7 +159,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 if (this.tr == null && parent != null) {
-                    final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                    final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                     indexer.awaitIndexing();
 
                     final Path dirPath = parent.getPath();
@@ -190,7 +189,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                 }
 
                 ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                    final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                     indexer.awaitIndexing();
 
                     final List<TestCaseDto> loadedItems = new ArrayList<>();
@@ -210,8 +209,8 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                         }
                     }
 
-                    final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(project, loadedItems).sortedList();
-                    Services.getInstance(project, TestCaseCacheService.class).load(sorted);
+                    final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(p, loadedItems).sortedList();
+                    Services.getInstance(p, TestCaseCacheService.class).load(sorted);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         allTestCases.clear();
@@ -345,7 +344,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public Set<String> getAvailableModules() {
-        Services.getInstance(project, ProjectIndexer.class);
+        Services.getInstance(p, ProjectIndexer.class);
         final Set<String> modules = new HashSet<>();
         for (final TestCaseDto tc : allTestCases) {
             final String module = tc.getModule();
@@ -455,7 +454,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
             UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(this, list);
-            changeStatus.onExecutionFinished(project, this);
+            changeStatus.onExecutionFinished(p, this);
             return;
         }
 
@@ -521,7 +520,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             try {
                 final Path dirPath = parent.getPath();
 
-                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, tr);
+                Services.getInstance(p, ProjectIndexer.class).putTestRun(dirPath, tr);
 
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run data: " + ex.getMessage());
@@ -539,7 +538,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onStartExecutionClicked() {
         UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(this, list);
-        changeStatus.applyStatusChange(project, this, TestRunStatus.IN_PROGRESS);
+        changeStatus.applyStatusChange(p, this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
     }
 }

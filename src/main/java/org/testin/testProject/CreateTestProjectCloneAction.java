@@ -37,31 +37,31 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null) return;
+        final Project p = e.getProject();
+        if (p == null) return;
 
         if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {
-            Services.getInstance(project, Notifier.class).error(project, "Clone Error", "Missing parameters for cloning the project.");
+            Services.getInstance(p, Notifier.class).error(p, "Clone Error", "Missing parameters for cloning the project.");
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Cloning repository", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Cloning repository", false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 indicator.setText("Cloning into " + projectName + "...");
 
                 try {
-                    GitCommandRunner.execute(Services.getInstance(project, Setting.class).getTestinPath(), "git", "clone", gitUrl, projectName);
+                    GitCommandRunner.execute(Services.getInstance(p, Setting.class).getTestinPath(), "git", "clone", gitUrl, projectName);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        VirtualFile vRoot = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Services.getInstance(project, Setting.class).getTestinPath().toFile());
+                        VirtualFile vRoot = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Services.getInstance(p, Setting.class).getTestinPath().toFile());
                         if (vRoot != null) {
                             vRoot.refresh(false, true);
                         }
 
-                        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-                        final Path projectPath = Services.getInstance(project, Setting.class).getTestinPath().resolve(projectName);
+                        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                        final Path projectPath = Services.getInstance(p, Setting.class).getTestinPath().resolve(projectName);
 
                         indexer.scanSingleProject(projectPath);
                         final TestProjectDirectoryDto clonedProject = indexer.getTestProjectsByPath().get(projectPath.toString());
@@ -69,11 +69,11 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
                             projectPanel.getTestProjectSelector().addTestProject(clonedProject);
 
                         projectPanel.getProjectTree().updateNodes();
-                        Services.getInstance(project, Notifier.class).info(project, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
+                        Services.getInstance(p, Notifier.class).info(p, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
                     });
 
                 } catch (final Exception ex) {
-                    Services.getInstance(project, Notifier.class).error(project, "Clone Failed", "Could not clone repository:\n" + ex.getMessage());
+                    Services.getInstance(p, Notifier.class).error(p, "Clone Failed", "Could not clone repository:\n" + ex.getMessage());
                 }
             }
         });

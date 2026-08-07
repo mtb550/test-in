@@ -29,12 +29,12 @@ import java.util.function.Consumer;
 
 public class TestCaseUpdateMenuDialog {
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> items;
     private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems;
 
     public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems) {
-        this.project = p;
+        this.p = p;
         this.items = items;
         this.updatedItems = updatedItems;
     }
@@ -49,7 +49,7 @@ public class TestCaseUpdateMenuDialog {
             Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
 
             if (isSingle) {
-                new UpdateTestCaseDialog(project, items.getFirst(), selectedItem, (tc, cg) -> {
+                new UpdateTestCaseDialog(p, items.getFirst(), selectedItem, (tc, cg) -> {
                     cg = new CodeGeneratorDialog(gt);
                     cg.setGt(gt);
 
@@ -59,7 +59,7 @@ public class TestCaseUpdateMenuDialog {
                 }).show();
 
             } else {
-                selectedItem.getBulkAction().show(project, items, (list, cg) -> {
+                selectedItem.getBulkAction().show(p, items, (list, cg) -> {
                     cg = new CodeGeneratorDialog(gt);
                     cg.setGt(gt);
 
@@ -76,7 +76,7 @@ public class TestCaseUpdateMenuDialog {
         JBList<UpdateTestCaseFields> list = buildMenuList(fields);
         JBPopup popup = buildPopup(title, list);
         registerShortcuts(list, popup, onSelection);
-        popup.showCenteredInCurrentWindow(project);
+        popup.showCenteredInCurrentWindow(p);
     }
 
     @NotNull

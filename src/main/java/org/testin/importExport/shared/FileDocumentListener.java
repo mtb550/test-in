@@ -2,6 +2,7 @@ package org.testin.importExport.shared;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
+import org.jetbrains.annotations.NotNull;
 import org.testin.enums.FileTypes;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.logger.Logger;
@@ -18,13 +19,13 @@ import java.util.function.Consumer;
 
 public class FileDocumentListener implements DocumentListener {
     private final TextFieldWithBrowseButton fileField;
-    private final Project project;
+    private final @NotNull Project p;
     private final Consumer<Map<String, List<TestCaseDto>>> onDataLoaded;
     private final BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader;
 
-    public FileDocumentListener(TextFieldWithBrowseButton fileField, Project project, Consumer<Map<String, List<TestCaseDto>>> onDataLoaded, BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
+    public FileDocumentListener(TextFieldWithBrowseButton fileField, Project p, Consumer<Map<String, List<TestCaseDto>>> onDataLoaded, BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
         this.fileField = fileField;
-        this.project = project;
+        this.p = p;
         this.onDataLoaded = onDataLoaded;
         this.importLoader = importLoader;
     }
@@ -72,7 +73,7 @@ public class FileDocumentListener implements DocumentListener {
             Map<String, List<TestCaseDto>> parsedData = importLoader.apply(importFile, fmt);
 
             if (parsedData == null || parsedData.isEmpty()) {
-                Services.getInstance(project, Notifier.class).warn(project, "No Data", "No test cases found in the selected file.");
+                Services.getInstance(p, Notifier.class).warn(p, "No Data", "No test cases found in the selected file.");
                 return;
             }
 
@@ -80,8 +81,8 @@ public class FileDocumentListener implements DocumentListener {
 
         } catch (final Exception ex) {
             Logger.error("Import parse failed: " + ex.getMessage());
-            Services.getInstance(project, Notifier.class).error(
-                    project, "Parse Error", ex.getMessage()
+            Services.getInstance(p, Notifier.class).error(
+                    p, "Parse Error", ex.getMessage()
             );
         }
     }

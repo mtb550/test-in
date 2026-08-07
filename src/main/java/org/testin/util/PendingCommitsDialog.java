@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.indexer.ProjectIndexer;
@@ -22,13 +23,13 @@ import java.util.UUID;
 
 public class PendingCommitsDialog extends DialogWrapper {
 
-    private final Project project;
+    private final @NotNull Project p;
     private final List<TestCaseDiff> differences;
     private final Path repoRoot;
 
-    public PendingCommitsDialog(@Nullable Project project, List<TestCaseDiff> differences, Path repoRoot) {
-        super(project, true);
-        this.project = project;
+    public PendingCommitsDialog(@NotNull Project p, List<TestCaseDiff> differences, Path repoRoot) {
+        super(p, true);
+        this.p = p;
         this.differences = differences;
         this.repoRoot = repoRoot;
         setTitle("Pending Test Case Changes");
@@ -148,10 +149,13 @@ public class PendingCommitsDialog extends DialogWrapper {
                     model.removeRow(selectedRow);
                 }
             } else if (diff.type() == TestCaseDiff.DiffType.MODIFIED) {
-                TestCaseDto currentDto = Services.getInstance(project, ProjectIndexer.class).getTestCaseById(UUID.fromString(testCaseId));
+                final TestCaseDto currentDto = Services.getInstance(p, ProjectIndexer.class).getTestCaseById(UUID.fromString(testCaseId));
+                final TestCaseDto oldDto = diff.oldState();
 
-                TestCaseDto oldDto = diff.oldState();
+                if (currentDto == null)
+                    return;
 
+                // todo, move it to runnable action in enum to skip if statements
                 if (changeTypeLabel.contains("Description"))
                     currentDto.setDescription(oldDto.getDescription());
 
@@ -164,11 +168,11 @@ public class PendingCommitsDialog extends DialogWrapper {
                 else if (changeTypeLabel.contains("Group"))
                     currentDto.setGroup(oldDto.getGroup());
 
-                Services.getInstance(project, ProjectIndexer.class).putTestCase(jsonFile.getParentFile().toPath(), currentDto);
+                Services.getInstance(p, ProjectIndexer.class).putTestCase(jsonFile.getParentFile().toPath(), currentDto);
                 model.removeRow(selectedRow);
             }
         } catch (final Exception ex) {
-            Services.getInstance(project, Notifier.class).error(project, "Revert Failed", "Could not revert change: " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, "Revert Failed", "Could not revert change: " + ex.getMessage());
         }
     }
 }

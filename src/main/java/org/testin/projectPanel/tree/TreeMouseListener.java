@@ -17,12 +17,12 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class TreeMouseListener extends PopupHandler {
-    private final Project project;
+    private final @NotNull Project p;
     private final SimpleTree tree;
     private final TreeContextMenu treeContextMenu;
 
     public TreeMouseListener(final @NotNull Project p, final SimpleTree tree, final TreeContextMenu treeContextMenu) {
-        this.project = p;
+        this.p = p;
         this.tree = tree;
         this.treeContextMenu = treeContextMenu;
     }
@@ -52,7 +52,7 @@ public class TreeMouseListener extends PopupHandler {
             return;
 
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
-            new OpenActionAction(tree).execute(project);
+            new OpenActionAction(tree).execute(p);
             e.consume();
         }
     }

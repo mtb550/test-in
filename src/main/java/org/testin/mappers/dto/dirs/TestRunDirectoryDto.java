@@ -2,6 +2,7 @@ package org.testin.mappers.dto.dirs;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.mappers.markers.TestRunMarker;
 import org.testin.util.indexer.ProjectIndexer;
@@ -15,7 +16,9 @@ import java.nio.file.Path;
 @ToString(callSuper = true)
 public class TestRunDirectoryDto extends DirectoryDto {
 
-    private TestRunMarker marker;
+    @NotNull
+    @Builder.Default
+    private TestRunMarker marker = new TestRunMarker();
 
     @Override
     public @NonNull CreateNodeMenu getMenu() {

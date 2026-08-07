@@ -40,8 +40,8 @@ public class UpdateTestProjectStatusAction extends DumbAwareAction {
         final Object userObject = node.getUserObject();
         if (!(userObject instanceof TestProjectDirectoryDto tp)) return;
 
-        final Project project = e.getProject();
-        if (project == null) return;
+        final Project p = e.getProject();
+        if (p == null) return;
 
         try {
             final TestProjectMarker marker = tp.getMarker();
@@ -50,16 +50,16 @@ public class UpdateTestProjectStatusAction extends DumbAwareAction {
             marker.setUpdatedAt(ZonedDateTime.now());
             tp.setMarker(marker);
 
-            Services.getInstance(project, ProjectIndexer.class).persistTestProjectMarker(project, tp);
+            Services.getInstance(p, ProjectIndexer.class).persistTestProjectMarker(p, tp);
 
-            Services.getInstance(project, ProjectPanel.class).getProjectTree().updateNodes();
+            Services.getInstance(p, ProjectPanel.class).getProjectTree().updateNodes();
 
-            Services.getInstance(project, Notifier.class).info(project, "Test project '" + tp.getName() + "' is " + projectStatus.getDescription() + ".");
+            Services.getInstance(p, Notifier.class).info(p, "Test project '" + tp.getName() + "' is " + projectStatus.getDescription() + ".");
 
         } catch (final Exception ex) {
             Logger.error("Unable to update status to " + projectStatus.getDescription());
             Logger.error(ex.getMessage());
-            Services.getInstance(project, Notifier.class).error(project, "Unable to update status to " + projectStatus.getDescription());
+            Services.getInstance(p, Notifier.class).error(p, "Unable to update status to " + projectStatus.getDescription());
         }
     }
 

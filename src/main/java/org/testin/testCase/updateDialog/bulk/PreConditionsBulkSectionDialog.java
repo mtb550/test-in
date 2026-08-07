@@ -1,10 +1,16 @@
 package org.testin.testCase.updateDialog.bulk;
 
+import com.intellij.openapi.project.Project;
+import groovyjarjarantlr4.v4.runtime.misc.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.List;
 
 public class PreConditionsBulkSectionDialog extends JsonSplitBulkSectionDialog {
+
+    public PreConditionsBulkSectionDialog(final @NotNull Project p) {
+        super(p);
+    }
 
     @Override
     protected String getPopupTitle() {

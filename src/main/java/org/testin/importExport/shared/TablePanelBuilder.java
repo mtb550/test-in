@@ -32,7 +32,7 @@ public class TablePanelBuilder {
         return columnNames.toArray(new String[0]);
     }
 
-    public DefaultTableModel createModel(Project project, List<TestEditorAttributes> importAttributes, List<TestCaseDto> testCases) {
+    public DefaultTableModel createModel(Project p, List<TestEditorAttributes> importAttributes, List<TestCaseDto> testCases) {
         String[] columns = buildColumnNames(importAttributes);
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -53,14 +53,14 @@ public class TablePanelBuilder {
             rowData[1] = String.valueOf(index++);
 
             for (int i = 0; i < importAttributes.size(); i++) {
-                rowData[i + 2] = importAttributes.get(i).getValueExtractor().apply(tc, project);
+                rowData[i + 2] = importAttributes.get(i).getValueExtractor().apply(tc, p);
             }
             model.addRow(rowData);
         }
         return model;
     }
 
-    public JBTable buildTable(DefaultTableModel model, Project project) {
+    public JBTable buildTable(DefaultTableModel model, Project p) {
         JBTable table = new JBTable(model);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -82,13 +82,13 @@ public class TablePanelBuilder {
         try {
             TableColumn priorityCol = table.getColumn("Priority");
             ComboBox<String> priorityBox = new ComboBox<>();
-            for (Priority p : Priority.values()) {
-                priorityBox.addItem(p.getName());
+            for (Priority pr : Priority.values()) {
+                priorityBox.addItem(pr.getName());
             }
             priorityCol.setCellEditor(new DefaultCellEditor(priorityBox));
 
             TableColumn groupCol = table.getColumn("Group");
-            groupCol.setCellEditor(new GroupMultiSelectEditor(project));
+            groupCol.setCellEditor(new GroupMultiSelectEditor(p));
         } catch (final IllegalArgumentException ex) {
             Logger.error(ex.getMessage());
         }
@@ -132,17 +132,17 @@ public class TablePanelBuilder {
         ));
     }
 
-    public JBTabbedPane createTabbedPane(Map<String, List<TestCaseDto>> sheetsData, List<TestEditorAttributes> attributes, Project project, Consumer<DefaultTableModel> modelCustomizer) {
+    public JBTabbedPane createTabbedPane(Map<String, List<TestCaseDto>> sheetsData, List<TestEditorAttributes> attributes, Project p, Consumer<DefaultTableModel> modelCustomizer) {
         JBTabbedPane tabbedPane = new JBTabbedPane();
 
         for (Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
             String sheetName = entry.getKey();
             List<TestCaseDto> testCases = entry.getValue();
 
-            DefaultTableModel model = createModel(project, attributes, testCases);
+            DefaultTableModel model = createModel(p, attributes, testCases);
             modelCustomizer.accept(model);
 
-            JBTable table = buildTable(model, project);
+            JBTable table = buildTable(model, p);
             tabbedPane.addTab(sheetName, new JBScrollPane(table));
         }
 

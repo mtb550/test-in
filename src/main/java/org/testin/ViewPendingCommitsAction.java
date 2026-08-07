@@ -59,40 +59,40 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
+        final Project p = e.getProject();
 
-        final Path path = Services.getInstance(project, Tools.class).getProjectPath(tree);
+        final Path path = Services.getInstance(p, Tools.class).getProjectPath(tree);
         if (path == null) return;
 
         File gitDir = new File(path.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Services.getInstance(project, Notifier.class).warnWithAction(project,
+            Services.getInstance(p, Notifier.class).warnWithAction(p,
                     "Git repository not found",
                     "The selected project (" + path.getFileName() + ") is not a Git repository.",
                     "Initialize Git (git init)",
-                    () -> initializeGitRepository(project, path)
+                    () -> initializeGitRepository(p, path)
             );
 
             return;
         }
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Scanning for changes", true) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Scanning for changes", true) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    List<TestCaseDiff> changes = GitDiffProcessor.getPendingChanges(project, path);
+                    List<TestCaseDiff> changes = GitDiffProcessor.getPendingChanges(p, path);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (changes.isEmpty()) {
-                            Services.getInstance(project, Notifier.class).info(project, "No Changes", "Your test cases are up to date in this project.");
+                            Services.getInstance(p, Notifier.class).info(p, "No Changes", "Your test cases are up to date in this project.");
                             return;
                         }
 
-                        PendingCommitsDialog dialog = new PendingCommitsDialog(project, changes, path);
+                        PendingCommitsDialog dialog = new PendingCommitsDialog(p, changes, path);
                         if (dialog.showAndGet()) {
                             String commitMessage = Messages.showInputDialog(
-                                    project,
+                                    p,
                                     "Enter a message for this commit:",
                                     "Commit Test Cases",
                                     Messages.getQuestionIcon(),
@@ -101,16 +101,16 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             );
 
                             if (commitMessage != null && !commitMessage.trim().isEmpty()) {
-                                performCommitWorkflow(project, path, commitMessage.trim());
+                                performCommitWorkflow(p, path, commitMessage.trim());
                             } else if (commitMessage != null) {
-                                Services.getInstance(project, Notifier.class).warn(project, "Commit Aborted", "A commit message is required.");
+                                Services.getInstance(p, Notifier.class).warn(p, "Commit Aborted", "A commit message is required.");
                             }
                         }
                     });
 
                 } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).error(project, "Git Error", "Failed to calculate diffs: " + ex.getMessage())
+                            Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage())
                     );
                 }
             }
@@ -285,8 +285,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         private final JBTextField emailField = new JBTextField();
         private final JBCheckBox globalCheckBox = new JBCheckBox("Set globally");
 
-        public GitIdentityDialog(@Nullable Project project) {
-            super(project, true);
+        public GitIdentityDialog(@Nullable Project p) {
+            super(p, true);
             setTitle("Set Git Identity and Commit");
             init();
         }

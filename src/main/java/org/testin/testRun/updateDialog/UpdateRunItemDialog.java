@@ -41,7 +41,7 @@ public class UpdateRunItemDialog {
     @NotNull
     private final ErrorCaptureSection errorCaptureSection;
 
-    private final Project project;
+    private final @NotNull Project p;
     private final TestRunItems runItem;
     private final RunItemUpdateFields selectedItem;
     private final Consumer<TestRunItems> onSave;
@@ -49,7 +49,7 @@ public class UpdateRunItemDialog {
     private final List<RunItemEditSection> cachedSections;
 
     public UpdateRunItemDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull RunItemUpdateFields selectedItem, final @NotNull Consumer<TestRunItems> onSave) {
-        this.project = p;
+        this.p = p;
         this.runItem = runItem;
         this.selectedItem = selectedItem;
         this.onSave = onSave;
@@ -163,7 +163,7 @@ public class UpdateRunItemDialog {
 
     public void show() {
         if (popup != null) {
-            popup.showCenteredInCurrentWindow(project);
+            popup.showCenteredInCurrentWindow(p);
         }
     }
 }

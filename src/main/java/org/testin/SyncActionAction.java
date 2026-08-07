@@ -39,17 +39,17 @@ public class SyncActionAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
+        final Project p = e.getProject();
         Path repoPath = getActiveProjectPath();
 
         if (repoPath == null) {
-            Services.getInstance(project, Notifier.class).error(project, "Sync Error", "Could not determine the active project. Please select a project in the tree.");
+            Services.getInstance(p, Notifier.class).error(p, "Sync Error", "Could not determine the active project. Please select a project in the tree.");
             return;
         }
 
         File gitDir = new File(repoPath.toFile(), ".git");
         if (!gitDir.exists() || !gitDir.isDirectory()) {
-            Services.getInstance(project, Notifier.class).warn(project, "Sync Error", "This project is not a Git repository. Initialize it first.");
+            Services.getInstance(p, Notifier.class).warn(p, "Sync Error", "This project is not a Git repository. Initialize it first.");
             return;
         }
 
@@ -64,7 +64,7 @@ public class SyncActionAction extends DumbAwareAction {
 
                     if (remoteUrl.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(project, Notifier.class).warn(project, "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
+                                Services.getInstance(p, Notifier.class).warn(p, "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
                         );
                         return;
                     }
@@ -79,14 +79,14 @@ public class SyncActionAction extends DumbAwareAction {
                     }
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        Services.getInstance(project, Notifier.class).info(project, "Sync Successful", "Your project is now up to date with the remote repository.");
+                        Services.getInstance(p, Notifier.class).info(p, "Sync Successful", "Your project is now up to date with the remote repository.");
                         projectPanel.getTestProjectSelector().loadTestProjectList();
                         projectPanel.setupMainLayout();
                     });
 
                 } catch (final Exception ex) {
                     Logger.error(ex.getMessage());
-                    ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).error(project, "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
+                    ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
                     );
                 }
             }

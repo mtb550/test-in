@@ -31,7 +31,7 @@ public class CreateNodesDialog {
     private final JBList<DirectoryType> list;
     private final JBPopup popup;
     private final CodeGeneratorDialog cg;
-    private final Project project;
+    private final @NotNull Project p;
 
     public CreateNodesDialog(final @NotNull Project p, final @NotNull CreateNodeMenu menu, final TriConsumer<@NotNull String, @NotNull DirectoryType, @NotNull CodeGeneratorDialog> onSelected) {
         textField = new ExtendableTextField();
@@ -56,7 +56,7 @@ public class CreateNodesDialog {
 
         mainPanel.add(textField, BorderLayout.NORTH);
 
-        this.project = p;
+        this.p = p;
         this.cg = new CodeGeneratorDialog(menu.getGeneratorType());
 
         JPanel listWrapper = new JPanel(new BorderLayout());
@@ -98,7 +98,7 @@ public class CreateNodesDialog {
     }
 
     public void show() {
-        popup.showCenteredInCurrentWindow(project);
+        popup.showCenteredInCurrentWindow(p);
         SwingUtilities.invokeLater(() -> {
             textField.revalidate();
             textField.repaint();

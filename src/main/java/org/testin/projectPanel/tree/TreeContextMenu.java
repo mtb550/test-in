@@ -24,11 +24,11 @@ import org.testin.util.services.Services;
 import java.util.List;
 
 public class TreeContextMenu extends DefaultActionGroup {
-    final @NotNull Project project;
+    private final @NotNull Project p;
 
     public TreeContextMenu(final @NotNull Project p, final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
         super("Tree Popup Menu", true);
-        this.project = p;
+        this.p = p;
 
         add(new OpenActionAction(tree));
         add(new CreateTreeNodeAction(projectPanel, tree));

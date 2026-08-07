@@ -83,7 +83,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_DESCRIPTION,
-            (project, items, updatedItems) -> new DescriptionBulkSectionDialog().show(project, items, updatedItems),
+            (p, items, updatedItems) -> new DescriptionBulkSectionDialog(p).show(items, updatedItems),
             TestCaseBaseDialog::getDescriptionSection
     ),
 
@@ -94,7 +94,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT,
-            (project, items, updatedItems) -> new ExpectedResultBulkSectionDialog().show(project, items, updatedItems),
+            (p, items, updatedItems) -> new ExpectedResultBulkSectionDialog(p).show(items, updatedItems),
             TestCaseBaseDialog::getExpectedResultSection
     ),
 
@@ -105,7 +105,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_MODULE,
-            (project, items, updatedItems) -> new ModuleBulkSectionDialog().show(project, items, updatedItems),
+            (p, items, updatedItems) -> new ModuleBulkSectionDialog(p).show(items, updatedItems),
             TestCaseBaseDialog::getModuleSection
     ),
 
@@ -116,7 +116,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_TEST_DATA,
-            (project, items, updatedItems) -> new TestDataBulkSectionDialog().show(project, items, updatedItems),
+            (p, items, updatedItems) -> new TestDataBulkSectionDialog(p).show(items, updatedItems),
             TestCaseBaseDialog::getTestDataSection
     ),
 
@@ -127,7 +127,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE},
             true,
             GeneratorType.UPDATE_TEST_CASE_PRE_CONDITIONS,
-            (project, items, updatedItems) -> new PreConditionsBulkSectionDialog().show(project, items, updatedItems),
+            (p, items, updatedItems) -> new PreConditionsBulkSectionDialog(p).show(items, updatedItems),
             TestCaseBaseDialog::getPreConditionsSection
     ),
 
@@ -149,7 +149,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE},
             true,
             GeneratorType.UPDATE_TEST_CASE_STEPS,
-            (project, items, updatedItems) -> new StepsBulkSectionDialog().show(project, items, updatedItems),
+            (p, items, updatedItems) -> new StepsBulkSectionDialog(p).show(items, updatedItems),
             TestCaseBaseDialog::getStepsSection
     ),
 
@@ -171,7 +171,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, NAVIGATE_ARROWS, SET_PRIORITY},
             true,
             GeneratorType.UPDATE_TEST_CASE_PRIORITY,
-            (project, items, updatedItems) -> new PriorityBulkSectionDialog().show(project, items, updatedItems),
+            (p, items, updatedItems) -> new PriorityBulkSectionDialog(p).show(items, updatedItems),
             TestCaseBaseDialog::getPrioritySection
     ),
 
@@ -193,7 +193,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
             true,
             GeneratorType.UPDATE_TEST_CASE_GROUP,
-            (project, items, updatedItems) -> new GroupBulkSectionDialog().show(project, items, updatedItems),
+            (p, items, updatedItems) -> new GroupBulkSectionDialog(p).show(items, updatedItems),
             TestCaseBaseDialog::getGroupSection
     );
 

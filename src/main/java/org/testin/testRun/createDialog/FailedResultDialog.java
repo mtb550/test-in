@@ -19,7 +19,7 @@ import java.awt.*;
 
 public class FailedResultDialog {
 
-    private final Project project;
+    private final @NotNull Project p;
     private final TestRunItems runItem;
     private final ActualResultSection actualResultSection;
     private final BugPrioritySection bugPrioritySection;
@@ -28,7 +28,7 @@ public class FailedResultDialog {
     private final Runnable onSave;
 
     public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Runnable onSave) {
-        this.project = p;
+        this.p = p;
         this.runItem = runItem;
         this.onSave = onSave;
 
@@ -140,7 +140,7 @@ public class FailedResultDialog {
 
     public void show() {
         if (popup != null) {
-            popup.showCenteredInCurrentWindow(project);
+            popup.showCenteredInCurrentWindow(p);
         }
     }
 }

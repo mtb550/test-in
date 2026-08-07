@@ -28,17 +28,18 @@ import java.util.Objects;
 
 public final class SettingsConfigurable implements Configurable {
 
-    private final TestinPathPanel testinPathPanel = new TestinPathPanel();
+    private final TestinPathPanel testinPathPanel;
     private final JBTextField rootAutomationPathField = new JBTextField();
     private final JBTextField testerNameField = new JBTextField();
     private final JBTextField testerRoleField = new JBTextField();
     private final TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
     private final ComboBox<String> logLevelComboBox;
-    private final Project project;
+    private final @NotNull Project p;
 
     public SettingsConfigurable(final @NotNull Project p) {
-        this.project = p;
+        this.p = p;
+        testinPathPanel = new TestinPathPanel(p);
         this.logLevelComboBox = new ComboBox<>(Arrays.stream(Logger.Level.values()).map(Logger.Level::name).toArray(String[]::new));
     }
 
@@ -54,7 +55,7 @@ public final class SettingsConfigurable implements Configurable {
         rootAutomationPathField.setToolTipText(
                 "Automatically detected base package path for your automation framework");
 
-        downloadFolderField.addBrowseFolderListener(project, FileChooserDescriptorFactory.createSingleFolderDescriptor()
+        downloadFolderField.addBrowseFolderListener(p, FileChooserDescriptorFactory.createSingleFolderDescriptor()
                         .withTitle("Select Default Download Folder")
                         .withDescription("Choose the default folder for imports, exports, and reports"),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
@@ -104,7 +105,7 @@ public final class SettingsConfigurable implements Configurable {
 
         Logger.setLogLevel(Logger.Level.valueOf(settings.logLevel));
 
-        Setting setting = Services.getInstance(project, Setting.class);
+        Setting setting = Services.getInstance(p, Setting.class);
 
         if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty()) {
             setting.setTestinPath(Path.of(settings.rootTestinPath));
@@ -118,9 +119,9 @@ public final class SettingsConfigurable implements Configurable {
             setting.setAutomationPath(null);
         }
 
-        ProjectPanel panel = Services.getInstance(project, ProjectPanel.class);
+        ProjectPanel panel = Services.getInstance(p, ProjectPanel.class);
         if (panel != null) {
-            new RefreshAction(panel).execute();
+            new RefreshAction(p, panel).execute();
         }
     }
 
@@ -130,8 +131,8 @@ public final class SettingsConfigurable implements Configurable {
 
         testinPathPanel.setPathText(settings.rootTestinPath);
 
-        VirtualFile mainSourceRoot = Services.getInstance(project, Tools.class)
-                .getTestSourceRoot(project);
+        VirtualFile mainSourceRoot = Services.getInstance(p, Tools.class)
+                .getTestSourceRoot(p);
         if (mainSourceRoot != null) {
             rootAutomationPathField.setText(mainSourceRoot.getPath());
         } else {

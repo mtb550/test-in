@@ -8,7 +8,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
-import org.testin.editorPanel.testEditor.TestEditorCM;
+import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
@@ -39,11 +39,11 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
 
         if (!selectedTestCases.isEmpty()) {
             try {
-                TestEditorCM.setGlobalCutAction(true);
+                TestEditorContextMenu.setGlobalCutAction(true);
 
-                TestEditorCM.getGlobalPendingCutIds().clear();
-                selectedTestCases.forEach(tc -> TestEditorCM.getGlobalPendingCutIds().add(tc.getId()));
-                TestEditorCM.setGlobalSourceEditorUI(editor);
+                TestEditorContextMenu.getGlobalPendingCutIds().clear();
+                selectedTestCases.forEach(tc -> TestEditorContextMenu.getGlobalPendingCutIds().add(tc.getId()));
+                TestEditorContextMenu.setGlobalSourceEditorUI(editor);
 
                 String json = Services.getInstance(e.getProject(), Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));

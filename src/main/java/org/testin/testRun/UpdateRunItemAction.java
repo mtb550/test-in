@@ -33,8 +33,8 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null) return;
+        final Project p = e.getProject();
+        if (p == null) return;
 
         final TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;
@@ -46,12 +46,12 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
         Logger.trace("update test run item for: " + selected.getDescription());
 
-        new RunItemUpdateMenuDialog(project, runItem, updatedItem -> {
+        new RunItemUpdateMenuDialog(p, runItem, updatedItem -> {
             Logger.trace("run item updated, actual result: " + updatedItem.getActualResult());
 
             if (runEditor.getParent() != null) {
                 Path dirPath = runEditor.getParent().getPath();
-                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, runEditor.getTr());
+                Services.getInstance(p, ProjectIndexer.class).putTestRun(dirPath, runEditor.getTr());
             }
 
             list.repaint();

@@ -24,12 +24,12 @@ import java.util.function.Consumer;
 
 public class RunItemUpdateMenuDialog {
 
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private final @NotNull TestRunItems runItem;
     private final @NotNull Consumer<TestRunItems> updatedItem;
 
     public RunItemUpdateMenuDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Consumer<TestRunItems> updatedItem) {
-        this.project = p;
+        this.p = p;
         this.runItem = runItem;
         this.updatedItem = updatedItem;
     }
@@ -37,7 +37,7 @@ public class RunItemUpdateMenuDialog {
     public void show() {
         showMenu(selectedItem -> {
             Logger.trace("Menu item selected -> " + selectedItem.getName());
-            new UpdateRunItemDialog(project, runItem, selectedItem, updatedItem).show();
+            new UpdateRunItemDialog(p, runItem, selectedItem, updatedItem).show();
         });
     }
 
@@ -49,7 +49,7 @@ public class RunItemUpdateMenuDialog {
         final JBList<RunItemUpdateFields> list = buildMenuList(fields);
         final JBPopup popup = buildPopup(list);
         registerShortcuts(list, popup, onSelection);
-        popup.showCenteredInCurrentWindow(project);
+        popup.showCenteredInCurrentWindow(p);
     }
 
     @NotNull

@@ -1,3 +1,10 @@
+project -> p
+projectPanel -> pp
+tree -> t
+name -> s
+codeGenerator -> cg
+generatorType -> gt
+
 implement mail SMTP notifications.
 implement class debugger
 implement method debugger

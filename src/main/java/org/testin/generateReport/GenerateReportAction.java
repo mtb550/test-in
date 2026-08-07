@@ -59,7 +59,7 @@ public class GenerateReportAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
+        final Project p = e.getProject();
 
         TestRunDirectoryDto tr = null;
 
@@ -75,9 +75,9 @@ public class GenerateReportAction extends DumbAwareAction {
         if (tr == null) return;
 
         String suggestedName = tr.getPath().getFileName().toString() + "_Report";
-        GenerateReportDialog dialog = new GenerateReportDialog(project, suggestedName);
+        GenerateReportDialog dialog = new GenerateReportDialog(p, suggestedName);
         if (dialog.showAndGet()) {
-            processAndSave(project, tr, dialog.getSelectedFormat(), dialog.getSelectedFile());
+            processAndSave(p, tr, dialog.getSelectedFormat(), dialog.getSelectedFile());
         }
     }
 

@@ -41,15 +41,15 @@ public class CreateTreeNodeAction extends DumbAwareAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
 
-        final Project project = e.getProject();
-        final DirectoryDto parentDir = Services.getInstance(project, Tools.class).getCurrentSelectedDirectory(tree);
+        final Project p = e.getProject();
+        final DirectoryDto parentDir = Services.getInstance(p, Tools.class).getCurrentSelectedDirectory(tree);
         final TreePath path = tree.getSelectionPath();
 
         if (path == null || parentDir == null) return;
 
         final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        new CreateNodesDialog(project, parentDir.getMenu(), (s, dt, cg) -> {
+        new CreateNodesDialog(p, parentDir.getMenu(), (s, dt, cg) -> {
 
             if (s.isEmpty()) return;
             final Path newDirPath = parentDir.getPath().resolve(s);
@@ -59,13 +59,13 @@ public class CreateTreeNodeAction extends DumbAwareAction {
                 return;
             }
 
-            DirectoryDto dir = dt.getAction().execute(tree, project, s, parentNode, parentDir, newDirPath);
+            DirectoryDto dir = dt.getAction().apply(p).execute(tree, s, parentNode, parentDir, newDirPath);
 
             if (dt == DirectoryType.TS)
-                Services.getInstance(project, EditorUtil.class).open(project, dir);
+                Services.getInstance(p, EditorUtil.class).open(p, dir);
 
             if (cg.isSelected() && dt.getCodeGenerator() != null)
-                dt.getCodeGenerator().execute(project, dir);
+                dt.getCodeGenerator().execute(p, dir);
 
         }).show();
     }

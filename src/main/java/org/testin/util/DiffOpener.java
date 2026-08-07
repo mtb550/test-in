@@ -11,12 +11,12 @@ import com.intellij.openapi.vcs.changes.ui.ChangeDiffRequestChain;
 import java.util.Collections;
 
 public class DiffOpener {
-    public static void openSideBySideDiff(Project project, Change change) {
-        ChangeDiffRequestProducer producer = ChangeDiffRequestProducer.create(project, change);
+    public static void openSideBySideDiff(Project p, Change change) {
+        ChangeDiffRequestProducer producer = ChangeDiffRequestProducer.create(p, change);
 
         if (producer != null) {
             DiffRequestChain chain = new ChangeDiffRequestChain(Collections.singletonList(producer), 0);
-            DiffManager.getInstance().showDiff(project, chain, DiffDialogHints.DEFAULT);
+            DiffManager.getInstance().showDiff(p, chain, DiffDialogHints.DEFAULT);
         }
     }
 }

@@ -23,7 +23,7 @@ import java.util.List;
 public class BranchSelector {
     private final boolean showRemote = false;
 
-    private final Project project;
+    private final @NotNull Project p;
     private final ProjectPanel projectPanel;
     private final ComboBox<String> comboBox;
     private final DefaultComboBoxModel<String> model;
@@ -34,7 +34,7 @@ public class BranchSelector {
     private boolean isUpdating = false;
 
     public BranchSelector(final @NotNull Project p, final ProjectPanel projectPanel, final TestProjectDirectoryDto testProjectDirectory) {
-        this.project = p;
+        this.p = p;
         this.projectPanel = projectPanel;
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
@@ -95,7 +95,7 @@ public class BranchSelector {
     private void checkoutBranchAndRefreshTree(final String targetBranch) {
         if (projectPath == null) return;
 
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Checking out branch: " + targetBranch, false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking out branch: " + targetBranch, false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -122,7 +122,7 @@ public class BranchSelector {
                             isUpdating = false;
                         }
 
-                        Services.getInstance(project, Notifier.class).error(project, "Git Checkout Failed", "Could not checkout " + targetBranch + ". Do you have uncommitted changes?\n" + ex.getMessage());
+                        Services.getInstance(p, Notifier.class).error(p, "Git Checkout Failed", "Could not checkout " + targetBranch + ". Do you have uncommitted changes?\n" + ex.getMessage());
                     });
                 }
             }
@@ -130,7 +130,7 @@ public class BranchSelector {
     }
 
     private void loadGitBranches() {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Fetching Git branches", false) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Fetching Git branches", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -179,7 +179,7 @@ public class BranchSelector {
                         } finally {
                             isUpdating = false;
                         }
-                        Services.getInstance(project, Notifier.class).error(project, "Git Error", "Failed to load branches: " + ex.getMessage());
+                        Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to load branches: " + ex.getMessage());
                     });
                 }
             }

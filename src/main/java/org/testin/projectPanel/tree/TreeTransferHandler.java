@@ -38,14 +38,14 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
-    private final Project project;
+    private final @NotNull Project p;
     private final SimpleTree tree;
     @Getter
     private final Set<DefaultMutableTreeNode> selectedNodes;
     private Integer lastAction;
 
     public TreeTransferHandler(final @NotNull Project p, final SimpleTree tree, final Set<DefaultMutableTreeNode> selectedNodes) {
-        this.project = p;
+        this.p = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
     }
@@ -153,17 +153,17 @@ public class TreeTransferHandler extends TransferHandler {
         Path newPath = targetDir.getPath().resolve(sourceDir.getName());
 
         // The indexer owns file I/O + in-memory store (VFS move + path updates).
-        Services.getInstance(project, ProjectIndexer.class).moveNode(oldPath, newPath);
+        Services.getInstance(p, ProjectIndexer.class).moveNode(oldPath, newPath);
 
         // UI-only: refresh the moved subtree paths.
-        Services.getInstance(project, Tools.class).updateChildrenPathsRecursive(movedNode, oldPath, newPath);
+        Services.getInstance(p, Tools.class).updateChildrenPathsRecursive(movedNode, oldPath, newPath);
 
         Logger.info("Moved successfully to: " + newPath);
     }
 
     private void persistCopy(final DirectoryDto source, final DirectoryDto target) {
         // The indexer owns the file I/O (VFS copy).
-        Services.getInstance(project, ProjectIndexer.class).copyNode(source.getPath(), target.getPath());
+        Services.getInstance(p, ProjectIndexer.class).copyNode(source.getPath(), target.getPath());
         Logger.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
     }
 

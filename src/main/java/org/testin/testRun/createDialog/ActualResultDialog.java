@@ -19,13 +19,13 @@ import java.awt.*;
 
 public class ActualResultDialog {
 
-    private final Project project;
+    private final @NotNull Project p;
     private final TestRunItems runItem;
     private final ActualResultSection section;
     private final JBPopup popup;
 
     public ActualResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem) {
-        this.project = p;
+        this.p = p;
         this.runItem = runItem;
         this.section = new ActualResultSection();
 
@@ -109,7 +109,7 @@ public class ActualResultDialog {
 
     public void show() {
         if (popup != null) {
-            popup.showCenteredInCurrentWindow(project);
+            popup.showCenteredInCurrentWindow(p);
         }
     }
 }

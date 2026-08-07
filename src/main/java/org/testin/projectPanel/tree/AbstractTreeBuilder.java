@@ -15,14 +15,14 @@ import java.nio.file.Path;
 import java.util.List;
 
 public abstract class AbstractTreeBuilder {
-    protected final Project project;
+    protected final @NotNull Project p;
     protected final ProjectPanel projectPanel;
 
     @Getter
     protected DefaultMutableTreeNode rootNode;
 
     public AbstractTreeBuilder(final @NotNull Project p, final ProjectPanel projectPanel) {
-        this.project = p;
+        this.p = p;
         this.projectPanel = projectPanel;
         this.rootNode = new DefaultMutableTreeNode("loading..");
     }
@@ -32,10 +32,10 @@ public abstract class AbstractTreeBuilder {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
 
-                if (projectPanel.getProject().isDisposed()) return;
+                if (p.isDisposed()) return;
 
                 final Path rootPath = rootDirectoryDto.getPath();
 
@@ -79,7 +79,7 @@ public abstract class AbstractTreeBuilder {
     }
 
     private List<DirectoryDto> getChildrenFromIndexer(final Path path) {
-        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         return indexer.getChildren(path);
     }
 

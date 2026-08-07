@@ -6,14 +6,15 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowManager;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.logger.Logger;
 
 import java.util.Collection;
 
 public class CommitTabOpener {
 
-    public static void openCommitTabAndListFiles(Project project) {
-        ChangeListManager changeListManager = ChangeListManager.getInstance(project);
+    public static void openCommitTabAndListFiles(final @NotNull Project p) {
+        ChangeListManager changeListManager = ChangeListManager.getInstance(p);
         Collection<Change> allChanges = changeListManager.getAllChanges();
 
         Logger.info("--- Files with changes ---");
@@ -24,7 +25,7 @@ public class CommitTabOpener {
         }
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            ToolWindowManager manager = ToolWindowManager.getInstance(project);
+            ToolWindowManager manager = ToolWindowManager.getInstance(p);
 
             ToolWindow commitWindow = manager.getToolWindow("Commit");
 

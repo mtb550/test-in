@@ -52,11 +52,11 @@ public class ImportAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
+        final Project p = e.getProject();
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(p, Notifier.class).error(p, "Import Error", "Please select a directory in the Project Panel tree.");
             return;
         }
 
@@ -67,7 +67,7 @@ public class ImportAction extends DumbAwareAction {
                 !(dirDto instanceof TestSetDirectoryDto ||
                         dirDto instanceof TestSetPackageDirectoryDto ||
                         dirDto instanceof TestCasesMainDirectoryDto)) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Services.getInstance(p, Notifier.class).error(p, "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
 
@@ -79,23 +79,23 @@ public class ImportAction extends DumbAwareAction {
         }
 
         if (targetDirectory == null) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "The selected path in the Project Panel is invalid.");
+            Services.getInstance(p, Notifier.class).error(p, "Import Error", "The selected path in the Project Panel is invalid.");
             return;
         }
 
-        ImportDialog dialog = new ImportDialog(project, importAttributes, (file, format) -> format.importToFile(project, ImportAction.this, file));
+        ImportDialog dialog = new ImportDialog(p, importAttributes, (file, format) -> format.importToFile(p, ImportAction.this, file));
 
         if (dialog.showAndGet()) {
             Map<String, List<TestCaseDto>> selectedCasesBySheet = dialog.getSelectedTestCasesBySheet();
 
             if (selectedCasesBySheet.isEmpty()) {
-                Services.getInstance(project, Notifier.class).softShow(project, "No Selection", "No test cases were selected for import.");
+                Services.getInstance(p, Notifier.class).softShow(p, "No Selection", "No test cases were selected for import.");
                 return;
             }
 
-            executeImportWriteAction(project, targetDirectory, dirDto, parentNode, dialog, selectedCasesBySheet);
+            executeImportWriteAction(p, targetDirectory, dirDto, parentNode, dialog, selectedCasesBySheet);
         } else {
-            Services.getInstance(project, Notifier.class).softShow(project, "Import Cancelled", "Import was cancelled from preview dialog.");
+            Services.getInstance(p, Notifier.class).softShow(p, "Import Cancelled", "Import was cancelled from preview dialog.");
         }
     }
 
@@ -130,7 +130,7 @@ public class ImportAction extends DumbAwareAction {
 
                     String cName = Services.getInstance(p, Tools.class).removeSpecialChars(rawSheetName);
                     Path newDirPath = Path.of(targetDirectory.getPath()).resolve(cName);
-                    DirectoryDto dir = new CreateTestSet().execute(tree, p, cName, parentNode, selectedDirDto, newDirPath);
+                    DirectoryDto dir = new CreateTestSet(p).execute(tree, cName, parentNode, selectedDirDto, newDirPath);
 
                     // todo, to be enhanced later
                     VirtualFile sheetDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(newDirPath);

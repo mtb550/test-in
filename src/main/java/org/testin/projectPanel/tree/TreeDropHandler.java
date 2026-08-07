@@ -20,7 +20,7 @@ public class TreeDropHandler implements FileDropHandler {
 
     @Override
     public @Nullable Object handleDrop(final @NotNull FileDropEvent event, final @NotNull Continuation<? super Boolean> continuation) {
-        final Project project = event.getProject();
+        final @NotNull Project p = event.getProject();
         final Transferable transferable = event.getTransferable();
 
         if (!transferable.isDataFlavorSupported(TreeTransferHandler.NODE_FLAVOR)) {
@@ -36,13 +36,13 @@ public class TreeDropHandler implements FileDropHandler {
                     if (node.getUserObject() instanceof TestSetDirectoryDto ts) {
                         Logger.info("dragged Test set: " + ts.getName());
 
-                        Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, ts);
+                        Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, ts);
                         continue;
                     }
 
                     if (node.getUserObject() instanceof TestRunDirectoryDto tr) {
                         Logger.info("dragged Test Run: " + tr.getName());
-                        Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, tr);
+                        Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, tr);
                     }
                 }
             });

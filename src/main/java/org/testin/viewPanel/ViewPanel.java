@@ -37,10 +37,10 @@ public class ViewPanel implements Disposable {
     private final ViewPagination page;
 
     @Getter
-    private final Project project;
+    private final @NotNull Project p;
 
     public ViewPanel(final @NotNull Project p) {
-        this.project = p;
+        this.p = p;
         Disposer.register(p, this);
         detailsTab = new JBPanel<>(new BorderLayout());
         historyTab = new JBPanel<>(new BorderLayout());
@@ -58,7 +58,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        new ViewPanelExecutionSubscriber(this);
+        new ViewPanelExecutionSubscriber(p, this);
     }
 
     private JBScrollPane createScrollPane(Component view) {
@@ -91,11 +91,11 @@ public class ViewPanel implements Disposable {
     }
 
     public void show(final List<TestCaseDto> testCases, final ArrayList<String> path) {
-        this.show(project, testCases, path);
+        this.show(p, testCases, path);
     }
 
     public ViewPanel hide() {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
+        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw != null && tw.isVisible()) {
             tw.hide(null);
         }
@@ -107,7 +107,7 @@ public class ViewPanel implements Disposable {
     }
 
     private void selectContent(final ViewTab tab) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
+        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw == null) return;
 
         Content[] contents = tw.getContentManager().getContents();
@@ -120,7 +120,7 @@ public class ViewPanel implements Disposable {
     }
 
     public void hide(final TestCaseDto testCaseDtoToMatch) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
+        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw == null || !tw.isVisible()) return;
 
         TestCaseDto currentlyShown = this.getCurrentTestCaseDto();
@@ -141,7 +141,7 @@ public class ViewPanel implements Disposable {
         TestCaseDto currentTestCaseDto = this.getCurrentTestCaseDto();
         ArrayList<String> currentPath = this.page.getCurrentPath();
 
-        new DetailsTab().load(project, detailsTab, currentTestCaseDto, currentPath);
+        new DetailsTab().load(p, detailsTab, currentTestCaseDto, currentPath);
         new HistoryTab().load(historyTab);
         new OpenBugsTab().load(openBugsTab);
 

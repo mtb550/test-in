@@ -40,8 +40,8 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Project project = e.getProject();
-        if (project == null || !(editor instanceof RunEditor runEditor)) return;
+        final Project p = e.getProject();
+        if (p == null || !(editor instanceof RunEditor runEditor)) return;
 
         TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
         TestRunStatus newStatus;
@@ -56,7 +56,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
             return;
         }
 
-        applyStatusChange(project, runEditor, newStatus);
+        applyStatusChange(p, runEditor, newStatus);
     }
 
     @Override
@@ -157,15 +157,15 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
                 final Path runPath = editor.getParent().getPath();
                 final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(runPath);
 
+                if (trd == null) return;
+
                 TestRunMarker marker = trd.getMarker();
 
-                if (marker != null) {
-                    marker.setStatus(editor.getParent().getMarker().getStatus());
-                    marker.setCreatedAt(editor.getParent().getMarker().getCreatedAt());
+                marker.setStatus(editor.getParent().getMarker().getStatus());
+                marker.setCreatedAt(editor.getParent().getMarker().getCreatedAt());
 
-                    indexer.updateRunMarker(p, runPath, marker);
-                    Logger.trace("Marker persisted -> " + marker.getStatus().getLabel());
-                }
+                indexer.updateRunMarker(p, runPath, marker);
+                Logger.trace("Marker persisted -> " + marker.getStatus().getLabel());
             } catch (final Exception ex) {
                 Logger.error("Failed to persist marker: " + ex.getMessage());
             }

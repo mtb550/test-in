@@ -1,6 +1,7 @@
 package org.testin.enums;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.testin.generateJavaCode.GeneratorAction;
@@ -13,6 +14,7 @@ import org.testin.nodeCreator.NodeCreator;
 import org.testin.testRun.CreateTestRun;
 
 import javax.swing.*;
+import java.util.function.Function;
 
 @Getter
 @AllArgsConstructor
@@ -24,7 +26,7 @@ public enum DirectoryType {
             TestProjectDirectoryDto.class,
             ".tp",
             null,
-            (project, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(project, dir)
+            (p, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir)
     ),
 
     TCD(
@@ -53,8 +55,8 @@ public enum DirectoryType {
             AllIcons.Nodes.WebFolder,
             TestSetPackageDirectoryDto.class,
             ".tsp",
-            new CreateTestSetPackage(),
-            (project, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(project, dir)
+            CreateTestSetPackage::new,
+            (p, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir)
     ),
 
     TRP(
@@ -63,7 +65,7 @@ public enum DirectoryType {
             AllIcons.Nodes.WebFolder,
             TestRunPackageDirectoryDto.class,
             ".trp",
-            new CreateTestRunPackage(),
+            CreateTestRunPackage::new,
             null
     ),
 
@@ -73,8 +75,8 @@ public enum DirectoryType {
             AllIcons.FileTypes.Text,
             TestSetDirectoryDto.class,
             ".ts",
-            new CreateTestSet(),
-            (project, dir) -> GeneratorType.CREATE_TEST_SET.getAction().execute(project, dir)
+            CreateTestSet::new,
+            (p, dir) -> GeneratorType.CREATE_TEST_SET.getAction().execute(p, dir)
     ),
 
     TR(
@@ -83,7 +85,7 @@ public enum DirectoryType {
             AllIcons.Nodes.Services,
             TestRunDirectoryDto.class,
             ".tr",
-            new CreateTestRun(),
+            CreateTestRun::new,
             null
     ),
 
@@ -102,6 +104,6 @@ public enum DirectoryType {
     private final Icon icon;
     private final Class<? extends DirectoryDto> clazz;
     private final String marker;
-    private final NodeCreator action;
+    private final Function<Project, NodeCreator> action;
     private final GeneratorAction codeGenerator;
 }

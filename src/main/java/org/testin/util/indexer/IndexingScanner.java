@@ -23,11 +23,11 @@ import java.util.stream.Stream;
 
 final class IndexingScanner {
 
-    private final Project project;
+    private final @NotNull Project p;
     private final IndexerDataStore store;
 
     IndexingScanner(final @NotNull Project p, final @NotNull IndexerDataStore store) {
-        this.project = p;
+        this.p = p;
         this.store = store;
     }
 
@@ -41,7 +41,7 @@ final class IndexingScanner {
 
     private void scanProjectContents(final Path projectPath, final ProgressIndicator indicator) {
         try {
-            final TestProjectDirectoryDto tp = Services.getInstance(project, DirectoryMapper.class).getTestProjectNode(project, projectPath);
+            final TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
 
             if (tp.getMarker().getStatus() == ProjectStatus.ARCHIVED) {
                 Logger.info("Skipping archived project: " + projectPath.getFileName());
@@ -86,7 +86,7 @@ final class IndexingScanner {
             // Sequential recursion: scanTestSet updates the ProgressIndicator, which is
             // not thread-safe, so the tree walk must stay on one thread. Only the leaf
             // file reads inside scanTestSet are parallelised.
-            dirs.stream().forEach(dirPath -> {
+            dirs.forEach(dirPath -> {
                 if (Files.exists(dirPath.resolve(DirectoryType.TS.getMarker()))) {
                     scanTestSet(dirPath, parent, indicator);
 
@@ -104,8 +104,8 @@ final class IndexingScanner {
 
     private void scanTestSetPackage(final Path path, final DirectoryDto parent, final ProgressIndicator indicator) {
         try {
-            final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
-            final TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(project, path, parent);
+            final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
+            final TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(p, path, parent);
 
             store.getTestSetPackagesByPath().put(path.toString(), tsp);
 
@@ -128,13 +128,13 @@ final class IndexingScanner {
     private void scanTestSet(final Path path, final DirectoryDto parent,
                              final ProgressIndicator indicator) {
         try {
-            final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
-            final TestSetDirectoryDto ts = dirMapper.getTestSetNode(project, path, parent);
+            final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
+            final TestSetDirectoryDto ts = dirMapper.getTestSetNode(p, path, parent);
 
             store.getTestSetsDirByPath().put(path.toString(), ts);
 
             final List<UUID> caseIds = Collections.synchronizedList(new ArrayList<>());
-            final Mapper mapper = Services.getInstance(project, Mapper.class);
+            final Mapper mapper = Services.getInstance(p, Mapper.class);
 
             try (Stream<Path> files = Files.list(path)) {
                 files.filter(Files::isRegularFile)
@@ -143,11 +143,6 @@ final class IndexingScanner {
                         .forEach(filePath -> {
                             try {
                                 final TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
-                                if (tc == null || tc.getId() == null) {
-                                    Logger.warn("Skipping non-test-case json '" + filePath.getFileName() +
-                                            "' in " + path);
-                                    return;
-                                }
                                 tc.setParent(ts);
                                 store.getTestCasesById().put(tc.getId(), tc);
                                 caseIds.add(tc.getId());
@@ -172,7 +167,7 @@ final class IndexingScanner {
         try (Stream<Path> paths = Files.list(trDir)) {
             final List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
-            dirs.stream().forEach(dirPath -> {
+            dirs.forEach(dirPath -> {
                 if (Files.exists(dirPath.resolve(DirectoryType.TR.getMarker()))) {
                     scanTestRun(dirPath, parent, indicator);
                 } else if (Files.exists(dirPath.resolve(DirectoryType.TRP.getMarker()))) {
@@ -189,8 +184,8 @@ final class IndexingScanner {
     private void scanTestRunPackageDir(final Path path, final DirectoryDto parent,
                                        final ProgressIndicator indicator) {
         try {
-            final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
-            final TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(project, path, parent);
+            final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
+            final TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
 
             store.getTestRunPackagesByPath().put(path.toString(), trp);
 
@@ -213,15 +208,15 @@ final class IndexingScanner {
     private void scanTestRun(final Path path, final DirectoryDto parent,
                              final ProgressIndicator indicator) {
         try {
-            final DirectoryMapper dirMapper = Services.getInstance(project, DirectoryMapper.class);
-            final TestRunDirectoryDto tr = dirMapper.getTestRunNode(project, path, parent);
+            final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
+            final TestRunDirectoryDto tr = dirMapper.getTestRunNode(p, path, parent);
 
             store.getTestRunsDirByPath().put(path.toString(), tr);
 
             final String fileName = path.getFileName().toString();
             final Path jsonPath = path.resolve(fileName + ".json");
             if (Files.exists(jsonPath)) {
-                final Mapper mapper = Services.getInstance(project, Mapper.class);
+                final Mapper mapper = Services.getInstance(p, Mapper.class);
                 final TestRunDto trr = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
                 store.getTestRunsByPath().put(path.toString(), trr);
             }

@@ -26,7 +26,7 @@ public class Main implements ToolWindowFactory, DumbAware {
             final ProjectPanel projectPanel = Services.getInstance(p, ProjectPanel.class);
             final Content content = ContentFactory.getInstance().createContent(projectPanel.getPanel(), null, false);
 
-            tw.setTitleActions(ProjectPanelActions.create(projectPanel));
+            tw.setTitleActions(ProjectPanelActions.create(p, projectPanel));
             tw.getContentManager().addContent(content);
 
             Disposer.register(content, projectPanel);

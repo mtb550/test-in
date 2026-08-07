@@ -32,7 +32,7 @@ import java.awt.*;
 @Getter
 @Service(Service.Level.PROJECT)
 public final class ProjectPanel implements Disposable {
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
     private final @NotNull TestProjectSelector testProjectSelector;
     private final @NotNull TestProjectTreeBuilder testProjectTreeBuilder;
@@ -42,7 +42,7 @@ public final class ProjectPanel implements Disposable {
     private @NotNull ProjectTree projectTree;
 
     public ProjectPanel(final @NotNull Project p) {
-        this.project = p;
+        this.p = p;
         Logger.info("ProjectPanel.ProjectPanel()");
 
         testProjectSelector = new TestProjectSelector(p, this);
@@ -68,12 +68,12 @@ public final class ProjectPanel implements Disposable {
             JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
             topBar.add(testProjectSelector.getSelectedTestProject(), BorderLayout.NORTH);
 
-            branchSelector = new BranchSelector(project, this, testProjectSelector.getSelectedTestProject().getItem());
+            branchSelector = new BranchSelector(p, this, testProjectSelector.getSelectedTestProject().getItem());
             topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
 
             panel.add(topBar, BorderLayout.NORTH);
 
-            projectTree = new ProjectTree(project, this);
+            projectTree = new ProjectTree(p, this);
             panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         } else {
@@ -100,12 +100,12 @@ public final class ProjectPanel implements Disposable {
         emptyText.appendLine("");
         emptyText.appendLine("");
 
-        if (Services.getInstance(project, Setting.class).getTestinPath().toString().isEmpty())
+        if (Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty())
             emptyText.appendLine(
                     AllIcons.General.Settings,
                     "Configure Testin settings",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> ShowSettingsUtil.getInstance().showSettingsDialog(project, SettingsConfigurable.class)
+                    e -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)
             );
 
         else
@@ -116,7 +116,7 @@ public final class ProjectPanel implements Disposable {
                     e -> {
                         final CreateTestProjectAction action = new CreateTestProjectAction(this);
                         final AnActionEvent event = AnActionEvent.createEvent(
-                                SimpleDataContext.getProjectContext(project),
+                                SimpleDataContext.getProjectContext(p),
                                 action.getTemplatePresentation().clone(),
                                 "createTestProject",
                                 ActionUiKind.NONE,

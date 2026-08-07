@@ -37,7 +37,7 @@ import java.util.function.BiFunction;
 public class ImportDialog extends DialogWrapper {
     private final Map<String, DefaultTableModel> tableModelsMap = new LinkedHashMap<>();
 
-    private final Project project;
+    private final @NotNull Project p;
 
     @Getter
     private final CodeGeneratorDialog cg = new CodeGeneratorDialog(GeneratorType.CREATE_TEST_CASE);
@@ -54,7 +54,7 @@ public class ImportDialog extends DialogWrapper {
 
     public ImportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
         super(p, true);
-        this.project = p;
+        this.p = p;
         this.importAttributes = importAttributes;
 
         cg.setText("create test methods");
@@ -148,10 +148,10 @@ public class ImportDialog extends DialogWrapper {
             String sheetName = entry.getKey();
             List<TestCaseDto> testCases = entry.getValue();
 
-            DefaultTableModel model = new TablePanelBuilder().createModel(project, importAttributes, testCases);
-            model.addTableModelListener(new CellEditListener(importAttributes, project, testCases));
+            DefaultTableModel model = new TablePanelBuilder().createModel(p, importAttributes, testCases);
+            model.addTableModelListener(new CellEditListener(importAttributes, p, testCases));
             tableModelsMap.put(sheetName, model);
-            tableTabbedPane.addTab(sheetName, new JScrollPane(new TablePanelBuilder().buildTable(model, project)));
+            tableTabbedPane.addTab(sheetName, new JScrollPane(new TablePanelBuilder().buildTable(model, p)));
         }
     }
 
@@ -159,12 +159,12 @@ public class ImportDialog extends DialogWrapper {
     protected void doOKAction() {
         String filePath = fileField.getText().trim();
         if (filePath.isEmpty()) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select a source file first.");
+            Services.getInstance(p, Notifier.class).error(p, "Import Error", "Please select a source file first.");
             return;
         }
 
         if (originalSheetsData.isEmpty()) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "No data loaded from the selected file.");
+            Services.getInstance(p, Notifier.class).error(p, "Import Error", "No data loaded from the selected file.");
             return;
         }
 
@@ -182,7 +182,7 @@ public class ImportDialog extends DialogWrapper {
         }
 
         if (!hasSelection) {
-            Services.getInstance(project, Notifier.class).error(project, "Import Error", "Please select at least one test case to import.");
+            Services.getInstance(p, Notifier.class).error(p, "Import Error", "Please select at least one test case to import.");
             return;
         }
 

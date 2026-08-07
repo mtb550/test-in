@@ -3,11 +3,11 @@ package org.testin.settings.Dialogs;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBTextField;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.notifications.Notifier;
 import org.testin.util.services.Services;
 
@@ -21,10 +21,12 @@ import java.nio.file.Path;
 
 public final class TestinPathPanel {
 
+    private final Project p;
     private final TextFieldWithBrowseButton pathField = new TextFieldWithBrowseButton();
     private final JButton openFolderBtn = new JButton("Open");
 
-    public TestinPathPanel() {
+    public TestinPathPanel(final @NotNull Project p) {
+        this.p = p;
         setupField();
         setupOpenButton();
         setupValidationListener();
@@ -52,11 +54,7 @@ public final class TestinPathPanel {
                 Desktop.getDesktop().open(new File(pathField.getText()));
 
             } catch (final Exception ex) {
-                // todo, change this to get the correct project direct.
-                Project project = ProjectManager.getInstance().getDefaultProject();
-
-                Services.getInstance(project, Notifier.class)
-                        .error(project, "Error", "Could not open folder: " + ex.getMessage());
+                Services.getInstance(p, Notifier.class).error(p, "Error", "Could not open folder: " + ex.getMessage());
             }
         });
     }

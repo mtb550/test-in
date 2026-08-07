@@ -1,10 +1,16 @@
 package org.testin.testCase.updateDialog.bulk;
 
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.List;
 
 public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
+
+    public DescriptionBulkSectionDialog(final @NotNull Project p) {
+        super(p);
+    }
 
     @Override
     protected String getPopupTitle() {

@@ -19,10 +19,10 @@ public class SelectionListener implements ListSelectionListener {
     private final IEditor editor;
     private final ArrayList<String> path;
 
-    private final Project project;
+    private final @NotNull Project p;
 
     public SelectionListener(final @NotNull Project p, final JBList<TestCaseDto> list, final IEditor editor, final ArrayList<String> path) {
-        this.project = p;
+        this.p = p;
         this.list = list;
         this.editor = editor;
         this.path = path;
@@ -36,7 +36,7 @@ public class SelectionListener implements ListSelectionListener {
             if (selected != null && !selected.isEmpty()) {
                 list.ensureIndexIsVisible(list.getSelectedIndex());
 
-                Optional.ofNullable(ViewToolWindowFactory.getToolWindow(project))
+                Optional.ofNullable(ViewToolWindowFactory.getToolWindow(p))
                         .filter(ToolWindow::isVisible)
                         .map(tw -> ViewToolWindowFactory.getViewPanel())
                         .ifPresent(viewer -> viewer.show(selected, path));

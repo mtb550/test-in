@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class TestEditorCM extends EditorContextMenu {
+public class TestEditorContextMenu extends EditorContextMenu {
     @Getter
     private static final Set<UUID> globalPendingCutIds = new HashSet<>();
 
@@ -44,10 +44,10 @@ public class TestEditorCM extends EditorContextMenu {
     @Setter
     private static IEditor globalSourceEditorUI = null;
 
-    public TestEditorCM(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    public TestEditorContextMenu(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
 
-        add(new CreateTestCaseAction(ui, dir, list));
+        add(new CreateTestCaseAction(p, ui, dir, list));
         add(new ViewDetailsAction(list, dir.getPath2()));
 
         addSeparator();
@@ -81,9 +81,9 @@ public class TestEditorCM extends EditorContextMenu {
         globalSourceEditorUI = null;
     }
 
-    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditorCM testEditorCM) {
+    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditorContextMenu testEditorContextMenu) {
         new EscapeAction(list);
-        new OpenContextMenuAction(list, testEditorCM);
+        new OpenContextMenuAction(list, testEditorContextMenu);
         new CloseTestCaseDetailsAction(list);
     }
 

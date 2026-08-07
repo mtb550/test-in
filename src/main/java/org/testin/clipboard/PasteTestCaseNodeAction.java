@@ -12,7 +12,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditor;
-import org.testin.editorPanel.testEditor.TestEditorCM;
+import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.RemoveTestCaseAction;
 import org.testin.util.KeyboardSet;
@@ -41,21 +41,21 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (e.getProject() == null) return;
-        final Project project = e.getProject();
-        List<TestCaseDto> pastedCases = getFromClipboard(project);
+        final Project p = e.getProject();
+        List<TestCaseDto> pastedCases = getFromClipboard(p);
         if (pastedCases.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
             TestEditor destUI = (editor instanceof TestEditor) ? (TestEditor) editor : null;
             if (destUI == null) return;
 
-            boolean isCut = TestEditorCM.isGlobalCutAction();
-            IEditor sourceUI = TestEditorCM.getGlobalSourceEditorUI();
+            boolean isCut = TestEditorContextMenu.isGlobalCutAction();
+            IEditor sourceUI = TestEditorContextMenu.getGlobalSourceEditorUI();
 
             if (isCut && sourceUI != null) {
 
                 List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
-                        .filter(tc -> TestEditorCM.getGlobalPendingCutIds().contains(tc.getId()))
+                        .filter(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()))
                         .collect(Collectors.toList());
 
                 ApplicationManager.getApplication().runWriteAction(() ->
@@ -71,7 +71,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             for (TestCaseDto tc : pastedCases) {
                 if (tc == null) continue;
 
-                TestCaseDto clonedTc = cloneForPasting(project, tc, isCut);
+                TestCaseDto clonedTc = cloneForPasting(p, tc, isCut);
 
                 if (destUI.getParent() != null) {
                     clonedTc.setParent(destUI.getParent());
@@ -83,7 +83,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
             destUI.updateSequenceAndSaveAll();
 
             if (isCut) {
-                TestEditorCM.clearCutState();
+                TestEditorContextMenu.clearCutState();
             }
         });
     }

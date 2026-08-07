@@ -19,10 +19,10 @@ import java.util.List;
 
 @Service(Service.Level.PROJECT)
 public final class TestCasePersistService implements Disposable {
-    private final Project project;
+    private final @NotNull Project p;
 
     public TestCasePersistService(final @NotNull Project p) {
-        this.project = p;
+        this.p = p;
     }
 
     public void persist(final Path path, final @Nullable List<TestCaseDto> tcs) {
@@ -32,14 +32,14 @@ public final class TestCasePersistService implements Disposable {
             try {
                 VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
                 if (dirVFile == null) {
-                    Services.getInstance(project, Notifier.class).error(project, "Save Error", "Could not resolve directory: " + path);
+                    Services.getInstance(p, Notifier.class).error(p, "Save Error", "Could not resolve directory: " + path);
                     return;
                 }
 
                 for (TestCaseDto tc : tcs) {
                     if (tc == null) continue;
 
-                    Services.getInstance(project, ProjectIndexer.class).putTestCase(path, tc);
+                    Services.getInstance(p, ProjectIndexer.class).putTestCase(path, tc);
 
                     String fileName = tc.getId() + ".json";
                     VirtualFile targetFile = dirVFile.findChild(fileName);
@@ -48,12 +48,12 @@ public final class TestCasePersistService implements Disposable {
                         targetFile = dirVFile.createChildData(this, fileName);
                     }
 
-                    byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(tc);
+                    byte[] jsonBytes = Services.getInstance(p, Mapper.class).writeValueAsBytes(tc);
                     targetFile.setBinaryContent(jsonBytes);
                 }
 
             } catch (final IOException ex) {
-                Services.getInstance(project, Notifier.class).error(project, "Save Error", "Failed to persist data: " + ex.getMessage());
+                Services.getInstance(p, Notifier.class).error(p, "Save Error", "Failed to persist data: " + ex.getMessage());
             }
         }));
     }

@@ -17,11 +17,13 @@ import javax.swing.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RefreshAction extends DumbAwareAction {
+    private final @NotNull Project p;
     private final ProjectPanel projectPanel;
     private final AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
-    public RefreshAction(final @NotNull ProjectPanel projectPanel) {
+    public RefreshAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
         super("Refresh", "Re-index and reload tree", AllIcons.Actions.Refresh);
+        this.p = p;
         this.projectPanel = projectPanel;
     }
 
@@ -31,14 +33,12 @@ public class RefreshAction extends DumbAwareAction {
             return;
         }
 
-        final Project project = projectPanel.getProject();
-
         Logger.info("Refresh: re-indexing started");
 
         final TestProjectDirectoryDto previouslySelected = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
         final String previousProjectName = previouslySelected != null ? previouslySelected.getName() : null;
 
-        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.resetForReindex();
 
         indexer.indexWithProgress();

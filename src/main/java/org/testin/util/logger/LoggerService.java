@@ -63,10 +63,10 @@ public final class LoggerService implements Disposable {
 
     private Path getLogFile() {
         try {
-            Project project = Logger.getProject();
+            Project p = Logger.getProject();
             Path projectDir;
-            if (project != null && project.getBasePath() != null) {
-                projectDir = Path.of(project.getBasePath());
+            if (p != null && p.getBasePath() != null) {
+                projectDir = Path.of(p.getBasePath());
             } else {
                 projectDir = Path.of("").toAbsolutePath();
             }

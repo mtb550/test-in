@@ -12,8 +12,8 @@ import org.jetbrains.annotations.Nullable;
 public class TestinHideActivity implements ProjectActivity {
     @Nullable
     @Override
-    public Object execute(@NotNull Project project, @NotNull Continuation<? super Unit> continuation) {
-        ChangeListManager manager = ChangeListManager.getInstance(project);
+    public Object execute(final @NotNull Project p, @NotNull Continuation<? super Unit> continuation) {
+        ChangeListManager manager = ChangeListManager.getInstance(p);
 
         LocalChangeList list = manager.findChangeList("testin Automation");
         if (list == null) {

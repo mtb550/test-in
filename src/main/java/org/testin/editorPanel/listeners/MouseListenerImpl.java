@@ -28,7 +28,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class MouseListenerImpl extends MouseAdapter {
-    private final @NotNull Project project;
+    private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull CollectionListModel<TestCaseDto> model;
     private final @NotNull EditorContextMenu cm;
@@ -36,7 +36,7 @@ public class MouseListenerImpl extends MouseAdapter {
     private final @NotNull IEditor editor;
 
     public MouseListenerImpl(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull EditorContextMenu cm) {
-        this.project = p;
+        this.p = p;
         this.editor = editor;
         this.list = list;
         this.path = dir.getPath2();
@@ -51,7 +51,7 @@ public class MouseListenerImpl extends MouseAdapter {
 
         if (SwingUtilities.isLeftMouseButton(e) && e.getClickCount() == 2) {
             if (isClickOnItem)
-                Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(project, List.of(selected), path));
+                Optional.ofNullable(model.getElementAt(index)).ifPresent(selected -> ViewToolWindowFactory.showPanel(p, List.of(selected), path));
 
             return;
         }
@@ -87,11 +87,11 @@ public class MouseListenerImpl extends MouseAdapter {
 
             if (action == CardHoverAction.NAVIGATE_TO_TEST_METHOD) {
                 Logger.trace("navigate action, tc: " + tc.getDescription());
-                new NavigateToCodeAction(list).execute(project, tc);
+                new NavigateToCodeAction(list).execute(p, tc);
 
             } else if (action == CardHoverAction.RUN_TEST_CASE) {
                 Logger.trace("run action, tc: " + tc.getDescription());
-                new RunTestCaseAction(list).execute(project, tc);
+                new RunTestCaseAction(list).execute(p, tc);
             }
 
             e.consume();
