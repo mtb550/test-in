@@ -158,12 +158,7 @@ public class ExportAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-//        final TreePath path = tree.getSelectionPath();
-//
-//        e.getPresentation().setEnabled(path != null &&
-//                tree.getSelectionCount() == 1 &&
-//                ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject() instanceof DirectoryDto
-//        );
+
         final TreePath path = tree.getSelectionPath();
         final int selectionCount = tree.getSelectionCount();
 

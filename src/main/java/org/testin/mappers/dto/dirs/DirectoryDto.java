@@ -58,8 +58,6 @@ public abstract class DirectoryDto {
     @NonNull
     public abstract CreateNodeMenu getMenu();
 
-    // Polymorphic directory-object resolution: each concrete directory knows how to resolve
-    // the object at a child folder, replacing the instanceof/if-chain in CreateTestRun.
     @Nullable
     public abstract Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer);
 }

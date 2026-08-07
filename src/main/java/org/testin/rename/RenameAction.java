@@ -27,7 +27,6 @@ import java.nio.file.Path;
 
 public class RenameAction extends DumbAwareAction {
     private final @NotNull Project p;
-    // todo: rename projectPanel to pp @ all classes
     private final @NotNull ProjectPanel pp;
     private final @NotNull SimpleTree tree;
 
@@ -58,11 +57,8 @@ public class RenameAction extends DumbAwareAction {
         Path oldPath = dir.getPath();
         Path newPath = oldPath.getParent().resolve(newName);
 
-        // The indexer owns file I/O + in-memory state: rename the directory on disk and
-        // update the store (paths, name, path2, modified metadata).
         Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath);
 
-        // UI-only updates, after the store is consistent.
         Services.getInstance(p, Tools.class).updateChildrenPathsRecursive(node, oldPath, newPath);
         ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
 
@@ -72,6 +68,7 @@ public class RenameAction extends DumbAwareAction {
 
         Logger.info("Success! Renamed to: " + newName);
 
+        // todo: update indexer and its child after rename
         // todo: add code generator code to change the name in automation code.
     }
 

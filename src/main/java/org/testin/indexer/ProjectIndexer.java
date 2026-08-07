@@ -157,8 +157,6 @@ public final class ProjectIndexer {
     }
 
     private void finishWithFailure() {
-        // Un-stick the indexer: leave indexed=false so the next indexWithProgress() can
-        // retry, but clear the in-progress flag so calls no longer bail out on it.
         if (indexingLatch.getCount() == 0) {
             indexing.set(false);
             Logger.warn("Indexing finished with errors; will retry on the next request.");
@@ -167,8 +165,6 @@ public final class ProjectIndexer {
 
     private void restoreOpenEditorsOnce() {
         ApplicationManager.getApplication().invokeLater(() -> {
-            // getAndSet(false) makes this a proper one-shot: restore exactly once and
-            // clear the flag (resetForReindex() pre-clears it to skip the restore).
             if (restoreEditorsOnComplete.getAndSet(false)) {
                 Logger.info("Indexing finished, restoring open editors.");
                 Services.getInstance(p, EditorUtil.class).restoreLastOpened(p);
@@ -400,7 +396,6 @@ public final class ProjectIndexer {
     }
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
-        // The indexer owns file I/O: rename the directory on disk first, then update the store.
         Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, "Rename Failed", vf -> {
             try {
                 vf.rename(this, newPath.getFileName().toString());

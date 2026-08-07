@@ -83,9 +83,6 @@ final class IndexingScanner {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
-            // Sequential recursion: scanTestSet updates the ProgressIndicator, which is
-            // not thread-safe, so the tree walk must stay on one thread. Only the leaf
-            // file reads inside scanTestSet are parallelised.
             dirs.forEach(dirPath -> {
                 if (Files.exists(dirPath.resolve(DirectoryType.TS.getMarker()))) {
                     scanTestSet(dirPath, parent, indicator);

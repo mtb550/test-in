@@ -188,6 +188,7 @@ reduce arrow padding &
 apply tree async model
 update tree dialogs to apply rename, remove from automation
 add separate grid view button.
+fix all todo comments
 
 
 
