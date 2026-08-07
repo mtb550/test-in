@@ -146,7 +146,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
             if (item.getStatus() == TestStatus.PENDING) {
                 item.setStatus(TestStatus.UNTESTED);
                 item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-                item.setExecutedBy(AppSettingsState.getInstance().testerName);
+                item.setExecutedBy(Services.getInstance(p, AppSettingsState.class).testerName);
             }
         }
     }

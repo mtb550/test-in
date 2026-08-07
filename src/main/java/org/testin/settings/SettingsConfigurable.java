@@ -80,7 +80,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        AppSettingsState settings = AppSettingsState.getInstance();
+        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().equals(settings.rootTestinPath);
         modified |= !rootAutomationPathField.getText().equals(settings.rootAutomationPath);
         modified |= readModeCheckBox.isSelected() != settings.readMode;
@@ -93,7 +93,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public void apply() {
-        AppSettingsState settings = AppSettingsState.getInstance();
+        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         settings.rootTestinPath = testinPathPanel.getPathText();
         settings.rootAutomationPath = rootAutomationPathField.getText();
@@ -125,7 +125,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public void reset() {
-        AppSettingsState settings = AppSettingsState.getInstance();
+        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         testinPathPanel.setPathText(settings.rootTestinPath);
 

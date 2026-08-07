@@ -125,7 +125,7 @@ public class CreateTestRun implements NodeCreator {
 
     private void saveSelectedToJSON(final RunCreationForm form, final CheckedTreeNode root, final Path savePath, final ProjectPanel pp, final TestRunDirectoryDto trDir) {
         final TestRunDto tr = new TestRunDto()
-                .setCreatedBy(AppSettingsState.getInstance().testerName)
+                .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
                 .setChangeLog(form.getDescriptionField().getText().trim())
                 .setCommitId(form.getCommitIdField().getText().trim())
                 .setPlatform(form.getFieldValue(TestRunConfiguration.PLATFORM))

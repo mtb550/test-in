@@ -21,7 +21,7 @@ public final class StartupActivity implements ProjectActivity {
     public static void execute(final @NotNull Project p) {
         Logger.setProject(p);
 
-        AppSettingsState settings = AppSettingsState.getInstance();
+        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         if (settings.rootTestinPath == null || settings.rootTestinPath.isEmpty()) {
             Logger.info("First run detected — saving default settings to testinSettings.xml");
