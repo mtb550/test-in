@@ -16,12 +16,12 @@ import org.testin.util.services.Services;
 
 public class CreateTestProjectAction extends DumbAwareAction {
     private final @NotNull Project p;
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
 
-    public CreateTestProjectAction(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+    public CreateTestProjectAction(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         super("New Test Project", "Create or Clone test project", AllIcons.General.Add);
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
     }
 
     @Override
@@ -32,12 +32,12 @@ public class CreateTestProjectAction extends DumbAwareAction {
 
             if (type == DirectoryType.IMPORT_TP) {
                 String projectName = Services.getInstance(p, Tools.class).extractProjectNameFromUrl(name);
-                new CreateTestProjectCloneAction(p, name.trim(), projectName, projectPanel).actionPerformed(e);
+                new CreateTestProjectCloneAction(p, name.trim(), projectName, pp).actionPerformed(e);
                 return;
             }
 
             if (type == DirectoryType.TP) {
-                new CreateTestProjectNewAction(p, projectPanel, name.trim(), cg).actionPerformed(e);
+                new CreateTestProjectNewAction(p, pp, name.trim(), cg).actionPerformed(e);
             }
 
         }).show();

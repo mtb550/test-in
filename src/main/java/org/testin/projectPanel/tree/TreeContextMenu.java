@@ -26,12 +26,12 @@ import java.util.List;
 public class TreeContextMenu extends DefaultActionGroup {
     private final @NotNull Project p;
 
-    public TreeContextMenu(final @NotNull Project p, final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
+    public TreeContextMenu(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull SimpleTree tree) {
         super("Tree Popup Menu", true);
         this.p = p;
 
         add(new OpenActionAction(p, tree));
-        add(new CreateTreeNodeAction(p, projectPanel, tree));
+        add(new CreateTreeNodeAction(p, pp, tree));
 
         addSeparator();
 
@@ -42,8 +42,8 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ARCHIVED),
                         new UndoNodeAction(p, tree),
                         new RedoNodeAction(p, tree),
-                        new RemoveAction(p, tree, projectPanel),
-                        new RenameAction(p, projectPanel, tree),
+                        new RemoveAction(p, tree, pp),
+                        new RenameAction(p, pp, tree),
                         new CopyNodeAction(p, tree),
                         new CutNodeAction(p, tree),
                         new PasteNodeAction(p, tree))
@@ -61,7 +61,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        add(new SyncActionAction(p, tree, projectPanel));
+        add(new SyncActionAction(p, tree, pp));
         add(new ViewPendingCommitsAction(p, tree));
 
         addSeparator();

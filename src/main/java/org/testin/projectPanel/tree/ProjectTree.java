@@ -20,7 +20,7 @@ import java.util.Set;
 @Getter
 public class ProjectTree {
     private final @NotNull Project p;
-    private final ProjectPanel projectPanel;
+    private final ProjectPanel pp;
     private final JBScrollPane scrollPane;
     private final DefaultMutableTreeNode mainRoot;
     private final DefaultTreeModel treeModel;
@@ -28,11 +28,11 @@ public class ProjectTree {
     private final TreeTransferHandler transferHandler;
     private final TreeContextMenu treeContextMenu;
 
-    public ProjectTree(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+    public ProjectTree(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
 
-        final TestProjectDirectoryDto testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+        final TestProjectDirectoryDto testProjectDirectory = (TestProjectDirectoryDto) pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
         this.mainRoot = new DefaultMutableTreeNode(testProjectDirectory != null ? testProjectDirectory : "Project");
         this.treeModel = new DefaultTreeModel(mainRoot);
@@ -53,7 +53,7 @@ public class ProjectTree {
         this.transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes);
         mainTree.setTransferHandler(transferHandler);
 
-        treeContextMenu = new TreeContextMenu(p, projectPanel, mainTree);
+        treeContextMenu = new TreeContextMenu(p, pp, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
 
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
@@ -61,7 +61,7 @@ public class ProjectTree {
 
     public void updateNodes() {
         ApplicationManager.getApplication().invokeLater(() -> {
-            projectPanel.getTestProjectSelector().loadTestProjectList();
+            pp.getTestProjectSelector().loadTestProjectList();
             doRefreshTree();
         });
     }
@@ -69,14 +69,14 @@ public class ProjectTree {
     private void doRefreshTree() {
         mainRoot.removeAllChildren();
 
-        final TestProjectDirectoryDto testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+        final TestProjectDirectoryDto testProjectDirectory = (TestProjectDirectoryDto) pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
         if (testProjectDirectory != null) {
             mainRoot.setUserObject(testProjectDirectory);
 
             if (testProjectDirectory.getMarker().getStatus() == ProjectStatus.ACTIVE) {
-                DefaultMutableTreeNode tcNode = projectPanel.getTestCaseTreeBuilder().getRootNode();
-                DefaultMutableTreeNode trNode = projectPanel.getTestRunTreeBuilder().getRootNode();
+                DefaultMutableTreeNode tcNode = pp.getTestCaseTreeBuilder().getRootNode();
+                DefaultMutableTreeNode trNode = pp.getTestRunTreeBuilder().getRootNode();
 
                 if (tcNode != null) mainRoot.add(tcNode);
                 if (trNode != null) mainRoot.add(trNode);

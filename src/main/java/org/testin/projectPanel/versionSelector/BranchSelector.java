@@ -24,7 +24,7 @@ public class BranchSelector {
     private final boolean showRemote = false;
 
     private final @NotNull Project p;
-    private final ProjectPanel projectPanel;
+    private final ProjectPanel pp;
     private final ComboBox<String> comboBox;
     private final DefaultComboBoxModel<String> model;
 
@@ -33,9 +33,9 @@ public class BranchSelector {
 
     private boolean isUpdating = false;
 
-    public BranchSelector(final @NotNull Project p, final ProjectPanel projectPanel, final TestProjectDirectoryDto testProjectDirectory) {
+    public BranchSelector(final @NotNull Project p, final ProjectPanel pp, final TestProjectDirectoryDto testProjectDirectory) {
         this.p = p;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
 
@@ -104,10 +104,10 @@ public class BranchSelector {
                     currentBranch = targetBranch;
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        TestProjectDirectoryDto currentProject = projectPanel.getTestProjectSelector().getSelectedTestProject().getItem();
+                        TestProjectDirectoryDto currentProject = pp.getTestProjectSelector().getSelectedTestProject().getItem();
                         if (currentProject != null) {
-                            projectPanel.getTestCaseTreeBuilder().buildTree(currentProject);
-                            projectPanel.getTestRunTreeBuilder().buildTree(currentProject);
+                            pp.getTestCaseTreeBuilder().buildTree(currentProject);
+                            pp.getTestRunTreeBuilder().buildTree(currentProject);
                         }
                     });
 

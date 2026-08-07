@@ -26,14 +26,14 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
     private final @NotNull Project p;
     private final @NotNull String gitUrl;
     private final @NotNull String projectName;
-    private final @NotNull ProjectPanel projectPanel;
+    private final @NotNull ProjectPanel pp;
 
-    public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull ProjectPanel projectPanel) {
+    public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull ProjectPanel pp) {
         super("Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
         this.p = p;
         this.gitUrl = gitUrl;
         this.projectName = name;
-        this.projectPanel = projectPanel;
+        this.pp = pp;
     }
 
     @Override
@@ -65,9 +65,9 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
                         indexer.scanSingleProject(projectPath);
                         final TestProjectDirectoryDto clonedProject = indexer.getTestProjectsByPath().get(projectPath.toString());
                         if (clonedProject != null)
-                            projectPanel.getTestProjectSelector().addTestProject(clonedProject);
+                            pp.getTestProjectSelector().addTestProject(clonedProject);
 
-                        projectPanel.getProjectTree().updateNodes();
+                        pp.getProjectTree().updateNodes();
                         Services.getInstance(p, Notifier.class).info(p, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
                     });
 
