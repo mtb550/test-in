@@ -20,7 +20,7 @@ public class ZoomIndicatorDialog {
     private static JBPopup currentPopup;
     private static Timer hideTimer;
 
-    public static void show(final @NotNull Project project, final JComponent parent, float currentSize) {
+    public static void show(final @NotNull Project p, final JComponent parent, float currentSize) {
         if (currentPopup != null && !currentPopup.isDisposed()) currentPopup.cancel();
 
         JBPanel<?> panel = new JBPanel<>();
@@ -37,8 +37,8 @@ public class ZoomIndicatorDialog {
             @Override
             public void mouseClicked(final MouseEvent e) {
                 if (currentPopup != null) currentPopup.cancel();
-                if (!project.isDisposed()) {
-                    ShowSettingsUtilImpl.showSettingsDialog(project, "preferences.editor", "Change font size");
+                if (!p.isDisposed()) {
+                    ShowSettingsUtilImpl.showSettingsDialog(p, "preferences.editor", "Change font size");
                 }
             }
         });

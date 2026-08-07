@@ -27,7 +27,7 @@ public class ExportExcel {
         this.exportAction = exportAction;
     }
 
-    public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
         try (Workbook workbook = new XSSFWorkbook()) {
             CellStyle headerStyle = workbook.createCellStyle();
             Font headerFont = workbook.createFont();
@@ -58,7 +58,7 @@ public class ExportExcel {
                     Row row = sheet.createRow(rowIndex++);
                     for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
                         Cell cell = row.createCell(i);
-                        String val = exportAction.exportAttributes.get(i).getValueExtractor().apply(tc, project);
+                        String val = exportAction.exportAttributes.get(i).getValueExtractor().apply(tc, p);
                         cell.setCellValue(val != null ? val : "");
                     }
                 }
@@ -77,11 +77,11 @@ public class ExportExcel {
         }
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(project, Notifier.class).infoWithActions(project,
+                Services.getInstance(p, Notifier.class).infoWithActions(p,
                         "Export Complete", "Exported to: " + destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
                             VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-                            Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                            Services.getInstance(p, Tools.class).openWithAssociatedProgram(p, vf);
                         }))
         );
     }

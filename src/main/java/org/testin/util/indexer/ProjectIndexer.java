@@ -42,10 +42,10 @@ public final class ProjectIndexer {
 
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
-    public ProjectIndexer(final @NotNull Project project) {
-        this.project = project;
-        this.store = new IndexerDataStore(project);
-        this.scanner = new IndexingScanner(project, store);
+    public ProjectIndexer(final @NotNull Project p) {
+        this.project = p;
+        this.store = new IndexerDataStore(p);
+        this.scanner = new IndexingScanner(p, store);
     }
 
     private long estimateBytes(final int testCases, final int testRuns, final int projects, final int testSets, final int testRunDirs, final int testSetPkgs, final int testRunPkgs, final int testSetCaseSets) {
@@ -391,12 +391,12 @@ public final class ProjectIndexer {
         }
     }
 
-    public void persistTestProjectMarker(final @NotNull Project project, final @NotNull TestProjectDirectoryDto tp) {
-        store.addTestProjectMarker(project, tp);
+    public void persistTestProjectMarker(final @NotNull Project p, final @NotNull TestProjectDirectoryDto tp) {
+        store.addTestProjectMarker(p, tp);
     }
 
-    public void updateRunMarker(final @NotNull Project project, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
-        store.updateRunMarker(project, runPath, marker);
+    public void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
+        store.updateRunMarker(p, runPath, marker);
     }
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

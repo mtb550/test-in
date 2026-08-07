@@ -24,9 +24,9 @@ public class NavigateToCodeAction extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.NavigateToCode.getCustomShortcut(), list);
     }
 
-    public void execute(final @NotNull Project project, final @NotNull TestCaseDto tc) {
-        ArrayList<String> generatedFqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
-        new CodeNavigator().toCode(project, generatedFqcn);
+    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        ArrayList<String> generatedFqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+        new CodeNavigator().toCode(p, generatedFqcn);
     }
 
     @Override

@@ -99,28 +99,28 @@ public class ImportAction extends DumbAwareAction {
         }
     }
 
-    private void executeImportWriteAction(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode, final ImportDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
+    private void executeImportWriteAction(final @NotNull Project p, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode, final ImportDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                TestCaseDto tail = findExistingTail(project, targetDirectory);
+                TestCaseDto tail = findExistingTail(p, targetDirectory);
                 List<TestCaseDto> flatList = new ArrayList<>();
                 selectedCasesBySheet.values().forEach(flatList::addAll);
 
-                linkAndSaveTestCases(project, targetDirectory, flatList, tail);
+                linkAndSaveTestCases(p, targetDirectory, flatList, tail);
 
                 if (dialog.getCg().isSelected()) {
                     Logger.info("Import: generating test methods for " + flatList.size() + " imported cases");
                     CreateTestMethod syncInjector = new CreateTestMethod();
                     for (TestCaseDto tc : flatList) {
                         tc.setParent(ts);
-                        List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
-                        syncInjector.executeSync(project, tc, fqcn);
+                        List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+                        syncInjector.executeSync(p, tc, fqcn);
                     }
                 }
 
-                Services.getInstance(project, EditorUtil.class).closeThenOpen(project, targetDirectory, ts);
-                Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
+                Services.getInstance(p, EditorUtil.class).closeThenOpen(p, targetDirectory, ts);
+                Services.getInstance(p, Notifier.class).info(p, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
             } else {
                 int totalImported = 0;
@@ -128,15 +128,15 @@ public class ImportAction extends DumbAwareAction {
                     String rawSheetName = entry.getKey();
                     List<TestCaseDto> sheetCases = entry.getValue();
 
-                    String cName = Services.getInstance(project, Tools.class).removeSpecialChars(rawSheetName);
+                    String cName = Services.getInstance(p, Tools.class).removeSpecialChars(rawSheetName);
                     Path newDirPath = Path.of(targetDirectory.getPath()).resolve(cName);
-                    DirectoryDto dir = new CreateTestSet().execute(tree, project, cName, parentNode, selectedDirDto, newDirPath);
+                    DirectoryDto dir = new CreateTestSet().execute(tree, p, cName, parentNode, selectedDirDto, newDirPath);
 
                     // todo, to be enhanced later
                     VirtualFile sheetDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(newDirPath);
 
-                    TestCaseDto tail = findExistingTail(project, sheetDir);
-                    linkAndSaveTestCases(project, sheetDir, sheetCases, tail);
+                    TestCaseDto tail = findExistingTail(p, sheetDir);
+                    linkAndSaveTestCases(p, sheetDir, sheetCases, tail);
 
                     if (dialog.getCg().isSelected()) {
                         TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
@@ -145,14 +145,14 @@ public class ImportAction extends DumbAwareAction {
                         CreateTestMethod syncInjector = new CreateTestMethod();
                         for (TestCaseDto tc : sheetCases) {
                             tc.setParent(sheetDto);
-                            List<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
-                            syncInjector.executeSync(project, tc, fqcn);
+                            List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+                            syncInjector.executeSync(p, tc, fqcn);
                         }
                     }
 
                     totalImported += sheetCases.size();
                 }
-                Services.getInstance(project, Notifier.class).info(project, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
+                Services.getInstance(p, Notifier.class).info(p, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
             }
 
             targetDirectory.refresh(false, true);
@@ -160,9 +160,9 @@ public class ImportAction extends DumbAwareAction {
         });
     }
 
-    private void linkAndSaveTestCases(final @NotNull Project project, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail) {
+    private void linkAndSaveTestCases(final @NotNull Project p, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail) {
         final Path dirPath = Path.of(dir.getPath());
-        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         TestCaseDto previousNode = existingTail;
 
@@ -188,14 +188,14 @@ public class ImportAction extends DumbAwareAction {
     }
 
     @Nullable
-    private TestCaseDto findExistingTail(final @NotNull Project project, final VirtualFile directory) {
+    private TestCaseDto findExistingTail(final @NotNull Project p, final VirtualFile directory) {
         if (directory == null) return null;
         VirtualFile[] children = directory.getChildren();
         if (children != null) {
             for (VirtualFile child : children) {
                 if (!child.isDirectory() && child.getName().endsWith(".json")) {
                     try (InputStream is = child.getInputStream()) {
-                        TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(is, TestCaseDto.class);
+                        TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class);
                         if (tc.getNext() == null) {
                             return tc;
                         }

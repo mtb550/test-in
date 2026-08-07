@@ -19,7 +19,7 @@ public class Steps extends BaseDetails {
     private static final int MARGIN_BOTTOM_PER_STEP = 8;
 
     @Override
-    public int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int row) {
+    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int row) {
 
         final List<String> steps = dto.getSteps();
 
@@ -33,7 +33,7 @@ public class Steps extends BaseDetails {
         for (int i = 0; i < steps.size(); i++) {
             if (steps.get(i).isBlank()) continue;
 
-            final String stepText = (i + 1) + "- " + Services.getInstance(project, Tools.class).format(steps.get(i));
+            final String stepText = (i + 1) + "- " + Services.getInstance(p, Tools.class).format(steps.get(i));
             final int marginBottom = (i == steps.size() - 1) ? 0 : MARGIN_BOTTOM_PER_STEP;
             stepsContainer.add(createStepComponent(stepText, marginBottom));
         }

@@ -73,17 +73,17 @@ public class SetTestRunStatusAction extends DumbAwareAction {
         e.getPresentation().setEnabled(enabled);
     }
 
-    private void persistMarker(final Project project, final TestRunDirectoryDto tr, final TestRunStatus newStatus) {
+    private void persistMarker(final @NotNull Project p, final TestRunDirectoryDto tr, final TestRunStatus newStatus) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(tr.getPath());
 
                 TestRunMarker marker = trd.getMarker();
                 if (marker != null) {
                     marker.setStatus(newStatus);
 
-                    indexer.updateRunMarker(project, tr.getPath(), marker);
+                    indexer.updateRunMarker(p, tr.getPath(), marker);
                 }
             } catch (final Exception ex) {
                 Logger.error("Failed to persist marker: " + ex.getMessage());

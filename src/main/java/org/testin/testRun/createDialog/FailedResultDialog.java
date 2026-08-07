@@ -27,8 +27,8 @@ public class FailedResultDialog {
     private final JBPopup popup;
     private final Runnable onSave;
 
-    public FailedResultDialog(final @NotNull Project project, final @NotNull TestRunItems runItem, final @NotNull Runnable onSave) {
-        this.project = project;
+    public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Runnable onSave) {
+        this.project = p;
         this.runItem = runItem;
         this.onSave = onSave;
 

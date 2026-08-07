@@ -41,8 +41,8 @@ public class TestProjectSelector {
     @NotNull
     private ComboBox<TestProjectDirectoryDto> selectedTestProject;
 
-    public TestProjectSelector(final @NotNull Project project, final @NotNull ProjectPanel projectPanel) {
-        this.project = project;
+    public TestProjectSelector(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+        this.project = p;
         this.projectPanel = projectPanel;
         testProjectList = new DefaultComboBoxModel<>();
         selectedTestProject = new ComboBox<>(testProjectList);
@@ -56,7 +56,7 @@ public class TestProjectSelector {
 
             TestProjectDirectoryDto selected = (TestProjectDirectoryDto) selectedTestProject.getSelectedItem();
             if (selected != null)
-                PropertiesComponent.getInstance(project).setValue(SELECTED_PROJECT_KEY, selected.getName());
+                PropertiesComponent.getInstance(p).setValue(SELECTED_PROJECT_KEY, selected.getName());
         });
     }
 

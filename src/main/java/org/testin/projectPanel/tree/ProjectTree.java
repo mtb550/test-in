@@ -28,8 +28,8 @@ public class ProjectTree {
     private final TreeTransferHandler transferHandler;
     private final TreeContextMenu treeContextMenu;
 
-    public ProjectTree(final @NotNull Project project, final @NotNull ProjectPanel projectPanel) {
-        this.project = project;
+    public ProjectTree(final @NotNull Project p, final @NotNull ProjectPanel projectPanel) {
+        this.project = p;
         this.projectPanel = projectPanel;
 
         final TestProjectDirectoryDto testProjectDirectory = (TestProjectDirectoryDto) projectPanel.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
@@ -50,11 +50,11 @@ public class ProjectTree {
 
         mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
 
-        this.transferHandler = new TreeTransferHandler(project, mainTree, sharedCutNodes);
+        this.transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes);
         mainTree.setTransferHandler(transferHandler);
 
-        treeContextMenu = new TreeContextMenu(project, projectPanel, mainTree);
-        mainTree.addMouseListener(new TreeMouseListener(project, mainTree, treeContextMenu));
+        treeContextMenu = new TreeContextMenu(p, projectPanel, mainTree);
+        mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
 
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
     }

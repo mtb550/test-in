@@ -33,7 +33,7 @@ public class MarkerDetailsViewDialog {
     private static final int INSETS_RIGHT = 8;
     private static final int VALUE_INSETS_RIGHT = 16;
 
-    public static void show(final @NotNull Project project, final @NotNull DirectoryDto dto) {
+    public static void show(final @NotNull Project p, final @NotNull DirectoryDto dto) {
         JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
         panel.setOpaque(false);
         panel.setBorder(JBUI.Borders.empty(10));
@@ -90,7 +90,7 @@ public class MarkerDetailsViewDialog {
                 .setMinSize(new Dimension(400, 300));
 
         JBPopup popup = builder.createPopup();
-        popup.showCenteredInCurrentWindow(project);
+        popup.showCenteredInCurrentWindow(p);
     }
 
     private static int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,

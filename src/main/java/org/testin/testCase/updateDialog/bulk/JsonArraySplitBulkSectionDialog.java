@@ -48,8 +48,8 @@ public abstract class JsonArraySplitBulkSectionDialog {
 
     protected abstract List<List<String>> extractOriginalValues(final List<TestCaseDto> items);
 
-    public void show(final @NotNull Project project, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
-        this.project = project;
+    public void show(final @NotNull Project p, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
+        this.project = p;
         List<List<String>> originalValues = new ArrayList<>();
         List<List<String>> activeValues = new ArrayList<>();
 
@@ -62,8 +62,8 @@ public abstract class JsonArraySplitBulkSectionDialog {
         }
 
         Document leftDoc = EditorFactory.getInstance().createDocument("");
-        Editor leftEditor = EditorFactory.getInstance().createViewer(leftDoc, project);
-        setupEditorAppearance(leftEditor, project);
+        Editor leftEditor = EditorFactory.getInstance().createViewer(leftDoc, p);
+        setupEditorAppearance(leftEditor, p);
         leftEditor.getContentComponent().setFocusable(false);
         leftEditor.getSettings().setCaretRowShown(false);
         leftEditor.addEditorMouseListener(new EditorMouseListener() {
@@ -76,8 +76,8 @@ public abstract class JsonArraySplitBulkSectionDialog {
         Document rightDoc = EditorFactory.getInstance().createDocument("");
         EditorActionManager.getInstance().setReadonlyFragmentModificationHandler(rightDoc, e -> {
         });
-        Editor rightEditor = EditorFactory.getInstance().createEditor(rightDoc, project);
-        setupEditorAppearance(rightEditor, project);
+        Editor rightEditor = EditorFactory.getInstance().createEditor(rightDoc, p);
+        setupEditorAppearance(rightEditor, p);
 
         List<RangeHighlighter> leftLineHighlighters = new ArrayList<>();
         List<ItemMarker> itemMarkers = new ArrayList<>();
@@ -144,7 +144,7 @@ public abstract class JsonArraySplitBulkSectionDialog {
             leftSb.append("]");
             rightSb.append("]");
 
-            WriteCommandAction.runWriteCommandAction(project, () -> {
+            WriteCommandAction.runWriteCommandAction(p, () -> {
                 for (RangeMarker g : guardBlocks) rightDoc.removeGuardedBlock(g);
                 guardBlocks.clear();
                 itemMarkers.clear();
@@ -467,7 +467,7 @@ public abstract class JsonArraySplitBulkSectionDialog {
         });
 
         renderUI.accept(0, 0);
-        popup.showCenteredInCurrentWindow(project);
+        popup.showCenteredInCurrentWindow(p);
     }
 
     private void navigate(final int direction, Editor editor, final List<ItemMarker> markers) {
@@ -501,9 +501,9 @@ public abstract class JsonArraySplitBulkSectionDialog {
         return nearestOffset;
     }
 
-    private void setupEditorAppearance(final Editor editor, final Project project) {
+    private void setupEditorAppearance(final Editor editor, final @NotNull Project p) {
         FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
-        com.intellij.openapi.editor.highlighter.EditorHighlighter highlighter = com.intellij.openapi.editor.highlighter.EditorHighlighterFactory.getInstance().createEditorHighlighter(project, jsonFileType);
+        com.intellij.openapi.editor.highlighter.EditorHighlighter highlighter = com.intellij.openapi.editor.highlighter.EditorHighlighterFactory.getInstance().createEditorHighlighter(p, jsonFileType);
         if (editor instanceof EditorEx) ((EditorEx) editor).setHighlighter(highlighter);
         EditorColorsScheme scheme = editor.getColorsScheme();
         scheme.setEditorFontSize(15f);

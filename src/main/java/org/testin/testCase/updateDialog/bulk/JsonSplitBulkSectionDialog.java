@@ -48,8 +48,8 @@ public abstract class JsonSplitBulkSectionDialog {
 
     protected abstract void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges);
 
-    public void show(final @NotNull Project project, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
-        this.project = project;
+    public void show(final @NotNull Project p, final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
+        this.project = p;
         StringBuilder leftSb = new StringBuilder();
         StringBuilder rightSb = new StringBuilder();
         List<int[]> rightEditableRanges = new ArrayList<>();
@@ -67,8 +67,8 @@ public abstract class JsonSplitBulkSectionDialog {
 
         Document leftDoc = EditorFactory.getInstance().createDocument(leftSb.toString());
         leftDoc.setReadOnly(true);
-        Editor leftEditor = EditorFactory.getInstance().createViewer(leftDoc, project);
-        setupEditorAppearance(leftEditor, project);
+        Editor leftEditor = EditorFactory.getInstance().createViewer(leftDoc, p);
+        setupEditorAppearance(leftEditor, p);
 
         leftEditor.getContentComponent().setFocusable(false);
         leftEditor.getSettings().setCaretRowShown(false);
@@ -101,8 +101,8 @@ public abstract class JsonSplitBulkSectionDialog {
         EditorActionManager.getInstance().setReadonlyFragmentModificationHandler(rightDoc, e -> {
         });
 
-        Editor rightEditor = EditorFactory.getInstance().createEditor(rightDoc, project);
-        setupEditorAppearance(rightEditor, project);
+        Editor rightEditor = EditorFactory.getInstance().createEditor(rightDoc, p);
+        setupEditorAppearance(rightEditor, p);
 
         List<RangeHighlighter> leftLineHighlighters = new ArrayList<>();
         Color themeCaretRowColor = rightEditor.getColorsScheme().getColor(EditorColors.CARET_ROW_COLOR);
@@ -422,7 +422,7 @@ public abstract class JsonSplitBulkSectionDialog {
                 KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | KeyEvent.SHIFT_DOWN_MASK)
         ), rightEditor.getContentComponent());
 
-        popup.showCenteredInCurrentWindow(project);
+        popup.showCenteredInCurrentWindow(p);
     }
 
     private int getNearestValidOffset(final int offset, final List<RangeMarker> markers) {
@@ -441,9 +441,9 @@ public abstract class JsonSplitBulkSectionDialog {
         return nearestOffset;
     }
 
-    private void setupEditorAppearance(final Editor editor, final Project project) {
+    private void setupEditorAppearance(final Editor editor, final @NotNull Project p) {
         FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
-        EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new com.intellij.testFramework.LightVirtualFile("dummy.json", jsonFileType, ""));
+        EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(p, new com.intellij.testFramework.LightVirtualFile("dummy.json", jsonFileType, ""));
 
         if (editor instanceof EditorEx) {
             ((EditorEx) editor).setHighlighter(highlighter);

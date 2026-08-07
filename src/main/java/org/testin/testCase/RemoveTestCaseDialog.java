@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class RemoveTestCaseDialog {
 
-    public static boolean confirmDeleteAction(final @NotNull Project project, final List<TestCaseDto> selected) {
+    public static boolean confirmDeleteAction(final @NotNull Project p, final List<TestCaseDto> selected) {
         if (selected == null || selected.isEmpty()) return false;
 
         final String title = selected.size() == 1 ? "Delete Test Case" : "Delete Test Cases";
@@ -30,6 +30,6 @@ public class RemoveTestCaseDialog {
                 .yesText("Delete")
                 .noText("Cancel")
                 .asWarning()
-                .ask(project);
+                .ask(p);
     }
 }

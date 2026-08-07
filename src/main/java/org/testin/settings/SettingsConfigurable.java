@@ -37,8 +37,8 @@ public final class SettingsConfigurable implements Configurable {
     private final ComboBox<String> logLevelComboBox;
     private final Project project;
 
-    public SettingsConfigurable(final @NotNull Project project) {
-        this.project = project;
+    public SettingsConfigurable(final @NotNull Project p) {
+        this.project = p;
         this.logLevelComboBox = new ComboBox<>(Arrays.stream(Logger.Level.values()).map(Logger.Level::name).toArray(String[]::new));
     }
 

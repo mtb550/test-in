@@ -63,7 +63,7 @@ public enum RunStatus {
         return IDLE;
     }
 
-    public void executeAction(final @NotNull Project project, final TestCaseDto dto, final JBList<TestCaseDto> list) {
-        new RunTestCaseAction(list).execute(project, dto);
+    public void executeAction(final @NotNull Project p, final TestCaseDto dto, final JBList<TestCaseDto> list) {
+        new RunTestCaseAction(list).execute(p, dto);
     }
 }

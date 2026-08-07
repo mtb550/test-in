@@ -117,8 +117,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         });
     }
 
-    private void performCommitWorkflow(final @NotNull Project project, final Path repoPath, final String commitMessage) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Committing to local Git", false) {
+    private void performCommitWorkflow(final @NotNull Project p, final Path repoPath, final String commitMessage) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Committing to local Git", false) {
             @Override
             public void run(@NotNull ProgressIndicator commitIndicator) {
                 commitIndicator.setIndeterminate(true);
@@ -132,11 +132,11 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         NotificationAction pushAction = NotificationAction.createSimple(
                                 "Push to Remote",
-                                () -> pushToRemote(project, repoPath)
+                                () -> pushToRemote(p, repoPath)
                         );
 
-                        pushNotification = Services.getInstance(project, Notifier.class).infoWithActions(
-                                project,
+                        pushNotification = Services.getInstance(p, Notifier.class).infoWithActions(
+                                p,
                                 "Commit successful",
                                 "Changes committed locally. Would you like to push to the remote repository now?",
                                 pushAction
@@ -147,11 +147,11 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                     String errorMsg = ex.getMessage();
                     if (errorMsg != null && errorMsg.contains("Author identity unknown")) {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                promptAndSetGitIdentity(project, repoPath, commitMessage)
+                                promptAndSetGitIdentity(p, repoPath, commitMessage)
                         );
                     } else {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(project, Notifier.class).error(project, "Commit Failed", "Failed to commit changes:\n" + errorMsg)
+                                Services.getInstance(p, Notifier.class).error(p, "Commit Failed", "Failed to commit changes:\n" + errorMsg)
                         );
                     }
                 }
@@ -159,8 +159,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         });
     }
 
-    private void initializeGitRepository(final @NotNull Project project, final Path repoPath) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Initializing git repository", false) {
+    private void initializeGitRepository(final @NotNull Project p, final Path repoPath) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Initializing git repository", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -170,55 +170,55 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                     GitCommandRunner.execute(repoPath, "git", "config", "--local", "http.sslVerify", "false");
 
 
-                    ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).info(project, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName()));
+                    ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).info(p, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName()));
 
                 } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(project, Notifier.class).error(project, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage())
+                            Services.getInstance(p, Notifier.class).error(p, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage())
                     );
                 }
             }
         });
     }
 
-    private void pushToRemote(final @NotNull Project project, final Path repoPath) {
+    private void pushToRemote(final @NotNull Project p, final Path repoPath) {
         String remoteUrl = GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
 
         if (remoteUrl.isEmpty()) {
             remoteUrl = com.intellij.openapi.ui.Messages.showInputDialog(
-                    project,
+                    p,
                     "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
                     "Configure Remote",
                     com.intellij.openapi.ui.Messages.getQuestionIcon()
             );
 
             if (remoteUrl == null || remoteUrl.trim().isEmpty()) {
-                Services.getInstance(project, Notifier.class).warn(project, "Push Aborted", "A remote URL is required to push.");
+                Services.getInstance(p, Notifier.class).warn(p, "Push Aborted", "A remote URL is required to push.");
                 return;
             }
 
             final String finalRemoteUrl = remoteUrl.trim();
 
-            ProgressManager.getInstance().run(new Task.Backgroundable(project, "Configuring remote", false) {
+            ProgressManager.getInstance().run(new Task.Backgroundable(p, "Configuring remote", false) {
                 @Override
                 public void run(@NotNull ProgressIndicator indicator) {
                     try {
                         GitCommandRunner.execute(repoPath, "git", "remote", "add", "origin", finalRemoteUrl);
-                        executeGitPush(project, repoPath);
+                        executeGitPush(p, repoPath);
                     } catch (final Exception ex) {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(project, Notifier.class).error(project, "Git Error", "Failed to add remote: " + ex.getMessage())
+                                Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage())
                         );
                     }
                 }
             });
         } else {
-            executeGitPush(project, repoPath);
+            executeGitPush(p, repoPath);
         }
     }
 
-    private void executeGitPush(final @NotNull Project project, final Path repoPath) {
-        ProgressManager.getInstance().run(new Task.Backgroundable(project, "Pushing to Remote", false) {
+    private void executeGitPush(final @NotNull Project p, final Path repoPath) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Pushing to Remote", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -236,15 +236,15 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         pushNotification = null;
                     }
 
-                    Services.getInstance(project, Notifier.class).info(project, "Push Successful", "Test cases were successfully pushed to the remote repository!");
+                    Services.getInstance(p, Notifier.class).info(p, "Push Successful", "Test cases were successfully pushed to the remote repository!");
                 });
             }
         });
     }
 
-    private void promptAndSetGitIdentity(final @NotNull Project project, final Path repoPath, final String pendingCommitMessage) {
+    private void promptAndSetGitIdentity(final @NotNull Project p, final Path repoPath, final String pendingCommitMessage) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            GitIdentityDialog dialog = new GitIdentityDialog(project);
+            GitIdentityDialog dialog = new GitIdentityDialog(p);
 
             if (dialog.showAndGet()) {
                 String name = dialog.getUserName();
@@ -252,11 +252,11 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 boolean setGlobally = dialog.isSetGlobalConfig();
 
                 if (name.trim().isEmpty() || email.trim().isEmpty()) {
-                    Services.getInstance(project, Notifier.class).warn(project, "Missing Info", "Name and email are required to configure Git.");
+                    Services.getInstance(p, Notifier.class).warn(p, "Missing Info", "Name and email are required to configure Git.");
                     return;
                 }
 
-                ProgressManager.getInstance().run(new Task.Backgroundable(project, "Configuring git identity", false) {
+                ProgressManager.getInstance().run(new Task.Backgroundable(p, "Configuring git identity", false) {
                     @Override
                     public void run(@NotNull ProgressIndicator indicator) {
                         indicator.setIndeterminate(true);
@@ -266,12 +266,12 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             GitCommandRunner.execute(repoPath, "git", "config", scope, "user.email", email.trim());
 
                             ApplicationManager.getApplication().invokeLater(() -> {
-                                Services.getInstance(project, Notifier.class).info(project, "Git Identity Set", "Identity configured successfully. Resuming commit...");
-                                performCommitWorkflow(project, repoPath, pendingCommitMessage);
+                                Services.getInstance(p, Notifier.class).info(p, "Git Identity Set", "Identity configured successfully. Resuming commit...");
+                                performCommitWorkflow(p, repoPath, pendingCommitMessage);
                             });
                         } catch (final Exception ex) {
                             ApplicationManager.getApplication().invokeLater(() ->
-                                    Services.getInstance(project, Notifier.class).error(project, "Config Failed", "Failed to set Git identity:\n" + ex.getMessage())
+                                    Services.getInstance(p, Notifier.class).error(p, "Config Failed", "Failed to set Git identity:\n" + ex.getMessage())
                             );
                         }
                     }

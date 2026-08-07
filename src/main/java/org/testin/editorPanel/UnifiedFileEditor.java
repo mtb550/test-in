@@ -21,8 +21,8 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     private final @NotNull UnifiedVirtualFile vf;
     private final @NotNull Project project;
 
-    public UnifiedFileEditor(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf, final @NotNull IEditor editor) {
-        this.project = project;
+    public UnifiedFileEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf, final @NotNull IEditor editor) {
+        this.project = p;
         this.vf = vf;
         this.editor = editor;
     }

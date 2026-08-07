@@ -21,8 +21,8 @@ import java.util.List;
 public final class TestCasePersistService implements Disposable {
     private final Project project;
 
-    public TestCasePersistService(final @NotNull Project project) {
-        this.project = project;
+    public TestCasePersistService(final @NotNull Project p) {
+        this.project = p;
     }
 
     public void persist(final Path path, final @Nullable List<TestCaseDto> tcs) {

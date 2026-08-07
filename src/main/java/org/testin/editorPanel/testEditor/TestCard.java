@@ -19,9 +19,9 @@ public class TestCard extends BaseCard {
     private final Map<String, String> details = new LinkedHashMap<>();
     private boolean isPendingCut = false;
 
-    public TestCard(final @NotNull Project project) {
+    public TestCard(final @NotNull Project p) {
         super();
-        this.project = project;
+        this.project = p;
     }
 
     public void updateData(final int index, final @NotNull TestCaseDto tc, final Set<?> activeDetails, final boolean isUnsorted) {

@@ -18,9 +18,9 @@ public class RunCard extends BaseCard {
     private final @NotNull List<JComponent> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
 
-    public RunCard(final @NotNull Project project) {
+    public RunCard(final @NotNull Project p) {
         super();
-        this.project = project;
+        this.project = p;
     }
 
     @Override

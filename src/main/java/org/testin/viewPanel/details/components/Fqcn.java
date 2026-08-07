@@ -17,8 +17,8 @@ import java.util.ArrayList;
 public class Fqcn extends BaseDetails {
 
     @Override
-    public int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        ArrayList<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(dto);
+    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+        ArrayList<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(dto);
         return addRow(panel, gbc, TestEditorAttributes.FQCN.getName2(), fqcn.toString(), currentRow);
     }
 }

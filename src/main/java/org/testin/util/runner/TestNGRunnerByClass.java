@@ -26,10 +26,10 @@ import org.testin.util.logger.Logger;
 @Service(Service.Level.PROJECT)
 public class TestNGRunnerByClass {
 
-    public void runTestClass(final @NotNull Project project, final @NotNull String fqcn) {
+    public void runTestClass(final @NotNull Project p, final @NotNull String fqcn) {
 
-        if (DumbService.isDumb(project)) {
-            DumbService.getInstance(project).showDumbModeNotification(
+        if (DumbService.isDumb(p)) {
+            DumbService.getInstance(p).showDumbModeNotification(
                     "Cannot run tests while IntelliJ is indexing. Please wait a moment."
             );
             return;
@@ -41,8 +41,8 @@ public class TestNGRunnerByClass {
             try {
                 ApplicationManager.getApplication().runReadAction(() -> {
 
-                    PsiClass targetClass = JavaPsiFacade.getInstance(project)
-                            .findClass(fqcn, GlobalSearchScope.projectScope(project));
+                    PsiClass targetClass = JavaPsiFacade.getInstance(p)
+                            .findClass(fqcn, GlobalSearchScope.projectScope(p));
 
                     final String finalFqcn = targetClass != null ? targetClass.getQualifiedName() : fqcn;
                     final Module finalModule = targetClass != null ? ModuleUtilCore.findModuleForPsiElement(targetClass) : null;
@@ -54,7 +54,7 @@ public class TestNGRunnerByClass {
                             return;
                         }
 
-                        RunManager runManager = RunManager.getInstance(project);
+                        RunManager runManager = RunManager.getInstance(p);
                         TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
                         final int dotIndex = finalFqcn.lastIndexOf('.');
@@ -85,7 +85,7 @@ public class TestNGRunnerByClass {
                     });
                 });
             } catch (final IndexNotReadyException ex) {
-                ApplicationManager.getApplication().invokeLater(() -> DumbService.getInstance(project).showDumbModeNotification("Indexing interrupted the test run. Please try again."));
+                ApplicationManager.getApplication().invokeLater(() -> DumbService.getInstance(p).showDumbModeNotification("Indexing interrupted the test run. Please try again."));
             }
         });
     }

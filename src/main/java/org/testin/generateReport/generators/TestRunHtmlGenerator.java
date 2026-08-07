@@ -29,7 +29,7 @@ public final class TestRunHtmlGenerator {
     final String LIGHT_BG = "#f2f5fa";
     final String BORDER_COLOR = "#d0d7e5";
 
-    public String generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trdir,
+    public String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trdir,
                            final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         // Compute summary stats
         final List<TestRunItems> results = tr.getResults();
@@ -51,7 +51,7 @@ public final class TestRunHtmlGenerator {
         final String runStatus = trdir.getMarker().getStatus().getLabel();
 
         // Project name
-        final String projectName = project.getName();
+        final String projectName = p.getName();
 
         StringBuilder html = new StringBuilder();
 

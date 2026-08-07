@@ -24,8 +24,8 @@ public class ActualResultDialog {
     private final ActualResultSection section;
     private final JBPopup popup;
 
-    public ActualResultDialog(final @NotNull Project project, final @NotNull TestRunItems runItem) {
-        this.project = project;
+    public ActualResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem) {
+        this.project = p;
         this.runItem = runItem;
         this.section = new ActualResultSection();
 

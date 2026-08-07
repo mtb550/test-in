@@ -1,4 +1,5 @@
 package org.testin.importExport.shared;
+import org.jetbrains.annotations.NotNull;
 
 import com.intellij.openapi.project.Project;
 
@@ -10,14 +11,14 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
     private final JButton button = new JButton();
     private String currentValue = "";
 
-    public GroupMultiSelectEditor(final Project project) {
+    public GroupMultiSelectEditor(final @NotNull Project p) {
         button.setBorderPainted(false);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setBackground(UIManager.getColor("Table.selectionBackground"));
         button.setForeground(UIManager.getColor("Table.selectionForeground"));
 
         button.addActionListener(e -> {
-            GroupSelectionDialog dialog = new GroupSelectionDialog(project, currentValue);
+            GroupSelectionDialog dialog = new GroupSelectionDialog(p, currentValue);
             if (dialog.showAndGet()) {
                 currentValue = dialog.getSelectedGroupsStr();
             }

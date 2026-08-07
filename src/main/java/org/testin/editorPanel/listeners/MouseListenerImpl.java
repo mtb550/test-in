@@ -35,8 +35,8 @@ public class MouseListenerImpl extends MouseAdapter {
     private final @NotNull ArrayList<String> path;
     private final @NotNull IEditor editor;
 
-    public MouseListenerImpl(final @NotNull Project project, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull EditorContextMenu cm) {
-        this.project = project;
+    public MouseListenerImpl(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull EditorContextMenu cm) {
+        this.project = p;
         this.editor = editor;
         this.list = list;
         this.path = dir.getPath2();

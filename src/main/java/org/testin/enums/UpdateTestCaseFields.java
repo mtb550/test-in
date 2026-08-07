@@ -251,6 +251,6 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     }
 
     public interface IBulkEditorAction {
-        void show(final @NotNull Project project, final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems);
+        void show(final @NotNull Project p, final List<TestCaseDto> items, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems);
     }
 }

@@ -13,7 +13,7 @@ import java.awt.*;
 
 public class ExpectedResult extends BaseDetails {
     @Override
-    public int render(final @NotNull Project project, @NotNull JBPanel<?> panel, @NotNull GridBagConstraints gbc, @NotNull TestCaseDto dto, int currentRow) {
-        return addRow(panel, gbc, TestEditorAttributes.EXPECTED_RESULT.getName2(), Services.getInstance(project, Tools.class).format(dto.getExpectedResult()), currentRow);
+    public int render(final @NotNull Project p, @NotNull JBPanel<?> panel, @NotNull GridBagConstraints gbc, @NotNull TestCaseDto dto, int currentRow) {
+        return addRow(panel, gbc, TestEditorAttributes.EXPECTED_RESULT.getName2(), Services.getInstance(p, Tools.class).format(dto.getExpectedResult()), currentRow);
     }
 }

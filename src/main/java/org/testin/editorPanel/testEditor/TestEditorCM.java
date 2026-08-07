@@ -44,7 +44,7 @@ public class TestEditorCM extends EditorContextMenu {
     @Setter
     private static IEditor globalSourceEditorUI = null;
 
-    public TestEditorCM(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    public TestEditorCM(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Editor Context Menu", true);
 
         add(new CreateTestCaseAction(ui, dir, list));
@@ -57,7 +57,7 @@ public class TestEditorCM extends EditorContextMenu {
         add(new CopyTestCaseNodeAction(list));
         add(new CutTestCaseNodeAction(ui, list));
         add(new PasteTestCaseNodeAction(ui, list));
-        add(new RemoveTestCaseAction(project, dir, list, model));
+        add(new RemoveTestCaseAction(p, dir, list, model));
 
         addSeparator();
 

@@ -10,7 +10,7 @@ import org.testin.util.services.Services;
 import java.util.*;
 
 public class TestCaseSorter {
-    public static SortResult sortTestCases(final @NotNull Project project, final List<TestCaseDto> unsortedList) {
+    public static SortResult sortTestCases(final @NotNull Project p, final List<TestCaseDto> unsortedList) {
         if (unsortedList == null || unsortedList.isEmpty()) {
             return new SortResult(new ArrayList<>(), new HashSet<>());
         }
@@ -30,7 +30,7 @@ public class TestCaseSorter {
         final Set<UUID> unsortedIds = new HashSet<>();
 
         if (head == null) {
-            Services.getInstance(project, Notifier.class).softShow(project, "Warning", "No Head found in test cases.");
+            Services.getInstance(p, Notifier.class).softShow(p, "Warning", "No Head found in test cases.");
             unsortedList.forEach(tc -> unsortedIds.add(tc.getId()));
             return new SortResult(unsortedList, unsortedIds);
         }

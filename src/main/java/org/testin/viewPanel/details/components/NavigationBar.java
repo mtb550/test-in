@@ -47,7 +47,7 @@ public class NavigationBar extends BaseDetails {
     }
 
     @Override
-    public int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
@@ -80,17 +80,17 @@ public class NavigationBar extends BaseDetails {
                     @Override
                     public void mouseClicked(final MouseEvent e) {
                         if (isLast) {
-                            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-                            Path testSetPath = Services.getInstance(project, Setting.class).getTestinPath();
+                            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                            Path testSetPath = Services.getInstance(p, Setting.class).getTestinPath();
                             for (final String segment : currentPath) {
                                 testSetPath = testSetPath.resolve(segment);
                             }
 
                             final TestSetDirectoryDto ts = indexer.getTestSetByPath(testSetPath);
-                            if (Services.getInstance(project, EditorUtil.class).isOpen(project, ts.getName()))
+                            if (Services.getInstance(p, EditorUtil.class).isOpen(p, ts.getName()))
                                 return;
 
-                            Services.getInstance(project, EditorUtil.class).open(project, ts);
+                            Services.getInstance(p, EditorUtil.class).open(p, ts);
                         }
                     }
                 });

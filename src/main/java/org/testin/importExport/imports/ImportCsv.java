@@ -21,26 +21,26 @@ public class ImportCsv {
         this.importAction = importAction;
     }
 
-    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
+    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final File file) {
         Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try {
-            List<TestCaseDto> testCases = parseFile(project, file);
+            List<TestCaseDto> testCases = parseFile(p, file);
             if (!testCases.isEmpty()) {
                 String name = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
                 result.put(name, testCases);
             }
         } catch (final Exception ex) {
             Logger.error("CSV import parse failed: " + ex.getMessage());
-            Services.getInstance(project, Notifier.class).error(project, "CSV Parse Error", ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, "CSV Parse Error", ex.getMessage());
         }
         return result;
     }
 
-    public List<TestCaseDto> parseFile(final @NotNull Project project, final File file) {
-        return parseCsvFile(file, project);
+    public List<TestCaseDto> parseFile(final @NotNull Project p, final File file) {
+        return parseCsvFile(file, p);
     }
 
-    private List<TestCaseDto> parseCsvFile(final File file, final Project project) {
+    private List<TestCaseDto> parseCsvFile(final File file, final @NotNull Project p) {
         List<TestCaseDto> result = new ArrayList<>();
         List<String[]> records = parseCsvRecords(file);
 
@@ -82,7 +82,7 @@ public class ImportCsv {
                         String val = values[colIndex];
                         rawValue = val != null ? val.trim() : "";
                     }
-                    attr.getImportSetter().accept(project, currentTestCase, rawValue);
+                    attr.getImportSetter().accept(p, currentTestCase, rawValue);
                 }
             }
 

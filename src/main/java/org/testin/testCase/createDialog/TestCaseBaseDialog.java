@@ -40,14 +40,14 @@ public abstract class TestCaseBaseDialog {
     protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
-    public TestCaseBaseDialog(final @NotNull Project project, final @NotNull GeneratorType gt) {
+    public TestCaseBaseDialog(final @NotNull Project p, final @NotNull GeneratorType gt) {
         this.cg = new CodeGeneratorDialog(gt);
-        this.DescriptionSection = new DescriptionSection(project);
-        this.expectedResultSection = new ExpectedResultSection(project);
-        this.moduleSection = new ModuleSection(project);
+        this.DescriptionSection = new DescriptionSection(p);
+        this.expectedResultSection = new ExpectedResultSection(p);
+        this.moduleSection = new ModuleSection(p);
         this.testDataSection = new TestDataSection();
         this.preConditionsSection = new PreConditionsSection();
-        this.stepsSection = new StepsSection(project);
+        this.stepsSection = new StepsSection(p);
         this.prioritySection = new PrioritySection();
         this.groupSection = new GroupSection();
         this.statusBarSection = new StatusBarSection();

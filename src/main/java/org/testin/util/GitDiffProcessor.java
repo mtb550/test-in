@@ -13,7 +13,7 @@ import java.util.Objects;
 
 public class GitDiffProcessor {
 
-    public static List<TestCaseDiff> getPendingChanges(final @NotNull Project project, Path repoRoot) {
+    public static List<TestCaseDiff> getPendingChanges(final @NotNull Project p, Path repoRoot) {
         List<TestCaseDiff> allChanges = new ArrayList<>();
 
         String statusOutput = GitCommandRunner.execute(repoRoot, "git", "status", "--porcelain", "-uall");
@@ -40,7 +40,7 @@ public class GitDiffProcessor {
             Path relativePath = Path.of(relativePathStr);
 
             if (statusCode.contains("A") || statusCode.contains("?")) {
-                TestCaseDto newDto = Services.getInstance(project, Mapper.class).readValue(absolutePath.toFile(), TestCaseDto.class);
+                TestCaseDto newDto = Services.getInstance(p, Mapper.class).readValue(absolutePath.toFile(), TestCaseDto.class);
                 allChanges.add(new TestCaseDiff(
                         newDto.getId().toString(),
                         relativePath,
@@ -56,12 +56,12 @@ public class GitDiffProcessor {
                 ));
 
             } else if (statusCode.contains("M")) {
-                TestCaseDto newDto = Services.getInstance(project, Mapper.class).readValue(absolutePath.toFile(), TestCaseDto.class);
+                TestCaseDto newDto = Services.getInstance(p, Mapper.class).readValue(absolutePath.toFile(), TestCaseDto.class);
 
                 String gitPath = relativePathStr.replace("\\", "/");
                 String oldJsonString = GitCommandRunner.execute(repoRoot, "git", "show", "HEAD:" + gitPath);
 
-                TestCaseDto oldDto = Services.getInstance(project, Mapper.class).readValue(oldJsonString, TestCaseDto.class);
+                TestCaseDto oldDto = Services.getInstance(p, Mapper.class).readValue(oldJsonString, TestCaseDto.class);
 
                 List<TestCaseDiff.FieldChange> fieldChanges = compareFields(oldDto, newDto);
                 if (!fieldChanges.isEmpty()) {
@@ -77,7 +77,7 @@ public class GitDiffProcessor {
             } else if (statusCode.contains("D")) {
                 String gitPath = relativePathStr.replace("\\", "/");
                 String oldJsonString = GitCommandRunner.execute(repoRoot, "git", "show", "HEAD:" + gitPath);
-                TestCaseDto oldDto = Services.getInstance(project, Mapper.class).readValue(oldJsonString, TestCaseDto.class);
+                TestCaseDto oldDto = Services.getInstance(p, Mapper.class).readValue(oldJsonString, TestCaseDto.class);
 
                 allChanges.add(new TestCaseDiff(
                         oldDto.getId().toString(),

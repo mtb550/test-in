@@ -14,20 +14,20 @@ import java.util.*;
 
 public class ImportJson {
 
-    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
+    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final File file) {
         Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try {
-            Map<String, List<TestCaseDto>> parsed = parseFile(project, file);
+            Map<String, List<TestCaseDto>> parsed = parseFile(p, file);
             result.putAll(parsed);
         } catch (final Exception ex) {
             Logger.error("JSON import parse failed: " + ex.getMessage());
-            Services.getInstance(project, Notifier.class).error(project, "JSON Parse Error", ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, "JSON Parse Error", ex.getMessage());
         }
         return result;
     }
 
-    public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project project, final File file) {
-        Map<String, List<TestCaseDto>> data = Services.getInstance(project, Mapper.class).readValue(file, new TypeReference<>() {
+    public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project p, final File file) {
+        Map<String, List<TestCaseDto>> data = Services.getInstance(p, Mapper.class).readValue(file, new TypeReference<>() {
         });
         Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         for (Map.Entry<String, List<TestCaseDto>> entry : data.entrySet()) {

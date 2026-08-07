@@ -57,7 +57,7 @@ public final class TestRunPdfGenerator {
     private final DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
     private final DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC); // #0052cc, matches HTML footer link
 
-    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(baos);
             PdfDocument pdf = new PdfDocument(writer);
@@ -71,7 +71,7 @@ public final class TestRunPdfGenerator {
 
             // Project name from the project selector combo box (selected value)
             String projectName = "";
-            TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(project, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+            TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
             if (selectedProject != null) {
                 projectName = selectedProject.getName();

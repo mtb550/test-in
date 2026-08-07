@@ -24,16 +24,16 @@ import java.util.Arrays;
 public class CreateTestSet implements NodeCreator {
 
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NotNull Project project, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
-        final TestSetDirectoryDto ts = Services.getInstance(project, DirectoryMapper.class).getTestSetNode(project, newDirPath, parentDir);
+    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NotNull Project p, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+        final TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
 
-        Services.getInstance(project, ProjectIndexer.class).addTestSet(ts);
-        Services.getInstance(project, ProjectIndexer.class).createNode(tree, parentNode, ts);
+        Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);
+        Services.getInstance(p, ProjectIndexer.class).createNode(tree, parentNode, ts);
 
         ApplicationManager.getApplication().invokeLater(() ->
                 ApplicationManager.getApplication().runWriteAction(() -> {
                     try {
-                        ProjectRootManager rootManager = ProjectRootManager.getInstance(project);
+                        ProjectRootManager rootManager = ProjectRootManager.getInstance(p);
 
                         VirtualFile testRoot = Arrays.stream(rootManager.getContentSourceRoots())
                                 .filter(root -> rootManager.getFileIndex().isInTestSourceContent(root))
@@ -43,9 +43,9 @@ public class CreateTestSet implements NodeCreator {
                         if (testRoot != null) {
                             String basePath = AppSettingsState.getInstance().rootAutomationPath;
 
-                            String safePackageName = !parentDir.getName().isEmpty() ? Services.getInstance(project, Tools.class).toCamelCase(parentDir.getName()) : "";
+                            String safePackageName = !parentDir.getName().isEmpty() ? Services.getInstance(p, Tools.class).toCamelCase(parentDir.getName()) : "";
 
-                            String safeCamelClass = Services.getInstance(project, Tools.class).toCamelCase(name);
+                            String safeCamelClass = Services.getInstance(p, Tools.class).toCamelCase(name);
                             String safeClassName = safeCamelClass.substring(0, 1).toUpperCase() + safeCamelClass.substring(1);
                             safeClassName += "Test";
 

@@ -28,7 +28,7 @@ public class OpenActionAction extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), tree);
     }
 
-    public void execute(final @NotNull Project project) {
+    public void execute(final @NotNull Project p) {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null) return;
 
@@ -40,13 +40,13 @@ public class OpenActionAction extends DumbAwareAction {
 
             if (directoryDto instanceof TestSetDirectoryDto ts) {
                 Logger.info("open test set: " + ts.getPath());
-                Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, ts);
+                Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, ts);
                 continue;
             }
 
             if (directoryDto instanceof TestRunDirectoryDto tr) {
                 Logger.info("open test run: " + tr.getPath());
-                Services.getInstance(project, EditorUtil.class).openIfNotOpen(project, tr);
+                Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, tr);
             }
 
         }

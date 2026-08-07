@@ -13,18 +13,18 @@ public final class ProjectCloseListenerImpl implements ProjectCloseListener {
     }
 
     @Override
-    public void projectClosed(final @NotNull Project project) {
+    public void projectClosed(final @NotNull Project p) {
 
     }
 
     @Override
-    public void projectClosing(final @NotNull Project project) {
+    public void projectClosing(final @NotNull Project p) {
 
     }
 
     @Override
-    public void projectClosingBeforeSave(final @NotNull Project project) {
-        Services.getInstance(project, EditorUtil.class).saveOpen(project);
+    public void projectClosingBeforeSave(final @NotNull Project p) {
+        Services.getInstance(p, EditorUtil.class).saveOpen(p);
     }
 
 }

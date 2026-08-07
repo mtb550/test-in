@@ -48,8 +48,8 @@ public class UpdateRunItemDialog {
     private final JBPopup popup;
     private final List<RunItemEditSection> cachedSections;
 
-    public UpdateRunItemDialog(final @NotNull Project project, final @NotNull TestRunItems runItem, final @NotNull RunItemUpdateFields selectedItem, final @NotNull Consumer<TestRunItems> onSave) {
-        this.project = project;
+    public UpdateRunItemDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull RunItemUpdateFields selectedItem, final @NotNull Consumer<TestRunItems> onSave) {
+        this.project = p;
         this.runItem = runItem;
         this.selectedItem = selectedItem;
         this.onSave = onSave;

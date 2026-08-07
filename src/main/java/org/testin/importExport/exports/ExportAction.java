@@ -87,17 +87,17 @@ public class ExportAction extends DumbAwareAction {
         });
     }
 
-    public Map<String, List<TestCaseDto>> gatherData(final @NotNull Project project, final VirtualFile targetDirectory, final DirectoryDto dirDto) {
+    public Map<String, List<TestCaseDto>> gatherData(final @NotNull Project p, final VirtualFile targetDirectory, final DirectoryDto dirDto) {
         Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
 
         if (dirDto instanceof TestSetDirectoryDto) {
-            allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(project, targetDirectory));
+            allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(p, targetDirectory));
         } else {
             VirtualFile[] children = targetDirectory.getChildren();
             if (children != null) {
                 for (VirtualFile child : children) {
                     if (child.isDirectory()) {
-                        List<TestCaseDto> tcs = loadTestCasesInOrder(project, child);
+                        List<TestCaseDto> tcs = loadTestCasesInOrder(p, child);
                         if (!tcs.isEmpty()) {
                             allSheets.put(child.getName(), tcs);
                         }
@@ -116,7 +116,7 @@ public class ExportAction extends DumbAwareAction {
         return target;
     }
 
-    public List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project project, final VirtualFile dir) {
+    public List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final VirtualFile dir) {
         Map<UUID, TestCaseDto> tcMap = new HashMap<>();
         TestCaseDto head = null;
 
@@ -126,7 +126,7 @@ public class ExportAction extends DumbAwareAction {
         for (VirtualFile file : files) {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
-                    TestCaseDto tc = Services.getInstance(project, Mapper.class).readValue(is, TestCaseDto.class);
+                    TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class);
                     tcMap.put(tc.getId(), tc);
                     if (Boolean.TRUE.equals(tc.getIsHead())) {
                         head = tc;

@@ -33,8 +33,8 @@ public class GenerateReportDialog extends DialogWrapper {
     @Getter
     private File selectedFile;
 
-    public GenerateReportDialog(final @NotNull Project project, final String suggestedFileName) {
-        super(project, true);
+    public GenerateReportDialog(final @NotNull Project p, final String suggestedFileName) {
+        super(p, true);
 
         setTitle("Generate Report");
         setOKButtonText("Generate");
@@ -47,7 +47,7 @@ public class GenerateReportDialog extends DialogWrapper {
                 .withTitle("Select Destination Folder")
                 .withDescription("Choose the folder to save the report in");
 
-        folderField.addBrowseFolderListener(project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+        folderField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
 
         init();
         setSize(450, 200);
@@ -57,7 +57,7 @@ public class GenerateReportDialog extends DialogWrapper {
             folderField.setText(defaultFolder);
         } else {
             ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(
-                    folderField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+                    folderField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
             folderField.addActionListener(browseListener);
             SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }

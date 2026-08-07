@@ -90,7 +90,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
         return ActionUpdateThread.BGT;
     }
 
-    public void applyStatusChange(final @NotNull Project project, final @NotNull RunEditor editor, final @NotNull TestRunStatus newStatus) {
+    public void applyStatusChange(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestRunStatus newStatus) {
         TestRunMarker marker = editor.getParent().getMarker();
         TestRunStatus oldStatus = marker.getStatus();
 
@@ -105,8 +105,8 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
         if (newStatus == TestRunStatus.COMPLETED && oldStatus == TestRunStatus.IN_PROGRESS)
             editor.stopExecution();
 
-        persistMarker(project, editor);
-        persistResults(project, editor);
+        persistMarker(p, editor);
+        persistResults(p, editor);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
@@ -120,7 +120,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
         });
     }
 
-    public void onExecutionFinished(final @NotNull Project project, final @NotNull RunEditor editor) {
+    public void onExecutionFinished(final @NotNull Project p, final @NotNull RunEditor editor) {
         editor.stopExecution();
 
         TestRunMarker marker = editor.getParent().getMarker();
@@ -129,8 +129,8 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
 
         resetPendingToUntested(editor);
 
-        persistMarker(project, editor);
-        persistResults(project, editor);
+        persistMarker(p, editor);
+        persistResults(p, editor);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
@@ -150,10 +150,10 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
         }
     }
 
-    private void persistMarker(final @NotNull Project project, final @NotNull RunEditor editor) {
+    private void persistMarker(final @NotNull Project p, final @NotNull RunEditor editor) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 final Path runPath = editor.getParent().getPath();
                 final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(runPath);
 
@@ -163,7 +163,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
                     marker.setStatus(editor.getParent().getMarker().getStatus());
                     marker.setCreatedAt(editor.getParent().getMarker().getCreatedAt());
 
-                    indexer.updateRunMarker(project, runPath, marker);
+                    indexer.updateRunMarker(p, runPath, marker);
                     Logger.trace("Marker persisted -> " + marker.getStatus().getLabel());
                 }
             } catch (final Exception ex) {
@@ -172,13 +172,13 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
         });
     }
 
-    private void persistResults(final @NotNull Project project, final @NotNull RunEditor editor) {
+    private void persistResults(final @NotNull Project p, final @NotNull RunEditor editor) {
         if (editor.getTr() == null) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = editor.getParent().getPath();
-                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
+                Services.getInstance(p, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
                 Logger.trace("Results persisted");
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run results: " + ex.getMessage());

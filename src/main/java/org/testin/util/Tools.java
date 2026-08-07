@@ -172,8 +172,8 @@ public final class Tools {
         return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
 
-    public @Nullable VirtualFile getTestSourceRoot(final @NotNull Project project) {
-        Module[] modules = ModuleManager.getInstance(project).getModules();
+    public @Nullable VirtualFile getTestSourceRoot(final @NotNull Project p) {
+        Module[] modules = ModuleManager.getInstance(p).getModules();
 
         for (Module module : modules) {
             List<VirtualFile> sourceRoots = ModuleRootManager.getInstance(module)
@@ -204,23 +204,23 @@ public final class Tools {
         return pascalCase.toString();
     }
 
-    public void openWithAssociatedProgram(final @NotNull Project project, final VirtualFile virtualFile) {
+    public void openWithAssociatedProgram(final @NotNull Project p, final VirtualFile virtualFile) {
         if (virtualFile == null || !virtualFile.exists()) {
-            Services.getInstance(project, Notifier.class).error(project, "Open Error", "The file does not exist.");
+            Services.getInstance(p, Notifier.class).error(p, "Open Error", "The file does not exist.");
             return;
         }
 
         File file = new File(virtualFile.getPath());
 
         if (!Desktop.isDesktopSupported()) {
-            Services.getInstance(project, Notifier.class).error(project, "System Error", "Desktop operations are not supported on this system.");
+            Services.getInstance(p, Notifier.class).error(p, "System Error", "Desktop operations are not supported on this system.");
             return;
         }
 
         Desktop desktop = Desktop.getDesktop();
 
         if (!desktop.isSupported(Desktop.Action.OPEN)) {
-            Services.getInstance(project, Notifier.class).error(project, "System Error", "The 'Open' action is not supported on this system.");
+            Services.getInstance(p, Notifier.class).error(p, "System Error", "The 'Open' action is not supported on this system.");
             return;
         }
 
@@ -229,7 +229,7 @@ public final class Tools {
                 desktop.open(file);
             } catch (final IOException ex) {
                 ApplicationManager.getApplication().invokeLater(() ->
-                        Services.getInstance(project, Notifier.class).error(project, "Execution Error", "Failed to open the file: " + ex.getMessage())
+                        Services.getInstance(p, Notifier.class).error(p, "Execution Error", "Failed to open the file: " + ex.getMessage())
                 );
             }
         });
@@ -353,13 +353,13 @@ public final class Tools {
         return generatedFqcn;
     }
 
-    public @NotNull List<String> buildFqcnClass(final @NotNull Project project, final @NotNull DirectoryDto dir) {
+    public @NotNull List<String> buildFqcnClass(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
 
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
 
         if (generatedFqcn.isEmpty()) {
-            Services.getInstance(project, Notifier.class).softShow(project, "empty fqcn , directory: " + dir.getPath());
+            Services.getInstance(p, Notifier.class).softShow(p, "empty fqcn , directory: " + dir.getPath());
         }
 
         int lastIdx = generatedFqcn.size() - 1;

@@ -41,16 +41,16 @@ public final class ProjectPanel implements Disposable {
     private @NotNull BranchSelector branchSelector;
     private @NotNull ProjectTree projectTree;
 
-    public ProjectPanel(final @NotNull Project project) {
-        this.project = project;
+    public ProjectPanel(final @NotNull Project p) {
+        this.project = p;
         Logger.info("ProjectPanel.ProjectPanel()");
 
-        testProjectSelector = new TestProjectSelector(project, this);
-        testProjectTreeBuilder = new TestProjectTreeBuilder(project, this);
-        testCaseTreeBuilder = new TestCaseTreeBuilder(project, this);
-        testRunTreeBuilder = new TestRunTreeBuilder(project, this);
-        branchSelector = new BranchSelector(project, this, testProjectSelector.getSelectedTestProject().getItem());
-        projectTree = new ProjectTree(project, this);
+        testProjectSelector = new TestProjectSelector(p, this);
+        testProjectTreeBuilder = new TestProjectTreeBuilder(p, this);
+        testCaseTreeBuilder = new TestCaseTreeBuilder(p, this);
+        testRunTreeBuilder = new TestRunTreeBuilder(p, this);
+        branchSelector = new BranchSelector(p, this, testProjectSelector.getSelectedTestProject().getItem());
+        projectTree = new ProjectTree(p, this);
 
         testProjectSelector.init();
         setupMainLayout();

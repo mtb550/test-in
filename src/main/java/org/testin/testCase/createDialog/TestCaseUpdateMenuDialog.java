@@ -33,8 +33,8 @@ public class TestCaseUpdateMenuDialog {
     private final @NotNull List<TestCaseDto> items;
     private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems;
 
-    public TestCaseUpdateMenuDialog(final @NotNull Project project, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems) {
-        this.project = project;
+    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems) {
+        this.project = p;
         this.items = items;
         this.updatedItems = updatedItems;
     }

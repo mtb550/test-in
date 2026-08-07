@@ -18,8 +18,8 @@ import java.util.Optional;
 
 public final class StartupActivity implements ProjectActivity {
 
-    public static void execute(final @NotNull Project project) {
-        Logger.setProject(project);
+    public static void execute(final @NotNull Project p) {
+        Logger.setProject(p);
 
         AppSettingsState settings = AppSettingsState.getInstance();
 
@@ -38,40 +38,40 @@ public final class StartupActivity implements ProjectActivity {
             testinPath = Path.of(settings.rootTestinPath);
         } else {
             ApplicationManager.getApplication().invokeLater(() -> {
-                if (!project.isDisposed()) {
-                    Services.getInstance(project, Notifier.class).warnWithAction(project,
+                if (!p.isDisposed()) {
+                    Services.getInstance(p, Notifier.class).warnWithAction(p,
                             "Testin Setup Required",
                             "Please configure the Root Testin Folder to enable test management features.",
                             "Open Settings",
-                            () -> ShowSettingsUtil.getInstance().showSettingsDialog(project, SettingsConfigurable.class)
+                            () -> ShowSettingsUtil.getInstance().showSettingsDialog(p, SettingsConfigurable.class)
                     );
                 }
             });
         }
 
-        Services.getInstance(project, Setting.class).setTestinPath(testinPath);
+        Services.getInstance(p, Setting.class).setTestinPath(testinPath);
 
         Path automationPath = null;
 
         if (settings.rootAutomationPath != null && !settings.rootAutomationPath.trim().isEmpty()) {
             String folderFormat = settings.rootAutomationPath.replace(".", "/");
 
-            automationPath = Optional.ofNullable(project.getBasePath())
+            automationPath = Optional.ofNullable(p.getBasePath())
                     .map(Path::of)
-                    .map(p -> p.resolve(folderFormat))
+                    .map(path -> path.resolve(folderFormat))
                     .orElse(null);
         }
 
-        Services.getInstance(project, Setting.class).setAutomationPath(automationPath);
+        Services.getInstance(p, Setting.class).setAutomationPath(automationPath);
 
         Logger.info("testin Path: " + testinPath);
         Logger.info("automation Path: " + automationPath);
 
         if (testinPath != null) {
-            Services.getInstance(project, ProjectIndexer.class).indexWithProgress();
+            Services.getInstance(p, ProjectIndexer.class).indexWithProgress();
         }
 
-        TestCaseExecutionTracker.initGlobalListener(project);
+        TestCaseExecutionTracker.initGlobalListener(p);
     }
 
     @Override

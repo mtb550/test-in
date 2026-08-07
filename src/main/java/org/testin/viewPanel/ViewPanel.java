@@ -39,16 +39,16 @@ public class ViewPanel implements Disposable {
     @Getter
     private final Project project;
 
-    public ViewPanel(final @NotNull Project project) {
-        this.project = project;
-        Disposer.register(project, this);
+    public ViewPanel(final @NotNull Project p) {
+        this.project = p;
+        Disposer.register(p, this);
         detailsTab = new JBPanel<>(new BorderLayout());
         historyTab = new JBPanel<>(new BorderLayout());
         openBugsTab = new JBPanel<>(new BorderLayout());
 
-        FontSyncUtil.syncWithNativeEditor(project, detailsTab, this);
-        FontSyncUtil.syncWithNativeEditor(project, historyTab, this);
-        FontSyncUtil.syncWithNativeEditor(project, openBugsTab, this);
+        FontSyncUtil.syncWithNativeEditor(p, detailsTab, this);
+        FontSyncUtil.syncWithNativeEditor(p, historyTab, this);
+        FontSyncUtil.syncWithNativeEditor(p, openBugsTab, this);
 
         detailsScrollPane = createScrollPane(detailsTab);
         historyScrollPane = createScrollPane(historyTab);
@@ -70,8 +70,8 @@ public class ViewPanel implements Disposable {
         return sp;
     }
 
-    public void show(final Project project, final List<TestCaseDto> testCases, final ArrayList<String> path) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
+    public void show(final @NotNull Project p, final List<TestCaseDto> testCases, final ArrayList<String> path) {
+        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw == null || testCases == null || testCases.isEmpty()) return;
 
         tw.show(() -> {
@@ -80,8 +80,8 @@ public class ViewPanel implements Disposable {
         });
     }
 
-    public void show(final Project project, final List<TestCaseDto> testCases, final ArrayList<String> path, final ViewTab tab) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(project);
+    public void show(final @NotNull Project p, final List<TestCaseDto> testCases, final ArrayList<String> path, final ViewTab tab) {
+        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw == null) return;
 
         tw.show(() -> {

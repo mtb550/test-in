@@ -14,7 +14,7 @@ import java.awt.*;
 public class Module extends BaseDetails {
 
     @Override
-    public int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        return addRow(panel, gbc, TestEditorAttributes.MODULE.getName2(), Services.getInstance(project, Tools.class).format(dto.getModule()), currentRow);
+    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+        return addRow(panel, gbc, TestEditorAttributes.MODULE.getName2(), Services.getInstance(p, Tools.class).format(dto.getModule()), currentRow);
     }
 }

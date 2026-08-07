@@ -25,10 +25,10 @@ public final class Notifier {
 
     private final String GROUP_ID = "testin.notifications";
 
-    public void softShow(final @NotNull Project project, final @NotNull String title, final @NotNull String message) {
+    public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
 
         SwingUtilities.invokeLater(() -> {
-            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(project);
+            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(p);
             if (ideFrame == null || ideFrame.getStatusBar() == null) return;
 
             final JComponent statusBarComponent = ideFrame.getStatusBar().getComponent();
@@ -49,10 +49,10 @@ public final class Notifier {
         });
     }
 
-    public void softShow(final @NotNull Project project, final @NotNull String message) {
+    public void softShow(final @NotNull Project p, final @NotNull String message) {
 
         SwingUtilities.invokeLater(() -> {
-            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(project);
+            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(p);
             if (ideFrame == null || ideFrame.getStatusBar() == null) return;
 
             final JComponent statusBarComponent = ideFrame.getStatusBar().getComponent();
@@ -73,58 +73,58 @@ public final class Notifier {
         });
     }
 
-    public void info(final @NotNull Project project, final @NotNull String message) {
+    public void info(final @NotNull Project p, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(message, NotificationType.INFORMATION)
-                .notify(project);
+                .notify(p);
     }
 
-    public void warn(final @NotNull Project project, final @NotNull String message) {
+    public void warn(final @NotNull Project p, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(message, NotificationType.WARNING)
-                .notify(project);
+                .notify(p);
     }
 
-    public void error(final @NotNull Project project, final @NotNull String message) {
+    public void error(final @NotNull Project p, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(message, NotificationType.ERROR)
-                .notify(project);
+                .notify(p);
     }
 
-    public void info(final @NotNull Project project, final @NotNull String title, final @NotNull String message) {
+    public void info(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.INFORMATION)
-                .notify(project);
+                .notify(p);
     }
 
-    public void warn(final @NotNull Project project, final @NotNull String title, final @NotNull String message) {
+    public void warn(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.WARNING)
-                .notify(project);
+                .notify(p);
     }
 
-    public void error(final @NotNull Project project, final @NotNull String title, final @NotNull String message) {
+    public void error(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
         NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.ERROR)
-                .notify(project);
+                .notify(p);
     }
 
-    public void warnWithAction(final @NotNull Project project, final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {
+    public void warnWithAction(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {
         final Notification notification = NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.WARNING);
 
         notification.addAction(NotificationAction.createSimple(actionName, action));
-        notification.notify(project);
+        notification.notify(p);
     }
 
-    public Notification infoWithActions(final @NotNull Project project, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
+    public Notification infoWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
         final Notification notification = NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
                 .createNotification(title, message, NotificationType.INFORMATION);
@@ -133,7 +133,7 @@ public final class Notifier {
             notification.addAction(action);
         }
 
-        notification.notify(project);
+        notification.notify(p);
         return notification;
     }
 }

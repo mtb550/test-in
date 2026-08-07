@@ -117,13 +117,13 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         return ActionUpdateThread.BGT;
     }
 
-    private List<TestCaseDto> getFromClipboard(final @NotNull Project project) {
+    private List<TestCaseDto> getFromClipboard(final @NotNull Project p) {
         Transferable contents = CopyPasteManager.getInstance().getContents();
         if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 String json = (String) contents.getTransferData(DataFlavor.stringFlavor);
 
-                return Services.getInstance(project, Mapper.class).readValue(json, new TypeReference<>() {
+                return Services.getInstance(p, Mapper.class).readValue(json, new TypeReference<>() {
                 });
 
             } catch (final Exception ex) {
@@ -133,10 +133,10 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         return Collections.emptyList();
     }
 
-    private TestCaseDto cloneForPasting(final @NotNull Project project, final TestCaseDto original, final boolean isCut) {
+    private TestCaseDto cloneForPasting(final @NotNull Project p, final TestCaseDto original, final boolean isCut) {
         final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
-        final TestCaseDto clonedTc = Services.getInstance(project, Mapper.class).convertValue(original, TestCaseDto.class);
+        final TestCaseDto clonedTc = Services.getInstance(p, Mapper.class).convertValue(original, TestCaseDto.class);
 
         if (isCut) {
             clonedTc.setUpdatedAt(now);

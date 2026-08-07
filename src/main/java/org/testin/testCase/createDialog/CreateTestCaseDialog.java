@@ -22,9 +22,9 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
     private final Project project;
     private JBPopup popup;
 
-    public CreateTestCaseDialog(final @NotNull Project project, final BiConsumer<@NotNull TestCaseDto, @NotNull CodeGeneratorDialog> onSave) {
-        super(project, GeneratorType.CREATE_TEST_CASE);
-        this.project = project;
+    public CreateTestCaseDialog(final @NotNull Project p, final BiConsumer<@NotNull TestCaseDto, @NotNull CodeGeneratorDialog> onSave) {
+        super(p, GeneratorType.CREATE_TEST_CASE);
+        this.project = p;
 
         final TestCaseDto dto = new TestCaseDto();
 

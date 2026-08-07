@@ -18,22 +18,22 @@ import java.util.List;
 
 public class CodeNavigator {
 
-    public void toCode(final @NotNull Project project, final @NotNull List<String> fqcn) {
+    public void toCode(final @NotNull Project p, final @NotNull List<String> fqcn) {
         final String className = String.join(".", fqcn.subList(0, fqcn.size() - 1));
         final String methodName = fqcn.getLast();
 
         Logger.trace("navigate to method, className: " + className + ", methodName: " + methodName);
 
-        if (DumbService.isDumb(project)) {
+        if (DumbService.isDumb(p)) {
             Logger.trace("dumb mode detected, deferring navigation");
-            DumbService.getInstance(project).runWhenSmart(() -> toCode(project, fqcn));
+            DumbService.getInstance(p).runWhenSmart(() -> toCode(p, fqcn));
             return;
         }
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
                     try {
-                        final PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(className, GlobalSearchScope.projectScope(project));
+                        final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(className, GlobalSearchScope.projectScope(p));
 
                         if (targetClass != null) {
                             Navigatable targetElement = targetClass;
@@ -58,12 +58,12 @@ public class CodeNavigator {
                             });
 
                         } else
-                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(project, Notifier.class).softShow(project, "Navigation Error: ", "Class Not Found: " + className));
+                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).softShow(p, "Navigation Error: ", "Class Not Found: " + className));
 
                     } catch (final IndexNotReadyException ex) {
                         Logger.trace("index not ready, deferring navigation");
-                        Services.getInstance(project, Notifier.class).softShow(project, "index not ready, deferring navigation");
-                        DumbService.getInstance(project).runWhenSmart(() -> toCode(project, fqcn));
+                        Services.getInstance(p, Notifier.class).softShow(p, "index not ready, deferring navigation");
+                        DumbService.getInstance(p).runWhenSmart(() -> toCode(p, fqcn));
                     }
                 })
         );

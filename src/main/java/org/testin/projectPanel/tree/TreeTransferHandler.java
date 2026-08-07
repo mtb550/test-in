@@ -44,8 +44,8 @@ public class TreeTransferHandler extends TransferHandler {
     private final Set<DefaultMutableTreeNode> selectedNodes;
     private Integer lastAction;
 
-    public TreeTransferHandler(final @NotNull Project project, final SimpleTree tree, final Set<DefaultMutableTreeNode> selectedNodes) {
-        this.project = project;
+    public TreeTransferHandler(final @NotNull Project p, final SimpleTree tree, final Set<DefaultMutableTreeNode> selectedNodes) {
+        this.project = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
     }

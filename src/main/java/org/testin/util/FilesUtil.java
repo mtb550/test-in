@@ -17,9 +17,9 @@ import java.nio.file.Path;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FilesUtil {
 
-    public <T> void write(final @NotNull Project project, final @NotNull Path path, final @NotNull T content) {
+    public <T> void write(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
         try {
-            byte[] jsonBytes = Services.getInstance(project, Mapper.class).writeValueAsBytes(content);
+            byte[] jsonBytes = Services.getInstance(p, Mapper.class).writeValueAsBytes(content);
             final Path parent = path.getParent();
             if (parent != null) {
                 Files.createDirectories(parent);
@@ -27,7 +27,7 @@ public final class FilesUtil {
             Files.write(path, jsonBytes);
 
         } catch (final IOException ex) {
-            Services.getInstance(project, Notifier.class).error(project, "unable to write content: " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, "unable to write content: " + ex.getMessage());
             Logger.error("unable to write content: " + ex.getMessage());
             Logger.error("path" + path);
             ex.printStackTrace(System.err);

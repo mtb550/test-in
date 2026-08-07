@@ -27,8 +27,8 @@ public class TestRunStatusMenuDialog {
 
     private final Consumer<TestRunStatus> onStatusSelected;
 
-    public TestRunStatusMenuDialog(final @NotNull Project project, final Consumer<TestRunStatus> onStatusSelected) {
-        this.project = project;
+    public TestRunStatusMenuDialog(final @NotNull Project p, final Consumer<TestRunStatus> onStatusSelected) {
+        this.project = p;
         this.onStatusSelected = onStatusSelected;
     }
 

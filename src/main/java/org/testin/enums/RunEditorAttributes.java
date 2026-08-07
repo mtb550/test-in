@@ -132,14 +132,14 @@ public enum RunEditorAttributes {
     private final ValueExtractor valueExtractor;
     private final DrawItem drawItem;
 
-    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project project) {
+    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         if (drawItem != null) badges.addAll(drawItem.apply(runItem));
-        else details.put(name, valueExtractor.apply(runItem, project));
+        else details.put(name, valueExtractor.apply(runItem, p));
     }
 
     @FunctionalInterface
     public interface ValueExtractor {
-        String apply(final TestRunItems item, final Project project);
+        String apply(final TestRunItems item, final @NotNull Project p);
     }
 
     @FunctionalInterface

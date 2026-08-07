@@ -29,9 +29,9 @@ public class RemoveTestCaseAction extends DumbAwareAction {
     private final CollectionListModel<TestCaseDto> model;
     private final Project project;
 
-    public RemoveTestCaseAction(final Project project, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public RemoveTestCaseAction(final @NotNull Project p, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
         super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
-        this.project = project;
+        this.project = p;
         this.dir = dir;
         this.list = list;
         this.model = model;

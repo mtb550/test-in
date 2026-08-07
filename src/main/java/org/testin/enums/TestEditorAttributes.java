@@ -262,14 +262,14 @@ public enum TestEditorAttributes {
     private final DrawItem drawItem;
     private final ImportSetter importSetter;
 
-    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project project) {
+    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         if (drawItem != null) badges.addAll(drawItem.apply(tc));
-        else details.put(name, valueExtractor.apply(tc, project));
+        else details.put(name, valueExtractor.apply(tc, p));
     }
 
     @FunctionalInterface
     public interface ValueExtractor {
-        String apply(final @NotNull TestCaseDto tc, final @NotNull Project project);
+        String apply(final @NotNull TestCaseDto tc, final @NotNull Project p);
     }
 
     @FunctionalInterface

@@ -22,23 +22,23 @@ public class ImportExcel {
         this.importAction = importAction;
     }
 
-    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project project, final File file) {
+    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final File file) {
         Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try {
-            Map<String, List<TestCaseDto>> parsed = parseFile(project, file);
+            Map<String, List<TestCaseDto>> parsed = parseFile(p, file);
             result.putAll(parsed);
         } catch (final Exception ex) {
             Logger.error("Excel import parse failed: " + ex.getMessage());
-            Services.getInstance(project, Notifier.class).error(project, "Excel Parse Error", ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, "Excel Parse Error", ex.getMessage());
         }
         return result;
     }
 
-    public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project project, final File file) {
+    public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project p, final File file) {
         Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try (InputStream fis = new FileInputStream(file);
              Workbook workbook = WorkbookFactory.create(fis)) {
-            parseWorkbook(workbook, project, result);
+            parseWorkbook(workbook, p, result);
 
         } catch (final IOException ex) {
             Logger.error(ex.getMessage());
@@ -47,7 +47,7 @@ public class ImportExcel {
         return result;
     }
 
-    private void parseWorkbook(final Workbook workbook, final @NotNull Project project, final Map<String, List<TestCaseDto>> result) {
+    private void parseWorkbook(final Workbook workbook, final @NotNull Project p, final Map<String, List<TestCaseDto>> result) {
         DataFormatter dataFormatter = new DataFormatter();
 
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -97,7 +97,7 @@ public class ImportExcel {
                             Cell dataCell = row.getCell(colIndex);
                             rawValue = dataFormatter.formatCellValue(dataCell).trim();
                         }
-                        attr.getImportSetter().accept(project, currentTestCase, rawValue);
+                        attr.getImportSetter().accept(p, currentTestCase, rawValue);
                     }
                 }
 

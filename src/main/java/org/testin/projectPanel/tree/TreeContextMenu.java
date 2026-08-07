@@ -26,16 +26,16 @@ import java.util.List;
 public class TreeContextMenu extends DefaultActionGroup {
     final @NotNull Project project;
 
-    public TreeContextMenu(final @NotNull Project project, final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
+    public TreeContextMenu(final @NotNull Project p, final @NotNull ProjectPanel projectPanel, final @NotNull SimpleTree tree) {
         super("Tree Popup Menu", true);
-        this.project = project;
+        this.project = p;
 
         add(new OpenActionAction(tree));
         add(new CreateTreeNodeAction(projectPanel, tree));
 
         addSeparator();
 
-        add(Services.getInstance(project, Tools.class).createSubGroup("Actions", AllIcons.Actions.Edit,
+        add(Services.getInstance(p, Tools.class).createSubGroup("Actions", AllIcons.Actions.Edit,
                 List.of(
                         new UpdateTestProjectStatusAction(tree, ProjectStatus.ACTIVE),
                         new UpdateTestProjectStatusAction(tree, ProjectStatus.INACTIVE),

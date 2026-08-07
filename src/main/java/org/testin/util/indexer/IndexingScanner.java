@@ -26,8 +26,8 @@ final class IndexingScanner {
     private final Project project;
     private final IndexerDataStore store;
 
-    IndexingScanner(final @NotNull Project project, final @NotNull IndexerDataStore store) {
-        this.project = project;
+    IndexingScanner(final @NotNull Project p, final @NotNull IndexerDataStore store) {
+        this.project = p;
         this.store = store;
     }
 

@@ -21,8 +21,8 @@ public class TreeMouseListener extends PopupHandler {
     private final SimpleTree tree;
     private final TreeContextMenu treeContextMenu;
 
-    public TreeMouseListener(final @NotNull Project project, final SimpleTree tree, final TreeContextMenu treeContextMenu) {
-        this.project = project;
+    public TreeMouseListener(final @NotNull Project p, final SimpleTree tree, final TreeContextMenu treeContextMenu) {
+        this.project = p;
         this.tree = tree;
         this.treeContextMenu = treeContextMenu;
     }

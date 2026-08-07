@@ -31,8 +31,8 @@ public class StepsSection implements ICreateTestCaseSection {
     private final JPanel wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
-    public StepsSection(final @NotNull Project project) {
-        this.project = project;
+    public StepsSection(final @NotNull Project p) {
+        this.project = p;
         this.stepFields = new ArrayList<>();
 
         this.stepsContainer = new JPanel();

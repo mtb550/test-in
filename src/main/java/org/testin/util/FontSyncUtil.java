@@ -26,28 +26,28 @@ public class FontSyncUtil {
         return EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize();
     }
 
-    public static void syncWithNativeEditor(final @NotNull Project project, final JComponent component, final com.intellij.openapi.Disposable parentDisposable) {
+    public static void syncWithNativeEditor(final @NotNull Project p, final JComponent component, final com.intellij.openapi.Disposable parentDisposable) {
         updateComponentFontSize(component);
 
         ApplicationManager.getApplication().getMessageBus().connect(parentDisposable).subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) scheme -> updateComponentFontSize(component));
 
-        setupGlobalJavaEditorWatcher(project, parentDisposable);
+        setupGlobalJavaEditorWatcher(p, parentDisposable);
 
         component.addMouseWheelListener(e -> {
             if (e.isControlDown() || e.isMetaDown()) {
-                zoomGlobalIdeEditors(project, component, e.getWheelRotation() < 0);
+                zoomGlobalIdeEditors(p, component, e.getWheelRotation() < 0);
                 e.consume();
             }
         });
     }
 
-    private static void setupGlobalJavaEditorWatcher(final @NotNull Project project, final Disposable parentDisposable) {
+    private static void setupGlobalJavaEditorWatcher(final @NotNull Project p, final Disposable parentDisposable) {
         if (isGlobalWatcherActive) return;
         isGlobalWatcherActive = true;
 
         IdeEventQueue.getInstance().addPostprocessor(event -> {
             if (event instanceof MouseWheelEvent e && (e.isControlDown() || e.isMetaDown())) {
-                Timer timer = new Timer(50, evt -> syncJavaEditorToGlobal(project));
+                Timer timer = new Timer(50, evt -> syncJavaEditorToGlobal(p));
                 timer.setRepeats(false);
                 timer.start();
             }
@@ -55,10 +55,10 @@ public class FontSyncUtil {
         }, parentDisposable);
     }
 
-    private static void syncJavaEditorToGlobal(final @NotNull Project project) {
+    private static void syncJavaEditorToGlobal(final @NotNull Project p) {
         try {
-            if (!project.isDisposed()) {
-                Editor activeEditor = FileEditorManager.getInstance(project).getSelectedTextEditor();
+            if (!p.isDisposed()) {
+                Editor activeEditor = FileEditorManager.getInstance(p).getSelectedTextEditor();
                 if (activeEditor != null) {
                     float localSize = activeEditor.getColorsScheme().getEditorFontSize();
                     EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
@@ -79,7 +79,7 @@ public class FontSyncUtil {
         }
     }
 
-    private static void zoomGlobalIdeEditors(final @NotNull Project project, final JComponent component, boolean zoomIn) {
+    private static void zoomGlobalIdeEditors(final @NotNull Project p, final JComponent component, boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
             float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), 8.0f, 72.0f);
@@ -93,7 +93,7 @@ public class FontSyncUtil {
                     .globalSchemeChange(globalScheme);
 
             updateComponentFontSize(component);
-            ZoomIndicatorDialog.show(project, component, newSize);
+            ZoomIndicatorDialog.show(p, component, newSize);
         });
     }
 

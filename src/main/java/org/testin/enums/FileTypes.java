@@ -1,4 +1,5 @@
 package org.testin.enums;
+import org.jetbrains.annotations.NotNull;
 
 import com.intellij.openapi.project.Project;
 import lombok.Getter;
@@ -116,16 +117,16 @@ public enum FileTypes {
         this.reportHandler = reportHandler;
     }
 
-    public void exportToFile(final Project project, final ExportAction exportAction, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
-        exportHandler.handle(project, exportAction, destFile, sheetsData);
+    public void exportToFile(final @NotNull Project p, final ExportAction exportAction, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+        exportHandler.handle(p, exportAction, destFile, sheetsData);
     }
 
     public Map<String, List<TestCaseDto>> importToFile(Project project, ImportAction importAction, File importFile) {
         return importHandler.handle(project, importAction, importFile);
     }
 
-    public byte[] generateReport(final Project project, final TestRunDirectoryDto trDir, final TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
-        return reportHandler.handle(project, trDir, tr, detailsMap);
+    public byte[] generateReport(final @NotNull Project p, final TestRunDirectoryDto trDir, final TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+        return reportHandler.handle(p, trDir, tr, detailsMap);
     }
 
     @FunctionalInterface

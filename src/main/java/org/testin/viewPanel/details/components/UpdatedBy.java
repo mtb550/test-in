@@ -12,7 +12,7 @@ import java.awt.*;
 public class UpdatedBy extends BaseDetails {
 
     @Override
-    public int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         return addRow(panel, gbc, TestEditorAttributes.UPDATE_AT.getName2(), dto.getUpdatedBy(), currentRow);
     }
 }

@@ -29,8 +29,8 @@ import java.util.Optional;
 public final class EditorUtil {
     private final String OPEN_EDITORS_KEY = "testin.openEditors";
 
-    public boolean isOpen(final @NotNull Project project, final @NotNull String s) {
-        final FileEditorManager fed = FileEditorManager.getInstance(project);
+    public boolean isOpen(final @NotNull Project p, final @NotNull String s) {
+        final FileEditorManager fed = FileEditorManager.getInstance(p);
         final VirtualFile[] openFiles = fed.getOpenFiles();
 
         for (VirtualFile vf : openFiles) {
@@ -43,8 +43,8 @@ public final class EditorUtil {
         return false;
     }
 
-    public void close(final @NotNull Project project, final @NotNull String s) {
-        final FileEditorManager fed = FileEditorManager.getInstance(project);
+    public void close(final @NotNull Project p, final @NotNull String s) {
+        final FileEditorManager fed = FileEditorManager.getInstance(p);
         final VirtualFile[] openFiles = fed.getOpenFiles();
 
         for (VirtualFile vf : openFiles) {
@@ -56,8 +56,8 @@ public final class EditorUtil {
 
     }
 
-    public void closeThenOpen(final @NotNull Project project, final @NotNull VirtualFile vf, final @NotNull DirectoryDto dir) {
-        final FileEditorManager fed = FileEditorManager.getInstance(project);
+    public void closeThenOpen(final @NotNull Project p, final @NotNull VirtualFile vf, final @NotNull DirectoryDto dir) {
+        final FileEditorManager fed = FileEditorManager.getInstance(p);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             VirtualFile targetVf = null;
@@ -71,7 +71,7 @@ public final class EditorUtil {
             }
 
             if (targetVf == null) {
-                open(project, dir);
+                open(p, dir);
                 return;
             }
 
@@ -79,34 +79,34 @@ public final class EditorUtil {
         });
     }
 
-    public void open(final @NotNull Project project, final @NotNull DirectoryDto dir) {
+    public void open(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final EditorType ft = dir instanceof TestRunDirectoryDto ? EditorType.TEST_RUN : EditorType.TEST_CASE;
         final UnifiedVirtualFile newVf = new UnifiedVirtualFile(dir, ft);
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Optional.ofNullable(FileEditorManager.getInstance(project))
+                Optional.ofNullable(FileEditorManager.getInstance(p))
                         .ifPresent(editorManager -> editorManager.openFile(newVf, true)));
     }
 
-    public void openIfNotOpen(final @NotNull Project project, final @NotNull DirectoryDto dir) {
-        if (isOpen(project, dir.getName())) {
+    public void openIfNotOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        if (isOpen(p, dir.getName())) {
             Logger.info("Editor already open, focusing: " + dir.getName());
 
         } else {
             Logger.info("Opening Editor: " + dir.getPath());
-            open(project, dir);
+            open(p, dir);
         }
     }
 
-    public void saveOpen(final @NotNull Project project) {
+    public void saveOpen(final @NotNull Project p) {
         try {
-            final FileEditorManager fileEditorManager = FileEditorManager.getInstance(project);
+            final FileEditorManager fileEditorManager = FileEditorManager.getInstance(p);
             final List<String> entries = getEntries(fileEditorManager);
 
             if (entries.isEmpty())
-                PropertiesComponent.getInstance(project).setValue(OPEN_EDITORS_KEY, null);
+                PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);
             else
-                PropertiesComponent.getInstance(project).setValue(OPEN_EDITORS_KEY, String.join(";", entries));
+                PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, String.join(";", entries));
 
         } catch (final Exception ex) {
             Logger.error("Failed to save open editors: " + ex.getMessage());
@@ -129,9 +129,9 @@ public final class EditorUtil {
         return entries;
     }
 
-    public void restoreLastOpened(final @NotNull Project project) {
+    public void restoreLastOpened(final @NotNull Project p) {
         try {
-            final String saved = PropertiesComponent.getInstance(project).getValue(OPEN_EDITORS_KEY);
+            final String saved = PropertiesComponent.getInstance(p).getValue(OPEN_EDITORS_KEY);
 
             if (saved == null || saved.isEmpty()) {
                 Logger.debug("EditorStateService: no saved editors to restore");
@@ -144,7 +144,7 @@ public final class EditorUtil {
 
             Logger.info("restoring " + entries.length + " open editors");
 
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             for (final String entry : entries) {
                 final int sep = entry.indexOf('|');
@@ -155,19 +155,19 @@ public final class EditorUtil {
                     final TestSetDirectoryDto ts = indexer.getTestSetByPath(path);
                     Logger.debug("EditorStateService: lookup testSet by path '" + path + "' -> " + "found");
 
-                    openIfNotOpen(project, ts);
+                    openIfNotOpen(p, ts);
 
                 } else if ("tr".equals(type)) {
                     final TestRunDirectoryDto tr = indexer.getTestRunDirByPath(path);
                     Logger.debug("EditorStateService: lookup testRun by path '" + path + "' -> " + "found");
-                    openIfNotOpen(project, tr);
+                    openIfNotOpen(p, tr);
 
                 } else {
                     Logger.warn("EditorStateService: unknown directory type '" + type + "', skipping: " + path);
                 }
             }
 
-            PropertiesComponent.getInstance(project).setValue(OPEN_EDITORS_KEY, null);
+            PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);
             Logger.info("EditorStateService: cleared saved editor state");
 
         } catch (final Exception ex) {

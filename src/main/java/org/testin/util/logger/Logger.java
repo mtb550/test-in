@@ -23,8 +23,8 @@ public final class Logger {
         return project;
     }
 
-    public static void setProject(final @NotNull Project project) {
-        Logger.project = project;
+    public static void setProject(final @NotNull Project p) {
+        Logger.project = p;
     }
 
     public static void setLogLevel(final @NotNull Level level) {

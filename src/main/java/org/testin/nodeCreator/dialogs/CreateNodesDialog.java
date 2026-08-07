@@ -33,7 +33,7 @@ public class CreateNodesDialog {
     private final CodeGeneratorDialog cg;
     private final Project project;
 
-    public CreateNodesDialog(final @NotNull Project project, final @NotNull CreateNodeMenu menu, final TriConsumer<@NotNull String, @NotNull DirectoryType, @NotNull CodeGeneratorDialog> onSelected) {
+    public CreateNodesDialog(final @NotNull Project p, final @NotNull CreateNodeMenu menu, final TriConsumer<@NotNull String, @NotNull DirectoryType, @NotNull CodeGeneratorDialog> onSelected) {
         textField = new ExtendableTextField();
 
         textField.setFont(fieldFont);
@@ -56,7 +56,7 @@ public class CreateNodesDialog {
 
         mainPanel.add(textField, BorderLayout.NORTH);
 
-        this.project = project;
+        this.project = p;
         this.cg = new CodeGeneratorDialog(menu.getGeneratorType());
 
         JPanel listWrapper = new JPanel(new BorderLayout());

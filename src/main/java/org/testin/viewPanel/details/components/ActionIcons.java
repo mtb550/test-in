@@ -33,7 +33,7 @@ public class ActionIcons extends BaseDetails {
     }
 
     @Override
-    public int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
         final JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
 
@@ -67,7 +67,7 @@ public class ActionIcons extends BaseDetails {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                new NavigateToCodeAction(null).execute(project, dto);
+                new NavigateToCodeAction(null).execute(p, dto);
             }
         });
 
@@ -103,7 +103,7 @@ public class ActionIcons extends BaseDetails {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                currentStatus.executeAction(project, dto, null);
+                currentStatus.executeAction(p, dto, null);
             }
         });
 

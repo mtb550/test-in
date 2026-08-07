@@ -23,18 +23,18 @@ import java.nio.file.Path;
 @Service(Service.Level.PROJECT)
 public final class TreeUtilImpl {
 
-    public void executeVfsAction(final @NotNull Project project, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
+    public void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
             if (vf != null) {
                 operation.execute(vf);
             } else {
-                Services.getInstance(project, Notifier.class).error(project, "Could not find path on disk:\n" + path, errorTitle);
+                Services.getInstance(p, Notifier.class).error(p, "Could not find path on disk:\n" + path, errorTitle);
             }
         }));
     }
 
-    public void executeVfsAction(final @NotNull Project project, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
+    public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
@@ -43,10 +43,10 @@ public final class TreeUtilImpl {
                 if (sourceVf != null && targetVf != null) {
                     operation.execute(sourceVf, targetVf);
                 } else {
-                    Services.getInstance(project, Notifier.class).error(project, "Could not find source or target path on disk.", errorTitle);
+                    Services.getInstance(p, Notifier.class).error(p, "Could not find source or target path on disk.", errorTitle);
                 }
             } catch (final Exception ex) {
-                Services.getInstance(project, Notifier.class).error(project, "Operation failed: " + ex.getMessage(), errorTitle);
+                Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
     }
@@ -70,14 +70,14 @@ public final class TreeUtilImpl {
         });
     }
 
-    public void removeVf(final @NotNull Project project, final Object requester, final Path path) {
+    public void removeVf(final @NotNull Project p, final Object requester, final Path path) {
         try {
             VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
             if (vf != null) {
                 WriteAction.run(() -> vf.delete(requester));
             }
         } catch (final IOException ex) {
-            Services.getInstance(project, Notifier.class).error(project, "Could not delete file: " + ex.getMessage(), "Error");
+            Services.getInstance(p, Notifier.class).error(p, "Could not delete file: " + ex.getMessage(), "Error");
         }
     }
 

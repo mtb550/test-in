@@ -29,8 +29,8 @@ import java.util.ArrayList;
 @Service(Service.Level.PROJECT)
 public final class TestNGRunnerByMethod {
 
-    public void runTestMethod(final @NotNull Project project, final @NotNull TestCaseDto tc) {
-        ArrayList<String> fqcn = Services.getInstance(project, Tools.class).buildFqcnMethod(tc);
+    public void runTestMethod(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        ArrayList<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
@@ -43,7 +43,7 @@ public final class TestNGRunnerByMethod {
                     Logger.info("Extracted  - classFqcn: " + classFqcn + ", methodName: " + methodName);
                     Logger.info("FQCN list size: " + fqcn.size() + ", elements: " + fqcn);
 
-                    PsiClass targetClass = JavaPsiFacade.getInstance(project).findClass(classFqcn, GlobalSearchScope.projectScope(project));
+                    PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p));
 
                     if (targetClass == null) {
                         Logger.warn("Target class not found for FQCN: " + classFqcn);
@@ -61,7 +61,7 @@ public final class TestNGRunnerByMethod {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
 
-                        final RunManager runManager = RunManager.getInstance(project);
+                        final RunManager runManager = RunManager.getInstance(p);
                         final TestNGConfigurationType configType = TestNGConfigurationType.getInstance();
 
                         RunnerAndConfigurationSettings settings = runManager.findConfigurationByName(configLabel);

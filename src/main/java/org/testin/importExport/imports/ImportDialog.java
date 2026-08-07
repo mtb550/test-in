@@ -52,9 +52,9 @@ public class ImportDialog extends DialogWrapper {
 
     private JBTabbedPane tableTabbedPane;
 
-    public ImportDialog(final @NotNull Project project, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
-        super(project, true);
-        this.project = project;
+    public ImportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes, final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
+        super(p, true);
+        this.project = p;
         this.importAttributes = importAttributes;
 
         cg.setText("create test methods");
@@ -66,9 +66,9 @@ public class ImportDialog extends DialogWrapper {
                 .withTitle("Select Import File")
                 .withDescription("Choose a file to import test cases from (.xls, .xlsx, .json, .csv)");
 
-        fileField.addBrowseFolderListener(project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+        fileField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
 
-        FileDocumentListener fileListener = new FileDocumentListener(fileField, project, this::onDataLoaded, importLoader);
+        FileDocumentListener fileListener = new FileDocumentListener(fileField, p, this::onDataLoaded, importLoader);
         fileField.getTextField().getDocument().addDocumentListener(fileListener);
 
         setCancelButtonText("Cancel");
@@ -79,7 +79,7 @@ public class ImportDialog extends DialogWrapper {
         if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
             fileField.setText(defaultFolder);
         } else {
-            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
             fileField.addActionListener(browseListener);
             SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(fileField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }

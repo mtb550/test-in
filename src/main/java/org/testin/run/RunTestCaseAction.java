@@ -25,21 +25,21 @@ public class RunTestCaseAction extends DumbAwareAction {
         this.registerCustomShortcutSet(KeyboardSet.RunTestCase.getCustomShortcut(), list);
     }
 
-    public void execute(final @NotNull Project project, final @NotNull List<TestCaseDto> testCases) {
+    public void execute(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
 
         for (TestCaseDto tc : testCases) {
             if (tc == null || "RUNNING".equals(tc.getTempStatus())) continue;
 
-            project.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(tc.getId().toString().toLowerCase(), "RUNNING", null);
+            p.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(tc.getId().toString().toLowerCase(), "RUNNING", null);
 
-            Services.getInstance(project, Notifier.class).softShow(project, "Running Test Case: ", tc.getDescription());
-            Services.getInstance(project, TestNGRunnerByMethod.class).runTestMethod(project, tc);
+            Services.getInstance(p, Notifier.class).softShow(p, "Running Test Case: ", tc.getDescription());
+            Services.getInstance(p, TestNGRunnerByMethod.class).runTestMethod(p, tc);
         }
     }
 
-    public void execute(final @NotNull Project project, final @NotNull TestCaseDto tc) {
-        execute(project, List.of(tc));
+    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        execute(p, List.of(tc));
     }
 
     @Override

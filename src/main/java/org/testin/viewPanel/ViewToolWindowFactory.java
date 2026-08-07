@@ -23,13 +23,13 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     @Getter
     private static ViewPanel viewPanel;
 
-    public static ToolWindow getToolWindow(final Project project) {
-        if (project == null) return null;
-        return ToolWindowManager.getInstance(project).getToolWindow("testin.view");
+    public static ToolWindow getToolWindow(final @NotNull Project p) {
+        if (p == null) return null;
+        return ToolWindowManager.getInstance(p).getToolWindow("testin.view");
     }
 
-    public static void showPanel(final Project project, final List<TestCaseDto> testCases, final ArrayList<String> path, final Consumer<ViewPanel> onReadyAction) {
-        ToolWindow tw = getToolWindow(project);
+    public static void showPanel(final @NotNull Project p, final List<TestCaseDto> testCases, final ArrayList<String> path, final Consumer<ViewPanel> onReadyAction) {
+        ToolWindow tw = getToolWindow(p);
 
         if (tw != null) {
             tw.show(() -> {
@@ -45,20 +45,20 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         }
     }
 
-    public static void showPanel(final Project project, final List<TestCaseDto> testCases, final ArrayList<String> path) {
-        showPanel(project, testCases, path, null);
+    public static void showPanel(final @NotNull Project p, final List<TestCaseDto> testCases, final ArrayList<String> path) {
+        showPanel(p, testCases, path, null);
     }
 
     @Override
-    public void createToolWindowContent(final @NotNull Project project, final @NotNull ToolWindow toolWindow) {
+    public void createToolWindowContent(final @NotNull Project p, final @NotNull ToolWindow toolWindow) {
         Logger.info("ViewToolWindowFactory.createToolWindowContent()");
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (!project.isDisposed()) {
-                StartupActivity.execute(project);
+            if (!p.isDisposed()) {
+                StartupActivity.execute(p);
             }
 
-            viewPanel = new ViewPanel(project);
+            viewPanel = new ViewPanel(p);
 
             ContentFactory contentFactory = ContentFactory.getInstance();
 

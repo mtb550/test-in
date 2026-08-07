@@ -19,10 +19,10 @@ public class TestCaseExecutionSubscriber {
     private final ProjectIndexer indexer;
     private UUID runningDtoId = null;
 
-    public TestCaseExecutionSubscriber(final @NotNull Project project, final @NotNull JBList<TestCaseDto> list, final @NotNull Disposable parentDisposable) {
-        this.indexer = Services.getInstance(project, ProjectIndexer.class);
+    public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull Disposable parentDisposable) {
+        this.indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        project.getMessageBus().connect(parentDisposable).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
+        p.getMessageBus().connect(parentDisposable).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
             @Override
             public void onStatusChanged(final @NotNull String testName, final @NotNull String status, final String error) {
                 Logger.debug("TestEditor subscription fired: testName='" + testName + "', status='" + status + "'");

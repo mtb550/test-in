@@ -43,13 +43,13 @@ public final class TestRunWordGenerator {
     private static final String WHITE = "FFFFFF";
     private static final String BLACK = "000000";
 
-    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
                 String cleanName = tr.getChangeLog().replace(".json", "");
 
                 String projectName = "";
-                TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(project, ProjectPanel.class)
+                TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ProjectPanel.class)
                         .getTestProjectSelector().getSelectedTestProject().getSelectedItem();
                 if (selectedProject != null) {
                     projectName = selectedProject.getName();

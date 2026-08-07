@@ -33,8 +33,8 @@ public class BranchSelector {
 
     private boolean isUpdating = false;
 
-    public BranchSelector(final @NotNull Project project, final ProjectPanel projectPanel, final TestProjectDirectoryDto testProjectDirectory) {
-        this.project = project;
+    public BranchSelector(final @NotNull Project p, final ProjectPanel projectPanel, final TestProjectDirectoryDto testProjectDirectory) {
+        this.project = p;
         this.projectPanel = projectPanel;
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);

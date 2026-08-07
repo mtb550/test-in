@@ -27,7 +27,7 @@ import java.util.UUID;
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
 
-    public void executeNext(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+    public void executeNext(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
         int executingIndex = editor.getCurrentlyExecutingIndex();
@@ -44,7 +44,7 @@ public final class RunStatusService {
 
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
-        persistRunDataAsync(project, editor);
+        persistRunDataAsync(p, editor);
         triggerFilterRefresh(ui, list);
 
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -56,7 +56,7 @@ public final class RunStatusService {
         });
     }
 
-    public void executeManual(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
+    public void executeManual(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
         TestRunItems item = editor.getResultsMap().get(tc.getId());
@@ -73,11 +73,11 @@ public final class RunStatusService {
 
         Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
-        persistRunDataAsync(project, editor);
+        persistRunDataAsync(p, editor);
         triggerFilterRefresh(ui, null);
     }
 
-    public void applyStatus(final @NotNull Project project, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+    public void applyStatus(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
         List<TestCaseDto> selectedItems = list.getSelectedValuesList();
@@ -87,9 +87,9 @@ public final class RunStatusService {
             TestCaseDto tc = selectedItems.getFirst();
             int globalIndex = editor.getCurrentTestCases().indexOf(tc);
             if (globalIndex == editor.getCurrentlyExecutingIndex()) {
-                executeNext(project, ui, list, status);
+                executeNext(p, ui, list, status);
             } else {
-                executeManual(project, ui, tc, status);
+                executeManual(p, ui, tc, status);
             }
         } else {
             for (TestCaseDto tc : selectedItems) {
@@ -106,18 +106,18 @@ public final class RunStatusService {
                 }
             }
 
-            persistRunDataAsync(project, editor);
+            persistRunDataAsync(p, editor);
             triggerFilterRefresh(ui, list);
         }
     }
 
-    private void persistRunDataAsync(final @NotNull Project project, final @NotNull RunEditor editor) {
+    private void persistRunDataAsync(final @NotNull Project p, final @NotNull RunEditor editor) {
         if (editor.getTr() == null || editor.getParent() == null) return;
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = editor.getParent().getPath();
-                Services.getInstance(project, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
+                Services.getInstance(p, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
             } catch (final Exception ex) {
                 Logger.error("Failed to persist test run data: " + ex.getMessage());
             }

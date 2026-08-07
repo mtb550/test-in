@@ -45,9 +45,9 @@ public class ExportDialog extends DialogWrapper {
     @Getter
     private File selectedFile;
 
-    public ExportDialog(final @NotNull Project project, final List<TestEditorAttributes> exportAttributes, final Map<String, List<TestCaseDto>> sheetsData, final VirtualFile exportTarget) {
-        super(project, true);
-        this.project = project;
+    public ExportDialog(final @NotNull Project p, final List<TestEditorAttributes> exportAttributes, final Map<String, List<TestCaseDto>> sheetsData, final VirtualFile exportTarget) {
+        super(p, true);
+        this.project = p;
         this.exportAttributes = exportAttributes;
         this.originalSheetsData = sheetsData;
 
@@ -63,7 +63,7 @@ public class ExportDialog extends DialogWrapper {
                 .withTitle("Select Export Folder")
                 .withDescription("Choose the folder to save the export file in");
 
-        folderField.addBrowseFolderListener(project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+        folderField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
 
         setCancelButtonText("Cancel");
         init();
@@ -73,7 +73,7 @@ public class ExportDialog extends DialogWrapper {
         if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
             folderField.setText(defaultFolder);
         } else {
-            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(folderField, project, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(folderField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
             folderField.addActionListener(browseListener);
             SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }

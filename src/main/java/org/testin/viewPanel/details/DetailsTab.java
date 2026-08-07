@@ -46,7 +46,7 @@ public class DetailsTab {
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
 
-    public void load(final @NotNull Project project, final @NotNull JBPanel<?> detailsTab, final @Nullable TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @Nullable TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
@@ -57,7 +57,7 @@ public class DetailsTab {
             final JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
             contentPanel.setOpaque(false);
 
-            renderStoneLayout(project, contentPanel, dto, currentPath);
+            renderStoneLayout(p, contentPanel, dto, currentPath);
 
             final JBScrollPane scrollPane = new JBScrollPane(contentPanel);
             scrollPane.setBorder(null);
@@ -65,7 +65,7 @@ public class DetailsTab {
 
             detailsTab.add(scrollPane, BorderLayout.CENTER);
 
-            registerEditShortcutOnce(project, detailsTab);
+            registerEditShortcutOnce(p, detailsTab);
         }
 
         detailsTab.revalidate();
@@ -81,36 +81,36 @@ public class DetailsTab {
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
-    private void renderStoneLayout(final @NotNull Project project, final JBPanel<?> panel, final TestCaseDto dto, final ArrayList<String> currentPath) {
+    private void renderStoneLayout(final @NotNull Project p, final JBPanel<?> panel, final TestCaseDto dto, final ArrayList<String> currentPath) {
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = WEIGHT_X;
 
-        final int row = setupFixedRows(project, panel, gbc, dto, currentPath);
+        final int row = setupFixedRows(p, panel, gbc, dto, currentPath);
         addVerticalSpacer(panel, row);
     }
 
-    private int setupFixedRows(final @NotNull Project project, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final ArrayList<String> currentPath) {
+    private int setupFixedRows(final @NotNull Project p, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final ArrayList<String> currentPath) {
         int row = 0;
 
-        row = new NavigationBar(currentPath).render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Id().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Title().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new ActionIcons().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Badges().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new ExpectedResult().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Steps().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new PreConditions().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new TestData().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Fqcn().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Reference().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Module().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new CreatedBy().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new UpdatedBy().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new CreatedAt().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new UpdatedAt().render(project, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new NavigationBar(currentPath).render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Id().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Title().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new ActionIcons().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Badges().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new ExpectedResult().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Steps().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new PreConditions().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new TestData().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Fqcn().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Reference().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new Module().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new CreatedBy().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new UpdatedBy().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new CreatedAt().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        row = new UpdatedAt().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
 
         return row;
     }
@@ -122,7 +122,7 @@ public class DetailsTab {
         panel.add(Box.createVerticalGlue(), spacerGbc);
     }
 
-    private void registerEditShortcutOnce(final @NotNull Project project, final @NotNull JBPanel<?> detailsTab) {
+    private void registerEditShortcutOnce(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab) {
         if (Boolean.TRUE.equals(detailsTab.getClientProperty(SHORTCUT_REGISTERED_KEY))) {
             return;
         }
@@ -138,7 +138,7 @@ public class DetailsTab {
                 if (currentDto == null) return;
 
                 final ArrayList<String> path = viewPanel.getPage().getCurrentPath();
-                openUpdateMenu(project, currentDto, path);
+                openUpdateMenu(p, currentDto, path);
             }
 
             @Override
@@ -148,12 +148,12 @@ public class DetailsTab {
         }.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getCustomShortcut(), detailsTab);
     }
 
-    private void openUpdateMenu(final @NotNull Project project, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         final List<TestCaseDto> items = List.of(dto);
 
-        new TestCaseUpdateMenuDialog(project, items, (tcs, cg) -> {
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
-            final Path editPath = resolveEditPath(project, dto, currentPath);
+        new TestCaseUpdateMenuDialog(p, items, (tcs, cg) -> {
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final Path editPath = resolveEditPath(p, dto, currentPath);
 
             if (editPath != null) {
                 for (final TestCaseDto tc : tcs) {
@@ -161,7 +161,7 @@ public class DetailsTab {
                 }
             }
 
-            Services.getInstance(project, Notifier.class).softShow(project, "Updated..");
+            Services.getInstance(p, Notifier.class).softShow(p, "Updated..");
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 final ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
@@ -181,7 +181,7 @@ public class DetailsTab {
                         final GeneratorAction action = gt.getAction();
                         final TestCaseDto firstItem = tcs.getFirst();
 
-                        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(project, firstItem));
+                        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, firstItem));
                     }
                 }
             });
@@ -189,24 +189,24 @@ public class DetailsTab {
     }
 
     @Nullable
-    private Path resolveEditPath(final @NotNull Project project, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    private Path resolveEditPath(final @NotNull Project p, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         final DirectoryDto parent = dto.getParent();
         if (!parent.getPath().toString().isEmpty()) {
             return parent.getPath();
         }
 
         if (currentPath != null && !currentPath.isEmpty()) {
-            Path root = Services.getInstance(project, Setting.class).getTestinPath();
+            Path root = Services.getInstance(p, Setting.class).getTestinPath();
             if (root.toString().isEmpty()) {
-                root = Path.of(project.getBasePath() != null ? project.getBasePath() : "");
+                root = Path.of(p.getBasePath() != null ? p.getBasePath() : "");
             }
 
-            Path resolved = root.isAbsolute() ? root : Path.of(project.getBasePath() != null ? project.getBasePath() : "").resolve(root);
+            Path resolved = root.isAbsolute() ? root : Path.of(p.getBasePath() != null ? p.getBasePath() : "").resolve(root);
             for (final String segment : currentPath) {
                 resolved = resolved.resolve(segment);
             }
 
-            final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final TestSetDirectoryDto ts = indexer.getTestSetByPath(resolved);
             return ts.getPath();
         }

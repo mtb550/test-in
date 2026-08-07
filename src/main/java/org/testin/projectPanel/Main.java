@@ -16,14 +16,14 @@ import org.testin.util.services.Services;
 public class Main implements ToolWindowFactory, DumbAware {
 
     @Override
-    public void createToolWindowContent(final @NotNull Project project, final @NotNull ToolWindow tw) {
+    public void createToolWindowContent(final @NotNull Project p, final @NotNull ToolWindow tw) {
         Logger.info("ToolWindowFactory.createToolWindowContent()");
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (!project.isDisposed())
-                StartupActivity.execute(project);
+            if (!p.isDisposed())
+                StartupActivity.execute(p);
 
-            final ProjectPanel projectPanel = Services.getInstance(project, ProjectPanel.class);
+            final ProjectPanel projectPanel = Services.getInstance(p, ProjectPanel.class);
             final Content content = ContentFactory.getInstance().createContent(projectPanel.getPanel(), null, false);
 
             tw.setTitleActions(ProjectPanelActions.create(projectPanel));

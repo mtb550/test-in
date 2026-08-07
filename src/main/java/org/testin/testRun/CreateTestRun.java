@@ -41,9 +41,9 @@ public class CreateTestRun implements NodeCreator {
     private TestRunDirectoryDto tr;
 
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NotNull Project project, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
-        this.project = project;
-        final TestProjectDirectoryDto tp = Services.getInstance(project, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
+    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NotNull Project p, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+        this.project = p;
+        final TestProjectDirectoryDto tp = Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
 
         final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
 
@@ -57,7 +57,7 @@ public class CreateTestRun implements NodeCreator {
 
                 final RunCreationForm form = new RunCreationForm(name, root, Collections.emptyMap());
 
-                DialogBuilder dialogBuilder = new DialogBuilder(project);
+                DialogBuilder dialogBuilder = new DialogBuilder(p);
                 dialogBuilder.setTitle("Create Test Run");
                 dialogBuilder.setCenterPanel(form.getMainPanel());
                 dialogBuilder.addOkAction().setText("Save Test Run");
@@ -65,8 +65,8 @@ public class CreateTestRun implements NodeCreator {
 
                 dialogBuilder.setOkOperation(() -> {
                     dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
-                    tr = Services.getInstance(project, DirectoryMapper.class).setTestRunNode(project, newDirPath, parentDir);
-                    saveSelectedToJSON(form, root, newDirPath, Services.getInstance(project, ProjectPanel.class), tr);
+                    tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
+                    saveSelectedToJSON(form, root, newDirPath, Services.getInstance(p, ProjectPanel.class), tr);
                 });
 
                 dialogBuilder.show();

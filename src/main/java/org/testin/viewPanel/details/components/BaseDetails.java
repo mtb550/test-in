@@ -34,7 +34,7 @@ public abstract class BaseDetails {
         return FontSyncUtil.getBaseFontSize() + 8.0f; // Roughly 23.0f default
     }
 
-    public abstract int render(final @NotNull Project project, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);
+    public abstract int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);
 
     protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @Nullable String valueText, final int row) {
 

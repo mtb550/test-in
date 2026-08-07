@@ -21,8 +21,8 @@ public class SelectionListener implements ListSelectionListener {
 
     private final Project project;
 
-    public SelectionListener(final @NotNull Project project, final JBList<TestCaseDto> list, final IEditor editor, final ArrayList<String> path) {
-        this.project = project;
+    public SelectionListener(final @NotNull Project p, final JBList<TestCaseDto> list, final IEditor editor, final ArrayList<String> path) {
+        this.project = p;
         this.list = list;
         this.editor = editor;
         this.path = path;

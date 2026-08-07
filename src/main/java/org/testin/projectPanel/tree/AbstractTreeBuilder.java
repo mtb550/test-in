@@ -21,8 +21,8 @@ public abstract class AbstractTreeBuilder {
     @Getter
     protected DefaultMutableTreeNode rootNode;
 
-    public AbstractTreeBuilder(final @NotNull Project project, final ProjectPanel projectPanel) {
-        this.project = project;
+    public AbstractTreeBuilder(final @NotNull Project p, final ProjectPanel projectPanel) {
+        this.project = p;
         this.projectPanel = projectPanel;
         this.rootNode = new DefaultMutableTreeNode("loading..");
     }

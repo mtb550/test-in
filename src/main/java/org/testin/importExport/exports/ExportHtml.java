@@ -24,20 +24,20 @@ public class ExportHtml {
         this.exportAction = exportAction;
     }
 
-    public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
-            writeHtmlDocument(writer, project, sheetsData);
+            writeHtmlDocument(writer, p, sheetsData);
         } catch (final IOException ex) {
             Logger.error(ex.getMessage());
             throw new RuntimeException(ex);
         }
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(project, Notifier.class)
-                        .infoWithActions(project, "Export Complete", "Exported to: " + destFile.getName(), NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
+                Services.getInstance(p, Notifier.class)
+                        .infoWithActions(p, "Export Complete", "Exported to: " + destFile.getName(), NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
     }
 
-    private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project project, final Map<String, List<TestCaseDto>> sheetsData) {
+    private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project p, final Map<String, List<TestCaseDto>> sheetsData) {
         try {
             writer.write("<!DOCTYPE html>");
             writer.newLine();
@@ -101,7 +101,7 @@ public class ExportHtml {
                 for (TestCaseDto tc : testCases) {
                     writer.write("<tr>");
                     for (TestEditorAttributes attr : exportAction.exportAttributes) {
-                        String val = attr.getValueExtractor().apply(tc, project);
+                        String val = attr.getValueExtractor().apply(tc, p);
                         writer.write("<td>" + htmlEscape(val != null ? val : "") + "</td>");
                     }
                     writer.write("</tr>");

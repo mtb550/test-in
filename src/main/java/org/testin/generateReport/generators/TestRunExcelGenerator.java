@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public final class TestRunExcelGenerator {
 
-    public byte[] generate(final @NotNull Project project, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
             Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
@@ -75,7 +75,7 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 5, result.getBugPriority().getName());
                 ws.style(row, 5).bold().set();
 
-                String formattedDuration = Services.getInstance(project, Tools.class).getFormattedDuration(result.getDuration());
+                String formattedDuration = Services.getInstance(p, Tools.class).getFormattedDuration(result.getDuration());
                 ws.value(row, 6, formattedDuration);
 
                 ws.value(row, 7, expectedResult);

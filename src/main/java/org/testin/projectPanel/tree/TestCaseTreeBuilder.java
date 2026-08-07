@@ -10,8 +10,8 @@ import org.testin.util.logger.Logger;
 
 public class TestCaseTreeBuilder extends AbstractTreeBuilder {
 
-    public TestCaseTreeBuilder(final @NotNull Project project, final ProjectPanel projectPanel) {
-        super(project, projectPanel);
+    public TestCaseTreeBuilder(final @NotNull Project p, final ProjectPanel projectPanel) {
+        super(p, projectPanel);
     }
 
     public void buildTree(final TestProjectDirectoryDto selectedTestProjectDirectory) {

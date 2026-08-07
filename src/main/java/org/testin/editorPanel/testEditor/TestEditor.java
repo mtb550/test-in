@@ -96,12 +96,12 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Setter
     private int hoveredIndex = -1;
 
-    public TestEditor(final @NotNull Project project, final @NotNull UnifiedVirtualFile vf) {
-        this.project = project;
+    public TestEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
+        this.project = p;
         this.parent = vf.getTestSet();
 
         final Disposable projectDisposable = Disposer.newDisposable();
-        Disposer.register(project, projectDisposable);
+        Disposer.register(p, projectDisposable);
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -123,7 +123,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
 
-        FontSyncUtil.syncWithNativeEditor(project, list, projectDisposable);
+        FontSyncUtil.syncWithNativeEditor(p, list, projectDisposable);
 
         final JBScrollPane scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);
@@ -139,8 +139,8 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.syncListener.setOnUpdateCallback(this::onDataSynced);
         this.model.addListDataListener(syncListener);
 
-        final TestEditorCM cm = new TestEditorCM(project, this, parent, list, model);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(project, this, list, model, parent, cm);
+        final TestEditorCM cm = new TestEditorCM(p, this, parent, list, model);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, cm);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
@@ -155,11 +155,11 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
-        list.addListSelectionListener(new SelectionListener(project, list, this, parent.getPath2()));
+        list.addListSelectionListener(new SelectionListener(p, list, this, parent.getPath2()));
 
         list.addKeyListener(new KeyListener(list, this));
 
-        new TestCaseExecutionSubscriber(project, list, projectDisposable);
+        new TestCaseExecutionSubscriber(p, list, projectDisposable);
 
         loadDataAsync();
     }

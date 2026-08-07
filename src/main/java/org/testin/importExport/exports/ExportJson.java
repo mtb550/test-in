@@ -21,14 +21,14 @@ public class ExportJson {
     public ExportJson() {
     }
 
-    public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
-        Services.getInstance(project, FilesUtil.class).write(project, destFile.toPath(), sheetsData);
+    public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+        Services.getInstance(p, FilesUtil.class).write(p, destFile.toPath(), sheetsData);
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(project, Notifier.class).infoWithActions(project, "Export Complete", "Exported to: " + destFile.getName(),
+                Services.getInstance(p, Notifier.class).infoWithActions(p, "Export Complete", "Exported to: " + destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
                             VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-                            Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                            Services.getInstance(p, Tools.class).openWithAssociatedProgram(p, vf);
                         }))
         );
     }

@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 final class IndexerDataStore {
 
-    private final Project project;
+    private final @NotNull Project p;
 
     @Getter
     private final Map<UUID, TestCaseDto> testCasesById = new ConcurrentHashMap<>();
@@ -58,8 +58,8 @@ final class IndexerDataStore {
     @Getter
     private final Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
 
-    IndexerDataStore(final @NotNull Project project) {
-        this.project = project;
+    IndexerDataStore(final @NotNull Project p) {
+        this.p = p;
     }
 
     List<TestCaseDto> getTestCasesForTestSet(final Path testSetPath) {
@@ -143,8 +143,8 @@ final class IndexerDataStore {
             ids.add(tc.getId());
         }
 
-        Services.getInstance(project, FilesUtil.class)
-                .write(project, testSetPath.resolve(tc.getId() + ".json"), tc);
+        Services.getInstance(p, FilesUtil.class)
+                .write(p, testSetPath.resolve(tc.getId() + ".json"), tc);
     }
 
     void removeTestCase(final Path testSetPath, final UUID tcId) {
@@ -176,8 +176,8 @@ final class IndexerDataStore {
             newIds.add(tc.getId());
             testCasesById.put(tc.getId(), tc);
 
-            Services.getInstance(project, FilesUtil.class)
-                    .write(project, testSetPath.resolve(tc.getId() + ".json"), tc);
+            Services.getInstance(p, FilesUtil.class)
+                    .write(p, testSetPath.resolve(tc.getId() + ".json"), tc);
         }
 
         final List<UUID> oldIds = testSetCaseIds.get(pathStr);
@@ -197,8 +197,8 @@ final class IndexerDataStore {
     void putTestRun(final Path testRunPath, final TestRunDto tr) {
         testRunsByPath.put(testRunPath.toString(), tr);
 
-        Services.getInstance(project, FilesUtil.class)
-                .write(project, testRunPath.resolve(testRunPath.getFileName() + ".json"), tr);
+        Services.getInstance(p, FilesUtil.class)
+                .write(p, testRunPath.resolve(testRunPath.getFileName() + ".json"), tr);
     }
 
     void addTestSet(final TestSetDirectoryDto ts) {
@@ -228,7 +228,7 @@ final class IndexerDataStore {
     }
 
     private void writeMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
-        Services.getInstance(project, FilesUtil.class).write(project, dirPath.resolve(markerFileName), marker);
+        Services.getInstance(p, FilesUtil.class).write(p, dirPath.resolve(markerFileName), marker);
     }
 
     // VFS refresh is a write-intent + slow operation, so it must run inside a write action
@@ -348,12 +348,12 @@ final class IndexerDataStore {
         refreshDir(tp.getTestRunsDirectory().getPath());
     }
 
-    void addTestProjectMarker(final @NotNull Project project, final @NotNull TestProjectDirectoryDto tp) {
+    void addTestProjectMarker(final @NotNull Project p, final @NotNull TestProjectDirectoryDto tp) {
         final Path markerPath = tp.getPath().resolve(DirectoryType.TP.getMarker());
-        Services.getInstance(project, FilesUtil.class).write(project, markerPath, tp.getMarker());
+        Services.getInstance(p, FilesUtil.class).write(p, markerPath, tp.getMarker());
     }
 
-    void updateRunMarker(final @NotNull Project project, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
+    void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
         final TestRunDirectoryDto trd = testRunsDirByPath.get(runPath.toString());
         if (trd != null) {
             trd.setMarker(marker);
@@ -361,7 +361,7 @@ final class IndexerDataStore {
             Logger.warn("updateRunMarker: run dir not indexed, updating marker on disk only: " + runPath);
         }
         // Always persist the marker file even when the run dir is not (yet) in memory.
-        Services.getInstance(project, FilesUtil.class).write(project, runPath.resolve(DirectoryType.TR.getMarker()), marker);
+        Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), marker);
     }
 
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

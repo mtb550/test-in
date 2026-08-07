@@ -25,7 +25,7 @@ public class ExportCsv {
         this.exportAction = exportAction;
     }
 
-    public void exportToFile(final @NotNull Project project, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
             List<String> headerNames = exportAction.exportAttributes.stream()
                     .map(TestEditorAttributes::getName)
@@ -39,7 +39,7 @@ public class ExportCsv {
                 for (TestCaseDto tc : testCases) {
                     List<String> rowValues = new ArrayList<>();
                     for (TestEditorAttributes attr : exportAction.exportAttributes) {
-                        String val = attr.getValueExtractor().apply(tc, project);
+                        String val = attr.getValueExtractor().apply(tc, p);
                         rowValues.add(escapeCsvField(val != null ? val : ""));
                     }
                     writer.write(String.join(",", rowValues));
@@ -52,10 +52,10 @@ public class ExportCsv {
         }
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(project, Notifier.class).infoWithActions(project, "Export Complete", "Exported to: " + destFile.getName(),
+                Services.getInstance(p, Notifier.class).infoWithActions(p, "Export Complete", "Exported to: " + destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
                             VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-                            Services.getInstance(project, Tools.class).openWithAssociatedProgram(project, vf);
+                            Services.getInstance(p, Tools.class).openWithAssociatedProgram(p, vf);
                         }))
         );
     }

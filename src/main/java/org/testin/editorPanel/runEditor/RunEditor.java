@@ -111,12 +111,12 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Getter
     private int currentlyExecutingIndex = -1;
 
-    public RunEditor(final @NotNull Project project, final UnifiedVirtualFile vf) {
-        this.project = project;
+    public RunEditor(final @NotNull Project p, final UnifiedVirtualFile vf) {
+        this.project = p;
         this.parent = vf.getTestRun();
 
         final Disposable projectDisposable = Disposer.newDisposable();
-        Disposer.register(project, projectDisposable);
+        Disposer.register(p, projectDisposable);
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -126,7 +126,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         buildOpeningPanel();
         loadDataAsync();
 
-        FontSyncUtil.syncWithNativeEditor(project, list, projectDisposable);
+        FontSyncUtil.syncWithNativeEditor(p, list, projectDisposable);
     }
 
     private void buildOpeningPanel() {

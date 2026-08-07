@@ -94,22 +94,22 @@ public class GenerateReportAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    private void processAndSave(final Project project, final TestRunDirectoryDto tr, final FileTypes format, final File outputFile) {
+    private void processAndSave(final @NotNull Project p, final TestRunDirectoryDto tr, final FileTypes format, final File outputFile) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 Path dirPath = tr.getPath();
 
-                final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 TestRunDto runData = indexer.getTestRunByPath(dirPath);
                 if (runData == null) {
-                    Services.getInstance(project, Notifier.class).error(project, "Report Error",
+                    Services.getInstance(p, Notifier.class).error(p, "Report Error",
                             "No test run data found at: " + dirPath);
                     return;
                 }
 
-                Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(project, runData);
+                Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
 
-                byte[] fileBytes = format.generateReport(project, tr, runData, detailsMap);
+                byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
 
                 File reportFile;
                 if (outputFile != null) {
@@ -140,7 +140,7 @@ public class GenerateReportAction extends DumbAwareAction {
                 };
                 copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
 
-                Services.getInstance(project, Notifier.class).infoWithActions(project,
+                Services.getInstance(p, Notifier.class).infoWithActions(p,
                         format.name() + " Report Generated",
                         "Saved successfully: " + reportFile.getName(),
                         openAction,
@@ -148,20 +148,20 @@ public class GenerateReportAction extends DumbAwareAction {
                 );
 
             } catch (final Exception ex) {
-                Services.getInstance(project, Notifier.class).error(project, "Report Error", "Failed to generate " + format.name() + " report: " + ex.getMessage());
+                Services.getInstance(p, Notifier.class).error(p, "Report Error", "Failed to generate " + format.name() + " report: " + ex.getMessage());
                 Logger.error("Exception: " + ex.getMessage());
             }
         });
     }
 
-    private Map<UUID, TestCaseDto> fetchTestCaseDetails(final Project project, final TestRunDto tr) {
+    private Map<UUID, TestCaseDto> fetchTestCaseDetails(final @NotNull Project p, final TestRunDto tr) {
         final Map<UUID, TestCaseDto> detailsMap = new ConcurrentHashMap<>();
 
         if (tr.getResults().isEmpty()) {
             return detailsMap;
         }
 
-        final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         for (final TestRunItems item : tr.getResults()) {
             final TestCaseDto tc = indexer.getTestCaseById(item.getId());
