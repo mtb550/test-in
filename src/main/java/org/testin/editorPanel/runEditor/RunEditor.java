@@ -506,7 +506,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         if (item != null) {
             item.setStatus(status);
             item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-            item.setExecutedBy(AppSettingsState.getInstance().testerName);
+            item.setExecutedBy(Services.getInstance(p, AppSettingsState.class).testerName);
         }
 
         persistRunDataAsync();

@@ -8,6 +8,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.settings.AppSettingsState;
+import org.testin.util.services.Services;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
@@ -43,7 +44,7 @@ public final class TestRunHtmlGenerator {
         // Run-level metadata
         final String runName = tr.getChangeLog().replace(".json", "");
         final String platform = tr.getPlatform();
-        final AppSettingsState settings = AppSettingsState.getInstance();
+        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         final String testerName = settings.testerName;
         final String testerRole = settings.testerRole;
         final String executedBy = testerName; // todo, to be changed to be like pdf generator calss, get all executed by values.

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
 import org.testin.settings.AppSettingsState;
+import org.testin.util.services.Services;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +19,8 @@ import java.io.File;
 import java.util.Arrays;
 
 public class GenerateReportDialog extends DialogWrapper {
+
+    private final @NotNull Project p;
 
     private final TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
 
@@ -35,6 +38,7 @@ public class GenerateReportDialog extends DialogWrapper {
 
     public GenerateReportDialog(final @NotNull Project p, final String suggestedFileName) {
         super(p, true);
+        this.p = p;
 
         setTitle("Generate Report");
         setOKButtonText("Generate");
@@ -52,7 +56,7 @@ public class GenerateReportDialog extends DialogWrapper {
         init();
         setSize(450, 200);
 
-        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
             folderField.setText(defaultFolder);
         } else {
@@ -99,7 +103,7 @@ public class GenerateReportDialog extends DialogWrapper {
         gbc.weightx = 1.0;
         panel.add(formatCombo, gbc);
 
-        String defaultFolder = AppSettingsState.getInstance().defaultDownloadFolder;
+        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
             gbc.gridx = 0;
             gbc.gridy = 3;
@@ -140,7 +144,7 @@ public class GenerateReportDialog extends DialogWrapper {
         selectedFormat = fmt;
 
         if (setDefaultCheckBox.isSelected()) {
-            AppSettingsState.getInstance().defaultDownloadFolder = folder;
+            Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder;
         }
 
         super.doOKAction();

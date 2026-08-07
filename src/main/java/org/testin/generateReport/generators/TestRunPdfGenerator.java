@@ -78,7 +78,7 @@ public final class TestRunPdfGenerator {
             }
 
             // Tester identity from settings (fallback to marker / literal)
-            AppSettingsState settings = AppSettingsState.getInstance();
+            AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
             String testerName = settings.testerName.trim();
             String testerRole = settings.testerRole;
 

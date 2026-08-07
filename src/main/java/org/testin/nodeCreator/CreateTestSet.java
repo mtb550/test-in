@@ -46,7 +46,7 @@ public class CreateTestSet implements NodeCreator {
                                 .orElse(null);
 
                         if (testRoot != null) {
-                            String basePath = AppSettingsState.getInstance().rootAutomationPath;
+                            String basePath = Services.getInstance(p, AppSettingsState.class).rootAutomationPath;
 
                             String safePackageName = !parentDir.getName().isEmpty() ? Services.getInstance(p, Tools.class).toCamelCase(parentDir.getName()) : "";
 
