@@ -276,17 +276,14 @@ public final class ProjectIndexer {
         return store.getTestProjectsByPath();
     }
 
-    /**
-     * The indexer is the only component allowed to read disk state. All other classes must
-     * ask the indexer instead of touching the disk (Files.exists / VFS refresh) directly.
-     */
+
     public boolean rootExists() {
         final Path root = Services.getInstance(p, Setting.class).getTestinPath();
-        return root != null && Files.isDirectory(root);
+        return Files.isDirectory(root);
     }
 
     public boolean projectExists(final @NotNull Path projectPath) {
-        return projectPath != null && Files.isDirectory(projectPath);
+        return Files.isDirectory(projectPath);
     }
 
     public @NotNull List<DirectoryDto> getChildren(final @NotNull Path parentPath) {

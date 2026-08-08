@@ -77,7 +77,6 @@ public class TestProjectSelector {
             testProjectList.removeAllElements();
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            // The indexer owns disk reads; ask it instead of Files.exists directly.
             if (indexer.rootExists()) {
                 final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
                 projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));

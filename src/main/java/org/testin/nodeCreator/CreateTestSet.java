@@ -30,8 +30,6 @@ public class CreateTestSet implements NodeCreator {
         Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);
         Services.getInstance(p, ProjectIndexer.class).createNode(tree, parentNode, ts);
 
-        // Code generation is owned by the generateJavaCode package (accepted). CreateJavaClass
-        // builds the FQCN/package from the test-set DTO and writes the class via VFS internally.
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
                 GeneratorType.CREATE_TEST_SET.getAction().execute(p, ts);
