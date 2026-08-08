@@ -143,18 +143,9 @@ public class PendingCommitsDialog extends DialogWrapper {
                 if (currentDto == null)
                     return;
 
-                // todo, move it to runnable action in enum to skip if statements
-                if (changeTypeLabel.contains("Description"))
-                    currentDto.setDescription(oldDto.getDescription());
-
-                else if (changeTypeLabel.contains("Expected Result"))
-                    currentDto.setExpectedResult(oldDto.getExpectedResult());
-
-                else if (changeTypeLabel.contains("Priority"))
-                    currentDto.setPriority(oldDto.getPriority());
-
-                else if (changeTypeLabel.contains("Group"))
-                    currentDto.setGroup(oldDto.getGroup());
+                final ChangeType changeType = ChangeType.fromLabel(changeTypeLabel);
+                if (changeType != null && changeType.getRevertAction() != null)
+                    changeType.getRevertAction().apply(currentDto, oldDto);
 
                 Services.getInstance(p, ProjectIndexer.class).putTestCase(jsonFile.getParentFile().toPath(), currentDto);
                 model.removeRow(selectedRow);
