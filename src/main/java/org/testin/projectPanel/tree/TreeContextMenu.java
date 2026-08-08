@@ -37,7 +37,7 @@ public class TreeContextMenu extends DefaultActionGroup {
         this.p = p;
 
         add(new OpenAction(p, tree));
-        add(new CreateTreeNodeAction(p, pp, tree));
+        add(new CreateTreeNodeAction(p, tree));
 
         addSeparator();
 

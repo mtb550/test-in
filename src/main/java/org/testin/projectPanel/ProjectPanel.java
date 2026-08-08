@@ -24,7 +24,7 @@ import org.testin.projectPanel.versionSelector.BranchSelector;
 import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.settings.SettingsConfigurable;
-import org.testin.testProject.CreateTestProjectAction;
+import org.testin.nodeCreator.CreateTestProjectAction;
 import org.testin.util.Bundle;
 
 import java.awt.*;

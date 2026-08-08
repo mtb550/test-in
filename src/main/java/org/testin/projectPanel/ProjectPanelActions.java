@@ -7,7 +7,7 @@ import org.testin.projectPanel.toolBar.CollapseAllAction;
 import org.testin.projectPanel.toolBar.ExpandAllAction;
 import org.testin.projectPanel.toolBar.RefreshAction;
 import org.testin.settings.OpenSettingsAction;
-import org.testin.testProject.CreateTestProjectAction;
+import org.testin.nodeCreator.CreateTestProjectAction;
 
 import java.util.List;
 

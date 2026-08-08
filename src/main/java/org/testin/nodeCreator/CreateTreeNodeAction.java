@@ -26,42 +26,38 @@ import java.nio.file.Path;
 public class CreateTreeNodeAction extends DumbAwareAction {
 
     private final @NotNull Project p;
-
-    @Getter
-    private final @NotNull ProjectPanel pp;
-
-    @Getter
     private final @NotNull SimpleTree tree;
+    private final @NotNull Tools tools;
 
-    public CreateTreeNodeAction(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull SimpleTree tree) {
+    public CreateTreeNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Create", "Create new node", AllIcons.General.Add);
         this.p = p;
-        this.pp = pp;
         this.tree = tree;
+        this.tools = Services.getInstance(p, Tools.class);
         this.registerCustomShortcutSet(KeyboardSet.CreateNode.getCustomShortcut(), tree);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final DirectoryDto parentDir = Services.getInstance(p, Tools.class).getCurrentSelectedDirectory(tree);
+        final DirectoryDto pDir = tools.getCurrentSelectedDirectory(tree);
         final TreePath path = tree.getSelectionPath();
 
-        if (path == null || parentDir == null) return;
+        if (path == null || pDir == null) return;
 
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+        final DefaultMutableTreeNode pNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        new CreateNodesDialog(p, parentDir.getMenu(), (s, dt, cg) -> {
+        new CreateNodesDialog(p, pDir.getMenu(), (s, dt, cg) -> {
 
             if (s.isEmpty()) return;
-            final Path newDirPath = parentDir.getPath().resolve(s);
+            final Path newDirPath = pDir.getPath().resolve(s);
 
             if (dt.getAction() == null) {
                 Logger.info("No creation logic defined for type: " + dt);
                 return;
             }
 
-            DirectoryDto dir = dt.getAction().apply(p).execute(tree, s, parentNode, parentDir, newDirPath);
+            DirectoryDto dir = dt.getAction().apply(p).execute(tree, s, pNode, pDir, newDirPath);
 
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);
@@ -75,7 +71,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
 
-        DirectoryDto parentDir = Services.getInstance(p, Tools.class).getCurrentSelectedDirectory(tree);
+        DirectoryDto parentDir = tools.getCurrentSelectedDirectory(tree);
 
         if (parentDir == null || parentDir instanceof TestProjectDirectoryDto) {
             e.getPresentation().setEnabled(false);

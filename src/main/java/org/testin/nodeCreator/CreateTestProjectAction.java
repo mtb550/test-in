@@ -1,4 +1,4 @@
-package org.testin.testProject;
+package org.testin.nodeCreator;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
@@ -12,6 +12,8 @@ import org.testin.nodeCreator.dialogs.CreateNodesDialog;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.Setting;
+import org.testin.testProject.CreateTestProjectCloneAction;
+import org.testin.testProject.CreateTestProjectNewAction;
 import org.testin.util.Tools;
 
 public class CreateTestProjectAction extends DumbAwareAction {
