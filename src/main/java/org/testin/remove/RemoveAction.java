@@ -9,7 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.GeneratorType;
+import org.testin.enums.DirectoryType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.*;
@@ -76,25 +76,9 @@ public class RemoveAction extends DumbAwareAction {
 
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            // todo, use enum instead
-            switch (pkg) {
-                case TestProjectDirectoryDto ignored -> {
-                    indexer.removeTestProject(pkg.getPath());
-                    GeneratorType.REMOVE_TEST_PROJECT.getAction().execute(p, pkg);
-                }
-                case TestSetDirectoryDto ignored -> {
-                    indexer.removeTestSet(pkg.getPath());
-                    GeneratorType.REMOVE_TEST_SET.getAction().execute(p, pkg);
-                }
-                case TestRunDirectoryDto ignored -> indexer.removeTestRun(pkg.getPath());
-                case TestSetPackageDirectoryDto ignored -> {
-                    indexer.removeTestSetPackage(pkg.getPath());
-                    GeneratorType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, pkg);
-                }
-                case TestRunPackageDirectoryDto ignored -> indexer.removeTestRunPackage(pkg.getPath());
-                default -> {
-                }
-            }
+            final DirectoryType type = DirectoryType.from(pkg);
+            if (type != null && type.getRemoveHandler() != null)
+                type.getRemoveHandler().remove(p, pkg);
 
             if (node.getParent() != null)
                 indexer.removeNode(node, tree);
