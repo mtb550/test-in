@@ -11,6 +11,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
+import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
@@ -58,7 +59,7 @@ public class StepsSection implements ICreateTestCaseSection {
         }
     }
 
-    public void showSection(final JPanel contentPanel, final TestCaseBaseDialog.IUIAction repackAction) {
+    public void showSection(final JPanel contentPanel, final IUIAction repackAction) {
         showSection(contentPanel);
         wrapper.setVisible(true);
         addStepField("", repackAction);
@@ -70,7 +71,7 @@ public class StepsSection implements ICreateTestCaseSection {
         });
     }
 
-    public void addStepField(final String text, final TestCaseBaseDialog.IUIAction repackAction) {
+    public void addStepField(final String text, final IUIAction repackAction) {
         TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
         TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(p, provider, false, text != null ? text : "");
 
@@ -126,7 +127,7 @@ public class StepsSection implements ICreateTestCaseSection {
         stepsContainer.add(stepRow);
     }
 
-    private void removeStepAction(JPanel stepRow, TextFieldWithAutoCompletion<String> stepField, TestCaseBaseDialog.IUIAction repackAction) {
+    private void removeStepAction(JPanel stepRow, TextFieldWithAutoCompletion<String> stepField, IUIAction repackAction) {
         if (stepFields.size() == 1) {
             stepField.setText("");
             stepField.requestFocus();
@@ -158,7 +159,7 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final TestCaseBaseDialog.IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseAddStep.getCustomShortcut(), () ->
                 showSection(slot, repackAction));
     }
@@ -186,7 +187,7 @@ public class StepsSection implements ICreateTestCaseSection {
         }
     }
 
-    public void setStepsData(List<String> steps, TestCaseBaseDialog.IUIAction repack) {
+    public void setStepsData(List<String> steps, IUIAction repack) {
         stepsContainer.removeAll();
         stepFields.clear();
         if (steps != null && !steps.isEmpty()) {
@@ -197,7 +198,7 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseBaseDialog.IUIAction repackAction) {
+    public void fillData(final TestCaseDto dto, final IUIAction repackAction) {
         setStepsData(dto.getSteps(), repackAction);
     }
 }

@@ -101,7 +101,4 @@ public enum RunItemUpdateFields implements IStatusBarItem {
         }
     }
 
-    public interface SectionExtractor {
-        RunItemEditSection create(final UpdateRunItemDialog ui);
-    }
 }

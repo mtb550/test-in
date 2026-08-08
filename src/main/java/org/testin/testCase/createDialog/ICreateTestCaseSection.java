@@ -1,6 +1,7 @@
 package org.testin.testCase.createDialog;
 
 import com.intellij.util.ui.JBUI;
+import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -13,13 +14,13 @@ public interface ICreateTestCaseSection {
 
     void applyTo(final TestCaseDto dto);
 
-    void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final TestCaseBaseDialog.IUIAction repackAction);
+    void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction);
 
     JComponent getFocusComponent();
 
     void setEditable(final boolean editable);
 
-    void fillData(final TestCaseDto dto, final TestCaseBaseDialog.IUIAction repackAction);
+    void fillData(final TestCaseDto dto, final IUIAction repackAction);
 
     default JPanel createIconPanel(final Icon icon) {
         JPanel iconPanel = new JPanel(new GridBagLayout());

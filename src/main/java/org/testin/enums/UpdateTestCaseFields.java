@@ -249,7 +249,4 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
         }
     }
 
-    public interface IBulkEditorAction {
-        void execute(final @NotNull Project p, final List<TestCaseDto> items, final Consumer<List<TestCaseDto>> updatedItems);
-    }
 }

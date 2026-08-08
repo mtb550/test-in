@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.enums.IUIAction;
 import org.testin.enums.UpdateTestCaseFields;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.*;

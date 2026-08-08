@@ -10,6 +10,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
+import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.statusBar.IStatusBarItem;
 
@@ -134,8 +135,4 @@ public abstract class TestCaseBaseDialog {
         };
     }
 
-    // todo, move to separate class
-    public interface IUIAction {
-        void execute();
-    }
 }

@@ -1,0 +1,13 @@
+package org.testin.enums;
+
+import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
+import org.testin.mappers.dto.TestCaseDto;
+
+import java.util.List;
+import java.util.function.Consumer;
+
+@FunctionalInterface
+public interface IBulkEditorAction {
+    void execute(final @NotNull Project p, final List<TestCaseDto> items, final Consumer<List<TestCaseDto>> updatedItems);
+}

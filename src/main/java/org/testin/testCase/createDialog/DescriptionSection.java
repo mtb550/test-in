@@ -9,6 +9,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
+import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
@@ -65,7 +66,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final TestCaseBaseDialog.IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseDescription.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -83,7 +84,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseBaseDialog.IUIAction repackAction) {
+    public void fillData(final TestCaseDto dto, final IUIAction repackAction) {
         descriptionField.setText(dto.getDescription());
     }
 }

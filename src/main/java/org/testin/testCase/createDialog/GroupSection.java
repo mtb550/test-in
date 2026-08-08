@@ -4,6 +4,7 @@ import com.intellij.ui.components.JBCheckBox;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.testin.enums.CreateTestCaseFields;
+import org.testin.enums.IUIAction;
 import org.testin.enums.Group;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -75,7 +76,7 @@ public class GroupSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final TestCaseBaseDialog.IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseGroup.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -117,7 +118,7 @@ public class GroupSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final TestCaseBaseDialog.IUIAction repackAction) {
+    public void fillData(final TestCaseDto dto, final IUIAction repackAction) {
         setSelectedGroup(dto.getGroup());
     }
 }

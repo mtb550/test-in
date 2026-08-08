@@ -11,6 +11,8 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.enums.IVfsBiOperation;
+import org.testin.enums.IVfsOperation;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -81,11 +83,4 @@ public final class TreeUtilImpl {
         }
     }
 
-    public interface IVfsOperation {
-        void execute(VirtualFile vf);
-    }
-
-    public interface IVfsBiOperation {
-        void execute(VirtualFile sourceVf, VirtualFile targetVf);
-    }
 }

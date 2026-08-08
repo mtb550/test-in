@@ -3,6 +3,7 @@ package org.testin.editorPanel.listeners;
 import com.intellij.ui.CollectionListModel;
 import lombok.Setter;
 import org.testin.editorPanel.testEditor.TestEditor;
+import org.testin.enums.IUpdateCallback;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -92,7 +93,4 @@ public class ModelSyncListener implements ListDataListener {
     public void contentsChanged(final ListDataEvent e) {
     }
 
-    public interface IUpdateCallback {
-        void onUpdate();
-    }
 }
