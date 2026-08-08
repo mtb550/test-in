@@ -1,8 +1,10 @@
 package org.testin.enums;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public enum ViewTab {
     DETAILS("Details"),
     HISTORY("History"),
@@ -10,7 +12,4 @@ public enum ViewTab {
 
     private final String displayName;
 
-    ViewTab(final String displayName) {
-        this.displayName = displayName;
-    }
 }

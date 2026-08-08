@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.keymap.KeymapUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.swing.*;
@@ -11,6 +12,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 @Getter
+@AllArgsConstructor
 public enum KeyboardSet {
     DeletePackage(KeyEvent.VK_DELETE, 0),
     RenameNode(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK),
@@ -81,10 +83,6 @@ public enum KeyboardSet {
     private final int keyCode;
     private final int modifiers;
 
-    KeyboardSet(final int keyCode, final int modifiers) {
-        this.keyCode = keyCode;
-        this.modifiers = modifiers;
-    }
 
     @SuppressWarnings("MagicConstant")
     public boolean matches(KeyEvent e) {

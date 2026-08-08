@@ -3,6 +3,7 @@ package org.testin.enums;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.KeyboardSet;
@@ -11,6 +12,7 @@ import javax.swing.*;
 import java.util.Optional;
 
 @Getter
+@AllArgsConstructor
 public enum TestRunStatus {
     CREATED(
             "Created",
@@ -46,11 +48,6 @@ public enum TestRunStatus {
     private final KeyboardSet keyboardSet;
     private final Icon icon;
 
-    TestRunStatus(final String label, final KeyboardSet keyboardSet, final Icon icon) {
-        this.label = label;
-        this.keyboardSet = keyboardSet;
-        this.icon = icon;
-    }
 
     public String getShortcutText() {
         return Optional.ofNullable(keyboardSet)
