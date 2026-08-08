@@ -13,6 +13,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.toolBar.RefreshAction;
@@ -40,7 +41,7 @@ public final class SettingsConfigurable implements Configurable {
     public SettingsConfigurable(final @NotNull Project p) {
         this.p = p;
         testinPathPanel = new TestinPathPanel(p);
-        this.logLevelComboBox = new ComboBox<>(Arrays.stream(Logger.Level.values()).map(Logger.Level::name).toArray(String[]::new));
+        this.logLevelComboBox = new ComboBox<>(Arrays.stream(Level.values()).map(Level::name).toArray(String[]::new));
     }
 
     @Override
@@ -103,7 +104,7 @@ public final class SettingsConfigurable implements Configurable {
         settings.testerRole = testerRoleField.getText();
         settings.defaultDownloadFolder = downloadFolderField.getText();
 
-        Logger.setLogLevel(Logger.Level.valueOf(settings.logLevel));
+        Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
         Setting setting = Services.getInstance(p, Setting.class);
 

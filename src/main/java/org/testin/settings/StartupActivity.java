@@ -8,6 +8,7 @@ import kotlin.coroutines.Continuation;
 import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestCaseExecutionTracker;
@@ -25,10 +26,10 @@ public final class StartupActivity implements ProjectActivity {
 
         if (settings.rootTestinPath == null || settings.rootTestinPath.isEmpty()) {
             Logger.info("First run detected — saving default settings to testinSettings.xml");
-            settings.logLevel = Logger.Level.INFO.name();
+            settings.logLevel = Level.INFO.name();
         }
 
-        Logger.setLogLevel(Logger.Level.valueOf(settings.logLevel));
+        Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
         Logger.info("StartupActivity.execute()");
 

@@ -23,7 +23,7 @@ public final class LoggerService implements Disposable {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
     private volatile boolean isRunning = true;
 
-    private volatile Logger.Level currentLogLevel = Logger.Level.DISABLED;
+    private volatile Level currentLogLevel = Level.DISABLED;
 
     private Thread writerThread;
 
@@ -31,7 +31,7 @@ public final class LoggerService implements Disposable {
         startWriterThread();
     }
 
-    public void setLogLevel(@NotNull Logger.Level level) {
+    public void setLogLevel(@NotNull Level level) {
         this.currentLogLevel = level;
     }
 
@@ -78,9 +78,9 @@ public final class LoggerService implements Disposable {
         }
     }
 
-    public void log(@NotNull Logger.Level level, @NotNull String callerClass, @NotNull String message) {
+    public void log(@NotNull Level level, @NotNull String callerClass, @NotNull String message) {
 
-        if (!isRunning || currentLogLevel == Logger.Level.DISABLED || level.priority < currentLogLevel.priority) return;
+        if (!isRunning || currentLogLevel == Level.DISABLED || level.priority < currentLogLevel.priority) return;
 
         String formattedMessage = "[" + LocalDateTime.now().format(formatter) + "] " + "[" + level.paddedName + "] " + "[" + callerClass + "] " + message;
 

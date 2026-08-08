@@ -45,14 +45,14 @@ public class GitDiffProcessor {
                 allChanges.add(new TestCaseDiff(
                         newDto.getId().toString(),
                         relativePath,
-                        TestCaseDiff.DiffType.ADDED,
+                        DiffType.ADDED,
                         null,
                         newDto,
                         List.of(new TestCaseDiff.FieldChange(
                                 "Test Case",
                                 "",
                                 newDto.getDescription(),
-                                TestCaseDiff.ChangeType.CREATE_TEST_CASE
+                                ChangeType.CREATE_TEST_CASE
                         ))
                 ));
 
@@ -69,7 +69,7 @@ public class GitDiffProcessor {
                     allChanges.add(new TestCaseDiff(
                             newDto.getId().toString(),
                             relativePath,
-                            TestCaseDiff.DiffType.MODIFIED,
+                            DiffType.MODIFIED,
                             oldDto,
                             newDto,
                             fieldChanges
@@ -83,14 +83,14 @@ public class GitDiffProcessor {
                 allChanges.add(new TestCaseDiff(
                         oldDto.getId().toString(),
                         relativePath,
-                        TestCaseDiff.DiffType.DELETED,
+                        DiffType.DELETED,
                         oldDto,
                         null,
                         List.of(new TestCaseDiff.FieldChange(
                                 "Test Case",
                                 oldDto.getDescription(),
                                 "",
-                                TestCaseDiff.ChangeType.REMOVE_TEST_CASE
+                                ChangeType.REMOVE_TEST_CASE
                         ))
                 ));
             }
@@ -106,7 +106,7 @@ public class GitDiffProcessor {
                     "Description",
                     oldDto.getDescription(),
                     newDto.getDescription(),
-                    TestCaseDiff.ChangeType.CHANGE_DESCRIPTION
+                    ChangeType.CHANGE_DESCRIPTION
             ));
         }
         if (!Objects.equals(oldDto.getExpectedResult(), newDto.getExpectedResult())) {
@@ -114,7 +114,7 @@ public class GitDiffProcessor {
                     "Expected Result",
                     oldDto.getExpectedResult(),
                     newDto.getExpectedResult(),
-                    TestCaseDiff.ChangeType.CHANGE_EXPECTED_RESULT
+                    ChangeType.CHANGE_EXPECTED_RESULT
             ));
         }
         if (!Objects.equals(oldDto.getPriority(), newDto.getPriority())) {
@@ -124,7 +124,7 @@ public class GitDiffProcessor {
                     "Priority",
                     oldP,
                     newP,
-                    TestCaseDiff.ChangeType.CHANGE_PRIORITY
+                    ChangeType.CHANGE_PRIORITY
             ));
         }
         if (!Objects.equals(oldDto.getGroup(), newDto.getGroup())) {
@@ -134,7 +134,7 @@ public class GitDiffProcessor {
                     "Group",
                     oldG,
                     newG,
-                    TestCaseDiff.ChangeType.CHANGE_GROUP
+                    ChangeType.CHANGE_GROUP
             ));
         }
 

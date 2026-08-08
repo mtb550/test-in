@@ -102,7 +102,7 @@ public class PendingCommitsDialog extends DialogWrapper {
         return panel;
     }
 
-    private String getChangeTypeLabel(TestCaseDiff.ChangeType changeType) {
+    private String getChangeTypeLabel(ChangeType changeType) {
         return switch (changeType) {
             case CREATE_TEST_CASE -> "Create Test Case";
             case REMOVE_TEST_CASE -> "Remove Test Case";
@@ -114,11 +114,11 @@ public class PendingCommitsDialog extends DialogWrapper {
     }
 
     private String getDescriptionForRow(TestCaseDiff diff, TestCaseDiff.FieldChange fc) {
-        if (diff.type() == TestCaseDiff.DiffType.ADDED) {
+        if (diff.type() == DiffType.ADDED) {
             TestCaseDto newState = diff.newState();
             return newState != null ? newState.getDescription() : fc.newValue();
 
-        } else if (diff.type() == TestCaseDiff.DiffType.DELETED) {
+        } else if (diff.type() == DiffType.DELETED) {
             TestCaseDto oldState = diff.oldState();
             return oldState != null ? oldState.getDescription() : fc.oldValue();
 
@@ -144,11 +144,11 @@ public class PendingCommitsDialog extends DialogWrapper {
         try {
             File jsonFile = repoRoot.resolve(diff.relativeFilePath()).toFile();
 
-            if (diff.type() == TestCaseDiff.DiffType.ADDED) {
+            if (diff.type() == DiffType.ADDED) {
                 if (jsonFile.exists() && jsonFile.delete()) {
                     model.removeRow(selectedRow);
                 }
-            } else if (diff.type() == TestCaseDiff.DiffType.MODIFIED) {
+            } else if (diff.type() == DiffType.MODIFIED) {
                 final TestCaseDto currentDto = Services.getInstance(p, ProjectIndexer.class).getTestCaseById(UUID.fromString(testCaseId));
                 final TestCaseDto oldDto = diff.oldState();
 
