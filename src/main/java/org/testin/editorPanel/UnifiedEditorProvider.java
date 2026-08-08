@@ -3,12 +3,11 @@ package org.testin.editorPanel;
 import com.intellij.openapi.fileEditor.FileEditor;
 import com.intellij.openapi.fileEditor.FileEditorPolicy;
 import com.intellij.openapi.fileEditor.FileEditorProvider;
+import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.DumbAware;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.runEditor.RunEditor;
-import org.testin.editorPanel.testEditor.TestEditor;
 
 public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
 
@@ -21,17 +20,11 @@ public class UnifiedEditorProvider implements FileEditorProvider, DumbAware {
     public @NotNull FileEditor createEditor(final @NotNull Project p, final @NotNull VirtualFile file) {
         if (file instanceof UnifiedVirtualFile unifiedFile) {
 
-            final IEditor editor;
+            final FileType ft = unifiedFile.getFileType();
+            if (!(ft instanceof EditorType editorType) || editorType.getFactory() == null)
+                throw new IllegalArgumentException("Unknown FileType: " + ft);
 
-            if (unifiedFile.getFileType() == EditorType.TEST_RUN)
-                editor = new RunEditor(p, unifiedFile);
-
-            else if (unifiedFile.getFileType() == EditorType.TEST_CASE)
-                editor = new TestEditor(p, unifiedFile);
-
-            else
-                throw new IllegalArgumentException("Unknown FileType: " + unifiedFile.getFileType());
-
+            final IEditor editor = editorType.getFactory().apply(p, unifiedFile);
             return new UnifiedFileEditor(p, unifiedFile, editor);
         }
 

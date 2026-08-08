@@ -52,6 +52,12 @@ public final class TestRunWordGenerator {
             BugSeverity.MAJOR, DARK_YELLOW
     );
 
+    private static final Map<Integer, int[]> COLUMN_WIDTHS = Map.of(
+            2, new int[]{3, 97},
+            3, new int[]{3, 87, 10},
+            4, new int[]{3, 77, 10, 10}
+    );
+
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
@@ -457,10 +463,6 @@ public final class TestRunWordGenerator {
     }
 
     private int[] widthsFor(int cols) {
-        return switch (cols) {
-            case 2 -> new int[]{3, 97};
-            case 3 -> new int[]{3, 87, 10};
-            default -> new int[]{3, 77, 10, 10};
-        };
+        return COLUMN_WIDTHS.getOrDefault(cols, new int[]{3, 77, 10, 10});
     }
 }

@@ -2,24 +2,30 @@ package org.testin.editorPanel;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.ex.FakeFileType;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editorPanel.runEditor.RunEditor;
+import org.testin.editorPanel.testEditor.TestEditor;
 
 import javax.swing.*;
+import java.util.function.BiFunction;
 
 public class EditorType extends FakeFileType {
 
     public static final EditorType TEST_RUN = new EditorType(
             "Test Run",
             "Test Run Editor",
-            AllIcons.Nodes.Services
+            AllIcons.Nodes.Services,
+            RunEditor::new
     );
 
     public static final EditorType TEST_CASE = new EditorType(
             "Test Case",
             "Test Case Editor",
-            AllIcons.FileTypes.Text
+            AllIcons.FileTypes.Text,
+            TestEditor::new
     );
 
     @Getter
@@ -34,10 +40,14 @@ public class EditorType extends FakeFileType {
     @NotNull
     private final Icon icon;
 
-    private EditorType(final @NotNull String name, final @NotNull String description, final @NotNull Icon icon) {
+    @Getter
+    private final BiFunction<Project, UnifiedVirtualFile, IEditor> factory;
+
+    private EditorType(final @NotNull String name, final @NotNull String description, final @NotNull Icon icon, final @NotNull BiFunction<Project, UnifiedVirtualFile, IEditor> factory) {
         this.name = name;
         this.description = description;
         this.icon = icon;
+        this.factory = factory;
     }
 
     @Override

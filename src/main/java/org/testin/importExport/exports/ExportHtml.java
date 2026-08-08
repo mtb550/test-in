@@ -20,6 +20,14 @@ import java.util.Map;
 public class ExportHtml {
     private final @NotNull ExportAction exportAction;
 
+    private static final Map<Character, String> HTML_ESCAPES = Map.of(
+            '&', "&",
+            '<', "<",
+            '>', ">",
+            '"', "&#34;",
+            '\'', "&#39;"
+    );
+
     public ExportHtml(final @NotNull ExportAction exportAction) {
         this.exportAction = exportAction;
     }
@@ -102,7 +110,7 @@ public class ExportHtml {
                     writer.write("<tr>");
                     for (TestEditorAttributes attr : exportAction.exportAttributes) {
                         String val = attr.getTestValueExtractor().execute(tc, p);
-                        writer.write("<td>" + htmlEscape(val != null ? val : "") + "</td>");
+                        writer.write("<td>" + htmlEscape(val) + "</td>");
                     }
                     writer.write("</tr>");
                     writer.newLine();
@@ -135,26 +143,8 @@ public class ExportHtml {
         StringBuilder sb = new StringBuilder(value.length());
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
-            switch (c) {
-                case '&':
-                    sb.append("&");
-                    break;
-                case '<':
-                    sb.append("<");
-                    break;
-                case '>':
-                    sb.append(">");
-                    break;
-                case '"':
-                    sb.append("&#34;");
-                    break;
-                case '\'':
-                    sb.append("&#39;");
-                    break;
-                default:
-                    sb.append(c);
-                    break;
-            }
+            final String rep = HTML_ESCAPES.get(c);
+            if (rep != null) sb.append(rep); else sb.append(c);
         }
         return sb.toString();
     }

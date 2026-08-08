@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
+import java.util.Map;
 import java.util.Optional;
 
 @Getter
@@ -47,6 +48,16 @@ public enum TestRunStatus {
     private final String label;
     private final KeyboardSet keyboardSet;
     private final Icon icon;
+
+    private static final Map<TestRunStatus, TestRunStatus> TRANSITIONS = Map.of(
+            CREATED, IN_PROGRESS,
+            ASSIGNED, IN_PROGRESS,
+            IN_PROGRESS, COMPLETED
+    );
+
+    public TestRunStatus getNextStatus() {
+        return TRANSITIONS.get(this);
+    }
 
 
     public String getShortcutText() {

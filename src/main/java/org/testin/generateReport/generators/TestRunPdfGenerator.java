@@ -67,6 +67,12 @@ public final class TestRunPdfGenerator {
             BugSeverity.MAJOR, DARK_YELLOW
     );
 
+    private static final Map<Integer, float[]> COLUMN_WIDTHS = Map.of(
+            0, new float[]{7, 93},
+            1, new float[]{7, 83, 10},
+            2, new float[]{7, 73, 10, 10}
+    );
+
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(baos);
@@ -324,11 +330,7 @@ public final class TestRunPdfGenerator {
 
         // Column widths depend on which extra columns are shown
         int extraCols = (withPriority ? 1 : 0) + (withSeverity ? 1 : 0);
-        float[] widths = switch (extraCols) {
-            case 0 -> new float[]{7, 93};
-            case 1 -> new float[]{7, 83, 10};
-            default -> new float[]{7, 73, 10, 10};
-        };
+        float[] widths = COLUMN_WIDTHS.getOrDefault(extraCols, new float[]{7, 73, 10, 10});
         Table table = new Table(UnitValue.createPercentArray(widths))
                 .useAllAvailableWidth()
                 .setBorder(Border.NO_BORDER);
