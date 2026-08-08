@@ -19,8 +19,6 @@ public class RemoveJavaClass implements GeneratorAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
 
-        // The generated test class lives under the test source root at the FQCN package path,
-        // NOT as a sibling of the testin data directory.
         final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnClass(p, dir);
         if (fqcn.isEmpty()) return;
 

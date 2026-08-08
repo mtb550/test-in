@@ -76,9 +76,7 @@ public class RemoveAction extends DumbAwareAction {
 
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            // The indexer owns the file/dir removal + in-memory store. The generateJavaCode
-            // generators own the generated Java files (class/package removal) and are accepted
-            // exceptions to the SLA (they write via VFS internally).
+            // todo, use enum instead
             switch (pkg) {
                 case TestProjectDirectoryDto ignored -> {
                     indexer.removeTestProject(pkg.getPath());

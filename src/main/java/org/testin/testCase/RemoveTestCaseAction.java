@@ -68,11 +68,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
         final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
         for (final TestCaseDto tc : selectedItems) {
-            // The indexer owns the delete: removeTestCase updates the in-memory store and
-            // deletes the JSON file via Files.deleteIfExists. No direct VFS access here.
             indexer.removeTestCase(dir.getPath(), tc.getId());
-
-            // The generateJavaCode generator owns the generated Java test method (VFS via PSI).
             GeneratorType.REMOVE_TEST_CASE.getAction().execute(p, tc);
         }
 
