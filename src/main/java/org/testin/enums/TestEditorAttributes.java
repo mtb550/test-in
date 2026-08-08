@@ -258,8 +258,8 @@ public enum TestEditorAttributes {
     private final boolean importable;
     private final boolean copyable;
     private final boolean exportable;
-    private final TestValueExtractor testValueExtractor;
-    private final TestDrawItem testDrawItem;
+    private final ValueExtractor<TestCaseDto> testValueExtractor;
+    private final DrawItem<TestCaseDto> testDrawItem;
     private final ImportSetter importSetter;
 
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {

@@ -131,8 +131,8 @@ public enum RunEditorAttributes {
     private final String name;
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
-    private final RunValueExtractor runValueExtractor;
-    private final RunDrawItem runDrawItem;
+    private final ValueExtractor<TestRunItems> runValueExtractor;
+    private final DrawItem<TestRunItems> runDrawItem;
 
     public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         if (runDrawItem != null) badges.addAll(runDrawItem.execute(runItem));
