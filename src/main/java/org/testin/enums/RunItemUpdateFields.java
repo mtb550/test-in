@@ -3,6 +3,7 @@ package org.testin.enums;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,11 +15,13 @@ import org.testin.util.KeyboardSet;
 import javax.swing.*;
 
 @Getter
+@AllArgsConstructor
 public enum RunItemUpdateFields implements IStatusBarItem {
 
     SAVE(
             "Save",
             KeyboardSet.Enter,
+            null,
             new IStatusBarItem[]{},
             false,
             null
@@ -67,23 +70,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
     private final boolean updateMenuItem;
     private final @Nullable SectionExtractor sectionExtractor;
 
-    RunItemUpdateFields(final @NotNull String name, final @Nullable KeyboardSet shortcut, final @NotNull Icon icon, final @NotNull IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final @Nullable SectionExtractor sectionExtractor) {
-        this.name = name;
-        this.shortcut = shortcut;
-        this.icon = icon;
-        this.statusBarItems = statusBarItems;
-        this.updateMenuItem = updateMenuItem;
-        this.sectionExtractor = sectionExtractor;
-    }
 
-    RunItemUpdateFields(final @NotNull String name, final @NotNull KeyboardSet shortcut, final @NotNull IStatusBarItem[] statusBarItems, final boolean updateMenuItem, final @Nullable SectionExtractor sectionExtractor) {
-        this.name = name;
-        this.shortcut = shortcut;
-        this.icon = null;
-        this.statusBarItems = statusBarItems;
-        this.updateMenuItem = updateMenuItem;
-        this.sectionExtractor = sectionExtractor;
-    }
 
     @Override
     public String getShortcutText() {
