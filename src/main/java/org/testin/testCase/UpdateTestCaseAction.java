@@ -49,7 +49,7 @@ public class UpdateTestCaseAction extends DumbAwareAction {
 
         Logger.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
 
-        new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, cg) -> {
+        new TestCaseUpdateMenuDialog(p, selectedItems, (updatedItems, gt) -> {
 
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             for (final TestCaseDto tc : updatedItems)
@@ -72,19 +72,11 @@ public class UpdateTestCaseAction extends DumbAwareAction {
                     }
                 }
 
-                if (cg.isSelected()) {
-                    final GeneratorType gt = cg.getGt();
-                    Logger.trace("Code generator selected: " + gt);
+                Logger.trace("Generating automation code: " + gt);
+                final GeneratorAction action = gt.getAction();
+                final TestCaseDto firstItem = updatedItems.getFirst();
 
-                    if (gt != null) {
-                        final GeneratorAction action = gt.getAction();
-                        final TestCaseDto firstItem = updatedItems.getFirst();
-
-                        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, firstItem));
-                    }
-                } else {
-                    Logger.trace("Code generator is NOT selected or is null.");
-                }
+                ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, firstItem));
             });
         }).show();
     }

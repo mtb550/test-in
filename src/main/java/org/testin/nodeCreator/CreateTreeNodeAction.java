@@ -6,14 +6,12 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.nodeCreator.dialogs.CreateNodesDialog;
-import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
@@ -47,7 +45,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
         final DefaultMutableTreeNode pNode = (DefaultMutableTreeNode) path.getLastPathComponent();
 
-        new CreateNodesDialog(p, pDir.getMenu(), (s, dt, cg) -> {
+        new CreateNodesDialog(p, pDir.getMenu(), (s, dt) -> {
 
             if (s.isEmpty()) return;
             final Path newDirPath = pDir.getPath().resolve(s);
@@ -62,7 +60,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);
 
-            if (cg.isSelected() && dt.getCodeGenerator() != null)
+            if (dt.getCodeGenerator() != null)
                 dt.getCodeGenerator().execute(p, dir);
 
         }).show();

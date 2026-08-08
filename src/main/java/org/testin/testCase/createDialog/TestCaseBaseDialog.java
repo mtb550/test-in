@@ -10,8 +10,6 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
-import org.testin.generateJavaCode.CodeGeneratorDialog;
-import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.statusBar.IStatusBarItem;
 
@@ -21,13 +19,12 @@ import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Getter
 public abstract class TestCaseBaseDialog {
     protected final @NotNull Project p;
-    protected final CodeGeneratorDialog cg;
     protected final DescriptionSection DescriptionSection;
     protected final ExpectedResultSection expectedResultSection;
     protected final ModuleSection moduleSection;
@@ -41,9 +38,8 @@ public abstract class TestCaseBaseDialog {
     protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
-    public TestCaseBaseDialog(final @NotNull Project p, final @NotNull GeneratorType gt) {
+    public TestCaseBaseDialog(final @NotNull Project p) {
         this.p = p;
-        this.cg = new CodeGeneratorDialog(gt);
         this.DescriptionSection = new DescriptionSection(p);
         this.expectedResultSection = new ExpectedResultSection(p);
         this.moduleSection = new ModuleSection(p);
@@ -122,13 +118,13 @@ public abstract class TestCaseBaseDialog {
         }.registerCustomShortcutSet(shortcutSet, component);
     }
 
-    public Runnable save(final TestCaseDto dto, final BiConsumer<TestCaseDto, CodeGeneratorDialog> onSave, final JBPopup[] popupWrapper) {
+    public Runnable save(final TestCaseDto dto, final Consumer<TestCaseDto> onSave, final JBPopup[] popupWrapper) {
         return () -> {
             getAllSections().forEach(section -> section.applyTo(dto));
 
             String title = dto.getDescription();
             if (DescriptionSection.getWrapper().getParent() == null || !title.trim().isEmpty()) {
-                onSave.accept(dto, cg);
+                onSave.accept(dto);
 
                 if (popupWrapper[0] != null)
                     popupWrapper[0].closeOk(null);

@@ -151,7 +151,7 @@ public class DetailsTab {
     private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         final List<TestCaseDto> items = List.of(dto);
 
-        new TestCaseUpdateMenuDialog(p, items, (tcs, cg) -> {
+        new TestCaseUpdateMenuDialog(p, items, (tcs, gt) -> {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final Path editPath = resolveEditPath(p, dto, currentPath);
 
@@ -173,17 +173,11 @@ public class DetailsTab {
                     }
                 }
 
-                if (cg.isSelected()) {
-                    final GeneratorType gt = cg.getGt();
-                    Logger.trace("Code generator selected: " + gt);
+                Logger.trace("Generating automation code: " + gt);
+                final GeneratorAction action = gt.getAction();
+                final TestCaseDto firstItem = tcs.getFirst();
 
-                    if (gt != null) {
-                        final GeneratorAction action = gt.getAction();
-                        final TestCaseDto firstItem = tcs.getFirst();
-
-                        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, firstItem));
-                    }
-                }
+                ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, firstItem));
             });
         }).show();
     }

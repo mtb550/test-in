@@ -9,21 +9,20 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.UpdateTestCaseFields;
-import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.*;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
     private @NotNull JBPopup popup;
 
-    public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull BiConsumer<@NotNull TestCaseDto, @NotNull CodeGeneratorDialog> onSave) {
-        super(p, selectedItem.getGt());
+    public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
+        super(p);
 
         IUIAction repackPopup = () -> {
             popup.pack(false, true);
@@ -105,7 +104,6 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, targetSection.getFocusComponent())
                 .setTitle("Update " + selectedItem.getName())
-                .setSettingButtons(cg)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)

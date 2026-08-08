@@ -108,14 +108,12 @@ public class ImportAction extends DumbAwareAction {
 
                 linkAndSaveTestCases(p, targetDirectory, flatList, tail);
 
-                if (dialog.getCg().isSelected()) {
-                    Logger.info("Import: generating test methods for " + flatList.size() + " imported cases");
-                    CreateTestMethod syncInjector = new CreateTestMethod();
-                    for (TestCaseDto tc : flatList) {
-                        tc.setParent(ts);
-                        List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-                        syncInjector.executeSync(p, tc, fqcn);
-                    }
+                Logger.info("Import: generating test methods for " + flatList.size() + " imported cases");
+                CreateTestMethod syncInjector = new CreateTestMethod();
+                for (TestCaseDto tc : flatList) {
+                    tc.setParent(ts);
+                    List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+                    syncInjector.executeSync(p, tc, fqcn);
                 }
 
                 Services.getInstance(p, EditorUtil.class).closeThenOpen(p, targetDirectory, ts);
@@ -138,16 +136,14 @@ public class ImportAction extends DumbAwareAction {
                     // todo: change sheetDir from vf to directoryDto
                     linkAndSaveTestCases(p, sheetDir, sheetCases, tail);
 
-                    if (dialog.getCg().isSelected()) {
-                        TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
+                    TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
 
-                        Logger.info("Import: generating test methods for sheet '" + cName + "' with " + sheetCases.size() + " cases");
-                        CreateTestMethod syncInjector = new CreateTestMethod();
-                        for (TestCaseDto tc : sheetCases) {
-                            tc.setParent(sheetDto);
-                            List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-                            syncInjector.executeSync(p, tc, fqcn);
-                        }
+                    Logger.info("Import: generating test methods for sheet '" + cName + "' with " + sheetCases.size() + " cases");
+                    CreateTestMethod syncInjector = new CreateTestMethod();
+                    for (TestCaseDto tc : sheetCases) {
+                        tc.setParent(sheetDto);
+                        List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+                        syncInjector.executeSync(p, tc, fqcn);
                     }
 
                     totalImported += sheetCases.size();

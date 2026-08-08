@@ -8,13 +8,10 @@ import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTabbedPane;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
 import org.testin.enums.TestEditorAttributes;
-import org.testin.generateJavaCode.CodeGeneratorDialog;
-import org.testin.generateJavaCode.GeneratorType;
 import org.testin.importExport.shared.CellEditListener;
 import org.testin.importExport.shared.FileDocumentListener;
 import org.testin.importExport.shared.TablePanelBuilder;
@@ -39,9 +36,6 @@ public class ImportDialog extends DialogWrapper {
 
     private final @NotNull Project p;
 
-    @Getter
-    private final CodeGeneratorDialog cg = new CodeGeneratorDialog(GeneratorType.CREATE_TEST_CASE);
-
     private final List<TestEditorAttributes> importAttributes;
 
     private final TextFieldWithBrowseButton fileField = new TextFieldWithBrowseButton();
@@ -57,7 +51,6 @@ public class ImportDialog extends DialogWrapper {
         this.p = p;
         this.importAttributes = importAttributes;
 
-        cg.setText("create test methods");
         setTitle("Import Test Cases");
         setOKButtonText("Import Selected");
 
@@ -117,10 +110,6 @@ public class ImportDialog extends DialogWrapper {
         gbc.gridy = 1;
         gbc.weightx = 0;
         topPanel.add(new JLabel("Options:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        topPanel.add(cg, gbc);
 
         String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder == null || defaultFolder.trim().isEmpty()) {

@@ -26,7 +26,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -36,6 +35,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public abstract class JsonArraySplitBulkSectionDialog {
     protected final @NotNull Project p;
@@ -52,7 +52,7 @@ public abstract class JsonArraySplitBulkSectionDialog {
 
     protected abstract List<List<String>> extractOriginalValues(final List<TestCaseDto> items);
 
-    public void show(final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
+    public void show(final List<TestCaseDto> selectedItems, final Consumer<List<TestCaseDto>> updatedItems) {
         List<List<String>> originalValues = new ArrayList<>();
         List<List<String>> activeValues = new ArrayList<>();
 
@@ -313,7 +313,7 @@ public abstract class JsonArraySplitBulkSectionDialog {
             applyValues(selectedItems, activeValues);
             if (updatedItems != null)
                 // todo, apply update automation edit bulk test cases. set to null for now
-                updatedItems.accept(selectedItems, null);
+                updatedItems.accept(selectedItems);
             popup.closeOk(null);
         };
 

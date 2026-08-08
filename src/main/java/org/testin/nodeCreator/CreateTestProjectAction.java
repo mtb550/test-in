@@ -29,7 +29,7 @@ public class CreateTestProjectAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        new CreateNodesDialog(p, CreateNodeMenu.TEST_PROJECT, (name, type, cg) -> {
+        new CreateNodesDialog(p, CreateNodeMenu.TEST_PROJECT, (name, type) -> {
             if (name.trim().isEmpty()) return;
 
             if (type == DirectoryType.IMPORT_TP) {
@@ -39,7 +39,7 @@ public class CreateTestProjectAction extends DumbAwareAction {
             }
 
             if (type == DirectoryType.TP) {
-                new CreateTestProjectNewAction(p, pp, name.trim(), cg).actionPerformed(e);
+                new CreateTestProjectNewAction(p, pp, name.trim()).actionPerformed(e);
             }
 
         }).show();

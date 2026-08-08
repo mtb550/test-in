@@ -40,7 +40,7 @@ public class CreateTestCaseAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        new CreateTestCaseDialog(p, (tc, cg) -> {
+        new CreateTestCaseDialog(p, tc -> {
             List<TestCaseDto> tcs = editor.getAllTestCases();
 
             final boolean isEmpty = tcs.isEmpty();
@@ -58,8 +58,7 @@ public class CreateTestCaseAction extends DumbAwareAction {
             Services.getInstance(p, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
             Services.getInstance(p, Notifier.class).softShow(p, "Created..");
 
-            if (cg.isSelected())
-                GeneratorType.CREATE_TEST_CASE.getAction().execute(p, tc);
+            GeneratorType.CREATE_TEST_CASE.getAction().execute(p, tc);
 
             SwingUtilities.invokeLater(() -> editor.selectTestCase(tc));
 

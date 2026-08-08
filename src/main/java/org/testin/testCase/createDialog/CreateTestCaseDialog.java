@@ -8,21 +8,19 @@ import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.CodeGeneratorDialog;
-import org.testin.generateJavaCode.GeneratorType;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
     private JBPopup popup;
 
-    public CreateTestCaseDialog(final @NotNull Project p, final BiConsumer<@NotNull TestCaseDto, @NotNull CodeGeneratorDialog> onSave) {
-        super(p, GeneratorType.CREATE_TEST_CASE);
+    public CreateTestCaseDialog(final @NotNull Project p, final Consumer<@NotNull TestCaseDto> onSave) {
+        super(p);
 
         final TestCaseDto dto = new TestCaseDto();
 
@@ -108,7 +106,6 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, DescriptionSection.getFocusComponent())
                 .setTitle("Create Test Case")
-                .setSettingButtons(cg)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
                 .setCancelOnClickOutside(false)

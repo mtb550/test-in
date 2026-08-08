@@ -13,7 +13,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.UpdateTestCaseFields;
-import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -31,9 +30,9 @@ public class TestCaseUpdateMenuDialog {
 
     private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> items;
-    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems;
+    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GeneratorType> updatedItems;
 
-    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull CodeGeneratorDialog> updatedItems) {
+    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GeneratorType> updatedItems) {
         this.p = p;
         this.items = items;
         this.updatedItems = updatedItems;
@@ -49,23 +48,15 @@ public class TestCaseUpdateMenuDialog {
             Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
 
             if (isSingle) {
-                new UpdateTestCaseDialog(p, items.getFirst(), selectedItem, (tc, cg) -> {
-                    cg = new CodeGeneratorDialog(gt);
-                    cg.setGt(gt);
-
-                    Logger.trace("Single Edit Save -> Injecting changeType " + cg.getGt() + " into UI's CodeGenerator.");
-                    updatedItems.accept(items, cg);
-
+                new UpdateTestCaseDialog(p, items.getFirst(), selectedItem, tc -> {
+                    Logger.trace("Single Edit Save -> changeType = " + gt);
+                    updatedItems.accept(items, gt);
                 }).show();
 
             } else {
-                selectedItem.getBulkAction().show(p, items, (list, cg) -> {
-                    cg = new CodeGeneratorDialog(gt);
-                    cg.setGt(gt);
-
-
-                    Logger.trace("Bulk Edit Save -> Passing main menu CodeGenerator with changeType " + cg.getGt());
-                    updatedItems.accept(list, cg);
+                selectedItem.getBulkAction().show(p, items, list -> {
+                    Logger.trace("Bulk Edit Save -> changeType = " + gt);
+                    updatedItems.accept(list, gt);
                 });
             }
         });

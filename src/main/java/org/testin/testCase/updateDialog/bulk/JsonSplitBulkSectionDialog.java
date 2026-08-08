@@ -26,7 +26,6 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.CodeGeneratorDialog;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -35,7 +34,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public abstract class JsonSplitBulkSectionDialog {
     protected final @NotNull Project p;
@@ -52,7 +51,7 @@ public abstract class JsonSplitBulkSectionDialog {
 
     protected abstract void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges);
 
-    public void show(final List<TestCaseDto> selectedItems, final BiConsumer<List<TestCaseDto>, CodeGeneratorDialog> updatedItems) {
+    public void show(final List<TestCaseDto> selectedItems, final Consumer<List<TestCaseDto>> updatedItems) {
         StringBuilder leftSb = new StringBuilder();
         StringBuilder rightSb = new StringBuilder();
         List<int[]> rightEditableRanges = new ArrayList<>();
@@ -285,7 +284,7 @@ public abstract class JsonSplitBulkSectionDialog {
             applyValues(selectedItems, newValues);
             if (updatedItems != null)
                 // todo, apply update automation edit bulk test cases. set to null for now
-                updatedItems.accept(selectedItems, null);
+                updatedItems.accept(selectedItems);
             popup.closeOk(null);
         };
 

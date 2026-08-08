@@ -8,18 +8,17 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
-import com.intellij.util.TriConsumer;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
-import org.testin.generateJavaCode.CodeGeneratorDialog;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class CreateNodesDialog {
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
@@ -30,12 +29,12 @@ public class CreateNodesDialog {
     private final ExtendableTextField textField;
     private final JBList<DirectoryType> list;
     private final JBPopup popup;
-    private final CodeGeneratorDialog cg;
     private final @NotNull Project p;
 
-    public CreateNodesDialog(final @NotNull Project p, final @NotNull CreateNodeMenu menu, final TriConsumer<@NotNull String, @NotNull DirectoryType, @NotNull CodeGeneratorDialog> onSelected) {
-        textField = new ExtendableTextField();
+    public CreateNodesDialog(final @NotNull Project p, final @NotNull CreateNodeMenu menu, final BiConsumer<@NotNull String, @NotNull DirectoryType> onSubmit) {
+        this.p = p;
 
+        textField = new ExtendableTextField();
         textField.setFont(fieldFont);
         textField.setBorder(fieldBorder);
 
@@ -56,9 +55,6 @@ public class CreateNodesDialog {
 
         mainPanel.add(textField, BorderLayout.NORTH);
 
-        this.p = p;
-        this.cg = new CodeGeneratorDialog(menu.getGeneratorType());
-
         JPanel listWrapper = new JPanel(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
 
@@ -71,7 +67,6 @@ public class CreateNodesDialog {
 
         ComponentPopupBuilder builder = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(mainPanel, textField)
-                .setSettingButtons(this.cg)
                 .setTitle(menu.getTitle())
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
@@ -89,7 +84,7 @@ public class CreateNodesDialog {
 
         popup = builder.createPopup();
 
-        final Runnable submitAction = () -> executeSubmitAction(onSelected);
+        final Runnable submitAction = () -> executeSubmitAction(onSubmit);
 
         textField.addKeyListener(new DialogKeyListenerImpl(list, popup, submitAction));
         list.addMouseListener(new DialogMouseAdapterImpl(list, submitAction));
@@ -105,11 +100,11 @@ public class CreateNodesDialog {
         });
     }
 
-    private void executeSubmitAction(final TriConsumer<String, DirectoryType, CodeGeneratorDialog> onSelected) {
+    private void executeSubmitAction(final BiConsumer<String, DirectoryType> onSubmit) {
         final String text = textField.getText().trim();
 
         if (!text.isEmpty()) {
-            onSelected.accept(text, list.getSelectedValue(), cg);
+            onSubmit.accept(text, list.getSelectedValue());
             popup.closeOk(null);
 
         } else textField.requestFocus();
