@@ -1,5 +1,8 @@
 package org.testin.logger;
 
+import lombok.AllArgsConstructor;
+
+@AllArgsConstructor
 public enum Level {
     DISABLED(-1, "OFF  "),
     TRACE(0, "TRACE"),
@@ -12,8 +15,4 @@ public enum Level {
     public final int priority;
     public final String paddedName;
 
-    Level(final int priority, final String paddedName) {
-        this.priority = priority;
-        this.paddedName = paddedName;
-    }
 }
