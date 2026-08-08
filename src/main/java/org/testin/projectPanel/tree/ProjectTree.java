@@ -8,6 +8,7 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.ProjectStatus;
+import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 
@@ -44,7 +45,7 @@ public class ProjectTree {
         mainTree.setDragEnabled(true);
         mainTree.setDropMode(DropMode.ON_OR_INSERT);
 
-        Set<DefaultMutableTreeNode> sharedCutNodes = new HashSet<>();
+        Set<DirectoryDto> sharedCutNodes = new HashSet<>();
 
         updateNodes();
 

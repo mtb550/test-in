@@ -41,10 +41,10 @@ public class TreeTransferHandler extends TransferHandler {
     private final @NotNull Project p;
     private final SimpleTree tree;
     @Getter
-    private final Set<DefaultMutableTreeNode> selectedNodes;
+    private final Set<DirectoryDto> selectedNodes;
     private Integer lastAction;
 
-    public TreeTransferHandler(final @NotNull Project p, final SimpleTree tree, final Set<DefaultMutableTreeNode> selectedNodes) {
+    public TreeTransferHandler(final @NotNull Project p, final SimpleTree tree, final Set<DirectoryDto> selectedNodes) {
         this.p = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
@@ -188,7 +188,10 @@ public class TreeTransferHandler extends TransferHandler {
             TreePath[] paths = tree.getSelectionPaths();
             if (paths != null) {
                 for (TreePath path : paths) {
-                    selectedNodes.add((DefaultMutableTreeNode) path.getLastPathComponent());
+                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+                    Object userObject = node.getUserObject();
+                    DirectoryDto dir = (DirectoryDto) userObject;
+                    selectedNodes.add(dir);
                 }
             }
         }

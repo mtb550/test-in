@@ -52,8 +52,9 @@ public abstract class DirectoryDto {
     @Builder.Default
     private String modifiedBy = "";
 
-    // todo, all dto's should has marker then apply.
-    //private Marker marker;
+    // todo, how to make it
+    //@NotNull
+    //public abstract IMarker getMarker();
 
     @NonNull
     public abstract CreateNodeMenu getMenu();

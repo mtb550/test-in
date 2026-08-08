@@ -14,37 +14,22 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Set;
 
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
-    private final Set<DefaultMutableTreeNode> selectedNodes;
+    private final Set<DirectoryDto> selectedNodes;
 
-    public TreeCellRenderer(final Set<DefaultMutableTreeNode> selectedNodes) {
+    public TreeCellRenderer(final Set<DirectoryDto> selectedNodes) {
         this.selectedNodes = selectedNodes;
     }
 
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {
-            switch (value) {
-                case DefaultMutableTreeNode node when node.getUserObject() instanceof DirectoryDto dir -> {
+            DirectoryDto dir = (DirectoryDto) ((DefaultMutableTreeNode) value).getUserObject();
+            DirectoryType type = DirectoryType.from(dir);
 
-                    DirectoryType type = DirectoryType.from(dir);
-
-                    setIcon(type != null ? type.getIcon() : AllIcons.Nodes.Folder);
-                    append(dir.getName(), getSimpleTextAttributes(node, dir));
-                    append(" ");
-                    append(dir instanceof TestRunDirectoryDto trDir ? trDir.getMarker().getStatus().getLabel() : "", SimpleTextAttributes.GRAY_ATTRIBUTES);
-                }
-
-                case DefaultMutableTreeNode node -> {
-                    setIcon(AllIcons.Nodes.Unknown);
-                    Object obj = node.getUserObject();
-                    append(obj != null ? obj.toString() : "", SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
-                }
-
-                default -> {
-                    setIcon(AllIcons.Nodes.Unknown);
-                    append(value.toString(), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
-                }
-            }
+            setIcon(type.getIcon());
+            append(dir.getName(), (selectedNodes != null && !selectedNodes.contains(dir)) ? type.getAttributes() : SimpleTextAttributes.GRAYED_ATTRIBUTES);
+            append(" ");
+            append(dir instanceof TestRunDirectoryDto trDir ? trDir.getMarker().getStatus().getLabel() : "", SimpleTextAttributes.GRAY_ATTRIBUTES);
 
         } catch (final Exception ex) {
             Logger.error("Error rendering tree node: " + ex.getMessage());
@@ -53,14 +38,6 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
         }
     }
 
-    private @NotNull SimpleTextAttributes getSimpleTextAttributes(final DefaultMutableTreeNode node, final DirectoryDto dir) {
-        final DirectoryType type = DirectoryType.from(dir);
-        final SimpleTextAttributes attrs = type != null ? type.getAttributes() : SimpleTextAttributes.REGULAR_ATTRIBUTES;
-        if (attrs == SimpleTextAttributes.REGULAR_ATTRIBUTES && selectedNodes != null && selectedNodes.contains(node))
-            return SimpleTextAttributes.GRAYED_ATTRIBUTES;
-
-        return attrs;
-    }
 
     // todo, if (dir instanceof TestSetDirectoryDto setDir) {
     // todo, later, make a tag for test set if it is approved or still, need to set business and plan before implement

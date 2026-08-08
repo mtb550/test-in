@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.SimpleTextAttributes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.generateJavaCode.GeneratorType;
@@ -33,7 +34,7 @@ public enum DirectoryType {
                 Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath());
                 GeneratorType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
             },
-            SimpleTextAttributes.REGULAR_ATTRIBUTES
+            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
 
     TCD(
@@ -136,9 +137,9 @@ public enum DirectoryType {
         BY_CLASS = Map.copyOf(map);
     }
 
-    private final String description;
+    private final @NotNull String description;
     private final String displayedName;
-    private final Icon icon;
+    private final @NotNull Icon icon;
     private final Class<? extends DirectoryDto> clazz;
     private final String marker;
     private final Function<Project, NodeCreator> action;
