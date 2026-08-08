@@ -54,11 +54,6 @@ public enum TestRunStatus {
     private final KeyboardSet keyboardSet;
     private final Icon icon;
 
-    public TestRunStatus getNextStatus() {
-        return TRANSITIONS.get(this);
-    }
-
-
     public String getShortcutText() {
         return Optional.ofNullable(keyboardSet)
                 .map(KeyboardSet::getShortcutText)
