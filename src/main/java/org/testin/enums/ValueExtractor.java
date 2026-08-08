@@ -5,5 +5,5 @@ import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
 public interface ValueExtractor<T> {
-    String execute(final T item, final @NotNull Project p);
+    @NotNull String execute(final @NotNull T item, final @NotNull Project p);
 }

@@ -7,5 +7,5 @@ import java.util.List;
 
 @FunctionalInterface
 public interface DrawItem<T> {
-    List<JComponent> execute(final T item);
+    @NotNull List<JComponent> execute(final @NotNull T item);
 }
