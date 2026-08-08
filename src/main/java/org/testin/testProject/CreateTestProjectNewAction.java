@@ -16,7 +16,6 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.Setting;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class CreateTestProjectNewAction extends DumbAwareAction {
@@ -38,7 +37,8 @@ public class CreateTestProjectNewAction extends DumbAwareAction {
 
         final Path tpPath = Services.getInstance(p, Setting.class).getTestinPath().resolve(tpName);
 
-        if (Files.exists(tpPath)) {
+        // The indexer owns disk reads; ask it instead of Files.exists directly.
+        if (Services.getInstance(p, ProjectIndexer.class).projectExists(tpPath)) {
             Services.getInstance(p, Notifier.class).error(p, "Creation Failed", "A test project named '" + tpName + "' already exists.");
             return;
         }

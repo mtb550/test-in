@@ -9,8 +9,7 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
+
 import org.jetbrains.annotations.NotNull;
 import org.testin.git.GitCommandRunner;
 import org.testin.indexer.ProjectIndexer;
@@ -54,11 +53,8 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
                     GitCommandRunner.execute(Services.getInstance(p, Setting.class).getTestinPath(), "git", "clone", gitUrl, projectName);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        VirtualFile vRoot = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(Services.getInstance(p, Setting.class).getTestinPath().toFile());
-                        if (vRoot != null) {
-                            vRoot.refresh(false, true);
-                        }
-
+                        // The indexer owns disk reads/refresh: scanSingleProject re-scans the cloned
+                        // project from disk. No direct VFS refresh here.
                         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                         final Path projectPath = Services.getInstance(p, Setting.class).getTestinPath().resolve(projectName);
 

@@ -13,10 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.testCase.RemoveTestCaseAction;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
 
@@ -27,7 +27,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public class PasteTestCaseNodeAction extends DumbAwareAction {
     private final @NotNull Project p;
@@ -56,10 +55,14 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
                 List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
                         .filter(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()))
-                        .collect(Collectors.toList());
+                        .toList();
 
-                ApplicationManager.getApplication().runWriteAction(() ->
-                        RemoveTestCaseAction.deletePhysicalFiles(cutItems, sourceUI.getParent().getPath(), this));
+                ApplicationManager.getApplication().runWriteAction(() -> {
+                    final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                    for (final TestCaseDto tc : cutItems) {
+                        indexer.removeTestCase(sourceUI.getParent().getPath(), tc.getId());
+                    }
+                });
 
                 sourceUI.getAllTestCases().removeAll(cutItems);
                 if (sourceUI != destUI && sourceUI instanceof TestEditor) {

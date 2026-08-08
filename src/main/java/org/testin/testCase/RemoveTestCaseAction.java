@@ -6,21 +6,16 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.KeyboardSet;
-import org.testin.util.Mapper;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 public class RemoveTestCaseAction extends DumbAwareAction {
@@ -36,22 +31,6 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         this.list = list;
         this.model = model;
         this.registerCustomShortcutSet(KeyboardSet.DeletePackage.getCustomShortcut(), list);
-    }
-
-    public static void deletePhysicalFiles(final List<TestCaseDto> items, final Path dirPath, final Object requestor) {
-        VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dirPath.toFile());
-        if (dirVFile == null) return;
-
-        for (TestCaseDto tc : items) {
-            VirtualFile targetFile = dirVFile.findChild(tc.getId() + ".json");
-            if (targetFile != null) {
-                try {
-                    targetFile.delete(requestor);
-                } catch (final IOException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        }
     }
 
     @Override
@@ -91,31 +70,13 @@ public class RemoveTestCaseAction extends DumbAwareAction {
             indexer.removeTestCase(dir.getPath(), tc.getId());
         }
 
-        deletePhysicalFiles(selectedItems, dir.getPath(), this);
-
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
             model.remove(model.getElementIndex(selectedItems.get(i)));
         }
     }
 
     private void saveToFile(TestCaseDto item) {
-        VirtualFile dirVFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(dir.getPath().toFile());
-        if (dirVFile == null) return;
-
-        String fileName = item.getId() + ".json";
-        VirtualFile targetFile = dirVFile.findChild(fileName);
-
-        try {
-            if (targetFile == null) {
-                targetFile = dirVFile.createChildData(this, fileName);
-            }
-
-            String json = Services.getInstance(p, Mapper.class).writeValueAsString(item);
-            VfsUtil.saveText(targetFile, json);
-
-        } catch (final IOException ex) {
-            throw new RuntimeException(ex);
-        }
+        Services.getInstance(p, ProjectIndexer.class).putTestCase(dir.getPath(), item);
     }
 
     @Override

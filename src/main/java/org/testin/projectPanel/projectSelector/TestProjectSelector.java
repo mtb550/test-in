@@ -12,11 +12,9 @@ import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.settings.Setting;
 
 import javax.swing.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -77,11 +75,10 @@ public class TestProjectSelector {
             final String savedProjectName = PropertiesComponent.getInstance(p).getValue(SELECTED_PROJECT_KEY);
 
             testProjectList.removeAllElements();
-            final Path root = Services.getInstance(p, Setting.class).getTestinPath();
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-            if (Files.exists(root) && Files.isDirectory(root)) {
-                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-
+            // The indexer owns disk reads; ask it instead of Files.exists directly.
+            if (indexer.rootExists()) {
                 final List<TestProjectDirectoryDto> projects = new ArrayList<>(indexer.getTestProjectsByPath().values());
                 projects.sort(Comparator.comparing(TestProjectDirectoryDto::getName));
                 projects.stream()
@@ -89,7 +86,7 @@ public class TestProjectSelector {
                         .forEach(testProjectList::addElement);
             }
 
-            if (!Files.exists(root) || testProjectList.getSize() == 0) {
+            if (!indexer.rootExists() || testProjectList.getSize() == 0) {
                 pp.showEmptyState();
                 selectedTestProject.setEnabled(false);
                 selectedTestProject.setSelectedItem(null);
