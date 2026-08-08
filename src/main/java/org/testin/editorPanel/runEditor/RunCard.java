@@ -36,7 +36,7 @@ public class RunCard extends BaseCard {
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(runItem, badges, details, p));
 
-        updateUI(index, RunEditorAttributes.DESCRIPTION.getValueExtractor().apply(runItem, p), badges, details);
+        updateUI(index, RunEditorAttributes.DESCRIPTION.getRunValueExtractor().execute(runItem, p), badges, details);
 
         final JBLabel statusLabel = attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName());
 

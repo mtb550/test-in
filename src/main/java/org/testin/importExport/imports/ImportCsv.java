@@ -82,7 +82,7 @@ public class ImportCsv {
                         String val = values[colIndex];
                         rawValue = val != null ? val.trim() : "";
                     }
-                    attr.getImportSetter().accept(p, currentTestCase, rawValue);
+                    attr.getImportSetter().execute(p, currentTestCase, rawValue);
                 }
             }
 

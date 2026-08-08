@@ -54,7 +54,7 @@ public class TestCaseUpdateMenuDialog {
                 }).show();
 
             } else {
-                selectedItem.getBulkAction().show(p, items, list -> {
+                selectedItem.getBulkAction().execute(p, items, list -> {
                     Logger.trace("Bulk Edit Save -> changeType = " + gt);
                     updatedItems.accept(list, gt);
                 });

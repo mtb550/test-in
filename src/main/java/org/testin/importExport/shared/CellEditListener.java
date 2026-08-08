@@ -38,9 +38,9 @@ public class CellEditListener implements TableModelListener {
                     TestEditorAttributes currentAttr = importAttributes.get(col - 2);
                     TestCaseDto tc = testCases.get(row);
 
-                    currentAttr.getImportSetter().accept(p, tc, updatedValue);
+                    currentAttr.getImportSetter().execute(p, tc, updatedValue);
 
-                    String formattedValue = currentAttr.getValueExtractor().apply(tc, p);
+                    String formattedValue = currentAttr.getTestValueExtractor().execute(tc, p);
                     model.setValueAt(formattedValue, row, col);
                 } finally {
                     isUpdating = false;

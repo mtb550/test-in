@@ -53,7 +53,7 @@ public class TablePanelBuilder {
             rowData[1] = String.valueOf(index++);
 
             for (int i = 0; i < importAttributes.size(); i++) {
-                rowData[i + 2] = importAttributes.get(i).getValueExtractor().apply(tc, p);
+                rowData[i + 2] = importAttributes.get(i).getTestValueExtractor().execute(tc, p);
             }
             model.addRow(rowData);
         }

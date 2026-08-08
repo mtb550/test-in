@@ -58,7 +58,7 @@ public class ExportExcel {
                     Row row = sheet.createRow(rowIndex++);
                     for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
                         Cell cell = row.createCell(i);
-                        String val = exportAction.exportAttributes.get(i).getValueExtractor().apply(tc, p);
+                        String val = exportAction.exportAttributes.get(i).getTestValueExtractor().execute(tc, p);
                         cell.setCellValue(val != null ? val : "");
                     }
                 }

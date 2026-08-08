@@ -6,5 +6,5 @@ import org.testin.mappers.dto.TestCaseDto;
 
 @FunctionalInterface
 public interface ImportSetter {
-    void accept(final @NotNull Project p, final TestCaseDto tc, final String value);
+    void execute(final @NotNull Project p, final TestCaseDto tc, final String value);
 }

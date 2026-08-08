@@ -97,7 +97,7 @@ public class ImportExcel {
                             Cell dataCell = row.getCell(colIndex);
                             rawValue = dataFormatter.formatCellValue(dataCell).trim();
                         }
-                        attr.getImportSetter().accept(p, currentTestCase, rawValue);
+                        attr.getImportSetter().execute(p, currentTestCase, rawValue);
                     }
                 }
 

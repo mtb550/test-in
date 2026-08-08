@@ -1,6 +1,7 @@
 package org.testin.enums;
 
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateReport.generators.TestRunExcelGenerator;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
+@AllArgsConstructor
 public enum FileTypes {
     XLS(
             "XLS",
@@ -108,39 +110,16 @@ public enum FileTypes {
     private final ImportHandler importHandler;
     private final ReportHandler reportHandler;
 
-    FileTypes(final String label, final String extension, final String infoMessage, final ExportHandler exportHandler, final ImportHandler importHandler, final ReportHandler reportHandler) {
-        this.label = label;
-        this.extension = extension;
-        this.infoMessage = infoMessage;
-        this.exportHandler = exportHandler;
-        this.importHandler = importHandler;
-        this.reportHandler = reportHandler;
+    public void exportToFile(final @NotNull Project p, final @NotNull ExportAction exportAction, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+        exportHandler.execute(p, exportAction, destFile, sheetsData);
     }
 
-    public void exportToFile(final @NotNull Project p, final ExportAction exportAction, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
-        exportHandler.handle(p, exportAction, destFile, sheetsData);
+    public Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p, final @NotNull ImportAction importAction, final @NotNull File importFile) {
+        return importHandler.execute(p, importAction, importFile);
     }
 
-    public Map<String, List<TestCaseDto>> importToFile(Project p, ImportAction importAction, File importFile) {
-        return importHandler.handle(p, importAction, importFile);
+    public byte[] generateReport(final @NotNull Project p, final TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+        return reportHandler.execute(p, trDir, tr, detailsMap);
     }
 
-    public byte[] generateReport(final @NotNull Project p, final TestRunDirectoryDto trDir, final TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
-        return reportHandler.handle(p, trDir, tr, detailsMap);
-    }
-
-    @FunctionalInterface
-    public interface ReportHandler {
-        byte[] handle(Project p, TestRunDirectoryDto trDir, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap);
-    }
-
-    @FunctionalInterface
-    public interface ExportHandler {
-        void handle(Project p, ExportAction exportAction, File destFile, Map<String, List<TestCaseDto>> sheetsData);
-    }
-
-    @FunctionalInterface
-    public interface ImportHandler {
-        Map<String, List<TestCaseDto>> handle(Project p, ImportAction importAction, File importFile);
-    }
 }

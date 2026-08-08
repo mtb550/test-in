@@ -101,7 +101,7 @@ public class ExportHtml {
                 for (TestCaseDto tc : testCases) {
                     writer.write("<tr>");
                     for (TestEditorAttributes attr : exportAction.exportAttributes) {
-                        String val = attr.getValueExtractor().apply(tc, p);
+                        String val = attr.getTestValueExtractor().execute(tc, p);
                         writer.write("<td>" + htmlEscape(val != null ? val : "") + "</td>");
                     }
                     writer.write("</tr>");

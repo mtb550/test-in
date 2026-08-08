@@ -65,7 +65,7 @@ public class TestCard extends BaseCard {
             badges.add(new Shared.RoundedBadge(displayText, badgeColor));
         }
 
-        updateUI(index, TestEditorAttributes.DESCRIPTION.getValueExtractor().apply(tc, p), badges, details);
+        updateUI(index, TestEditorAttributes.DESCRIPTION.getTestValueExtractor().execute(tc, p), badges, details);
     }
 
     @Override

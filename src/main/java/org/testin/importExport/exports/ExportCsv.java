@@ -39,7 +39,7 @@ public class ExportCsv {
                 for (TestCaseDto tc : testCases) {
                     List<String> rowValues = new ArrayList<>();
                     for (TestEditorAttributes attr : exportAction.exportAttributes) {
-                        String val = attr.getValueExtractor().apply(tc, p);
+                        String val = attr.getTestValueExtractor().execute(tc, p);
                         rowValues.add(escapeCsvField(val != null ? val : ""));
                     }
                     writer.write(String.join(",", rowValues));

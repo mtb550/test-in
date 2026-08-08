@@ -258,22 +258,13 @@ public enum TestEditorAttributes {
     private final boolean importable;
     private final boolean copyable;
     private final boolean exportable;
-    private final ValueExtractor valueExtractor;
-    private final DrawItem drawItem;
+    private final TestValueExtractor testValueExtractor;
+    private final TestDrawItem testDrawItem;
     private final ImportSetter importSetter;
 
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-        if (drawItem != null) badges.addAll(drawItem.apply(tc));
-        else details.put(name, valueExtractor.apply(tc, p));
+        if (testDrawItem != null) badges.addAll(testDrawItem.execute(tc));
+        else details.put(name, testValueExtractor.execute(tc, p));
     }
 
-    @FunctionalInterface
-    public interface ValueExtractor {
-        String apply(final @NotNull TestCaseDto tc, final @NotNull Project p);
-    }
-
-    @FunctionalInterface
-    public interface DrawItem {
-        List<JComponent> apply(final @NotNull TestCaseDto tc);
-    }
 }

@@ -34,7 +34,7 @@ public class CopyTestCaseAction extends DumbAwareAction {
 
         final String text = Arrays.stream(TestEditorAttributes.values())
                 .filter(TestEditorAttributes::isCopyable)
-                .map(attr -> attr.getName2() + " " + attr.getValueExtractor().apply(tc, p))
+                .map(attr -> attr.getName2() + " " + attr.getTestValueExtractor().execute(tc, p))
                 .collect(Collectors.joining("\n"));
 
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
