@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditor;
+import org.testin.generateJavaCode.GeneratorType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -64,6 +65,13 @@ public class KeyListener extends KeyAdapter {
                             indexer.removeTestCase(dirPath, tc.getId());
                         } catch (final Exception ex) {
                             Logger.error("Failed to delete test case: " + tc.getId());
+                        }
+                    });
+
+                    // Remove the generated test methods on the EDT (PSI write action).
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        for (final TestCaseDto tc : selectedCases) {
+                            GeneratorType.REMOVE_TEST_CASE.getAction().execute(p, tc);
                         }
                     });
 

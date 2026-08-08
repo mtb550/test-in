@@ -10,6 +10,7 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
+import org.testin.generateJavaCode.GeneratorType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -67,7 +68,12 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
         final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
         for (final TestCaseDto tc : selectedItems) {
+            // The indexer owns the delete: removeTestCase updates the in-memory store and
+            // deletes the JSON file via Files.deleteIfExists. No direct VFS access here.
             indexer.removeTestCase(dir.getPath(), tc.getId());
+
+            // The generateJavaCode generator owns the generated Java test method (VFS via PSI).
+            GeneratorType.REMOVE_TEST_CASE.getAction().execute(p, tc);
         }
 
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
