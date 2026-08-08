@@ -45,15 +45,14 @@ public enum TestRunStatus {
             AllIcons.Actions.Cancel
     );
 
-    private final String label;
-    private final KeyboardSet keyboardSet;
-    private final Icon icon;
-
     private static final Map<TestRunStatus, TestRunStatus> TRANSITIONS = Map.of(
             CREATED, IN_PROGRESS,
             ASSIGNED, IN_PROGRESS,
             IN_PROGRESS, COMPLETED
     );
+    private final String label;
+    private final KeyboardSet keyboardSet;
+    private final Icon icon;
 
     public TestRunStatus getNextStatus() {
         return TRANSITIONS.get(this);

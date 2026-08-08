@@ -31,6 +31,11 @@ import java.util.stream.Collectors;
 
 public final class TestRunWordGenerator {
 
+    private static final Map<Integer, int[]> COLUMN_WIDTHS = Map.of(
+            2, new int[]{3, 97},
+            3, new int[]{3, 87, 10},
+            4, new int[]{3, 77, 10, 10}
+    );
     final String DARK_NAVY = "1F3864";
     final String MEDIUM_BLUE = "2E5496";
     final String DARK_GRAY = "595959";
@@ -41,21 +46,13 @@ public final class TestRunWordGenerator {
     final String BORDER_GRAY = "D0D7E5";
     final String WHITE = "FFFFFF";
     final String BLACK = "000000";
-
     private final Map<BugPriority, String> PRIORITY_COLOR = Map.of(
             BugPriority.HIGH, RED,
             BugPriority.MEDIUM, DARK_YELLOW
     );
-
     private final Map<BugSeverity, String> SEVERITY_COLOR = Map.of(
             BugSeverity.BLOCKER, RED,
             BugSeverity.MAJOR, DARK_YELLOW
-    );
-
-    private static final Map<Integer, int[]> COLUMN_WIDTHS = Map.of(
-            2, new int[]{3, 97},
-            3, new int[]{3, 87, 10},
-            4, new int[]{3, 77, 10, 10}
     );
 
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {

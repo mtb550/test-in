@@ -126,15 +126,6 @@ public enum DirectoryType {
             SimpleTextAttributes.REGULAR_ATTRIBUTES
     );
 
-    private final String description;
-    private final String displayedName;
-    private final Icon icon;
-    private final Class<? extends DirectoryDto> clazz;
-    private final String marker;
-    private final Function<Project, NodeCreator> action;
-    private final GeneratorAction codeGenerator;
-    private final RemoveHandler removeHandler;
-    private final SimpleTextAttributes attributes;
     private static final Map<Class<?>, DirectoryType> BY_CLASS;
 
     static {
@@ -144,6 +135,16 @@ public enum DirectoryType {
 
         BY_CLASS = Map.copyOf(map);
     }
+
+    private final String description;
+    private final String displayedName;
+    private final Icon icon;
+    private final Class<? extends DirectoryDto> clazz;
+    private final String marker;
+    private final Function<Project, NodeCreator> action;
+    private final GeneratorAction codeGenerator;
+    private final RemoveHandler removeHandler;
+    private final SimpleTextAttributes attributes;
 
     public static @Nullable DirectoryType from(final DirectoryDto dir) {
         return BY_CLASS.get(dir.getClass());

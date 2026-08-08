@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ExportHtml {
-    private final @NotNull ExportAction exportAction;
-
     private static final Map<Character, String> HTML_ESCAPES = Map.of(
             '&', "&",
             '<', "<",
@@ -27,6 +25,7 @@ public class ExportHtml {
             '"', "&#34;",
             '\'', "&#39;"
     );
+    private final @NotNull ExportAction exportAction;
 
     public ExportHtml(final @NotNull ExportAction exportAction) {
         this.exportAction = exportAction;
@@ -144,7 +143,8 @@ public class ExportHtml {
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
             final String rep = HTML_ESCAPES.get(c);
-            if (rep != null) sb.append(rep); else sb.append(c);
+            if (rep != null) sb.append(rep);
+            else sb.append(c);
         }
         return sb.toString();
     }

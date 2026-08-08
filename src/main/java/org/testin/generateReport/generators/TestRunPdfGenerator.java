@@ -45,6 +45,11 @@ import java.util.stream.Collectors;
 public final class TestRunPdfGenerator {
 
 
+    private static final Map<Integer, float[]> COLUMN_WIDTHS = Map.of(
+            0, new float[]{7, 93},
+            1, new float[]{7, 83, 10},
+            2, new float[]{7, 73, 10, 10}
+    );
     private final DeviceRgb DARK_NAVY = new DeviceRgb(0x1F, 0x38, 0x64);
     private final DeviceRgb MEDIUM_BLUE = new DeviceRgb(0x2E, 0x54, 0x96);
     private final DeviceRgb DARK_GRAY = new DeviceRgb(0x59, 0x59, 0x59);
@@ -56,21 +61,13 @@ public final class TestRunPdfGenerator {
     private final DeviceRgb WHITE = new DeviceRgb(0xFF, 0xFF, 0xFF);
     private final DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
     private final DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC);
-
     private final Map<BugPriority, DeviceRgb> PRIORITY_COLOR = Map.of(
             BugPriority.HIGH, RED,
             BugPriority.MEDIUM, DARK_YELLOW
     );
-
     private final Map<BugSeverity, DeviceRgb> SEVERITY_COLOR = Map.of(
             BugSeverity.BLOCKER, RED,
             BugSeverity.MAJOR, DARK_YELLOW
-    );
-
-    private static final Map<Integer, float[]> COLUMN_WIDTHS = Map.of(
-            0, new float[]{7, 93},
-            1, new float[]{7, 83, 10},
-            2, new float[]{7, 73, 10, 10}
     );
 
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
