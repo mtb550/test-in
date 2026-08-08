@@ -55,12 +55,11 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
 
     private @NotNull SimpleTextAttributes getSimpleTextAttributes(final DefaultMutableTreeNode node, final DirectoryDto dir) {
         final DirectoryType type = DirectoryType.from(dir);
-        if (type != null && type.isBold())
-            return SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
+        final SimpleTextAttributes attrs = type != null ? type.getAttributes() : SimpleTextAttributes.REGULAR_ATTRIBUTES;
+        if (attrs == SimpleTextAttributes.REGULAR_ATTRIBUTES && selectedNodes != null && selectedNodes.contains(node))
+            return SimpleTextAttributes.GRAYED_ATTRIBUTES;
 
-        return (selectedNodes != null && selectedNodes.contains(node))
-                ? SimpleTextAttributes.GRAYED_ATTRIBUTES
-                : SimpleTextAttributes.REGULAR_ATTRIBUTES;
+        return attrs;
     }
 
     // todo, if (dir instanceof TestSetDirectoryDto setDir) {

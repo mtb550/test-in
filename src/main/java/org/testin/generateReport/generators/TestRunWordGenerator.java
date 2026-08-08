@@ -143,15 +143,9 @@ public final class TestRunWordGenerator {
                 addStatCell(statsTable, 4, passRate + "%", "Pass Rate", MEDIUM_BLUE);
 
                 addHeading(doc, "3. Result Analysis", 20, 12);
-
-                addColoredBody(doc, "Passed (" + passed + "): ", GREEN,
-                        "All passed cases covered the core authentication flow end-to-end: login by username and by ID, credential validation and error handling (invalid username/password combinations, empty fields, special characters, SQL injection resistance), account lockout after max failed attempts and lockout-duration behavior, OTP generation, validation, expiry and resend logic, password change and the full password policy rule set (length, case, numeric, sequence, ID-portion, language checks), and session timeout and logout behavior. No deviations from expected behavior were observed across these cases.");
-
-                addColoredBody(doc, "Failed (" + failed + "): ", RED,
-                        "One case failed: \"Verify system redirects user to the provider website after successful authentication.\" Instead of redirecting to the provider website, the system redirected the user to the home page. This was logged as High priority / Major severity, as it affects the core post-authentication redirect flow and requires remediation before the next cycle.");
-
-                addColoredBody(doc, "Pending (" + (pending + blocked) + "): ", DARK_YELLOW,
-                        "No test cases were left pending in this cycle — all 60 planned cases were executed to completion.");
+                addColoredBody(doc, "Passed (" + passed + "): ", GREEN, "n\\a");
+                addColoredBody(doc, "Failed (" + failed + "): ", RED, "n\\a");
+                addColoredBody(doc, "Pending (" + (pending + blocked) + "): ", DARK_YELLOW, "n\\a");
 
                 if (failed > 0) {
                     buildCaseTable(doc, "4", "Failed Test Cases",

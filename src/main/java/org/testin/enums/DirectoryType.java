@@ -2,6 +2,7 @@ package org.testin.enums;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.SimpleTextAttributes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
@@ -13,6 +14,8 @@ import org.testin.nodeCreator.*;
 import org.testin.services.Services;
 
 import javax.swing.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Getter
@@ -30,7 +33,7 @@ public enum DirectoryType {
                 Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath());
                 GeneratorType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
             },
-            false
+            SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
     TCD(
@@ -42,7 +45,7 @@ public enum DirectoryType {
             null,
             null,
             null,
-            true
+            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
 
     TRD(
@@ -54,7 +57,7 @@ public enum DirectoryType {
             null,
             null,
             null,
-            true
+            SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
 
     TSP(
@@ -69,7 +72,7 @@ public enum DirectoryType {
                 Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath());
                 GeneratorType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
             },
-            false
+            SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
     TRP(
@@ -81,7 +84,7 @@ public enum DirectoryType {
             CreateTestRunPackage::new,
             null,
             (p, dir) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath()),
-            false
+            SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
     TS(
@@ -96,7 +99,7 @@ public enum DirectoryType {
                 Services.getInstance(p, ProjectIndexer.class).removeTestSet(dir.getPath());
                 GeneratorType.REMOVE_TEST_SET.getAction().execute(p, dir);
             },
-            false
+            SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
     TR(
@@ -108,7 +111,7 @@ public enum DirectoryType {
             CreateTestRun::new,
             null,
             (p, dir) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath()),
-            false
+            SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
     IMPORT_TP(
@@ -120,7 +123,7 @@ public enum DirectoryType {
             null,
             null,
             null,
-            false
+            SimpleTextAttributes.REGULAR_ATTRIBUTES
     );
 
     private final String description;
@@ -131,12 +134,18 @@ public enum DirectoryType {
     private final Function<Project, NodeCreator> action;
     private final GeneratorAction codeGenerator;
     private final RemoveHandler removeHandler;
-    private final boolean bold;
+    private final SimpleTextAttributes attributes;
+    private static final Map<Class<?>, DirectoryType> BY_CLASS;
+
+    static {
+        final Map<Class<?>, DirectoryType> map = new HashMap<>();
+        for (final DirectoryType type : values())
+            map.putIfAbsent(type.clazz, type);
+
+        BY_CLASS = Map.copyOf(map);
+    }
 
     public static @Nullable DirectoryType from(final DirectoryDto dir) {
-        for (final DirectoryType type : values())
-            if (type.clazz == dir.getClass()) return type;
-
-        return null;
+        return BY_CLASS.get(dir.getClass());
     }
 }
