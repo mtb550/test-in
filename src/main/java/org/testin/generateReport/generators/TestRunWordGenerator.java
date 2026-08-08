@@ -42,6 +42,16 @@ public final class TestRunWordGenerator {
     final String WHITE = "FFFFFF";
     final String BLACK = "000000";
 
+    private final Map<BugPriority, String> PRIORITY_COLOR = Map.of(
+            BugPriority.HIGH, RED,
+            BugPriority.MEDIUM, DARK_YELLOW
+    );
+
+    private final Map<BugSeverity, String> SEVERITY_COLOR = Map.of(
+            BugSeverity.BLOCKER, RED,
+            BugSeverity.MAJOR, DARK_YELLOW
+    );
+
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
@@ -321,10 +331,7 @@ public final class TestRunWordGenerator {
                 shadeCell(priCell, rowBg);
                 setCellPadding(priCell, 4, 6, 4, 6);
                 BugPriority pri = item.getBugPriority();
-                String priColor;
-                if (pri == BugPriority.HIGH) priColor = RED;
-                else if (pri == BugPriority.MEDIUM) priColor = DARK_YELLOW;
-                else priColor = DARK_GRAY;
+                String priColor = PRIORITY_COLOR.getOrDefault(pri, DARK_GRAY);
                 setCellText(priCell, pri.getName(), 9, true, priColor);
             }
 
@@ -333,10 +340,7 @@ public final class TestRunWordGenerator {
                 shadeCell(sevCell, rowBg);
                 setCellPadding(sevCell, 4, 6, 4, 6);
                 BugSeverity sev = item.getBugSeverity();
-                String sevColor;
-                if (sev == BugSeverity.BLOCKER) sevColor = RED;
-                else if (sev == BugSeverity.MAJOR) sevColor = DARK_YELLOW;
-                else sevColor = DARK_GRAY;
+                String sevColor = SEVERITY_COLOR.getOrDefault(sev, DARK_GRAY);
                 String sevText = sev.getName();
                 if (sevText.isEmpty()) sevText = "—";
                 setCellText(sevCell, sevText, 9, true, sevColor);

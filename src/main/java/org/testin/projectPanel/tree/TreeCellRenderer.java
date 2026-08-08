@@ -7,13 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
-import org.testin.mappers.dto.dirs.TestRunsMainDirectoryDto;
 
 import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
-import java.util.Arrays;
 import java.util.Set;
 
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
@@ -29,10 +26,7 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             switch (value) {
                 case DefaultMutableTreeNode node when node.getUserObject() instanceof DirectoryDto dir -> {
 
-                    DirectoryType type = Arrays.stream(DirectoryType.values())
-                            .filter(t -> t.getClazz() == dir.getClass())
-                            .findFirst()
-                            .orElse(null);
+                    DirectoryType type = DirectoryType.from(dir);
 
                     setIcon(type != null ? type.getIcon() : AllIcons.Nodes.Folder);
                     append(dir.getName(), getSimpleTextAttributes(node, dir));
@@ -60,15 +54,13 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
     }
 
     private @NotNull SimpleTextAttributes getSimpleTextAttributes(final DefaultMutableTreeNode node, final DirectoryDto dir) {
-        return switch (dir) {
-            case TestCasesMainDirectoryDto ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
+        final DirectoryType type = DirectoryType.from(dir);
+        if (type != null && type.isBold())
+            return SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
 
-            case TestRunsMainDirectoryDto ignored -> SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES;
-
-            default -> (selectedNodes != null && selectedNodes.contains(node))
-                    ? SimpleTextAttributes.GRAYED_ATTRIBUTES
-                    : SimpleTextAttributes.REGULAR_ATTRIBUTES;
-        };
+        return (selectedNodes != null && selectedNodes.contains(node))
+                ? SimpleTextAttributes.GRAYED_ATTRIBUTES
+                : SimpleTextAttributes.REGULAR_ATTRIBUTES;
     }
 
     // todo, if (dir instanceof TestSetDirectoryDto setDir) {

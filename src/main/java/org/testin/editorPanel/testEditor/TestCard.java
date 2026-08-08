@@ -5,6 +5,7 @@ import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.Shared;
+import org.testin.enums.TestCardStatus;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.mappers.dto.TestCaseDto;
 
@@ -43,26 +44,13 @@ public class TestCard extends BaseCard {
         final String tempStatus = tc.getTempStatus();
 
         if (!tempStatus.trim().isEmpty()) {
-            final Color badgeColor;
-            final String displayText = switch (tempStatus) {
-                case "RUNNING" -> {
-                    badgeColor = new JBColor(new Color(255, 200, 100), new Color(200, 150, 50));
-                    yield "Running";
-                }
-                case "PASSED" -> {
-                    badgeColor = new JBColor(new Color(100, 200, 100), new Color(50, 150, 50));
-                    yield "Passed";
-                }
-                case "FAILED" -> {
-                    badgeColor = new JBColor(new Color(255, 100, 100), new Color(180, 50, 50));
-                    yield "Failed";
-                }
-                default -> {
-                    badgeColor = new JBColor(new Color(180, 180, 180), new Color(120, 120, 120));
-                    yield tempStatus;
-                }
-            };
-            badges.add(new Shared.RoundedBadge(displayText, badgeColor));
+            final TestCardStatus status = TestCardStatus.from(tempStatus);
+            if (status != null) {
+                badges.add(new Shared.RoundedBadge(status.getLabel(), status.getBadgeColor()));
+            } else {
+                final JBColor gray = new JBColor(new Color(180, 180, 180), new Color(120, 120, 120));
+                badges.add(new Shared.RoundedBadge(tempStatus, gray));
+            }
         }
 
         updateUI(index, TestEditorAttributes.DESCRIPTION.getTestValueExtractor().execute(tc, p), badges, details);

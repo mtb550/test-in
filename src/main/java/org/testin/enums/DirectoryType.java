@@ -29,7 +29,8 @@ public enum DirectoryType {
             (p, dir) -> {
                 Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath());
                 GeneratorType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
-            }
+            },
+            false
     ),
 
     TCD(
@@ -40,7 +41,8 @@ public enum DirectoryType {
             ".tcd",
             null,
             null,
-            null
+            null,
+            true
     ),
 
     TRD(
@@ -51,7 +53,8 @@ public enum DirectoryType {
             ".trd",
             null,
             null,
-            null
+            null,
+            true
     ),
 
     TSP(
@@ -65,7 +68,8 @@ public enum DirectoryType {
             (p, dir) -> {
                 Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath());
                 GeneratorType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
-            }
+            },
+            false
     ),
 
     TRP(
@@ -76,7 +80,8 @@ public enum DirectoryType {
             ".trp",
             CreateTestRunPackage::new,
             null,
-            (p, dir) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath())
+            (p, dir) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath()),
+            false
     ),
 
     TS(
@@ -90,7 +95,8 @@ public enum DirectoryType {
             (p, dir) -> {
                 Services.getInstance(p, ProjectIndexer.class).removeTestSet(dir.getPath());
                 GeneratorType.REMOVE_TEST_SET.getAction().execute(p, dir);
-            }
+            },
+            false
     ),
 
     TR(
@@ -101,7 +107,8 @@ public enum DirectoryType {
             ".tr",
             CreateTestRun::new,
             null,
-            (p, dir) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath())
+            (p, dir) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath()),
+            false
     ),
 
     IMPORT_TP(
@@ -112,7 +119,8 @@ public enum DirectoryType {
             null,
             null,
             null,
-            null
+            null,
+            false
     );
 
     private final String description;
@@ -123,6 +131,7 @@ public enum DirectoryType {
     private final Function<Project, NodeCreator> action;
     private final GeneratorAction codeGenerator;
     private final RemoveHandler removeHandler;
+    private final boolean bold;
 
     public static @Nullable DirectoryType from(final DirectoryDto dir) {
         for (final DirectoryType type : values())

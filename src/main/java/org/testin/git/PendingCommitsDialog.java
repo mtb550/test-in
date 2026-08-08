@@ -53,11 +53,10 @@ public class PendingCommitsDialog extends DialogWrapper {
 
         for (TestCaseDiff diff : differences) {
             for (TestCaseDiff.FieldChange fc : diff.fieldChanges()) {
-                String changeTypeLabel = getChangeTypeLabel(fc.changeType());
                 String description = getDescriptionForRow(diff, fc);
                 model.addRow(new Object[]{
                         diff.testCaseId(),
-                        changeTypeLabel,
+                        fc.changeType().getLabel(),
                         description,
                         fc.oldValue(),
                         fc.newValue()
@@ -100,17 +99,6 @@ public class PendingCommitsDialog extends DialogWrapper {
         panel.setPreferredSize(new Dimension(900, 400));
 
         return panel;
-    }
-
-    private String getChangeTypeLabel(ChangeType changeType) {
-        return switch (changeType) {
-            case CREATE_TEST_CASE -> "Create Test Case";
-            case REMOVE_TEST_CASE -> "Remove Test Case";
-            case CHANGE_DESCRIPTION -> "Change Description";
-            case CHANGE_EXPECTED_RESULT -> "Change Expected Result";
-            case CHANGE_PRIORITY -> "Change Priority";
-            case CHANGE_GROUP -> "Change Group";
-        };
     }
 
     private String getDescriptionForRow(TestCaseDiff diff, TestCaseDiff.FieldChange fc) {

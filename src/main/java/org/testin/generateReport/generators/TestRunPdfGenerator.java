@@ -57,6 +57,16 @@ public final class TestRunPdfGenerator {
     private final DeviceRgb BLACK = new DeviceRgb(0x00, 0x00, 0x00);
     private final DeviceRgb LINK_BLUE = new DeviceRgb(0x00, 0x52, 0xCC);
 
+    private final Map<BugPriority, DeviceRgb> PRIORITY_COLOR = Map.of(
+            BugPriority.HIGH, RED,
+            BugPriority.MEDIUM, DARK_YELLOW
+    );
+
+    private final Map<BugSeverity, DeviceRgb> SEVERITY_COLOR = Map.of(
+            BugSeverity.BLOCKER, RED,
+            BugSeverity.MAJOR, DARK_YELLOW
+    );
+
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             PdfWriter writer = new PdfWriter(baos);
@@ -375,10 +385,7 @@ public final class TestRunPdfGenerator {
 
             if (withPriority) {
                 BugPriority pri = item.getBugPriority();
-                DeviceRgb priColor;
-                if (pri == BugPriority.HIGH) priColor = RED;
-                else if (pri == BugPriority.MEDIUM) priColor = DARK_YELLOW;
-                else priColor = DARK_GRAY;
+                DeviceRgb priColor = PRIORITY_COLOR.getOrDefault(pri, DARK_GRAY);
                 String priText = pri.getName();
                 table.addCell(new Cell()
                         .setBackgroundColor(rowBg)
@@ -392,10 +399,7 @@ public final class TestRunPdfGenerator {
 
             if (withSeverity) {
                 BugSeverity sev = item.getBugSeverity();
-                DeviceRgb sevColor;
-                if (sev == BugSeverity.BLOCKER) sevColor = RED;
-                else if (sev == BugSeverity.MAJOR) sevColor = DARK_YELLOW;
-                else sevColor = DARK_GRAY;
+                DeviceRgb sevColor = SEVERITY_COLOR.getOrDefault(sev, DARK_GRAY);
                 String sevText = sev.getName();
                 if (sevText.isEmpty()) sevText = "—";
                 table.addCell(new Cell()
