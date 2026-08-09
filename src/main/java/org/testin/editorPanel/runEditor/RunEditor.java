@@ -94,6 +94,8 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     private JComponent currentCenter;
 
+    private final Disposable projectDisposable;
+
     @Getter
     @Setter
     private int currentPage = 1;
@@ -130,6 +132,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         final Disposable projectDisposable = Disposer.newDisposable();
         Disposer.register(p, projectDisposable);
+        this.projectDisposable = projectDisposable;
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -399,6 +402,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
             gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap);
+            FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
 
             gridTable.getSelectionModel().addListSelectionListener(e -> {
                 if (e.getValueIsAdjusting()) return;

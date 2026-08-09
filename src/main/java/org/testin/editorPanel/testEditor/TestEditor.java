@@ -69,6 +69,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final JBScrollPane scrollPane;
     private final ModelSyncListener syncListener;
+    private final Disposable projectDisposable;
 
     @Getter
     @NotNull
@@ -114,6 +115,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         final Disposable projectDisposable = Disposer.newDisposable();
         Disposer.register(p, projectDisposable);
+        this.projectDisposable = projectDisposable;
 
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
@@ -442,6 +444,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
             gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes);
+            FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
 
             gridTable.getSelectionModel().addListSelectionListener(e -> {
                 if (e.getValueIsAdjusting()) return;
