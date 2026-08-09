@@ -13,6 +13,12 @@ public interface IToolBar {
 
     void onToolBarRefreshButtonClicked();
 
+    default void onToolBarSwitchToListView() {
+    }
+
+    default void onToolBarSwitchToGridView() {
+    }
+
     default void onToolBarCreateTestCaseClicked() {
     }
 

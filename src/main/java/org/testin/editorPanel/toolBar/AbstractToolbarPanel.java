@@ -5,8 +5,12 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
+import org.testin.editorPanel.toolBar.components.GridViewBtn;
 import org.testin.editorPanel.toolBar.components.IToolbarItem;
+import org.testin.editorPanel.toolBar.components.ListViewBtn;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
+import org.testin.enums.ViewMode;
+import org.testin.enums.ViewMode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,11 +22,16 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
     @Getter
     protected final SearchTxt searchTxt;
+
     @Getter
     private final IToolBar callbacks;
+
     @Getter
     private final Map<Class<? extends IToolbarItem>, IToolbarItem> toolbarItems = new HashMap<>();
 
+    @Getter
+    private ViewMode currentView = ViewMode.LIST_VIEW;
+    
     public AbstractToolbarPanel(final IToolBar callbacks) {
         super(new GridBagLayout());
         this.callbacks = callbacks;
@@ -56,6 +65,36 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         add(searchTxt, gbc);
 
         toolbarItems.put(SearchTxt.class, searchTxt);
+
+        wireViewButtons();
+    }
+
+    private void wireViewButtons() {
+        final GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
+        final ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
+        if (gridBtn == null || listBtn == null) return;
+
+        gridBtn.addActionListener(e -> setView(ViewMode.GRID_VIEW));
+        listBtn.addActionListener(e -> setView(ViewMode.LIST_VIEW));
+
+        updateViewButtons();
+    }
+
+    private void setView(final ViewMode view) {
+        if (currentView == view) return;
+        currentView = view;
+        updateViewButtons();
+    }
+
+    private void updateViewButtons() {
+        final GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
+        final ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
+        if (gridBtn == null || listBtn == null) return;
+
+        gridBtn.setVisible(currentView == ViewMode.LIST_VIEW);
+        listBtn.setVisible(currentView == ViewMode.GRID_VIEW);
+        revalidate();
+        repaint();
     }
 
     protected abstract List<IToolbarItem> getCustomComponents();
