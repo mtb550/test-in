@@ -8,6 +8,8 @@ import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.table.JBTable;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.Dialogs.RunOpeningForm;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.UnifiedVirtualFile;
+import org.testin.editorPanel.grid.GridPanelBuilder;
 import org.testin.editorPanel.listeners.MouseListenerImpl;
 import org.testin.editorPanel.listeners.RunListRenderer;
 import org.testin.editorPanel.listeners.SelectionListener;
@@ -81,6 +84,14 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     private CollectionListModel<TestCaseDto> model;
 
+    private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
+
+    private JBTable gridTable;
+
+    private JBScrollPane gridScrollPane;
+
+    private JBScrollPane listScrollPane;
+
     @Getter
     @Setter
     private int currentPage = 1;
@@ -137,6 +148,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         mainPanel = openingForm.getMainPanel();
         list = openingForm.getList();
         model = openingForm.getModel();
+        listScrollPane = openingForm.getScrollPane();
 
         list.setCellRenderer(new RunListRenderer(p, this));
 
@@ -264,6 +276,17 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
+    public void onToolBarSwitchedToListView() {
+        setCenter(listScrollPane);
+    }
+
+    @Override
+    public void onToolBarSwitchedToGridView() {
+        rebuildGrid();
+        setCenter(gridScrollPane);
+    }
+
+    @Override
     public void onToolBarRefreshButtonClicked() {
         FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null)
@@ -340,6 +363,47 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         if (statusBar != null) {
             statusBar.updatePaginationState(currentPage, totalPages, total);
         }
+
+        if (toolBar != null && toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
+            rebuildGrid();
+            setCenter(gridScrollPane);
+        }
+    }
+
+    private List<TestCaseDto> getCurrentPageItems() {
+        final int total = currentTestCases.size();
+        final int fromIndex = (currentPage - 1) * pageSize;
+        final int toIndex = Math.min(fromIndex + pageSize, total);
+        return currentTestCases.subList(fromIndex, toIndex);
+    }
+
+    private void rebuildGrid() {
+        final List<TestCaseDto> pageItems = getCurrentPageItems();
+        final Set<RunEditorAttributes> attributes = getSelectedDetails();
+
+        gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap);
+
+        gridTable.getSelectionModel().addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) return;
+            final int row = gridTable.getSelectedRow();
+            if (row >= 0 && row < pageItems.size()) {
+                selectTestCase(pageItems.get(row));
+            }
+        });
+
+        gridScrollPane = new JBScrollPane(gridTable);
+    }
+
+    private void setCenter(final JComponent component) {
+        if (listScrollPane != null) {
+            mainPanel.remove(listScrollPane);
+        }
+        if (gridScrollPane != null) {
+            mainPanel.remove(gridScrollPane);
+        }
+        mainPanel.add(component, BorderLayout.CENTER);
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
     @Override

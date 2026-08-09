@@ -18,6 +18,8 @@ public class RunOpeningForm {
     private final JBPanel<?> mainPanel;
     private final JBList<TestCaseDto> list;
     private final CollectionListModel<TestCaseDto> model;
+    @Getter
+    private final JBScrollPane scrollPane;
 
     public RunOpeningForm(final AbstractToolbarPanel toolBar, final StatusBar statusBar) {
         this.model = new CollectionListModel<>();
@@ -28,7 +30,7 @@ public class RunOpeningForm {
         list.setOpaque(true);
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-        JBScrollPane scrollPane = new JBScrollPane(list);
+        this.scrollPane = new JBScrollPane(list);
         scrollPane.setBorder(JBUI.Borders.empty());
 
         mainPanel = new JBPanel<>(new BorderLayout());

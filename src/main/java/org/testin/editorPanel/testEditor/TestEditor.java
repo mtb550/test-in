@@ -11,6 +11,7 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.UnifiedVirtualFile;
+import org.testin.editorPanel.grid.GridPanelBuilder;
 import org.testin.editorPanel.listeners.*;
 import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
@@ -29,6 +31,7 @@ import org.testin.editorPanel.toolBar.components.TestDetailsPopupBtn;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.enums.ViewMode;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -62,6 +65,11 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final @NotNull JBList<TestCaseDto> list;
 
     private final CollectionListModel<TestCaseDto> model;
+
+    private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
+    private final JBScrollPane scrollPane;
+    private JBTable gridTable;
+    private JBScrollPane gridScrollPane;
 
     private final ModelSyncListener syncListener;
 
@@ -125,7 +133,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         FontSync.syncWithNativeEditor(p, list, projectDisposable);
 
-        final JBScrollPane scrollPane = new JBScrollPane(list);
+        this.scrollPane = new JBScrollPane(list);
         scrollPane.setOpaque(true);
         scrollPane.setBackground(UIUtil.getPanelBackground());
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
@@ -328,6 +336,17 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
+    public void onToolBarSwitchedToListView() {
+        setCenter(scrollPane);
+    }
+
+    @Override
+    public void onToolBarSwitchedToGridView() {
+        rebuildGrid();
+        setCenter(gridScrollPane);
+    }
+
+    @Override
     public void onToolBarRefreshButtonClicked() {
         FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null) {
@@ -384,6 +403,47 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         }
 
         statusBar.updatePaginationState(currentPage, totalPages, totalItems);
+
+        if (toolBar != null && toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
+            rebuildGrid();
+            setCenter(gridScrollPane);
+        }
+    }
+
+    private List<TestCaseDto> getCurrentPageItems() {
+        final int totalItems = currentTestCases.size();
+        final int startIndex = (currentPage - 1) * pageSize;
+        final int endIndex = Math.min(startIndex + pageSize, totalItems);
+        return startIndex < totalItems
+                ? new ArrayList<>(currentTestCases.subList(startIndex, endIndex))
+                : new ArrayList<>();
+    }
+
+    private void rebuildGrid() {
+        final List<TestCaseDto> pageItems = getCurrentPageItems();
+        final Set<TestEditorAttributes> attributes = getSelectedDetails();
+
+        gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes);
+
+        gridTable.getSelectionModel().addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) return;
+            final int row = gridTable.getSelectedRow();
+            if (row >= 0 && row < pageItems.size()) {
+                selectTestCase(pageItems.get(row));
+            }
+        });
+
+        gridScrollPane = new JBScrollPane(gridTable);
+    }
+
+    private void setCenter(final JComponent component) {
+        mainPanel.remove(scrollPane);
+        if (gridScrollPane != null) {
+            mainPanel.remove(gridScrollPane);
+        }
+        mainPanel.add(component, BorderLayout.CENTER);
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
     private int getTotalPages(final List<TestCaseDto> filtered) {
