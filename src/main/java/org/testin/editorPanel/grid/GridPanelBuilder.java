@@ -112,13 +112,19 @@ public class GridPanelBuilder {
 
         final JBTable table = new JBTable(model);
         table.setFillsViewportHeight(true);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         return table;
     }
 
-    private void autoSizeColumns(final JBTable table) {
+    public static void resizeToFont(final JBTable table) {
+        final FontMetrics fm = table.getFontMetrics(table.getFont());
+        table.setRowHeight(Math.max(fm.getHeight() + 4, 20));
+        autoSizeColumns(table);
+    }
+
+    private static void autoSizeColumns(final JBTable table) {
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
             final TableColumn col = table.getColumnModel().getColumn(i);
