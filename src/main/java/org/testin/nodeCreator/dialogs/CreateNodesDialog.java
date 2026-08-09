@@ -1,10 +1,12 @@
 package org.testin.nodeCreator.dialogs;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.TextComponentEmptyText;
 import com.intellij.ui.components.fields.ExtendableTextField;
@@ -50,12 +52,12 @@ public class CreateNodesDialog {
         list.setSelectedIndex(0);
         list.setVisibleRowCount(optionsList.size());
 
-        JPanel mainPanel = new JPanel(new BorderLayout());
+        JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
         mainPanel.setBorder(JBUI.Borders.empty());
 
         mainPanel.add(textField, BorderLayout.NORTH);
 
-        JPanel listWrapper = new JPanel(new BorderLayout());
+        JBPanel<?> listWrapper = new JBPanel<>(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
 
         JBScrollPane scrollPane = new JBScrollPane(listWrapper);
@@ -94,7 +96,7 @@ public class CreateNodesDialog {
 
     public void show() {
         popup.showCenteredInCurrentWindow(p);
-        SwingUtilities.invokeLater(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> {
             textField.revalidate();
             textField.repaint();
         });

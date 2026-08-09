@@ -3,6 +3,7 @@ package org.testin.testCase.updateDialog.bulk;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
@@ -24,6 +25,8 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
@@ -226,7 +229,7 @@ public abstract class JsonArraySplitBulkSectionDialog {
         rightDoc.addDocumentListener(new DocumentListener() {
             @Override
             public void documentChanged(@NotNull DocumentEvent event) {
-                SwingUtilities.invokeLater(() -> {
+                ApplicationManager.getApplication().invokeLater(() -> {
                     if (rightEditor.isDisposed()) return;
                     MarkupModel markupModel = rightEditor.getMarkupModel();
                     for (RangeHighlighter h : markupModel.getAllHighlighters()) {
@@ -285,14 +288,14 @@ public abstract class JsonArraySplitBulkSectionDialog {
         splitter.setFirstComponent(leftEditor.getComponent());
         splitter.setSecondComponent(rightEditor.getComponent());
 
-        JPanel statusBar = new JPanel(new BorderLayout());
+        JBPanel<?> statusBar = new JBPanel<>(new BorderLayout());
         statusBar.setBorder(JBUI.Borders.empty(6, 10));
-        JLabel shortcutLabel = new JLabel("💡 Shortcuts:  [Enter] Save  |  [Ctrl+Enter] Add  |  [Shift+Del] Remove  |  [Ctrl+Click] Multi-Caret  |  [Ctrl+Shift+A] All Carets");
+        JBLabel shortcutLabel = new JBLabel("💡 Shortcuts:  [Enter] Save  |  [Ctrl+Enter] Add  |  [Shift+Del] Remove  |  [Ctrl+Click] Multi-Caret  |  [Ctrl+Shift+A] All Carets");
         shortcutLabel.setForeground(JBColor.GRAY);
         shortcutLabel.setFont(JBUI.Fonts.smallFont());
         statusBar.add(shortcutLabel, BorderLayout.WEST);
 
-        JPanel panel = new JPanel(new BorderLayout());
+        JBPanel<?> panel = new JBPanel<>(new BorderLayout());
         panel.add(splitter, BorderLayout.CENTER);
         panel.add(statusBar, BorderLayout.SOUTH);
         panel.setPreferredSize(new Dimension(JBUI.scale(1100), JBUI.scale(550)));

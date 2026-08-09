@@ -16,7 +16,6 @@ import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
 import org.testin.util.FontSync;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -48,7 +47,7 @@ public class NavigationBar extends BaseDetails {
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final JBPanel<?> pathPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
         float navFontSize = Math.max(8.0f, FontSync.getBaseFontSize() - 1.0f);
@@ -117,7 +116,7 @@ public class NavigationBar extends BaseDetails {
         return currentRow + 1;
     }
 
-    private void setUnderline(final @NotNull JLabel label, final boolean underline) {
+    private void setUnderline(final @NotNull JBLabel label, final boolean underline) {
         final Font font = label.getFont();
         final Map<TextAttribute, Object> attributes = new HashMap<>(font.getAttributes());
         attributes.put(TextAttribute.UNDERLINE, underline ? TextAttribute.UNDERLINE_ON : -1);

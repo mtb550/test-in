@@ -6,6 +6,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
@@ -74,7 +75,7 @@ public class DetailsTab {
     private void renderPlaceholder(final @NotNull JBPanel<?> panel) {
         panel.setLayout(new BorderLayout());
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
-        final JLabel placeholder = new JLabel(PLACEHOLDER_TEXT);
+        final JBLabel placeholder = new JBLabel(PLACEHOLDER_TEXT);
         placeholder.setForeground(JBColor.GRAY);
         placeholder.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize() + 5.0f));
         panel.add(placeholder, BorderLayout.NORTH);

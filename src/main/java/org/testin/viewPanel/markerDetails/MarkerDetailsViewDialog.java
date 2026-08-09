@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
@@ -121,7 +122,7 @@ public class MarkerDetailsViewDialog {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT);
 
-        JLabel label = new JLabel(labelText);
+        JBLabel label = new JBLabel(labelText);
         label.setForeground(JBColor.GRAY);
         label.setFont(JBFont.label().deriveFont(Font.BOLD, FontSync.getBaseFontSize() + LABEL_FONT_SIZE_OFFSET));
 

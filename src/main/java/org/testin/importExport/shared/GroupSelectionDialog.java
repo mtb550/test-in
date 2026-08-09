@@ -3,6 +3,7 @@ package org.testin.importExport.shared;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +48,7 @@ public class GroupSelectionDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JBPanel<?> panel = new JBPanel<>(new BorderLayout());
         panel.add(new JBScrollPane(list), BorderLayout.CENTER);
         return panel;
     }

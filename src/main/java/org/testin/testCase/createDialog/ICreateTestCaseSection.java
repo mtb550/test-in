@@ -1,5 +1,9 @@
 package org.testin.testCase.createDialog;
 
+import com.intellij.ui.components.JBLabel;
+
+
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
@@ -8,13 +12,13 @@ import javax.swing.*;
 import java.awt.*;
 
 public interface ICreateTestCaseSection {
-    JPanel getWrapper();
+    JBPanel<?> getWrapper();
 
-    void showSection(final JPanel contentPanel);
+    void showSection(final JBPanel<?> contentPanel);
 
     void applyTo(final TestCaseDto dto);
 
-    void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction);
+    void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction);
 
     JComponent getFocusComponent();
 
@@ -22,10 +26,10 @@ public interface ICreateTestCaseSection {
 
     void fillData(final TestCaseDto dto, final IUIAction repackAction);
 
-    default JPanel createIconPanel(final Icon icon) {
-        JPanel iconPanel = new JPanel(new GridBagLayout());
+    default JBPanel<?> createIconPanel(final Icon icon) {
+        JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
         iconPanel.setOpaque(false);
-        JLabel iconLabel = new JLabel(icon);
+        JBLabel iconLabel = new JBLabel(icon);
         iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
         iconPanel.add(iconLabel);
         return iconPanel;

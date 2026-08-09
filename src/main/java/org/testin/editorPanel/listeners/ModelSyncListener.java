@@ -1,12 +1,12 @@
 package org.testin.editorPanel.listeners;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.CollectionListModel;
 import lombok.Setter;
 import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.enums.IUpdateCallback;
 import org.testin.mappers.dto.TestCaseDto;
 
-import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
@@ -51,11 +51,11 @@ public class ModelSyncListener implements ListDataListener {
 
         editor.updateSequenceAndSaveAll();
 
-        Optional.ofNullable(onUpdateCallback).ifPresent(cb -> SwingUtilities.invokeLater(cb::onUpdate));
+        Optional.ofNullable(onUpdateCallback).ifPresent(cb -> ApplicationManager.getApplication().invokeLater(cb::onUpdate));
 
         if (newlyAdded != null) {
             final TestCaseDto target = newlyAdded;
-            SwingUtilities.invokeLater(() -> editor.selectTestCase(target));
+            ApplicationManager.getApplication().invokeLater(() -> editor.selectTestCase(target));
         }
     }
 
@@ -86,7 +86,7 @@ public class ModelSyncListener implements ListDataListener {
             editor.updateSequenceAndSaveAll();
         }
 
-        Optional.ofNullable(onUpdateCallback).ifPresent(cb -> SwingUtilities.invokeLater(cb::onUpdate));
+        Optional.ofNullable(onUpdateCallback).ifPresent(cb -> ApplicationManager.getApplication().invokeLater(cb::onUpdate));
     }
 
     @Override

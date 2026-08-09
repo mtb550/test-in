@@ -153,6 +153,9 @@ public class GridPanelBuilder {
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        if (editable) {
+            table.setDefaultEditor(Object.class, new GridCellEditor());
+        }
 
         return table;
     }

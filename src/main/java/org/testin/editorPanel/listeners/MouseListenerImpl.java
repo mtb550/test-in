@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.AbstractEditorContextMenu;
@@ -148,7 +149,7 @@ public class MouseListenerImpl extends MouseAdapter {
         if (e.isControlDown() || e.isMetaDown())
             return;
 
-        JScrollPane scrollPane = getScrollPane(e.getComponent());
+        JBScrollPane scrollPane = getScrollPane(e.getComponent());
 
         if (scrollPane != null && e.getComponent() != scrollPane) {
             MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
@@ -186,11 +187,11 @@ public class MouseListenerImpl extends MouseAdapter {
         return null;
     }
 
-    private JScrollPane getScrollPane(final Component component) {
+    private JBScrollPane getScrollPane(final Component component) {
         Component current = component;
         while (current != null) {
-            if (current instanceof JScrollPane)
-                return (JScrollPane) current;
+            if (current instanceof JBScrollPane)
+                return (JBScrollPane) current;
 
             current = current.getParent();
         }

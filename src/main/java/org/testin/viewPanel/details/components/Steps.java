@@ -25,7 +25,7 @@ public class Steps extends BaseDetails {
         if (steps.isEmpty() || steps.stream().allMatch(String::isBlank))
             return row;
 
-        final JPanel stepsContainer = new JPanel();
+        final JBPanel<?> stepsContainer = new JBPanel<>();
         stepsContainer.setLayout(new BoxLayout(stepsContainer, BoxLayout.Y_AXIS));
         stepsContainer.setOpaque(false);
 

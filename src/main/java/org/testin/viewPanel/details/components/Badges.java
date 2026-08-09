@@ -1,7 +1,6 @@
 package org.testin.viewPanel.details.components;
 
 import com.intellij.openapi.project.Project;
-
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +8,6 @@ import org.testin.editorPanel.Shared;
 import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
 
-import javax.swing.*;
 import java.awt.*;
 
 public class Badges extends BaseDetails {
@@ -22,7 +20,7 @@ public class Badges extends BaseDetails {
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        JPanel badgesPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
+        JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         badgesPanel.setOpaque(false);
 
         badgesPanel.add(Shared.createPriorityBadge(dto));

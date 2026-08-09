@@ -2,6 +2,7 @@ package org.testin.testCase.createDialog;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.TextFieldWithAutoCompletion;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
@@ -19,7 +20,7 @@ import java.awt.*;
 public class ExpectedResultSection implements ICreateTestCaseSection {
     @Getter
     private final TextFieldWithAutoCompletion<String> expectedResultField;
-    private final JPanel wrapper;
+    private final JBPanel<?> wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ExpectedResultSection(final @NotNull Project p) {
@@ -29,7 +30,7 @@ public class ExpectedResultSection implements ICreateTestCaseSection {
         this.expectedResultField.setShowPlaceholderWhenFocused(true);
         this.expectedResultField.setBorder(JBUI.Borders.empty(10));
 
-        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper = new JBPanel<>(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(CreateTestCaseFields.EXPECTED_RESULT.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.expectedResultField, BorderLayout.CENTER);
@@ -37,12 +38,12 @@ public class ExpectedResultSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JPanel getWrapper() {
+    public JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JPanel contentPanel) {
+    public void showSection(final JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         expectedResultField.requestFocus();
@@ -56,7 +57,7 @@ public class ExpectedResultSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseExpectedResult.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();

@@ -279,7 +279,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.currentPage = page;
         refreshView();
 
-        SwingUtilities.invokeLater(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> {
             list.setSelectedIndex(localIndex);
             list.ensureIndexIsVisible(localIndex);
             list.requestFocusInWindow();

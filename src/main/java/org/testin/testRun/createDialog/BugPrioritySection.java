@@ -1,6 +1,7 @@
 package org.testin.testRun.createDialog;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
@@ -19,13 +20,13 @@ public class BugPrioritySection implements RunItemEditSection {
 
     @Getter
     private final ButtonGroup buttonGroup;
-    private final JPanel wrapper;
+    private final JBPanel<?> wrapper;
     private BugPriority selected;
 
     public BugPrioritySection() {
         this.buttonGroup = new ButtonGroup();
 
-        JPanel radioPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        JBPanel<?> radioPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 8, 0));
         radioPanel.setOpaque(false);
 
         for (BugPriority bp : BugPriority.values()) {
@@ -38,7 +39,7 @@ public class BugPrioritySection implements RunItemEditSection {
             radioPanel.add(rb);
         }
 
-        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper = new JBPanel<>(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(AllIcons.General.Filter), BorderLayout.WEST);
         this.wrapper.add(radioPanel, BorderLayout.CENTER);
@@ -46,12 +47,12 @@ public class BugPrioritySection implements RunItemEditSection {
     }
 
     @Override
-    public JPanel getWrapper() {
+    public JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JPanel contentPanel) {
+    public void showSection(final JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
     }

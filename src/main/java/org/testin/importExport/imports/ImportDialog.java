@@ -1,13 +1,13 @@
 package org.testin.importExport.imports;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBTabbedPane;
+import com.intellij.ui.components.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
@@ -74,7 +74,7 @@ public class ImportDialog extends DialogWrapper {
         } else {
             ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
             fileField.addActionListener(browseListener);
-            SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(fileField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+            ApplicationManager.getApplication().invokeLater(() -> browseListener.actionPerformed(new ActionEvent(fileField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }
     }
 
@@ -90,9 +90,9 @@ public class ImportDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JBPanel<?> panel = new JBPanel<>(new BorderLayout());
 
-        JPanel topPanel = new JPanel(new GridBagLayout());
+        JBPanel<?> topPanel = new JBPanel<>(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(4, 4, 4, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -100,7 +100,7 @@ public class ImportDialog extends DialogWrapper {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        topPanel.add(new JLabel("Source:"), gbc);
+        topPanel.add(new JBLabel("Source:"), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
@@ -109,14 +109,14 @@ public class ImportDialog extends DialogWrapper {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.weightx = 0;
-        topPanel.add(new JLabel("Options:"), gbc);
+        topPanel.add(new JBLabel("Options:"), gbc);
 
         String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
             gbc.gridx = 0;
             gbc.gridy = 2;
             gbc.anchor = GridBagConstraints.WEST;
-            topPanel.add(new JPanel(), gbc);
+            topPanel.add(new JBPanel<>(), gbc);
 
             gbc.gridx = 1;
             gbc.weightx = 1.0;
@@ -140,7 +140,7 @@ public class ImportDialog extends DialogWrapper {
             DefaultTableModel model = new TablePanelBuilder().createModel(p, importAttributes, testCases);
             model.addTableModelListener(new CellEditListener(importAttributes, p, testCases));
             tableModelsMap.put(sheetName, model);
-            tableTabbedPane.addTab(sheetName, new JScrollPane(new TablePanelBuilder().buildTable(model, p)));
+            tableTabbedPane.addTab(sheetName, new JBScrollPane(new TablePanelBuilder().buildTable(model, p)));
         }
     }
 

@@ -4,6 +4,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.ColoredListCellRenderer;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -21,7 +22,7 @@ import java.util.Objects;
 
 public class PrioritySection implements ICreateTestCaseSection {
     private final ComboBox<Priority> priority;
-    private final JPanel wrapper;
+    private final JBPanel<?> wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public PrioritySection() {
@@ -45,7 +46,7 @@ public class PrioritySection implements ICreateTestCaseSection {
             }
         });
 
-        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper = new JBPanel<>(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(CreateTestCaseFields.PRIORITY.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.priority, BorderLayout.CENTER);
@@ -53,12 +54,12 @@ public class PrioritySection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JPanel getWrapper() {
+    public JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JPanel contentPanel) {
+    public void showSection(final JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         priority.requestFocus();
@@ -76,7 +77,7 @@ public class PrioritySection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCasePriority.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();

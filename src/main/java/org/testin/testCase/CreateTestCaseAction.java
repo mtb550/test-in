@@ -3,6 +3,7 @@ package org.testin.testCase;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
@@ -19,7 +20,6 @@ import org.testin.services.TestCasePersistService;
 import org.testin.testCase.createDialog.CreateTestCaseDialog;
 import org.testin.util.KeyboardSet;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -60,7 +60,7 @@ public class CreateTestCaseAction extends DumbAwareAction {
 
             GeneratorType.CREATE_TEST_CASE.getAction().execute(p, tc);
 
-            SwingUtilities.invokeLater(() -> editor.selectTestCase(tc));
+            ApplicationManager.getApplication().invokeLater(() -> editor.selectTestCase(tc));
 
         }).show();
     }

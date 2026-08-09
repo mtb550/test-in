@@ -1,10 +1,14 @@
 package org.testin.generateReport;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.*;
 import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBTextField;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +28,7 @@ public class GenerateReportDialog extends DialogWrapper {
 
     private final TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
 
-    private final JTextField fileNameField = new JTextField(30);
+    private final JBTextField fileNameField = new JBTextField(30);
 
     private final ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
             .filter(type -> type.getReportHandler() != null)
@@ -63,14 +67,14 @@ public class GenerateReportDialog extends DialogWrapper {
             ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(
                     folderField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
             folderField.addActionListener(browseListener);
-            SwingUtilities.invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
+            ApplicationManager.getApplication().invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }
     }
 
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(4, 4, 4, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -78,7 +82,7 @@ public class GenerateReportDialog extends DialogWrapper {
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        panel.add(new JLabel("Destination:"), gbc);
+        panel.add(new JBLabel("Destination:"), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
@@ -88,7 +92,7 @@ public class GenerateReportDialog extends DialogWrapper {
         gbc.gridy = 1;
         gbc.weightx = 0;
         gbc.anchor = GridBagConstraints.WEST;
-        panel.add(new JLabel("File name:"), gbc);
+        panel.add(new JBLabel("File name:"), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
@@ -97,7 +101,7 @@ public class GenerateReportDialog extends DialogWrapper {
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.weightx = 0;
-        panel.add(new JLabel("Format:"), gbc);
+        panel.add(new JBLabel("Format:"), gbc);
 
         gbc.gridx = 1;
         gbc.weightx = 1.0;
@@ -108,7 +112,7 @@ public class GenerateReportDialog extends DialogWrapper {
             gbc.gridx = 0;
             gbc.gridy = 3;
             gbc.anchor = GridBagConstraints.WEST;
-            panel.add(new JPanel(), gbc);
+            panel.add(new JBPanel<>(), gbc);
 
             gbc.gridx = 1;
             gbc.weightx = 1.0;

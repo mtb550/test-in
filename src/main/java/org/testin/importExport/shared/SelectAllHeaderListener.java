@@ -1,23 +1,26 @@
 package org.testin.importExport.shared;
 
-import javax.swing.*;
+import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class SelectAllHeaderListener extends MouseAdapter {
     private final DefaultTableModel model;
-    private final JCheckBox headerCheckbox;
-    private final JTable table;
+    private final JBCheckBox headerCheckbox;
+    private final JBTable table;
 
-    public SelectAllHeaderListener(JTable table, DefaultTableModel model, JCheckBox headerCheckbox) {
+    public SelectAllHeaderListener(final @NotNull JBTable table, final @NotNull DefaultTableModel model, final @NotNull JBCheckBox headerCheckbox) {
         this.table = table;
         this.model = model;
         this.headerCheckbox = headerCheckbox;
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mouseClicked(final @NotNull MouseEvent e) {
         int col = table.columnAtPoint(e.getPoint());
         if (col == 0) {
             boolean newState = !headerCheckbox.isSelected();

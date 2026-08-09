@@ -2,12 +2,16 @@ package org.testin.testCase.createDialog;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.TextFieldWithAutoCompletionListProvider;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
@@ -28,19 +32,19 @@ public class StepsSection implements ICreateTestCaseSection {
     private final @NotNull Project p;
     @Getter
     private final List<TextFieldWithAutoCompletion<String>> stepFields;
-    private final JPanel stepsContainer;
-    private final JPanel wrapper;
+    private final JBPanel<?> stepsContainer;
+    private final JBPanel<?> wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public StepsSection(final @NotNull Project p) {
         this.p = p;
         this.stepFields = new ArrayList<>();
 
-        this.stepsContainer = new JPanel();
+        this.stepsContainer = new JBPanel<>();
         this.stepsContainer.setLayout(new BoxLayout(this.stepsContainer, BoxLayout.Y_AXIS));
         this.stepsContainer.setOpaque(false);
 
-        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper = new JBPanel<>(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(CreateTestCaseFields.STEPS.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.stepsContainer, BorderLayout.CENTER);
@@ -48,22 +52,22 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JPanel getWrapper() {
+    public JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JPanel contentPanel) {
+    public void showSection(final JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null) {
             contentPanel.add(wrapper);
         }
     }
 
-    public void showSection(final JPanel contentPanel, final IUIAction repackAction) {
+    public void showSection(final JBPanel<?> contentPanel, final IUIAction repackAction) {
         showSection(contentPanel);
         wrapper.setVisible(true);
         addStepField("", repackAction);
-        SwingUtilities.invokeLater(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> {
             repackAction.execute();
             if (!stepFields.isEmpty()) {
                 stepFields.getLast().requestFocus();
@@ -80,11 +84,11 @@ public class StepsSection implements ICreateTestCaseSection {
         stepField.setShowPlaceholderWhenFocused(true);
         stepField.setBorder(JBUI.Borders.empty(6, 10));
 
-        JPanel stepRow = new JPanel(new BorderLayout(JBUI.scale(8), 0));
+        JBPanel<?> stepRow = new JBPanel<>(new BorderLayout(JBUI.scale(8), 0));
         stepRow.setOpaque(false);
         stepRow.setBorder(JBUI.Borders.emptyBottom(6));
 
-        JLabel removeButton = new JLabel(AllIcons.Actions.Cancel);
+        JBLabel removeButton = new JBLabel(AllIcons.Actions.Cancel);
         removeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         removeButton.setToolTipText("Remove step " + KeyboardSet.CreateTestCaseRemoveStep.getShortcutText());
 
@@ -109,13 +113,13 @@ public class StepsSection implements ICreateTestCaseSection {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
                 Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                if (SwingUtilities.isDescendingFrom(focusOwner, stepField)) {
+                if (UIUtil.isDescendingFrom(focusOwner, stepField)) {
                     removeStepAction(stepRow, stepField, repackAction);
                 }
             }
         }.registerCustomShortcutSet(KeyboardSet.CreateTestCaseRemoveStep.getCustomShortcut(), stepField);
 
-        JPanel buttonWrapper = new JPanel(new BorderLayout());
+        JBPanel<?> buttonWrapper = new JBPanel<>(new BorderLayout());
         buttonWrapper.setOpaque(false);
         buttonWrapper.setBorder(JBUI.Borders.emptyRight(4));
         buttonWrapper.add(removeButton, BorderLayout.CENTER);
@@ -127,7 +131,7 @@ public class StepsSection implements ICreateTestCaseSection {
         stepsContainer.add(stepRow);
     }
 
-    private void removeStepAction(JPanel stepRow, TextFieldWithAutoCompletion<String> stepField, IUIAction repackAction) {
+    private void removeStepAction(JBPanel<?> stepRow, TextFieldWithAutoCompletion<String> stepField, IUIAction repackAction) {
         if (stepFields.size() == 1) {
             stepField.setText("");
             stepField.requestFocus();
@@ -142,7 +146,7 @@ public class StepsSection implements ICreateTestCaseSection {
 
         if (!stepFields.isEmpty())
             stepFields.getLast().requestFocus();
-        SwingUtilities.invokeLater(repackAction::execute);
+        ApplicationManager.getApplication().invokeLater(repackAction::execute);
     }
 
     @Override
@@ -159,7 +163,7 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseAddStep.getCustomShortcut(), () ->
                 showSection(slot, repackAction));
     }
@@ -179,7 +183,7 @@ public class StepsSection implements ICreateTestCaseSection {
             Container row = field.getParent();
             if (row != null) {
                 for (Component c : row.getComponents()) {
-                    if (c instanceof JPanel buttonWrapper) {
+                    if (c instanceof JBPanel<?> buttonWrapper) {
                         buttonWrapper.setVisible(editable);
                     }
                 }

@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.HtmlChunk;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
@@ -34,10 +35,10 @@ public class ActionIcons extends BaseDetails {
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        final JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
 
-        final JLabel navLabel = new JLabel();
+        final JBLabel navLabel = new JBLabel();
         final Icon navIconBase = IconUtil.scale(navIconRaw, navLabel, BASE_SCALE);
         final Icon navIconHover = IconUtil.scale(navIconRaw, navLabel, HOVER_SCALE);
         navLabel.setIcon(navIconBase);
@@ -71,7 +72,7 @@ public class ActionIcons extends BaseDetails {
             }
         });
 
-        final JLabel runLabel = new JLabel();
+        final JBLabel runLabel = new JBLabel();
         final RunStatus currentStatus = RunStatus.fromString(dto.getTempStatus());
         final Icon currentRunIconRaw = currentStatus.getIcon();
         final Icon runIconBase = IconUtil.scale(currentRunIconRaw, runLabel, BASE_SCALE);

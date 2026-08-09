@@ -1,6 +1,8 @@
 package org.testin.testRun.createDialog;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.ui.ComboBox;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
@@ -17,15 +19,15 @@ public class StatusSection implements RunItemEditSection {
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     @Getter
-    private final JComboBox<TestStatus> statusCombo;
-    private final JPanel wrapper;
+    private final ComboBox<TestStatus> statusCombo;
+    private final JBPanel<?> wrapper;
 
     public StatusSection() {
-        this.statusCombo = new JComboBox<>(TestStatus.values());
+        this.statusCombo = new ComboBox<>(TestStatus.values());
         this.statusCombo.setFont(fieldFont);
         this.statusCombo.setBorder(JBUI.Borders.empty(10));
 
-        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper = new JBPanel<>(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(AllIcons.General.Filter), BorderLayout.WEST);
         this.wrapper.add(statusCombo, BorderLayout.CENTER);
@@ -33,12 +35,12 @@ public class StatusSection implements RunItemEditSection {
     }
 
     @Override
-    public JPanel getWrapper() {
+    public JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JPanel contentPanel) {
+    public void showSection(final JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         statusCombo.requestFocus();

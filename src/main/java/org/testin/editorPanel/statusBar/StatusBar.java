@@ -68,7 +68,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         currentPageLabel.setFont(dynamicSmallFont);
         pageSizeField.setFont(dynamicSmallFont);
 
-        final JPanel paginationPanel = new JBPanel<>(new FlowLayout(FlowLayout.CENTER, JBUI.scale(5), 0));
+        final JBPanel<?> paginationPanel = new JBPanel<>(new FlowLayout(FlowLayout.CENTER, JBUI.scale(5), 0));
         paginationPanel.setOpaque(false);
 
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
@@ -108,7 +108,6 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     private void makeCompact(final JButton button, final Font font) {
-        button.putClientProperty("ActionToolbar.smallVariant", true);
         button.setMargin(JBUI.insets(0, 4));
         button.setFont(font);
         button.setFocusable(false);

@@ -51,7 +51,7 @@ public class RunCreationForm {
         mainPanel.setPreferredSize(new Dimension(JBUI.scale(900), JBUI.scale(600)));
     }
 
-    private JPanel buildConfigurationPanel(final @NotNull String runName) {
+    private JBPanel<?> buildConfigurationPanel(final @NotNull String runName) {
         final FormBuilder formBuilder = FormBuilder.createFormBuilder();
 
         final JBTextField runNameField = new JBTextField(runName);
@@ -72,7 +72,13 @@ public class RunCreationForm {
             }
         }
 
-        final JPanel configurationPanel = formBuilder.getPanel();
+        final JPanel formPanel = formBuilder.getPanel();
+        final JBPanel<?> configurationPanel = new JBPanel<>(formPanel.getLayout());
+        while (formPanel.getComponentCount() > 0) {
+            final Component component = formPanel.getComponent(0);
+            formPanel.remove(component);
+            configurationPanel.add(component);
+        }
         configurationPanel.setBorder(JBUI.Borders.compound(
                 JBUI.Borders.customLine(UIUtil.getBoundsColor(), 0, 0, 1, 0),
                 JBUI.Borders.empty(10)

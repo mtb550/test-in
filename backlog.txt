@@ -183,9 +183,9 @@ reduce arrow padding &
 
 * need to set team members, leaders.
 
-* fix issue: after change testin path, should update the tree and project list to reads the new path.
+* fix issue: after change test-in path, should update the tree and project list to reads the new path.
 
-* apply xml or yaml file in automation itself.
+* apply XML or YAML file in automation itself.
 * make one project each automation project. then update indexer
 
 apply tree async model.
@@ -193,5 +193,28 @@ add separate grid view button. (20% Done)
 fix all todo comments.
 why archived test projects not shown?
 
-
+usage   java swing api      IntelliJ SDK equivalence    api
+-------------------------------------------------------------------------------------
+137     JPanel              JBPanel                     (com.intellij.ui.components)
+ 91     JComponent          — used as-is                (base class, no JB wrapper)
+ 30     JLabel              JBLabel                     (com.intellij.ui.components)
+ 29     SwingUtilities      ApplicationManager.getApplication()
+ 13     JList               JBList                      (com.intellij.ui.components)
+ 8      JButton             — used as-is                (no JB wrapper)
+ 6      JScrollPane         JBScrollPane                (com.intellij.ui.components)
+ 4      JTable              JBTable                     (com.intellij.ui.table)
+ 4      JComboBox           ComboBox<T>                 (com.intellij.openapi.ui)
+ 3      JTextField          JBTextField                 (com.intellij.ui.components)
+ 2      JTree               Tree                        (com.intellij.ui.treeStructure)
+ 1      JPopupMenu          JBPopupMenu                 (com.intellij.openapi.ui)
+ 0      JTabbedPane         JBTabbedPane                (com.intellij.ui.components)
+ 0      JOptionPane         Messages                    (com.intellij.openapi.ui)
+ 0      JCheckBox           JBCheckBox                  (com.intellij.ui.components)
+update this table above
+make font same in view and editor
+implement + button in test editor
+make font sync work one be inside details
+after move to IntelliJ api, text fields and field map in test run creation form not aligned same before, should be each element under the next
+after move to IntelliJ api, once I create new test case, after create the ui should move to the new and select it, now it is not move to it and not selected.
+in editors in grid view, apply word wrap, once make column smaller active word wrap.
 

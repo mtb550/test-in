@@ -2,6 +2,8 @@ package org.testin.git;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
+import com.intellij.openapi.ui.JBPopupMenu;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +43,7 @@ public class PendingCommitsDialog extends DialogWrapper {
     @Nullable
     @Override
     protected JComponent createCenterPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
+        JBPanel<?> panel = new JBPanel<>(new BorderLayout());
 
         String[] columns = {"Test Case ID", "Change Type", "Test Case Description", "Old Value", "New Value"};
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
@@ -73,7 +75,7 @@ public class PendingCommitsDialog extends DialogWrapper {
         table.getColumnModel().getColumn(4).setPreferredWidth(200);
 
         // --- Context Menu for Rejecting Changes ---
-        JPopupMenu popupMenu = new JPopupMenu();
+        JBPopupMenu popupMenu = new JBPopupMenu();
         JMenuItem rejectItem = new JMenuItem("Reject Specific Change");
         rejectItem.addActionListener(e -> rejectSelectedChange(table, model));
         popupMenu.add(rejectItem);

@@ -1,5 +1,6 @@
 package org.testin.editorPanel.listeners;
 
+import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.logger.Logger;
@@ -28,7 +29,7 @@ public class TransferListener extends TransferHandler {
 
     @Override
     protected Transferable createTransferable(final JComponent c) {
-        if (!(c instanceof JList<?> rawList)) return null;
+        if (!(c instanceof JBList<?> rawList)) return null;
 
         draggedIndices = rawList.getSelectedIndices();
 
@@ -73,7 +74,7 @@ public class TransferListener extends TransferHandler {
 
             if (items.isEmpty()) return false;
 
-            final JList.DropLocation dl = (JList.DropLocation) support.getDropLocation();
+            final JBList.DropLocation dl = (JBList.DropLocation) support.getDropLocation();
             final int offset = (editor.getCurrentPage() - 1) * editor.getPageSize();
             int insertAtGlobal = offset + dl.getIndex();
 

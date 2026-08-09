@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
@@ -67,9 +68,9 @@ public abstract class TestCaseBaseDialog {
     protected void initDynamicStatusBar(JComponent parentPanel) {
         focusListener = evt -> {
             Component focusOwner = (Component) evt.getNewValue();
-            if (focusOwner != null && SwingUtilities.isDescendingFrom(focusOwner, parentPanel)) {
+            if (focusOwner != null && UIUtil.isDescendingFrom(focusOwner, parentPanel)) {
                 for (ICreateTestCaseSection section : getAllSections()) {
-                    if (SwingUtilities.isDescendingFrom(focusOwner, section.getWrapper())) {
+                    if (UIUtil.isDescendingFrom(focusOwner, section.getWrapper())) {
                         IStatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(DescriptionSection));
                         if (items != null) statusBarSection.updateItems(items);
                         return;

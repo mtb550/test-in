@@ -70,7 +70,7 @@ public class Id extends BaseDetails {
             }
         });
 
-        JPanel idContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
+        JBPanel<?> idContainer = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         idContainer.setOpaque(false);
         idContainer.add(idBadge);
         idContainer.add(copyIcon);

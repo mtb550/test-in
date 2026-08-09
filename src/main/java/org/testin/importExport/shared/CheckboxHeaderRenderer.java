@@ -1,14 +1,16 @@
 package org.testin.importExport.shared;
 
+import com.intellij.ui.components.JBCheckBox;
+
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
 public class CheckboxHeaderRenderer implements TableCellRenderer {
-    private final JCheckBox headerCheckbox;
+    private final JBCheckBox headerCheckbox;
 
-    public CheckboxHeaderRenderer(JCheckBox headerCheckbox) {
+    public CheckboxHeaderRenderer(JBCheckBox headerCheckbox) {
         this.headerCheckbox = headerCheckbox;
     }
 

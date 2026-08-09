@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
 import org.testin.notifications.Notifier;
@@ -92,8 +93,8 @@ public final class TestinPathPanel {
         }
     }
 
-    public JPanel getComponent() {
-        JPanel panel = new JPanel(new BorderLayout(5, 0));
+    public JBPanel<?> getComponent() {
+        JBPanel<?> panel = new JBPanel<>(new BorderLayout(5, 0));
         panel.add(pathField, BorderLayout.CENTER);
         panel.add(openFolderBtn, BorderLayout.EAST);
         return panel;

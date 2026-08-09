@@ -8,6 +8,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +41,7 @@ public class FailedResultDialog {
         bugPrioritySection.fillData(runItem);
         bugSeveritySection.fillData(runItem);
 
-        JPanel mainPanel = new JPanel(new BorderLayout()) {
+        JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
             public Dimension getPreferredSize() {
                 Dimension pref = super.getPreferredSize();
@@ -56,29 +57,29 @@ public class FailedResultDialog {
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 
-        JPanel contentPanel = new JPanel();
+        JBPanel<?> contentPanel = new JBPanel<>();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
         // Actual Result section
-        JPanel actualSlot = new JPanel(new BorderLayout());
+        JBPanel<?> actualSlot = new JBPanel<>(new BorderLayout());
         actualSlot.setOpaque(false);
         actualResultSection.showSection(actualSlot);
         contentPanel.add(actualSlot);
 
         // Bug Severity section
-        JPanel severitySlot = new JPanel(new BorderLayout());
+        JBPanel<?> severitySlot = new JBPanel<>(new BorderLayout());
         severitySlot.setOpaque(false);
         bugSeveritySection.showSection(severitySlot);
         contentPanel.add(severitySlot);
 
         // Bug Priority section
-        JPanel prioritySlot = new JPanel(new BorderLayout());
+        JBPanel<?> prioritySlot = new JBPanel<>(new BorderLayout());
         prioritySlot.setOpaque(false);
         bugPrioritySection.showSection(prioritySlot);
         contentPanel.add(prioritySlot);
 
-        JPanel anchorPanel = new JPanel(new BorderLayout());
+        JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
 

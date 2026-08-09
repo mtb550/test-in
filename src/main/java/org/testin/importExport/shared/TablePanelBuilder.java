@@ -2,9 +2,11 @@ package org.testin.importExport.shared;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
 import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
@@ -22,7 +24,7 @@ import java.util.function.Consumer;
 
 public class TablePanelBuilder {
 
-    public String[] buildColumnNames(List<TestEditorAttributes> attributes) {
+    public String[] buildColumnNames(final @NotNull List<TestEditorAttributes> attributes) {
         List<String> columnNames = new ArrayList<>();
         columnNames.add("");
         columnNames.add("#");
@@ -32,7 +34,7 @@ public class TablePanelBuilder {
         return columnNames.toArray(new String[0]);
     }
 
-    public DefaultTableModel createModel(Project p, List<TestEditorAttributes> importAttributes, List<TestCaseDto> testCases) {
+    public DefaultTableModel createModel(final @NotNull Project p, List<TestEditorAttributes> importAttributes, final @NotNull List<TestCaseDto> testCases) {
         String[] columns = buildColumnNames(importAttributes);
         DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
@@ -60,15 +62,15 @@ public class TablePanelBuilder {
         return model;
     }
 
-    public JBTable buildTable(DefaultTableModel model, Project p) {
+    public JBTable buildTable(final @NotNull DefaultTableModel model, final @NotNull Project p) {
         JBTable table = new JBTable(model);
         table.setFillsViewportHeight(true);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
         TableColumn importColumn = table.getColumnModel().getColumn(0);
 
-        JCheckBox headerCheckbox = new JCheckBox();
+        JBCheckBox headerCheckbox = new JBCheckBox();
         headerCheckbox.setSelected(true);
         headerCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
         headerCheckbox.setToolTipText("Select All / Deselect All");
@@ -98,7 +100,7 @@ public class TablePanelBuilder {
         return table;
     }
 
-    public void autoSizeColumns(JBTable table) {
+    public void autoSizeColumns(final @NotNull JBTable table) {
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
             TableColumn col = table.getColumnModel().getColumn(i);
@@ -132,7 +134,7 @@ public class TablePanelBuilder {
         ));
     }
 
-    public JBTabbedPane createTabbedPane(Map<String, List<TestCaseDto>> sheetsData, List<TestEditorAttributes> attributes, Project p, Consumer<DefaultTableModel> modelCustomizer) {
+    public JBTabbedPane createTabbedPane(final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull List<TestEditorAttributes> attributes, final @NotNull Project p, final @NotNull Consumer<DefaultTableModel> modelCustomizer) {
         JBTabbedPane tabbedPane = new JBTabbedPane();
 
         for (Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {

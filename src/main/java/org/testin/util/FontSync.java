@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.Dialogs.ZoomIndicatorDialog;
@@ -106,7 +107,7 @@ public class FontSync {
             if (currentFont != null && currentFont.getSize2D() != newSize) {
                 float delta = newSize - currentFont.getSize2D();
                 component.setFont(currentFont.deriveFont(newSize));
-                if (component instanceof JList) {
+                if (component instanceof JBList) {
                     component.updateUI();
                 } else if (component instanceof JBTable table) {
                     GridPanelBuilder.resizeToFont(table);

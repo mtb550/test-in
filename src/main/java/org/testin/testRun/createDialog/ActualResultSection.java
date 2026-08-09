@@ -2,6 +2,7 @@ package org.testin.testRun.createDialog;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
@@ -19,7 +20,7 @@ public class ActualResultSection implements RunItemEditSection {
 
     @Getter
     private final JBTextField actualResultField;
-    private final JPanel wrapper;
+    private final JBPanel<?> wrapper;
     private final JBLabel descriptionLabel;
     private final JBLabel expectedResultLabel;
 
@@ -37,13 +38,13 @@ public class ActualResultSection implements RunItemEditSection {
         this.wrapper = buildPanel();
     }
 
-    private JPanel buildPanel() {
-        JPanel panel = new JPanel();
+    private JBPanel<?> buildPanel() {
+        JBPanel<?> panel = new JBPanel<>();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
 
         // Description row — same pattern as ExpectedResultSection
-        JPanel descRow = new JPanel(new BorderLayout());
+        JBPanel<?> descRow = new JBPanel<>(new BorderLayout());
         descRow.setOpaque(false);
         descRow.add(createIconPanel(AllIcons.Actions.Edit), BorderLayout.WEST);
         descRow.add(descriptionLabel, BorderLayout.CENTER);
@@ -51,7 +52,7 @@ public class ActualResultSection implements RunItemEditSection {
         panel.add(descRow);
 
         // Expected Result row — same pattern as ExpectedResultSection
-        JPanel expRow = new JPanel(new BorderLayout());
+        JBPanel<?> expRow = new JBPanel<>(new BorderLayout());
         expRow.setOpaque(false);
         expRow.add(createIconPanel(AllIcons.General.InspectionsOK), BorderLayout.WEST);
         expRow.add(expectedResultLabel, BorderLayout.CENTER);
@@ -59,7 +60,7 @@ public class ActualResultSection implements RunItemEditSection {
         panel.add(expRow);
 
         // Actual Result row — same pattern as ExpectedResultSection
-        JPanel actRow = new JPanel(new BorderLayout());
+        JBPanel<?> actRow = new JBPanel<>(new BorderLayout());
         actRow.setOpaque(false);
         actRow.add(createIconPanel(AllIcons.Actions.Copy), BorderLayout.WEST);
         actRow.add(actualResultField, BorderLayout.CENTER);
@@ -70,12 +71,12 @@ public class ActualResultSection implements RunItemEditSection {
     }
 
     @Override
-    public JPanel getWrapper() {
+    public JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JPanel contentPanel) {
+    public void showSection(final JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         actualResultField.requestFocus();

@@ -4,6 +4,7 @@ import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationAction;
 import com.intellij.notification.NotificationGroupManager;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.MessageType;
@@ -27,7 +28,7 @@ public final class Notifier {
 
     public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
 
-        SwingUtilities.invokeLater(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> {
             IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(p);
             if (ideFrame == null || ideFrame.getStatusBar() == null) return;
 
@@ -51,7 +52,7 @@ public final class Notifier {
 
     public void softShow(final @NotNull Project p, final @NotNull String message) {
 
-        SwingUtilities.invokeLater(() -> {
+        ApplicationManager.getApplication().invokeLater(() -> {
             IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(p);
             if (ideFrame == null || ideFrame.getStatusBar() == null) return;
 

@@ -3,6 +3,7 @@ package org.testin.testCase.createDialog;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
@@ -22,7 +23,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
     private final TextFieldWithAutoCompletion<String> descriptionField;
-    private final JPanel wrapper;
+    private final JBPanel<?> wrapper;
 
     public DescriptionSection(final @NotNull Project p) {
         this.descriptionField = new TextFieldWithAutoCompletion<>(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
@@ -31,7 +32,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
         this.descriptionField.setShowPlaceholderWhenFocused(true);
         this.descriptionField.setBorder(JBUI.Borders.empty(10));
 
-        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper = new JBPanel<>(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(CreateTestCaseFields.DESCRIPTION.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.descriptionField, BorderLayout.CENTER);
@@ -48,12 +49,12 @@ public class DescriptionSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JPanel getWrapper() {
+    public JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JPanel contentPanel) {
+    public void showSection(final JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         descriptionField.requestFocus();
@@ -66,7 +67,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseDescription.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();

@@ -9,6 +9,7 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -75,7 +76,7 @@ public final class SettingsConfigurable implements Configurable {
                 .addLabeledComponent(new JBLabel("Tester role: "), testerRoleField, 1, false)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel("Default download folder: "), downloadFolderField, 1, false)
-                .addComponentFillVertically(new JPanel(), 0)
+                .addComponentFillVertically(new JBPanel<>(), 0)
                 .getPanel();
     }
 

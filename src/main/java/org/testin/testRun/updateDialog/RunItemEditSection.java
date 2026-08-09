@@ -1,5 +1,7 @@
 package org.testin.testRun.updateDialog;
 
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.TestRunItems;
@@ -9,9 +11,9 @@ import java.awt.*;
 
 public interface RunItemEditSection {
 
-    JPanel getWrapper();
+    JBPanel<?> getWrapper();
 
-    void showSection(final JPanel contentPanel);
+    void showSection(final JBPanel<?> contentPanel);
 
     void fillData(final @NotNull TestRunItems runItem);
 
@@ -19,10 +21,10 @@ public interface RunItemEditSection {
 
     JComponent getFocusComponent();
 
-    default JPanel createIconPanel(final Icon icon) {
-        JPanel iconPanel = new JPanel(new GridBagLayout());
+    default JBPanel<?> createIconPanel(final Icon icon) {
+        JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());
         iconPanel.setOpaque(false);
-        JLabel iconLabel = new JLabel(icon);
+        JBLabel iconLabel = new JBLabel(icon);
         iconLabel.setBorder(JBUI.Borders.empty(0, 10, 0, 8));
         iconPanel.add(iconLabel);
         return iconPanel;

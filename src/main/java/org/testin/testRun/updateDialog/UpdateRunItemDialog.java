@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
@@ -69,7 +70,7 @@ public class UpdateRunItemDialog {
 
         allSections.forEach(s -> s.fillData(runItem));
 
-        JPanel mainPanel = new JPanel(new BorderLayout()) {
+        JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
             public Dimension getPreferredSize() {
                 Dimension pref = super.getPreferredSize();
@@ -85,12 +86,12 @@ public class UpdateRunItemDialog {
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 
-        JPanel contentPanel = new JPanel();
+        JBPanel<?> contentPanel = new JBPanel<>();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
         for (RunItemEditSection section : allSections) {
-            JPanel slot = new JPanel(new BorderLayout());
+            JBPanel<?> slot = new JBPanel<>(new BorderLayout());
             slot.setOpaque(false);
 
             boolean isTarget = (section == targetSection);
@@ -101,7 +102,7 @@ public class UpdateRunItemDialog {
             }
         }
 
-        JPanel anchorPanel = new JPanel(new BorderLayout());
+        JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
 

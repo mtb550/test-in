@@ -1,6 +1,8 @@
 package org.testin.testCase.createDialog;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.components.JBCheckBox;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.testin.enums.CreateTestCaseFields;
@@ -17,12 +19,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GroupSection implements ICreateTestCaseSection {
-    private final JPanel group;
-    private final JPanel wrapper;
+    private final JBPanel<?> group;
+    private final JBPanel<?> wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 1f);
 
     public GroupSection() {
-        this.group = new JPanel(new FlowLayout(FlowLayout.LEFT, JBUI.scale(4), JBUI.scale(4)));
+        this.group = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(4), JBUI.scale(4)));
         this.group.setOpaque(false);
 
         Arrays.stream(Group.values())
@@ -34,7 +36,7 @@ public class GroupSection implements ICreateTestCaseSection {
                 })
                 .forEach(this.group::add);
 
-        this.wrapper = new JPanel(new BorderLayout());
+        this.wrapper = new JBPanel<>(new BorderLayout());
         this.wrapper.setOpaque(false);
         this.wrapper.add(createIconPanel(CreateTestCaseFields.GROUP.getIcon()), BorderLayout.WEST);
         this.wrapper.add(this.group, BorderLayout.CENTER);
@@ -42,12 +44,12 @@ public class GroupSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JPanel getWrapper() {
+    public JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JPanel contentPanel) {
+    public void showSection(final JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         focusFirstCheckbox();
@@ -56,7 +58,7 @@ public class GroupSection implements ICreateTestCaseSection {
     private void focusFirstCheckbox() {
         for (Component c : group.getComponents()) {
             if (c instanceof JBCheckBox cb) {
-                SwingUtilities.invokeLater(cb::requestFocusInWindow);
+                ApplicationManager.getApplication().invokeLater(cb::requestFocusInWindow);
                 return;
             }
         }
@@ -76,7 +78,7 @@ public class GroupSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JPanel slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
         base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseGroup.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
