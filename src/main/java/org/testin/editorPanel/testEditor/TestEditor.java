@@ -45,6 +45,8 @@ import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.nio.file.Path;
@@ -88,6 +90,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final List<TestCaseDto> currentTestCases;
 
     private JBTable gridTable;
+    private boolean gridUpdating;
 
     private JBScrollPane gridScrollPane;
 
@@ -445,6 +448,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         try {
             gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes);
             FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
+            attachGridEditListener(gridTable, pageItems);
 
             gridTable.getSelectionModel().addListSelectionListener(e -> {
                 if (e.getValueIsAdjusting()) return;
@@ -459,6 +463,28 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }
+    }
+
+    private void attachGridEditListener(final JBTable table, final List<TestCaseDto> pageItems) {
+        final List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
+        table.getModel().addTableModelListener(e -> {
+            if (gridUpdating) return;
+            if (e.getType() != TableModelEvent.UPDATE) return;
+            final int row = e.getFirstRow();
+            final int col = e.getColumn();
+            if (row < 0 || col <= 0) return;
+            gridUpdating = true;
+            try {
+                final DefaultTableModel gridModel = (DefaultTableModel) e.getSource();
+                final TestEditorAttributes attr = ordered.get(col - 1);
+                final TestCaseDto tc = pageItems.get(row);
+                attr.getImportSetter().execute(p, tc, String.valueOf(gridModel.getValueAt(row, col)));
+                gridModel.setValueAt(attr.getTestValueExtractor().execute(tc, p), row, col);
+                model.allContentsChanged();
+            } finally {
+                gridUpdating = false;
+            }
+        });
     }
 
     private void setCenter(final JComponent component) {

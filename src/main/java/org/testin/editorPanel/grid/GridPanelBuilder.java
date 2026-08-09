@@ -40,7 +40,7 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final JBTable table = buildTable(columns, rows);
+        final JBTable table = buildTable(columns, rows, false);
         applyColumnVisibility(table, ordered, RunEditorAttributes::getName, attributes);
         return table;
     }
@@ -63,7 +63,7 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final JBTable table = buildTable(columns, rows);
+        final JBTable table = buildTable(columns, rows, true);
         applyColumnVisibility(table, ordered, TestEditorAttributes::getName, attributes);
         return table;
     }
@@ -98,11 +98,11 @@ public class GridPanelBuilder {
         return columns.toArray(new String[0]);
     }
 
-    private JBTable buildTable(final String[] columns, final List<String[]> rows) {
+    private JBTable buildTable(final String[] columns, final List<String[]> rows, final boolean editable) {
         final DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(final int row, final int column) {
-                return false;
+                return editable && column > 0;
             }
         };
 
@@ -114,6 +114,7 @@ public class GridPanelBuilder {
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
         return table;
     }
