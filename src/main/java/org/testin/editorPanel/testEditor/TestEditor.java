@@ -69,19 +69,29 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final JBScrollPane scrollPane;
     private final ModelSyncListener syncListener;
+
     @Getter
+    @NotNull
     private final AbstractToolbarPanel toolBar;
+
     @Getter
     private final StatusBar statusBar;
+
     @Getter
     private final List<TestCaseDto> allTestCases;
+
     @Getter
     private final Set<UUID> unsortedIds;
+
     @Getter
     private final List<TestCaseDto> currentTestCases;
+
     private JBTable gridTable;
+
     private JBScrollPane gridScrollPane;
+
     private JComponent currentCenter;
+
     @Getter
     @Setter
     private int currentPage = 1;
@@ -332,20 +342,20 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarSwitchedToListView() {
-        Logger.debug("[switch] -> LIST view, currentView=" + (toolBar != null ? toolBar.getCurrentView() : "null"));
+        Logger.debug("[switch] -> LIST view, currentView=" + toolBar.getCurrentView());
         setCenter(scrollPane);
     }
 
     @Override
     public void onToolBarSwitchedToGridView() {
-        Logger.debug("[switch] -> GRID view, currentView=" + (toolBar != null ? toolBar.getCurrentView() : "null"));
+        Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
         rebuildGrid();
         setCenter(gridScrollPane);
     }
 
     @Override
     public void onToolBarRefreshButtonClicked() {
-        Logger.debug("[refresh] clicked, currentView=" + (toolBar != null ? toolBar.getCurrentView() : "null"));
+        Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
         FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null) {
             toolBarFilter.resetToolBarFilter();
@@ -369,11 +379,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Override
     public Set<TestEditorAttributes> getSelectedDetails() {
         AbstractToolbarPanel baseToolBar = getToolBar();
-        if (baseToolBar != null) {
-            TestDetailsPopupBtn popup = baseToolBar.getToolbarItem(TestDetailsPopupBtn.class);
-            if (popup != null) {
-                return popup.getSelectedDetails();
-            }
+        TestDetailsPopupBtn popup = baseToolBar.getToolbarItem(TestDetailsPopupBtn.class);
+        if (popup != null) {
+            return popup.getSelectedDetails();
         }
         return Collections.emptySet();
     }
@@ -402,7 +410,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         statusBar.updatePaginationState(currentPage, totalPages, totalItems);
 
-        if (toolBar != null && toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
+        if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
             setCenter(gridScrollPane);
@@ -484,13 +492,11 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     private List<TestCaseDto> getFilteredList() {
-        final String query = (toolBar != null && toolBar.getSearchTxt() != null)
+        final String query = toolBar.getSearchTxt() != null
                 ? toolBar.getSearchTxt().getSearchQuery() : "";
 
-        FilterPopupBtn filterPopup = null;
-        if (toolBar != null) {
-            filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
-        }
+        FilterPopupBtn filterPopup;
+        filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
 
         final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
         final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
@@ -519,8 +525,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         for (MouseListener listener : list.getMouseListeners())
             list.removeMouseListener(listener);
 
-        if (toolBar != null)
-            toolBar.dispose();
+        toolBar.dispose();
 
         TestCaseDto selectedInThisFile = list.getSelectedValue();
 
