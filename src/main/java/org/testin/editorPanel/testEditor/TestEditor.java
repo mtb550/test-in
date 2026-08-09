@@ -68,26 +68,20 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final JBScrollPane scrollPane;
-    private JBTable gridTable;
-    private JBScrollPane gridScrollPane;
-
     private final ModelSyncListener syncListener;
-
     @Getter
     private final AbstractToolbarPanel toolBar;
-
     @Getter
     private final StatusBar statusBar;
-
     @Getter
     private final List<TestCaseDto> allTestCases;
-
     @Getter
     private final Set<UUID> unsortedIds;
-
     @Getter
     private final List<TestCaseDto> currentTestCases;
-
+    private JBTable gridTable;
+    private JBScrollPane gridScrollPane;
+    private JComponent currentCenter;
     @Getter
     @Setter
     private int currentPage = 1;
@@ -159,6 +153,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         cm.registerShortcuts(list, cm);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
+        currentCenter = scrollPane;
 
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
@@ -337,17 +332,20 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarSwitchedToListView() {
+        Logger.debug("[switch] -> LIST view, currentView=" + (toolBar != null ? toolBar.getCurrentView() : "null"));
         setCenter(scrollPane);
     }
 
     @Override
     public void onToolBarSwitchedToGridView() {
+        Logger.debug("[switch] -> GRID view, currentView=" + (toolBar != null ? toolBar.getCurrentView() : "null"));
         rebuildGrid();
         setCenter(gridScrollPane);
     }
 
     @Override
     public void onToolBarRefreshButtonClicked() {
+        Logger.debug("[refresh] clicked, currentView=" + (toolBar != null ? toolBar.getCurrentView() : "null"));
         FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null) {
             toolBarFilter.resetToolBarFilter();
@@ -405,6 +403,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         statusBar.updatePaginationState(currentPage, totalPages, totalItems);
 
         if (toolBar != null && toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
+            Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
             setCenter(gridScrollPane);
         }
@@ -422,26 +421,33 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private void rebuildGrid() {
         final List<TestCaseDto> pageItems = getCurrentPageItems();
         final Set<TestEditorAttributes> attributes = getSelectedDetails();
+        Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
+        try {
+            gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes);
 
-        gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes);
+            gridTable.getSelectionModel().addListSelectionListener(e -> {
+                if (e.getValueIsAdjusting()) return;
+                final int row = gridTable.getSelectedRow();
+                if (row >= 0 && row < pageItems.size()) {
+                    selectTestCase(pageItems.get(row));
+                }
+            });
 
-        gridTable.getSelectionModel().addListSelectionListener(e -> {
-            if (e.getValueIsAdjusting()) return;
-            final int row = gridTable.getSelectedRow();
-            if (row >= 0 && row < pageItems.size()) {
-                selectTestCase(pageItems.get(row));
-            }
-        });
-
-        gridScrollPane = new JBScrollPane(gridTable);
+            gridScrollPane = new JBScrollPane(gridTable);
+            Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());
+        } catch (final Exception ex) {
+            Logger.error("[grid] rebuildGrid FAILED: " + ex);
+        }
     }
 
     private void setCenter(final JComponent component) {
-        mainPanel.remove(scrollPane);
-        if (gridScrollPane != null) {
-            mainPanel.remove(gridScrollPane);
+        Logger.debug("[center] setCenter -> " + component.getClass().getSimpleName()
+                + " (had center=" + (currentCenter != null) + ")");
+        if (currentCenter != null) {
+            mainPanel.remove(currentCenter);
         }
         mainPanel.add(component, BorderLayout.CENTER);
+        currentCenter = component;
         mainPanel.revalidate();
         mainPanel.repaint();
     }

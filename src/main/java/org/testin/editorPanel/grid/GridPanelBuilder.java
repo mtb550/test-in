@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
 import org.testin.enums.RunEditorAttributes;
 import org.testin.enums.TestEditorAttributes;
+import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 
@@ -18,6 +19,7 @@ import java.util.List;
 public class GridPanelBuilder {
 
     public JBTable buildRunTable(final Project p, final List<TestCaseDto> testCases, final Set<RunEditorAttributes> attributes, final Map<UUID, TestRunItems> resultsMap) {
+        Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values())
                 .filter(attributes::contains)
                 .toList();
@@ -43,6 +45,7 @@ public class GridPanelBuilder {
     }
 
     public JBTable buildTestTable(final Project p, final List<TestCaseDto> testCases, final Set<TestEditorAttributes> attributes) {
+        Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values())
                 .filter(attributes::contains)
                 .toList();
