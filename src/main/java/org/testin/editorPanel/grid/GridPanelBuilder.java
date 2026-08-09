@@ -9,11 +9,7 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;

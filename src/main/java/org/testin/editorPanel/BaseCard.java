@@ -56,11 +56,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    /**
-     * Adds a status badge (JBLabel with run-status icon) to the badge panel.
-     * The badge shows the current tempStatus (RUNNING/PASSED/FAILED).
-     * Call this from subclasses in updateData() after clearing badges.
-     */
     protected void addStatusBadge(final JBLabel statusLabel) {
         if (statusLabel != null) {
             badgePanel.add(statusLabel);

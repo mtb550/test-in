@@ -296,6 +296,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         final VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(parent.getPath().toFile());
         if (vDir != null) vDir.refresh(false, true);
 
+        refreshView();
         selectTestCase(tc);
     }
 
@@ -458,7 +459,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
 
             gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
-            gridTable.getModel().addTableModelListener(new GridEditListener(p, pageItems, () -> model.allContentsChanged()));
+            gridTable.getModel().addTableModelListener(new GridEditListener(p, pageItems, model::allContentsChanged));
             gridTable.addMouseListener(new GridContextMenuListener(gridTable, list, contextMenu, pageItems));
 
             gridScrollPane = new JBScrollPane(gridTable);

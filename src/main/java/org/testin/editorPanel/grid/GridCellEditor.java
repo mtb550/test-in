@@ -5,9 +5,6 @@ import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.util.EventObject;
 
-/**
- * Grid cell editor that word-wraps text so editing in a narrow column stays readable.
- */
 public class GridCellEditor extends AbstractCellEditor implements TableCellEditor {
 
     private final JTextArea textArea = new JTextArea();

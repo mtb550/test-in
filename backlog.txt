@@ -193,8 +193,13 @@ add separate grid view button. (20% Done)
 fix all todo comments.
 why archived test projects not shown?
 remove call rebuildGrid(). just repaint
+
+grid view changes:
+make columns in grid view auto resizable until specific limit and put max value that once reached then use wordwrap
 add cell padding in grid view (one value padding for all 4 areas)
 make cell not top left, make it middle left.
+
+
 
 usage   java swing api      IntelliJ SDK equivalence    api            notes
 -------------------------------------------------------------------------------------
@@ -214,7 +219,7 @@ usage   java swing api      IntelliJ SDK equivalence    api            notes
   0     JOptionPane         Messages                    (com.intellij.openapi.ui)           none used
   0     JCheckBox           JBCheckBox                  (com.intellij.ui.components)        converted
 
-
+-- to be checked all are resolved later.
 a. Update the table above (the usage table in backlog.txt) with current numbers. DONE
 b. Make font same in view and editor.
 c. Implement + button in test editor. DONE

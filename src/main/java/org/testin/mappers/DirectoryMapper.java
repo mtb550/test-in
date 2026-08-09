@@ -245,11 +245,6 @@ public final class DirectoryMapper {
         }
     }
 
-    /**
-     * Reads a marker file, falling back to a default marker when the file is
-     * missing or empty/corrupt, so a single bad marker can never kill the scan
-     * of a whole project or run. Markers are optional metadata.
-     */
     private <M> M readMarkerSafe(final @NotNull Mapper mapper, final @NotNull File file, final @NotNull Class<M> type, final String kind, final String name) {
         try {
             return mapper.readValue(file, type);
