@@ -189,7 +189,7 @@ reduce arrow padding &
 * make one project each automation project. then update indexer
 
 apply tree async model.
-add separate grid view button.
+add separate grid view button. (20% Done)
 fix all todo comments.
 why archived test projects not shown?
 

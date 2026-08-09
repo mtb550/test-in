@@ -5,6 +5,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.toolBar.components.GridViewBtn;
 import org.testin.editorPanel.toolBar.components.IToolbarItem;
 import org.testin.editorPanel.toolBar.components.ListViewBtn;
@@ -69,9 +70,8 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     }
 
     private void wireViewButtons() {
-        final GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
-        final ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
-        if (gridBtn == null || listBtn == null) return;
+        final @NotNull GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
+        final @NotNull ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
 
         gridBtn.addActionListener(e -> setView(ViewMode.GRID_VIEW));
         listBtn.addActionListener(e -> setView(ViewMode.LIST_VIEW));
@@ -79,19 +79,19 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         updateViewButtons();
     }
 
-    private void setView(final ViewMode view) {
+    private void setView(final @NotNull ViewMode view) {
         if (currentView == view) return;
         currentView = view;
         updateViewButtons();
     }
 
     private void updateViewButtons() {
-        final GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
-        final ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
-        if (gridBtn == null || listBtn == null) return;
+        final @NotNull GridViewBtn gridBtn = getToolbarItem(GridViewBtn.class);
+        final @NotNull ListViewBtn listBtn = getToolbarItem(ListViewBtn.class);
 
         gridBtn.setVisible(currentView == ViewMode.LIST_VIEW);
         listBtn.setVisible(currentView == ViewMode.GRID_VIEW);
+
         revalidate();
         repaint();
     }
