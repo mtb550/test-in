@@ -1,6 +1,8 @@
 package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
@@ -47,6 +49,8 @@ import org.testin.util.FontSync;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -87,6 +91,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private CollectionListModel<TestCaseDto> model;
 
     private JBTable gridTable;
+    private RunEditorContextMenu contextMenu;
 
     private JBScrollPane gridScrollPane;
 
@@ -159,14 +164,14 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         list.setCellRenderer(new RunListRenderer(p, this));
 
-        final RunEditorContextMenu cm = new RunEditorContextMenu(p, this, parent, list);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, cm);
+        this.contextMenu = new RunEditorContextMenu(p, this, parent, list);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, this.contextMenu);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
         list.addMouseMotionListener(mouseListenerImpl);
 
-        cm.registerShortcuts(list, cm);
+        this.contextMenu.registerShortcuts(list, this.contextMenu);
 
         ArrayList<String> selectionPath = parent.getPath2();
         list.addListSelectionListener(new SelectionListener(p, list, this, selectionPath));
@@ -403,6 +408,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         try {
             gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap);
             FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
+            attachGridContextMenu(gridTable, pageItems);
 
             gridTable.getSelectionModel().addListSelectionListener(e -> {
                 if (e.getValueIsAdjusting()) return;
@@ -417,6 +423,21 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }
+    }
+
+    private void attachGridContextMenu(final JBTable table, final List<TestCaseDto> pageItems) {
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (!SwingUtilities.isRightMouseButton(e)) return;
+                final int row = table.rowAtPoint(e.getPoint());
+                if (row < 0 || row >= pageItems.size()) return;
+                list.setSelectedIndex(row);
+                ActionManager.getInstance()
+                        .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, contextMenu)
+                        .getComponent().show(e.getComponent(), e.getX(), e.getY());
+            }
+        });
     }
 
     private void setCenter(final JComponent component) {

@@ -2,6 +2,8 @@ package org.testin.editorPanel.testEditor;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
@@ -48,6 +50,8 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.nio.file.Path;
 import java.util.*;
@@ -67,6 +71,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final @NotNull JBList<TestCaseDto> list;
 
     private final CollectionListModel<TestCaseDto> model;
+    private final TestEditorContextMenu contextMenu;
 
     private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final JBScrollPane scrollPane;
@@ -156,8 +161,8 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.syncListener.setOnUpdateCallback(this::onDataSynced);
         this.model.addListDataListener(syncListener);
 
-        final TestEditorContextMenu cm = new TestEditorContextMenu(p, this, parent, list, model);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, cm);
+        this.contextMenu = new TestEditorContextMenu(p, this, parent, list, model);
+        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, this.contextMenu);
 
         list.addMouseListener(mouseListenerImpl);
         list.addMouseWheelListener(mouseListenerImpl);
@@ -166,7 +171,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.setTransferHandler(new TransferListener(this));
         list.setCellRenderer(new TestListRenderer(p, this));
 
-        cm.registerShortcuts(list, cm);
+        this.contextMenu.registerShortcuts(list, this.contextMenu);
         mainPanel.add(scrollPane, BorderLayout.CENTER);
         currentCenter = scrollPane;
 
@@ -449,6 +454,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes);
             FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
             attachGridEditListener(gridTable, pageItems);
+            attachGridContextMenu(gridTable, pageItems);
 
             gridTable.getSelectionModel().addListSelectionListener(e -> {
                 if (e.getValueIsAdjusting()) return;
@@ -483,6 +489,21 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
                 model.allContentsChanged();
             } finally {
                 gridUpdating = false;
+            }
+        });
+    }
+
+    private void attachGridContextMenu(final JBTable table, final List<TestCaseDto> pageItems) {
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                if (!SwingUtilities.isRightMouseButton(e)) return;
+                final int row = table.rowAtPoint(e.getPoint());
+                if (row < 0 || row >= pageItems.size()) return;
+                list.setSelectedIndex(row);
+                ActionManager.getInstance()
+                        .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, contextMenu)
+                        .getComponent().show(e.getComponent(), e.getX(), e.getY());
             }
         });
     }
