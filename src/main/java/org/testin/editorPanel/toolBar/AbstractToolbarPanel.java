@@ -10,7 +10,6 @@ import org.testin.editorPanel.toolBar.components.IToolbarItem;
 import org.testin.editorPanel.toolBar.components.ListViewBtn;
 import org.testin.editorPanel.toolBar.components.SearchTxt;
 import org.testin.enums.ViewMode;
-import org.testin.enums.ViewMode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,7 +30,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
     @Getter
     private ViewMode currentView = ViewMode.LIST_VIEW;
-    
+
     public AbstractToolbarPanel(final IToolBar callbacks) {
         super(new GridBagLayout());
         this.callbacks = callbacks;

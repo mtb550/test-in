@@ -23,8 +23,8 @@ public class RunToolBar extends AbstractToolbarPanel {
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
                 new RunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
                 new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules),
-                new ListViewBtn(getCallbacks()::onToolBarSwitchToListView),
-                new GridViewBtn(getCallbacks()::onToolBarSwitchToGridView)
+                new ListViewBtn(getCallbacks()::onToolBarSwitchedToListView),
+                new GridViewBtn(getCallbacks()::onToolBarSwitchedToGridView)
                 // todo, why tool bar search not here ?
         );
     }

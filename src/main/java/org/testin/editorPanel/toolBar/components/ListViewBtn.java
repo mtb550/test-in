@@ -5,7 +5,7 @@ import com.intellij.icons.AllIcons;
 public class ListViewBtn extends AbstractButton implements IToolbarItem {
 
     public ListViewBtn(final Runnable onSwitchToList) {
-        super("Switch to List View", AllIcons.Actions.ListFiles);
+        super("List View", AllIcons.Actions.ListFiles);
 
         addActionListener(e -> onSwitchToList.run());
         // TODO: switch editor to list view
