@@ -137,6 +137,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
+        list.setExpandableItemsEnabled(false);
 
         FontSync.syncWithNativeEditor(p, list, projectDisposable);
 
@@ -318,7 +319,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarCreateTestCaseClicked() {
-        new CreateTestCaseAction(p, this, parent, list);
+        new CreateTestCaseAction(p, this, parent, list).openCreateDialog();
     }
 
     @Override

@@ -27,11 +27,11 @@ public abstract class BaseDetails {
     final int VALUE_INSETS_RIGHT = 16;
 
     protected float getLabelFontSize() {
-        return FontSync.getBaseFontSize() + 5.0f; // Roughly 20.0f default
+        return FontSync.getBaseFontSize();
     }
 
     protected float getValueFontSize() {
-        return FontSync.getBaseFontSize() + 8.0f; // Roughly 23.0f default
+        return FontSync.getBaseFontSize();
     }
 
     public abstract int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);

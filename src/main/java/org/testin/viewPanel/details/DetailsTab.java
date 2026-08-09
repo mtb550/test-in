@@ -77,7 +77,7 @@ public class DetailsTab {
         panel.setBorder(JBUI.Borders.empty(25, 16, 0, 0));
         final JBLabel placeholder = new JBLabel(PLACEHOLDER_TEXT);
         placeholder.setForeground(JBColor.GRAY);
-        placeholder.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize() + 5.0f));
+        placeholder.setFont(JBFont.label().deriveFont(FontSync.getBaseFontSize()));
         panel.add(placeholder, BorderLayout.NORTH);
     }
 

@@ -9,6 +9,7 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -23,7 +24,72 @@ public class GridPanelBuilder {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
         table.setRowHeight(Math.max(fm.getHeight() + 4, 20));
         autoSizeColumns(table);
+        updateRowHeights(table);
     }
+
+    private static TableCellRenderer wrappingRenderer() {
+        return new DefaultTableCellRenderer() {
+            private final JTextArea textArea = new JTextArea();
+
+            {
+                textArea.setLineWrap(true);
+                textArea.setWrapStyleWord(true);
+                textArea.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+            }
+
+            @Override
+            public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+                textArea.setText(value == null ? "" : value.toString());
+                textArea.setFont(table.getFont());
+                textArea.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
+                textArea.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                // size the area to the column width so text wraps at the current column size
+                final int width = table.getColumnModel().getColumn(column).getWidth();
+                textArea.setSize(new Dimension(width, Short.MAX_VALUE));
+                return textArea;
+            }
+        };
+    }
+
+    private static void updateRowHeights(final JBTable table) {
+        if (table.getRowCount() == 0) return;
+        final int baseHeight = table.getRowHeight();
+        for (int r = 0; r < table.getRowCount(); r++) {
+            int maxHeight = baseHeight;
+            for (int c = 0; c < table.getColumnCount(); c++) {
+                final Component comp = table.prepareRenderer(table.getCellRenderer(r, c), r, c);
+                maxHeight = Math.max(maxHeight, comp.getPreferredSize().height);
+            }
+            table.setRowHeight(r, maxHeight);
+        }
+    }
+
+    private static void addColumnResizeListener(final JBTable table) {
+        table.getColumnModel().addColumnModelListener(new javax.swing.event.TableColumnModelListener() {
+            @Override
+            public void columnMarginChanged(final javax.swing.event.ChangeEvent e) {
+                updateRowHeights(table);
+            }
+
+            @Override
+            public void columnAdded(final javax.swing.event.TableColumnModelEvent e) {
+            }
+
+            @Override
+            public void columnRemoved(final javax.swing.event.TableColumnModelEvent e) {
+            }
+
+            @Override
+            public void columnMoved(final javax.swing.event.TableColumnModelEvent e) {
+                updateRowHeights(table);
+            }
+
+            @Override
+            public void columnSelectionChanged(final javax.swing.event.ListSelectionEvent e) {
+            }
+        });
+    }
+
 
     private static void autoSizeColumns(final JBTable table) {
         int tableTotalWidth = 0;
@@ -153,6 +219,8 @@ public class GridPanelBuilder {
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        table.setDefaultRenderer(Object.class, wrappingRenderer());
+        addColumnResizeListener(table);
         if (editable) {
             table.setDefaultEditor(Object.class, new GridCellEditor());
         }

@@ -39,7 +39,10 @@ public class CreateTestCaseAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        openCreateDialog();
+    }
 
+    public void openCreateDialog() {
         new CreateTestCaseDialog(p, tc -> {
             List<TestCaseDto> tcs = editor.getAllTestCases();
 

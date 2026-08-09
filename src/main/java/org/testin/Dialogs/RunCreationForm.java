@@ -9,7 +9,6 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ui.FormBuilder;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.tree.TreeUtil;
@@ -52,39 +51,57 @@ public class RunCreationForm {
     }
 
     private JBPanel<?> buildConfigurationPanel(final @NotNull String runName) {
-        final FormBuilder formBuilder = FormBuilder.createFormBuilder();
+        final JBPanel<?> configurationPanel = new JBPanel<>(new GridBagLayout());
+
+        final GridBagConstraints labelGbc = new GridBagConstraints();
+        labelGbc.gridx = 0;
+        labelGbc.anchor = GridBagConstraints.NORTHWEST;
+        labelGbc.insets = JBUI.insets(4, 4, 4, 10);
+
+        final GridBagConstraints fieldGbc = new GridBagConstraints();
+        fieldGbc.gridx = 1;
+        fieldGbc.weightx = 1.0;
+        fieldGbc.fill = GridBagConstraints.HORIZONTAL;
+        fieldGbc.anchor = GridBagConstraints.NORTHWEST;
+        fieldGbc.insets = JBUI.insets(4, 0, 4, 4);
 
         final JBTextField runNameField = new JBTextField(runName);
         runNameField.setEditable(false);
         runNameField.setEnabled(false);
-        formBuilder.addLabeledComponent("Test Run name:", runNameField);
+        addLabeledRow(configurationPanel, labelGbc, fieldGbc, 0, "Test Run name:", runNameField);
 
-        formBuilder.addLabeledComponent(TestRunConfiguration.CHANGE_LOG.getDisplayName(), descriptionField);
-        formBuilder.addLabeledComponent(TestRunConfiguration.COMMIT_ID.getDisplayName(), commitIdField);
+        addLabeledRow(configurationPanel, labelGbc, fieldGbc, 1, TestRunConfiguration.CHANGE_LOG.getDisplayName(), descriptionField);
+        addLabeledRow(configurationPanel, labelGbc, fieldGbc, 2, TestRunConfiguration.COMMIT_ID.getDisplayName(), commitIdField);
 
+        int row = 3;
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
             if (field.getOptions() != null) {
                 final ComboBox<String> comboBox = new ComboBox<>(field.getOptions());
-
                 comboBox.setEditable(true);
                 fieldMap.put(field, comboBox);
-                formBuilder.addLabeledComponent(new JBLabel(field.getDisplayName() + ":", field.getIcon(), SwingConstants.LEFT), comboBox);
+                addLabeledRow(configurationPanel, labelGbc, fieldGbc, row, field.getDisplayName(), comboBox);
+                row++;
             }
         }
 
-        final JPanel formPanel = formBuilder.getPanel();
-        final JBPanel<?> configurationPanel = new JBPanel<>(formPanel.getLayout());
-        while (formPanel.getComponentCount() > 0) {
-            final Component component = formPanel.getComponent(0);
-            formPanel.remove(component);
-            configurationPanel.add(component);
-        }
         configurationPanel.setBorder(JBUI.Borders.compound(
                 JBUI.Borders.customLine(UIUtil.getBoundsColor(), 0, 0, 1, 0),
                 JBUI.Borders.empty(10)
         ));
 
         return configurationPanel;
+    }
+
+    private void addLabeledRow(final JBPanel<?> panel, final GridBagConstraints labelGbc, final GridBagConstraints fieldGbc, final int row, final String label, final JComponent component) {
+        final GridBagConstraints lc = (GridBagConstraints) labelGbc.clone();
+        lc.gridy = row;
+        final JBLabel labelComp = new JBLabel(label);
+        labelComp.setVerticalAlignment(SwingConstants.TOP);
+        panel.add(labelComp, lc);
+
+        final GridBagConstraints fc = (GridBagConstraints) fieldGbc.clone();
+        fc.gridy = row;
+        panel.add(component, fc);
     }
 
     // todo, move to separate class

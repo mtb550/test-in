@@ -158,6 +158,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         ArrayList<String> selectionPath = parent.getPath2();
         list.addListSelectionListener(new SelectionListener(p, list, this, selectionPath));
 
+        list.setExpandableItemsEnabled(false);
         refreshView();
     }
 

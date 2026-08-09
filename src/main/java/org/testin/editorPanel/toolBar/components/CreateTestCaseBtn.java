@@ -11,7 +11,6 @@ public class CreateTestCaseBtn extends AbstractButton implements IToolbarItem {
         super(null, AllIcons.General.Add);
 
         new HelpTooltip()
-                // todo, deprecated
                 .setDescription(HtmlChunk.text("Create test case"))
                 .setShortcut(KeyboardSet.CreateTestCase.getShortcut())
                 .installOn(this);

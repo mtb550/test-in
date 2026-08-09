@@ -26,8 +26,8 @@ import java.time.ZonedDateTime;
 public class MarkerDetailsViewDialog {
     final @NotNull Project p;
     final int LABEL_WIDTH = 255;
-    final float LABEL_FONT_SIZE_OFFSET = 5.0f;
-    final float VALUE_FONT_SIZE_OFFSET = 8.0f;
+    final float LABEL_FONT_SIZE_OFFSET = 0.0f;
+    final float VALUE_FONT_SIZE_OFFSET = 0.0f;
     final int INSETS_TOP = 12;
     final int INSETS_LEFT = 16;
     final int INSETS_BOTTOM = 12;

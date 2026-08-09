@@ -24,12 +24,13 @@ import java.awt.event.MouseWheelEvent;
 public class FontSync {
 
     private static boolean isGlobalWatcherActive = false;
+    private static float lastBaseFontSize = getBaseFontSize();
 
     public static float getBaseFontSize() {
         return EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize();
     }
 
-    public static void syncWithNativeEditor(final @NotNull Project p, final JComponent component, final com.intellij.openapi.Disposable parentDisposable) {
+    public static void syncWithNativeEditor(final @NotNull Project p, final @NotNull JComponent component, final @NotNull Disposable parentDisposable) {
         updateComponentFontSize(component);
 
         ApplicationManager.getApplication().getMessageBus().connect(parentDisposable).subscribe(EditorColorsManager.TOPIC, (EditorColorsListener) scheme -> updateComponentFontSize(component));
@@ -44,7 +45,7 @@ public class FontSync {
         });
     }
 
-    private static void setupGlobalJavaEditorWatcher(final @NotNull Project p, final Disposable parentDisposable) {
+    private static void setupGlobalJavaEditorWatcher(final @NotNull Project p, final @NotNull Disposable parentDisposable) {
         if (isGlobalWatcherActive) return;
         isGlobalWatcherActive = true;
 
@@ -82,7 +83,7 @@ public class FontSync {
         }
     }
 
-    private static void zoomGlobalIdeEditors(final @NotNull Project p, final JComponent component, boolean zoomIn) {
+    private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
             float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), 8.0f, 72.0f);
@@ -100,27 +101,31 @@ public class FontSync {
         });
     }
 
-    private static void updateComponentFontSize(final JComponent component) {
-        float newSize = getBaseFontSize();
+    private static void updateComponentFontSize(final @NotNull JComponent component) {
+        final float newSize = getBaseFontSize();
         ApplicationManager.getApplication().invokeLater(() -> {
             Font currentFont = component.getFont();
-            if (currentFont != null && currentFont.getSize2D() != newSize) {
-                float delta = newSize - currentFont.getSize2D();
-                component.setFont(currentFont.deriveFont(newSize));
-                if (component instanceof JBList) {
-                    component.updateUI();
-                } else if (component instanceof JBTable table) {
-                    GridPanelBuilder.resizeToFont(table);
-                } else {
-                    applyDeltaRecursively(component, delta);
+            if (currentFont != null) {
+                float delta = newSize - lastBaseFontSize;
+                boolean rootNeedsUpdate = currentFont.getSize2D() != newSize;
+                if (delta != 0.0f || rootNeedsUpdate) {
+                    lastBaseFontSize = newSize;
+                    component.setFont(currentFont.deriveFont(newSize));
+                    if (component instanceof JBList) {
+                        component.updateUI();
+                    } else if (component instanceof JBTable table) {
+                        GridPanelBuilder.resizeToFont(table);
+                    } else {
+                        applyDeltaRecursively(component, delta);
+                    }
+                    component.revalidate();
+                    component.repaint();
                 }
-                component.revalidate();
-                component.repaint();
             }
         });
     }
 
-    private static void applyDeltaRecursively(final Container container, float delta) {
+    private static void applyDeltaRecursively(final @NotNull Container container, float delta) {
         for (Component child : container.getComponents()) {
             final Font f = child.getFont();
             if (f != null)
