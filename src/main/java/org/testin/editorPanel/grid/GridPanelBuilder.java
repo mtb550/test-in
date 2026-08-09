@@ -19,6 +19,44 @@ import java.util.List;
 
 public class GridPanelBuilder {
 
+    public static void resizeToFont(final JBTable table) {
+        final FontMetrics fm = table.getFontMetrics(table.getFont());
+        table.setRowHeight(Math.max(fm.getHeight() + 4, 20));
+        autoSizeColumns(table);
+    }
+
+    private static void autoSizeColumns(final JBTable table) {
+        int tableTotalWidth = 0;
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            final TableColumn col = table.getColumnModel().getColumn(i);
+            int maxWidth;
+
+            TableCellRenderer headerRenderer = col.getHeaderRenderer();
+            if (headerRenderer == null) {
+                headerRenderer = table.getTableHeader().getDefaultRenderer();
+            }
+            final Component headerComp = headerRenderer.getTableCellRendererComponent(
+                    table, col.getHeaderValue(), false, false, 0, i);
+            maxWidth = headerComp.getPreferredSize().width;
+
+            for (int r = 0; r < table.getRowCount(); r++) {
+                final TableCellRenderer renderer = table.getCellRenderer(r, i);
+                final Component comp = table.prepareRenderer(renderer, r, i);
+                maxWidth = Math.max(comp.getPreferredSize().width, maxWidth);
+            }
+
+            maxWidth += 20;
+            col.setPreferredWidth(maxWidth);
+            tableTotalWidth += maxWidth;
+        }
+
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        table.setPreferredScrollableViewportSize(new Dimension(
+                Math.min(tableTotalWidth, (int) (screenSize.width * 0.85)),
+                Math.min(table.getRowHeight() * Math.max(3, table.getRowCount()), (int) (screenSize.height * 0.70))
+        ));
+    }
+
     public JBTable buildRunTable(final Project p, final List<TestCaseDto> testCases, final Set<RunEditorAttributes> attributes, final Map<UUID, TestRunItems> resultsMap) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
@@ -117,43 +155,5 @@ public class GridPanelBuilder {
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
         return table;
-    }
-
-    public static void resizeToFont(final JBTable table) {
-        final FontMetrics fm = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(fm.getHeight() + 4, 20));
-        autoSizeColumns(table);
-    }
-
-    private static void autoSizeColumns(final JBTable table) {
-        int tableTotalWidth = 0;
-        for (int i = 0; i < table.getColumnCount(); i++) {
-            final TableColumn col = table.getColumnModel().getColumn(i);
-            int maxWidth;
-
-            TableCellRenderer headerRenderer = col.getHeaderRenderer();
-            if (headerRenderer == null) {
-                headerRenderer = table.getTableHeader().getDefaultRenderer();
-            }
-            final Component headerComp = headerRenderer.getTableCellRendererComponent(
-                    table, col.getHeaderValue(), false, false, 0, i);
-            maxWidth = headerComp.getPreferredSize().width;
-
-            for (int r = 0; r < table.getRowCount(); r++) {
-                final TableCellRenderer renderer = table.getCellRenderer(r, i);
-                final Component comp = table.prepareRenderer(renderer, r, i);
-                maxWidth = Math.max(comp.getPreferredSize().width, maxWidth);
-            }
-
-            maxWidth += 20;
-            col.setPreferredWidth(maxWidth);
-            tableTotalWidth += maxWidth;
-        }
-
-        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        table.setPreferredScrollableViewportSize(new Dimension(
-                Math.min(tableTotalWidth, (int) (screenSize.width * 0.85)),
-                Math.min(table.getRowHeight() * Math.max(3, table.getRowCount()), (int) (screenSize.height * 0.70))
-        ));
     }
 }

@@ -1,11 +1,8 @@
 package org.testin.editorPanel.testEditor;
 
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.automate.AutomateTestCaseAction;
@@ -13,7 +10,7 @@ import org.testin.clipboard.CopyTestCaseAction;
 import org.testin.clipboard.CopyTestCaseNodeAction;
 import org.testin.clipboard.CutTestCaseNodeAction;
 import org.testin.clipboard.PasteTestCaseNodeAction;
-import org.testin.editorPanel.EditorContextMenu;
+import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.statusBar.NextPageAction;
 import org.testin.editorPanel.statusBar.PrevPageAction;
@@ -28,23 +25,12 @@ import org.testin.testCase.UpdateTestCaseAction;
 import org.testin.viewPanel.CloseTestCaseDetailsAction;
 import org.testin.viewPanel.ViewDetailsAction;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
-public class TestEditorContextMenu extends EditorContextMenu {
-    @Getter
-    private static final Set<UUID> globalPendingCutIds = new HashSet<>();
-    @Getter
-    @Setter
-    private static boolean globalCutAction = false;
-    @Getter
-    @Setter
-    private static IEditor globalSourceEditorUI = null;
     private final @NotNull Project p;
 
     public TestEditorContextMenu(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
-        super("Editor Context Menu", true);
+        super("Test Editor Context Menu", true);
         this.p = p;
 
         add(new CreateTestCaseAction(p, ui, dir, list));
@@ -71,24 +57,10 @@ public class TestEditorContextMenu extends EditorContextMenu {
         add(new PrevPageAction(p, ui, list));
     }
 
-    public static void clearCutState() {
-        globalCutAction = false;
-        globalPendingCutIds.clear();
-
-        if (globalSourceEditorUI != null && globalSourceEditorUI.getPreferredFocusedComponent() != null)
-            globalSourceEditorUI.getPreferredFocusedComponent().repaint();
-
-        globalSourceEditorUI = null;
-    }
-
-    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull TestEditorContextMenu testEditorContextMenu) {
-        new EscapeAction(p, list);
-        new OpenContextMenuAction(p, list, testEditorContextMenu);
-        new CloseTestCaseDetailsAction(p, list);
-    }
-
     @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.EDT;
+    public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu) {
+        new EscapeAction(p, list);
+        new OpenContextMenuAction(p, list, menu);
+        new CloseTestCaseDetailsAction(p, list);
     }
 }

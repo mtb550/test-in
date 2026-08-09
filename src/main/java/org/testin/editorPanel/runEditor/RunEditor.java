@@ -1,8 +1,6 @@
 package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
@@ -20,10 +18,7 @@ import org.testin.Dialogs.RunOpeningForm;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
-import org.testin.editorPanel.listeners.MouseListenerImpl;
-import org.testin.editorPanel.listeners.RunListRenderer;
-import org.testin.editorPanel.listeners.SelectionListener;
-import org.testin.editorPanel.listeners.StatusBarListener;
+import org.testin.editorPanel.listeners.*;
 import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.editorPanel.toolBar.IToolBar;
@@ -49,8 +44,6 @@ import org.testin.util.FontSync;
 import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -78,29 +71,18 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private final @NotNull Map<UUID, TestRunItems> resultsMap;
 
     private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
-
+    private final Disposable projectDisposable;
     CheckboxTree checklistTree;
-
     @Getter
     TestRunDto tr;
-
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
-
     private JBList<TestCaseDto> list;
-
     private CollectionListModel<TestCaseDto> model;
-
     private JBTable gridTable;
     private RunEditorContextMenu contextMenu;
-
     private JBScrollPane gridScrollPane;
-
     private JBScrollPane listScrollPane;
-
     private JComponent currentCenter;
-
-    private final Disposable projectDisposable;
-
     @Getter
     @Setter
     private int currentPage = 1;
@@ -408,36 +390,15 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         try {
             gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap);
             FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
-            attachGridContextMenu(gridTable, pageItems);
 
-            gridTable.getSelectionModel().addListSelectionListener(e -> {
-                if (e.getValueIsAdjusting()) return;
-                final int row = gridTable.getSelectedRow();
-                if (row >= 0 && row < pageItems.size()) {
-                    selectTestCase(pageItems.get(row));
-                }
-            });
+            gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
+            gridTable.addMouseListener(new GridContextMenuListener(gridTable, list, contextMenu, pageItems));
 
             gridScrollPane = new JBScrollPane(gridTable);
             Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }
-    }
-
-    private void attachGridContextMenu(final JBTable table, final List<TestCaseDto> pageItems) {
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (!SwingUtilities.isRightMouseButton(e)) return;
-                final int row = table.rowAtPoint(e.getPoint());
-                if (row < 0 || row >= pageItems.size()) return;
-                list.setSelectedIndex(row);
-                ActionManager.getInstance()
-                        .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, contextMenu)
-                        .getComponent().show(e.getComponent(), e.getX(), e.getY());
-            }
-        });
     }
 
     private void setCenter(final JComponent component) {

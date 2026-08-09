@@ -7,7 +7,7 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.EditorContextMenu;
+import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.enums.CardHoverAction;
 import org.testin.logger.Logger;
@@ -31,11 +31,11 @@ public class MouseListenerImpl extends MouseAdapter {
     private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull CollectionListModel<TestCaseDto> model;
-    private final @NotNull EditorContextMenu cm;
+    private final @NotNull AbstractEditorContextMenu cm;
     private final @NotNull ArrayList<String> path;
     private final @NotNull IEditor editor;
 
-    public MouseListenerImpl(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull EditorContextMenu cm) {
+    public MouseListenerImpl(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull AbstractEditorContextMenu cm) {
         this.p = p;
         this.editor = editor;
         this.list = list;

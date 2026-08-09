@@ -2,8 +2,6 @@ package org.testin.editorPanel.testEditor;
 
 import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionManager;
-import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
@@ -47,11 +45,7 @@ import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
-import javax.swing.event.TableModelEvent;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.nio.file.Path;
 import java.util.*;
@@ -95,7 +89,6 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final List<TestCaseDto> currentTestCases;
 
     private JBTable gridTable;
-    private boolean gridUpdating;
 
     private JBScrollPane gridScrollPane;
 
@@ -273,10 +266,19 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         final int index = currentTestCases.indexOf(tc);
         if (index == -1) return;
 
-        this.currentPage = (index / pageSize) + 1;
+        final int page = (index / pageSize) + 1;
+        final int localIndex = index % pageSize;
+
+        if (page == this.currentPage) {
+            list.setSelectedIndex(localIndex);
+            list.ensureIndexIsVisible(localIndex);
+            list.requestFocusInWindow();
+            return;
+        }
+
+        this.currentPage = page;
         refreshView();
 
-        final int localIndex = index % pageSize;
         SwingUtilities.invokeLater(() -> {
             list.setSelectedIndex(localIndex);
             list.ensureIndexIsVisible(localIndex);
@@ -453,59 +455,16 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         try {
             gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes);
             FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
-            attachGridEditListener(gridTable, pageItems);
-            attachGridContextMenu(gridTable, pageItems);
 
-            gridTable.getSelectionModel().addListSelectionListener(e -> {
-                if (e.getValueIsAdjusting()) return;
-                final int row = gridTable.getSelectedRow();
-                if (row >= 0 && row < pageItems.size()) {
-                    selectTestCase(pageItems.get(row));
-                }
-            });
+            gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
+            gridTable.getModel().addTableModelListener(new GridEditListener(p, pageItems, () -> model.allContentsChanged()));
+            gridTable.addMouseListener(new GridContextMenuListener(gridTable, list, contextMenu, pageItems));
 
             gridScrollPane = new JBScrollPane(gridTable);
             Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }
-    }
-
-    private void attachGridEditListener(final JBTable table, final List<TestCaseDto> pageItems) {
-        final List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
-        table.getModel().addTableModelListener(e -> {
-            if (gridUpdating) return;
-            if (e.getType() != TableModelEvent.UPDATE) return;
-            final int row = e.getFirstRow();
-            final int col = e.getColumn();
-            if (row < 0 || col <= 0) return;
-            gridUpdating = true;
-            try {
-                final DefaultTableModel gridModel = (DefaultTableModel) e.getSource();
-                final TestEditorAttributes attr = ordered.get(col - 1);
-                final TestCaseDto tc = pageItems.get(row);
-                attr.getImportSetter().execute(p, tc, String.valueOf(gridModel.getValueAt(row, col)));
-                gridModel.setValueAt(attr.getTestValueExtractor().execute(tc, p), row, col);
-                model.allContentsChanged();
-            } finally {
-                gridUpdating = false;
-            }
-        });
-    }
-
-    private void attachGridContextMenu(final JBTable table, final List<TestCaseDto> pageItems) {
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                if (!SwingUtilities.isRightMouseButton(e)) return;
-                final int row = table.rowAtPoint(e.getPoint());
-                if (row < 0 || row >= pageItems.size()) return;
-                list.setSelectedIndex(row);
-                ActionManager.getInstance()
-                        .createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, contextMenu)
-                        .getComponent().show(e.getComponent(), e.getX(), e.getY());
-            }
-        });
     }
 
     private void setCenter(final JComponent component) {
