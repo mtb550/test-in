@@ -335,9 +335,19 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarDetailsSelectionChanged() {
+        Logger.debug("[details] selectedDetails changed -> " + getSelectedDetails());
         if (model != null) {
             model.allContentsChanged();
         }
+        if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
+            Logger.debug("[details] grid active -> toggling column visibility");
+            updateGridColumns();
+        }
+    }
+
+    private void updateGridColumns() {
+        if (gridTable == null) return;
+        gridPanelBuilder.applyColumnVisibility(gridTable, Arrays.stream(TestEditorAttributes.values()).toList(), TestEditorAttributes::getName, getSelectedDetails());
     }
 
     @Override

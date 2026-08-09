@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -20,9 +21,7 @@ public class GridPanelBuilder {
 
     public JBTable buildRunTable(final Project p, final List<TestCaseDto> testCases, final Set<RunEditorAttributes> attributes, final Map<UUID, TestRunItems> resultsMap) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
-        final List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values())
-                .filter(attributes::contains)
-                .toList();
+        final List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
 
         final String[] columns = buildColumns(ordered, RunEditorAttributes::getName);
         final List<String[]> rows = new ArrayList<>();
@@ -41,14 +40,14 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        return buildTable(columns, rows);
+        final JBTable table = buildTable(columns, rows);
+        applyColumnVisibility(table, ordered, RunEditorAttributes::getName, attributes);
+        return table;
     }
 
     public JBTable buildTestTable(final Project p, final List<TestCaseDto> testCases, final Set<TestEditorAttributes> attributes) {
         Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
-        final List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values())
-                .filter(attributes::contains)
-                .toList();
+        final List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
 
         final String[] columns = buildColumns(ordered, TestEditorAttributes::getName);
         final List<String[]> rows = new ArrayList<>();
@@ -64,7 +63,32 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        return buildTable(columns, rows);
+        final JBTable table = buildTable(columns, rows);
+        applyColumnVisibility(table, ordered, TestEditorAttributes::getName, attributes);
+        return table;
+    }
+
+    public <E> void applyColumnVisibility(final JBTable table, final List<E> allValues, final java.util.function.Function<E, String> name, final Set<E> selected) {
+        final TableColumnModel cm = table.getColumnModel();
+        while (cm.getColumnCount() > 0) {
+            cm.removeColumn(cm.getColumn(cm.getColumnCount() - 1));
+        }
+
+        cm.addColumn(columnFor(0, "#"));
+        for (int i = 0; i < allValues.size(); i++) {
+            final E attr = allValues.get(i);
+            if (selected.contains(attr)) {
+                cm.addColumn(columnFor(i + 1, name.apply(attr)));
+            }
+        }
+
+        autoSizeColumns(table);
+    }
+
+    private TableColumn columnFor(final int modelIndex, final String header) {
+        final TableColumn column = new TableColumn(modelIndex);
+        column.setHeaderValue(header);
+        return column;
     }
 
     private <E> String[] buildColumns(final List<E> attributes, final java.util.function.Function<E, String> name) {
@@ -90,8 +114,6 @@ public class GridPanelBuilder {
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        autoSizeColumns(table);
 
         return table;
     }

@@ -278,6 +278,15 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         if (list != null && model != null) {
             model.allContentsChanged();
         }
+        if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
+            Logger.debug("[details] grid active -> toggling column visibility");
+            updateGridColumns();
+        }
+    }
+
+    private void updateGridColumns() {
+        if (gridTable == null) return;
+        gridPanelBuilder.applyColumnVisibility(gridTable, Arrays.stream(RunEditorAttributes.values()).toList(), RunEditorAttributes::getName, getSelectedDetails());
     }
 
     @Override
