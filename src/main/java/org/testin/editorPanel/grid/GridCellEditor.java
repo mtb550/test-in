@@ -15,10 +15,21 @@ import java.util.EventObject;
 public class GridCellEditor extends AbstractCellEditor implements TableCellEditor {
 
     private final JBTextArea textArea = new JBTextArea();
+    private final JPanel editorPanel = new JPanel(new GridBagLayout());
+    private final GridBagConstraints editorConstraints = new GridBagConstraints();
 
     public GridCellEditor() {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
+        textArea.setOpaque(true);
+
+        editorPanel.setOpaque(true);
+        editorConstraints.gridx = 0;
+        editorConstraints.gridy = 0;
+        editorConstraints.weightx = 1.0;
+        editorConstraints.weighty = 0.0;
+        editorConstraints.fill = GridBagConstraints.HORIZONTAL;
+        editorConstraints.anchor = GridBagConstraints.WEST;
 
         KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         textArea.getInputMap().put(enter, "stopEditing");
@@ -46,7 +57,12 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
         textArea.setBackground(table.getSelectionBackground());
         textArea.setForeground(table.getForeground());
         textArea.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(JBColor.blue, 1), BorderFactory.createEmptyBorder(GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING)));
-        return textArea;
+        editorPanel.setBackground(GridPanelBuilder.SELECTION_BACKGROUND);
+        editorPanel.removeAll();
+        editorPanel.add(textArea, editorConstraints);
+        editorPanel.revalidate();
+        SwingUtilities.invokeLater(() -> textArea.requestFocusInWindow());
+        return editorPanel;
     }
 
     @Override

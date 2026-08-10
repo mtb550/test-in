@@ -20,6 +20,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.util.*;
@@ -253,41 +254,23 @@ public class GridPanelBuilder {
         return table;
     }
 
-    private JBTable buildTable(final String[] columns, final List<String[]> rows, final boolean editable) {
-        final DefaultTableModel model = new DefaultTableModel(columns, 0) {
+    private static void installEnterToEdit(final JBTable table) {
+        final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        final Action startEditing = new AbstractAction() {
             @Override
-            public boolean isCellEditable(final int row, final int column) {
-                return editable && column > 0;
+            public void actionPerformed(final java.awt.event.ActionEvent event) {
+                final int row = table.getSelectedRow();
+                final int column = table.getSelectedColumn();
+                if (row < 0 || column < 0 || !table.isCellEditable(row, column)) return;
+                if (table.editCellAt(row, column)) {
+                    final Component editor = table.getEditorComponent();
+                    if (editor != null) editor.requestFocusInWindow();
+                }
             }
         };
-
-        for (final String[] row : rows) {
-            model.addRow(row);
-        }
-
-        final JBTable table = new JBTable(model);
-        // JBTable's IntelliJ UI paints a rollover background over table rows.
-        // The grid renderer owns all row colors, so use the standard table UI here.
-        table.setUI(new BasicTableUI());
-        table.setFillsViewportHeight(true);
-        table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setCellSelectionEnabled(true);
-        table.setSelectionBackground(SELECTION_BACKGROUND);
-        table.setSelectionForeground(table.getForeground());
-        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-        table.setDefaultRenderer(Object.class, wrappingRenderer());
-        table.setShowGrid(false);
-        table.setIntercellSpacing(new Dimension(0, 0));
-        table.setBorder(BorderFactory.createLineBorder(GRID_COLOR, 1));
-        table.setExpandableItemsEnabled(false);
-        addColumnResizeListener(table);
-        addWheelScrollListener(table);
-        if (editable) {
-            table.setDefaultEditor(Object.class, new GridCellEditor());
-        }
-
-        return table;
+        table.getInputMap(JComponent.WHEN_FOCUSED).put(enter, "startEditing");
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "startEditing");
+        table.getActionMap().put("startEditing", startEditing);
     }
 
     public <E> void applyColumnVisibility(final JBTable table, final List<E> allValues, final java.util.function.Function<E, String> name, final Set<E> selected) {
@@ -313,6 +296,44 @@ public class GridPanelBuilder {
         return column;
     }
 
+    private JBTable buildTable(final String[] columns, final List<String[]> rows, final boolean editable) {
+        final DefaultTableModel model = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(final int row, final int column) {
+                return editable && column > 0;
+            }
+        };
+
+        for (final String[] row : rows) {
+            model.addRow(row);
+        }
+
+        final JBTable table = new JBTable(model);
+        // JBTable's IntelliJ UI paints a rollover background over table rows.
+        // The grid renderer owns all row colors, so use the standard table UI here.
+        table.setUI(new BasicTableUI());
+        table.setFillsViewportHeight(true);
+        table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.setCellSelectionEnabled(true);
+        table.setSelectionBackground(SELECTION_BACKGROUND);
+        table.setSelectionForeground(table.getForeground());
+        installEnterToEdit(table);
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+        table.setDefaultRenderer(Object.class, wrappingRenderer());
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setBorder(BorderFactory.createLineBorder(GRID_COLOR, 1));
+        table.setExpandableItemsEnabled(false);
+        addColumnResizeListener(table);
+        addWheelScrollListener(table);
+        if (editable) {
+            table.setDefaultEditor(Object.class, new GridCellEditor());
+        }
+
+        return table;
+    }
+
     private <E> String[] buildColumns(final List<E> attributes, final java.util.function.Function<E, String> name) {
         final List<String> columns = new ArrayList<>();
         columns.add("#");
@@ -321,26 +342,26 @@ public class GridPanelBuilder {
     }
 
     private record SelectionCellBorder(Insets insets) implements Border {
-            private SelectionCellBorder(final boolean firstColumn) {
-                this(new Insets(1, firstColumn ? 1 : 0, 1, 1));
-            }
-
-            @Override
-            public Insets getBorderInsets(final Component component) {
-                return insets;
-            }
-
-            @Override
-            public boolean isBorderOpaque() {
-                return false;
-            }
-
-            @Override
-            public void paintBorder(final Component component, final Graphics graphics, final int x, final int y, final int width, final int height) {
-                final Color previousColor = graphics.getColor();
-                graphics.setColor(EditorColors.SELECTION_BORDER);
-                graphics.drawRect(x, y, width - 1, height - 1);
-                graphics.setColor(previousColor);
-            }
+        private SelectionCellBorder(final boolean firstColumn) {
+            this(new Insets(1, firstColumn ? 1 : 0, 1, 1));
         }
+
+        @Override
+        public Insets getBorderInsets(final Component component) {
+            return insets;
+        }
+
+        @Override
+        public boolean isBorderOpaque() {
+            return false;
+        }
+
+        @Override
+        public void paintBorder(final Component component, final Graphics graphics, final int x, final int y, final int width, final int height) {
+            final Color previousColor = graphics.getColor();
+            graphics.setColor(EditorColors.SELECTION_BORDER);
+            graphics.drawRect(x, y, width - 1, height - 1);
+            graphics.setColor(previousColor);
+        }
+    }
 }
