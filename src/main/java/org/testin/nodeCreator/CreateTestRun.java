@@ -10,7 +10,6 @@ import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import org.testin.testRun.CreateTestRunDialog;
 import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
@@ -27,6 +26,7 @@ import org.testin.mappers.markers.TestRunMarker;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
+import org.testin.testRun.CreateTestRunDialog;
 import org.testin.util.EditorUtil;
 
 import javax.swing.tree.DefaultMutableTreeNode;
