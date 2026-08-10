@@ -7,11 +7,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.projectPanel.tree.TreeTransferHandler;
 import org.testin.util.KeyboardSet;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-
 
 public class CutNodeAction extends DumbAwareAction {
     private final @NotNull Project p;
@@ -26,9 +23,8 @@ public class CutNodeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Action action = tree.getActionMap().get("cut");
-        if (action != null) {
-            action.actionPerformed(new ActionEvent(tree, ActionEvent.ACTION_PERFORMED, "cut"));
+        if (tree.getTransferHandler() instanceof TreeTransferHandler transferHandler) {
+            transferHandler.copySelectionToClipboard(true);
         }
     }
 

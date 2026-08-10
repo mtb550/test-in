@@ -335,16 +335,27 @@ public final class ProjectIndexer {
         VirtualFileManager.getInstance().syncRefresh();
     }
 
-    public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
-        Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, newPath, "Move Failed", (sourceVf, targetVf) -> {
+    public void moveNode(final @NotNull Path oldPath,
+                         final @NotNull Path newPath,
+                         final @Nullable Runnable onFinished) {
+        final Path targetParent = newPath.getParent();
+        if (targetParent == null) {
+            if (onFinished != null) onFinished.run();
+            return;
+        }
+
+        Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, targetParent, "Move Failed", (sourceVf, targetVf) -> {
             try {
                 sourceVf.move(this, targetVf);
             } catch (final IOException ex) {
                 Logger.error(ex.getMessage());
                 throw new RuntimeException(ex);
             }
-        });
-        store.renameNode(oldPath, newPath);
+        }, () -> {
+            store.renameNode(oldPath, newPath);
+            Logger.info("Moved successfully to: " + newPath);
+            if (onFinished != null) onFinished.run();
+        }, onFinished);
     }
 
     public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath) {
@@ -382,14 +393,10 @@ public final class ProjectIndexer {
     }
 
     private void refreshIndexedProject(final @NotNull Path changedPath) {
-        final Path projectPath = store.getTestProjectsByPath().keySet().stream()
+        store.getTestProjectsByPath().keySet().stream()
                 .map(Path::of)
                 .filter(changedPath::startsWith)
-                .max(Comparator.comparingInt(Path::getNameCount))
-                .orElse(null);
-        if (projectPath != null) {
-            scanCoordinator.rescanExclusively(projectPath);
-        }
+                .max(Comparator.comparingInt(Path::getNameCount)).ifPresent(scanCoordinator::rescanExclusively);
     }
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {

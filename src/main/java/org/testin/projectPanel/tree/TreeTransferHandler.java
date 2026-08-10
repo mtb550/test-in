@@ -1,5 +1,6 @@
 package org.testin.projectPanel.tree;
 
+import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.Getter;
@@ -22,6 +23,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transfers application values and lets the async model rebuild from indexer state.
@@ -35,7 +37,7 @@ public class TreeTransferHandler extends TransferHandler {
     private final Runnable refresh;
     @Getter
     private final Set<DirectoryDto> selectedNodes;
-    private Integer lastAction;
+    private int clipboardAction = COPY;
 
     public TreeTransferHandler(final @NotNull Project p, final SimpleTree tree,
                                final Set<DirectoryDto> selectedNodes, final Runnable refresh) {
@@ -53,14 +55,20 @@ public class TreeTransferHandler extends TransferHandler {
     @Override
     protected Transferable createTransferable(final JComponent c) {
         final List<DirectoryDto> directories = TreeValueUtil.selectedDirectories(tree.getSelectionPaths());
-        return directories.isEmpty() ? null : new NodesTransferable(new TreeTransferPayload(directories.toArray(DirectoryDto[]::new)));
+        return directories.isEmpty() ? null : new NodesTransferable(new TreeTransferPayload(
+                directories.toArray(DirectoryDto[]::new), clipboardAction));
     }
 
     @Override
     public boolean canImport(final TransferSupport support) {
         if (!support.isDataFlavorSupported(NODE_FLAVOR)) return false;
         final DirectoryDto target = targetDirectory(support);
-        return target != null;
+        if (target == null) return false;
+
+        if (support.isDrop() && support.getDropAction() == NONE) {
+            support.setDropAction(MOVE);
+        }
+        return true;
     }
 
     @Override
@@ -73,22 +81,23 @@ public class TreeTransferHandler extends TransferHandler {
             final DirectoryDto target = targetDirectory(support);
             if (target == null) return false;
 
-            final int action = support.isDrop() ? support.getDropAction() : (lastAction != null ? lastAction : COPY);
-            for (DirectoryDto source : sources) {
-                if (action == MOVE) {
-                    if (source.getPath().equals(target.getPath()) || target.getPath().startsWith(source.getPath()))
-                        continue;
-                    persistMove(source, target);
+            final int action = resolveAction(support, payload);
+            if (action == MOVE) {
+                final List<DirectoryDto> movableSources = new ArrayList<>();
+                for (DirectoryDto source : sources) {
+                    if (isValidMove(source, target)) movableSources.add(source);
                 }
-            }
 
-            if (action == COPY) {
+                if (movableSources.isEmpty()) return false;
+                moveNodes(movableSources, target);
+            } else if (action == COPY) {
                 final List<Path> sourcePaths = java.util.Arrays.stream(sources).map(DirectoryDto::getPath).toList();
                 Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), refresh);
+            } else {
+                return false;
             }
 
             resetLastAction();
-            if (action == MOVE) refresh.run();
             return true;
         } catch (final Exception ex) {
             Logger.error("Tree transfer failed: " + ex.getMessage());
@@ -98,35 +107,96 @@ public class TreeTransferHandler extends TransferHandler {
 
     private DirectoryDto targetDirectory(final TransferSupport support) {
         if (support.isDrop()) {
-            final TreePath path = ((SimpleTree.DropLocation) support.getDropLocation()).getPath();
+            final TreePath path = dropPath(support);
             return path == null ? null : TreeValueUtil.directoryOf(path.getLastPathComponent());
         }
         return TreeValueUtil.selectedDirectory(tree.getSelectionPath());
     }
 
-    private void persistMove(final DirectoryDto source, final DirectoryDto target) {
+    private TreePath dropPath(final TransferSupport support) {
+        if (support.getDropLocation() instanceof SimpleTree.DropLocation dropLocation) {
+            return dropLocation.getPath();
+        }
+        if (support.getDropLocation() instanceof JTree.DropLocation dropLocation) {
+            return dropLocation.getPath();
+        }
+        return null;
+    }
+
+    private int resolveAction(final TransferSupport support, final TreeTransferPayload payload) {
+        if (!support.isDrop()) {
+            return payload.clipboardAction() == MOVE ? MOVE : COPY;
+        }
+
+        // Keep Ctrl-drag copy support. A normal internal tree drag is a move,
+        // including platforms that report NONE before the drop action is set.
+        if (support.getUserDropAction() == COPY) return COPY;
+        support.setDropAction(MOVE);
+        return MOVE;
+    }
+
+    private boolean isValidMove(final DirectoryDto source, final DirectoryDto target) {
+        final Path sourcePath = source.getPath().normalize();
+        final Path targetPath = target.getPath().normalize();
+
+        if (sourcePath.equals(targetPath) || targetPath.startsWith(sourcePath)) return false;
+        return !targetPath.equals(sourcePath.getParent());
+    }
+
+    private void moveNodes(final List<DirectoryDto> sources, final DirectoryDto target) {
+        final AtomicInteger remaining = new AtomicInteger(sources.size());
+        for (DirectoryDto source : sources) {
+            persistMove(source, target, () -> {
+                if (remaining.decrementAndGet() == 0) refresh.run();
+            });
+        }
+    }
+
+    private void persistMove(final DirectoryDto source, final DirectoryDto target, final Runnable onFinished) {
         final Path newPath = target.getPath().resolve(source.getName());
-        Services.getInstance(p, ProjectIndexer.class).moveNode(source.getPath(), newPath);
-        Logger.info("Moved successfully to: " + newPath);
+        Services.getInstance(p, ProjectIndexer.class).moveNode(source.getPath(), newPath, onFinished);
     }
 
     @Override
     protected void exportDone(final JComponent source, final Transferable data, final int action) {
-        resetLastAction();
+        if (action != MOVE) resetLastAction();
     }
 
     public void resetLastAction() {
-        lastAction = null;
         selectedNodes.clear();
         tree.repaint();
     }
 
     @Override
     public void exportToClipboard(final JComponent comp, final Clipboard clip, final int action) {
-        super.exportToClipboard(comp, clip, action);
-        lastAction = action;
+        clipboardAction = action;
+        try {
+            super.exportToClipboard(comp, clip, action);
+        } finally {
+            clipboardAction = COPY;
+        }
+        updateClipboardState(action, TreeValueUtil.selectedDirectories(tree.getSelectionPaths()));
+    }
+
+    public boolean copySelectionToClipboard(final boolean cut) {
+        final List<DirectoryDto> directories = TreeValueUtil.selectedDirectories(tree.getSelectionPaths());
+        if (directories.isEmpty()) return false;
+
+        final int action = cut ? MOVE : COPY;
+        CopyPasteManager.getInstance().setContents(new NodesTransferable(new TreeTransferPayload(
+                directories.toArray(DirectoryDto[]::new), action)));
+        updateClipboardState(action, directories);
+        return true;
+    }
+
+    public boolean pasteFromClipboard() {
+        final Transferable contents = CopyPasteManager.getInstance().getContents();
+        return contents != null && importData(new TransferSupport(tree, contents));
+    }
+
+    private void updateClipboardState(final int action, final List<DirectoryDto> directories) {
         selectedNodes.clear();
-        if (action == MOVE) selectedNodes.addAll(TreeValueUtil.selectedDirectories(tree.getSelectionPaths()));
+        if (action == MOVE) selectedNodes.addAll(directories);
         tree.repaint();
     }
 

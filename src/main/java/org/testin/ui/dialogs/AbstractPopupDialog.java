@@ -5,6 +5,8 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.statusBar.DialogStatusBar;
+import org.testin.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +18,7 @@ public abstract class AbstractPopupDialog {
 
     protected final @NotNull Project project;
     protected final @NotNull JBPanel<?> contentPanel;
+    protected final @NotNull DialogStatusBar statusBar;
 
     private final @NotNull String title;
     private final @Nullable Icon titleIcon;
@@ -24,11 +27,27 @@ public abstract class AbstractPopupDialog {
     protected AbstractPopupDialog(final @NotNull Project project,
                                   final @NotNull String title,
                                   final @Nullable Icon titleIcon) {
+        this(project, title, titleIcon, new DialogStatusBar());
+    }
+
+    protected AbstractPopupDialog(final @NotNull Project project,
+                                  final @NotNull String title,
+                                  final @Nullable Icon titleIcon,
+                                  final @NotNull IStatusBarItem[] statusItems) {
+        this(project, title, titleIcon, new DialogStatusBar(statusItems));
+    }
+
+    private AbstractPopupDialog(final @NotNull Project project,
+                                final @NotNull String title,
+                                final @Nullable Icon titleIcon,
+                                final @NotNull DialogStatusBar statusBar) {
         this.project = project;
         this.title = title;
         this.titleIcon = titleIcon;
+        this.statusBar = statusBar;
         this.contentPanel = DialogStyle.styleContent(new JBPanel<>(new BorderLayout()));
         this.contentPanel.setBorder(BorderFactory.createEmptyBorder());
+        this.contentPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);
     }
 
     protected final void addContent(final @NotNull Component component, final Object constraint) {

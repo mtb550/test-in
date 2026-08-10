@@ -46,14 +46,18 @@ public class ProjectTree implements Disposable {
 
         mainTree.setRootVisible(true);
         mainTree.setShowsRootHandles(true);
-        mainTree.setDragEnabled(true);
-        mainTree.setDropMode(DropMode.ON_OR_INSERT);
+        // Nodes can only be moved into a directory.  INSERT also exposes
+        // sibling positions, which the transfer handler cannot resolve to a
+        // destination directory.
+        mainTree.setDropMode(DropMode.ON);
+        mainTree.setAutoscrolls(true);
 
         final Set<DirectoryDto> sharedCutNodes = new HashSet<>();
         mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
 
         this.transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh);
         mainTree.setTransferHandler(transferHandler);
+        mainTree.setDragEnabled(true);
 
         treeContextMenu = new TreeContextMenu(p, pp, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
@@ -73,6 +77,8 @@ public class ProjectTree implements Disposable {
                         pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
                 treeStructure.setSelectedProject(selectedProject);
                 structureModel.invalidateAsync();
+                mainTree.revalidate();
+                mainTree.repaint();
             } finally {
                 refreshScheduled.set(false);
             }
