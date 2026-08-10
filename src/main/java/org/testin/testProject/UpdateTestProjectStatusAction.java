@@ -14,9 +14,9 @@ import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.markers.TestProjectMarker;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.time.ZonedDateTime;
 
@@ -38,9 +38,8 @@ public class UpdateTestProjectStatusAction extends DumbAwareAction {
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = node.getUserObject();
-        if (!(userObject instanceof TestProjectDirectoryDto tp)) return;
+        final TestProjectDirectoryDto tp = TreeValueUtil.valueOf(path.getLastPathComponent(), TestProjectDirectoryDto.class);
+        if (tp == null) return;
 
         try {
             final TestProjectMarker marker = tp.getMarker();
@@ -66,8 +65,7 @@ public class UpdateTestProjectStatusAction extends DumbAwareAction {
     public void update(final @NotNull AnActionEvent e) {
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-        e.getPresentation().setEnabled(node.getUserObject() instanceof TestProjectDirectoryDto);
+        e.getPresentation().setEnabled(TreeValueUtil.valueOf(path.getLastPathComponent(), TestProjectDirectoryDto.class) != null);
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.testin.nodeCreator;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.testin.generateJavaCode.GeneratorType;
@@ -13,7 +12,6 @@ import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;
 
 public class CreateTestSet implements NodeCreator {
@@ -24,12 +22,10 @@ public class CreateTestSet implements NodeCreator {
     }
 
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+    public @NonNull DirectoryDto execute(final @NonNull String name, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
         final TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
 
         Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);
-        Services.getInstance(p, ProjectIndexer.class).createNode(tree, parentNode, ts);
-
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
                 GeneratorType.CREATE_TEST_SET.getAction().execute(p, ts);
@@ -42,4 +38,3 @@ public class CreateTestSet implements NodeCreator {
     }
 
 }
-

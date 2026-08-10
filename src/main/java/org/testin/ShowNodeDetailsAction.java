@@ -8,9 +8,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.viewPanel.markerDetails.MarkerDetailsViewDialog;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class ShowNodeDetailsAction extends DumbAwareAction {
@@ -29,8 +29,7 @@ public class ShowNodeDetailsAction extends DumbAwareAction {
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        Object userObject = treeNode.getUserObject();
+        Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
         if (!(userObject instanceof DirectoryDto dir)) return;
 

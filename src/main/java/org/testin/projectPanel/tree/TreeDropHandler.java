@@ -13,7 +13,6 @@ import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.datatransfer.Transferable;
 
 public class TreeDropHandler implements FileDropHandler {
@@ -28,19 +27,19 @@ public class TreeDropHandler implements FileDropHandler {
         }
 
         try {
-            final DefaultMutableTreeNode[] nodes = (DefaultMutableTreeNode[]) transferable.getTransferData(TreeTransferHandler.NODE_FLAVOR);
+            final TreeTransferPayload payload = (TreeTransferPayload) transferable.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                for (DefaultMutableTreeNode node : nodes) {
+                for (org.testin.mappers.dto.dirs.DirectoryDto node : payload.nodes()) {
 
-                    if (node.getUserObject() instanceof TestSetDirectoryDto ts) {
+                    if (node instanceof TestSetDirectoryDto ts) {
                         Logger.info("dragged Test set: " + ts.getName());
 
                         Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, ts);
                         continue;
                     }
 
-                    if (node.getUserObject() instanceof TestRunDirectoryDto tr) {
+                    if (node instanceof TestRunDirectoryDto tr) {
                         Logger.info("dragged Test Run: " + tr.getName());
                         Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, tr);
                     }

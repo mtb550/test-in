@@ -13,9 +13,9 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -37,10 +37,8 @@ public class SetTestRunStatusAction extends DumbAwareAction {
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = parentNode.getUserObject();
-
-        if (userObject instanceof TestRunDirectoryDto testRunDto) {
+        final TestRunDirectoryDto testRunDto = TreeValueUtil.valueOf(path.getLastPathComponent(), TestRunDirectoryDto.class);
+        if (testRunDto != null) {
             new TestRunStatusMenuDialog(p, selectedStatus -> {
                 TestRunMarker marker = testRunDto.getMarker();
                 marker.setStatus(selectedStatus);
@@ -50,7 +48,7 @@ public class SetTestRunStatusAction extends DumbAwareAction {
 
                 persistMarker(p, testRunDto, selectedStatus);
 
-                tree.repaint();
+                Services.getInstance(p, org.testin.projectPanel.ProjectPanel.class).getProjectTree().refresh();
             }).show();
         }
     }
@@ -62,9 +60,8 @@ public class SetTestRunStatusAction extends DumbAwareAction {
             e.getPresentation().setEnabled(false);
             return;
         }
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = parentNode.getUserObject();
-        boolean enabled = userObject instanceof TestRunDirectoryDto dir &&
+        final TestRunDirectoryDto dir = TreeValueUtil.valueOf(path.getLastPathComponent(), TestRunDirectoryDto.class);
+        boolean enabled = dir != null &&
                 dir.getMarker().getStatus() != TestRunStatus.COMPLETED &&
                 dir.getMarker().getStatus() != TestRunStatus.CLOSED;
 

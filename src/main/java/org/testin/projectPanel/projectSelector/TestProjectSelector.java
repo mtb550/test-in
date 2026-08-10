@@ -159,10 +159,9 @@ public class TestProjectSelector {
                 PropertiesComponent.getInstance(p).setValue(SELECTED_PROJECT_KEY, tp.getName());
 
             if (tp.getMarker().getStatus() == ProjectStatus.ACTIVE) {
-                pp.getTestCaseTreeBuilder().buildTree(selectedTestProject.getItem());
-                pp.getTestRunTreeBuilder().buildTree(selectedTestProject.getItem());
+                pp.getProjectTree().refresh();
             } else {
-                pp.getProjectTree().refreshTree();
+                pp.getProjectTree().refresh();
             }
 
             pp.getBranchSelector().updateProject(tp);

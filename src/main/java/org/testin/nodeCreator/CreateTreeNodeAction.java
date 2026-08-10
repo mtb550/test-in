@@ -17,7 +17,6 @@ import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 import org.testin.util.Tools;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
@@ -43,8 +42,6 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
         if (path == null || pDir == null) return;
 
-        final DefaultMutableTreeNode pNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-
         new CreateNodesDialog(p, pDir.getMenu(), (s, dt) -> {
 
             if (s.isEmpty()) return;
@@ -55,7 +52,8 @@ public class CreateTreeNodeAction extends DumbAwareAction {
                 return;
             }
 
-            DirectoryDto dir = dt.getAction().apply(p).execute(tree, s, pNode, pDir, newDirPath);
+            DirectoryDto dir = dt.getAction().apply(p).execute(s, pDir, newDirPath);
+            Services.getInstance(p, org.testin.projectPanel.ProjectPanel.class).getProjectTree().refresh();
 
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);

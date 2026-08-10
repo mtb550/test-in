@@ -10,10 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.runner.TestNGRunnerByClass;
 import org.testin.services.Services;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class RunTestSetAction extends DumbAwareAction {
@@ -34,7 +34,7 @@ public class RunTestSetAction extends DumbAwareAction {
             return;
         }
 
-        Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+        Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
         e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto);
     }
 
@@ -43,7 +43,7 @@ public class RunTestSetAction extends DumbAwareAction {
         TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        Object userObject = ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject();
+        Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
         if (userObject instanceof TestSetDirectoryDto ts) {
 

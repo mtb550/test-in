@@ -14,12 +14,11 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
@@ -42,9 +41,8 @@ public class RenameAction extends DumbAwareAction {
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        final DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-
-        if (!(node.getUserObject() instanceof DirectoryDto dir)) return;
+        final DirectoryDto dir = TreeValueUtil.directoryOf(path.getLastPathComponent());
+        if (dir == null) return;
         if (dir instanceof TestCasesMainDirectoryDto || dir instanceof TestRunsMainDirectoryDto) return;
 
         String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
@@ -59,7 +57,7 @@ public class RenameAction extends DumbAwareAction {
 
         Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath);
 
-        ((DefaultTreeModel) tree.getModel()).nodeChanged(node);
+        pp.getProjectTree().refresh();
 
         if (dir instanceof TestProjectDirectoryDto) {
             pp.getTestProjectSelector().loadTestProjectList();
@@ -82,8 +80,7 @@ public class RenameAction extends DumbAwareAction {
         TreePath path = tree.getSelectionPath();
 
         e.getPresentation().setEnabled(path != null &&
-                path.getLastPathComponent() instanceof DefaultMutableTreeNode node &&
-                node.getUserObject() instanceof DirectoryDto dir &&
+                TreeValueUtil.directoryOf(path.getLastPathComponent()) instanceof DirectoryDto dir &&
                 !(dir instanceof TestCasesMainDirectoryDto) &&
                 !(dir instanceof TestRunsMainDirectoryDto)
         );

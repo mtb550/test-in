@@ -17,9 +17,9 @@ import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.nio.file.Path;
@@ -96,17 +96,14 @@ public class SyncActionAction extends DumbAwareAction {
     private Path getActiveProjectPath() {
         TreePath selectionPath = tree.getSelectionPath();
         if (selectionPath != null) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
-            while (node != null) {
-                if (node.getUserObject() instanceof TestProjectDirectoryDto prj) {
-                    return prj.getPath();
-                }
-                node = (DefaultMutableTreeNode) node.getParent();
+            for (Object component : selectionPath.getPath()) {
+                TestProjectDirectoryDto project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class);
+                if (project != null) return project.getPath();
             }
         }
 
-        DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-        if (root != null && root.getUserObject() instanceof TestProjectDirectoryDto prj) {
+        TestProjectDirectoryDto prj = TreeValueUtil.valueOf(tree.getModel().getRoot(), TestProjectDirectoryDto.class);
+        if (prj != null) {
             return prj.getPath();
         }
         return null;
@@ -116,10 +113,7 @@ public class SyncActionAction extends DumbAwareAction {
     public void update(final @NotNull AnActionEvent e) {
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
-        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = selectedNode.getUserObject();
-
-        e.getPresentation().setEnabled(userObject instanceof TestProjectDirectoryDto);
+        e.getPresentation().setEnabled(TreeValueUtil.valueOf(path.getLastPathComponent(), TestProjectDirectoryDto.class) != null);
     }
 
     @Override

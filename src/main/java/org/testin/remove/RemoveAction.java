@@ -10,16 +10,14 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.testin.util.KeyboardSet.DeletePackage;
@@ -43,12 +41,9 @@ public class RemoveAction extends DumbAwareAction {
                 !(dir instanceof TestRunsMainDirectoryDto);
     }
 
-    private List<DefaultMutableTreeNode> getRemovableNodes(final TreePath[] paths) {
-        return Arrays.stream(paths)
-                .map(TreePath::getLastPathComponent)
-                .filter(DefaultMutableTreeNode.class::isInstance)
-                .map(DefaultMutableTreeNode.class::cast)
-                .filter(node -> isRemovable(node.getUserObject()))
+    private List<DirectoryDto> getRemovableNodes(final TreePath[] paths) {
+        return TreeValueUtil.selectedDirectories(paths).stream()
+                .filter(this::isRemovable)
                 .toList();
     }
 
@@ -58,30 +53,26 @@ public class RemoveAction extends DumbAwareAction {
         TreePath[] paths = tree.getSelectionPaths();
         if (paths == null || paths.length == 0) return;
 
-        List<DefaultMutableTreeNode> nodesToRemove = getRemovableNodes(paths);
+        List<DirectoryDto> nodesToRemove = getRemovableNodes(paths);
         if (nodesToRemove.isEmpty()) return;
 
         String msg = nodesToRemove.size() == 1
-                ? "Remove '" + ((DirectoryDto) nodesToRemove.getFirst().getUserObject()).getName() + "'?"
+                ? "Remove '" + nodesToRemove.getFirst().getName() + "'?"
                 : "Remove these " + nodesToRemove.size() + " items?";
 
         if (Messages.showYesNoDialog(msg, "Confirm Removing", Messages.getQuestionIcon()) != Messages.YES)
             return;
 
-        for (DefaultMutableTreeNode node : nodesToRemove) {
-            DirectoryDto pkg = (DirectoryDto) node.getUserObject();
+        for (DirectoryDto pkg : nodesToRemove) {
 
             if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
                 Services.getInstance(p, EditorUtil.class).close(p, pkg.getName());
-
-            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             final DirectoryType type = DirectoryType.from(pkg);
             if (type != null && type.getRemoveHandler() != null)
                 type.getRemoveHandler().remove(p, pkg);
 
-            if (node.getParent() != null)
-                indexer.removeNode(node, tree);
+
         }
 
         ApplicationManager.getApplication().invokeLater(() -> {

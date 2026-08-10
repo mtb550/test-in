@@ -48,7 +48,6 @@ public class EscapeAction extends DumbAwareAction {
         if (tree != null && transferHandler != null) {
             transferHandler.getSelectedNodes().clear();
             transferHandler.resetLastAction();
-            tree.repaint();
             Logger.info("Clipboard/Cut state cleared via ESC.");
             return;
         }

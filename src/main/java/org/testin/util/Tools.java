@@ -26,10 +26,10 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.io.File;
@@ -110,8 +110,8 @@ public final class Tools {
     }
 
     public Path getProjectPath(final SimpleTree tree) {
-        final DefaultMutableTreeNode root = (DefaultMutableTreeNode) tree.getModel().getRoot();
-        if (root != null && root.getUserObject() instanceof TestProjectDirectoryDto dir)
+        final Object root = TreeValueUtil.valueOf(tree.getModel().getRoot());
+        if (root instanceof TestProjectDirectoryDto dir)
             return dir.getPath();
         return null;
     }
@@ -120,9 +120,8 @@ public final class Tools {
         TreePath path = tree.getSelectionPath();
         if (path == null) return null;
 
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-
-        if (parentNode.getUserObject() instanceof DirectoryDto parentDir) {
+        final Object value = TreeValueUtil.valueOf(path.getLastPathComponent());
+        if (value instanceof DirectoryDto parentDir) {
             return parentDir;
         }
 
@@ -150,21 +149,6 @@ public final class Tools {
             }
         }
         return result.toString();
-    }
-
-    public void updateChildrenPathsRecursive(final DefaultMutableTreeNode parentNode, final Path oldParentPath, final Path newParentPath) {
-        for (int i = 0; i < parentNode.getChildCount(); i++) {
-            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) parentNode.getChildAt(i);
-
-            if (childNode.getUserObject() instanceof DirectoryDto childDir) {
-
-                Path relativePath = oldParentPath.relativize(childDir.getPath());
-                Path newChildPath = newParentPath.resolve(relativePath);
-
-                childDir.setPath(newChildPath);
-                updateChildrenPathsRecursive(childNode, oldParentPath, newParentPath);
-            }
-        }
     }
 
     public String getFormattedDuration(final Duration duration) {

@@ -24,10 +24,10 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.KeyboardSet;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.file.Files;
@@ -65,10 +65,7 @@ public class GenerateReportAction extends DumbAwareAction {
         TestRunDirectoryDto tr = null;
 
         if (tree != null) {
-            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-            if (selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto dto) {
-                tr = dto;
-            }
+            tr = TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
         } else if (editor instanceof RunEditor re) {
             tr = re.getParent();
         }
@@ -85,8 +82,7 @@ public class GenerateReportAction extends DumbAwareAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
         if (tree != null) {
-            DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
-            e.getPresentation().setEnabled(selectedNode != null && selectedNode.getUserObject() instanceof TestRunDirectoryDto);
+            e.getPresentation().setEnabled(TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class) != null);
         } else e.getPresentation().setEnabled(editor instanceof RunEditor);
     }
 

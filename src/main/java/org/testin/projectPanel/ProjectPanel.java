@@ -18,9 +18,6 @@ import org.testin.logger.Logger;
 import org.testin.nodeCreator.CreateTestProjectAction;
 import org.testin.projectPanel.projectSelector.TestProjectSelector;
 import org.testin.projectPanel.tree.ProjectTree;
-import org.testin.projectPanel.tree.TestCaseTreeBuilder;
-import org.testin.projectPanel.tree.TestProjectTreeBuilder;
-import org.testin.projectPanel.tree.TestRunTreeBuilder;
 import org.testin.projectPanel.versionSelector.BranchSelector;
 import org.testin.services.Services;
 import org.testin.settings.Setting;
@@ -35,26 +32,18 @@ public final class ProjectPanel implements Disposable {
     private final @NotNull Project p;
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
     private final @NotNull TestProjectSelector testProjectSelector;
-    private final @NotNull TestProjectTreeBuilder testProjectTreeBuilder;
-    private final @NotNull TestCaseTreeBuilder testCaseTreeBuilder;
-    private final @NotNull TestRunTreeBuilder testRunTreeBuilder;
     private @NotNull BranchSelector branchSelector;
-    private @NotNull ProjectTree projectTree;
+    private final @NotNull ProjectTree projectTree;
 
     public ProjectPanel(final @NotNull Project p) {
         this.p = p;
         Logger.info("ProjectPanel.ProjectPanel()");
 
         testProjectSelector = new TestProjectSelector(p, this);
-        testProjectTreeBuilder = new TestProjectTreeBuilder(p, this);
-        testCaseTreeBuilder = new TestCaseTreeBuilder(p, this);
-        testRunTreeBuilder = new TestRunTreeBuilder(p, this);
         branchSelector = new BranchSelector(p, this, testProjectSelector.getSelectedTestProject().getItem());
         projectTree = new ProjectTree(p, this);
 
         testProjectSelector.init();
-        setupMainLayout();
-
     }
 
     public void setupMainLayout() {
@@ -73,7 +62,6 @@ public final class ProjectPanel implements Disposable {
 
             panel.add(topBar, BorderLayout.NORTH);
 
-            projectTree = new ProjectTree(p, this);
             panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         } else {
@@ -132,8 +120,6 @@ public final class ProjectPanel implements Disposable {
 
     @Override
     public void dispose() {
-        if (projectTree.getMainTree() != null) {
-            projectTree.getMainTree().setModel(null);
-        }
+        projectTree.dispose();
     }
 }

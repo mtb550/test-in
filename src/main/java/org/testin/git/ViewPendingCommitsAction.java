@@ -21,11 +21,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.nio.file.Path;
@@ -52,8 +52,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
     public void update(final @NotNull AnActionEvent e) {
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
-        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = selectedNode.getUserObject();
+        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
         e.getPresentation().setEnabled(userObject instanceof TestProjectDirectoryDto);
     }

@@ -10,7 +10,6 @@ import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 
 import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Set;
 
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
@@ -23,7 +22,11 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {
-            DirectoryDto dir = (DirectoryDto) ((DefaultMutableTreeNode) value).getUserObject();
+            DirectoryDto dir = TreeValueUtil.directoryOf(value);
+            if (dir == null) {
+                append(value != null ? value.toString() : "", SimpleTextAttributes.REGULAR_ATTRIBUTES);
+                return;
+            }
             DirectoryType type = DirectoryType.from(dir);
 
             setIcon(type.getIcon());

@@ -7,7 +7,6 @@ import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CheckedTreeNode;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.testin.enums.TestRunConfiguration;
@@ -44,7 +43,7 @@ public class CreateTestRun implements NodeCreator {
     }
 
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull SimpleTree tree, final @NonNull String name, final @NonNull DefaultMutableTreeNode parentNode, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+    public @NonNull DirectoryDto execute(final @NonNull String name, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
         final TestProjectDirectoryDto tp = Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
 
         final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
@@ -152,7 +151,7 @@ public class CreateTestRun implements NodeCreator {
                 virtualDir.refresh(false, true);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                pp.getTestRunTreeBuilder().buildTree(pp.getTestProjectSelector().getSelectedTestProject().getItem());
+                pp.getProjectTree().refresh();
                 Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, trDir);
 
             });

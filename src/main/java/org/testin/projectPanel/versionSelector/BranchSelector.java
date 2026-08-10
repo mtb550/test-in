@@ -106,8 +106,7 @@ public class BranchSelector {
                     ApplicationManager.getApplication().invokeLater(() -> {
                         TestProjectDirectoryDto currentProject = pp.getTestProjectSelector().getSelectedTestProject().getItem();
                         if (currentProject != null) {
-                            pp.getTestCaseTreeBuilder().buildTree(currentProject);
-                            pp.getTestRunTreeBuilder().buildTree(currentProject);
+                            pp.getProjectTree().refresh();
                         }
                     });
 

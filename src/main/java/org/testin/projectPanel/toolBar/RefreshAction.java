@@ -9,11 +9,9 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 
-import javax.swing.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RefreshAction extends DumbAwareAction {
@@ -35,9 +33,6 @@ public class RefreshAction extends DumbAwareAction {
 
         Logger.info("Refresh: re-indexing started");
 
-        final TestProjectDirectoryDto previouslySelected = (TestProjectDirectoryDto) pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-        final String previousProjectName = previouslySelected != null ? previouslySelected.getName() : null;
-
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.resetForReindex();
 
@@ -50,19 +45,7 @@ public class RefreshAction extends DumbAwareAction {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 pp.getTestProjectSelector().loadTestProjectList();
-                pp.setupMainLayout();
-
-                if (previousProjectName != null) {
-                    final DefaultComboBoxModel<TestProjectDirectoryDto> list = pp.getTestProjectSelector().getTestProjectList();
-                    for (int i = 0; i < list.getSize(); i++) {
-                        TestProjectDirectoryDto tp = list.getElementAt(i);
-                        if (tp.getName().equals(previousProjectName)) {
-                            pp.getTestProjectSelector().getSelectedTestProject().setSelectedItem(tp);
-                            pp.getTestProjectSelector().filterByTestProject(tp);
-                            break;
-                        }
-                    }
-                }
+                pp.getProjectTree().refresh();
 
                 refreshGuard.set(false);
                 Logger.info("Refresh: tree rebuilt");

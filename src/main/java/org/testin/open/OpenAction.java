@@ -11,11 +11,11 @@ import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 public class OpenAction extends DumbAwareAction {
@@ -35,9 +35,8 @@ public class OpenAction extends DumbAwareAction {
         if (paths == null) return;
 
         for (TreePath path : paths) {
-            DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-            if (node == null) continue;
-            if (!(node.getUserObject() instanceof DirectoryDto directoryDto)) return;
+            final DirectoryDto directoryDto = TreeValueUtil.directoryOf(path.getLastPathComponent());
+            if (directoryDto == null) return;
 
 
             if (directoryDto instanceof TestSetDirectoryDto ts) {
@@ -66,12 +65,10 @@ public class OpenAction extends DumbAwareAction {
 
         if (paths != null) {
             for (TreePath path : paths) {
-                if (path.getLastPathComponent() instanceof DefaultMutableTreeNode node) {
-                    Object userObject = node.getUserObject();
-                    if (userObject instanceof TestSetDirectoryDto || userObject instanceof TestRunDirectoryDto) {
-                        shouldEnable = true;
-                        break;
-                    }
+                Object value = TreeValueUtil.valueOf(path.getLastPathComponent());
+                if (value instanceof TestSetDirectoryDto || value instanceof TestRunDirectoryDto) {
+                    shouldEnable = true;
+                    break;
                 }
             }
         }

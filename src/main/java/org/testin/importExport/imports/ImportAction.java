@@ -22,12 +22,12 @@ import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.nodeCreator.CreateTestSet;
 import org.testin.notifications.Notifier;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -59,8 +59,7 @@ public class ImportAction extends DumbAwareAction {
             return;
         }
 
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = parentNode.getUserObject();
+        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
         if (!(userObject instanceof DirectoryDto dirDto) ||
                 !(dirDto instanceof TestSetDirectoryDto ||
@@ -92,13 +91,13 @@ public class ImportAction extends DumbAwareAction {
                 return;
             }
 
-            executeImportWriteAction(p, targetDirectory, dirDto, parentNode, dialog, selectedCasesBySheet);
+            executeImportWriteAction(p, targetDirectory, dirDto, dialog, selectedCasesBySheet);
         } else {
             Services.getInstance(p, Notifier.class).softShow(p, "Import Cancelled", "Import was cancelled from preview dialog.");
         }
     }
 
-    private void executeImportWriteAction(final @NotNull Project p, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final DefaultMutableTreeNode parentNode, final ImportDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
+    private void executeImportWriteAction(final @NotNull Project p, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final ImportDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
@@ -127,7 +126,7 @@ public class ImportAction extends DumbAwareAction {
 
                     String cName = Services.getInstance(p, Tools.class).removeSpecialChars(rawSheetName);
                     Path newDirPath = Path.of(targetDirectory.getPath()).resolve(cName);
-                    DirectoryDto dir = new CreateTestSet(p).execute(tree, cName, parentNode, selectedDirDto, newDirPath);
+                    DirectoryDto dir = new CreateTestSet(p).execute(cName, selectedDirDto, newDirPath);
 
                     // todo, to be enhanced later
                     VirtualFile sheetDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(newDirPath);
@@ -152,6 +151,9 @@ public class ImportAction extends DumbAwareAction {
             }
 
             targetDirectory.refresh(false, true);
+            ApplicationManager.getApplication().invokeLater(() ->
+                    Services.getInstance(p, org.testin.projectPanel.ProjectPanel.class).getProjectTree().refresh()
+            );
 
         });
     }
@@ -214,8 +216,7 @@ public class ImportAction extends DumbAwareAction {
             return;
         }
 
-        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = selectedNode.getUserObject();
+        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
         e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto ||
                 userObject instanceof TestSetPackageDirectoryDto ||

@@ -6,8 +6,6 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.ui.treeStructure.SimpleTree;
-import com.intellij.util.ui.tree.TreeUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +14,6 @@ import org.testin.enums.IVfsOperation;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -51,25 +47,6 @@ public final class TreeUtilImpl {
                 Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
-    }
-
-    public void createNode(final SimpleTree tree, final DefaultMutableTreeNode node, final Object obj) {
-        DefaultMutableTreeNode newNode = new DefaultMutableTreeNode(obj);
-
-        ApplicationManager.getApplication().invokeLater(() -> {
-            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-            model.insertNodeInto(newNode, node, node.getChildCount());
-            TreeUtil.selectNode(tree, newNode);
-        });
-    }
-
-    public void removeNode(final DefaultMutableTreeNode node, final SimpleTree tree) {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-            if (node.getParent() != null) {
-                model.removeNodeFromParent(node);
-            }
-        });
     }
 
     public void removeVf(final @NotNull Project p, final Object requester, final Path path) {

@@ -7,7 +7,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileManager;
-import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
@@ -21,7 +20,6 @@ import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
 import org.testin.util.TreeUtilImpl;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -334,14 +332,6 @@ public final class ProjectIndexer {
     private void removeVf(final @NotNull Path path) {
         Services.getInstance(p, TreeUtilImpl.class).removeVf(p, this, path);
         VirtualFileManager.getInstance().syncRefresh();
-    }
-
-    public void createNode(final SimpleTree tree, final DefaultMutableTreeNode parentNode, final Object dto) {
-        Services.getInstance(p, TreeUtilImpl.class).createNode(tree, parentNode, dto);
-    }
-
-    public void removeNode(final DefaultMutableTreeNode node, final SimpleTree tree) {
-        Services.getInstance(p, TreeUtilImpl.class).removeNode(node, tree);
     }
 
     public void moveNode(final @NotNull Path oldPath, final @NotNull Path newPath) {

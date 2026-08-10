@@ -22,10 +22,10 @@ import org.testin.mappers.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 import java.io.File;
 import java.io.InputStream;
@@ -51,8 +51,7 @@ public class ExportAction extends DumbAwareAction {
         final TreePath path = tree.getSelectionPath();
         if (path == null) return;
 
-        final DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = parentNode.getUserObject();
+        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
         if (!(userObject instanceof DirectoryDto dirDto)) return;
 
         VirtualFile targetDir = resolveTargetDir(dirDto);
@@ -167,8 +166,7 @@ public class ExportAction extends DumbAwareAction {
             return;
         }
 
-        final DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) path.getLastPathComponent();
-        final Object userObject = selectedNode.getUserObject();
+        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
         e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto ||
                 userObject instanceof TestSetPackageDirectoryDto ||
