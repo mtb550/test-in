@@ -1,6 +1,11 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.FilePath;
+import com.intellij.openapi.vcs.VcsException;
+import com.intellij.openapi.vcs.changes.Change;
+import com.intellij.openapi.vcs.changes.ChangeListManager;
+import com.intellij.openapi.vcs.changes.ContentRevision;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
@@ -12,132 +17,117 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class GitDiffProcessor {
+/**
+ * Converts IntelliJ VCS changes into the test-case review model.
+ */
+public final class GitDiffProcessor {
 
-    public static List<TestCaseDiff> getPendingChanges(final @NotNull Project p, Path repoRoot) {
-        List<TestCaseDiff> allChanges = new ArrayList<>();
-
-        String statusOutput = GitCommandRunner.execute(repoRoot, "git", "status", "--porcelain", "-uall");
-
-        if (statusOutput.trim().isEmpty()) {
-            return allChanges;
-        }
-
-        String[] lines = statusOutput.split("\n");
-
-        for (String line : lines) {
-            if (line.trim().length() < 4) continue;
-
-            String statusCode = line.substring(0, 2);
-            String relativePathStr = line.substring(3).trim();
-
-            if (relativePathStr.startsWith("\"") && relativePathStr.endsWith("\"")) {
-                relativePathStr = relativePathStr.substring(1, relativePathStr.length() - 1);
-            }
-
-            if (!relativePathStr.endsWith(".json")) continue;
-
-            Path absolutePath = repoRoot.resolve(relativePathStr);
-            Path relativePath = Path.of(relativePathStr);
-
-            if (statusCode.contains("A") || statusCode.contains("?")) {
-                TestCaseDto newDto = Services.getInstance(p, Mapper.class).readValue(absolutePath.toFile(), TestCaseDto.class);
-                allChanges.add(new TestCaseDiff(
-                        newDto.getId().toString(),
-                        relativePath,
-                        DiffType.ADDED,
-                        null,
-                        newDto,
-                        List.of(new TestCaseDiff.FieldChange(
-                                "Test Case",
-                                "",
-                                newDto.getDescription(),
-                                ChangeType.CREATE_TEST_CASE
-                        ))
-                ));
-
-            } else if (statusCode.contains("M")) {
-                TestCaseDto newDto = Services.getInstance(p, Mapper.class).readValue(absolutePath.toFile(), TestCaseDto.class);
-
-                String gitPath = relativePathStr.replace("\\", "/");
-                String oldJsonString = GitCommandRunner.execute(repoRoot, "git", "show", "HEAD:" + gitPath);
-
-                TestCaseDto oldDto = Services.getInstance(p, Mapper.class).readValue(oldJsonString, TestCaseDto.class);
-
-                List<TestCaseDiff.FieldChange> fieldChanges = compareFields(oldDto, newDto);
-                if (!fieldChanges.isEmpty()) {
-                    allChanges.add(new TestCaseDiff(
-                            newDto.getId().toString(),
-                            relativePath,
-                            DiffType.MODIFIED,
-                            oldDto,
-                            newDto,
-                            fieldChanges
-                    ));
-                }
-            } else if (statusCode.contains("D")) {
-                String gitPath = relativePathStr.replace("\\", "/");
-                String oldJsonString = GitCommandRunner.execute(repoRoot, "git", "show", "HEAD:" + gitPath);
-                TestCaseDto oldDto = Services.getInstance(p, Mapper.class).readValue(oldJsonString, TestCaseDto.class);
-
-                allChanges.add(new TestCaseDiff(
-                        oldDto.getId().toString(),
-                        relativePath,
-                        DiffType.DELETED,
-                        oldDto,
-                        null,
-                        List.of(new TestCaseDiff.FieldChange(
-                                "Test Case",
-                                oldDto.getDescription(),
-                                "",
-                                ChangeType.REMOVE_TEST_CASE
-                        ))
-                ));
-            }
-        }
-        return allChanges;
+    private GitDiffProcessor() {
     }
 
-    private static List<TestCaseDiff.FieldChange> compareFields(TestCaseDto oldDto, TestCaseDto newDto) {
-        List<TestCaseDiff.FieldChange> changes = new ArrayList<>();
+    public static @NotNull List<TestCaseDiff> getPendingChanges(
+            final @NotNull Project project,
+            final @NotNull Path repositoryRoot) {
+        final Path normalizedRoot = repositoryRoot.toAbsolutePath().normalize();
+        final Mapper mapper = Services.getInstance(project, Mapper.class);
+        final List<TestCaseDiff> result = new ArrayList<>();
 
-        if (!Objects.equals(oldDto.getDescription(), newDto.getDescription())) {
-            changes.add(new TestCaseDiff.FieldChange(
-                    "Description",
-                    oldDto.getDescription(),
-                    newDto.getDescription(),
-                    ChangeType.CHANGE_DESCRIPTION
-            ));
-        }
-        if (!Objects.equals(oldDto.getExpectedResult(), newDto.getExpectedResult())) {
-            changes.add(new TestCaseDiff.FieldChange(
-                    "Expected Result",
-                    oldDto.getExpectedResult(),
-                    newDto.getExpectedResult(),
-                    ChangeType.CHANGE_EXPECTED_RESULT
-            ));
-        }
-        if (!Objects.equals(oldDto.getPriority(), newDto.getPriority())) {
-            String oldP = oldDto.getPriority().name();
-            String newP = newDto.getPriority().name();
-            changes.add(new TestCaseDiff.FieldChange(
-                    "Priority",
-                    oldP,
-                    newP,
-                    ChangeType.CHANGE_PRIORITY
-            ));
-        }
-        if (!Objects.equals(oldDto.getGroup(), newDto.getGroup())) {
-            String oldG = oldDto.getGroup().stream().map(Group::getName).reduce((a, b) -> a + ", " + b).orElse("");
-            String newG = newDto.getGroup().stream().map(Group::getName).reduce((a, b) -> a + ", " + b).orElse("");
-            changes.add(new TestCaseDiff.FieldChange(
-                    "Group",
-                    oldG,
-                    newG,
-                    ChangeType.CHANGE_GROUP
-            ));
-        }
+        for (final Change change : ChangeListManager.getInstance(project).getAllChanges()) {
+            final Path filePath = pathOf(change);
+            if (filePath == null || !filePath.startsWith(normalizedRoot)
+                    || !filePath.toString().endsWith(".json")) {
+                continue;
+            }
 
+            final Path relativePath = normalizedRoot.relativize(filePath);
+            try {
+                appendChange(result, change, relativePath, mapper);
+            } catch (final VcsException | RuntimeException ex) {
+                throw new IllegalStateException("Failed to read Git change " + relativePath, ex);
+            }
+        }
+        return result;
+    }
+
+    private static void appendChange(
+            final @NotNull List<TestCaseDiff> result,
+            final @NotNull Change change,
+            final @NotNull Path relativePath,
+            final @NotNull Mapper mapper) throws VcsException {
+        final ContentRevision before = change.getBeforeRevision();
+        final ContentRevision after = change.getAfterRevision();
+
+        switch (change.getType()) {
+            case NEW -> {
+                final TestCaseDto newState = read(mapper, after);
+                result.add(new TestCaseDiff(
+                        newState.getId().toString(), relativePath, DiffType.ADDED, null, newState,
+                        List.of(new TestCaseDiff.FieldChange(
+                                "Test Case", "", newState.getDescription(), ChangeType.CREATE_TEST_CASE))));
+            }
+            case DELETED -> {
+                final TestCaseDto oldState = read(mapper, before);
+                result.add(new TestCaseDiff(
+                        oldState.getId().toString(), relativePath, DiffType.DELETED, oldState, null,
+                        List.of(new TestCaseDiff.FieldChange(
+                                "Test Case", oldState.getDescription(), "", ChangeType.REMOVE_TEST_CASE))));
+            }
+            case MODIFICATION, MOVED -> {
+                final TestCaseDto oldState = read(mapper, before);
+                final TestCaseDto newState = read(mapper, after);
+                final List<TestCaseDiff.FieldChange> fieldChanges = compareFields(oldState, newState);
+                if (!fieldChanges.isEmpty()) {
+                    result.add(new TestCaseDiff(
+                            newState.getId().toString(), relativePath, DiffType.MODIFIED,
+                            oldState, newState, fieldChanges));
+                }
+            }
+        }
+    }
+
+    private static @NotNull TestCaseDto read(
+            final @NotNull Mapper mapper,
+            final ContentRevision revision) throws VcsException {
+        if (revision == null) throw new IllegalStateException("Missing Git file revision");
+        return mapper.readValue(revision.getContent(), TestCaseDto.class);
+    }
+
+    private static Path pathOf(final @NotNull Change change) {
+        final ContentRevision revision = change.getAfterRevision() != null
+                ? change.getAfterRevision()
+                : change.getBeforeRevision();
+        if (revision == null) return null;
+        final FilePath file = revision.getFile();
+        return file == null ? null : Path.of(file.getPath()).toAbsolutePath().normalize();
+    }
+
+    private static @NotNull List<TestCaseDiff.FieldChange> compareFields(
+            final @NotNull TestCaseDto oldState,
+            final @NotNull TestCaseDto newState) {
+        final List<TestCaseDiff.FieldChange> changes = new ArrayList<>();
+        addIfChanged(changes, "Description", oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
+        addIfChanged(changes, "Expected Result", oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
+        addIfChanged(changes, "Priority", oldState.getPriority().name(), newState.getPriority().name(), ChangeType.CHANGE_PRIORITY);
+
+        if (!Objects.equals(oldState.getGroup(), newState.getGroup())) {
+            changes.add(new TestCaseDiff.FieldChange(
+                    "Group", groupNames(oldState), groupNames(newState), ChangeType.CHANGE_GROUP));
+        }
         return changes;
+    }
+
+    private static void addIfChanged(
+            final @NotNull List<TestCaseDiff.FieldChange> changes,
+            final @NotNull String field,
+            final String oldValue,
+            final String newValue,
+            final @NotNull ChangeType type) {
+        if (!Objects.equals(oldValue, newValue)) {
+            changes.add(new TestCaseDiff.FieldChange(field, oldValue, newValue, type));
+        }
+    }
+
+    private static String groupNames(final @NotNull TestCaseDto testCase) {
+        return testCase.getGroup().stream().map(Group::getName).reduce((first, second) -> first + ", " + second).orElse("");
     }
 }

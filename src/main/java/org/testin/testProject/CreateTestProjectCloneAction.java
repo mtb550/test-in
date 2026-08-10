@@ -9,9 +9,10 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
+import git4idea.commands.Git;
+import git4idea.commands.GitCommandResult;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.git.GitCommandRunner;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -50,7 +51,9 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
                 indicator.setText("Cloning into " + projectName + "...");
 
                 try {
-                    GitCommandRunner.execute(Services.getInstance(p, Setting.class).getTestinPath(), "git", "clone", gitUrl, projectName);
+                    final Path parentPath = Services.getInstance(p, Setting.class).getTestinPath();
+                    final GitCommandResult result = Git.getInstance().clone(p, parentPath, gitUrl, projectName);
+                    result.throwOnError();
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         // The indexer owns disk reads/refresh: scanSingleProject re-scans the cloned

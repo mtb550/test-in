@@ -11,23 +11,16 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBTextField;
 import com.intellij.ui.treeStructure.SimpleTree;
-import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 
-import javax.swing.*;
 import javax.swing.tree.TreePath;
-import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -35,12 +28,16 @@ import java.util.List;
 public class ViewPendingCommitsAction extends DumbAwareAction {
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
+    private final @NotNull GitRepositoryService git;
+    private final @NotNull GitCommitService commits;
     private Notification pushNotification;
 
     public ViewPendingCommitsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
         this.p = p;
         this.tree = tree;
+        this.git = new GitRepositoryService(p);
+        this.commits = new GitCommitService(p);
     }
 
     @Override
@@ -63,8 +60,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         final Path path = Services.getInstance(p, Tools.class).getProjectPath(tree);
         if (path == null) return;
 
-        File gitDir = new File(path.toFile(), ".git");
-        if (!gitDir.exists() || !gitDir.isDirectory()) {
+        if (!git.isRepository(path)) {
             Services.getInstance(p, Notifier.class).warnWithAction(p,
                     "Git repository not found",
                     "The selected project (" + path.getFileName() + ") is not a Git repository.",
@@ -122,11 +118,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             public void run(@NotNull ProgressIndicator commitIndicator) {
                 commitIndicator.setIndeterminate(true);
                 try {
-                    commitIndicator.setText("Staging files...");
-                    GitCommandRunner.execute(repoPath, "git", "add", ".");
-
-                    commitIndicator.setText("Committing files...");
-                    GitCommandRunner.execute(repoPath, "git", "commit", "-m", commitMessage);
+                    commitIndicator.setText("Staging and committing files...");
+                    commits.stageAndCommit(repoPath, commitMessage);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         NotificationAction pushAction = NotificationAction.createSimple(
@@ -144,7 +137,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
                 } catch (final Exception ex) {
                     String errorMsg = ex.getMessage();
-                    if (errorMsg != null && errorMsg.contains("Author identity unknown")) {
+                    if (isIdentityError(errorMsg)) {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 promptAndSetGitIdentity(p, repoPath, commitMessage)
                         );
@@ -164,9 +157,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    GitCommandRunner.execute(repoPath, "git", "init");
-                    GitCommandRunner.execute(repoPath, "git", "checkout", "-b", "main");
-                    GitCommandRunner.execute(repoPath, "git", "config", "--local", "http.sslVerify", "false");
+                    commits.initialize(repoPath);
 
 
                     ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).info(p, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName()));
@@ -181,39 +172,52 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
     }
 
     private void pushToRemote(final @NotNull Project p, final Path repoPath) {
-        String remoteUrl = GitCommandRunner.execute(repoPath, "git", "config", "--get", "remote.origin.url").trim();
-
-        if (remoteUrl.isEmpty()) {
-            remoteUrl = com.intellij.openapi.ui.Messages.showInputDialog(
-                    p,
-                    "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
-                    "Configure Remote",
-                    com.intellij.openapi.ui.Messages.getQuestionIcon()
-            );
-
-            if (remoteUrl == null || remoteUrl.trim().isEmpty()) {
-                Services.getInstance(p, Notifier.class).warn(p, "Push Aborted", "A remote URL is required to push.");
-                return;
-            }
-
-            final String finalRemoteUrl = remoteUrl.trim();
-
-            ProgressManager.getInstance().run(new Task.Backgroundable(p, "Configuring remote", false) {
-                @Override
-                public void run(@NotNull ProgressIndicator indicator) {
-                    try {
-                        GitCommandRunner.execute(repoPath, "git", "remote", "add", "origin", finalRemoteUrl);
-                        executeGitPush(p, repoPath);
-                    } catch (final Exception ex) {
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage())
-                        );
-                    }
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking Git remote", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                try {
+                    final String remoteUrl = git.getRemoteUrl(repoPath);
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (remoteUrl.isEmpty()) {
+                            configureRemoteAndPush(p, repoPath);
+                        } else {
+                            executeGitPush(p, repoPath);
+                        }
+                    });
+                } catch (final Exception ex) {
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Services.getInstance(p, Notifier.class).error(p, "Git Error", "Could not read the Git remote: " + ex.getMessage())
+                    );
                 }
-            });
-        } else {
-            executeGitPush(p, repoPath);
+            }
+        });
+    }
+
+    private void configureRemoteAndPush(final @NotNull Project p, final Path repoPath) {
+        final String remoteUrl = Messages.showInputDialog(
+                p,
+                "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
+                "Configure Remote",
+                Messages.getQuestionIcon());
+
+        if (remoteUrl == null || remoteUrl.trim().isEmpty()) {
+            Services.getInstance(p, Notifier.class).warn(p, "Push Aborted", "A remote URL is required to push.");
+            return;
         }
+
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Configuring remote", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                try {
+                    commits.configureRemote(repoPath, remoteUrl.trim());
+                    ApplicationManager.getApplication().invokeLater(() -> executeGitPush(p, repoPath));
+                } catch (final Exception ex) {
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage())
+                    );
+                }
+            }
+        });
     }
 
     private void executeGitPush(final @NotNull Project p, final Path repoPath) {
@@ -221,13 +225,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                GitCommandRunner.execute(repoPath, "git", "branch", "-M", "main");
                 indicator.setText("Syncing with remote (Pull --rebase)...");
-                GitCommandRunner.execute(repoPath, "git", "pull", "--rebase", "--autostash", "origin", "main");
-                GitCommandRunner.execute(repoPath, "git", "rebase", "--abort");
-
                 indicator.setText("Pushing commits...");
-                GitCommandRunner.execute(repoPath, "git", "push", "-u", "origin", "main");
+                commits.pullAndPushMain(repoPath);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (pushNotification != null) {
@@ -260,9 +260,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                     public void run(@NotNull ProgressIndicator indicator) {
                         indicator.setIndeterminate(true);
                         try {
-                            String scope = setGlobally ? "--global" : "--local";
-                            GitCommandRunner.execute(repoPath, "git", "config", scope, "user.name", name.trim());
-                            GitCommandRunner.execute(repoPath, "git", "config", scope, "user.email", email.trim());
+                            commits.configureIdentity(repoPath, name.trim(), email.trim(), setGlobally);
 
                             ApplicationManager.getApplication().invokeLater(() -> {
                                 Services.getInstance(p, Notifier.class).info(p, "Git Identity Set", "Identity configured successfully. Resuming commit...");
@@ -279,41 +277,11 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         });
     }
 
-    private static class GitIdentityDialog extends DialogWrapper {
-        private final JBTextField nameField = new JBTextField();
-        private final JBTextField emailField = new JBTextField();
-        private final JBCheckBox globalCheckBox = new JBCheckBox("Set globally");
-
-        public GitIdentityDialog(@Nullable Project p) {
-            super(p, true);
-            setTitle("Set Git Identity and Commit");
-            init();
-        }
-
-        @Override
-        protected @Nullable JComponent createCenterPanel() {
-            return FormBuilder.createFormBuilder()
-                    .addLabeledComponent("Name:", nameField)
-                    .addLabeledComponent("Email:", emailField)
-                    .addComponent(globalCheckBox)
-                    .getPanel();
-        }
-
-        @Override
-        public @Nullable JComponent getPreferredFocusedComponent() {
-            return nameField;
-        }
-
-        public String getUserName() {
-            return nameField.getText();
-        }
-
-        public String getUserEmail() {
-            return emailField.getText();
-        }
-
-        public boolean isSetGlobalConfig() {
-            return globalCheckBox.isSelected();
-        }
+    private boolean isIdentityError(final String message) {
+        if (message == null) return false;
+        final String normalized = message.toLowerCase(java.util.Locale.ROOT);
+        return normalized.contains("author identity unknown")
+                || normalized.contains("please tell me who you are");
     }
+
 }

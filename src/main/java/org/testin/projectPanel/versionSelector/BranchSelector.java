@@ -7,7 +7,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
-import org.testin.git.GitCommandRunner;
+import org.testin.git.GitRepositoryService;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
@@ -15,16 +15,13 @@ import org.testin.services.Services;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BranchSelector {
-    private final boolean showRemote = false;
-
     private final @NotNull Project p;
     private final ProjectPanel pp;
+    private final GitRepositoryService git;
     private final ComboBox<String> comboBox;
     private final DefaultComboBoxModel<String> model;
 
@@ -36,6 +33,7 @@ public class BranchSelector {
     public BranchSelector(final @NotNull Project p, final ProjectPanel pp, final TestProjectDirectoryDto testProjectDirectory) {
         this.p = p;
         this.pp = pp;
+        this.git = new GitRepositoryService(p);
         this.model = new DefaultComboBoxModel<>();
         this.comboBox = new ComboBox<>(model);
 
@@ -60,8 +58,7 @@ public class BranchSelector {
         }
 
         if (projectPath != null) {
-            File gitDir = new File(projectPath.toFile(), ".git");
-            if (gitDir.exists() && gitDir.isDirectory()) {
+            if (git.isRepository(projectPath)) {
                 isUpdating = true;
                 model.addElement("Loading branches...");
                 isUpdating = false;
@@ -100,7 +97,7 @@ public class BranchSelector {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    GitCommandRunner.execute(projectPath, "git", "checkout", targetBranch);
+                    git.checkout(projectPath, targetBranch);
                     currentBranch = targetBranch;
 
                     ApplicationManager.getApplication().invokeLater(() -> {
@@ -134,12 +131,9 @@ public class BranchSelector {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    String[] command = showRemote
-                            ? new String[]{"git", "branch", "-a", "--no-color"}
-                            : new String[]{"git", "branch", "--no-color"};
-
-                    String output = GitCommandRunner.execute(projectPath, command);
-                    List<String> branches = parseBranches(output);
+                    List<String> branches = git.getLocalBranches(projectPath);
+                    String loadedCurrentBranch = git.getCurrentBranch(projectPath);
+                    if (loadedCurrentBranch != null) currentBranch = loadedCurrentBranch;
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         isUpdating = true;
@@ -183,33 +177,6 @@ public class BranchSelector {
                 }
             }
         });
-    }
-
-    private List<String> parseBranches(final String commandOutput) {
-        List<String> branchList = new ArrayList<>();
-        if (commandOutput == null || commandOutput.trim().isEmpty()) {
-            return branchList;
-        }
-
-        String[] lines = commandOutput.split("\n");
-        for (String line : lines) {
-            String trimmed = line.trim();
-            if (trimmed.isEmpty()) continue;
-
-            if (trimmed.startsWith("*")) {
-                trimmed = trimmed.substring(1).trim();
-                currentBranch = trimmed;
-            }
-
-            if (showRemote && trimmed.contains("->")) {
-                continue;
-            }
-
-            if (!branchList.contains(trimmed)) {
-                branchList.add(trimmed);
-            }
-        }
-        return branchList;
     }
 
     public JComponent getComponent() {

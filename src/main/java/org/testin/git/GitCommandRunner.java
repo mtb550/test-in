@@ -1,39 +1,59 @@
 package org.testin.git;
 
+import com.intellij.openapi.project.Project;
+import git4idea.commands.Git;
+import git4idea.commands.GitCommand;
+import git4idea.commands.GitCommandResult;
+import git4idea.commands.GitLineHandler;
+import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.nio.file.Path;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 
-public class GitCommandRunner {
+/**
+ * Small adapter over IntelliJ Git4Idea command execution.
+ */
+final class GitCommandRunner {
 
-    public static String execute(Path workingDirectory, String... command) {
-        try {
-            ProcessBuilder pb = new ProcessBuilder(command);
-            pb.directory(workingDirectory.toFile());
-            pb.redirectErrorStream(true);
+    private GitCommandRunner() {
+    }
 
-
-            Process process = pb.start();
-
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String output = reader.lines().collect(Collectors.joining("\n"));
-                int exitCode = process.waitFor();
-
-                if (exitCode != 0 && !output.isEmpty()) {
-                    throw new RuntimeException("Git command failed: " + output);
-                }
-                return output;
-
-            } catch (final Exception ex) {
-                Logger.error("Git command failed: " + ex.getMessage());
-                throw new RuntimeException(ex);
-            }
-        } catch (final Exception ex) {
-            Logger.error("Git command interrupted: " + ex.getMessage());
-            throw new RuntimeException(ex);
+    static @NotNull String execute(
+            final @NotNull Project project,
+            final @NotNull Path workingDirectory,
+            final @NotNull String... command) {
+        if (command.length < 2 || !"git".equals(command[0])) {
+            throw new IllegalArgumentException("Expected a git command");
         }
+
+        final GitCommand gitCommand = commandFor(command[1]);
+
+        final GitLineHandler handler = new GitLineHandler(project, workingDirectory, gitCommand);
+        handler.addParameters(Arrays.copyOfRange(command, 2, command.length));
+
+        final GitCommandResult result = Git.getInstance().runCommand(handler);
+        if (!result.success()) {
+            final String details = result.getErrorOutputAsJoinedString().isBlank()
+                    ? result.getOutputAsJoinedString()
+                    : result.getErrorOutputAsJoinedString();
+            Logger.error("Git command failed: " + details);
+            throw new IllegalStateException("Git command failed: " + details);
+        }
+        return result.getOutputAsJoinedString();
+    }
+
+    private static @NotNull GitCommand commandFor(final @NotNull String command) {
+        return switch (command) {
+            case "add" -> GitCommand.ADD;
+            case "branch" -> GitCommand.BRANCH;
+            case "commit" -> GitCommand.COMMIT;
+            case "config" -> GitCommand.CONFIG;
+            case "init" -> GitCommand.INIT;
+            case "pull" -> GitCommand.PULL;
+            case "push" -> GitCommand.PUSH;
+            case "remote" -> GitCommand.REMOTE;
+            default -> throw new IllegalArgumentException("Unsupported Git command: " + command);
+        };
     }
 }
