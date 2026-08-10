@@ -55,7 +55,7 @@ public class GridPanelBuilder {
                 textArea.setFont(table.getFont());
                 textArea.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
                 wrapper.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
-                // size the area to the column width so text wraps at the current column size
+
                 final int width = table.getColumnModel().getColumn(column).getWidth();
                 textArea.setSize(new Dimension(width, Short.MAX_VALUE));
                 wrapper.add(textArea, c);
@@ -233,15 +233,12 @@ public class GridPanelBuilder {
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        // Set selection blue background and dark blue styling
-        table.setSelectionBackground(new Color(38, 79, 142)); // Dark blue row selection
-        table.setSelectionForeground(Color.WHITE);
-
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         table.setDefaultRenderer(Object.class, wrappingRenderer());
+        // below, set constant border for table cells
+        //table.setBorder();
+        table.setExpandableItemsEnabled(false);
         addColumnResizeListener(table);
-
         if (editable) {
             table.setDefaultEditor(Object.class, new GridCellEditor());
         }
