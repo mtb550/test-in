@@ -18,16 +18,17 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
 import java.nio.file.Path;
+import java.util.*;
 import java.util.List;
-import java.util.UUID;
 
 public class PendingCommitsDialog extends DialogWrapper {
 
     private final @NotNull Project p;
     private final List<TestCaseDiff> differences;
     private final Path repoRoot;
+    private final List<TestCaseDiff> rowDifferences = new ArrayList<>();
+    private JBTable table;
 
     public PendingCommitsDialog(@NotNull Project p, List<TestCaseDiff> differences, Path repoRoot) {
         super(p, true);
@@ -63,10 +64,13 @@ public class PendingCommitsDialog extends DialogWrapper {
                         fc.oldValue(),
                         fc.newValue()
                 });
+                rowDifferences.add(diff);
             }
         }
 
-        JBTable table = new JBTable(model);
+        table = new JBTable(model);
+        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        if (table.getRowCount() > 0) table.addRowSelectionInterval(0, table.getRowCount() - 1);
         table.setFillsViewportHeight(true);
         table.getColumnModel().getColumn(0).setPreferredWidth(100);
         table.getColumnModel().getColumn(1).setPreferredWidth(120);
@@ -103,6 +107,15 @@ public class PendingCommitsDialog extends DialogWrapper {
         return panel;
     }
 
+    public @NotNull List<TestCaseDiff> getSelectedDifferences() {
+        if (table == null || table.getSelectedRowCount() == 0) return List.of();
+        final Set<TestCaseDiff> selected = new LinkedHashSet<>();
+        for (final int row : table.getSelectedRows()) {
+            if (row >= 0 && row < rowDifferences.size()) selected.add(rowDifferences.get(row));
+        }
+        return List.copyOf(selected);
+    }
+
     private String getDescriptionForRow(TestCaseDiff diff, TestCaseDiff.FieldChange fc) {
         if (diff.type() == DiffType.ADDED) {
             TestCaseDto newState = diff.newState();
@@ -132,14 +145,15 @@ public class PendingCommitsDialog extends DialogWrapper {
         if (diff == null) return;
 
         try {
-            File jsonFile = repoRoot.resolve(diff.relativeFilePath()).toFile();
+            final Path jsonPath = repoRoot.resolve(diff.relativeFilePath());
+            final Path testSetPath = jsonPath.getParent();
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             if (diff.type() == DiffType.ADDED) {
-                if (jsonFile.exists() && jsonFile.delete()) {
-                    model.removeRow(selectedRow);
-                }
+                indexer.removeTestCase(testSetPath, UUID.fromString(testCaseId));
+                removeRow(selectedRow, model);
             } else if (diff.type() == DiffType.MODIFIED) {
-                final TestCaseDto currentDto = Services.getInstance(p, ProjectIndexer.class).getTestCaseById(UUID.fromString(testCaseId));
+                final TestCaseDto currentDto = indexer.getTestCaseById(UUID.fromString(testCaseId));
                 final TestCaseDto oldDto = diff.oldState();
 
                 if (currentDto == null)
@@ -149,11 +163,19 @@ public class PendingCommitsDialog extends DialogWrapper {
                 if (changeType != null && changeType.getRevertAction() != null)
                     changeType.getRevertAction().apply(currentDto, oldDto);
 
-                Services.getInstance(p, ProjectIndexer.class).putTestCase(jsonFile.getParentFile().toPath(), currentDto);
-                model.removeRow(selectedRow);
+                indexer.putTestCase(testSetPath, currentDto);
+                removeRow(selectedRow, model);
+            } else if (diff.type() == DiffType.DELETED && diff.oldState() != null) {
+                indexer.putTestCase(testSetPath, diff.oldState());
+                removeRow(selectedRow, model);
             }
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, "Revert Failed", "Could not revert change: " + ex.getMessage());
         }
+    }
+
+    private void removeRow(final int row, final DefaultTableModel model) {
+        model.removeRow(row);
+        if (row >= 0 && row < rowDifferences.size()) rowDifferences.remove(row);
     }
 }

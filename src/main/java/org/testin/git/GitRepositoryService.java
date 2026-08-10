@@ -5,6 +5,7 @@ import com.intellij.openapi.vcs.VcsException;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import git4idea.GitLocalBranch;
+import git4idea.GitRemoteBranch;
 import git4idea.GitUtil;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
@@ -14,12 +15,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Repository lookup and branch operations backed by IntelliJ Git4Idea.
  */
 public final class GitRepositoryService {
+
+    private static final Pattern HEAD_BRANCH = Pattern.compile("(?m)^\\s*HEAD branch:\\s*(\\S+)\\s*$");
 
     private final @NotNull Project project;
 
@@ -56,17 +63,101 @@ public final class GitRepositoryService {
         return branch == null ? null : branch.getName();
     }
 
+    public @Nullable String getDefaultBranch(final @NotNull Path path) {
+        final String currentBranch = getCurrentBranch(path);
+        final String remoteName = getRemoteName(path);
+        if (remoteName == null) return currentBranch;
+        try {
+            final String remoteInfo = GitCommandRunner.execute(project, path, "git", "remote", "show", remoteName);
+            final Matcher matcher = HEAD_BRANCH.matcher(remoteInfo);
+            return matcher.find() ? matcher.group(1) : currentBranch;
+        } catch (final RuntimeException ignored) {
+            return currentBranch;
+        }
+    }
+
+    public void fetchRemoteBranches(final @NotNull Path path) throws VcsException {
+        if (getRemoteName(path) == null) return;
+        GitCommandRunner.execute(project, path, "git", "fetch", "--all", "--prune");
+        final GitRepository repository = findRepository(path);
+        if (repository != null) GitUtil.updateRepositories(List.of(repository));
+    }
+
+    public @NotNull List<String> getAvailableBranches(final @NotNull Path path) {
+        final GitRepository repository = findRepository(path);
+        if (repository == null) return List.of();
+
+        final Set<String> branches = new LinkedHashSet<>();
+        repository.getBranches().getLocalBranches().stream()
+                .map(GitLocalBranch::getName)
+                .forEach(branches::add);
+        repository.getBranches().getRemoteBranches().stream()
+                .map(GitRemoteBranch::getName)
+                .filter(name -> !name.endsWith("/HEAD"))
+                .forEach(branches::add);
+
+        return branches.stream().sorted().toList();
+    }
+
     public @NotNull String getRemoteUrl(final @NotNull Path path) throws VcsException {
+        final String remoteName = getRemoteName(path);
+        return remoteName == null ? "" : getRemoteUrl(path, remoteName);
+    }
+
+    public @NotNull String getRemoteUrl(final @NotNull Path path, final @NotNull String remoteName) throws VcsException {
         final VirtualFile root = LocalFileSystem.getInstance().findFileByNioFile(path);
         if (root == null) return "";
-        final String remote = git4idea.config.GitConfigUtil.getValue(project, root, "remote.origin.url");
+        final String remote = git4idea.config.GitConfigUtil.getValue(project, root, "remote." + remoteName + ".url");
         return remote == null ? "" : remote.trim();
     }
 
-    public void checkout(final @NotNull Path path, final @NotNull String branch) throws VcsException {
+    public @Nullable String getRemoteName(final @NotNull Path path) {
+        try {
+            final List<String> remotes = GitCommandRunner.execute(project, path, "git", "remote").lines()
+                    .map(String::trim)
+                    .filter(name -> !name.isEmpty())
+                    .toList();
+            if (remotes.contains("origin")) return "origin";
+            return remotes.isEmpty() ? null : remotes.getFirst();
+        } catch (final RuntimeException ignored) {
+            return null;
+        }
+    }
+
+    public @NotNull String checkout(final @NotNull Path path, final @NotNull String branch) throws VcsException {
         final GitRepository repository = requireRepository(path);
+        final boolean remoteBranch = repository.getBranches().getRemoteBranches().stream()
+                .map(GitRemoteBranch::getName)
+                .anyMatch(branch::equals);
+        if (remoteBranch) {
+            final String localBranch = branch.substring(branch.indexOf('/') + 1);
+            if (repository.getBranches().findLocalBranch(localBranch) == null) {
+                GitCommandRunner.execute(project, path, "git", "checkout", "-b", localBranch, "--track", branch);
+                return localBranch;
+            }
+        }
+
         final GitCommandResult result = Git.getInstance().checkout(repository, branch, null, false, false);
         result.throwOnError();
+        return branch;
+    }
+
+    public boolean hasConflicts(final @NotNull Path path) {
+        final GitRepository repository = findRepository(path);
+        if (repository == null) return false;
+        if (repository.isRebaseInProgress()) return true;
+        final GitCommandResult result = Git.getInstance().getUnmergedFiles(repository);
+        return result.success() && !result.getOutput().isEmpty();
+    }
+
+    public void abortRebase(final @NotNull Path path) throws VcsException {
+        final GitRepository repository = requireRepository(path);
+        Git.getInstance().rebaseAbort(repository).throwOnError();
+    }
+
+    public void continueRebase(final @NotNull Path path) throws VcsException {
+        final GitRepository repository = requireRepository(path);
+        Git.getInstance().rebaseContinue(repository).throwOnError();
     }
 
     private @NotNull GitRepository requireRepository(final @NotNull Path path) throws VcsException {

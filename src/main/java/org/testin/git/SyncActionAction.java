@@ -1,6 +1,7 @@
 package org.testin.git;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -64,37 +65,91 @@ public class SyncActionAction extends DumbAwareAction {
 
                 try {
                     indicator.setText("Checking remote configuration...");
-                    String remoteUrl = git.getRemoteUrl(repoPath);
+                    final String remoteName = git.getRemoteName(repoPath);
+                    final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
 
-                    if (remoteUrl.isEmpty()) {
+                    if (remoteName == null || remoteUrl.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(p, Notifier.class).warn(p, "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
                         );
                         return;
                     }
 
-                    indicator.setText("Pulling latest changes...");
-                    sync.pullMain(repoPath);
+                    final String branch = git.getDefaultBranch(repoPath);
+                    if (branch == null || branch.isBlank()) {
+                        throw new IllegalStateException("Could not determine the repository default branch.");
+                    }
+
+                    indicator.setText("Pulling latest changes from " + branch + "...");
+                    sync.pull(repoPath, remoteName, branch);
 
                     indicator.setText("Refreshing files...");
-                    VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile());
-                    if (vFile != null) {
-                        GitUtil.refreshVfsInRoot(vFile);
-                    }
-                    Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        Services.getInstance(p, Notifier.class).info(p, "Sync Successful", "Your project is now up to date with the remote repository.");
-                        pp.getProjectTree().refresh();
-                    });
+                    refreshAfterSync(repoPath);
 
                 } catch (final Exception ex) {
                     Logger.error(ex.getMessage());
-                    ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not pull changes:\n" + ex.getMessage())
-                    );
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (sync.hasConflicts(repoPath)) {
+                            showConflictActions(repoPath);
+                        } else {
+                            Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not pull changes:\n" + ex.getMessage());
+                        }
+                    });
                 }
             }
         });
+    }
+
+    private void showConflictActions(final Path repoPath) {
+        final NotificationAction continueAction = NotificationAction.createSimple(
+                "Continue Rebase", () -> finishRebase(repoPath, false));
+        final NotificationAction abortAction = NotificationAction.createSimple(
+                "Abort Rebase", () -> finishRebase(repoPath, true));
+        Services.getInstance(p, Notifier.class).warnWithActions(
+                p,
+                "Git Conflicts",
+                "Pull stopped because conflicts must be resolved in the IDE before continuing.",
+                continueAction,
+                abortAction);
+    }
+
+    private void finishRebase(final Path repoPath, final boolean abort) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, abort ? "Aborting rebase" : "Continuing rebase", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                try {
+                    if (abort) {
+                        sync.abortRebase(repoPath);
+                        refreshRepository(repoPath);
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Services.getInstance(p, Notifier.class).info(p, "Git Conflict Resolution", "Rebase aborted."));
+                    } else {
+                        sync.continueRebase(repoPath);
+                        refreshAfterSync(repoPath);
+                    }
+                } catch (final Exception ex) {
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (sync.hasConflicts(repoPath)) showConflictActions(repoPath);
+                        else
+                            Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", ex.getMessage());
+                    });
+                }
+            }
+        });
+    }
+
+    private void refreshAfterSync(final Path repoPath) {
+        refreshRepository(repoPath);
+        ApplicationManager.getApplication().invokeLater(() -> {
+            Services.getInstance(p, Notifier.class).info(p, "Sync Successful", "Your project is now up to date with the remote repository.");
+            pp.getProjectTree().refresh();
+        });
+    }
+
+    private void refreshRepository(final Path repoPath) {
+        final VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile());
+        if (vFile != null) GitUtil.refreshVfsInRoot(vFile);
+        Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
     }
 
     private Path getActiveProjectPath() {

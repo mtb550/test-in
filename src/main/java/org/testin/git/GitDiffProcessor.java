@@ -7,7 +7,6 @@ import com.intellij.openapi.vcs.changes.Change;
 import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.openapi.vcs.changes.ContentRevision;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
@@ -15,7 +14,6 @@ import org.testin.util.Mapper;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * Converts IntelliJ VCS changes into the test-case review model.
@@ -75,7 +73,7 @@ public final class GitDiffProcessor {
             case MODIFICATION, MOVED -> {
                 final TestCaseDto oldState = read(mapper, before);
                 final TestCaseDto newState = read(mapper, after);
-                final List<TestCaseDiff.FieldChange> fieldChanges = compareFields(oldState, newState);
+                final List<TestCaseDiff.FieldChange> fieldChanges = TestCaseChangeComparator.compare(oldState, newState);
                 if (!fieldChanges.isEmpty()) {
                     result.add(new TestCaseDiff(
                             newState.getId().toString(), relativePath, DiffType.MODIFIED,
@@ -101,33 +99,4 @@ public final class GitDiffProcessor {
         return file == null ? null : Path.of(file.getPath()).toAbsolutePath().normalize();
     }
 
-    private static @NotNull List<TestCaseDiff.FieldChange> compareFields(
-            final @NotNull TestCaseDto oldState,
-            final @NotNull TestCaseDto newState) {
-        final List<TestCaseDiff.FieldChange> changes = new ArrayList<>();
-        addIfChanged(changes, "Description", oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
-        addIfChanged(changes, "Expected Result", oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
-        addIfChanged(changes, "Priority", oldState.getPriority().name(), newState.getPriority().name(), ChangeType.CHANGE_PRIORITY);
-
-        if (!Objects.equals(oldState.getGroup(), newState.getGroup())) {
-            changes.add(new TestCaseDiff.FieldChange(
-                    "Group", groupNames(oldState), groupNames(newState), ChangeType.CHANGE_GROUP));
-        }
-        return changes;
-    }
-
-    private static void addIfChanged(
-            final @NotNull List<TestCaseDiff.FieldChange> changes,
-            final @NotNull String field,
-            final String oldValue,
-            final String newValue,
-            final @NotNull ChangeType type) {
-        if (!Objects.equals(oldValue, newValue)) {
-            changes.add(new TestCaseDiff.FieldChange(field, oldValue, newValue, type));
-        }
-    }
-
-    private static String groupNames(final @NotNull TestCaseDto testCase) {
-        return testCase.getGroup().stream().map(Group::getName).reduce((first, second) -> first + ", " + second).orElse("");
-    }
 }

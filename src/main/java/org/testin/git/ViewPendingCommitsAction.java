@@ -22,6 +22,7 @@ import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 
 // todo: to be refactored
@@ -86,6 +87,11 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
                         PendingCommitsDialog dialog = new PendingCommitsDialog(p, changes, path);
                         if (dialog.showAndGet()) {
+                            final List<TestCaseDiff> selectedChanges = dialog.getSelectedDifferences();
+                            if (selectedChanges.isEmpty()) {
+                                Services.getInstance(p, Notifier.class).warn(p, "Commit Aborted", "Select at least one change to commit.");
+                                return;
+                            }
                             String commitMessage = Messages.showInputDialog(
                                     p,
                                     "Enter a message for this commit:",
@@ -96,7 +102,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                             );
 
                             if (commitMessage != null && !commitMessage.trim().isEmpty()) {
-                                performCommitWorkflow(p, path, commitMessage.trim());
+                                performCommitWorkflow(p, path, commitMessage.trim(), selectedChanges);
                             } else if (commitMessage != null) {
                                 Services.getInstance(p, Notifier.class).warn(p, "Commit Aborted", "A commit message is required.");
                             }
@@ -112,14 +118,18 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         });
     }
 
-    private void performCommitWorkflow(final @NotNull Project p, final Path repoPath, final String commitMessage) {
+    private void performCommitWorkflow(
+            final @NotNull Project p,
+            final Path repoPath,
+            final String commitMessage,
+            final Collection<TestCaseDiff> selectedChanges) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Committing to local Git", false) {
             @Override
             public void run(@NotNull ProgressIndicator commitIndicator) {
                 commitIndicator.setIndeterminate(true);
                 try {
                     commitIndicator.setText("Staging and committing files...");
-                    commits.stageAndCommit(repoPath, commitMessage);
+                    commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         NotificationAction pushAction = NotificationAction.createSimple(
@@ -139,7 +149,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                     String errorMsg = ex.getMessage();
                     if (isIdentityError(errorMsg)) {
                         ApplicationManager.getApplication().invokeLater(() ->
-                                promptAndSetGitIdentity(p, repoPath, commitMessage)
+                                promptAndSetGitIdentity(p, repoPath, commitMessage, selectedChanges)
                         );
                     } else {
                         ApplicationManager.getApplication().invokeLater(() ->
@@ -176,12 +186,17 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
-                    final String remoteUrl = git.getRemoteUrl(repoPath);
+                    final String remoteName = git.getRemoteName(repoPath);
+                    final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
+                    final String branch = git.getDefaultBranch(repoPath);
+                    if (branch == null || branch.isBlank()) {
+                        throw new IllegalStateException("Could not determine the repository default branch.");
+                    }
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (remoteUrl.isEmpty()) {
-                            configureRemoteAndPush(p, repoPath);
+                            configureRemoteAndPush(p, repoPath, remoteName == null ? "origin" : remoteName, branch);
                         } else {
-                            executeGitPush(p, repoPath);
+                            executeGitPush(p, repoPath, remoteName, branch);
                         }
                     });
                 } catch (final Exception ex) {
@@ -193,7 +208,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         });
     }
 
-    private void configureRemoteAndPush(final @NotNull Project p, final Path repoPath) {
+    private void configureRemoteAndPush(final @NotNull Project p, final Path repoPath, final String remoteName, final String branch) {
         final String remoteUrl = Messages.showInputDialog(
                 p,
                 "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
@@ -209,8 +224,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 try {
-                    commits.configureRemote(repoPath, remoteUrl.trim());
-                    ApplicationManager.getApplication().invokeLater(() -> executeGitPush(p, repoPath));
+                    commits.configureRemote(repoPath, remoteName, remoteUrl.trim());
+                    ApplicationManager.getApplication().invokeLater(() -> executeGitPush(p, repoPath, remoteName, branch));
                 } catch (final Exception ex) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage())
@@ -220,28 +235,70 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         });
     }
 
-    private void executeGitPush(final @NotNull Project p, final Path repoPath) {
+    private void executeGitPush(final @NotNull Project p, final Path repoPath, final String remote, final String branch) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Pushing to Remote", false) {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 indicator.setText("Syncing with remote (Pull --rebase)...");
                 indicator.setText("Pushing commits...");
-                commits.pullAndPushMain(repoPath);
-
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    if (pushNotification != null) {
-                        pushNotification.expire();
-                        pushNotification = null;
-                    }
-
-                    Services.getInstance(p, Notifier.class).info(p, "Push Successful", "Test cases were successfully pushed to the remote repository!");
-                });
+                try {
+                    commits.pullAndPush(repoPath, remote, branch);
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (pushNotification != null) {
+                            pushNotification.expire();
+                            pushNotification = null;
+                        }
+                        Services.getInstance(p, Notifier.class).info(p, "Push Successful", "Test cases were successfully pushed to the remote repository!");
+                    });
+                } catch (final Exception ex) {
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (git.hasConflicts(repoPath)) showConflictActions(repoPath, remote, branch);
+                        else Services.getInstance(p, Notifier.class).error(p, "Push Failed", ex.getMessage());
+                    });
+                }
             }
         });
     }
 
-    private void promptAndSetGitIdentity(final @NotNull Project p, final Path repoPath, final String pendingCommitMessage) {
+    private void showConflictActions(final Path repoPath, final String remote, final String branch) {
+        Services.getInstance(p, Notifier.class).warnWithActions(
+                p,
+                "Git Conflicts",
+                "Pull stopped because conflicts must be resolved in the IDE before continuing.",
+                NotificationAction.createSimple("Continue Rebase", () -> finishRebase(repoPath, remote, branch, false)),
+                NotificationAction.createSimple("Abort Rebase", () -> finishRebase(repoPath, remote, branch, true)));
+    }
+
+    private void finishRebase(final Path repoPath, final String remote, final String branch, final boolean abort) {
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, abort ? "Aborting rebase" : "Continuing rebase", false) {
+            @Override
+            public void run(@NotNull ProgressIndicator indicator) {
+                try {
+                    if (abort) {
+                        git.abortRebase(repoPath);
+                    } else {
+                        git.continueRebase(repoPath);
+                        commits.push(repoPath, remote, branch);
+                    }
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Services.getInstance(p, Notifier.class).info(p, "Git Conflict Resolution", abort ? "Rebase aborted." : "Rebase continued and changes were pushed."));
+                } catch (final Exception ex) {
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        if (git.hasConflicts(repoPath)) showConflictActions(repoPath, remote, branch);
+                        else
+                            Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", ex.getMessage());
+                    });
+                }
+            }
+        });
+    }
+
+    private void promptAndSetGitIdentity(
+            final @NotNull Project p,
+            final Path repoPath,
+            final String pendingCommitMessage,
+            final Collection<TestCaseDiff> selectedChanges) {
         ApplicationManager.getApplication().invokeLater(() -> {
             GitIdentityDialog dialog = new GitIdentityDialog(p);
 
@@ -264,7 +321,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
                             ApplicationManager.getApplication().invokeLater(() -> {
                                 Services.getInstance(p, Notifier.class).info(p, "Git Identity Set", "Identity configured successfully. Resuming commit...");
-                                performCommitWorkflow(p, repoPath, pendingCommitMessage);
+                                performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges);
                             });
                         } catch (final Exception ex) {
                             ApplicationManager.getApplication().invokeLater(() ->

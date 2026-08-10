@@ -26,6 +26,10 @@ public enum ChangeType {
             "Change Expected Result",
             (current, old) -> current.setExpectedResult(old.getExpectedResult())),
 
+    CHANGE_STEPS(
+            "Change Steps",
+            (current, old) -> current.setSteps(new java.util.ArrayList<>(old.getSteps()))),
+
     CHANGE_PRIORITY(
             "Change Priority",
             (current, old) -> current.setPriority(old.getPriority())
@@ -33,7 +37,32 @@ public enum ChangeType {
 
     CHANGE_GROUP(
             "Change Group",
-            (current, old) -> current.setGroup(old.getGroup())
+            (current, old) -> current.setGroup(new java.util.ArrayList<>(old.getGroup()))
+    ),
+
+    CHANGE_STATUS(
+            "Change Status",
+            (current, old) -> current.setStatus(old.getStatus())
+    ),
+
+    CHANGE_REFERENCE(
+            "Change Reference",
+            (current, old) -> current.setReference(old.getReference())
+    ),
+
+    CHANGE_MODULE(
+            "Change Module",
+            (current, old) -> current.setModule(old.getModule())
+    ),
+
+    CHANGE_TEST_DATA(
+            "Change Test Data",
+            (current, old) -> current.setTestData(old.getTestData())
+    ),
+
+    CHANGE_PRECONDITIONS(
+            "Change Preconditions",
+            (current, old) -> current.setPreConditions(old.getPreConditions())
     );
 
     private final String label;

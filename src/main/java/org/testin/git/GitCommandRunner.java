@@ -47,8 +47,10 @@ final class GitCommandRunner {
         return switch (command) {
             case "add" -> GitCommand.ADD;
             case "branch" -> GitCommand.BRANCH;
+            case "checkout" -> GitCommand.CHECKOUT;
             case "commit" -> GitCommand.COMMIT;
             case "config" -> GitCommand.CONFIG;
+            case "fetch" -> GitCommand.FETCH;
             case "init" -> GitCommand.INIT;
             case "pull" -> GitCommand.PULL;
             case "push" -> GitCommand.PUSH;

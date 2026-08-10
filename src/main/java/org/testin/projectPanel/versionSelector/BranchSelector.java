@@ -97,8 +97,7 @@ public class BranchSelector {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    git.checkout(projectPath, targetBranch);
-                    currentBranch = targetBranch;
+                    currentBranch = git.checkout(projectPath, targetBranch);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         TestProjectDirectoryDto currentProject = pp.getTestProjectSelector().getSelectedTestProject().getItem();
@@ -131,7 +130,13 @@ public class BranchSelector {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    List<String> branches = git.getLocalBranches(projectPath);
+                    try {
+                        git.fetchRemoteBranches(projectPath);
+                    } catch (final Exception fetchError) {
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Services.getInstance(p, Notifier.class).warn(p, "Git Fetch Warning", "Could not refresh remote branches: " + fetchError.getMessage()));
+                    }
+                    List<String> branches = git.getAvailableBranches(projectPath);
                     String loadedCurrentBranch = git.getCurrentBranch(projectPath);
                     if (loadedCurrentBranch != null) currentBranch = loadedCurrentBranch;
 

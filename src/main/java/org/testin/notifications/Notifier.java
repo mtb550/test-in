@@ -125,6 +125,14 @@ public final class Notifier {
         notification.notify(p);
     }
 
+    public void warnWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
+        final Notification notification = NotificationGroupManager.getInstance()
+                .getNotificationGroup(GROUP_ID)
+                .createNotification(title, message, NotificationType.WARNING);
+        for (final NotificationAction action : actions) notification.addAction(action);
+        notification.notify(p);
+    }
+
     public Notification infoWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
         final Notification notification = NotificationGroupManager.getInstance()
                 .getNotificationGroup(GROUP_ID)
