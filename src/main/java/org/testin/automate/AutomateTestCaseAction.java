@@ -9,9 +9,14 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class AutomateTestCaseAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
     private final JBList<TestCaseDto> list;
 
@@ -19,7 +24,7 @@ public class AutomateTestCaseAction extends DumbAwareAction {
         super("Automate Test Case ", "", AllIcons.Actions.IntentionBulb);
         this.p = p;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.GenerateTestCase.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 
     @Override

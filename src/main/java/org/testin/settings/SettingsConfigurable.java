@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -21,7 +20,6 @@ import org.testin.projectPanel.toolBar.RefreshAction;
 import org.testin.services.Services;
 import org.testin.settings.Dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
-import org.testin.util.Tools;
 
 import javax.swing.*;
 import java.nio.file.Path;
@@ -31,7 +29,6 @@ import java.util.Objects;
 public final class SettingsConfigurable implements Configurable {
 
     private final TestinPathPanel testinPathPanel;
-    private final JBTextField rootAutomationPathField = new JBTextField();
     private final JBTextField testerNameField = new JBTextField();
     private final JBTextField testerRoleField = new JBTextField();
     private final TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
@@ -53,10 +50,6 @@ public final class SettingsConfigurable implements Configurable {
     @Nullable
     @Override
     public JComponent createComponent() {
-        rootAutomationPathField.setEnabled(false);
-        rootAutomationPathField.setToolTipText(
-                "Automatically detected base package path for your automation framework");
-
         downloadFolderField.addBrowseFolderListener(p, FileChooserDescriptorFactory.createSingleFolderDescriptor()
                         .withTitle("Select Default Download Folder")
                         .withDescription("Choose the default folder for imports, exports, and reports"),
@@ -65,7 +58,6 @@ public final class SettingsConfigurable implements Configurable {
 
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("Testin source root: "), testinPathPanel.getComponent(), 1, false)
-                .addLabeledComponent(new JBLabel("Java test source root"), rootAutomationPathField, 1, false)
                 .addVerticalGap(5)
                 .addComponent(readModeCheckBox)
                 .addVerticalGap(5)
@@ -84,7 +76,6 @@ public final class SettingsConfigurable implements Configurable {
     public boolean isModified() {
         AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().equals(settings.rootTestinPath);
-        modified |= !rootAutomationPathField.getText().equals(settings.rootAutomationPath);
         modified |= readModeCheckBox.isSelected() != settings.readMode;
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
         modified |= !testerNameField.getText().equals(settings.testerName);
@@ -98,7 +89,6 @@ public final class SettingsConfigurable implements Configurable {
         AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         settings.rootTestinPath = testinPathPanel.getPathText();
-        settings.rootAutomationPath = rootAutomationPathField.getText();
         settings.readMode = readModeCheckBox.isSelected();
         settings.logLevel = (String) logLevelComboBox.getSelectedItem();
         settings.testerName = testerNameField.getText();
@@ -115,12 +105,6 @@ public final class SettingsConfigurable implements Configurable {
             setting.setTestinPath(Path.of(""));
         }
 
-        if (settings.rootAutomationPath != null && !settings.rootAutomationPath.trim().isEmpty()) {
-            setting.setAutomationPath(Path.of(settings.rootAutomationPath));
-        } else {
-            setting.setAutomationPath(null);
-        }
-
         final ProjectPanel pp = Services.getInstance(p, ProjectPanel.class);
         if (pp != null) new RefreshAction(p, pp).execute();
     }
@@ -130,16 +114,6 @@ public final class SettingsConfigurable implements Configurable {
         AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         testinPathPanel.setPathText(settings.rootTestinPath);
-
-        VirtualFile mainSourceRoot = Services.getInstance(p, Tools.class)
-                .getTestSourceRoot(p);
-        if (mainSourceRoot != null) {
-            rootAutomationPathField.setText(mainSourceRoot.getPath());
-        } else {
-            rootAutomationPathField.setText(settings.rootAutomationPath != null
-                    ? settings.rootAutomationPath : "No source root detected");
-        }
-
         readModeCheckBox.setSelected(settings.readMode);
         logLevelComboBox.setSelectedItem(settings.logLevel);
         testerNameField.setText(settings.testerName);

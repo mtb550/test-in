@@ -13,12 +13,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.Dialogs.RunOpeningForm;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.TestCaseFilter;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
+import org.testin.editorPanel.list.ListPanelBuilder;
+import org.testin.editorPanel.list.ListView;
 import org.testin.editorPanel.listeners.*;
 import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
@@ -47,6 +48,7 @@ import java.awt.event.MouseListener;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class RunEditor implements Disposable, IToolBar, IEditor {
@@ -78,8 +80,8 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     /**
      * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
      */
-    private volatile int loadGeneration;
-    private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
+    private final AtomicInteger loadGeneration = new AtomicInteger();
+    private JBPanel<?> mainPanel;
     private JBList<TestCaseDto> list;
     private CollectionListModel<TestCaseDto> model;
     private JBTable gridTable;
@@ -130,8 +132,6 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         buildOpeningPanel();
         loadDataAsync();
-
-        FontSync.syncWithNativeEditor(p, list, projectDisposable);
     }
 
     private void buildOpeningPanel() {
@@ -139,38 +139,32 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         statusBar = new StatusBar();
         StatusBarListener.attach(this);
 
-        RunOpeningForm openingForm = new RunOpeningForm(toolBar, statusBar);
-        mainPanel = openingForm.getMainPanel();
-        list = openingForm.getList();
-        model = openingForm.getModel();
-        listScrollPane = openingForm.getScrollPane();
-        currentCenter = listScrollPane;
+        // Shared list-view construction (see ListPanelBuilder, the counterpart of GridPanelBuilder).
+        final ListView listView = ListPanelBuilder.build(p, projectDisposable);
+        model = listView.model();
+        list = listView.list();
+        listScrollPane = listView.scrollPane();
 
+        // Run editor specifics: the run card renderer.
         list.setCellRenderer(new RunListRenderer(p, this));
 
         this.contextMenu = new RunEditorContextMenu(p, this, parent, list);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, this.contextMenu);
-
-        list.addMouseListener(mouseListenerImpl);
-        list.addMouseWheelListener(mouseListenerImpl);
-        list.addMouseMotionListener(mouseListenerImpl);
-
-        this.contextMenu.registerShortcuts(list, this.contextMenu);
-
-        ArrayList<String> selectionPath = parent.getPath2();
-        list.addListSelectionListener(new SelectionListener(p, list, this, selectionPath));
-        list.addListSelectionListener(new GridListSelectionSynchronizer(
-                list,
+        ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
                 () -> gridTable,
-                () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW
-        ));
+                () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
 
-        list.setExpandableItemsEnabled(false);
+        mainPanel = new JBPanel<>(new BorderLayout());
+        mainPanel.add(toolBar, BorderLayout.NORTH);
+        mainPanel.add(statusBar, BorderLayout.SOUTH);
+
+        // List view is the default mode when the editor opens.
+        onToolBarSwitchedToListView();
+
         refreshView();
     }
 
     private void loadDataAsync() {
-        final int generation = ++loadGeneration;
+        final int generation = loadGeneration.incrementAndGet();
         if (list != null) {
             list.setPaintBusy(true);
             list.getEmptyText().setText("Loading...");
@@ -209,7 +203,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                 Services.getInstance(p, TestCaseCacheService.class).load(sorted);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    if (generation != loadGeneration) return;
+                    if (generation != loadGeneration.get()) return;
                     allTestCases.clear();
                     allTestCases.addAll(sorted);
                     currentTestCases.clear();

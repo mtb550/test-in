@@ -321,149 +321,54 @@ public abstract class JsonArraySplitBulkSectionDialog {
             popup.closeOk(null);
         };
 
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                saveLogic.run();
+        final JComponent keymapTarget = rightEditor.getContentComponent();
+        KeyAction.register(saveLogic, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), keymapTarget);
+        KeyAction.register(saveLogic, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK), keymapTarget);
+
+        KeyAction.register(() -> {
+            syncStateFromEditor.run();
+            final List<int[]> targets = collectCaretTargets(rightEditor, itemMarkers);
+            if (targets.isEmpty()) return;
+
+            for (final int[] target : targets) {
+                activeValues.get(target[0]).add(target[1] + 1, "");
             }
-        }.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)), rightEditor.getContentComponent());
 
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                saveLogic.run();
-            }
-        }.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK)), rightEditor.getContentComponent());
+            final int[] firstAdded = targets.getLast();
+            renderUI.accept(firstAdded[0], firstAdded[1] + 1);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK), keymapTarget);
 
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                syncStateFromEditor.run();
-                List<Caret> carets = rightEditor.getCaretModel().getAllCarets();
-                List<int[]> targets = new ArrayList<>();
+        KeyAction.register(() -> {
+            syncStateFromEditor.run();
+            final List<int[]> targets = collectCaretTargets(rightEditor, itemMarkers);
+            if (targets.isEmpty()) return;
 
-                for (Caret caret : carets) {
-                    int offset = caret.getOffset();
-                    ItemMarker current = itemMarkers.stream().filter(m -> m.marker != null && offset >= m.marker.getStartOffset() && offset <= m.marker.getEndOffset()).findFirst().orElse(null);
-                    if (current != null) {
-                        if (targets.stream().noneMatch(arr -> arr[0] == current.tcIdx && arr[1] == current.itemIdx)) {
-                            targets.add(new int[]{current.tcIdx, current.itemIdx});
-                        }
-                    }
+            int focusTc = targets.getLast()[0];
+            int focusStep = 0;
+
+            for (final int[] target : targets) {
+                final List<String> itemsList = activeValues.get(target[0]);
+                if (itemsList.size() > 1) {
+                    itemsList.remove(target[1]);
+                    focusStep = Math.min(target[1], itemsList.size() - 1);
+                } else {
+                    itemsList.set(0, "");
+                    focusStep = 0;
                 }
-                if (targets.isEmpty()) return;
-
-                targets.sort((a, b) -> {
-                    if (a[0] != b[0]) return Integer.compare(b[0], a[0]);
-                    return Integer.compare(b[1], a[1]);
-                });
-
-                for (int[] target : targets) {
-                    activeValues.get(target[0]).add(target[1] + 1, "");
-                }
-
-                int[] firstAdded = targets.getLast();
-                renderUI.accept(firstAdded[0], firstAdded[1] + 1);
             }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.CTRL_DOWN_MASK)), rightEditor.getContentComponent());
+            renderUI.accept(focusTc, focusStep);
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.SHIFT_DOWN_MASK), keymapTarget);
 
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                syncStateFromEditor.run();
-                List<Caret> carets = rightEditor.getCaretModel().getAllCarets();
-                List<int[]> targets = new ArrayList<>();
+        KeyAction.register(() -> navigate(1, rightEditor, itemMarkers), KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), keymapTarget);
+        KeyAction.register(() -> navigate(1, rightEditor, itemMarkers), KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), keymapTarget);
+        KeyAction.register(() -> navigate(-1, rightEditor, itemMarkers), KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), keymapTarget);
+        KeyAction.register(() -> navigate(-1, rightEditor, itemMarkers), KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK), keymapTarget);
 
-                for (Caret caret : carets) {
-                    int offset = caret.getOffset();
-                    ItemMarker current = itemMarkers.stream().filter(m -> m.marker != null && offset >= m.marker.getStartOffset() && offset <= m.marker.getEndOffset()).findFirst().orElse(null);
-                    if (current != null) {
-                        if (targets.stream().noneMatch(arr -> arr[0] == current.tcIdx && arr[1] == current.itemIdx)) {
-                            targets.add(new int[]{current.tcIdx, current.itemIdx});
-                        }
-                    }
-                }
-                if (targets.isEmpty()) return;
-
-                targets.sort((a, b) -> {
-                    if (a[0] != b[0]) return Integer.compare(b[0], a[0]);
-                    return Integer.compare(b[1], a[1]);
-                });
-
-                int focusTc = targets.getLast()[0];
-                int focusStep = 0;
-
-                for (int[] target : targets) {
-                    List<String> itemsList = activeValues.get(target[0]);
-                    if (itemsList.size() > 1) {
-                        itemsList.remove(target[1]);
-                        focusStep = Math.min(target[1], itemsList.size() - 1);
-                    } else {
-                        itemsList.set(0, "");
-                        focusStep = 0;
-                    }
-                }
-                renderUI.accept(focusTc, focusStep);
-            }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, KeyEvent.SHIFT_DOWN_MASK)), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                navigate(1, rightEditor, itemMarkers);
-            }
-        }.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                navigate(1, rightEditor, itemMarkers);
-            }
-        }.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                navigate(-1, rightEditor, itemMarkers);
-            }
-        }.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                navigate(-1, rightEditor, itemMarkers);
-            }
-        }.registerCustomShortcutSet(new CustomShortcutSet(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK)), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                syncStateFromEditor.run();
-                CaretModel caretModel = rightEditor.getCaretModel();
-                caretModel.removeSecondaryCarets();
-
-                boolean isFirst = true;
-                for (ItemMarker sm : itemMarkers) {
-                    if (sm.marker != null && sm.marker.isValid()) {
-                        int offset = sm.marker.getEndOffset();
-                        LogicalPosition logPos = rightEditor.offsetToLogicalPosition(offset);
-                        VisualPosition visPos = rightEditor.logicalToVisualPosition(logPos);
-
-                        if (isFirst) {
-                            caretModel.moveToVisualPosition(visPos);
-                            isFirst = false;
-                        } else {
-                            caretModel.addCaret(visPos, true);
-                        }
-                    }
-                }
-                updateRowHighlights.run();
-            }
-        }.registerCustomShortcutSet(new CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | KeyEvent.SHIFT_DOWN_MASK)
-        ), rightEditor.getContentComponent());
+        KeyAction.register(() -> {
+            syncStateFromEditor.run();
+            placeCaretOnAllItems(rightEditor, itemMarkers);
+            updateRowHighlights.run();
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | KeyEvent.SHIFT_DOWN_MASK), keymapTarget);
 
         popup.addListener(new JBPopupListener() {
             @Override
@@ -476,6 +381,53 @@ public abstract class JsonArraySplitBulkSectionDialog {
 
         renderUI.accept(0, 0);
         popup.showCenteredInCurrentWindow(p);
+    }
+
+    /**
+     * The (test case, item) pairs currently under carets, deduplicated and sorted
+     * bottom-up so index-shifting mutations stay valid while applying.
+     */
+    private List<int[]> collectCaretTargets(final Editor editor, final List<ItemMarker> markers) {
+        final List<int[]> targets = new ArrayList<>();
+
+        for (final Caret caret : editor.getCaretModel().getAllCarets()) {
+            final int offset = caret.getOffset();
+            final ItemMarker current = markers.stream()
+                    .filter(m -> m.marker != null && offset >= m.marker.getStartOffset() && offset <= m.marker.getEndOffset())
+                    .findFirst().orElse(null);
+            if (current != null && targets.stream().noneMatch(arr -> arr[0] == current.tcIdx && arr[1] == current.itemIdx)) {
+                targets.add(new int[]{current.tcIdx, current.itemIdx});
+            }
+        }
+
+        targets.sort((a, b) -> {
+            if (a[0] != b[0]) return Integer.compare(b[0], a[0]);
+            return Integer.compare(b[1], a[1]);
+        });
+        return targets;
+    }
+
+    /**
+     * Ctrl+Shift+A: one caret at the end of every editable item.
+     */
+    private void placeCaretOnAllItems(final Editor editor, final List<ItemMarker> markers) {
+        final CaretModel caretModel = editor.getCaretModel();
+        caretModel.removeSecondaryCarets();
+
+        boolean isFirst = true;
+        for (final ItemMarker sm : markers) {
+            if (sm.marker == null || !sm.marker.isValid()) continue;
+
+            final LogicalPosition logPos = editor.offsetToLogicalPosition(sm.marker.getEndOffset());
+            final VisualPosition visPos = editor.logicalToVisualPosition(logPos);
+
+            if (isFirst) {
+                caretModel.moveToVisualPosition(visPos);
+                isFirst = false;
+            } else {
+                caretModel.addCaret(visPos, true);
+            }
+        }
     }
 
     private void navigate(final int direction, Editor editor, final List<ItemMarker> markers) {
@@ -544,11 +496,4 @@ public abstract class JsonArraySplitBulkSectionDialog {
         return str.replace("\\\"", "\"").replace("\\\\", "\\");
     }
 
-    protected static class ItemMarker {
-        RangeMarker marker;
-        int tcIdx;
-        int itemIdx;
-        int startOffset;
-        int endOffset;
-    }
 }

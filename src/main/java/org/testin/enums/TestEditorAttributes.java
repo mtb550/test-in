@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.Shared;
+import org.testin.generateJavaCode.GeneratorType;
 import org.testin.importExport.imports.ImportSetter;
 import org.testin.mappers.Config;
 import org.testin.mappers.dto.TestCaseDto;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 // TODO: add order, then add it toolbar details (select by the order number) & add it to edit menu.
 // TODO: add all to edit menu: auto ref, business ref..etc
 // TODO: also, map all to view panel dynamically.
-// TODO: may you need to unify enum map to map all with one source of truth
 @Getter
 @AllArgsConstructor
 public enum TestEditorAttributes {
@@ -35,7 +35,8 @@ public enum TestEditorAttributes {
             (tc, p) -> String.valueOf(tc.getId()),
             null,
             (p, tc, v) -> {
-            }
+            },
+            null
     ),
 
     /// TODO:: added to tool bar details, to be shown but disabled
@@ -49,7 +50,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getDescription(),
             null,
-            (p, tc, v) -> tc.setDescription(Services.getInstance(p, Tools.class).sanitizeDescription(v))
+            (p, tc, v) -> tc.setDescription(Services.getInstance(p, Tools.class).sanitizeDescription(v)),
+            GeneratorType.UPDATE_TEST_CASE_DESCRIPTION
     ),
 
     EXPECTED_RESULT(
@@ -62,7 +64,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getExpectedResult(),
             null,
-            (p, tc, v) -> tc.setExpectedResult(v)
+            (p, tc, v) -> tc.setExpectedResult(v),
+            GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT
     ),
 
     STEPS(
@@ -75,7 +78,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> String.join(", ", tc.getSteps()),
             null,
-            (p, tc, v) -> tc.setSteps(Services.getInstance(p, Tools.class).parseStepsSafe(v))
+            (p, tc, v) -> tc.setSteps(Services.getInstance(p, Tools.class).parseStepsSafe(v)),
+            GeneratorType.UPDATE_TEST_CASE_STEPS
     ),
 
     PRIORITY(
@@ -88,7 +92,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getPriority().getName(),
             tc -> List.of(Shared.createPriorityBadge(tc)),
-            (p, tc, v) -> tc.setPriority(Services.getInstance(p, Tools.class).parsePrioritySafe(v))
+            (p, tc, v) -> tc.setPriority(Services.getInstance(p, Tools.class).parsePrioritySafe(v)),
+            GeneratorType.UPDATE_TEST_CASE_PRIORITY
     ),
 
     FQCN(
@@ -102,7 +107,8 @@ public enum TestEditorAttributes {
             (tc, p) -> String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc)),
             null,
             (p, tc, v) -> {
-            }
+            },
+            null
     ),
 
     REFERENCE(
@@ -115,7 +121,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getReference(),
             null,
-            (p, tc, v) -> tc.setReference(v)
+            (p, tc, v) -> tc.setReference(v),
+            null
     ),
 
     TEST_DATA(
@@ -128,7 +135,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getTestData(),
             null,
-            (p, tc, v) -> tc.setTestData(v)
+            (p, tc, v) -> tc.setTestData(v),
+            GeneratorType.UPDATE_TEST_CASE_TEST_DATA
     ),
 
     PRE_CONDITIONS(
@@ -141,7 +149,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getPreConditions(),
             null,
-            (p, tc, v) -> tc.setPreConditions(v)
+            (p, tc, v) -> tc.setPreConditions(v),
+            GeneratorType.UPDATE_TEST_CASE_PRE_CONDITIONS
     ),
 
     GROUP(
@@ -154,7 +163,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList()),
-            (p, tc, v) -> tc.setGroup(Services.getInstance(p, Tools.class).parseGroupsSafe(v))
+            (p, tc, v) -> tc.setGroup(Services.getInstance(p, Tools.class).parseGroupsSafe(v)),
+            GeneratorType.UPDATE_TEST_CASE_GROUP
     ),
 
     PATH(
@@ -168,7 +178,8 @@ public enum TestEditorAttributes {
             (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
             null,
             (p, tc, v) -> {
-            }
+            },
+            null
     ),
 
     ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
@@ -183,7 +194,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getModule(),
             null,
-            (p, tc, v) -> tc.setModule(v)
+            (p, tc, v) -> tc.setModule(v),
+            GeneratorType.UPDATE_TEST_CASE_MODULE
     ),
 
     STATUS(
@@ -196,7 +208,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getStatus().getDisplayText(),
             null,
-            (p, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v))
+            (p, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v)),
+            null
     ),
 
     CREATE_BY(
@@ -209,7 +222,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getCreatedBy(),
             null,
-            (p, tc, v) -> tc.setCreatedBy(v)
+            (p, tc, v) -> tc.setCreatedBy(v),
+            null
     ),
 
     UPDATE_BY(
@@ -222,7 +236,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getUpdatedBy(),
             null,
-            (p, tc, v) -> tc.setUpdatedBy(v)
+            (p, tc, v) -> tc.setUpdatedBy(v),
+            null
     ),
 
     CREATE_AT(
@@ -235,7 +250,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
             null,
-            (p, tc, v) -> tc.setCreatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v))
+            (p, tc, v) -> tc.setCreatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
+            null
     ),
 
     UPDATE_AT(
@@ -248,7 +264,8 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
             null,
-            (p, tc, v) -> tc.setUpdatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v))
+            (p, tc, v) -> tc.setUpdatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
+            null
     );
 
     private final String name;
@@ -261,6 +278,12 @@ public enum TestEditorAttributes {
     private final ValueExtractor<TestCaseDto> testValueExtractor;
     private final DrawItem<TestCaseDto> testDrawItem;
     private final ImportSetter importSetter;
+
+    /**
+     * Automation code update to run when this attribute changes; null when the
+     * attribute has no effect on the generated Java code.
+     */
+    private final GeneratorType generatorType;
 
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         if (testDrawItem != null) badges.addAll(testDrawItem.execute(tc));

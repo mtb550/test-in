@@ -26,7 +26,6 @@ import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
-import org.testin.util.KeyboardSet;
 
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
@@ -35,8 +34,14 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class GenerateReportAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
     private final @Nullable SimpleTree tree;
     private final @Nullable IEditor editor;
@@ -56,7 +61,7 @@ public class GenerateReportAction extends DumbAwareAction {
         this.tree = null;
         this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.GenerateReports.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 
     @Override

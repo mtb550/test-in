@@ -20,7 +20,7 @@ import org.testin.util.EditorUtil;
 import javax.swing.tree.TreePath;
 import java.util.List;
 
-import static org.testin.util.KeyboardSet.DeletePackage;
+import static org.testin.util.Shortcuts.DeletePackage;
 
 public class RemoveAction extends DumbAwareAction {
     private final @NotNull Project p;

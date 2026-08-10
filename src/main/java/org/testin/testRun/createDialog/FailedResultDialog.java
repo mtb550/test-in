@@ -14,7 +14,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.TestRunItems;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -139,7 +139,7 @@ public class FailedResultDialog {
                 return ActionUpdateThread.EDT;
             }
         };
-        saveAction.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), component);
+        saveAction.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), component);
     }
 
     public void show() {

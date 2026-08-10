@@ -9,7 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.statusBar.IStatusBarItem;
 import org.testin.testRun.updateDialog.UpdateRunItemDialog;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 
@@ -19,7 +20,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
 
     SAVE(
             "Save",
-            KeyboardSet.Enter,
+            Shortcuts.Enter,
             null,
             new IStatusBarItem[]{},
             false,
@@ -28,7 +29,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
 
     ACTUAL_RESULT(
             "Actual Result",
-            KeyboardSet.SetActualResult,
+            Shortcuts.SetActualResult,
             AllIcons.Actions.Copy,
             new IStatusBarItem[]{SAVE},
             true,
@@ -37,7 +38,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
 
     BUG_SEVERITY(
             "Bug Severity",
-            KeyboardSet.BugSeverity,
+            Shortcuts.BugSeverity,
             AllIcons.Actions.Highlighting,
             new IStatusBarItem[]{SAVE},
             true,
@@ -46,7 +47,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
 
     BUG_PRIORITY(
             "Bug Priority",
-            KeyboardSet.BugPriority,
+            Shortcuts.BugPriority,
             AllIcons.Actions.Report,
             new IStatusBarItem[]{SAVE},
             true,
@@ -63,7 +64,7 @@ public enum RunItemUpdateFields implements IStatusBarItem {
     );
 
     private final @NotNull String name;
-    private final @Nullable KeyboardSet shortcut;
+    private final @Nullable Shortcuts shortcut;
     private final @Nullable Icon icon;
     private final @NotNull IStatusBarItem[] statusBarItems;
     private final boolean updateMenuItem;

@@ -94,6 +94,13 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
     }
 
     private DefaultActionGroup buildActionGroup(final Runnable onToolBarFilterSelectedChanged) {
+        final Runnable onChanged = () -> {
+            updateToolBarFilterState();
+            if (onToolBarFilterSelectedChanged != null) {
+                onToolBarFilterSelectedChanged.run();
+            }
+        };
+
         DefaultActionGroup filterResetBtn = new DefaultActionGroup();
 
         filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
@@ -118,26 +125,8 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
         // priority menu
         DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
-                filterPriorityMenu.add(new DumbAwareToggleAction(p.getName(), null, IconManager.createIcon(p.getColor())) {
-                    @Override
-                    public boolean isSelected(@NotNull AnActionEvent e) {
-                        return selectedPriority.contains(p);
-                    }
-
-                    @Override
-                    public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                        p.onChange(selectedPriority, state);
-                        updateToolBarFilterState();
-                        if (onToolBarFilterSelectedChanged != null) {
-                            onToolBarFilterSelectedChanged.run();
-                        }
-                    }
-
-                    @Override
-                    public @NotNull ActionUpdateThread getActionUpdateThread() {
-                        return ActionUpdateThread.BGT;
-                    }
-                }));
+                filterPriorityMenu.add(new ToggleFilterAction<>(p.getName(), IconManager.createIcon(p.getColor()),
+                        p, selectedPriority, Priority::onChange, onChanged)));
         filterResetBtn.add(filterPriorityMenu);
 
         // group menu
@@ -146,67 +135,22 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
             if (g == Group.REGRESSION) {
                 filterGroupMenu.addSeparator();
             }
-
-            filterGroupMenu.add(new DumbAwareToggleAction(g.getName()) {
-                @Override
-                public boolean isSelected(@NotNull AnActionEvent e) {
-                    return selectedGroup.contains(g);
-                }
-
-                @Override
-                public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                    g.onChange(selectedGroup, state);
-                    updateToolBarFilterState();
-                    if (onToolBarFilterSelectedChanged != null) {
-                        onToolBarFilterSelectedChanged.run();
-                    }
-                }
-
-                @Override
-                public @NotNull ActionUpdateThread getActionUpdateThread() {
-                    return ActionUpdateThread.BGT;
-                }
-            });
+            filterGroupMenu.add(new ToggleFilterAction<>(g.getName(), null,
+                    g, selectedGroup, Group::onChange, onChanged));
         });
         filterResetBtn.add(filterGroupMenu);
 
+        // module menu is dynamic: modules come from the currently loaded test cases
         ActionGroup filterModuleMenu = new ActionGroup("Module", true) {
             @Override
             public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
-                List<AnAction> actions = new ArrayList<>();
+                final List<String> sortedModules = new ArrayList<>(availableModulesSupplier.get());
+                Collections.sort(sortedModules);
 
-                Set<String> modules = availableModulesSupplier.get();
-
-                if (!modules.isEmpty()) {
-                    List<String> sortedModules = new ArrayList<>(modules);
-                    Collections.sort(sortedModules);
-
-                    for (String module : sortedModules) {
-                        actions.add(new DumbAwareToggleAction(module) {
-                            @Override
-                            public boolean isSelected(@NotNull AnActionEvent e) {
-                                return selectedModule.contains(module);
-                            }
-
-                            @Override
-                            public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                                if (state) {
-                                    selectedModule.add(module);
-                                } else {
-                                    selectedModule.remove(module);
-                                }
-                                updateToolBarFilterState();
-                                if (onToolBarFilterSelectedChanged != null) {
-                                    onToolBarFilterSelectedChanged.run();
-                                }
-                            }
-
-                            @Override
-                            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                                return ActionUpdateThread.BGT;
-                            }
-                        });
-                    }
+                final List<AnAction> actions = new ArrayList<>();
+                for (final String module : sortedModules) {
+                    actions.add(new ToggleFilterAction<>(module, null,
+                            module, selectedModule, FilterMembership.plain(), onChanged));
                 }
                 return actions.toArray(new AnAction[0]);
             }
@@ -216,30 +160,8 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
         if (callbacks instanceof RunEditor) {
             DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
             Arrays.stream(TestStatus.values()).forEach(s ->
-                    filterStatusMenu.add(new DumbAwareToggleAction(s.name()) {
-                        @Override
-                        public boolean isSelected(@NotNull AnActionEvent e) {
-                            return selectedStatus.contains(s);
-                        }
-
-                        @Override
-                        public void setSelected(@NotNull AnActionEvent e, boolean state) {
-                            if (state) {
-                                selectedStatus.add(s);
-                            } else {
-                                selectedStatus.remove(s);
-                            }
-                            updateToolBarFilterState();
-                            if (onToolBarFilterSelectedChanged != null) {
-                                onToolBarFilterSelectedChanged.run();
-                            }
-                        }
-
-                        @Override
-                        public @NotNull ActionUpdateThread getActionUpdateThread() {
-                            return ActionUpdateThread.BGT;
-                        }
-                    }));
+                    filterStatusMenu.add(new ToggleFilterAction<>(s.name(), null,
+                            s, selectedStatus, FilterMembership.plain(), onChanged)));
             filterResetBtn.add(filterStatusMenu);
         }
 

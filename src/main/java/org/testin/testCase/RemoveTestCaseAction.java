@@ -15,7 +15,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import java.util.HashSet;
 import java.util.List;
@@ -34,7 +34,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         this.dir = dir;
         this.list = list;
         this.model = model;
-        this.registerCustomShortcutSet(KeyboardSet.DeletePackage.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.DeletePackage.getCustomShortcut(), list);
     }
 
     @Override

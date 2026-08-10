@@ -29,7 +29,7 @@ public class TestCaseChangeComparatorTest {
                 .group(List.of(Group.SMOKE))
                 .build();
 
-        final List<TestCaseDiff.FieldChange> changes = TestCaseChangeComparator.compare(oldState, newState);
+        final List<FieldChange> changes = TestCaseChangeComparator.compare(oldState, newState);
 
         assertEquals(changes.size(), 10);
         assertTrue(changes.stream().anyMatch(change -> change.changeType() == ChangeType.CHANGE_STEPS));

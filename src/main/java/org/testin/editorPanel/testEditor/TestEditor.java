@@ -22,6 +22,8 @@ import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.TestCaseFilter;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
+import org.testin.editorPanel.list.ListPanelBuilder;
+import org.testin.editorPanel.list.ListView;
 import org.testin.editorPanel.listeners.*;
 import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
@@ -41,6 +43,7 @@ import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testCase.CreateTestCaseAction;
+import org.testin.testCase.SortResult;
 import org.testin.testCase.TestCaseSorter;
 import org.testin.util.FontSync;
 import org.testin.viewPanel.ViewPanel;
@@ -52,6 +55,7 @@ import java.awt.event.MouseListener;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestEditor implements Disposable, IToolBar, IEditor {
     @Getter
@@ -82,7 +86,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     /**
      * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
      */
-    private volatile int loadGeneration;
+    private final AtomicInteger loadGeneration = new AtomicInteger();
 
     @Getter
     @NotNull
@@ -139,24 +143,18 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.mainPanel.setBackground(UIUtil.getPanelBackground());
         this.mainPanel.setOpaque(true);
 
-        this.model = new CollectionListModel<>(new ArrayList<>());
+        // Shared list-view construction (see ListPanelBuilder, the counterpart of GridPanelBuilder).
+        final ListView listView = ListPanelBuilder.build(p, projectDisposable);
+        this.model = listView.model();
+        this.list = listView.list();
+        this.scrollPane = listView.scrollPane();
 
-        this.list = new JBList<>(model);
-        list.setBackground(UIUtil.getPanelBackground());
-        list.setOpaque(true);
-        list.setPaintBusy(true);
-        list.getEmptyText().setText("Loading...");
-        list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        // Test editor specifics: manual reordering by drag-and-drop and the card renderer.
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
-        list.setExpandableItemsEnabled(false);
-
-        FontSync.syncWithNativeEditor(p, list, projectDisposable);
-
-        this.scrollPane = new JBScrollPane(list);
-        scrollPane.setOpaque(true);
-        scrollPane.setBackground(UIUtil.getPanelBackground());
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        list.setTransferHandler(new TransferListener(this));
+        list.setCellRenderer(new TestListRenderer(p, this));
+        list.addKeyListener(new KeyListener(p, list, this));
 
         this.pageSize = PropertiesComponent.getInstance().getInt("testin.pageSize", 50);
 
@@ -168,38 +166,24 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.model.addListDataListener(syncListener);
 
         this.contextMenu = new TestEditorContextMenu(p, this, parent, list, model);
-        final MouseListenerImpl mouseListenerImpl = new MouseListenerImpl(p, this, list, model, parent, this.contextMenu);
-
-        list.addMouseListener(mouseListenerImpl);
-        list.addMouseWheelListener(mouseListenerImpl);
-        list.addMouseMotionListener(mouseListenerImpl);
-
-        list.setTransferHandler(new TransferListener(this));
-        list.setCellRenderer(new TestListRenderer(p, this));
-
-        this.contextMenu.registerShortcuts(list, this.contextMenu);
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
-        currentCenter = scrollPane;
+        ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
+                () -> gridTable,
+                () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
 
         this.statusBar = new StatusBar();
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
-        list.addListSelectionListener(new SelectionListener(p, list, this, parent.getPath2()));
-        list.addListSelectionListener(new GridListSelectionSynchronizer(
-                list,
-                () -> gridTable,
-                () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW
-        ));
-
-        list.addKeyListener(new KeyListener(p, list, this));
 
         new TestCaseExecutionSubscriber(p, list, projectDisposable);
+
+        // List view is the default mode when the editor opens.
+        onToolBarSwitchedToListView();
 
         loadDataAsync();
     }
 
     private void loadDataAsync() {
-        final int generation = ++loadGeneration;
+        final int generation = loadGeneration.incrementAndGet();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             indexer.awaitIndexing();
@@ -208,7 +192,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
             if (items.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    if (generation != loadGeneration) return;
+                    if (generation != loadGeneration.get()) return;
                     allTestCases.clear();
                     currentTestCases.clear();
                     unsortedIds.clear();
@@ -221,10 +205,10 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
             Services.getInstance(p, TestCaseCacheService.class).load(items);
 
-            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(p, items);
+            final SortResult result = TestCaseSorter.sortTestCases(p, items);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                if (generation != loadGeneration) return;
+                if (generation != loadGeneration.get()) return;
                 allTestCases.clear();
                 allTestCases.addAll(result.sortedList());
                 currentTestCases.clear();
@@ -516,7 +500,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         if (allTestCases.isEmpty()) return;
 
         synchronized (allTestCases) {
-            final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(p, new ArrayList<>(allTestCases));
+            final SortResult result = TestCaseSorter.sortTestCases(p, new ArrayList<>(allTestCases));
 
             this.allTestCases.clear();
             this.allTestCases.addAll(result.sortedList());

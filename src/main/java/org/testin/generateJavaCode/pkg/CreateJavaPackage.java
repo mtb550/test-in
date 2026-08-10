@@ -23,9 +23,8 @@ public class CreateJavaPackage implements GeneratorAction {
 
         WriteAction.run(() -> {
             try {
-                VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
+                VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRootOrWarn(p);
                 if (testSourceRoot == null) {
-                    Logger.info("Could not find Main Source Root in the project modules.");
                     return;
                 }
 

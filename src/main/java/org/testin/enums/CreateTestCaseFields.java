@@ -7,7 +7,7 @@ import lombok.Getter;
 import org.testin.statusBar.IStatusBarItem;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.util.function.Function;
@@ -17,7 +17,7 @@ import java.util.function.Function;
 public enum CreateTestCaseFields implements IStatusBarItem {
     DESCRIPTION_SHORTCUT(
             "Description",
-            KeyboardSet.CreateTestCaseDescription,
+            Shortcuts.CreateTestCaseDescription,
             null,
             null,
             new IStatusBarItem[]{},
@@ -28,7 +28,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     EXPECTED_RESULT_SHORTCUT(
             "Expected Result",
-            KeyboardSet.CreateTestCaseExpectedResult,
+            Shortcuts.CreateTestCaseExpectedResult,
             null,
             null,
             new IStatusBarItem[]{},
@@ -39,7 +39,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     STEPS_SHORTCUT(
             "Steps",
-            KeyboardSet.CreateTestCaseAddStep,
+            Shortcuts.CreateTestCaseAddStep,
             null,
             null,
             new IStatusBarItem[]{},
@@ -50,7 +50,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     PRIORITY_SHORTCUT(
             "Priority",
-            KeyboardSet.CreateTestCasePriority,
+            Shortcuts.CreateTestCasePriority,
             null,
             null,
             new IStatusBarItem[]{},
@@ -61,7 +61,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     GROUP_SHORTCUT(
             "Groups",
-            KeyboardSet.CreateTestCaseGroup,
+            Shortcuts.CreateTestCaseGroup,
             null,
             null,
             new IStatusBarItem[]{},
@@ -72,7 +72,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     SAVE(
             "Save",
-            KeyboardSet.Enter,
+            Shortcuts.Enter,
             null,
             null,
             new IStatusBarItem[]{},
@@ -83,7 +83,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     ADD_STEP(
             "Add Step",
-            KeyboardSet.CreateTestCaseAddStep,
+            Shortcuts.CreateTestCaseAddStep,
             null,
             null,
             new IStatusBarItem[]{},
@@ -94,7 +94,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     REMOVE_STEP(
             "Remove Step",
-            KeyboardSet.CreateTestCaseRemoveStep,
+            Shortcuts.CreateTestCaseRemoveStep,
             null,
             null,
             new IStatusBarItem[]{},
@@ -106,7 +106,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     AUTO_COMPLETE(
             "Auto Complete",
             null,
-            KeyboardSet.AutoComplete.getShortcutText(),
+            Shortcuts.AutoComplete.getShortcutText(),
             null,
             new IStatusBarItem[]{},
             false,
@@ -117,7 +117,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     SET_PRIORITY(
             "Set Priority",
             null,
-            KeyboardSet.PriorityHigh.getShortcutText() + " / " + KeyboardSet.PriorityMedium.getShortcutText() + " / " + KeyboardSet.PriorityLow.getShortcutText(),
+            Shortcuts.PriorityHigh.getShortcutText() + " / " + Shortcuts.PriorityMedium.getShortcutText() + " / " + Shortcuts.PriorityLow.getShortcutText(),
             null,
             new IStatusBarItem[]{},
             false,
@@ -128,7 +128,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     NAVIGATE_TAB(
             "Navigate",
             null,
-            KeyboardSet.TabNext.getShortcutText() + " / " + KeyboardSet.TabPrevious.getShortcutText(),
+            Shortcuts.TabNext.getShortcutText() + " / " + Shortcuts.TabPrevious.getShortcutText(),
             null,
             new IStatusBarItem[]{},
             false,
@@ -139,7 +139,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     NAVIGATE_ARROWS(
             "Navigate Priority",
             null,
-            KeyboardSet.ArrowUp.getShortcutText() + " / " + KeyboardSet.ArrowDown.getShortcutText(),
+            Shortcuts.ArrowUp.getShortcutText() + " / " + Shortcuts.ArrowDown.getShortcutText(),
             null,
             new IStatusBarItem[]{},
             false,
@@ -149,7 +149,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     DESCRIPTION(
             "Description",
-            KeyboardSet.CreateTestCaseDescription,
+            Shortcuts.CreateTestCaseDescription,
             null,
             AllIcons.Actions.Edit,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, DESCRIPTION_SHORTCUT, EXPECTED_RESULT_SHORTCUT, STEPS_SHORTCUT, PRIORITY_SHORTCUT, GROUP_SHORTCUT},
@@ -160,7 +160,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     EXPECTED_RESULT(
             "Expected Results",
-            KeyboardSet.CreateTestCaseExpectedResult,
+            Shortcuts.CreateTestCaseExpectedResult,
             null,
             AllIcons.General.InspectionsOK,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
@@ -171,7 +171,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     MODULE(
             "Module",
-            KeyboardSet.CreateTestCaseModule,
+            Shortcuts.CreateTestCaseModule,
             null,
             AllIcons.General.ContextHelp,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
@@ -182,7 +182,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     TEST_DATA(
             "Test Data",
-            KeyboardSet.CreateTestCaseTestData,
+            Shortcuts.CreateTestCaseTestData,
             null,
             AllIcons.Nodes.DataTables,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
@@ -193,7 +193,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     PRE_CONDITIONS(
             "Pre Conditions",
-            KeyboardSet.CreateTestCasePreConditions,
+            Shortcuts.CreateTestCasePreConditions,
             null,
             AllIcons.Actions.StepOut,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
@@ -204,7 +204,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     STEPS(
             "Steps",
-            KeyboardSet.CreateTestCaseAddStep,
+            Shortcuts.CreateTestCaseAddStep,
             null,
             AllIcons.Actions.ListFiles,
             new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
@@ -215,7 +215,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     PRIORITY(
             "Priority",
-            KeyboardSet.CreateTestCasePriority,
+            Shortcuts.CreateTestCasePriority,
             null,
             AllIcons.Nodes.Favorite,
             new IStatusBarItem[]{SAVE, SET_PRIORITY, NAVIGATE_ARROWS},
@@ -226,7 +226,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     SELECT_GROUP(
             "Select / Unselect Group",
-            KeyboardSet.SelectGroup,
+            Shortcuts.SelectGroup,
             null,
             null,
             new IStatusBarItem[]{},
@@ -237,7 +237,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
 
     GROUP(
             "Group",
-            KeyboardSet.CreateTestCaseGroup,
+            Shortcuts.CreateTestCaseGroup,
             null,
             AllIcons.Nodes.Tag,
             new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
@@ -247,7 +247,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     );
 
     private final String name;
-    private final KeyboardSet shortcut;
+    private final Shortcuts shortcut;
     private final String customShortcutText;
     private final Icon icon;
     private final IStatusBarItem[] statusBarItems;

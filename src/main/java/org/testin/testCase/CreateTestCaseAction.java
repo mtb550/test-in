@@ -18,7 +18,7 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.services.TestCasePersistService;
 import org.testin.testCase.createDialog.CreateTestCaseDialog;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +34,7 @@ public class CreateTestCaseAction extends DumbAwareAction {
         this.p = p;
         this.editor = editor;
         this.dir = dir;
-        this.registerCustomShortcutSet(KeyboardSet.CreateTestCase.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), list);
     }
 
     @Override

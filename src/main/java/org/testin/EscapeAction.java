@@ -14,7 +14,7 @@ import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.projectPanel.tree.TreeTransferHandler;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.awt.datatransfer.StringSelection;
@@ -31,7 +31,7 @@ public class EscapeAction extends DumbAwareAction {
         this.tree = tree;
         this.transferHandler = transferHandler;
         this.list = null;
-        this.registerCustomShortcutSet(KeyboardSet.Escape.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), tree);
     }
 
     public EscapeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
@@ -40,7 +40,7 @@ public class EscapeAction extends DumbAwareAction {
         this.list = list;
         this.tree = null;
         this.transferHandler = null;
-        this.registerCustomShortcutSet(KeyboardSet.Escape.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), list);
     }
 
     @Override

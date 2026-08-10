@@ -84,7 +84,7 @@ public class CreateTestMethod implements GeneratorAction {
         if (targetClass != null) return targetClass;
 
         try {
-            VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
+            VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRootOrWarn(p);
             if (sourceRoot != null) {
                 // Package segments are camelCase (see NameSanitizer.packageName); lowercasing
                 // the directory here would disagree with the emitted package declaration

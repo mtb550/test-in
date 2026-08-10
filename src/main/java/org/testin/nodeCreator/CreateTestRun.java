@@ -7,7 +7,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CheckedTreeNode;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
@@ -36,14 +36,17 @@ import java.util.List;
 
 public class CreateTestRun implements NodeCreator {
     private final @NotNull Project p;
-    private TestRunDirectoryDto tr;
 
     public CreateTestRun(final @NotNull Project p) {
         this.p = p;
     }
 
+    /**
+     * Asynchronous creator: shows the run configuration dialog and completes on OK,
+     * including its own tree refresh and editor opening. Always returns null.
+     */
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull String name, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+    public @Nullable DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
         final TestProjectDirectoryDto tp = Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
 
         final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
@@ -73,7 +76,7 @@ public class CreateTestRun implements NodeCreator {
                     @Override
                     protected void doOKAction() {
                         close(DialogWrapper.OK_EXIT_CODE);
-                        tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
+                        final TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
                         saveSelectedToJSON(form, root, newDirPath, Services.getInstance(p, ProjectPanel.class), tr);
                     }
                 };
@@ -82,7 +85,7 @@ public class CreateTestRun implements NodeCreator {
             });
         });
 
-        return tr;
+        return null;
     }
 
     private DefaultMutableTreeNode buildDirectoryTree(final Path folder, final boolean isRoot, final DirectoryDto thisNodeDto) {

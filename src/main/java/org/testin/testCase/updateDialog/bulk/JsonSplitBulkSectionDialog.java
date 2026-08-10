@@ -353,97 +353,13 @@ public abstract class JsonSplitBulkSectionDialog {
             popup.closeOk(null);
         };
 
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                saveLogic.run();
-            }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)
-        ), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                saveLogic.run();
-            }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK)
-        ), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                rightEditor.getCaretModel().removeSecondaryCarets();
-                int offset = rightEditor.getCaretModel().getOffset();
-                int currentIndex = 0;
-                for (int i = 0; i < valueMarkers.size(); i++) {
-                    if (offset >= valueMarkers.get(i).getStartOffset() && offset <= valueMarkers.get(i).getEndOffset()) {
-                        currentIndex = i;
-                        break;
-                    }
-                }
-                int nextIndex = (currentIndex + 1) % valueMarkers.size();
-                rightEditor.getCaretModel().moveToOffset(valueMarkers.get(nextIndex).getEndOffset());
-            }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0)), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                rightEditor.getCaretModel().removeSecondaryCarets();
-                int offset = rightEditor.getCaretModel().getOffset();
-                int currentIndex = 0;
-                for (int i = 0; i < valueMarkers.size(); i++) {
-                    if (offset >= valueMarkers.get(i).getStartOffset() && offset <= valueMarkers.get(i).getEndOffset()) {
-                        currentIndex = i;
-                        break;
-                    }
-                }
-                int prevIndex = (currentIndex - 1 + valueMarkers.size()) % valueMarkers.size();
-                rightEditor.getCaretModel().moveToOffset(valueMarkers.get(prevIndex).getEndOffset());
-            }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK)), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                rightEditor.getCaretModel().removeSecondaryCarets();
-                int offset = rightEditor.getCaretModel().getOffset();
-                int currentIndex = 0;
-                for (int i = 0; i < valueMarkers.size(); i++) {
-                    if (offset >= valueMarkers.get(i).getStartOffset() && offset <= valueMarkers.get(i).getEndOffset()) {
-                        currentIndex = i;
-                        break;
-                    }
-                }
-                if (currentIndex < valueMarkers.size() - 1) {
-                    rightEditor.getCaretModel().moveToOffset(valueMarkers.get(currentIndex + 1).getEndOffset());
-                }
-            }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0)), rightEditor.getContentComponent());
-
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                rightEditor.getCaretModel().removeSecondaryCarets();
-                int offset = rightEditor.getCaretModel().getOffset();
-                int currentIndex = 0;
-                for (int i = 0; i < valueMarkers.size(); i++) {
-                    if (offset >= valueMarkers.get(i).getStartOffset() && offset <= valueMarkers.get(i).getEndOffset()) {
-                        currentIndex = i;
-                        break;
-                    }
-                }
-                if (currentIndex > 0) {
-                    rightEditor.getCaretModel().moveToOffset(valueMarkers.get(currentIndex - 1).getEndOffset());
-                }
-            }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0)), rightEditor.getContentComponent());
+        final JComponent keymapTarget = rightEditor.getContentComponent();
+        KeyAction.register(saveLogic, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), keymapTarget);
+        KeyAction.register(saveLogic, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, KeyEvent.SHIFT_DOWN_MASK), keymapTarget);
+        KeyAction.register(() -> navigate(1, true, rightEditor, valueMarkers), KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), keymapTarget);
+        KeyAction.register(() -> navigate(-1, true, rightEditor, valueMarkers), KeyStroke.getKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK), keymapTarget);
+        KeyAction.register(() -> navigate(1, false, rightEditor, valueMarkers), KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), keymapTarget);
+        KeyAction.register(() -> navigate(-1, false, rightEditor, valueMarkers), KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), keymapTarget);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!rightEditor.isDisposed() && !leftEditor.isDisposed()) {
@@ -463,34 +379,60 @@ public abstract class JsonSplitBulkSectionDialog {
             }
         });
 
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                CaretModel caretModel = rightEditor.getCaretModel();
-                caretModel.removeSecondaryCarets();
-
-                boolean isFirst = true;
-                for (RangeMarker marker : valueMarkers) {
-                    if (marker.isValid()) {
-                        int offset = marker.getEndOffset();
-                        LogicalPosition logPos = rightEditor.offsetToLogicalPosition(offset);
-                        VisualPosition visPos = rightEditor.logicalToVisualPosition(logPos);
-
-                        if (isFirst) {
-                            caretModel.moveToVisualPosition(visPos);
-                            isFirst = false;
-                        } else {
-                            caretModel.addCaret(visPos, true);
-                        }
-                    }
-                }
-                updateRowHighlights.run();
-            }
-        }.registerCustomShortcutSet(new com.intellij.openapi.actionSystem.CustomShortcutSet(
-                KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | KeyEvent.SHIFT_DOWN_MASK)
-        ), rightEditor.getContentComponent());
+        KeyAction.register(() -> {
+            placeCaretOnAllValues(rightEditor, valueMarkers);
+            updateRowHighlights.run();
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | KeyEvent.SHIFT_DOWN_MASK), keymapTarget);
 
         popup.showCenteredInCurrentWindow(p);
+    }
+
+    /**
+     * Moves the caret to the neighbouring editable value. Uses the live marker
+     * offsets, so navigation stays correct while the user is typing.
+     */
+    private void navigate(final int direction, final boolean wrap, final Editor editor, final List<RangeMarker> markers) {
+        if (markers.isEmpty()) return;
+
+        editor.getCaretModel().removeSecondaryCarets();
+        final int offset = editor.getCaretModel().getOffset();
+        int currentIndex = 0;
+        for (int i = 0; i < markers.size(); i++) {
+            if (offset >= markers.get(i).getStartOffset() && offset <= markers.get(i).getEndOffset()) {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        final int target = wrap
+                ? (currentIndex + direction + markers.size()) % markers.size()
+                : currentIndex + direction;
+        if (target < 0 || target >= markers.size()) return;
+
+        editor.getCaretModel().moveToOffset(markers.get(target).getEndOffset());
+    }
+
+    /**
+     * Ctrl+Shift+A: one caret at the end of every editable value.
+     */
+    private void placeCaretOnAllValues(final Editor editor, final List<RangeMarker> markers) {
+        final CaretModel caretModel = editor.getCaretModel();
+        caretModel.removeSecondaryCarets();
+
+        boolean isFirst = true;
+        for (final RangeMarker marker : markers) {
+            if (!marker.isValid()) continue;
+
+            final LogicalPosition logPos = editor.offsetToLogicalPosition(marker.getEndOffset());
+            final VisualPosition visPos = editor.logicalToVisualPosition(logPos);
+
+            if (isFirst) {
+                caretModel.moveToVisualPosition(visPos);
+                isFirst = false;
+            } else {
+                caretModel.addCaret(visPos, true);
+            }
+        }
     }
 
     private int getNearestValidOffset(final int offset, final List<RangeMarker> markers) {

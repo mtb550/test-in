@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 import org.testin.viewPanel.ViewPagination;
 
 import javax.swing.*;
@@ -18,7 +18,7 @@ public class NextTestCaseAction extends DumbAwareAction {
         this.controller = controller;
 
         if (component != null) {
-            this.registerCustomShortcutSet(KeyboardSet.NextTestCase.getCustomShortcut(), component);
+            this.registerCustomShortcutSet(Shortcuts.NextTestCase.getCustomShortcut(), component);
         }
     }
 

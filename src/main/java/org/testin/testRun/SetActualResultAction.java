@@ -13,7 +13,7 @@ import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testRun.createDialog.ActualResultDialog;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 public class SetActualResultAction extends DumbAwareAction {
 
@@ -26,7 +26,7 @@ public class SetActualResultAction extends DumbAwareAction {
         this.p = p;
         this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.SetActualResult.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.SetActualResult.getCustomShortcut(), list);
     }
 
     @Override

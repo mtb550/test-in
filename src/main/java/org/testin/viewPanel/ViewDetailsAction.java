@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class ViewDetailsAction extends DumbAwareAction {
         this.p = p;
         this.list = list;
         this.path = path;
-        this.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), list);
     }
 
     @Override

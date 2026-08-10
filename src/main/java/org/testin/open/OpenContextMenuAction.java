@@ -6,11 +6,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.KeyboardSet;
 
 import java.awt.*;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
 
 public class OpenContextMenuAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0);
     private final @NotNull Project p;
     private final SimpleTree tree;
     private final JBList<?> list;
@@ -22,7 +26,7 @@ public class OpenContextMenuAction extends DumbAwareAction {
         this.tree = tree;
         this.cm = cm;
         this.list = null;
-        this.registerCustomShortcutSet(KeyboardSet.OpenContextMenu.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 
     public OpenContextMenuAction(final @NotNull Project p, final JBList<?> list, final DefaultActionGroup cm) {
@@ -31,7 +35,7 @@ public class OpenContextMenuAction extends DumbAwareAction {
         this.list = list;
         this.cm = cm;
         this.tree = null;
-        this.registerCustomShortcutSet(KeyboardSet.OpenContextMenu.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 
     @Override

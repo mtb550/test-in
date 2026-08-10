@@ -16,12 +16,17 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
-import org.testin.util.KeyboardSet;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class RenameAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK);
     private final @NotNull Project p;
     private final @NotNull ProjectPanel pp;
     private final @NotNull SimpleTree tree;
@@ -31,7 +36,7 @@ public class RenameAction extends DumbAwareAction {
         this.p = p;
         this.pp = pp;
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.RenameNode.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 
     @Override

@@ -13,7 +13,7 @@ import org.testin.enums.IUIAction;
 import org.testin.enums.Priority;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.IconManager;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -78,7 +78,7 @@ public class PrioritySection implements ICreateTestCaseSection {
 
     @Override
     public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
-        base.registerShortcut(mainPanel, KeyboardSet.CreateTestCasePriority.getCustomShortcut(), () -> {
+        base.registerShortcut(mainPanel, Shortcuts.CreateTestCasePriority.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
         });

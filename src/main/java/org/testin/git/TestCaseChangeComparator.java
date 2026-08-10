@@ -16,10 +16,10 @@ final class TestCaseChangeComparator {
     private TestCaseChangeComparator() {
     }
 
-    static @NotNull List<TestCaseDiff.FieldChange> compare(
+    static @NotNull List<FieldChange> compare(
             final @NotNull TestCaseDto oldState,
             final @NotNull TestCaseDto newState) {
-        final List<TestCaseDiff.FieldChange> changes = new ArrayList<>();
+        final List<FieldChange> changes = new ArrayList<>();
         addIfChanged(changes, "Description", oldState.getDescription(), newState.getDescription(), ChangeType.CHANGE_DESCRIPTION);
         addIfChanged(changes, "Expected Result", oldState.getExpectedResult(), newState.getExpectedResult(), ChangeType.CHANGE_EXPECTED_RESULT);
         addIfChanged(changes, "Steps", formatSteps(oldState), formatSteps(newState), ChangeType.CHANGE_STEPS);
@@ -31,20 +31,20 @@ final class TestCaseChangeComparator {
         addIfChanged(changes, "Preconditions", oldState.getPreConditions(), newState.getPreConditions(), ChangeType.CHANGE_PRECONDITIONS);
 
         if (!Objects.equals(oldState.getGroup(), newState.getGroup())) {
-            changes.add(new TestCaseDiff.FieldChange(
+            changes.add(new FieldChange(
                     "Group", groupNames(oldState), groupNames(newState), ChangeType.CHANGE_GROUP));
         }
         return changes;
     }
 
     private static void addIfChanged(
-            final @NotNull List<TestCaseDiff.FieldChange> changes,
+            final @NotNull List<FieldChange> changes,
             final @NotNull String field,
             final String oldValue,
             final String newValue,
             final @NotNull ChangeType type) {
         if (!Objects.equals(oldValue, newValue)) {
-            changes.add(new TestCaseDiff.FieldChange(field, oldValue, newValue, type));
+            changes.add(new FieldChange(field, oldValue, newValue, type));
         }
     }
 

@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.BaseCard;
+import org.testin.editorPanel.RoundedBadge;
 import org.testin.editorPanel.Shared;
 import org.testin.enums.TestCardStatus;
 import org.testin.enums.TestEditorAttributes;
@@ -36,7 +37,7 @@ public class TestCard extends BaseCard {
                 .forEach(attr -> attr.applyToUI(tc, badges, details, p));
 
         if (isUnsorted) {
-            badges.add(new Shared.RoundedBadge("Unsorted", new JBColor(new Color(255, 100, 100), new Color(130, 50, 50))));
+            badges.add(new RoundedBadge("Unsorted", new JBColor(new Color(255, 100, 100), new Color(130, 50, 50))));
         }
 
         this.isRunning = "RUNNING".equals(tc.getTempStatus());
@@ -46,10 +47,10 @@ public class TestCard extends BaseCard {
         if (!tempStatus.trim().isEmpty()) {
             final TestCardStatus status = TestCardStatus.from(tempStatus);
             if (status != null) {
-                badges.add(new Shared.RoundedBadge(status.getLabel(), status.getBadgeColor()));
+                badges.add(new RoundedBadge(status.getLabel(), status.getBadgeColor()));
             } else {
                 final JBColor gray = new JBColor(new Color(180, 180, 180), new Color(120, 120, 120));
-                badges.add(new Shared.RoundedBadge(tempStatus, gray));
+                badges.add(new RoundedBadge(tempStatus, gray));
             }
         }
 

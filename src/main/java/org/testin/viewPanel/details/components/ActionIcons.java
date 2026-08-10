@@ -13,7 +13,7 @@ import org.testin.enums.CardHoverAction;
 import org.testin.enums.RunStatus;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.navigate.NavigateToCodeAction;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +46,7 @@ public class ActionIcons extends BaseDetails {
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text(CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip()))
-                .setShortcut(KeyboardSet.NavigateToCode.getShortcutText())
+                .setShortcut(Shortcuts.NavigateToCode.getShortcutText())
                 .installOn(navLabel);
 
         final int navTargetWidth = (int) (navIconRaw.getIconWidth() * HOVER_SCALE);
@@ -82,7 +82,7 @@ public class ActionIcons extends BaseDetails {
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text(currentStatus.getTooltip()))
-                .setShortcut(KeyboardSet.RunTestCase.getShortcutText())
+                .setShortcut(Shortcuts.RunTestCase.getShortcutText())
                 .installOn(runLabel);
 
         final int runTargetWidth = (int) (currentRunIconRaw.getIconWidth() * HOVER_SCALE);

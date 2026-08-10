@@ -1,6 +1,7 @@
 package org.testin.testCase.createDialog;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -13,13 +14,14 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -35,6 +37,12 @@ public class StepsSection implements ICreateTestCaseSection {
     private final JBPanel<?> stepsContainer;
     private final JBPanel<?> wrapper;
     Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
+
+    /**
+     * Parent for the per-step shortcut registrations; set by the owning dialog.
+     */
+    @Setter
+    private Disposable parentDisposable;
 
     public StepsSection(final @NotNull Project p) {
         this.p = p;
@@ -90,7 +98,7 @@ public class StepsSection implements ICreateTestCaseSection {
 
         JBLabel removeButton = new JBLabel(AllIcons.Actions.Cancel);
         removeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        removeButton.setToolTipText("Remove step " + KeyboardSet.CreateTestCaseRemoveStep.getShortcutText());
+        removeButton.setToolTipText("Remove step " + Shortcuts.CreateTestCaseRemoveStep.getShortcutText());
 
         removeButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -109,15 +117,16 @@ public class StepsSection implements ICreateTestCaseSection {
             }
         });
 
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                if (UIUtil.isDescendingFrom(focusOwner, stepField)) {
-                    removeStepAction(stepRow, stepField, repackAction);
-                }
-            }
-        }.registerCustomShortcutSet(KeyboardSet.CreateTestCaseRemoveStep.getCustomShortcut(), stepField);
+        final RemoveStepShortcutAction removeStepShortcut =
+                new RemoveStepShortcutAction(stepField, () -> removeStepAction(stepRow, stepField, repackAction));
+
+        // Tied to the dialog's disposable: rows are recreated on every fillData,
+        // and unparented registrations would keep the discarded rows alive.
+        if (parentDisposable != null) {
+            removeStepShortcut.registerCustomShortcutSet(Shortcuts.CreateTestCaseRemoveStep.getCustomShortcut(), stepField, parentDisposable);
+        } else {
+            removeStepShortcut.registerCustomShortcutSet(Shortcuts.CreateTestCaseRemoveStep.getCustomShortcut(), stepField);
+        }
 
         JBPanel<?> buttonWrapper = new JBPanel<>(new BorderLayout());
         buttonWrapper.setOpaque(false);
@@ -164,7 +173,7 @@ public class StepsSection implements ICreateTestCaseSection {
 
     @Override
     public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
-        base.registerShortcut(mainPanel, KeyboardSet.CreateTestCaseAddStep.getCustomShortcut(), () ->
+        base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseAddStep.getCustomShortcut(), () ->
                 showSection(slot, repackAction));
     }
 

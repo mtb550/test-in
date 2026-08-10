@@ -55,7 +55,4 @@ public class TestCaseSorter {
 
         return new SortResult(sortedList, unsortedIds);
     }
-
-    public record SortResult(List<TestCaseDto> sortedList, Set<UUID> unsortedIds) {
-    }
 }

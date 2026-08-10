@@ -16,7 +16,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testCase.createDialog.TestCaseUpdateMenuDialog;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
@@ -37,7 +37,7 @@ public class UpdateTestCaseAction extends DumbAwareAction {
         this.list = list;
         this.path = path;
         this.editor = editor;
-        this.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), list);
     }
 
     @Override

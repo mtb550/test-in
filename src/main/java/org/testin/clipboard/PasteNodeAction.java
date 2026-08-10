@@ -9,9 +9,14 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.projectPanel.tree.TreeTransferHandler;
 import org.testin.ui.dialogs.ConfirmationPopupDialog;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class PasteNodeAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
@@ -19,7 +24,7 @@ public class PasteNodeAction extends DumbAwareAction {
         super("Paste", "Paste items", AllIcons.Actions.MenuPaste);
         this.p = p;
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.PasteNode.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 
     @Override

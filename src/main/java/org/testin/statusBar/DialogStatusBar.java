@@ -1,6 +1,6 @@
 package org.testin.statusBar;
 
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 /**
  * Status bar used by the shared action dialogs.
@@ -9,24 +9,12 @@ public final class DialogStatusBar extends StatusBarBase {
 
     public DialogStatusBar() {
         this(new IStatusBarItem[]{
-                new ShortcutItem("Confirm", KeyboardSet.Enter.getShortcutText()),
-                new ShortcutItem("Cancel", KeyboardSet.Escape.getShortcutText())
+                new ShortcutItem("Confirm", Shortcuts.Enter.getShortcutText()),
+                new ShortcutItem("Cancel", Shortcuts.Escape.getShortcutText())
         });
     }
 
     private DialogStatusBar(final IStatusBarItem[] items) {
         super(items);
-    }
-
-    private record ShortcutItem(String name, String shortcutText) implements IStatusBarItem {
-        @Override
-        public String getName() {
-            return name;
-        }
-
-        @Override
-        public String getShortcutText() {
-            return shortcutText;
-        }
     }
 }

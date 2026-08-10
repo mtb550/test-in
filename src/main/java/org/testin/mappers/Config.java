@@ -1,6 +1,8 @@
 package org.testin.mappers;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -12,5 +14,14 @@ public class Config {
 
     @Getter
     private static final DateTimeFormatter dateFormatterPattern = DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN, Locale.US);
+
+    /**
+     * Java test source root, detected once at plugin startup (see Tools.getTestSourceRoot).
+     * Cached here so code generation does not re-scan the project modules on every call;
+     * re-detected only if the cached root becomes invalid (e.g. the folder was removed).
+     */
+    @Getter
+    @Setter
+    private static volatile VirtualFile testSourceRoot;
 
 }

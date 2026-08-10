@@ -17,7 +17,6 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
 
 import java.awt.datatransfer.DataFlavor;
@@ -27,8 +26,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class PasteTestCaseNodeAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
     private final @NotNull IEditor editor;
 
@@ -36,7 +41,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
         super("Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
         this.p = p;
         this.editor = editor;
-        this.registerCustomShortcutSet(KeyboardSet.PasteTestCaseNode.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 
     @Override

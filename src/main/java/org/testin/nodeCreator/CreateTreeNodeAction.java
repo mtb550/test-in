@@ -15,7 +15,7 @@ import org.testin.nodeCreator.dialogs.CreateNodesDialog;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
@@ -32,7 +32,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
         this.p = p;
         this.tree = tree;
         this.tools = Services.getInstance(p, Tools.class);
-        this.registerCustomShortcutSet(KeyboardSet.CreateNode.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), tree);
     }
 
     @Override
@@ -55,6 +55,10 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
             DirectoryDto dir = dt.getAction().apply(p).execute(s, pDir, newDirPath);
             Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
+
+            // Asynchronous creators (test runs) return null and run their own
+            // follow-up once their dialog completes.
+            if (dir == null) return;
 
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);

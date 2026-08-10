@@ -60,20 +60,20 @@ public final class GitDiffProcessor {
                 final TestCaseDto newState = read(mapper, after);
                 result.add(new TestCaseDiff(
                         newState.getId().toString(), relativePath, DiffType.ADDED, null, newState,
-                        List.of(new TestCaseDiff.FieldChange(
+                        List.of(new FieldChange(
                                 "Test Case", "", newState.getDescription(), ChangeType.CREATE_TEST_CASE))));
             }
             case DELETED -> {
                 final TestCaseDto oldState = read(mapper, before);
                 result.add(new TestCaseDiff(
                         oldState.getId().toString(), relativePath, DiffType.DELETED, oldState, null,
-                        List.of(new TestCaseDiff.FieldChange(
+                        List.of(new FieldChange(
                                 "Test Case", oldState.getDescription(), "", ChangeType.REMOVE_TEST_CASE))));
             }
             case MODIFICATION, MOVED -> {
                 final TestCaseDto oldState = read(mapper, before);
                 final TestCaseDto newState = read(mapper, after);
-                final List<TestCaseDiff.FieldChange> fieldChanges = TestCaseChangeComparator.compare(oldState, newState);
+                final List<FieldChange> fieldChanges = TestCaseChangeComparator.compare(oldState, newState);
                 if (!fieldChanges.isEmpty()) {
                     result.add(new TestCaseDiff(
                             newState.getId().toString(), relativePath, DiffType.MODIFIED,

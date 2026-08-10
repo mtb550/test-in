@@ -1,8 +1,12 @@
 package org.testin.util;
 
 import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
+import com.intellij.openapi.actionSystem.Shortcut;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -21,6 +25,7 @@ import org.testin.enums.DirectoryType;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.logger.Logger;
+import org.testin.mappers.Config;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
@@ -31,6 +36,7 @@ import org.testin.services.Services;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -90,6 +96,11 @@ public final class Tools {
     }
 
     public @Nullable VirtualFile getTestSourceRoot(final @NotNull Project p) {
+        // Detected once at startup and cached; module scanning repeats only if the
+        // cached root became invalid (e.g. the folder was deleted).
+        final VirtualFile cached = Config.getTestSourceRoot();
+        if (cached != null && cached.isValid()) return cached;
+
         Module[] modules = ModuleManager.getInstance(p).getModules();
 
         for (Module module : modules) {
@@ -98,12 +109,27 @@ public final class Tools {
 
             if (!sourceRoots.isEmpty()) {
                 Logger.debug("[TRACE] Found test source root: " + sourceRoots.getFirst());
+                Config.setTestSourceRoot(sourceRoots.getFirst());
                 return sourceRoots.getFirst();
             }
         }
 
         Logger.warn("[WARNING] No Test Source Root found in the project.");
         return null;
+    }
+
+    /**
+     * Like {@link #getTestSourceRoot} but also tells the user when no test source
+     * root exists — used by the creation generators, which skip in that case.
+     */
+    public @Nullable VirtualFile getTestSourceRootOrWarn(final @NotNull Project p) {
+        final VirtualFile root = getTestSourceRoot(p);
+        if (root == null) {
+            Services.getInstance(p, Notifier.class).softShow(p,
+                    "Java Test Source Not Found",
+                    "Unable to find a Java test source package - automation code was not generated.");
+        }
+        return root;
     }
 
     public void openWithAssociatedProgram(final @NotNull Project p, final VirtualFile virtualFile) {
@@ -221,6 +247,27 @@ public final class Tools {
         }
         generatedFqcn.replaceAll(this::sanitizePackageName);
         return generatedFqcn;
+    }
+
+    // ------------------------------------------------------------------
+    // Keyboard shortcut helpers (see util.Shortcuts for the shared keys;
+    // single-use keystrokes live as constants in their owning classes).
+    // ------------------------------------------------------------------
+
+    public static CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
+        return new CustomShortcutSet(key);
+    }
+
+    public static Shortcut keyboardShortcut(final @NotNull KeyStroke key) {
+        return new KeyboardShortcut(key, null);
+    }
+
+    public static String shortcutText(final @NotNull KeyStroke key) {
+        return KeymapUtil.getKeystrokeText(key);
+    }
+
+    public static boolean matches(final @NotNull KeyEvent e, final @NotNull KeyStroke key) {
+        return e.getKeyCode() == key.getKeyCode() && e.getModifiersEx() == key.getModifiers();
     }
 
     public DefaultActionGroup createSubGroup(final @NotNull String title, final @NotNull Icon icon, final @NotNull List<? extends DumbAwareAction> actions) {

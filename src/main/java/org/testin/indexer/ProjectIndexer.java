@@ -266,6 +266,13 @@ public final class ProjectIndexer {
         store.putTestRun(testRunPath, tr);
     }
 
+    /**
+     * Index-only registration; the caller persists the JSON itself.
+     */
+    public void registerTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
+        store.registerTestRun(testRunPath, tr);
+    }
+
     public void removeTestProject(final @NotNull Path path) {
         removeVf(path);
         store.removeTestProject(path);

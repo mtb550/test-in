@@ -5,11 +5,11 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 public class PrevPageAction extends AbstractPageAction {
 
     public PrevPageAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super(editor, list, "Previous Page", "Navigate to the previous page", AllIcons.Actions.Back, KeyboardSet.PreviousTestCase, -1);
+        super(editor, list, "Previous Page", "Navigate to the previous page", AllIcons.Actions.Back, Shortcuts.PreviousTestCase, -1);
     }
 }

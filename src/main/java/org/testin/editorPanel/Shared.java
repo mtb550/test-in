@@ -52,32 +52,4 @@ public class Shared {
         }
     }
 
-    public static class RoundedBadge extends JBLabel {
-        private final int radius;
-
-        public RoundedBadge(final String text, final Color bg) {
-            super(text);
-            this.radius = BADGE_RADIUS;
-            setOpaque(false);
-            setBackground(bg);
-            setForeground(JBColor.WHITE);
-
-            float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
-            setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
-
-            setBorder(JBUI.Borders.empty(2, 10));
-        }
-
-        @Override
-        protected void paintComponent(final Graphics g) {
-            if (radius > 0) {
-                final Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
-                g2.dispose();
-            }
-            super.paintComponent(g);
-        }
-    }
 }

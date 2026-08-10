@@ -7,7 +7,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 
@@ -20,7 +20,7 @@ abstract class AbstractPageAction extends DumbAwareAction {
 
     protected AbstractPageAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list,
                                  final @NotNull String title, final @NotNull String description, final Icon icon,
-                                 final @NotNull KeyboardSet shortcut, final int delta) {
+                                 final @NotNull Shortcuts shortcut, final int delta) {
         super(title, description, icon);
         this.editor = editor;
         this.delta = delta;

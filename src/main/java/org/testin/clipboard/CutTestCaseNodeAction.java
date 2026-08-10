@@ -13,13 +13,18 @@ import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class CutTestCaseNodeAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
     private final IEditor editor;
     private final JBList<TestCaseDto> list;
@@ -29,7 +34,7 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
         this.p = p;
         this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.CutTestCaseNode.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 
     @Override

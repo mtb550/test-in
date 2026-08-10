@@ -8,15 +8,20 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class RedoNodeAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
 
     public RedoNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Redo", "Redo last action", AllIcons.Actions.Redo);
         this.p = p;
-        this.registerCustomShortcutSet(KeyboardSet.Redo.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 
     @Override

@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.awt.datatransfer.StringSelection;
@@ -24,7 +24,7 @@ public class CopyTestCaseAction extends DumbAwareAction {
         super("Copy", "Copy test case", AllIcons.Actions.Copy);
         this.p = p;
         this.list = list;
-        registerCustomShortcutSet(KeyboardSet.CopyTestCase.getCustomShortcut(), list);
+        registerCustomShortcutSet(Shortcuts.CopyItem.getCustomShortcut(), list);
     }
 
     @Override

@@ -8,9 +8,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.projectPanel.tree.TreeTransferHandler;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class CutNodeAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
@@ -18,7 +23,7 @@ public class CutNodeAction extends DumbAwareAction {
         super("Cut", "Cut selected items", AllIcons.Actions.MenuCut);
         this.p = p;
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.CutNode.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 
     @Override

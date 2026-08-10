@@ -17,7 +17,7 @@ import org.testin.testRun.createDialog.BugPrioritySection;
 import org.testin.testRun.createDialog.BugSeveritySection;
 import org.testin.testRun.createDialog.ErrorCaptureSection;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -164,7 +164,7 @@ public class UpdateRunItemDialog {
                 return com.intellij.openapi.actionSystem.ActionUpdateThread.EDT;
             }
         };
-        saveAction.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), component);
+        saveAction.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), component);
     }
 
     public void show() {

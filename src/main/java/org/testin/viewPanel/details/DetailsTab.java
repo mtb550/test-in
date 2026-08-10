@@ -26,7 +26,7 @@ import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.testCase.createDialog.TestCaseUpdateMenuDialog;
 import org.testin.util.FontSync;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 import org.testin.util.Tools;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
@@ -159,7 +159,7 @@ public class DetailsTab {
             public @NotNull ActionUpdateThread getActionUpdateThread() {
                 return ActionUpdateThread.BGT;
             }
-        }.registerCustomShortcutSet(KeyboardSet.UpdateTestCase.getCustomShortcut(), detailsTab);
+        }.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), detailsTab);
     }
 
     private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {

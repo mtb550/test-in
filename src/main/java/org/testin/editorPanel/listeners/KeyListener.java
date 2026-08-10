@@ -10,7 +10,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -35,7 +35,7 @@ public class KeyListener extends KeyAdapter {
     @Override
     public void keyPressed(final KeyEvent e) {
 
-        if (KeyboardSet.CopyTestCase.matches(e)) {
+        if (Shortcuts.CopyItem.matches(e)) {
             final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
             if (selectedCases != null && !selectedCases.isEmpty()) {
                 final String titles = selectedCases.stream()
@@ -49,7 +49,7 @@ public class KeyListener extends KeyAdapter {
             return;
         }
 
-        if (e.getKeyCode() == KeyboardSet.DeletePackage.getKeyCode()) {
+        if (Shortcuts.DeletePackage.matches(e)) {
             final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
 
             if (selectedCases != null && !selectedCases.isEmpty()) {

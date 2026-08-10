@@ -15,7 +15,7 @@ import org.testin.enums.UpdateTestCaseFields;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.*;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -126,7 +126,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
         Runnable saveAction = save(existingDto, onSave, new JBPopup[]{popup});
 
-        registerShortcut(mainPanel, KeyboardSet.Enter.getCustomShortcut(), saveAction::run);
+        registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);
     }
 
     public void show() {

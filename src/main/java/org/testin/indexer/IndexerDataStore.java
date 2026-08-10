@@ -122,10 +122,18 @@ final class IndexerDataStore {
     }
 
     void putTestRun(final Path testRunPath, final TestRunDto tr) {
-        testRunsByPath.put(testRunPath.toString(), tr);
+        registerTestRun(testRunPath, tr);
 
         Services.getInstance(p, FilesUtil.class)
                 .write(p, testRunPath.resolve(testRunPath.getFileName() + ".json"), tr);
+    }
+
+    /**
+     * Index-only registration; used when the caller persists the JSON itself
+     * (e.g. the run-status writer, which snapshots the bytes beforehand).
+     */
+    void registerTestRun(final Path testRunPath, final TestRunDto tr) {
+        testRunsByPath.put(testRunPath.toString(), tr);
     }
 
     void addTestSet(final TestSetDirectoryDto ts) {

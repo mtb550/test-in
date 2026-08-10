@@ -9,8 +9,6 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,45 +44,11 @@ public final class GridExcelBehavior {
     // ------------------------------------------------------------------
 
     private static void installSequenceColumnRowSelection(final JBTable table) {
-        final MouseAdapter rowSelector = new MouseAdapter() {
-            @Override
-            public void mousePressed(final MouseEvent e) {
-                if (!SwingUtilities.isLeftMouseButton(e) || e.isPopupTrigger()) return;
-
-                final int viewRow = table.rowAtPoint(e.getPoint());
-                final int viewCol = table.columnAtPoint(e.getPoint());
-                if (viewRow < 0 || viewCol < 0) return;
-                if (table.convertColumnIndexToModel(viewCol) != 0) return; // only the "#" column
-
-                final ListSelectionModel rows = table.getSelectionModel();
-
-                if (e.isShiftDown()) {
-                    final int anchor = rows.getAnchorSelectionIndex();
-                    rows.setSelectionInterval(anchor < 0 ? viewRow : anchor, viewRow);
-                } else if (e.isControlDown() || e.isMetaDown()) {
-                    if (rows.isSelectedIndex(viewRow)) {
-                        rows.removeSelectionInterval(viewRow, viewRow);
-                    } else {
-                        rows.addSelectionInterval(viewRow, viewRow);
-                    }
-                } else {
-                    rows.setSelectionInterval(viewRow, viewRow);
-                }
-
-                table.setColumnSelectionInterval(0, table.getColumnCount() - 1);
-                table.requestFocusInWindow();
-
-                // Consumed events are ignored by BasicTableUI, so the default
-                // cell-selection handling cannot override the row selection.
-                e.consume();
-            }
-        };
-
         // Register ahead of the UI handler: listeners run in order, and ours must
         // consume the press before the table UI applies plain cell selection.
         final MouseListener[] existing = table.getMouseListeners();
         for (final MouseListener listener : existing) table.removeMouseListener(listener);
-        table.addMouseListener(rowSelector);
+        table.addMouseListener(new SequenceColumnRowSelector(table));
         for (final MouseListener listener : existing) table.addMouseListener(listener);
     }
 

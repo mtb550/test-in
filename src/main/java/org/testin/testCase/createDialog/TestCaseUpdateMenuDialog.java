@@ -1,31 +1,17 @@
 package org.testin.testCase.createDialog;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonShortcuts;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.ColoredListCellRenderer;
-import com.intellij.ui.SimpleTextAttributes;
-import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.UpdateTestCaseFields;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.updateDialog.UpdateTestCaseDialog;
-import org.testin.ui.dialogs.DialogStyle;
+import org.testin.ui.dialogs.ShortcutMenuPopup;
 
-import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 public class TestCaseUpdateMenuDialog {
 
@@ -40,101 +26,35 @@ public class TestCaseUpdateMenuDialog {
     }
 
     public void show() {
-        boolean isSingle = items.size() == 1;
-        String title = isSingle ? "Update Test Case" : "Update " + items.size() + " Test Cases";
+        final boolean isSingle = items.size() == 1;
+        final String title = isSingle ? "Update Test Case" : "Update " + items.size() + " Test Cases";
 
-        showMenu(title, selectedItem -> {
-
-            final GeneratorType gt = selectedItem.getGt();
-            Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
-
-            if (isSingle) {
-                new UpdateTestCaseDialog(p, items.getFirst(), selectedItem, tc -> {
-                    Logger.trace("Single Edit Save -> changeType = " + gt);
-                    updatedItems.accept(items, gt);
-                }).show();
-
-            } else {
-                selectedItem.getBulkAction().execute(p, items, list -> {
-                    Logger.trace("Bulk Edit Save -> changeType = " + gt);
-                    updatedItems.accept(list, gt);
-                });
-            }
-        });
-    }
-
-    private void showMenu(final String title, final Consumer<UpdateTestCaseFields> onSelection) {
-        UpdateTestCaseFields[] fields = Arrays.stream(UpdateTestCaseFields.values()).filter(UpdateTestCaseFields::isUpdateMenuItem).toArray(UpdateTestCaseFields[]::new);
-        JBList<UpdateTestCaseFields> list = buildMenuList(fields);
-        JBPopup popup = buildPopup(title, list);
-        registerShortcuts(list, popup, onSelection);
-        popup.showCenteredInCurrentWindow(p);
-    }
-
-    @NotNull
-    private JBList<UpdateTestCaseFields> buildMenuList(final UpdateTestCaseFields[] fields) {
-        JBList<UpdateTestCaseFields> list = new JBList<>(fields);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        list.setSelectedIndex(0);
-        list.setCellRenderer(createCellRenderer());
-        return list;
-    }
-
-    @NotNull
-    private ColoredListCellRenderer<UpdateTestCaseFields> createCellRenderer() {
-        return new ColoredListCellRenderer<>() {
-            @Override
-            protected void customizeCellRenderer(@NotNull JList<? extends UpdateTestCaseFields> l, UpdateTestCaseFields val, int i, boolean sel, boolean focus) {
-                setIcon(val.getIcon());
-                append(val.getName());
-                append("   " + val.getShortcutText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
-                setBorder(JBUI.Borders.empty(6, 12));
-            }
-        };
-    }
-
-    private JBPopup buildPopup(final String title, final JBList<UpdateTestCaseFields> list) {
-        DialogStyle.styleContent(list);
-        return JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(new JBScrollPane(list), list)
-                .setTitle(title)
-                .setRequestFocus(true)
-                .setCancelOnClickOutside(true)
-                .setMovable(false)
-                .createPopup();
-    }
-
-    private void registerShortcuts(final JBList<UpdateTestCaseFields> list, final JBPopup popup, final Consumer<UpdateTestCaseFields> onSelection) {
-        Runnable triggerSelection = () -> {
-            if (list.getSelectedValue() != null) {
-                onSelection.accept(list.getSelectedValue());
-                popup.closeOk(null);
-            }
-        };
-
-        Arrays.stream(UpdateTestCaseFields.values())
+        final UpdateTestCaseFields[] fields = Arrays.stream(UpdateTestCaseFields.values())
                 .filter(UpdateTestCaseFields::isUpdateMenuItem)
-                .forEach(f -> f.bindShortcut(list, () -> {
-                    onSelection.accept(f);
-                    popup.closeOk(null);
-                }));
+                .toArray(UpdateTestCaseFields[]::new);
 
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                triggerSelection.run();
-            }
-        }.registerCustomShortcutSet(CommonShortcuts.ENTER, list);
+        new ShortcutMenuPopup<>(p, title, fields,
+                UpdateTestCaseFields::getIcon,
+                UpdateTestCaseFields::getName,
+                UpdateTestCaseFields::getShortcutText,
+                UpdateTestCaseFields::bindShortcut,
+                selectedItem -> {
 
-        list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int idx = list.locationToIndex(e.getPoint());
-                if (idx >= 0) {
-                    list.setSelectedIndex(idx);
-                    triggerSelection.run();
-                }
-            }
-        });
+                    final GeneratorType gt = selectedItem.getGt();
+                    Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
+
+                    if (isSingle) {
+                        new UpdateTestCaseDialog(p, items.getFirst(), selectedItem, tc -> {
+                            Logger.trace("Single Edit Save -> changeType = " + gt);
+                            updatedItems.accept(items, gt);
+                        }).show();
+
+                    } else {
+                        selectedItem.getBulkAction().execute(p, items, list -> {
+                            Logger.trace("Bulk Edit Save -> changeType = " + gt);
+                            updatedItems.accept(list, gt);
+                        });
+                    }
+                }).show();
     }
 }

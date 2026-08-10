@@ -53,7 +53,7 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
         };
 
         for (TestCaseDiff diff : differences) {
-            for (TestCaseDiff.FieldChange fc : diff.fieldChanges()) {
+            for (FieldChange fc : diff.fieldChanges()) {
                 String description = getDescriptionForRow(diff, fc);
                 model.addRow(new Object[]{
                         diff.testCaseId(),
@@ -114,7 +114,7 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
         return List.copyOf(selected);
     }
 
-    private String getDescriptionForRow(TestCaseDiff diff, TestCaseDiff.FieldChange fc) {
+    private String getDescriptionForRow(TestCaseDiff diff, FieldChange fc) {
         if (diff.type() == DiffType.ADDED) {
             TestCaseDto newState = diff.newState();
             return newState != null ? newState.getDescription() : fc.newValue();

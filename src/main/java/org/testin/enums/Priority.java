@@ -2,7 +2,7 @@ package org.testin.enums;
 
 import com.intellij.ui.JBColor;
 import lombok.Getter;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import java.awt.*;
 import java.util.Set;
@@ -15,7 +15,7 @@ public enum Priority {
             1,
             JBColor.RED.brighter().brighter(),
             true,
-            KeyboardSet.PriorityHigh
+            Shortcuts.PriorityHigh
     ),
 
     MEDIUM(
@@ -23,7 +23,7 @@ public enum Priority {
             2,
             JBColor.BLUE.brighter(),
             true,
-            KeyboardSet.PriorityMedium
+            Shortcuts.PriorityMedium
     ),
 
     LOW(
@@ -31,17 +31,17 @@ public enum Priority {
             3,
             JBColor.GRAY.brighter(),
             true,
-            KeyboardSet.PriorityLow
+            Shortcuts.PriorityLow
     );
 
     private final String name;
     private final int value;
     private final Color color;
     private final boolean active;
-    private final KeyboardSet shortcut;
+    private final Shortcuts shortcut;
     private final BiConsumer<Set<Priority>, Boolean> action;
 
-    Priority(final String name, final int value, final Color color, final boolean active, final KeyboardSet shortcut) {
+    Priority(final String name, final int value, final Color color, final boolean active, final Shortcuts shortcut) {
         this.name = name;
         this.value = value;
         this.color = color;

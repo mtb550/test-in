@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -127,7 +127,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         Runnable saveAction = save(dto, onSave, new JBPopup[]{popup});
 
         // register enter shortcut
-        registerShortcut(mainPanel, KeyboardSet.Enter.getCustomShortcut(), saveAction::run);
+        registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);
     }
 
     public void show() {

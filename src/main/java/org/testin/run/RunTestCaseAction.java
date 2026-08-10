@@ -12,7 +12,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestNGRunnerByMethod;
 import org.testin.services.Services;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import java.util.List;
 
@@ -24,7 +24,7 @@ public class RunTestCaseAction extends DumbAwareAction {
         super("Run Test", "Run selected test cases", AllIcons.RunConfigurations.TestState.Run);
         this.p = p;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.RunTestCase.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.RunTestCase.getCustomShortcut(), list);
     }
 
     public void execute(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {

@@ -29,7 +29,7 @@ public class CreateJavaClass implements GeneratorAction {
 
         WriteAction.run(() -> {
             try {
-                VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
+                VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRootOrWarn(p);
 
                 if (testSourceRoot != null) {
                     VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, path.replace(".", "/"));

@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 public class CloseTestCaseDetailsAction extends DumbAwareAction {
     private final @NotNull Project p;
@@ -15,7 +15,7 @@ public class CloseTestCaseDetailsAction extends DumbAwareAction {
     public CloseTestCaseDetailsAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
         super("Close View Panel");
         this.p = p;
-        this.registerCustomShortcutSet(KeyboardSet.Escape.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), list);
     }
 
     @Override

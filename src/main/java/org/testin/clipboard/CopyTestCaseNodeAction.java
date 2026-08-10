@@ -12,13 +12,18 @@ import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.KeyboardSet;
 import org.testin.util.Mapper;
 
 import java.awt.datatransfer.StringSelection;
 import java.util.List;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
+import java.awt.event.InputEvent;
 
 public class CopyTestCaseNodeAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
 
@@ -26,7 +31,7 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
         super("Copy Node", "Copy selected test case(s) to clipboard", AllIcons.Actions.Copy);
         this.p = p;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.CopyTestCaseNode.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 
     @Override

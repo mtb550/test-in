@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.projectPanel.tree.TreeTransferHandler;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 public class CopyNodeAction extends DumbAwareAction {
     private final @NotNull Project p;
@@ -18,7 +18,7 @@ public class CopyNodeAction extends DumbAwareAction {
         super("Copy", "Copy selected items", AllIcons.Actions.Copy);
         this.p = p;
         this.tree = tree;
-        this.registerCustomShortcutSet(KeyboardSet.CopyNode.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Shortcuts.CopyItem.getCustomShortcut(), tree);
     }
 
     @Override

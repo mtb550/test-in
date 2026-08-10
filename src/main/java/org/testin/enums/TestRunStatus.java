@@ -6,9 +6,10 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
 
 import javax.swing.*;
+import java.awt.event.KeyEvent;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,19 +30,19 @@ public enum TestRunStatus {
 
     COMPLETED(
             "Completed",
-            KeyboardSet.StatusCompleted,
+            KeyStroke.getKeyStroke(KeyEvent.VK_2, 0),
             AllIcons.Actions.Checked
     ),
 
     ASSIGNED(
             "Assigned",
-            KeyboardSet.StatusAssigned,
+            KeyStroke.getKeyStroke(KeyEvent.VK_1, 0),
             AllIcons.General.User
     ), //todo, later, use xml to add tester's name dynamic
 
     CLOSED(
             "Closed",
-            KeyboardSet.StatusClosed,
+            KeyStroke.getKeyStroke(KeyEvent.VK_3, 0),
             AllIcons.Actions.Cancel
     );
 
@@ -51,23 +52,23 @@ public enum TestRunStatus {
             IN_PROGRESS, COMPLETED
     );
     private final String label;
-    private final KeyboardSet keyboardSet;
+    private final KeyStroke shortcut;
     private final Icon icon;
 
     public String getShortcutText() {
-        return Optional.ofNullable(keyboardSet)
-                .map(KeyboardSet::getShortcutText)
+        return Optional.ofNullable(shortcut)
+                .map(Tools::shortcutText)
                 .orElse("");
     }
 
     public void bindShortcut(final JComponent component, final Runnable onAction) {
-        if (keyboardSet != null) {
+        if (shortcut != null) {
             new DumbAwareAction() {
                 @Override
                 public void actionPerformed(@NotNull AnActionEvent e) {
                     onAction.run();
                 }
-            }.registerCustomShortcutSet(keyboardSet.getCustomShortcut(), component);
+            }.registerCustomShortcutSet(Tools.customShortcut(shortcut), component);
         }
     }
 }

@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 import org.testin.util.Tools;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class NavigateToCodeAction extends DumbAwareAction {
         super("Navigate to Code", "Jump to the automated test case", AllIcons.General.ArrowRight);
         this.p = p;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.NavigateToCode.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.NavigateToCode.getCustomShortcut(), list);
     }
 
     public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {

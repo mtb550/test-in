@@ -15,11 +15,15 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testRun.createDialog.FailedResultDialog;
-import org.testin.util.KeyboardSet;
 
 import java.util.List;
+import org.testin.util.Tools;
+import javax.swing.KeyStroke;
+import java.awt.event.KeyEvent;
 
 public class SetTestCaseStatusFailedAction extends DumbAwareAction {
+
+    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F, 0);
     private final @NotNull Project p;
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
@@ -29,7 +33,7 @@ public class SetTestCaseStatusFailedAction extends DumbAwareAction {
         this.p = p;
         this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.SetStatusFailed.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 
     @Override

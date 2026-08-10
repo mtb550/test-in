@@ -3,25 +3,22 @@ package org.testin.testRun;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestRunStatus;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
-import org.testin.mappers.markers.TestRunMarker;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
+import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 
 import javax.swing.tree.TreePath;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-// todo, to be refactored
 public class SetTestRunStatusAction extends DumbAwareAction {
     final @NotNull SimpleTree tree;
     private final @NotNull Project p;
@@ -41,13 +38,13 @@ public class SetTestRunStatusAction extends DumbAwareAction {
         final TestRunDirectoryDto testRunDto = TreeValueUtil.valueOf(path.getLastPathComponent(), TestRunDirectoryDto.class);
         if (testRunDto != null) {
             new TestRunStatusMenuDialog(p, selectedStatus -> {
-                TestRunMarker marker = testRunDto.getMarker();
-                marker.setStatus(selectedStatus);
-                marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-
                 Logger.trace("Status changed -> " + testRunDto.getName() + " = " + selectedStatus.getLabel());
 
-                persistMarker(p, testRunDto, selectedStatus);
+                // Updates the indexer-owned marker (single source of truth) and
+                // persists it through the sequential run-status writer.
+                Services.getInstance(p, RunStatusService.class).persistMarker(
+                        p, testRunDto.getPath(), selectedStatus,
+                        ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
                 Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
             }).show();
@@ -67,23 +64,6 @@ public class SetTestRunStatusAction extends DumbAwareAction {
                 dir.getMarker().getStatus() != TestRunStatus.CLOSED;
 
         e.getPresentation().setEnabled(enabled);
-    }
-
-    private void persistMarker(final @NotNull Project p, final TestRunDirectoryDto tr, final TestRunStatus newStatus) {
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(tr.getPath());
-
-                if (trd == null) return;
-                TestRunMarker marker = trd.getMarker();
-                marker.setStatus(newStatus);
-
-                indexer.updateRunMarker(p, tr.getPath(), marker);
-            } catch (final Exception ex) {
-                Logger.error("Failed to persist marker: " + ex.getMessage());
-            }
-        });
     }
 
     @Override

@@ -18,11 +18,29 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class ZoomIndicatorDialog {
+
+    /**
+     * A single indicator popup is enough: zooming always happens in the focused
+     * editor, so a new indicator replaces the previous one. One reusable timer
+     * instead of allocating one per wheel event; hide() clears the reference so
+     * nothing dangles after the popup is gone.
+     */
     private static JBPopup currentPopup;
-    private static Timer hideTimer;
+    private static final Timer HIDE_TIMER = new Timer(5000, e -> hide());
+
+    static {
+        HIDE_TIMER.setRepeats(false);
+    }
+
+    private static void hide() {
+        if (currentPopup != null && !currentPopup.isDisposed()) currentPopup.cancel();
+        currentPopup = null;
+    }
 
     public static void show(final @NotNull Project p, final JComponent parent, float currentSize) {
-        if (currentPopup != null && !currentPopup.isDisposed()) currentPopup.cancel();
+        hide();
+
+        if (!parent.isShowing()) return;
 
         JBPanel<?> panel = new JBPanel<>();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -37,7 +55,7 @@ public class ZoomIndicatorDialog {
         gearIcon.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(final MouseEvent e) {
-                if (currentPopup != null) currentPopup.cancel();
+                hide();
                 if (!p.isDisposed()) {
                     ShowSettingsUtilImpl.showSettingsDialog(p, "preferences.editor", "Change font size");
                 }
@@ -59,14 +77,6 @@ public class ZoomIndicatorDialog {
 
         currentPopup.show(new RelativePoint(parent, new Point(x, y)));
 
-        if (hideTimer != null) hideTimer.stop();
-
-        hideTimer = new Timer(5000, e -> {
-            if (currentPopup != null && !currentPopup.isDisposed())
-                currentPopup.cancel();
-        });
-
-        hideTimer.setRepeats(false);
-        hideTimer.start();
+        HIDE_TIMER.restart();
     }
 }

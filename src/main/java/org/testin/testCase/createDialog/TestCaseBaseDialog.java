@@ -1,12 +1,14 @@
 package org.testin.testCase.createDialog;
 
 import com.intellij.codeInsight.lookup.LookupManager;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -40,8 +42,17 @@ public abstract class TestCaseBaseDialog {
     protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
     private PropertyChangeListener focusListener;
 
+    /**
+     * Owns all global registrations of this dialog (application focus listener,
+     * per-step shortcuts). Parented to the project, so everything is released
+     * even when the popup is torn down without firing onClosed.
+     */
+    protected final Disposable dialogDisposable;
+
     public TestCaseBaseDialog(final @NotNull Project p) {
         this.p = p;
+        this.dialogDisposable = Disposer.newDisposable("testin.testCaseDialog");
+        Disposer.register(p, dialogDisposable);
         this.DescriptionSection = new DescriptionSection(p);
         this.expectedResultSection = new ExpectedResultSection(p);
         this.moduleSection = new ModuleSection(p);
@@ -63,6 +74,8 @@ public abstract class TestCaseBaseDialog {
                         field -> field.getSectionExtractor().apply(this),
                         CreateTestCaseFields::getStatusBarItems
                 ));
+
+        stepsSection.setParentDisposable(dialogDisposable);
     }
 
     protected void initDynamicStatusBar(JComponent parentPanel) {
@@ -79,13 +92,20 @@ public abstract class TestCaseBaseDialog {
             }
         };
         KeyboardFocusManager.getCurrentKeyboardFocusManager().addPropertyChangeListener("focusOwner", focusListener);
+
+        // Removal runs on any disposal path (popup onClosed or project teardown).
+        Disposer.register(dialogDisposable, this::removeFocusListener);
     }
 
-    public void dispose() {
+    private void removeFocusListener() {
         if (focusListener != null) {
             KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener);
             focusListener = null;
         }
+    }
+
+    public void dispose() {
+        Disposer.dispose(dialogDisposable);
     }
 
     public List<ICreateTestCaseSection> getAllSections() {

@@ -31,9 +31,4 @@ public final class Setting {
         settings.rootTestinPath = path != null ? path.toString() : "";
     }
 
-    public void setAutomationPath(final @Nullable Path path) {
-        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-        settings.rootAutomationPath = path != null ? path.toString() : "";
-    }
-
 }

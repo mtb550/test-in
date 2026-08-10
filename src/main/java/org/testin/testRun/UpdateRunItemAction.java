@@ -15,7 +15,7 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.testRun.updateDialog.RunItemUpdateMenuDialog;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import java.nio.file.Path;
 
@@ -30,7 +30,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
         this.p = p;
         this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(KeyboardSet.UpdateTestRunItem.getCustomShortcut(), list);
+        this.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), list);
     }
 
     @Override

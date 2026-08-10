@@ -14,7 +14,7 @@ import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.tree.TreePath;
 
@@ -27,7 +27,7 @@ public class OpenAction extends DumbAwareAction {
         this.p = p;
         this.tree = tree;
 
-        this.registerCustomShortcutSet(KeyboardSet.Enter.getCustomShortcut(), tree);
+        this.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), tree);
     }
 
     public void execute(final @NotNull Project p) {

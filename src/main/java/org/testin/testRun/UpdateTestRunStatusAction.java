@@ -13,16 +13,14 @@ import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.enums.TestRunStatus;
 import org.testin.enums.TestStatus;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
 
-import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
@@ -106,8 +104,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
         if (newStatus == TestRunStatus.COMPLETED && oldStatus == TestRunStatus.IN_PROGRESS)
             editor.stopExecution();
 
-        persistMarker(p, editor);
-        persistResults(p, editor);
+        persist(p, editor, marker);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
@@ -130,8 +127,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
 
         resetPendingToUntested(editor);
 
-        persistMarker(p, editor);
-        persistResults(p, editor);
+        persist(p, editor, marker);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
@@ -151,40 +147,14 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
         }
     }
 
-    private void persistMarker(final @NotNull Project p, final @NotNull RunEditor editor) {
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                final Path runPath = editor.getParent().getPath();
-                final TestRunDirectoryDto trd = indexer.getTestRunDirByPath(runPath);
-
-                if (trd == null) return;
-
-                TestRunMarker marker = trd.getMarker();
-
-                marker.setStatus(editor.getParent().getMarker().getStatus());
-                marker.setCreatedAt(editor.getParent().getMarker().getCreatedAt());
-
-                indexer.updateRunMarker(p, runPath, marker);
-                Logger.trace("Marker persisted -> " + marker.getStatus().getLabel());
-            } catch (final Exception ex) {
-                Logger.error("Failed to persist marker: " + ex.getMessage());
-            }
-        });
-    }
-
-    private void persistResults(final @NotNull Project p, final @NotNull RunEditor editor) {
-        if (editor.getTr() == null) return;
-
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                Path dirPath = editor.getParent().getPath();
-                Services.getInstance(p, ProjectIndexer.class).putTestRun(dirPath, editor.getTr());
-                Logger.trace("Results persisted");
-            } catch (final Exception ex) {
-                Logger.error("Failed to persist test run results: " + ex.getMessage());
-            }
-        });
+    /**
+     * Both writes go through the single-writer RunStatusService: state is
+     * snapshotted on the EDT, so later clicks can never tear the persisted JSON.
+     */
+    private void persist(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestRunMarker marker) {
+        final RunStatusService statusService = Services.getInstance(p, RunStatusService.class);
+        statusService.persistMarker(p, editor.getParent().getPath(), marker.getStatus(), marker.getCreatedAt());
+        statusService.persistRun(p, editor);
     }
 
     private void updateStartButton(final @NotNull RunEditor editor) {

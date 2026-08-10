@@ -10,7 +10,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.testin.util.FontSync;
-import org.testin.util.KeyboardSet;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -85,12 +85,12 @@ public class StatusBar extends JBPanel<StatusBar> {
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text("Previous page"))
-                .setShortcut(KeyboardSet.PreviousTestCase.getShortcutText())
+                .setShortcut(Shortcuts.PreviousTestCase.getShortcutText())
                 .installOn(prevButton);
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text("Next page"))
-                .setShortcut(KeyboardSet.NextTestCase.getShortcutText())
+                .setShortcut(Shortcuts.NextTestCase.getShortcutText())
                 .installOn(nextButton);
 
         new HelpTooltip()
