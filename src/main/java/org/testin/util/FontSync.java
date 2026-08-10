@@ -37,6 +37,10 @@ public class FontSync {
 
         setupGlobalJavaEditorWatcher(p, parentDisposable);
 
+        attachWheelZoom(p, component);
+    }
+
+    public static void attachWheelZoom(final @NotNull Project p, final @NotNull JComponent component) {
         component.addMouseWheelListener(e -> {
             if (e.isControlDown() || e.isMetaDown()) {
                 zoomGlobalIdeEditors(p, component, e.getWheelRotation() < 0);

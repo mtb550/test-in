@@ -10,7 +10,7 @@ import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
-import org.testin.Dialogs.RunCreationForm;
+import org.testin.testRun.CreateTestRunDialog;
 import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
@@ -58,7 +58,7 @@ public class CreateTestRun implements NodeCreator {
 
             ApplicationManager.getApplication().invokeLater(() -> {
 
-                final RunCreationForm form = new RunCreationForm(name, root, Collections.emptyMap());
+                final CreateTestRunDialog form = new CreateTestRunDialog(name, root, Collections.emptyMap());
 
                 DialogBuilder dialogBuilder = new DialogBuilder(p);
                 dialogBuilder.setTitle("Create Test Run");
@@ -122,10 +122,10 @@ public class CreateTestRun implements NodeCreator {
     }
 
 
-    private void saveSelectedToJSON(final RunCreationForm form, final CheckedTreeNode root, final Path savePath, final ProjectPanel pp, final TestRunDirectoryDto trDir) {
+    private void saveSelectedToJSON(final CreateTestRunDialog form, final CheckedTreeNode root, final Path savePath, final ProjectPanel pp, final TestRunDirectoryDto trDir) {
         final TestRunDto tr = new TestRunDto()
                 .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
-                .setChangeLog(form.getDescriptionField().getText().trim())
+                .setChangeLog(form.getChangeLog().getText().trim())
                 .setCommitId(form.getCommitIdField().getText().trim())
                 .setPlatform(form.getFieldValue(TestRunConfiguration.PLATFORM))
                 .setComponent(form.getFieldValue(TestRunConfiguration.COMPONENT))

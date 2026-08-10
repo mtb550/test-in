@@ -1,4 +1,4 @@
-package org.testin.Dialogs;
+package org.testin.testRun;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonShortcuts;

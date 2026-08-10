@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.mappers.dto.TestCaseDto;
@@ -15,13 +16,16 @@ import java.awt.*;
 
 @Getter
 public class RunOpeningForm {
+
     private final JBPanel<?> mainPanel;
+
     private final JBList<TestCaseDto> list;
+
     private final CollectionListModel<TestCaseDto> model;
-    @Getter
+
     private final JBScrollPane scrollPane;
 
-    public RunOpeningForm(final AbstractToolbarPanel toolBar, final StatusBar statusBar) {
+    public RunOpeningForm(final @NotNull AbstractToolbarPanel toolBar, final @NotNull StatusBar statusBar) {
         this.model = new CollectionListModel<>();
         this.list = new JBList<>(model);
 

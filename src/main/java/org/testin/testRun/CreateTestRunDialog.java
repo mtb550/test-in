@@ -1,10 +1,9 @@
-package org.testin.Dialogs;
+package org.testin.testRun;
 
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CheckboxTreeBase;
 import com.intellij.ui.CheckedTreeNode;
-import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
@@ -15,10 +14,7 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestRunConfiguration;
-import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
-import org.testin.mappers.dto.TestCaseDto;
-import org.testin.mappers.dto.dirs.DirectoryDto;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,22 +23,24 @@ import java.util.Map;
 import java.util.UUID;
 
 @Getter
-public class RunCreationForm {
+public class CreateTestRunDialog {
 
     private final JBPanel<?> mainPanel;
     private final CheckboxTree tree;
 
-    private final JBTextField descriptionField;
+    private final JBTextField changeLog;
     private final JBTextField commitIdField;
     private final Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
 
-    public RunCreationForm(final @NotNull String runName, final CheckedTreeNode root, final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
+    public CreateTestRunDialog(final @NotNull String runName, final CheckedTreeNode root, final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
         mainPanel = new JBPanel<>(new BorderLayout());
-        descriptionField = new JBTextField();
+        changeLog = new JBTextField();
         commitIdField = new JBTextField();
-        mainPanel.add(buildConfigurationPanel(runName), BorderLayout.NORTH);
 
-        tree = new CheckboxTree(createTreeRenderer(resultsMap), root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
+        final JBPanel<?> configurationPanel = buildConfigurationPanel(runName);
+        mainPanel.add(CollapsiblePanelImpl.build("Configuration details", configurationPanel, false), BorderLayout.NORTH);
+
+        tree = new CheckboxTree(RunTreeCellRendererImpl.create(resultsMap), root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
         TreeUtil.expandAll(tree);
 
         mainPanel.add(new JBScrollPane(tree), BorderLayout.CENTER);
@@ -61,16 +59,18 @@ public class RunCreationForm {
         final GridBagConstraints fieldGbc = new GridBagConstraints();
         fieldGbc.gridx = 1;
         fieldGbc.weightx = 1.0;
-        fieldGbc.fill = GridBagConstraints.HORIZONTAL;
         fieldGbc.anchor = GridBagConstraints.NORTHWEST;
         fieldGbc.insets = JBUI.insets(4, 0, 4, 4);
 
         final JBTextField runNameField = new JBTextField(runName);
         runNameField.setEditable(false);
         runNameField.setEnabled(false);
+        runNameField.setColumns(50);
         addLabeledRow(configurationPanel, labelGbc, fieldGbc, 0, "Test Run name:", runNameField);
 
-        addLabeledRow(configurationPanel, labelGbc, fieldGbc, 1, TestRunConfiguration.CHANGE_LOG.getDisplayName(), descriptionField);
+        changeLog.setColumns(50);
+        commitIdField.setColumns(50);
+        addLabeledRow(configurationPanel, labelGbc, fieldGbc, 1, TestRunConfiguration.CHANGE_LOG.getDisplayName(), changeLog);
         addLabeledRow(configurationPanel, labelGbc, fieldGbc, 2, TestRunConfiguration.COMMIT_ID.getDisplayName(), commitIdField);
 
         int row = 3;
@@ -102,36 +102,6 @@ public class RunCreationForm {
         final GridBagConstraints fc = (GridBagConstraints) fieldGbc.clone();
         fc.gridy = row;
         panel.add(component, fc);
-    }
-
-    // todo, move to separate class
-    private CheckboxTree.CheckboxTreeCellRenderer createTreeRenderer(final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
-        return new CheckboxTree.CheckboxTreeCellRenderer() {
-            @Override
-            public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
-                if (value instanceof CheckedTreeNode node) {
-                    final Object userObj = node.getUserObject();
-
-                    if (userObj instanceof DirectoryDto dir)
-                        getTextRenderer().append(dir.getName(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-
-                    else if (userObj instanceof TestCaseDto tc) {
-                        final TestRunItems result = resultsMap.get(tc.getId());
-
-                        if (result != null) {
-                            final TestStatus status = result.getStatus();
-                            getTextRenderer().append(tc.getDescription(), status.getStyle());
-                            getTextRenderer().append(status.getDisplayText(), SimpleTextAttributes.GRAYED_ATTRIBUTES);
-
-                        } else
-                            getTextRenderer().append(tc.getDescription(), SimpleTextAttributes.REGULAR_ATTRIBUTES);
-
-
-                    } else if (userObj instanceof String str)
-                        getTextRenderer().append(str, SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);
-                }
-            }
-        };
     }
 
     public @NotNull String getFieldValue(final @NotNull TestRunConfiguration field) {

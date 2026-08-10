@@ -63,6 +63,8 @@ public class DetailsTab {
             scrollPane.setBorder(null);
             scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
 
+            FontSync.attachWheelZoom(p, contentPanel);
+
             detailsTab.add(scrollPane, BorderLayout.CENTER);
 
             registerEditShortcutOnce(p, detailsTab);
@@ -202,7 +204,8 @@ public class DetailsTab {
 
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final TestSetDirectoryDto ts = indexer.getTestSetByPath(resolved);
-            return ts.getPath();
+            if (ts != null)
+                return ts.getPath();
         }
 
         return null;

@@ -219,11 +219,4 @@ usage   java swing api      IntelliJ SDK equivalence    api            notes
   0     JOptionPane         Messages                    (com.intellij.openapi.ui)           none used
   0     JCheckBox           JBCheckBox                  (com.intellij.ui.components)        converted
 
--- to be checked all are resolved later.
-a. Update the table above (the usage table in backlog.txt) with current numbers. DONE
-b. Make font same in view and editor.
-c. Implement + button in test editor. DONE
 d. Make font sync work one be inside details (typo: "make font sync work one be inside details" — likely "make font sync work once inside details" or "when inside details").
-e. After move to IntelliJ api, text fields and field map in test run creation form not aligned same before, should be each element under the next.
-f. After move to IntelliJ api, once I create new test case, after create the ui should move to the new and select it, now it is not move to it and not selected.
-g. In editors in grid view, apply word wrap, once make column smaller active word wrap.

@@ -8,7 +8,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.Dialogs.TestRunStatusMenuDialog;
 import org.testin.enums.TestRunStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;

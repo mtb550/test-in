@@ -1,4 +1,4 @@
-package org.testin.Dialogs;
+package org.testin.testRun;
 
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
@@ -9,7 +9,7 @@ import org.testin.mappers.dto.TestRunDto;
 import javax.swing.*;
 import java.awt.*;
 
-public class TestRunInfoPopup {
+public class TestRunInfoPopupDialog {
 
     public void show(final @NotNull TestRunDto run) {
         DialogWrapper dialog = new DialogWrapper(true) {
