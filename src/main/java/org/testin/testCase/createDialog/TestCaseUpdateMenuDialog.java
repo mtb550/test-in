@@ -17,6 +17,7 @@ import org.testin.generateJavaCode.GeneratorType;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.updateDialog.UpdateTestCaseDialog;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -93,6 +94,7 @@ public class TestCaseUpdateMenuDialog {
     }
 
     private JBPopup buildPopup(final String title, final JBList<UpdateTestCaseFields> list) {
+        DialogStyle.styleContent(list);
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(list), list)
                 .setTitle(title)

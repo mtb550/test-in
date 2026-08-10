@@ -4,7 +4,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.*;
+import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.openapi.ui.TextComponentAccessor;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
@@ -15,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
+import org.testin.ui.dialogs.FramelessDialogWrapper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +26,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Arrays;
 
-public class GenerateReportDialog extends DialogWrapper {
+public class GenerateReportDialog extends FramelessDialogWrapper {
 
     private final @NotNull Project p;
 
@@ -45,7 +49,6 @@ public class GenerateReportDialog extends DialogWrapper {
         this.p = p;
 
         setTitle("Generate Report");
-        setOKButtonText("Generate");
 
         fileNameField.setText(suggestedFileName);
         formatCombo.setSelectedItem("PDF");
@@ -57,7 +60,7 @@ public class GenerateReportDialog extends DialogWrapper {
 
         folderField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
 
-        init();
+        initFrameless();
         setSize(450, 200);
 
         String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;

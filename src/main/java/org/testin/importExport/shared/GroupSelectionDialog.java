@@ -1,13 +1,13 @@
 package org.testin.importExport.shared;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.Group;
+import org.testin.ui.dialogs.FramelessDialogWrapper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GroupSelectionDialog extends DialogWrapper {
+public class GroupSelectionDialog extends FramelessDialogWrapper {
     private final JBList<String> list;
 
     public GroupSelectionDialog(final @NotNull Project p, String currentSelection) {
@@ -42,7 +42,7 @@ public class GroupSelectionDialog extends DialogWrapper {
             list.setSelectedIndices(indices.stream().mapToInt(i -> i).toArray());
         }
 
-        init();
+        initFrameless();
     }
 
     @Nullable

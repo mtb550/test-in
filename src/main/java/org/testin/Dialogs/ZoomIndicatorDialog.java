@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +27,7 @@ public class ZoomIndicatorDialog {
         JBPanel<?> panel = new JBPanel<>();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setBorder(JBUI.Borders.empty(6, 12));
-        panel.setOpaque(true);
+        DialogStyle.styleContent(panel);
 
         panel.add(new JBLabel("Font size: " + (int) currentSize + "pt"));
         panel.add(Box.createHorizontalStrut(JBUI.scale(12)));

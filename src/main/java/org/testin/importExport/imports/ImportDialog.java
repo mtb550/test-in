@@ -4,7 +4,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.components.*;
@@ -19,6 +18,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
+import org.testin.ui.dialogs.FramelessDialogWrapper;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public class ImportDialog extends DialogWrapper {
+public class ImportDialog extends FramelessDialogWrapper {
     private final Map<String, DefaultTableModel> tableModelsMap = new LinkedHashMap<>();
 
     private final @NotNull Project p;
@@ -52,7 +52,6 @@ public class ImportDialog extends DialogWrapper {
         this.importAttributes = importAttributes;
 
         setTitle("Import Test Cases");
-        setOKButtonText("Import Selected");
 
         FileChooserDescriptor descriptor = new FileChooserDescriptor(true, false, false, false, false, false)
                 .withExtensionFilter("", "xls", "xlsx", "csv", "json")
@@ -64,8 +63,7 @@ public class ImportDialog extends DialogWrapper {
         FileDocumentListener fileListener = new FileDocumentListener(fileField, p, this::onDataLoaded, importLoader);
         fileField.getTextField().getDocument().addDocumentListener(fileListener);
 
-        setCancelButtonText("Cancel");
-        init();
+        initFrameless();
         setSize(900, 600);
 
         String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;

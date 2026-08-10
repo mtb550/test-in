@@ -1,7 +1,6 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.JBPopupMenu;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
@@ -12,6 +11,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.ui.dialogs.FramelessDialogWrapper;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
 
-public class PendingCommitsDialog extends DialogWrapper {
+public class PendingCommitsDialog extends FramelessDialogWrapper {
 
     private final @NotNull Project p;
     private final List<TestCaseDiff> differences;
@@ -36,9 +36,7 @@ public class PendingCommitsDialog extends DialogWrapper {
         this.differences = differences;
         this.repoRoot = repoRoot;
         setTitle("Pending Test Case Changes");
-        setOKButtonText("Commit Changes");
-        setCancelButtonText("Cancel");
-        init();
+        initFrameless();
     }
 
     @Nullable

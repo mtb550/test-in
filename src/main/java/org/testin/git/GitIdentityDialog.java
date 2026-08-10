@@ -1,18 +1,18 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.Nullable;
+import org.testin.ui.dialogs.FramelessDialogWrapper;
 
 import javax.swing.*;
 
 /**
  * Collects the Git identity required for a first commit.
  */
-final class GitIdentityDialog extends DialogWrapper {
+final class GitIdentityDialog extends FramelessDialogWrapper {
 
     private final JBTextField nameField = new JBTextField();
     private final JBTextField emailField = new JBTextField();
@@ -21,7 +21,7 @@ final class GitIdentityDialog extends DialogWrapper {
     GitIdentityDialog(final @Nullable Project project) {
         super(project, true);
         setTitle("Set Git Identity and Commit");
-        init();
+        initFrameless();
     }
 
     @Override

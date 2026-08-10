@@ -7,6 +7,7 @@ import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.testin.enums.RunEditorAttributes;
 import org.testin.logger.Logger;
+import org.testin.ui.dialogs.DialogStyle;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -56,6 +57,7 @@ public class RunDetailsPopupBtn extends AbstractButton implements IToolbarItem {
 
     private void showDetailsPopup(final Runnable onToolBarDetailsSelectedChanged) {
         CheckBoxList<RunEditorAttributes> detailsList = new CheckBoxList<>();
+        DialogStyle.styleContent(detailsList);
 
         Arrays.stream(RunEditorAttributes.values())
                 .filter(RunEditorAttributes::isStandardToolBarOption)

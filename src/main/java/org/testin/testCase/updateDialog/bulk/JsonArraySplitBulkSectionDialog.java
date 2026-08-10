@@ -30,6 +30,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
 import java.awt.*;
@@ -296,6 +297,7 @@ public abstract class JsonArraySplitBulkSectionDialog {
         statusBar.add(shortcutLabel, BorderLayout.WEST);
 
         JBPanel<?> panel = new JBPanel<>(new BorderLayout());
+        DialogStyle.styleContent(panel);
         panel.add(splitter, BorderLayout.CENTER);
         panel.add(statusBar, BorderLayout.SOUTH);
         panel.setPreferredSize(new Dimension(JBUI.scale(1100), JBUI.scale(550)));

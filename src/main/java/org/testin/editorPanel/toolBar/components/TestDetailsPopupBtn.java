@@ -7,6 +7,7 @@ import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
+import org.testin.ui.dialogs.DialogStyle;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -57,6 +58,7 @@ public class TestDetailsPopupBtn extends AbstractButton implements IToolbarItem 
 
     private void showDetailsPopup(final Runnable onToolBarDetailsSelectedChanged) {
         CheckBoxList<TestEditorAttributes> detailsList = new CheckBoxList<>();
+        DialogStyle.styleContent(detailsList);
 
         /// todo: no need to retrieve again, you retrive above.
         Arrays.stream(TestEditorAttributes.values())

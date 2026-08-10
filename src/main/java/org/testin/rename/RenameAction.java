@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.clazz.RenameJavaClass;
@@ -45,8 +44,11 @@ public class RenameAction extends DumbAwareAction {
         if (dir == null) return;
         if (dir instanceof TestCasesMainDirectoryDto || dir instanceof TestRunsMainDirectoryDto) return;
 
-        String newName = Messages.showInputDialog("Enter new name:", "Rename", AllIcons.Actions.Edit, dir.getName(), null);
-        if (newName == null || newName.isBlank() || newName.equals(dir.getName())) return;
+        new RenameDialog(p, dir.getName(), newName -> renameNode(dir, newName)).show();
+    }
+
+    private void renameNode(final @NotNull DirectoryDto dir, final @NotNull String newName) {
+        if (newName.isBlank() || newName.equals(dir.getName())) return;
 
         Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 

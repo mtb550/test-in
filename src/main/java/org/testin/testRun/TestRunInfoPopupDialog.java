@@ -1,10 +1,10 @@
 package org.testin.testRun;
 
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestRunDto;
+import org.testin.ui.dialogs.FramelessDialogWrapper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,10 +12,10 @@ import java.awt.*;
 public class TestRunInfoPopupDialog {
 
     public void show(final @NotNull TestRunDto run) {
-        DialogWrapper dialog = new DialogWrapper(true) {
+        FramelessDialogWrapper dialog = new FramelessDialogWrapper(true) {
             {
-                init();
                 setTitle("Test Run Info");
+                initFrameless();
             }
 
             @Override

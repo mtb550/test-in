@@ -4,7 +4,10 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.*;
+import com.intellij.openapi.ui.ComboBox;
+import com.intellij.openapi.ui.ComponentWithBrowseButton;
+import com.intellij.openapi.ui.TextComponentAccessor;
+import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBLabel;
@@ -19,6 +22,7 @@ import org.testin.importExport.shared.TablePanelBuilder;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
+import org.testin.ui.dialogs.FramelessDialogWrapper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +32,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class ExportDialog extends DialogWrapper {
+public class ExportDialog extends FramelessDialogWrapper {
 
     private final @NotNull Project p;
 
@@ -57,7 +61,6 @@ public class ExportDialog extends DialogWrapper {
         this.originalSheetsData = sheetsData;
 
         setTitle("Export Test Cases");
-        setOKButtonText("Export");
 
         String dirName = exportTarget.getName();
         fileNameField.setText(dirName);
@@ -70,8 +73,7 @@ public class ExportDialog extends DialogWrapper {
 
         folderField.addBrowseFolderListener(p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
 
-        setCancelButtonText("Cancel");
-        init();
+        initFrameless();
         setSize(900, 600);
 
         String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;

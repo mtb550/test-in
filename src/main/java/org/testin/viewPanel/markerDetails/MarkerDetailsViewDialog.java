@@ -17,6 +17,7 @@ import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestProjectMarker;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.FontSync;
 
 import javax.swing.*;
@@ -41,6 +42,7 @@ public class MarkerDetailsViewDialog {
     public void show(final @NotNull DirectoryDto dto) {
         JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
         panel.setOpaque(false);
+        DialogStyle.styleContent(panel);
         panel.setBorder(JBUI.Borders.empty(10));
 
         GridBagConstraints gbc = new GridBagConstraints();

@@ -12,6 +12,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
@@ -53,6 +54,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         };
 
         mainPanel.setBorder(JBUI.Borders.empty());
+        DialogStyle.styleContent(mainPanel);
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 

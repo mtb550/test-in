@@ -16,6 +16,7 @@ import org.testin.testRun.createDialog.ActualResultSection;
 import org.testin.testRun.createDialog.BugPrioritySection;
 import org.testin.testRun.createDialog.BugSeveritySection;
 import org.testin.testRun.createDialog.ErrorCaptureSection;
+import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.KeyboardSet;
 
 import javax.swing.*;
@@ -83,6 +84,7 @@ public class UpdateRunItemDialog {
         };
 
         mainPanel.setBorder(JBUI.Borders.empty());
+        DialogStyle.styleContent(mainPanel);
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 

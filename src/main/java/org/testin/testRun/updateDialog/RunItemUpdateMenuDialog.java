@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.enums.RunItemUpdateFields;
 import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -76,6 +77,7 @@ public class RunItemUpdateMenuDialog {
     }
 
     private JBPopup buildPopup(final JBList<RunItemUpdateFields> list) {
+        DialogStyle.styleContent(list);
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(list), list)
                 .setTitle("Update Test Run Item")

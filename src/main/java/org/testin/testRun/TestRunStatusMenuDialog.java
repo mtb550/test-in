@@ -13,6 +13,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestRunStatus;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
@@ -66,6 +67,7 @@ public class TestRunStatusMenuDialog {
     }
 
     private JBPopup buildPopup(final JBList<TestRunStatus> list) {
+        DialogStyle.styleContent(list);
         return JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(new JBScrollPane(list), list)
                 .setTitle("Set Test Run Status")

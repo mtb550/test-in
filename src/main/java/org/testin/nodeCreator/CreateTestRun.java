@@ -2,7 +2,6 @@ package org.testin.nodeCreator;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -26,6 +25,7 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
 import org.testin.testRun.CreateTestRunDialog;
+import org.testin.ui.dialogs.FramelessDialogWrapper;
 import org.testin.util.EditorUtil;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -59,19 +59,26 @@ public class CreateTestRun implements NodeCreator {
 
                 final CreateTestRunDialog form = new CreateTestRunDialog(name, root, Collections.emptyMap());
 
-                DialogBuilder dialogBuilder = new DialogBuilder(p);
-                dialogBuilder.setTitle("Create Test Run");
-                dialogBuilder.setCenterPanel(form.getMainPanel());
-                dialogBuilder.addOkAction().setText("Save Test Run");
-                dialogBuilder.addCancelAction();
+                FramelessDialogWrapper dialog = new FramelessDialogWrapper(p, true) {
+                    {
+                        setTitle("Create Test Run");
+                        initFrameless();
+                    }
 
-                dialogBuilder.setOkOperation(() -> {
-                    dialogBuilder.getDialogWrapper().close(DialogWrapper.OK_EXIT_CODE);
-                    tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
-                    saveSelectedToJSON(form, root, newDirPath, Services.getInstance(p, ProjectPanel.class), tr);
-                });
+                    @Override
+                    protected javax.swing.JComponent createCenterPanel() {
+                        return form.getMainPanel();
+                    }
 
-                dialogBuilder.show();
+                    @Override
+                    protected void doOKAction() {
+                        close(DialogWrapper.OK_EXIT_CODE);
+                        tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
+                        saveSelectedToJSON(form, root, newDirPath, Services.getInstance(p, ProjectPanel.class), tr);
+                    }
+                };
+
+                dialog.show();
             });
         });
 

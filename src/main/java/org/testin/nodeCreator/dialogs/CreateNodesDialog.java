@@ -15,6 +15,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
+import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -53,6 +54,7 @@ public class CreateNodesDialog {
         list.setVisibleRowCount(optionsList.size());
 
         JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
+        DialogStyle.styleContent(mainPanel);
         mainPanel.setBorder(JBUI.Borders.empty());
 
         mainPanel.add(textField, BorderLayout.NORTH);
