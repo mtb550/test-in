@@ -25,6 +25,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 
 public class GridPanelBuilder {
 
@@ -273,7 +274,7 @@ public class GridPanelBuilder {
         table.getActionMap().put("startEditing", startEditing);
     }
 
-    public <E> void applyColumnVisibility(final JBTable table, final List<E> allValues, final java.util.function.Function<E, String> name, final Set<E> selected) {
+    public <E> void applyColumnVisibility(final JBTable table, final List<E> allValues, final Function<E, String> name, final Set<E> selected) {
         final TableColumnModel cm = table.getColumnModel();
         while (cm.getColumnCount() > 0) {
             cm.removeColumn(cm.getColumn(cm.getColumnCount() - 1));
@@ -334,7 +335,7 @@ public class GridPanelBuilder {
         return table;
     }
 
-    private <E> String[] buildColumns(final List<E> attributes, final java.util.function.Function<E, String> name) {
+    private <E> String[] buildColumns(final List<E> attributes, final Function<E, String> name) {
         final List<String> columns = new ArrayList<>();
         columns.add("#");
         attributes.forEach(attr -> columns.add(name.apply(attr)));

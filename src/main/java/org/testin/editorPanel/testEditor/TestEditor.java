@@ -18,6 +18,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
 import org.testin.editorPanel.listeners.*;
@@ -173,7 +174,11 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
         list.addListSelectionListener(new SelectionListener(p, list, this, parent.getPath2()));
-        list.addListSelectionListener(e -> syncGridSelectionFromList(e.getValueIsAdjusting()));
+        list.addListSelectionListener(new GridListSelectionSynchronizer(
+                list,
+                () -> gridTable,
+                () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW
+        ));
 
         list.addKeyListener(new KeyListener(p, list, this));
 
@@ -414,15 +419,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     public void refreshView() {
         final int totalItems = currentTestCases.size();
-        final int totalPages = getTotalPages(currentTestCases);
-
-        if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-
-        final int startIndex = (currentPage - 1) * pageSize;
-        final int endIndex = Math.min(startIndex + pageSize, totalItems);
-        final List<TestCaseDto> pageItems = startIndex < totalItems
-                ? new ArrayList<>(currentTestCases.subList(startIndex, endIndex))
-                : new ArrayList<>();
+        final PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
+        currentPage = page.page();
+        final List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
         final TestCaseDto selectedItem = list.getSelectedValue();
 
@@ -434,7 +433,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             list.setSelectedValue(selectedItem, true);
         }
 
-        statusBar.updatePaginationState(currentPage, totalPages, totalItems);
+        statusBar.updatePaginationState(page.page(), page.totalPages(), totalItems);
 
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
@@ -445,18 +444,8 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     private List<TestCaseDto> getCurrentPageItems() {
         final int totalItems = currentTestCases.size();
-        final int startIndex = (currentPage - 1) * pageSize;
-        final int endIndex = Math.min(startIndex + pageSize, totalItems);
-        return startIndex < totalItems
-                ? new ArrayList<>(currentTestCases.subList(startIndex, endIndex))
-                : new ArrayList<>();
-    }
-
-    private void syncGridSelectionFromList(final boolean adjusting) {
-        if (adjusting || gridTable == null || toolBar.getCurrentView() != ViewMode.GRID_VIEW) return;
-        final int row = list.getSelectedIndex();
-        if (row < 0 || row >= gridTable.getRowCount() || row == gridTable.getSelectedRow()) return;
-        gridTable.changeSelection(row, Math.max(0, gridTable.getSelectedColumn()), false, false);
+        final PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
+        return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
     }
 
     private void rebuildGrid() {
@@ -497,7 +486,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     private int getTotalPages(final List<TestCaseDto> filtered) {
-        return filtered.isEmpty() ? 1 : (int) Math.ceil((double) filtered.size() / pageSize);
+        return PageWindow.of(filtered.size(), currentPage, pageSize).totalPages();
     }
 
     public void sortAndIdentifyUnsorted() {
