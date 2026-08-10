@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
+import org.testin.editorPanel.TestCaseFilter;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
 import org.testin.editorPanel.listeners.*;
@@ -51,7 +52,6 @@ import java.awt.event.MouseListener;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TestEditor implements Disposable, IToolBar, IEditor {
     @Getter
@@ -527,21 +527,13 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
         final Set<String> moduleFilter = filterPopup != null ? filterPopup.getSelectedModule() : Collections.emptySet();
 
-        if (allTestCases.isEmpty()) {
-            return Collections.emptyList();
-        }
-
         synchronized (allTestCases) {
-            return allTestCases.stream()
-                    .filter(tc -> {
-                        final boolean matchesSearch = query.isEmpty() || tc.getDescription().toLowerCase().contains(query) || tc.getId().toString().toLowerCase().contains(query) || tc.getExpectedResult().toLowerCase().contains(query) || tc.getSteps().stream().anyMatch(step -> step != null && step.toLowerCase().contains(query));
-                        final boolean matchesPriority = priorityFilter.isEmpty() || priorityFilter.contains(tc.getPriority());
-                        final boolean matchesGroup = groupFilter.isEmpty() || (groupFilter.contains(Group.UNASSIGNED) && (tc.getGroup().isEmpty())) || (tc.getGroup().stream().anyMatch(groupFilter::contains));
-                        final boolean matchesModule = moduleFilter.isEmpty() || moduleFilter.contains(tc.getModule());
-
-                        return matchesSearch && matchesGroup && matchesPriority && matchesModule;
-                    })
-                    .collect(Collectors.toList());
+            return TestCaseFilter.filter(
+                    allTestCases,
+                    query,
+                    groupFilter,
+                    priorityFilter,
+                    moduleFilter);
         }
     }
 

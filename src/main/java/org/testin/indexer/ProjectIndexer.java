@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 @Service(Service.Level.PROJECT)
@@ -33,7 +34,7 @@ public final class ProjectIndexer {
 
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
-    private final @NotNull IndexingScanner scanner;
+    private final @NotNull ProjectScanCoordinator scanCoordinator;
     private final @NotNull AtomicBoolean indexed = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean indexing = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
@@ -43,7 +44,7 @@ public final class ProjectIndexer {
     public ProjectIndexer(final @NotNull Project p) {
         this.p = p;
         this.store = new IndexerDataStore(p);
-        this.scanner = new IndexingScanner(p, store);
+        this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
     }
 
     private long estimateBytes(final int testCases, final int testRuns, final int projects, final int testSets, final int testRunDirs, final int testSetPkgs, final int testRunPkgs, final int testSetCaseSets) {
@@ -116,7 +117,7 @@ public final class ProjectIndexer {
                                 indicator.setText("Indexing " + projectName + "...");
 
                                 try {
-                                    scanner.scanProject(projectPath, indicator);
+                                    scanCoordinator.scan(projectPath, indicator);
                                 } catch (final Exception ex) {
                                     Logger.error("Failed to index project: " + projectName + " - " + ex.getMessage());
                                 }
@@ -347,21 +348,37 @@ public final class ProjectIndexer {
     }
 
     public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath) {
-        copyNode(sourcePath, targetPath, null);
+        copyNodes(List.of(sourcePath), targetPath, null);
     }
 
     public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath, final Runnable onComplete) {
-        Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
-            try {
-                sourceVf.copy(this, targetVf, sourceVf.getName());
-            } catch (final IOException ex) {
-                Logger.error(ex.getMessage());
-                throw new RuntimeException(ex);
-            }
-        }, () -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            refreshIndexedProject(targetPath);
-            if (onComplete != null) ApplicationManager.getApplication().invokeLater(onComplete);
-        }));
+        copyNodes(List.of(sourcePath), targetPath, onComplete);
+    }
+
+    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final Runnable onComplete) {
+        if (sourcePaths.isEmpty()) {
+            if (onComplete != null) onComplete.run();
+            return;
+        }
+
+        final AtomicInteger pending = new AtomicInteger(sourcePaths.size());
+        final Runnable operationFinished = () -> {
+            if (pending.decrementAndGet() != 0) return;
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                refreshIndexedProject(targetPath);
+                if (onComplete != null) ApplicationManager.getApplication().invokeLater(onComplete);
+            });
+        };
+        for (Path sourcePath : sourcePaths) {
+            Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
+                try {
+                    sourceVf.copy(this, targetVf, sourceVf.getName());
+                } catch (final IOException ex) {
+                    Logger.error(ex.getMessage());
+                    throw new RuntimeException(ex);
+                }
+            }, operationFinished, operationFinished);
+        }
     }
 
     private void refreshIndexedProject(final @NotNull Path changedPath) {
@@ -370,7 +387,9 @@ public final class ProjectIndexer {
                 .filter(changedPath::startsWith)
                 .max(Comparator.comparingInt(Path::getNameCount))
                 .orElse(null);
-        if (projectPath != null) scanner.scanProject(projectPath);
+        if (projectPath != null) {
+            scanCoordinator.rescanExclusively(projectPath);
+        }
     }
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
@@ -397,7 +416,7 @@ public final class ProjectIndexer {
     public void scanSingleProject(final @NotNull Path projectPath) {
         Logger.info("Scanning single project: " + projectPath.getFileName());
         try {
-            scanner.scanProject(projectPath);
+            scanCoordinator.scan(projectPath);
         } catch (final Exception ex) {
             Logger.error("Failed to scan single project: " + ex.getMessage());
         }

@@ -32,11 +32,19 @@ final class IndexingScanner {
     }
 
     void scanProject(final Path projectPath, final ProgressIndicator indicator) {
-        scanProjectContents(projectPath, indicator);
+        try {
+            scanProjectContents(projectPath, indicator);
+        } finally {
+            store.invalidateChildrenIndex();
+        }
     }
 
     void scanProject(final Path projectPath) {
-        scanProjectContents(projectPath, null);
+        try {
+            scanProjectContents(projectPath, null);
+        } finally {
+            store.invalidateChildrenIndex();
+        }
     }
 
     private void scanProjectContents(final Path projectPath, final ProgressIndicator indicator) {

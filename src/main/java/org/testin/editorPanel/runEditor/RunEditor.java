@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.Dialogs.RunOpeningForm;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
+import org.testin.editorPanel.TestCaseFilter;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
 import org.testin.editorPanel.listeners.*;
@@ -43,11 +44,9 @@ import org.testin.testRun.UpdateTestRunStatusAction;
 import org.testin.util.FontSync;
 
 import javax.swing.*;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.MouseListener;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -74,8 +73,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final Disposable projectDisposable;
     CheckboxTree checklistTree;
-    @Getter
-    TestRunDto tr;
+    private final RunExecutionTimer executionTimer = new RunExecutionTimer();
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
     private JBList<TestCaseDto> list;
     private CollectionListModel<TestCaseDto> model;
@@ -106,10 +104,8 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Getter
     @Setter
     private int hoveredIndex = -1;
-
-    private Timer executionTimer;
-
-    private long currentTestStartTime;
+    @Getter
+    private volatile TestRunDto tr;
 
     @Getter
     private int currentlyExecutingIndex = -1;
@@ -169,79 +165,68 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     private void loadDataAsync() {
+        if (list != null) {
+            list.setPaintBusy(true);
+            list.getEmptyText().setText("Loading...");
+        }
+
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                if (this.tr == null && parent != null) {
-                    final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                    indexer.awaitIndexing();
-
-                    final Path dirPath = parent.getPath();
-
-                    this.tr = indexer.getTestRunByPath(dirPath);
+                final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+                indexer.awaitIndexing();
+                if (tr == null && parent != null) {
+                    tr = indexer.getTestRunByPath(parent.getPath());
                 }
 
-                if (this.tr != null) {
-                    Map<UUID, TestRunItems> newResults = this.tr.getResults().stream().collect(Collectors.toMap(TestRunItems::getId, item -> item, (existingItem, duplicateItem) -> existingItem));
-                    this.resultsMap.putAll(newResults);
+                if (tr != null) {
+                    final Map<UUID, TestRunItems> newResults = tr.getResults().stream()
+                            .collect(Collectors.toMap(TestRunItems::getId, item -> item,
+                                    (existingItem, duplicateItem) -> existingItem));
+                    resultsMap.putAll(newResults);
+                }
 
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        StartExecutionBtn startBtn = toolBar.getToolbarItem(StartExecutionBtn.class);
-                        if (startBtn != null) {
-                            startBtn.updateEnabledState();
+                final List<TestCaseDto> loadedItems = new ArrayList<>();
+                if (tr != null) {
+                    for (final TestRunItems item : tr.getResults()) {
+                        final TestCaseDto testCase = indexer.getTestCaseById(item.getId());
+                        if (testCase == null) {
+                            Logger.warn("Test run references missing test case id=" + item.getId());
+                            continue;
                         }
-                    });
-                }
-            } catch (final Exception ex) {
-                Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
-            }
-
-            ApplicationManager.getApplication().invokeLater(() -> {
-                if (this.list != null) {
-                    this.list.setPaintBusy(true);
-                    this.list.getEmptyText().setText("Loading...");
+                        loadedItems.add(testCase);
+                        final TestRunItems runItem = resultsMap.get(item.getId());
+                        if (runItem != null) runItem.setTc(testCase);
+                    }
                 }
 
-                ApplicationManager.getApplication().executeOnPooledThread(() -> {
-                    final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                    indexer.awaitIndexing();
+                final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(p, loadedItems).sortedList();
+                Services.getInstance(p, TestCaseCacheService.class).load(sorted);
 
-                    final List<TestCaseDto> loadedItems = new ArrayList<>();
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    allTestCases.clear();
+                    allTestCases.addAll(sorted);
+                    currentTestCases.clear();
+                    currentTestCases.addAll(sorted);
 
-                    if (tr != null && !tr.getResults().isEmpty()) {
-                        for (final TestRunItems item : tr.getResults()) {
-                            final TestCaseDto tc = indexer.getTestCaseById(item.getId());
-                            if (tc == null) {
-                                Logger.warn("Test run references missing test case id=" + item.getId());
-                                continue;
-                            }
-                            loadedItems.add(tc);
-                            final TestRunItems runItem = resultsMap.get(item.getId());
-                            if (runItem != null) {
-                                runItem.setTc(tc);
-                            }
+                    if (list != null) {
+                        list.setPaintBusy(false);
+                        if (allTestCases.isEmpty()) {
+                            list.getEmptyText().setText("No test cases found in this run.");
                         }
                     }
-
-                    final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(p, loadedItems).sortedList();
-                    Services.getInstance(p, TestCaseCacheService.class).load(sorted);
-
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        allTestCases.clear();
-                        allTestCases.addAll(sorted);
-                        currentTestCases.clear();
-                        currentTestCases.addAll(sorted);
-
-                        if (list != null) {
-                            list.setPaintBusy(false);
-                            if (allTestCases.isEmpty()) {
-                                list.getEmptyText().setText("No test cases found in this run.");
-                            }
-                        }
-
-                        refreshView();
-                    });
+                    final StartExecutionBtn startBtn = toolBar.getToolbarItem(StartExecutionBtn.class);
+                    if (startBtn != null) startBtn.updateEnabledState();
+                    refreshView();
                 });
-            });
+            } catch (final Exception ex) {
+                Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (list != null) {
+                        list.setPaintBusy(false);
+                        list.getEmptyText().setText("Unable to load this test run.");
+                    }
+                });
+            }
         });
     }
 
@@ -459,34 +444,21 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         final Set<String> moduleFilter = filterPopup != null ? filterPopup.getSelectedModule() : Collections.emptySet();
         final Set<TestStatus> statusFilter = filterPopup != null ? filterPopup.getSelectedStatus() : Collections.emptySet();
 
-        if (allTestCases.isEmpty()) {
-            return Collections.emptyList();
-        }
-
         synchronized (allTestCases) {
-            return allTestCases.stream()
-                    .filter(tc -> {
-                        final boolean matchesSearch = query.isEmpty() || tc.getDescription().toLowerCase().contains(query) || tc.getId().toString().toLowerCase().contains(query) || tc.getExpectedResult().toLowerCase().contains(query) || tc.getSteps().stream().anyMatch(step -> step != null && step.toLowerCase().contains(query));
-                        final boolean matchesPriority = priorityFilter.isEmpty() || priorityFilter.contains(tc.getPriority());
-                        final boolean matchesGroup = groupFilter.isEmpty() || (groupFilter.contains(Group.UNASSIGNED) && tc.getGroup().isEmpty()) || (tc.getGroup().stream().anyMatch(groupFilter::contains));
-                        final boolean matchesModule = moduleFilter.isEmpty() || moduleFilter.contains(tc.getModule());
-
-                        boolean matchesStatus = statusFilter.isEmpty();
-                        if (!matchesStatus) {
-                            TestRunItems runItem = resultsMap.get(tc.getId());
-                            if (runItem != null) {
-                                matchesStatus = statusFilter.contains(runItem.getStatus());
-                            }
-                        }
-
-                        return matchesSearch && matchesGroup && matchesPriority && matchesModule && matchesStatus;
-                    })
-                    .collect(Collectors.toList());
+            return TestCaseFilter.filter(
+                    allTestCases,
+                    query,
+                    groupFilter,
+                    priorityFilter,
+                    moduleFilter,
+                    statusFilter,
+                    resultsMap::get);
         }
     }
 
     @Override
     public void dispose() {
+        executionTimer.dispose();
         if (list != null)
             for (MouseListener listener : list.getMouseListeners())
                 list.removeMouseListener(listener);
@@ -521,13 +493,26 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void selectTestCase(final TestCaseDto tc) {
         if (tc == null) return;
-        if (model != null) {
-            final int index = model.getItems().indexOf(tc);
-            if (index != -1 && list != null) {
-                list.setSelectedIndex(index);
-                list.ensureIndexIsVisible(index);
-            }
+
+        final int index = currentTestCases.indexOf(tc);
+        if (index < 0 || list == null) return;
+
+        final int targetPage = (index / Math.max(1, pageSize)) + 1;
+        final int localIndex = index % Math.max(1, pageSize);
+        if (targetPage != currentPage) {
+            currentPage = targetPage;
+            refreshView();
+            ApplicationManager.getApplication().invokeLater(() -> selectVisibleIndex(localIndex));
+            return;
         }
+        selectVisibleIndex(localIndex);
+    }
+
+    private void selectVisibleIndex(final int index) {
+        if (list == null || index < 0 || index >= list.getModel().getSize()) return;
+        list.setSelectedIndex(index);
+        list.ensureIndexIsVisible(index);
+        list.requestFocusInWindow();
     }
 
     @Override
@@ -570,20 +555,9 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             return;
         }
 
-        runItem.setDuration(Duration.ZERO);
-        currentTestStartTime = System.currentTimeMillis();
-
-        if (executionTimer != null) executionTimer.stop();
-
-        executionTimer = new Timer(1000, e -> {
-            long seconds = (System.currentTimeMillis() - currentTestStartTime) / 1000;
-            runItem.setDuration(Duration.ofSeconds(seconds));
-
-            if (list != null) {
-                list.repaint();
-            }
+        executionTimer.start(runItem, () -> {
+            if (list != null) list.repaint();
         });
-        executionTimer.start();
     }
 
     public void updateStatusAndNext(TestStatus status) {
@@ -618,9 +592,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     public void stopExecution() {
-        if (executionTimer != null) {
-            executionTimer.stop();
-        }
+        executionTimer.stop();
         currentlyExecutingIndex = -1;
     }
 

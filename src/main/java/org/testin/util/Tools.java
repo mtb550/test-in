@@ -21,7 +21,6 @@ import org.testin.enums.DirectoryType;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.logger.Logger;
-import org.testin.mappers.Config;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
@@ -36,77 +35,27 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Tools {
 
-    private final Pattern SANITIZE_PATTERN = Pattern.compile("[^a-zA-Z0-9 _]");
-    private final Pattern STEP_MUSH_PATTERN = Pattern.compile(".*\\s\\d+[-.].*");
-    private final Pattern STEP_LINE_PATTERN = Pattern.compile("(\\s)(?=\\d+[-.])");
-    private final Pattern STEP_CLEAN_PATTERN = Pattern.compile("^\\d+[-.]\\s*");
-    private final List<Character> SPECIAL_CHARS = Arrays.asList('!', '"', '#', '$', '%', '&', '\'', '(', ')', '*', '+', ',', '.', '/', ':', ';', '<', '=', '>', '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~');
+    private final NameSanitizer nameSanitizer = new NameSanitizer();
+    private final TestDataParser testDataParser = new TestDataParser();
 
     public String sanitizePackageName(final @NotNull String s) {
-        String removeKeyword = s.replace("-test-cases", "");
-        String cleanName = SANITIZE_PATTERN.matcher(removeKeyword).replaceAll("").trim();
-        String[] split = cleanName.split("[\\s_]+");
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < split.length; i++) {
-            String word = split[i];
-            if (word.isEmpty()) continue;
-            if (i == 0) sb.append(word.toLowerCase());
-            else sb.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1).toLowerCase());
-        }
-
-        String result = sb.toString();
-
-        if (result.isEmpty()) return "generated" + System.currentTimeMillis();
-
-        if (Character.isDigit(result.charAt(0))) result = "_" + result;
-        return result;
+        return nameSanitizer.packageName(s);
     }
 
     public String sanitizeClassName(final @NotNull String name) {
-        if (name.trim().isEmpty()) {
-            return "DefaultTest";
-        }
-
-        String cleanName = SANITIZE_PATTERN.matcher(name).replaceAll("").trim();
-        String[] split = cleanName.split("[\\s_]+");
-
-        StringBuilder sb = new StringBuilder();
-        for (String word : split) {
-            if (word.isEmpty()) continue;
-            sb.append(Character.toUpperCase(word.charAt(0))).append(word.substring(1));
-        }
-
-        String result = sb.toString();
-        if (result.isEmpty()) return "DefaultTest";
-        if (Character.isDigit(result.charAt(0))) result = "_" + result;
-        result += "Test";
-        return result;
+        return nameSanitizer.className(name);
     }
 
     public String removeSpecialChars(final @NotNull String s) {
-        if (s.isEmpty()) return "";
-
-        StringBuilder sb = new StringBuilder(s.length());
-        for (char c : s.toCharArray()) {
-            sb.append(SPECIAL_CHARS.contains(c) ? '_' : c);
-        }
-        return sb.toString();
+        return nameSanitizer.removeSpecialChars(s);
     }
 
     public Path getProjectPath(final SimpleTree tree) {
@@ -220,89 +169,27 @@ public final class Tools {
     }
 
     public String sanitizeDescription(final String rawDesc) {
-        if (rawDesc == null || rawDesc.isBlank()) return "EMPTY_DESCRIPTION";
-        String cleaned = SANITIZE_PATTERN.matcher(rawDesc).replaceAll("").trim();
-        return cleaned.isEmpty() ? "EMPTY_DESCRIPTION" : cleaned;
+        return nameSanitizer.description(rawDesc);
     }
 
     public List<String> parseStepsSafe(final String stepsRaw) {
-        if (stepsRaw == null || stepsRaw.isBlank()) {
-            return new ArrayList<>();
-        }
-
-        String text = stepsRaw;
-
-        if (!text.contains("\n") && STEP_MUSH_PATTERN.matcher(text).matches()) {
-            text = STEP_LINE_PATTERN.matcher(text).replaceAll("\n");
-        }
-
-        return Arrays.stream(text.split("\n"))
-                .map(line -> STEP_CLEAN_PATTERN.matcher(line).replaceFirst("").trim())
-                .filter(line -> !line.isEmpty())
-                .collect(Collectors.toList());
+        return testDataParser.steps(stepsRaw);
     }
 
     public Priority parsePrioritySafe(final String priorityStr) {
-        if (priorityStr == null || priorityStr.isBlank()) {
-            return Priority.LOW;
-        }
-        try {
-            return Priority.valueOf(priorityStr.trim().toUpperCase());
-        } catch (final IllegalArgumentException ex) {
-            return Priority.LOW;
-        }
+        return testDataParser.priority(priorityStr);
     }
 
     public ZonedDateTime parseDateSafe(final String dateStr) {
-        if (dateStr == null || dateStr.isBlank()) {
-            return ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        }
-        try {
-            return LocalDateTime.parse(dateStr, Config.EXCEL_DATE_FORMATTER).atZone(ZoneId.systemDefault());
-        } catch (final Exception ex) {
-            return ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-        }
+        return testDataParser.date(dateStr);
     }
 
     public List<Group> parseGroupsSafe(final String rawGroups) {
-        if (rawGroups == null || rawGroups.isBlank()) {
-            return new ArrayList<>();
-        }
-
-        return Arrays.stream(rawGroups.split(","))
-                .map(String::trim)
-                .filter(g -> !g.isEmpty())
-                .map(String::toUpperCase)
-                .map(groupName -> {
-                    try {
-                        return Group.valueOf(groupName);
-                    } catch (final IllegalArgumentException ex) {
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        return testDataParser.groups(rawGroups);
     }
 
     public String sanitizeMethodName(final String description) {
-        if (description == null || description.isEmpty()) return "testMethod";
-
-        String[] words = description.split("[^a-zA-Z0-9]+");
-        StringBuilder methodName = new StringBuilder();
-
-        for (String word : words) {
-            if (word.isEmpty()) continue;
-
-            if (methodName.isEmpty()) {
-                methodName.append(word.toLowerCase());
-            } else {
-                methodName.append(word.substring(0, 1).toUpperCase());
-                if (word.length() > 1) {
-                    methodName.append(word.substring(1).toLowerCase());
-                }
-            }
-        }
-        return methodName.toString();
+        return nameSanitizer.methodName(description);
     }
 
     public ArrayList<String> buildPath2(final @Nullable List<String> parentPath, final @NotNull String newName) {
@@ -376,17 +263,6 @@ public final class Tools {
     }
 
     public String extractProjectNameFromUrl(final @NotNull String gitUrl) {
-        String name = gitUrl;
-        if (name.endsWith("/")) name = name.substring(0, name.length() - 1);
-        if (name.endsWith(".git")) name = name.substring(0, name.length() - 4);
-
-        final int lastSlashIndex = name.lastIndexOf('/');
-        final int lastColonIndex = name.lastIndexOf(':');
-        final int splitIndex = Math.max(lastSlashIndex, lastColonIndex);
-
-        if (splitIndex != -1 && splitIndex < name.length() - 1)
-            return name.substring(splitIndex + 1);
-
-        return "ImportedTestProject";
+        return nameSanitizer.projectNameFromUrl(gitUrl);
     }
 }
