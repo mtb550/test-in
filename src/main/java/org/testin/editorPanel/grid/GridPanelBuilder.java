@@ -21,7 +21,7 @@ import java.util.List;
 public class GridPanelBuilder {
 
     static final int CELL_PADDING = 10;
-    private static final int MAX_COL_WIDTH = 250;
+    private static final int MAX_COL_WIDTH = 500;
     static final Color GRID_COLOR = JBColor.border();
 
     public static void resizeToFont(final JBTable table) {
