@@ -12,7 +12,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
     public GridCellEditor() {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
-        textArea.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+        textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
 
     @Override

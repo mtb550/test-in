@@ -167,11 +167,11 @@ revamp ui -> freelancer.
 
 4- editor status bar,
 remove border of arrows &
- add new arrows (go to first button + go to end button) &
+add new arrows (go to first button + go to end button) &
 reduce arrow padding &
- show boarder when hover &
- expand pagination field to see value if value is 3 digits &
- make max value.
+show boarder when hover &
+expand pagination field to see value if value is 3 digits &
+make max value.
 
 5- test run report enhancements:
     A - add JavaScript to switch between dark and white mode, if you need to change colors please change it.
@@ -195,11 +195,12 @@ why archived test projects not shown?
 remove call rebuildGrid(). just repaint
 
 grid view changes:
-make columns in grid view auto resizable until specific limit and put max value that once reached then use wordwrap
-add cell padding in grid view (one value padding for all 4 areas)
+make columns in grid view auto resizable until specific limit and
+put max value that once reached then use wordwrap.
+
+add cell padding in grid view (one value padding for all 4 areas).
+
 make cell not top left, make it middle left.
-
-
 
 usage   java swing api      IntelliJ SDK equivalence    api            notes
 -------------------------------------------------------------------------------------

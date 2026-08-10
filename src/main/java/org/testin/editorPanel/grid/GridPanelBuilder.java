@@ -16,6 +16,9 @@ import java.util.List;
 
 public class GridPanelBuilder {
 
+    private static final int CELL_PADDING = 10;
+    private static final int MAX_COL_WIDTH = 250;
+
     public static void resizeToFont(final JBTable table) {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
         table.setRowHeight(Math.max(fm.getHeight() + 4, 20));
@@ -24,13 +27,23 @@ public class GridPanelBuilder {
     }
 
     private static TableCellRenderer wrappingRenderer() {
-        return new DefaultTableCellRenderer() {
+        return new TableCellRenderer() {
             private final JTextArea textArea = new JTextArea();
+            private final JPanel wrapper = new JPanel(new GridBagLayout());
+            private final GridBagConstraints c = new GridBagConstraints();
 
             {
                 textArea.setLineWrap(true);
                 textArea.setWrapStyleWord(true);
-                textArea.setBorder(BorderFactory.createEmptyBorder(2, 4, 2, 4));
+                textArea.setBorder(BorderFactory.createEmptyBorder(CELL_PADDING, CELL_PADDING, CELL_PADDING, CELL_PADDING));
+                textArea.setOpaque(false);
+                wrapper.setOpaque(true);
+                c.gridx = 0;
+                c.gridy = 0;
+                c.weightx = 1.0;
+                c.weighty = 1.0;
+                c.fill = GridBagConstraints.HORIZONTAL;
+                c.anchor = GridBagConstraints.WEST;
             }
 
             @Override
@@ -38,11 +51,12 @@ public class GridPanelBuilder {
                 textArea.setText(value == null ? "" : value.toString());
                 textArea.setFont(table.getFont());
                 textArea.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
-                textArea.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                wrapper.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
                 // size the area to the column width so text wraps at the current column size
                 final int width = table.getColumnModel().getColumn(column).getWidth();
                 textArea.setSize(new Dimension(width, Short.MAX_VALUE));
-                return textArea;
+                wrapper.add(textArea, c);
+                return wrapper;
             }
         };
     }
@@ -88,10 +102,11 @@ public class GridPanelBuilder {
 
 
     private static void autoSizeColumns(final JBTable table) {
+        final FontMetrics fm = table.getFontMetrics(table.getFont());
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
             final TableColumn col = table.getColumnModel().getColumn(i);
-            int maxWidth;
+            int maxWidth = 0;
 
             TableCellRenderer headerRenderer = col.getHeaderRenderer();
             if (headerRenderer == null) {
@@ -102,14 +117,15 @@ public class GridPanelBuilder {
             maxWidth = headerComp.getPreferredSize().width;
 
             for (int r = 0; r < table.getRowCount(); r++) {
-                final TableCellRenderer renderer = table.getCellRenderer(r, i);
-                final Component comp = table.prepareRenderer(renderer, r, i);
-                maxWidth = Math.max(comp.getPreferredSize().width, maxWidth);
+                final Object value = table.getValueAt(r, i);
+                if (value != null) {
+                    maxWidth = Math.max(maxWidth, fm.stringWidth(value.toString()));
+                }
             }
 
-            maxWidth += 20;
-            col.setPreferredWidth(maxWidth);
-            tableTotalWidth += maxWidth;
+            maxWidth += 2 * CELL_PADDING + 20;
+            col.setPreferredWidth(Math.min(maxWidth, MAX_COL_WIDTH));
+            tableTotalWidth += Math.min(maxWidth, MAX_COL_WIDTH);
         }
 
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
