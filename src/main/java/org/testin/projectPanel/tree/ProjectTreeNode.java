@@ -48,12 +48,13 @@ public final class ProjectTreeNode extends AbstractTreeNode<Object> {
             }
             return children;
         } catch (final Exception ex) {
-            Logger.error("Could not load tree children for '" + directory.getPath() + "': " + ex.getMessage());
-            return List.of();
+            final String message = "Could not load '" + directory.getName() + "'";
+            Logger.error(message + ": " + ex.getMessage());
+            return List.of(child(new TreeLoadError(message)));
         }
     }
 
-    private ProjectTreeNode child(final DirectoryDto value) {
+    private ProjectTreeNode child(final Object value) {
         final ProjectTreeNode child = new ProjectTreeNode(project, value);
         child.setParent(this);
         return child;

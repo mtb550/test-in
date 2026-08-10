@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBPanelWithEmptyText;
@@ -32,7 +33,7 @@ public final class ProjectPanel implements Disposable {
     private final @NotNull Project p;
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
     private final @NotNull TestProjectSelector testProjectSelector;
-    private @NotNull BranchSelector branchSelector;
+    private final @NotNull BranchSelector branchSelector;
     private final @NotNull ProjectTree projectTree;
 
     public ProjectPanel(final @NotNull Project p) {
@@ -42,6 +43,7 @@ public final class ProjectPanel implements Disposable {
         testProjectSelector = new TestProjectSelector(p, this);
         branchSelector = new BranchSelector(p, this, testProjectSelector.getSelectedTestProject().getItem());
         projectTree = new ProjectTree(p, this);
+        Disposer.register(this, projectTree);
 
         testProjectSelector.init();
     }
@@ -57,7 +59,6 @@ public final class ProjectPanel implements Disposable {
             JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
             topBar.add(testProjectSelector.getSelectedTestProject(), BorderLayout.NORTH);
 
-            branchSelector = new BranchSelector(p, this, testProjectSelector.getSelectedTestProject().getItem());
             topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
 
             panel.add(topBar, BorderLayout.NORTH);
@@ -120,6 +121,5 @@ public final class ProjectPanel implements Disposable {
 
     @Override
     public void dispose() {
-        projectTree.dispose();
     }
 }

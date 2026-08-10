@@ -22,6 +22,11 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
     @Override
     public void customizeCellRenderer(final @NotNull JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
         try {
+            if (TreeValueUtil.valueOf(value) instanceof TreeLoadError(String message)) {
+                setIcon(AllIcons.General.Error);
+                append(message, SimpleTextAttributes.ERROR_ATTRIBUTES);
+                return;
+            }
             DirectoryDto dir = TreeValueUtil.directoryOf(value);
             if (dir == null) {
                 append(value != null ? value.toString() : "", SimpleTextAttributes.REGULAR_ATTRIBUTES);

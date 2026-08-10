@@ -45,7 +45,6 @@ public class RefreshAction extends DumbAwareAction {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 pp.getTestProjectSelector().loadTestProjectList();
-                pp.getProjectTree().refresh();
 
                 refreshGuard.set(false);
                 Logger.info("Refresh: tree rebuilt");

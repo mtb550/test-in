@@ -347,6 +347,10 @@ public final class ProjectIndexer {
     }
 
     public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath) {
+        copyNode(sourcePath, targetPath, null);
+    }
+
+    public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath, final Runnable onComplete) {
         Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
             try {
                 sourceVf.copy(this, targetVf, sourceVf.getName());
@@ -354,7 +358,19 @@ public final class ProjectIndexer {
                 Logger.error(ex.getMessage());
                 throw new RuntimeException(ex);
             }
-        });
+        }, () -> ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            refreshIndexedProject(targetPath);
+            if (onComplete != null) ApplicationManager.getApplication().invokeLater(onComplete);
+        }));
+    }
+
+    private void refreshIndexedProject(final @NotNull Path changedPath) {
+        final Path projectPath = store.getTestProjectsByPath().keySet().stream()
+                .map(Path::of)
+                .filter(changedPath::startsWith)
+                .max(Comparator.comparingInt(Path::getNameCount))
+                .orElse(null);
+        if (projectPath != null) scanner.scanProject(projectPath);
     }
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {

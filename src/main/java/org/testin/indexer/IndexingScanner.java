@@ -151,7 +151,9 @@ final class IndexingScanner {
             }
 
             store.getTestSetCaseIds().put(path.toString(), caseIds);
-            indicator.setText("Test set: " + ts.getName() + " (" + caseIds.size() + " cases)");
+            if (indicator != null) {
+                indicator.setText("Test set: " + ts.getName() + " (" + caseIds.size() + " cases)");
+            }
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test set '" +
@@ -218,7 +220,9 @@ final class IndexingScanner {
                 store.getTestRunsByPath().put(path.toString(), trr);
             }
 
-            indicator.setText("Test run: " + fileName);
+            if (indicator != null) {
+                indicator.setText("Test run: " + fileName);
+            }
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run '" +

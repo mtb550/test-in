@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transfers application values and lets the async model rebuild from indexer state.
@@ -74,18 +75,22 @@ public class TreeTransferHandler extends TransferHandler {
             if (target == null) return false;
 
             final int action = support.isDrop() ? support.getDropAction() : (lastAction != null ? lastAction : COPY);
+            final AtomicInteger pendingCopies = new AtomicInteger();
             for (DirectoryDto source : sources) {
                 if (action == MOVE) {
                     if (source.getPath().equals(target.getPath()) || target.getPath().startsWith(source.getPath()))
                         continue;
                     persistMove(source, target);
                 } else {
-                    persistCopy(source, target);
+                    pendingCopies.incrementAndGet();
+                    persistCopy(source, target, () -> {
+                        if (pendingCopies.decrementAndGet() == 0) refresh.run();
+                    });
                 }
             }
 
             resetLastAction();
-            refresh.run();
+            if (pendingCopies.get() == 0) refresh.run();
             return true;
         } catch (final Exception ex) {
             Logger.error("Tree transfer failed: " + ex.getMessage());
@@ -107,8 +112,8 @@ public class TreeTransferHandler extends TransferHandler {
         Logger.info("Moved successfully to: " + newPath);
     }
 
-    private void persistCopy(final DirectoryDto source, final DirectoryDto target) {
-        Services.getInstance(p, ProjectIndexer.class).copyNode(source.getPath(), target.getPath());
+    private void persistCopy(final DirectoryDto source, final DirectoryDto target, final Runnable onComplete) {
+        Services.getInstance(p, ProjectIndexer.class).copyNode(source.getPath(), target.getPath(), onComplete);
         Logger.info("Copied successfully to: " + target.getPath().resolve(source.getName()));
     }
 

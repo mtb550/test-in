@@ -13,6 +13,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 
@@ -48,7 +49,7 @@ public class SetTestRunStatusAction extends DumbAwareAction {
 
                 persistMarker(p, testRunDto, selectedStatus);
 
-                Services.getInstance(p, org.testin.projectPanel.ProjectPanel.class).getProjectTree().refresh();
+                Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
             }).show();
         }
     }

@@ -12,6 +12,7 @@ import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.nodeCreator.dialogs.CreateNodesDialog;
+import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.KeyboardSet;
@@ -53,7 +54,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
             }
 
             DirectoryDto dir = dt.getAction().apply(p).execute(s, pDir, newDirPath);
-            Services.getInstance(p, org.testin.projectPanel.ProjectPanel.class).getProjectTree().refresh();
+            Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
 
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);

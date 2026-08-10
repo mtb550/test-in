@@ -33,6 +33,12 @@ public final class TreeUtilImpl {
     }
 
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
+        executeVfsAction(p, sourcePath, targetPath, errorTitle, operation, null);
+    }
+
+    public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
+                                 final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation,
+                                 final Runnable onSuccess) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
                 VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
@@ -40,6 +46,7 @@ public final class TreeUtilImpl {
 
                 if (sourceVf != null && targetVf != null) {
                     operation.execute(sourceVf, targetVf);
+                    if (onSuccess != null) onSuccess.run();
                 } else {
                     Services.getInstance(p, Notifier.class).error(p, "Could not find source or target path on disk.", errorTitle);
                 }

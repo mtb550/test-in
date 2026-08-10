@@ -22,6 +22,7 @@ import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.nodeCreator.CreateTestSet;
 import org.testin.notifications.Notifier;
+import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
@@ -152,7 +153,7 @@ public class ImportAction extends DumbAwareAction {
 
             targetDirectory.refresh(false, true);
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, org.testin.projectPanel.ProjectPanel.class).getProjectTree().refresh()
+                    Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh()
             );
 
         });
