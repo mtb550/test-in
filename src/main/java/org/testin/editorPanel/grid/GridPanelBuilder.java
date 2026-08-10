@@ -1,6 +1,7 @@
 package org.testin.editorPanel.grid;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
 import org.testin.enums.RunEditorAttributes;
 import org.testin.enums.TestEditorAttributes;
@@ -19,8 +20,9 @@ import java.util.List;
 
 public class GridPanelBuilder {
 
-    private static final int CELL_PADDING = 10;
+    static final int CELL_PADDING = 10;
     private static final int MAX_COL_WIDTH = 250;
+    static final Color GRID_COLOR = JBColor.border();
 
     public static void resizeToFont(final JBTable table) {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
@@ -41,6 +43,7 @@ public class GridPanelBuilder {
                 textArea.setBorder(BorderFactory.createEmptyBorder(CELL_PADDING, CELL_PADDING, CELL_PADDING, CELL_PADDING));
                 textArea.setOpaque(false);
                 wrapper.setOpaque(true);
+                wrapper.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR));
                 c.gridx = 0;
                 c.gridy = 0;
                 c.weightx = 1.0;
@@ -235,8 +238,9 @@ public class GridPanelBuilder {
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         table.setDefaultRenderer(Object.class, wrappingRenderer());
-        // below, set constant border for table cells
-        //table.setBorder();
+        table.setShowGrid(false);
+        table.setIntercellSpacing(new Dimension(0, 0));
+        table.setBorder(BorderFactory.createLineBorder(GRID_COLOR, 1));
         table.setExpandableItemsEnabled(false);
         addColumnResizeListener(table);
         if (editable) {

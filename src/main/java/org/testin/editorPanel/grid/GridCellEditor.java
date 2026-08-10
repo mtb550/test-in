@@ -13,7 +13,10 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
     public GridCellEditor() {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
-        textArea.setBorder(BorderFactory.createEmptyBorder());
+        textArea.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(0, 0, 1, 1, GridPanelBuilder.GRID_COLOR),
+                BorderFactory.createEmptyBorder(GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING)
+        ));
     }
 
     @Override
