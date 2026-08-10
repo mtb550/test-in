@@ -7,6 +7,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -274,14 +275,16 @@ final class IndexerDataStore {
     void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
         final String oldStr = oldPath.toString();
         final String newStr = newPath.toString();
+        final Path newParentPath = newPath.getParent();
+        final DirectoryDto newParentDto = newParentPath == null ? null : findByPath(newParentPath);
 
-        renameMapEntry(testProjectsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
-        renameMapEntry(testSetsDirByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
-        renameMapEntry(testRunsDirByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
-        renameMapEntry(testSetPackagesByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
-        renameMapEntry(testRunPackagesByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
-        renameMapEntry(testCasesMainDirsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
-        renameMapEntry(testRunsMainDirsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath));
+        renameMapEntry(testProjectsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+        renameMapEntry(testSetsDirByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+        renameMapEntry(testRunsDirByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+        renameMapEntry(testSetPackagesByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+        renameMapEntry(testRunPackagesByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+        renameMapEntry(testCasesMainDirsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+        renameMapEntry(testRunsMainDirsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
         renameMapEntry(testCaseStore.getTestSetCaseIds(), oldStr, newStr, ids -> {
         });
         renameMapEntry(testRunsByPath, oldStr, newStr, tr -> {
@@ -297,6 +300,33 @@ final class IndexerDataStore {
         renameDescendantKeys(testCaseStore.getTestSetCaseIds(), oldPath, newPath);
         renameDescendantKeys(testRunsByPath, oldPath, newPath);
         childrenIndex.invalidate();
+    }
+
+    private void updatePathAndPath2(final @NotNull DirectoryDto dto, final Path newPath, final @Nullable DirectoryDto newParent) {
+        dto.setPath(newPath);
+        dto.setName(newPath.getFileName().toString());
+        dto.setParent(newParent);
+        dto.setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        dto.setModifiedBy(System.getProperty("user.name", ""));
+        rebuildPath2(dto);
+    }
+
+    @Nullable
+    private DirectoryDto findByPath(final @NotNull Path path) {
+        final String key = path.toString();
+        DirectoryDto dto = testProjectsByPath.get(key);
+        if (dto != null) return dto;
+        dto = testSetsDirByPath.get(key);
+        if (dto != null) return dto;
+        dto = testRunsDirByPath.get(key);
+        if (dto != null) return dto;
+        dto = testSetPackagesByPath.get(key);
+        if (dto != null) return dto;
+        dto = testRunPackagesByPath.get(key);
+        if (dto != null) return dto;
+        dto = testCasesMainDirsByPath.get(key);
+        if (dto != null) return dto;
+        return testRunsMainDirsByPath.get(key);
     }
 
     private void updatePathAndPath2(final @NotNull DirectoryDto dto, final Path newPath) {
@@ -367,8 +397,7 @@ final class IndexerDataStore {
         return directories;
     }
 
-    private <V> void renameMapEntry(final Map<String, V> map, final String oldKey,
-                                    final String newKey, final java.util.function.Consumer<V> updater) {
+    private <V> void renameMapEntry(final Map<String, V> map, final String oldKey, final String newKey, final java.util.function.Consumer<V> updater) {
         final V value = map.remove(oldKey);
         if (value != null) {
             updater.accept(value);
