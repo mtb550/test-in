@@ -1,6 +1,7 @@
 package org.testin.editorPanel.grid;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.table.JBTable;
 import org.testin.enums.RunEditorAttributes;
@@ -10,6 +11,7 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -23,6 +25,12 @@ public class GridPanelBuilder {
     static final int CELL_PADDING = 10;
     private static final int MAX_COL_WIDTH = 500;
     static final Color GRID_COLOR = JBColor.border();
+    private static final Color EVEN_ROW_COLOR = new JBColor(Gray._245, Gray._60);
+    private static final Color ODD_ROW_COLOR = new JBColor(Gray._230, Gray._45);
+
+    static Color rowColor(final int row) {
+        return row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR;
+    }
 
     public static void resizeToFont(final JBTable table) {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
@@ -30,6 +38,94 @@ public class GridPanelBuilder {
         autoSizeColumns(table);
         updateRowHeights(table);
     }
+
+//    private static TableCellRenderer wrappingRenderer() {
+//        return new TableCellRenderer() {
+//            private final JTextArea textArea = new JTextArea();
+//            private final JPanel wrapper = new JPanel(new GridBagLayout());
+//            private final GridBagConstraints c = new GridBagConstraints();
+//
+//            {
+//                textArea.setLineWrap(true);
+//                textArea.setWrapStyleWord(true);
+//                textArea.setBorder(BorderFactory.createEmptyBorder(CELL_PADDING, CELL_PADDING, CELL_PADDING, CELL_PADDING));
+//                textArea.setOpaque(false);
+//                wrapper.setOpaque(true);
+//                c.gridx = 0;
+//                c.gridy = 0;
+//                c.weightx = 1.0;
+//                c.weighty = 1.0;
+//                c.fill = GridBagConstraints.HORIZONTAL;
+//                c.anchor = GridBagConstraints.WEST;
+//            }
+//
+//            @Override
+//            public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+//                textArea.setText(value == null ? "" : value.toString());
+//                textArea.setFont(table.getFont());
+//                textArea.setForeground(table.getForeground());
+//                wrapper.setBackground(rowColor(row));
+//                wrapper.setBorder(isSelected
+//                        ? BorderFactory.createLineBorder(table.getSelectionBackground(), 1)
+//                        : BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR));
+//
+//                final int width = table.getColumnModel().getColumn(column).getWidth();
+//                textArea.setSize(new Dimension(width, Short.MAX_VALUE));
+//                wrapper.add(textArea, c);
+//                return wrapper;
+//            }
+//        };
+//    }
+
+//    private static TableCellRenderer wrappingRenderer() {
+//        return new TableCellRenderer() {
+//            private final JTextArea textArea = new JTextArea();
+//            private final JPanel wrapper = new JPanel(new GridBagLayout());
+//            private final GridBagConstraints c = new GridBagConstraints();
+//
+//            {
+//                textArea.setLineWrap(true);
+//                textArea.setWrapStyleWord(true);
+//                textArea.setBorder(BorderFactory.createEmptyBorder(CELL_PADDING, CELL_PADDING, CELL_PADDING, CELL_PADDING));
+//                textArea.setOpaque(false);
+//                wrapper.setOpaque(true);
+//                c.gridx = 0;
+//                c.gridy = 0;
+//                c.weightx = 1.0;
+//                c.weighty = 1.0;
+//                c.fill = GridBagConstraints.HORIZONTAL;
+//                c.anchor = GridBagConstraints.WEST;
+//            }
+//
+//            @Override
+//            public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+//                textArea.setText(value == null ? "" : value.toString());
+//                textArea.setFont(table.getFont());
+//                textArea.setForeground(table.getForeground());
+//                wrapper.setBackground(rowColor(row));
+//
+//                // --- MODIFIED BORDER LOGIC ---
+//                if (isSelected) {
+//                    // Draw top and bottom borders for all selected cells
+//                    int top = 1;
+//                    int bottom = 1;
+//                    // Only draw the left border on the first visible column
+//                    int left = (column == 0) ? 1 : 0;
+//                    // Only draw the right border on the last visible column
+//                    int right = (column == table.getColumnCount() - 1) ? 1 : 0;
+//
+//                    wrapper.setBorder(BorderFactory.createMatteBorder(top, left, bottom, right, table.getSelectionBackground()));
+//                } else {
+//                    wrapper.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR));
+//                }
+//
+//                final int width = table.getColumnModel().getColumn(column).getWidth();
+//                textArea.setSize(new Dimension(width, Short.MAX_VALUE));
+//                wrapper.add(textArea, c);
+//                return wrapper;
+//            }
+//        };
+//    }
 
     private static TableCellRenderer wrappingRenderer() {
         return new TableCellRenderer() {
@@ -43,7 +139,6 @@ public class GridPanelBuilder {
                 textArea.setBorder(BorderFactory.createEmptyBorder(CELL_PADDING, CELL_PADDING, CELL_PADDING, CELL_PADDING));
                 textArea.setOpaque(false);
                 wrapper.setOpaque(true);
-                wrapper.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR));
                 c.gridx = 0;
                 c.gridy = 0;
                 c.weightx = 1.0;
@@ -54,10 +149,30 @@ public class GridPanelBuilder {
 
             @Override
             public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+
                 textArea.setText(value == null ? "" : value.toString());
                 textArea.setFont(table.getFont());
-                textArea.setForeground(isSelected ? table.getSelectionForeground() : table.getForeground());
-                wrapper.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
+                textArea.setForeground(table.getForeground());
+                wrapper.setBackground(rowColor(row));
+
+                boolean isFirstCol = (column == 0);
+                boolean isLastCol = (column == table.getColumnCount() - 1);
+
+                int top = 2;
+                int bottom = 2;
+                int left = isFirstCol ? 2 : 0;
+                int right = isLastCol ? 2 : 0;
+
+                if (isSelected) {
+                    Border selectionBorder = BorderFactory.createMatteBorder(top, left, bottom, right, table.getSelectionBackground());
+                    Border innerPadding = BorderFactory.createEmptyBorder(0, 0, 0, isLastCol ? 0 : 1);
+                    wrapper.setBorder(BorderFactory.createCompoundBorder(selectionBorder, innerPadding));
+
+                } else {
+                    Border gridBorder = BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR);
+                    Border invisiblePadding = BorderFactory.createEmptyBorder(top, left, bottom - 1, isLastCol ? 1 : 0);
+                    wrapper.setBorder(BorderFactory.createCompoundBorder(invisiblePadding, gridBorder));
+                }
 
                 final int width = table.getColumnModel().getColumn(column).getWidth();
                 textArea.setSize(new Dimension(width, Short.MAX_VALUE));
@@ -105,7 +220,6 @@ public class GridPanelBuilder {
             }
         });
     }
-
 
     private static void autoSizeColumns(final JBTable table) {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
