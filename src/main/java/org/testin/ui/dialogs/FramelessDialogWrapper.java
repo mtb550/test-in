@@ -6,7 +6,6 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -53,13 +52,22 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
     protected JComponent createNorthPanel() {
         final JBPanel<?> header = new JBPanel<>(new BorderLayout());
         header.setOpaque(true);
-        header.setBackground(UIUtil.getPanelBackground());
+        header.setBackground(JBUI.CurrentTheme.Popup.headerBackground(true));
         header.setBorder(JBUI.Borders.empty(12, 16, 4, 16));
 
         final JBLabel title = new JBLabel(getTitle());
+        title.setForeground(JBUI.CurrentTheme.Popup.headerForeground(true));
         title.setFont(JBFont.label().deriveFont(Font.BOLD, JBUI.Fonts.label().getSize2D() + 2f));
+        if (getTitleIcon() != null) {
+            title.setIcon(getTitleIcon());
+            title.setIconTextGap(JBUI.scale(8));
+        }
         header.add(title, BorderLayout.WEST);
         return header;
+    }
+
+    protected @Nullable javax.swing.Icon getTitleIcon() {
+        return null;
     }
 
     @Override

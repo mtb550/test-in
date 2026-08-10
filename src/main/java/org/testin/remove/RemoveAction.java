@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
@@ -15,6 +14,7 @@ import org.testin.mappers.dto.dirs.*;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
+import org.testin.ui.dialogs.ConfirmationPopupDialog;
 import org.testin.util.EditorUtil;
 
 import javax.swing.tree.TreePath;
@@ -60,9 +60,16 @@ public class RemoveAction extends DumbAwareAction {
                 ? "Remove '" + nodesToRemove.getFirst().getName() + "'?"
                 : "Remove these " + nodesToRemove.size() + " items?";
 
-        if (Messages.showYesNoDialog(msg, "Confirm Removing", Messages.getQuestionIcon()) != Messages.YES)
-            return;
+        new ConfirmationPopupDialog(
+                p,
+                "Confirm Removing",
+                AllIcons.Actions.GC,
+                msg + "\n\nPress Enter to remove or Escape to cancel.",
+                () -> removeNodes(nodesToRemove)
+        ).show();
+    }
 
+    private void removeNodes(final List<DirectoryDto> nodesToRemove) {
         for (DirectoryDto pkg : nodesToRemove) {
 
             if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)

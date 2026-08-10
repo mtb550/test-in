@@ -1,116 +1,63 @@
 package org.testin.nodeCreator.dialogs;
 
-import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
-import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.TextComponentEmptyText;
-import com.intellij.ui.components.fields.ExtendableTextField;
-import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
-import org.testin.ui.dialogs.DialogStyle;
+import org.testin.ui.dialogs.AbstractInputPopupDialog;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-public class CreateNodesDialog {
-    final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
-    final Border fieldBorder = JBUI.Borders.empty(10);
-    final Font optionsFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
-    final Border optionsBorder = JBUI.Borders.empty(6);
-    final Dimension minSize = new Dimension(JBUI.scale(350), 0);
-    private final ExtendableTextField textField;
-    private final JBList<DirectoryType> list;
-    private final JBPopup popup;
-    private final @NotNull Project p;
+/**
+ * Create-node popup built on the shared dynamic input dialog.
+ */
+public final class CreateNodesDialog extends AbstractInputPopupDialog {
 
-    public CreateNodesDialog(final @NotNull Project p, final @NotNull CreateNodeMenu menu, final BiConsumer<@NotNull String, @NotNull DirectoryType> onSubmit) {
-        this.p = p;
+    private final @NotNull JBList<DirectoryType> list;
+    private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onSubmit;
 
-        textField = new ExtendableTextField();
-        textField.setFont(fieldFont);
-        textField.setBorder(fieldBorder);
+    public CreateNodesDialog(final @NotNull Project project,
+                             final @NotNull CreateNodeMenu menu,
+                             final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onSubmit) {
+        super(project, menu.getTitle(), AllIcons.General.Add, menu.getPlaceholder(), "");
+        this.onSubmit = onSubmit;
 
-        textField.getEmptyText().setText(menu.getPlaceholder());
-        TextComponentEmptyText.setupPlaceholderVisibility(textField);
-
-        List<DirectoryType> optionsList = menu.getAvailableOptions();
-        list = new JBList<>(optionsList.toArray(new DirectoryType[0]));
-
-        list.setBorder(optionsBorder);
-        list.setFont(optionsFont);
+        final List<DirectoryType> options = menu.getAvailableOptions();
+        list = new JBList<>(options.toArray(new DirectoryType[0]));
+        list.setBorder(JBUI.Borders.empty(6));
+        list.setFont(JBUI.Fonts.label().deriveFont(JBUI.Fonts.label().getSize2D() + 2f));
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setSelectedIndex(0);
-        list.setVisibleRowCount(optionsList.size());
+        list.setVisibleRowCount(options.size());
+        list.setCellRenderer(new DialogListCellRendererImpl());
 
-        JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
-        DialogStyle.styleContent(mainPanel);
-        mainPanel.setBorder(JBUI.Borders.empty());
+        setLeadingIcon(menu.getTargetParentType().getIcon());
+        list.addListSelectionListener(new DialogListSelectionListenerImpl(textField, list));
+        list.addMouseListener(new DialogMouseAdapterImpl(list, this::submitInput));
+        textField.addKeyListener(new DialogKeyListenerImpl(list));
 
-        mainPanel.add(textField, BorderLayout.NORTH);
-
-        JBPanel<?> listWrapper = new JBPanel<>(new BorderLayout());
+        final JBPanel<?> listWrapper = new JBPanel<>(new BorderLayout());
         listWrapper.add(list, BorderLayout.CENTER);
 
-        JBScrollPane scrollPane = new JBScrollPane(listWrapper);
+        final JBScrollPane scrollPane = new JBScrollPane(listWrapper);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        addContent(scrollPane, BorderLayout.CENTER);
 
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
-
-        ComponentPopupBuilder builder = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(mainPanel, textField)
-                .setTitle(menu.getTitle())
-                .setRequestFocus(true)
-                .setCancelOnWindowDeactivation(false)
-                .setCancelOnClickOutside(true)
-                .setMovable(false)
-                .setResizable(false)
-                // todo, dispose to be implemented
-                /*.addListener(new JBPopupListener() {
-                    @Override
-                    public void onClosed(@NotNull LightweightWindowEvent event) {
-                        dispose();
-                    }
-                })*/
-                .setMinSize(minSize);
-
-        popup = builder.createPopup();
-
-        final Runnable submitAction = () -> executeSubmitAction(onSubmit);
-
-        textField.addKeyListener(new DialogKeyListenerImpl(list, popup, submitAction));
-        list.addMouseListener(new DialogMouseAdapterImpl(list, submitAction));
-        list.setCellRenderer(new DialogListCellRendererImpl());
-        list.addListSelectionListener(new DialogListSelectionListenerImpl(textField, list));
+        initializeInputPopup();
     }
 
-    public void show() {
-        popup.showCenteredInCurrentWindow(p);
-        ApplicationManager.getApplication().invokeLater(() -> {
-            textField.revalidate();
-            textField.repaint();
-        });
-    }
-
-    private void executeSubmitAction(final BiConsumer<String, DirectoryType> onSubmit) {
-        final String text = textField.getText().trim();
-
-        if (!text.isEmpty()) {
-            onSubmit.accept(text, list.getSelectedValue());
-            popup.closeOk(null);
-
-        } else textField.requestFocus();
+    @Override
+    protected void onSubmit(final @NotNull String value) {
+        onSubmit.accept(value, list.getSelectedValue());
     }
 }

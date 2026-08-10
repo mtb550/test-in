@@ -1,6 +1,5 @@
 package org.testin.nodeCreator.dialogs;
 
-import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBList;
 import org.testin.enums.DirectoryType;
 
@@ -12,13 +11,11 @@ public class DialogKeyListenerImpl extends KeyAdapter {
     private final JBList<DirectoryType> list;
     private final Map<Integer, KeyBinding> keyBindings;
 
-    public DialogKeyListenerImpl(final JBList<DirectoryType> list, final JBPopup popup, final Runnable onSubmit) {
+    public DialogKeyListenerImpl(final JBList<DirectoryType> list) {
         this.list = list;
         this.keyBindings = Map.of(
                 KeyEvent.VK_DOWN, new KeyBinding(() -> moveBy(1), true),
-                KeyEvent.VK_UP, new KeyBinding(() -> moveBy(-1), true),
-                KeyEvent.VK_ENTER, new KeyBinding(onSubmit, false),
-                KeyEvent.VK_ESCAPE, new KeyBinding(popup::cancel, false)
+                KeyEvent.VK_UP, new KeyBinding(() -> moveBy(-1), true)
         );
     }
 
