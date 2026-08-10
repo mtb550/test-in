@@ -9,7 +9,10 @@ import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -106,7 +109,7 @@ public class GridPanelBuilder {
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
             final TableColumn col = table.getColumnModel().getColumn(i);
-            int maxWidth = 0;
+            int maxWidth;
 
             TableCellRenderer headerRenderer = col.getHeaderRenderer();
             if (headerRenderer == null) {
@@ -230,9 +233,15 @@ public class GridPanelBuilder {
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // Set selection blue background and dark blue styling
+        table.setSelectionBackground(new Color(38, 79, 142)); // Dark blue row selection
+        table.setSelectionForeground(Color.WHITE);
+
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         table.setDefaultRenderer(Object.class, wrappingRenderer());
         addColumnResizeListener(table);
+
         if (editable) {
             table.setDefaultEditor(Object.class, new GridCellEditor());
         }
