@@ -1,43 +1,15 @@
 package org.testin.editorPanel.statusBar;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 
-public class PrevPageAction extends DumbAwareAction {
-    private final @NotNull Project p;
-    private final @NotNull IEditor editor;
+public class PrevPageAction extends AbstractPageAction {
 
-    public PrevPageAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super("Previous Page", "Navigate to the previous page", AllIcons.Actions.Back);
-        this.p = p;
-        this.editor = editor;
-        registerCustomShortcutSet(KeyboardSet.PreviousTestCase.getCustomShortcut(), list);
-    }
-
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (editor.getCurrentPage() > 1) {
-            editor.setCurrentPage(editor.getCurrentPage() - 1);
-            editor.refreshView();
-        }
-    }
-
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        int current = editor.getCurrentPage();
-        e.getPresentation().setEnabled(current > 1);
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.EDT;
+    public PrevPageAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+        super(editor, list, "Previous Page", "Navigate to the previous page", AllIcons.Actions.Back, KeyboardSet.PreviousTestCase, -1);
     }
 }

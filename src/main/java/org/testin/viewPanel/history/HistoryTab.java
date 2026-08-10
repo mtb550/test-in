@@ -1,25 +1,25 @@
 package org.testin.viewPanel.history;
 
-import com.intellij.ui.components.JBList;
+import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
-import org.testin.mappers.DB;
-import org.testin.mappers.dto.TestCaseHistoryDto;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class HistoryTab {
+
+    /// TODO: real change history is not implemented yet; show an honest empty state
+    /// instead of demo data until it is.
     public void load(@NotNull JBPanel<?> historyTab) {
         historyTab.removeAll();
-        DefaultListModel<String> model = new DefaultListModel<>();
 
-        for (TestCaseHistoryDto h : DB.loadTestCaseHistory()) {
-            model.addElement(h.getTimestamp() + " - " + h.getChangeSummary());
-        }
+        final JBLabel emptyState = new JBLabel("No history available yet", SwingConstants.CENTER);
+        emptyState.setForeground(UIUtil.getContextHelpForeground());
+        emptyState.setBorder(JBUI.Borders.empty(20));
 
-        JBList<String> list = new JBList<>(model);
-        historyTab.add(new JBScrollPane(list), BorderLayout.CENTER);
+        historyTab.add(emptyState, BorderLayout.CENTER);
     }
 }

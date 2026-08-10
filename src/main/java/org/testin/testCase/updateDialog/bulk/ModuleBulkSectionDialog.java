@@ -1,10 +1,8 @@
 package org.testin.testCase.updateDialog.bulk;
 
 import com.intellij.openapi.project.Project;
-import groovyjarjarantlr4.v4.runtime.misc.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
-
-import java.util.List;
 
 public class ModuleBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
@@ -18,37 +16,17 @@ public class ModuleBulkSectionDialog extends JsonSplitBulkSectionDialog {
     }
 
     @Override
+    protected String getJsonFieldName() {
+        return "module";
+    }
+
+    @Override
     protected String getOriginalValue(final TestCaseDto tc) {
         return tc.getModule();
     }
 
     @Override
-    protected void appendJsonItem(final TestCaseDto tc, int index, boolean isLast, StringBuilder leftSb, StringBuilder rightSb, List<int[]> rightEditableRanges) {
-        String id = escapeJson(tc.getId().toString());
-        String escapedDescription = escapeJson(tc.getDescription());
-        // todo, add expected result to be shown once update bulk modules
-        String escapedModule = escapeJson(tc.getModule());
-
-        String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"description\": \"" + escapedDescription + "\",\n    \"module\": \"";
-        String suffix = "\"\n  }";
-        String comma = isLast ? "\n" : ",\n";
-
-        leftSb.append(prefix).append(escapedModule).append(suffix).append(comma);
-
-        rightSb.append(prefix);
-        int startOffset = rightSb.length();
-        rightSb.append(escapedModule);
-        int endOffset = rightSb.length();
-        rightEditableRanges.add(new int[]{startOffset, endOffset});
-        rightSb.append(suffix).append(comma);
-    }
-
-    @Override
-    protected void applyValues(final List<TestCaseDto> items, final List<String> newValues) {
-        for (int i = 0; i < items.size(); i++) {
-            if (newValues.get(i) != null) {
-                items.get(i).setModule(newValues.get(i).trim());
-            }
-        }
+    protected void setValue(final TestCaseDto tc, final String value) {
+        tc.setModule(value);
     }
 }

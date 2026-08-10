@@ -1,49 +1,22 @@
 package org.testin.generateJavaCode.method;
 
-import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.JavaPsiFacade;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiMethod;
-import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.generateJavaCode.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
 
-import java.util.List;
-
-public class RemoveTestMethod implements GeneratorAction {
+public class RemoveTestMethod extends UpdateTestBase implements GeneratorAction {
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-        if (fqcn.size() < 2) return;
-        final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-
-        WriteCommandAction.runWriteCommandAction(p, "Remove Test Method", null, () -> {
-            final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p));
-            if (targetClass == null) {
-                Logger.warn("RemoveTestMethod: class not found: " + path);
-                return;
-            }
-
-            final String targetId = tc.getId().toString();
-            for (PsiMethod m : targetClass.getMethods()) {
-                final PsiAnnotation annotation = m.getModifierList().findAnnotation("org.testng.annotations.Test");
-                if (annotation != null && annotation.getText().contains("testName") && annotation.getText().contains(targetId)) {
-                    m.delete();
-                    Logger.info("Removed test method: " + m.getName());
-                    return;
-                }
-            }
-            Logger.warn("RemoveTestMethod: no method found with testName=" + tc.getId());
+        applyUpdate(p, tc, "Remove Test Method", pm -> {
+            final String name = pm.getName();
+            pm.delete();
+            Logger.info("Removed test method: " + name);
         });
     }
-
 }

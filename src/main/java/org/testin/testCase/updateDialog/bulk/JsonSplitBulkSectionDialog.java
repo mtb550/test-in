@@ -47,13 +47,70 @@ public abstract class JsonSplitBulkSectionDialog {
         this.p = p;
     }
 
-    protected abstract void applyValues(final List<TestCaseDto> items, final List<String> newValues);
-
     protected abstract String getPopupTitle();
+
+    /**
+     * JSON key of the edited field, e.g. "testData".
+     */
+    protected abstract String getJsonFieldName();
 
     protected abstract String getOriginalValue(final TestCaseDto tc);
 
-    protected abstract void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges);
+    /**
+     * Applies one edited (non-null, trimmed) value to the test case.
+     */
+    protected abstract void setValue(final TestCaseDto tc, final String value);
+
+    /**
+     * Whether a value edited to blank may be applied (e.g. a description must not be blanked).
+     */
+    protected boolean acceptsBlank() {
+        return true;
+    }
+
+    /**
+     * Whether the description is rendered as read-only context above the edited field.
+     * False when the edited field IS the description.
+     */
+    protected boolean showsDescriptionContext() {
+        return true;
+    }
+
+    protected void applyValues(final List<TestCaseDto> items, final List<String> newValues) {
+        for (int i = 0; i < items.size(); i++) {
+            final String raw = newValues.get(i);
+            if (raw == null) continue; // unchanged row - never rewrite (see saveLogic)
+
+            final String value = raw.trim();
+            if (value.isEmpty() && !acceptsBlank()) continue;
+
+            setValue(items.get(i), value);
+        }
+    }
+
+    protected void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges) {
+        final String escapedValue = escapeJson(getOriginalValue(tc));
+
+        final StringBuilder prefixSb = new StringBuilder("  {\n    \"id\": \"")
+                .append(escapeJson(tc.getId().toString())).append("\",\n");
+        if (showsDescriptionContext()) {
+            prefixSb.append("    \"description\": \"").append(escapeJson(tc.getDescription())).append("\",\n");
+        }
+        prefixSb.append("    \"").append(getJsonFieldName()).append("\": \"");
+
+        final String prefix = prefixSb.toString();
+        final String suffix = "\"\n  }";
+        final String comma = isLast ? "\n" : ",\n";
+
+        leftSb.append(prefix).append(escapedValue).append(suffix).append(comma);
+
+        rightSb.append(prefix);
+        final int startOffset = rightSb.length();
+        rightSb.append(escapedValue);
+        final int endOffset = rightSb.length();
+        rightEditableRanges.add(new int[]{startOffset, endOffset});
+        rightSb.append(suffix).append(comma);
+    }
 
     public void show(final List<TestCaseDto> selectedItems, final Consumer<List<TestCaseDto>> updatedItems) {
         StringBuilder leftSb = new StringBuilder();
@@ -271,7 +328,6 @@ public abstract class JsonSplitBulkSectionDialog {
                 .setCancelOnWindowDeactivation(false)
                 .setMovable(true)
                 .setResizable(true)
-                // todo, add disposer on close same as @CreateTestCaseUI
                 .createPopup();
 
         Runnable saveLogic = () -> {
@@ -280,9 +336,13 @@ public abstract class JsonSplitBulkSectionDialog {
                 RangeMarker marker = valueMarkers.get(i);
                 if (marker.isValid()) {
                     String newText = rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
-                    newValues.add(unescapeJson(newText).trim());
+                    // The editor shows newlines flattened to spaces (escapeJson); writing an
+                    // untouched row back would permanently flatten the stored multi-line value.
+                    // null = "unchanged, skip".
+                    String originalEscaped = escapeJson(getOriginalValue(selectedItems.get(i)));
+                    newValues.add(newText.equals(originalEscaped) ? null : unescapeJson(newText).trim());
                 } else {
-                    newValues.add("");
+                    newValues.add(null);
                 }
             }
 
@@ -397,6 +457,7 @@ public abstract class JsonSplitBulkSectionDialog {
         popup.addListener(new JBPopupListener() {
             @Override
             public void onClosed(@NotNull LightweightWindowEvent event) {
+                Disposer.dispose(docListenerDisposable);
                 if (!leftEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(leftEditor);
                 if (!rightEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(rightEditor);
             }

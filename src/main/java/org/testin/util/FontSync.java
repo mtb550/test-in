@@ -10,6 +10,7 @@ import com.intellij.openapi.editor.colors.EditorColorsManager;
 import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.Disposer;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
@@ -53,14 +54,22 @@ public class FontSync {
         if (isGlobalWatcherActive) return;
         isGlobalWatcherActive = true;
 
+        // Single debounce timer instead of allocating one per wheel event.
+        final Timer debounce = new Timer(50, evt -> syncJavaEditorToGlobal(p));
+        debounce.setRepeats(false);
+
         IdeEventQueue.getInstance().addPostprocessor(event -> {
             if (event instanceof MouseWheelEvent e && (e.isControlDown() || e.isMetaDown())) {
-                Timer timer = new Timer(50, evt -> syncJavaEditorToGlobal(p));
-                timer.setRepeats(false);
-                timer.start();
+                debounce.restart();
             }
             return false;
         }, parentDisposable);
+
+        // When the owning editor goes away, let the next editor re-register the watcher.
+        Disposer.register(parentDisposable, () -> {
+            debounce.stop();
+            isGlobalWatcherActive = false;
+        });
     }
 
     private static void syncJavaEditorToGlobal(final @NotNull Project p) {

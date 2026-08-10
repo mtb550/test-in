@@ -47,32 +47,6 @@ public final class ProjectIndexer {
         this.scanCoordinator = new ProjectScanCoordinator(new IndexingScanner(p, store));
     }
 
-    private long estimateBytes(final int testCases, final int testRuns, final int projects, final int testSets, final int testRunDirs, final int testSetPkgs, final int testRunPkgs, final int testSetCaseSets) {
-        final long MAP_OVERHEAD = 256L;
-        final long TC_SIZE = 2048L;
-        final long TR_SIZE = 1024L;
-        final long DIR_SIZE = 512L;
-
-        long total = 0;
-        total += testCases * (TC_SIZE + MAP_OVERHEAD);
-        total += testRuns * (TR_SIZE + MAP_OVERHEAD);
-        total += projects * (DIR_SIZE + MAP_OVERHEAD);
-        total += testSets * (DIR_SIZE + MAP_OVERHEAD);
-        total += testRunDirs * (DIR_SIZE + MAP_OVERHEAD);
-        total += testSetPkgs * (DIR_SIZE + MAP_OVERHEAD);
-        total += testRunPkgs * (DIR_SIZE + MAP_OVERHEAD);
-        total += testSetCaseSets * MAP_OVERHEAD;
-        return total;
-    }
-
-    private String formatBytes(final long bytes) {
-        final long kb = bytes / 1024;
-        if (kb < 1024) {
-            return "~" + kb + " KB";
-        }
-        return String.format("~%.1f MB", kb / 1024.0);
-    }
-
     public void indexWithProgress() {
         try {
             if (indexed.get() || indexing.getAndSet(true)) {
@@ -224,27 +198,14 @@ public final class ProjectIndexer {
     }
 
     private void logSummary() {
-        final int tcCount = store.getTestCasesById().size();
-        final int trCount = store.getTestRunsByPath().size();
-        final int projCount = store.getTestProjectsByPath().size();
-        final int setCount = store.getTestSetsDirByPath().size();
-        final int runDirCount = store.getTestRunsDirByPath().size();
-        final int setPkgCount = store.getTestSetPackagesByPath().size();
-        final int runPkgCount = store.getTestRunPackagesByPath().size();
-
-        final long estimatedBytes = estimateBytes(
-                tcCount, trCount, projCount, setCount, runDirCount,
-                setPkgCount, runPkgCount, store.getTestSetCaseIds().size());
-
         Logger.info("Indexing complete: " +
-                tcCount + " test cases, " +
-                trCount + " test runs, " +
-                projCount + " projects, " +
-                setCount + " test sets, " +
-                runDirCount + " test run dirs, " +
-                setPkgCount + " test set packages, " +
-                runPkgCount + " test run packages | " +
-                formatBytes(estimatedBytes));
+                store.getTestCasesById().size() + " test cases, " +
+                store.getTestRunsByPath().size() + " test runs, " +
+                store.getTestProjectsByPath().size() + " projects, " +
+                store.getTestSetsDirByPath().size() + " test sets, " +
+                store.getTestRunsDirByPath().size() + " test run dirs, " +
+                store.getTestSetPackagesByPath().size() + " test set packages, " +
+                store.getTestRunPackagesByPath().size() + " test run packages");
     }
 
     public @NotNull List<TestCaseDto> getTestCasesForTestSet(final @NotNull Path testSetPath) {
@@ -356,14 +317,6 @@ public final class ProjectIndexer {
             Logger.info("Moved successfully to: " + newPath);
             if (onFinished != null) onFinished.run();
         }, onFinished);
-    }
-
-    public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath) {
-        copyNodes(List.of(sourcePath), targetPath, null);
-    }
-
-    public void copyNode(final @NotNull Path sourcePath, final @NotNull Path targetPath, final Runnable onComplete) {
-        copyNodes(List.of(sourcePath), targetPath, onComplete);
     }
 
     public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final Runnable onComplete) {

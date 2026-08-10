@@ -14,6 +14,7 @@ import org.testin.services.Services;
 import org.testin.util.Tools;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,7 @@ public class ExportCsv {
     }
 
     public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
             List<String> headerNames = exportAction.exportAttributes.stream()
                     .map(TestEditorAttributes::getName)
                     .toList();

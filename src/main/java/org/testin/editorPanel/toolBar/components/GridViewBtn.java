@@ -8,6 +8,5 @@ public class GridViewBtn extends AbstractButton implements IToolbarItem {
         super("Grid View", AllIcons.Nodes.DataTables);
 
         addActionListener(e -> onSwitchToGrid.run());
-        // TODO: switch editor to grid view
     }
 }

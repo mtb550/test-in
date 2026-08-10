@@ -8,6 +8,5 @@ public class ListViewBtn extends AbstractButton implements IToolbarItem {
         super("List View", AllIcons.Actions.ListFiles);
 
         addActionListener(e -> onSwitchToList.run());
-        // TODO: switch editor to list view
     }
 }

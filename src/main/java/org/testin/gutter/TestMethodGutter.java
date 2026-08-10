@@ -46,17 +46,30 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         String extractedValue = StringUtil.unquoteString(literal.getText()).trim();
         if (extractedValue.isEmpty()) return;
 
+        // Only mark testin-managed methods: a hand-written testName like "smoke"
+        // is not a UUID and clicking its marker would throw.
+        final UUID testCaseId = parseUuid(extractedValue);
+        if (testCaseId == null) return;
+
         RelatedItemLineMarkerInfo<PsiElement> marker = new RelatedItemLineMarkerInfo<>(
                 element,
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
                 psiElement -> "View Test Case Details",
-                (mouseEvent, psiElement) -> openViewPanel(p, UUID.fromString(extractedValue)),
+                (mouseEvent, psiElement) -> openViewPanel(p, testCaseId),
                 GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
         );
 
         result.add(marker);
+    }
+
+    private static UUID parseUuid(final String value) {
+        try {
+            return UUID.fromString(value);
+        } catch (final IllegalArgumentException ex) {
+            return null;
+        }
     }
 
     private void openViewPanel(final @NotNull Project p, final @NotNull UUID uuid) {

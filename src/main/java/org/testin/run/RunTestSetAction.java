@@ -13,6 +13,7 @@ import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.runner.TestNGRunnerByClass;
 import org.testin.services.Services;
+import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 
@@ -48,7 +49,10 @@ public class RunTestSetAction extends DumbAwareAction {
         if (userObject instanceof TestSetDirectoryDto ts) {
 
             Logger.info(this.getClass() + "directory file: " + ts.getPath().toFile());
-            String fqcn = String.join(".", ts.getPath2());
+            // Build the FQCN the same way the code generator does: strip the
+            // "Test Cases" display node and sanitize each segment. The raw path2
+            // join produced a class name findClass could never resolve.
+            String fqcn = String.join(".", Services.getInstance(p, Tools.class).buildFqcnClass(p, ts));
             Logger.info(this.getClass() + "fqcn path: " + fqcn);
 
             if (!fqcn.trim().isEmpty()) {

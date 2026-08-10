@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 
 final class IndexerDataStore {
 
@@ -53,6 +54,19 @@ final class IndexerDataStore {
     @Getter
     private final Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
 
+    /**
+     * All directory maps, used by operations that must be applied uniformly
+     * (rename, lookup, clear). Keep in sync when adding a new directory kind.
+     */
+    private final List<Map<String, ? extends DirectoryDto>> dirMaps = List.of(
+            testProjectsByPath,
+            testSetsDirByPath,
+            testRunsDirByPath,
+            testSetPackagesByPath,
+            testRunPackagesByPath,
+            testCasesMainDirsByPath,
+            testRunsMainDirsByPath);
+
     IndexerDataStore(final @NotNull Project p) {
         this.p = p;
         this.testCaseStore = new TestCaseSequenceStore(p);
@@ -70,27 +84,27 @@ final class IndexerDataStore {
         return testCaseStore.getForTestSet(testSetPath);
     }
 
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     TestRunDto getTestRunByPath(final Path testRunPath) {
         return testRunsByPath.get(testRunPath.toString());
     }
 
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     TestRunDirectoryDto getTestRunDirByPath(final Path path) {
         return testRunsDirByPath.get(path.toString());
     }
 
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     TestCaseDto getTestCaseById(final UUID id) {
         return testCaseStore.getTestCasesById().get(id);
     }
 
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     TestSetDirectoryDto getTestSetDirByPath(final Path path) {
         return testSetsDirByPath.get(path.toString());
     }
 
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     TestSetPackageDirectoryDto getTestSetPackageByPath(final Path path) {
         return testSetPackagesByPath.get(path.toString());
     }
@@ -115,31 +129,27 @@ final class IndexerDataStore {
     }
 
     void addTestSet(final TestSetDirectoryDto ts) {
-        testSetsDirByPath.put(ts.getPath().toString(), ts);
-        childrenIndex.invalidate();
-        writeMarker(ts.getPath(), DirectoryType.TS.getMarker(), ts.getMarker());
-        refreshDir(ts.getPath());
+        addDir(testSetsDirByPath, ts, DirectoryType.TS.getMarker(), ts.getMarker());
     }
 
     void addTestSetPackage(final TestSetPackageDirectoryDto tsp) {
-        testSetPackagesByPath.put(tsp.getPath().toString(), tsp);
-        childrenIndex.invalidate();
-        writeMarker(tsp.getPath(), DirectoryType.TSP.getMarker(), tsp.getMarker());
-        refreshDir(tsp.getPath());
+        addDir(testSetPackagesByPath, tsp, DirectoryType.TSP.getMarker(), tsp.getMarker());
     }
 
     void addTestRunDir(final @NotNull TestRunDirectoryDto trd) {
-        testRunsDirByPath.put(trd.getPath().toString(), trd);
-        childrenIndex.invalidate();
-        writeMarker(trd.getPath(), DirectoryType.TR.getMarker(), trd.getMarker());
-        refreshDir(trd.getPath());
+        addDir(testRunsDirByPath, trd, DirectoryType.TR.getMarker(), trd.getMarker());
     }
 
     void addTestRunPackage(final @NotNull TestRunPackageDirectoryDto trp) {
-        testRunPackagesByPath.put(trp.getPath().toString(), trp);
+        addDir(testRunPackagesByPath, trp, DirectoryType.TRP.getMarker(), trp.getMarker());
+    }
+
+    private <V extends DirectoryDto> void addDir(final @NotNull Map<String, V> map, final @NotNull V dto,
+                                                 final @NotNull String markerFileName, final @NotNull Object marker) {
+        map.put(dto.getPath().toString(), dto);
         childrenIndex.invalidate();
-        writeMarker(trp.getPath(), DirectoryType.TRP.getMarker(), trp.getMarker());
-        refreshDir(trp.getPath());
+        writeMarker(dto.getPath(), markerFileName, marker);
+        refreshDir(dto.getPath());
     }
 
     private void writeMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
@@ -278,25 +288,15 @@ final class IndexerDataStore {
         final Path newParentPath = newPath.getParent();
         final DirectoryDto newParentDto = newParentPath == null ? null : findByPath(newParentPath);
 
-        renameMapEntry(testProjectsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
-        renameMapEntry(testSetsDirByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
-        renameMapEntry(testRunsDirByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
-        renameMapEntry(testSetPackagesByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
-        renameMapEntry(testRunPackagesByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
-        renameMapEntry(testCasesMainDirsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
-        renameMapEntry(testRunsMainDirsByPath, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+        for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
+            renameMapEntry(map, oldStr, newStr, dto -> updatePathAndPath2(dto, newPath, newParentDto));
+            renameDescendants(map, oldPath, newPath);
+        }
+
         renameMapEntry(testCaseStore.getTestSetCaseIds(), oldStr, newStr, ids -> {
         });
         renameMapEntry(testRunsByPath, oldStr, newStr, tr -> {
         });
-
-        renameDescendants(testProjectsByPath, oldPath, newPath);
-        renameDescendants(testSetsDirByPath, oldPath, newPath);
-        renameDescendants(testRunsDirByPath, oldPath, newPath);
-        renameDescendants(testSetPackagesByPath, oldPath, newPath);
-        renameDescendants(testRunPackagesByPath, oldPath, newPath);
-        renameDescendants(testCasesMainDirsByPath, oldPath, newPath);
-        renameDescendants(testRunsMainDirsByPath, oldPath, newPath);
         renameDescendantKeys(testCaseStore.getTestSetCaseIds(), oldPath, newPath);
         renameDescendantKeys(testRunsByPath, oldPath, newPath);
         childrenIndex.invalidate();
@@ -314,27 +314,11 @@ final class IndexerDataStore {
     @Nullable
     private DirectoryDto findByPath(final @NotNull Path path) {
         final String key = path.toString();
-        DirectoryDto dto = testProjectsByPath.get(key);
-        if (dto != null) return dto;
-        dto = testSetsDirByPath.get(key);
-        if (dto != null) return dto;
-        dto = testRunsDirByPath.get(key);
-        if (dto != null) return dto;
-        dto = testSetPackagesByPath.get(key);
-        if (dto != null) return dto;
-        dto = testRunPackagesByPath.get(key);
-        if (dto != null) return dto;
-        dto = testCasesMainDirsByPath.get(key);
-        if (dto != null) return dto;
-        return testRunsMainDirsByPath.get(key);
-    }
-
-    private void updatePathAndPath2(final @NotNull DirectoryDto dto, final Path newPath) {
-        dto.setPath(newPath);
-        dto.setName(newPath.getFileName().toString());
-        dto.setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        dto.setModifiedBy(System.getProperty("user.name", ""));
-        rebuildPath2(dto);
+        for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
+            final DirectoryDto dto = map.get(key);
+            if (dto != null) return dto;
+        }
+        return null;
     }
 
     private <V extends DirectoryDto> void renameDescendants(final Map<String, V> map, final Path oldPath, final Path newPath) {
@@ -387,17 +371,16 @@ final class IndexerDataStore {
     }
 
     private Collection<DirectoryDto> allDirectories() {
+        // Test projects are included too; they are roots (null parent) and are
+        // simply skipped by the children index.
         final List<DirectoryDto> directories = new ArrayList<>();
-        directories.addAll(testCasesMainDirsByPath.values());
-        directories.addAll(testRunsMainDirsByPath.values());
-        directories.addAll(testSetPackagesByPath.values());
-        directories.addAll(testSetsDirByPath.values());
-        directories.addAll(testRunPackagesByPath.values());
-        directories.addAll(testRunsDirByPath.values());
+        for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
+            directories.addAll(map.values());
+        }
         return directories;
     }
 
-    private <V> void renameMapEntry(final Map<String, V> map, final String oldKey, final String newKey, final java.util.function.Consumer<V> updater) {
+    private <V> void renameMapEntry(final Map<String, V> map, final String oldKey, final String newKey, final Consumer<V> updater) {
         final V value = map.remove(oldKey);
         if (value != null) {
             updater.accept(value);
@@ -405,16 +388,9 @@ final class IndexerDataStore {
         }
     }
 
-
     void clearAll() {
         testCaseStore.clear();
-        testProjectsByPath.clear();
-        testSetsDirByPath.clear();
-        testRunsDirByPath.clear();
-        testSetPackagesByPath.clear();
-        testRunPackagesByPath.clear();
-        testCasesMainDirsByPath.clear();
-        testRunsMainDirsByPath.clear();
+        dirMaps.forEach(Map::clear);
         testRunsByPath.clear();
         childrenIndex.clear();
 

@@ -27,39 +27,23 @@ public final class Notifier {
     private final String GROUP_ID = "testin.notifications";
 
     public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
-
-        ApplicationManager.getApplication().invokeLater(() -> {
-            IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(p);
-            if (ideFrame == null || ideFrame.getStatusBar() == null) return;
-
-            final JComponent statusBarComponent = ideFrame.getStatusBar().getComponent();
-            if (statusBarComponent == null) return;
-
-            final String htmlContent = String.format("<html><b>%s</b><br>%s</html>", title, message);
-
-            final Balloon balloon = JBPopupFactory.getInstance()
-                    .createHtmlTextBalloonBuilder(htmlContent, MessageType.INFO, null)
-                    .setFadeoutTime(5000)
-                    .setAnimationCycle(200)
-                    .createBalloon();
-
-            final Point targetPoint = new Point(statusBarComponent.getWidth() - 30, statusBarComponent.getHeight() / 2);
-            final RelativePoint relativePoint = new RelativePoint(statusBarComponent, targetPoint);
-
-            balloon.show(relativePoint, Balloon.Position.above);
-        });
+        showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", title, message));
     }
 
     public void softShow(final @NotNull Project p, final @NotNull String message) {
+        showBalloon(p, String.format("<html>%s</html>", message));
+    }
 
+    /**
+     * Lightweight fading balloon anchored to the IDE status bar.
+     */
+    private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent) {
         ApplicationManager.getApplication().invokeLater(() -> {
             IdeFrame ideFrame = WindowManager.getInstance().getIdeFrame(p);
             if (ideFrame == null || ideFrame.getStatusBar() == null) return;
 
             final JComponent statusBarComponent = ideFrame.getStatusBar().getComponent();
             if (statusBarComponent == null) return;
-
-            final String htmlContent = String.format("<html>%s</html>", message);
 
             final Balloon balloon = JBPopupFactory.getInstance()
                     .createHtmlTextBalloonBuilder(htmlContent, MessageType.INFO, null)
@@ -68,80 +52,53 @@ public final class Notifier {
                     .createBalloon();
 
             final Point targetPoint = new Point(statusBarComponent.getWidth() - 30, statusBarComponent.getHeight() / 2);
-            final RelativePoint relativePoint = new RelativePoint(statusBarComponent, targetPoint);
-
-            balloon.show(relativePoint, Balloon.Position.above);
+            balloon.show(new RelativePoint(statusBarComponent, targetPoint), Balloon.Position.above);
         });
     }
 
     public void info(final @NotNull Project p, final @NotNull String message) {
-        NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(message, NotificationType.INFORMATION)
-                .notify(p);
+        notify(p, null, message, NotificationType.INFORMATION);
     }
 
     public void warn(final @NotNull Project p, final @NotNull String message) {
-        NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(message, NotificationType.WARNING)
-                .notify(p);
+        notify(p, null, message, NotificationType.WARNING);
     }
 
     public void error(final @NotNull Project p, final @NotNull String message) {
-        NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(message, NotificationType.ERROR)
-                .notify(p);
+        notify(p, null, message, NotificationType.ERROR);
     }
 
     public void info(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
-        NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(title, message, NotificationType.INFORMATION)
-                .notify(p);
+        notify(p, title, message, NotificationType.INFORMATION);
     }
 
     public void warn(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
-        NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(title, message, NotificationType.WARNING)
-                .notify(p);
+        notify(p, title, message, NotificationType.WARNING);
     }
 
     public void error(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
-        NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(title, message, NotificationType.ERROR)
-                .notify(p);
+        notify(p, title, message, NotificationType.ERROR);
     }
 
     public void warnWithAction(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {
-        final Notification notification = NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(title, message, NotificationType.WARNING);
-
-        notification.addAction(NotificationAction.createSimple(actionName, action));
-        notification.notify(p);
+        warnWithActions(p, title, message, NotificationAction.createSimple(actionName, action));
     }
 
     public void warnWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
-        final Notification notification = NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(title, message, NotificationType.WARNING);
-        for (final NotificationAction action : actions) notification.addAction(action);
-        notification.notify(p);
+        notify(p, title, message, NotificationType.WARNING, actions);
     }
 
     public Notification infoWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
-        final Notification notification = NotificationGroupManager.getInstance()
-                .getNotificationGroup(GROUP_ID)
-                .createNotification(title, message, NotificationType.INFORMATION);
+        return notify(p, title, message, NotificationType.INFORMATION, actions);
+    }
 
-        for (NotificationAction action : actions) {
-            notification.addAction(action);
-        }
+    private Notification notify(final @NotNull Project p, final String title, final @NotNull String message,
+                                final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
+        final Notification notification = title == null
+                ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(message, type)
+                : NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(title, message, type);
 
+        for (final NotificationAction action : actions) notification.addAction(action);
         notification.notify(p);
         return notification;
     }

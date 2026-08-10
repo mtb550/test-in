@@ -74,10 +74,14 @@ public class StatusBar extends JBPanel<StatusBar> {
         pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
         pageSizeField.setToolTipText("Test cases per page");
 
-        ///makeCompact(firstButton, dynamicSmallFont);
+        makeCompact(firstButton, dynamicSmallFont);
         makeCompact(prevButton, dynamicSmallFont);
         makeCompact(nextButton, dynamicSmallFont);
-        ///makeCompact(lastButton, dynamicSmallFont);
+        makeCompact(lastButton, dynamicSmallFont);
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("First page"))
+                .installOn(firstButton);
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text("Previous page"))
@@ -89,13 +93,16 @@ public class StatusBar extends JBPanel<StatusBar> {
                 .setShortcut(KeyboardSet.NextTestCase.getShortcutText())
                 .installOn(nextButton);
 
-        ///paginationPanel.add(firstButton);
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("Last page"))
+                .installOn(lastButton);
+
+        paginationPanel.add(firstButton);
         paginationPanel.add(prevButton);
         paginationPanel.add(currentPageLabel);
-        ///paginationPanel.add(new JBLabel(" | Per page:"));
         paginationPanel.add(pageSizeField);
         paginationPanel.add(nextButton);
-        ///paginationPanel.add(lastButton);
+        paginationPanel.add(lastButton);
 
         add(statusLabel, BorderLayout.WEST);
         add(paginationPanel, BorderLayout.CENTER);
@@ -114,18 +121,22 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     public void updatePaginationState(final int currentPage, final int totalPages, final int totalCount) {
-        ///statusLabel.setText(String.format(Locale.ENGLISH,"Showing %d of %d test cases", visibleCount, totalCount));
         statusLabel.setText(String.format(Locale.ENGLISH, "0 of %d test cases", totalCount));
-
         currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
-
         syncLabel.setText("Last updated: " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
 
         firstButton.setEnabled(currentPage > 1);
         prevButton.setEnabled(currentPage > 1);
         nextButton.setEnabled(currentPage < totalPages);
         lastButton.setEnabled(currentPage < totalPages);
+    }
+
+    /**
+     * Stops the clock timer. Must be called when the owning editor is disposed —
+     * a running Swing Timer keeps this component strongly referenced forever.
+     */
+    public void dispose() {
+        clockTimer.stop();
     }
 
     public void updateSelectionState(final int[] selectedIndices, final int currentPage, final int pageSize, final int totalCount) {

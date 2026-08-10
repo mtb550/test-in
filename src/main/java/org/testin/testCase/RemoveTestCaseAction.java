@@ -17,7 +17,10 @@ import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.KeyboardSet;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class RemoveTestCaseAction extends DumbAwareAction {
     private final DirectoryDto dir;
@@ -50,21 +53,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
     }
 
     private void performDeletion(final List<TestCaseDto> selectedItems) {
-        int firstIdx = model.getElementIndex(selectedItems.getFirst());
-        int lastIdx = model.getElementIndex(selectedItems.getLast());
-
-        TestCaseDto successor = (model.getSize() > lastIdx + 1) ? model.getElementAt(lastIdx + 1) : null;
-
-        if (firstIdx == 0) {
-            if (successor != null) {
-                successor.setIsHead(true);
-                saveToFile(successor);
-            }
-        } else {
-            TestCaseDto predecessor = model.getElementAt(firstIdx - 1);
-            predecessor.setNext(successor != null ? successor.getId() : null);
-            saveToFile(predecessor);
-        }
+        relinkAroundRemoved(selectedItems);
 
         final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
         for (final TestCaseDto tc : selectedItems) {
@@ -74,6 +63,44 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
             model.remove(model.getElementIndex(selectedItems.get(i)));
+        }
+    }
+
+    /**
+     * Stitches the linked list past every removed node. Handles non-contiguous
+     * selections: each removed run is bridged by its surrounding survivors —
+     * relinking only around first/last selected would leave middle survivors
+     * unreachable and silently break the ordering.
+     */
+    private void relinkAroundRemoved(final List<TestCaseDto> selectedItems) {
+        final Set<UUID> removedIds = new HashSet<>();
+        for (final TestCaseDto tc : selectedItems) removedIds.add(tc.getId());
+
+        TestCaseDto prevSurvivor = null;
+        int i = 0;
+        while (i < model.getSize()) {
+            final TestCaseDto tc = model.getElementAt(i);
+            if (!removedIds.contains(tc.getId())) {
+                prevSurvivor = tc;
+                i++;
+                continue;
+            }
+
+            // A run of removed rows: find the survivor after it.
+            int j = i;
+            while (j < model.getSize() && removedIds.contains(model.getElementAt(j).getId())) j++;
+            final TestCaseDto nextSurvivor = j < model.getSize() ? model.getElementAt(j) : null;
+
+            if (prevSurvivor == null) {
+                if (Boolean.TRUE.equals(tc.getIsHead()) && nextSurvivor != null) {
+                    nextSurvivor.setIsHead(true);
+                    saveToFile(nextSurvivor);
+                }
+            } else {
+                prevSurvivor.setNext(nextSurvivor != null ? nextSurvivor.getId() : null);
+                saveToFile(prevSurvivor);
+            }
+            i = j;
         }
     }
 

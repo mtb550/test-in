@@ -16,8 +16,8 @@ public class ProjectPanelActions {
     public List<AnAction> create(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         return List.of(
                 new OpenSettingsAction(p),
-                new ExpandAllAction(p, pp),
-                new CollapseAllAction(p, pp),
+                new ExpandAllAction(pp),
+                new CollapseAllAction(pp),
                 new RefreshAction(p, pp),
                 new CreateTestProjectAction(p, pp)
         );

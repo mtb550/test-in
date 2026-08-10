@@ -151,7 +151,9 @@ public class ImportAction extends DumbAwareAction {
                 Services.getInstance(p, Notifier.class).info(p, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
             }
 
-            targetDirectory.refresh(false, true);
+            // Asynchronous refresh: a synchronous recursive VFS refresh inside a
+            // write action is disallowed by the platform and can freeze the IDE.
+            targetDirectory.refresh(true, true);
             ApplicationManager.getApplication().invokeLater(() ->
                     Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh()
             );

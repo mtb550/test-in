@@ -9,6 +9,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.TestRunItems;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testRun.updateDialog.RunItemEditSection;
 
 import javax.swing.*;
@@ -84,8 +85,11 @@ public class ActualResultSection implements RunItemEditSection {
 
     @Override
     public void fillData(final @NotNull TestRunItems runItem) {
-        descriptionLabel.setText(runItem.getTc().getDescription());
-        expectedResultLabel.setText(runItem.getTc().getExpectedResult());
+        // tc is wired lazily by the run editor; a run item whose test case no longer
+        // exists in the test set never gets it assigned.
+        final TestCaseDto tc = runItem.getTc();
+        descriptionLabel.setText(tc != null ? tc.getDescription() : "");
+        expectedResultLabel.setText(tc != null ? tc.getExpectedResult() : "");
         actualResultField.setText(runItem.getActualResult());
     }
 

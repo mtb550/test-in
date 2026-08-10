@@ -53,8 +53,8 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
         addSeparator();
 
-        add(new NextPageAction(p, ui, list));
-        add(new PrevPageAction(p, ui, list));
+        add(new NextPageAction(ui, list));
+        add(new PrevPageAction(ui, list));
     }
 
     @Override

@@ -141,11 +141,6 @@
     <applicationListeners>
 
         <listener
-                class="org.testin.listeners.IntellijCloseListenerImpl"
-                topic="com.intellij.ide.AppLifecycleListener"
-        />
-
-        <listener
                 class="org.testin.listeners.ProjectCloseListenerImpl"
                 topic="com.intellij.openapi.project.ProjectCloseListener"
         />

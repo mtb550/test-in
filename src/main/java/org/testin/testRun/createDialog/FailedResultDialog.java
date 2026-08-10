@@ -105,8 +105,12 @@ public class FailedResultDialog {
                 .addListener(new JBPopupListener() {
                     @Override
                     public void onClosed(@NotNull LightweightWindowEvent event) {
-                        applyChanges();
-                        onSave.run();
+                        // Save only on OK. Without this check, Escape/cancel also committed
+                        // the edit, and the Enter shortcut saved twice.
+                        if (event.isOk()) {
+                            applyChanges();
+                            onSave.run();
+                        }
                     }
                 })
                 .createPopup();
@@ -124,11 +128,8 @@ public class FailedResultDialog {
         DumbAwareAction saveAction = new DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
+                // closeOk fires onClosed with isOk() == true, which applies and saves once.
                 if (popup != null) {
-                    applyChanges();
-                    if (onSave != null) {
-                        onSave.run();
-                    }
                     popup.closeOk(null);
                 }
             }

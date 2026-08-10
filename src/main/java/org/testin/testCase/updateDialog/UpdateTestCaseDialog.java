@@ -23,12 +23,14 @@ import java.util.function.Consumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
-    private @NotNull JBPopup popup;
+    private JBPopup popup;
 
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 
         IUIAction repackPopup = () -> {
+            // fillData can run this callback before the popup is created.
+            if (popup == null) return;
             popup.pack(false, true);
 
             ApplicationManager.getApplication().invokeLater(() -> {

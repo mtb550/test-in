@@ -56,16 +56,16 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    protected void addStatusBadge(final JBLabel statusLabel) {
-        if (statusLabel != null) {
-            badgePanel.add(statusLabel);
-        }
-    }
+    /**
+     * Size delta of the card title over the list font. Shared with the mouse hit-testing
+     * in {@code MouseListenerImpl} so hover targets line up with the painted icons.
+     */
+    public static final float TITLE_FONT_DELTA = 3.0f;
 
     public void applyListFont(final Font listFont) {
         float baseSize = listFont.getSize2D();
 
-        descriptionLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + 3.0f));
+        descriptionLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + TITLE_FONT_DELTA));
 
         for (JBLabel lbl : attributeLabels.values()) {
             lbl.setFont(listFont.deriveFont(baseSize));

@@ -84,22 +84,6 @@ public final class Tools {
         return StringUtil.capitalize(s) + ".";
     }
 
-    public String toCamelCase(final String text) {
-        if (text == null || text.isEmpty()) return text;
-        String[] words = text.split("[\\W_]+");
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
-            if (word.isEmpty()) continue;
-            if (i == 0) {
-                result.append(word.substring(0, 1).toLowerCase()).append(word.substring(1).toLowerCase());
-            } else {
-                result.append(word.substring(0, 1).toUpperCase()).append(word.substring(1).toLowerCase());
-            }
-        }
-        return result.toString();
-    }
-
     public String getFormattedDuration(final Duration duration) {
         if (duration == null) return null;
         return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
@@ -120,21 +104,6 @@ public final class Tools {
 
         Logger.warn("[WARNING] No Test Source Root found in the project.");
         return null;
-    }
-
-    public String toPascalCase(String text) {
-        if (text == null || text.trim().isEmpty()) return "";
-
-        String[] words = text.split("[\\s_\\-]+");
-        StringBuilder pascalCase = new StringBuilder();
-
-        for (String word : words) {
-            if (!word.isEmpty()) {
-                pascalCase.append(Character.toUpperCase(word.charAt(0)))
-                        .append(word.substring(1).toLowerCase());
-            }
-        }
-        return pascalCase.toString();
     }
 
     public void openWithAssociatedProgram(final @NotNull Project p, final VirtualFile virtualFile) {

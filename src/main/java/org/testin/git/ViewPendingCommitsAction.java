@@ -240,8 +240,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             @Override
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                indicator.setText("Syncing with remote (Pull --rebase)...");
-                indicator.setText("Pushing commits...");
+                indicator.setText("Syncing with remote (pull --rebase, then push)...");
                 try {
                     commits.pullAndPush(repoPath, remote, branch);
                     ApplicationManager.getApplication().invokeLater(() -> {

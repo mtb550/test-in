@@ -80,16 +80,6 @@ public class ViewPanel implements Disposable {
         });
     }
 
-    public void show(final @NotNull Project p, final List<TestCaseDto> testCases, final ArrayList<String> path, final ViewTab tab) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
-        if (tw == null) return;
-
-        tw.show(() -> {
-            this.selectContent(tab);
-            this.updateList(testCases, path);
-        });
-    }
-
     public void show(final List<TestCaseDto> testCases, final ArrayList<String> path) {
         this.show(p, testCases, path);
     }
@@ -164,5 +154,9 @@ public class ViewPanel implements Disposable {
         detailsTab.removeAll();
         historyTab.removeAll();
         openBugsTab.removeAll();
+
+        // Otherwise the static reference keeps this panel (and its project) alive
+        // after the project is closed, and other projects would operate on it.
+        ViewToolWindowFactory.onPanelDisposed(this);
     }
 }

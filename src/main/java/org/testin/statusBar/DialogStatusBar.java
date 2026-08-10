@@ -14,7 +14,7 @@ public final class DialogStatusBar extends StatusBarBase {
         });
     }
 
-    public DialogStatusBar(final IStatusBarItem[] items) {
+    private DialogStatusBar(final IStatusBarItem[] items) {
         super(items);
     }
 

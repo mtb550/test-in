@@ -20,7 +20,8 @@ public class TestToolBar extends AbstractToolbarPanel {
                 new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules),
                 new ListViewBtn(getCallbacks()::onToolBarSwitchedToListView),
                 new GridViewBtn(getCallbacks()::onToolBarSwitchedToGridView)
-                // todo, why tool bar search not here ?
+                // The search field is created and laid out by AbstractToolbarPanel itself
+                // because it needs its own horizontal-fill constraints.
         );
     }
 }

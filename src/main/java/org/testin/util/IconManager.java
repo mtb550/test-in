@@ -14,10 +14,6 @@ public class IconManager {
         return createScaledIcon(color, DEFAULT_FACTOR);
     }
 
-    public static Icon createZoomedIcon(final Color color) {
-        return createScaledIcon(color, SCALE_FACTOR);
-    }
-
     public static Icon zoomStandardIcon(final Icon icon, final Component contextComponent) {
         return IconUtil.scale(icon, contextComponent, SCALE_FACTOR);
     }

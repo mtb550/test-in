@@ -98,31 +98,31 @@ public enum GeneratorType {
     UPDATE_TEST_CASE_EXPECTED_RESULT(
             "Update Test Case",
             "Update Automation Test Method Expected Result",
-            new UpdateTestExpectedResult()
+            new NoOpCodeUpdate("expected result")
     ),
 
     UPDATE_TEST_CASE_MODULE(
             "Update Test Case",
-            "Update Automation Test Method Groups",
-            new UpdateTestModule()
+            "Update Automation Test Method Module",
+            new NoOpCodeUpdate("module")
     ),
 
     UPDATE_TEST_CASE_TEST_DATA(
             "Update Test Case",
             "Update Automation Test Method Test Data",
-            new UpdateTestTestData()
+            new NoOpCodeUpdate("test data")
     ),
 
     UPDATE_TEST_CASE_PRE_CONDITIONS(
             "Update Test Case",
             "Update Automation Test Method Pre Conditions",
-            new UpdateTestPreCondition()
+            new NoOpCodeUpdate("pre-conditions")
     ),
 
     UPDATE_TEST_CASE_STEPS(
             "Update Test Case",
             "Update Automation Test Method Steps",
-            new UpdateTestSteps()
+            new NoOpCodeUpdate("steps")
     ),
 
     UPDATE_TEST_CASE_GROUP(
@@ -140,7 +140,7 @@ public enum GeneratorType {
     UPDATE_TEST_CASE_ORDER(
             "Update Test Case",
             "Update Automation Test Method Order",
-            new UpdateTestOrder()
+            new NoOpCodeUpdate("order")
     );
 
     private final @NotNull String description;

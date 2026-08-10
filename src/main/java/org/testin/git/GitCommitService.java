@@ -5,9 +5,11 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Local Git repository operations used by the pending-commit workflow.
@@ -31,11 +33,11 @@ public final class GitCommitService {
         final Set<String> paths = selectedChanges.stream()
                 .map(TestCaseDiff::relativeFilePath)
                 .map(path -> path.toString().replace('\\', '/'))
-                .collect(java.util.stream.Collectors.toCollection(LinkedHashSet::new));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
         if (paths.isEmpty()) throw new IllegalArgumentException("No Git changes were selected");
 
-        GitCommandRunner.execute(project, repositoryPath, withPaths("git", "add", "--", paths));
-        GitCommandRunner.execute(project, repositoryPath, withPaths("git", "commit", "--only", "-m", message, paths));
+        GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "add", "--"));
+        GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "commit", "--only", "-m", message, "--"));
     }
 
     public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
@@ -62,35 +64,13 @@ public final class GitCommitService {
         Logger.info("Git push completed for " + repositoryPath);
     }
 
-    private String[] withPaths(
-            final String command,
-            final String firstArgument,
-            final String secondArgument,
-            final Set<String> paths) {
-        final String[] result = new String[3 + paths.size()];
-        result[0] = command;
-        result[1] = firstArgument;
-        result[2] = secondArgument;
-        int index = 3;
-        for (final String path : paths) result[index++] = path;
-        return result;
-    }
-
-    private String[] withPaths(
-            final String command,
-            final String firstArgument,
-            final String secondArgument,
-            final String thirdArgument,
-            final String fourthArgument,
-            final Set<String> paths) {
-        final String[] result = new String[6 + paths.size()];
-        result[0] = command;
-        result[1] = firstArgument;
-        result[2] = secondArgument;
-        result[3] = thirdArgument;
-        result[4] = fourthArgument;
-        result[5] = "--";
-        int index = 6;
+    /**
+     * Appends the path set after the fixed arguments. Call sites include the
+     * {@code "--"} separator explicitly so the full command stays readable.
+     */
+    private String[] withPaths(final Set<String> paths, final String... fixedArgs) {
+        final String[] result = Arrays.copyOf(fixedArgs, fixedArgs.length + paths.size());
+        int index = fixedArgs.length;
         for (final String path : paths) result[index++] = path;
         return result;
     }

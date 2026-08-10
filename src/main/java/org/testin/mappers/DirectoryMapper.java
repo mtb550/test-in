@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.*;
@@ -32,11 +33,8 @@ public final class DirectoryMapper {
                 .path2(Services.getInstance(p, Tools.class).buildPath2(null, fileName))
                 .build();
 
-        final TestCasesMainDirectoryDto tcd = setTestCasesRootNode(p, path, tp);
-        final TestRunsMainDirectoryDto trd = setTestRunsRootNode(p, path, tp);
-
-        tp.setTestCasesDirectory(tcd);
-        tp.setTestRunsDirectory(trd);
+        tp.setTestCasesDirectory(getTestCasesRootNode(p, path, tp));
+        tp.setTestRunsDirectory(getTestRunsRootNode(p, path, tp));
 
         return tp;
     }
@@ -73,30 +71,12 @@ public final class DirectoryMapper {
         }
     }
 
-    public @NotNull TestCasesMainDirectoryDto setTestCasesRootNode(final @NotNull Project p, final Path path, final TestProjectDirectoryDto tp) {
-        return TestCasesMainDirectoryDto.builder()
-                .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
-                .name(DirectoryType.TCD.getDisplayedName())
-                .parent(tp)
-                .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
-                .build();
-    }
-
     public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project p, final Path path, final TestProjectDirectoryDto tp) {
         return TestCasesMainDirectoryDto.builder()
                 .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
                 .name(DirectoryType.TCD.getDisplayedName())
                 .parent(tp)
                 .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
-                .build();
-    }
-
-    public @NotNull TestRunsMainDirectoryDto setTestRunsRootNode(final @NotNull Project p, final Path path, final TestProjectDirectoryDto tp) {
-        return TestRunsMainDirectoryDto.builder()
-                .path(path.resolve(DirectoryType.TRD.getDisplayedName()))
-                .name(DirectoryType.TRD.getDisplayedName())
-                .parent(tp)
-                .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
                 .build();
     }
 
@@ -151,33 +131,9 @@ public final class DirectoryMapper {
         }
     }
 
-    public @NotNull TestSetDirectoryDto setTestSetNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
-        final String fileName = path.getFileName().toString();
-        try {
-            Logger.info("retrieve the test set directory: " + fileName);
-
-            TestSetDirectoryDto testSetDirectoryDto = TestSetDirectoryDto
-                    .builder()
-                    .name(fileName)
-                    .path(path)
-                    .parent(parent)
-                    .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
-                    .build();
-
-            Logger.info("retrieve the test set directory: " + testSetDirectoryDto);
-            return testSetDirectoryDto;
-
-        } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, "Read Test Set Failed", "Failed to parse directory: " + fileName);
-            Logger.error("readTestSetNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
-            throw new RuntimeException(ex);
-        }
-    }
-
     public @NotNull TestSetDirectoryDto getTestSetNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
-            Logger.info("retrieve the test set directory: " + fileName);
             TestSetDirectoryDto testSetDirectoryDto = TestSetDirectoryDto
                     .builder()
                     .name(fileName)
@@ -196,45 +152,37 @@ public final class DirectoryMapper {
         }
     }
 
+    /**
+     * Builds a run node without reading the marker file (used when creating a new run).
+     */
     public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
-        final String fileName = path.getFileName().toString();
-        try {
-
-            TestRunDirectoryDto testRunDirectoryDto = TestRunDirectoryDto
-                    .builder()
-                    .name(fileName)
-                    .path(path)
-                    .parent(parent)
-                    .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
-                    .build();
-
-            Logger.info("retrieve the test run directory: " + testRunDirectoryDto);
-            return testRunDirectoryDto;
-
-        } catch (final Exception ex) {
-            Services.getInstance(p, Notifier.class).error(p, "Read Test Run Failed", "Failed to parse directory: " + fileName);
-            Logger.error("readTestRunNode: Failed to parse directory '" + fileName + "' at " + path.toAbsolutePath() + ": " + ex.getMessage());
-            throw new RuntimeException(ex);
-        }
+        return buildTestRunNode(p, path, parent, null);
     }
 
+    /**
+     * Builds a run node, reading its marker from disk (used when indexing an existing run).
+     */
     public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
+        final TestRunMarker marker = readMarkerSafe(Services.getInstance(p, Mapper.class),
+                path.resolve(DirectoryType.TR.getMarker()).toFile(), TestRunMarker.class, "run", fileName);
+        return buildTestRunNode(p, path, parent, marker);
+    }
+
+    private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final Path path,
+                                                          final DirectoryDto parent, final @Nullable TestRunMarker marker) {
+        final String fileName = path.getFileName().toString();
         try {
-            final Path markerPath = path.resolve(DirectoryType.TR.getMarker());
-            final TestRunMarker marker = readMarkerSafe(Services.getInstance(p, Mapper.class),
-                    markerPath.toFile(), TestRunMarker.class, "run", fileName);
-
-
-            TestRunDirectoryDto testRunDirectoryDto = TestRunDirectoryDto
+            final var builder = TestRunDirectoryDto
                     .builder()
                     .name(fileName)
                     .path(path)
                     .parent(parent)
-                    .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
-                    .marker(marker)
-                    .build();
+                    .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName));
 
+            if (marker != null) builder.marker(marker);
+
+            final TestRunDirectoryDto testRunDirectoryDto = builder.build();
             Logger.info("retrieve the test run directory: " + testRunDirectoryDto);
             return testRunDirectoryDto;
 

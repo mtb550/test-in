@@ -6,8 +6,6 @@ import org.testin.enums.Priority;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 
-import java.util.List;
-
 public class PriorityBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
     public PriorityBulkSectionDialog(final @NotNull Project p) {
@@ -20,44 +18,26 @@ public class PriorityBulkSectionDialog extends JsonSplitBulkSectionDialog {
     }
 
     @Override
+    protected String getJsonFieldName() {
+        return "priority";
+    }
+
+    @Override
+    protected boolean acceptsBlank() {
+        return false;
+    }
+
+    @Override
     protected String getOriginalValue(final TestCaseDto tc) {
         return tc.getPriority().name();
     }
 
     @Override
-    protected void appendJsonItem(final TestCaseDto tc, int index, boolean isLast, StringBuilder leftSb, StringBuilder rightSb, List<int[]> rightEditableRanges) {
-        String id = escapeJson(tc.getId().toString());
-        String escapedDescription = escapeJson(tc.getDescription());
-        // todo, add expected result to be shown once update bulk Priority
-        String priorityStr = tc.getPriority().name();
-        String escapedPriority = escapeJson(priorityStr);
-
-        String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"description\": \"" + escapedDescription + "\",\n    \"priority\": \"";
-        String suffix = "\"\n  }";
-        String comma = isLast ? "\n" : ",\n";
-
-        leftSb.append(prefix).append(escapedPriority).append(suffix).append(comma);
-
-        rightSb.append(prefix);
-        int startOffset = rightSb.length();
-        rightSb.append(escapedPriority);
-        int endOffset = rightSb.length();
-        rightEditableRanges.add(new int[]{startOffset, endOffset});
-        rightSb.append(suffix).append(comma);
-    }
-
-    @Override
-    protected void applyValues(final List<TestCaseDto> items, final List<String> newValues) {
-        for (int i = 0; i < items.size(); i++) {
-            String val = newValues.get(i).trim();
-            if (!val.isEmpty()) {
-                try {
-                    items.get(i).setPriority(Priority.valueOf(val.toUpperCase()));
-
-                } catch (final IllegalArgumentException ex) {
-                    Logger.error(ex.getMessage());
-                }
-            }
+    protected void setValue(final TestCaseDto tc, final String value) {
+        try {
+            tc.setPriority(Priority.valueOf(value.toUpperCase()));
+        } catch (final IllegalArgumentException ex) {
+            Logger.error(ex.getMessage());
         }
     }
 }

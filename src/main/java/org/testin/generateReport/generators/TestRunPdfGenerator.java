@@ -32,7 +32,6 @@ import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.settings.AppSettingsState;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -71,17 +70,15 @@ public final class TestRunPdfGenerator {
     );
 
     public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            PdfWriter writer = new PdfWriter(baos);
-            PdfDocument pdf = new PdfDocument(writer);
-            Document document = new Document(pdf);
+        // try-with-resources: closing the Document also closes the PdfDocument and
+        // PdfWriter, including on any failure path inside the body.
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+             Document document = new Document(new PdfDocument(new PdfWriter(baos)))) {
+            PdfDocument pdf = document.getPdfDocument();
 
             PdfFont boldFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
-
-            String cleanName = tr.getChangeLog().replace(".json", "");
-
 
             String projectName = "";
             TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getSelectedItem();
@@ -89,11 +86,6 @@ public final class TestRunPdfGenerator {
             if (selectedProject != null) {
                 projectName = selectedProject.getName();
             }
-
-
-            AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-            String testerName = settings.testerName.trim();
-            String testerRole = settings.testerRole;
 
             // TITLE
             document.add(new Paragraph("TEST SUMMARY REPORT")
@@ -302,7 +294,7 @@ public final class TestRunPdfGenerator {
             document.close();
             return baos.toByteArray();
 
-        } catch (final IOException ex) {
+        } catch (final Exception ex) {
             Logger.error("PDF generation failed: " + ex.getMessage());
             throw new RuntimeException(ex);
         }

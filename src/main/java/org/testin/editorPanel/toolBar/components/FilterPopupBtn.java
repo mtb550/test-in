@@ -11,7 +11,6 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.enums.Group;
@@ -52,7 +51,7 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
     @NotNull
     private final IToolBar callbacks;
 
-    public FilterPopupBtn(final @NonNull IToolBar callbacks, final @NonNull Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final @NonNull Supplier<Set<String>> availableModulesSupplier) {
+    public FilterPopupBtn(final @NotNull IToolBar callbacks, final @NotNull Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier) {
         super("Filter", AllIcons.General.Filter);
         this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;

@@ -13,9 +13,11 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.enums.TestEditorAttributes;
 import org.testin.generateJavaCode.GeneratorAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.mappers.Config;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
@@ -25,10 +27,10 @@ import org.testin.settings.Setting;
 import org.testin.testCase.createDialog.TestCaseUpdateMenuDialog;
 import org.testin.util.FontSync;
 import org.testin.util.KeyboardSet;
+import org.testin.util.Tools;
 import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 import org.testin.viewPanel.details.components.*;
-import org.testin.viewPanel.details.components.Module;
 
 import javax.swing.*;
 import java.awt.*;
@@ -94,26 +96,36 @@ public class DetailsTab {
         addVerticalSpacer(panel, row);
     }
 
+    /**
+     * Rows shown in the details panel, in display order. Rows with custom rendering
+     * are dedicated components; plain label/value rows are table-driven.
+     */
+    private List<BaseDetails> detailRows(final ArrayList<String> currentPath) {
+        return List.of(
+                new NavigationBar(currentPath),
+                new Id(),
+                new Title(),
+                new ActionIcons(),
+                new Badges(),
+                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT, (p, dto) -> Services.getInstance(p, Tools.class).format(dto.getExpectedResult())),
+                new Steps(),
+                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS, (p, dto) -> Services.getInstance(p, Tools.class).format(dto.getPreConditions())),
+                new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> Services.getInstance(p, Tools.class).format(dto.getTestData())),
+                new Fqcn(),
+                new AttributeRow(TestEditorAttributes.REFERENCE, (p, dto) -> Services.getInstance(p, Tools.class).format(dto.getReference())),
+                new AttributeRow(TestEditorAttributes.MODULE, (p, dto) -> Services.getInstance(p, Tools.class).format(dto.getModule())),
+                new AttributeRow(TestEditorAttributes.CREATE_BY, (p, dto) -> dto.getCreatedBy()),
+                new AttributeRow(TestEditorAttributes.UPDATE_BY, (p, dto) -> dto.getUpdatedBy()),
+                new AttributeRow(TestEditorAttributes.CREATE_AT, (p, dto) -> dto.getCreatedAt().format(Config.getDateFormatterPattern())),
+                new AttributeRow(TestEditorAttributes.UPDATE_AT, (p, dto) -> dto.getUpdatedAt().format(Config.getDateFormatterPattern()))
+        );
+    }
+
     private int setupFixedRows(final @NotNull Project p, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final ArrayList<String> currentPath) {
         int row = 0;
-
-        row = new NavigationBar(currentPath).render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Id().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Title().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new ActionIcons().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Badges().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new ExpectedResult().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Steps().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new PreConditions().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new TestData().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Fqcn().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Reference().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new Module().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new CreatedBy().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new UpdatedBy().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new CreatedAt().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-        row = new UpdatedAt().render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
-
+        for (final BaseDetails component : detailRows(currentPath)) {
+            row = component.render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
+        }
         return row;
     }
 

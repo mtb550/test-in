@@ -1,5 +1,6 @@
 package org.testin.editorPanel.grid;
 
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
@@ -14,6 +15,7 @@ import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 import javax.swing.border.Border;
+import javax.swing.event.TableModelEvent;
 import javax.swing.plaf.basic.BasicTableUI;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
@@ -25,12 +27,19 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 public class GridPanelBuilder {
 
     static final int CELL_PADDING = 10;
     private static final int MAX_COL_WIDTH = 500;
+
+    /**
+     * Client property holding the table kind ("test"/"run"), used to key the
+     * persisted user column widths so they survive grid rebuilds and restarts.
+     */
+    private static final String GRID_KIND_KEY = "testin.grid.kind";
     static final Color GRID_COLOR = JBColor.border();
     static final Color SELECTION_BACKGROUND = EditorColors.SELECTION_BACKGROUND;
     private static final Color EVEN_ROW_COLOR = new JBColor(Gray._245, Gray._60);
@@ -75,8 +84,9 @@ public class GridPanelBuilder {
                 textArea.setText(value == null ? "" : value.toString());
                 textArea.setFont(table.getFont());
                 textArea.setForeground(table.getForeground());
-                final boolean isSelectedRow = table.getSelectedRow() == row;
-                wrapper.setBackground(isSelectedRow ? SELECTION_BACKGROUND : rowColor(row));
+                // Per-cell selection background (multi-interval selection: only the
+                // cells inside the selection are highlighted, like Excel/DataGrip).
+                wrapper.setBackground(isSelected ? SELECTION_BACKGROUND : rowColor(row));
 
                 if (isSelected) {
                     // Keep the same insets as an unselected cell so selection never
@@ -114,6 +124,24 @@ public class GridPanelBuilder {
         }
     }
 
+    /**
+     * Re-measures row heights after cell values change (edit, paste, cut), so a
+     * value that now wraps to more lines becomes fully visible immediately.
+     * Coalesced via invokeLater: a block paste triggers one re-measure, not one per cell.
+     */
+    private static void installAutoRowHeight(final JBTable table, final DefaultTableModel model) {
+        final AtomicBoolean pending = new AtomicBoolean();
+        model.addTableModelListener(e -> {
+            if (e.getType() != TableModelEvent.UPDATE) return;
+            if (pending.compareAndSet(false, true)) {
+                SwingUtilities.invokeLater(() -> {
+                    pending.set(false);
+                    updateRowHeights(table);
+                });
+            }
+        });
+    }
+
     private static void addWheelScrollListener(final JBTable table) {
         table.addMouseWheelListener(new MouseAdapter() {
             @Override
@@ -129,10 +157,24 @@ public class GridPanelBuilder {
         });
     }
 
+    private static String widthKey(final Object kind, final Object header) {
+        return "testin.grid.colWidth." + kind + "." + header;
+    }
+
     private static void addColumnResizeListener(final JBTable table) {
         table.getColumnModel().addColumnModelListener(new javax.swing.event.TableColumnModelListener() {
             @Override
             public void columnMarginChanged(final javax.swing.event.ChangeEvent e) {
+                // getResizingColumn() is non-null only during a user drag-resize,
+                // so programmatic auto-sizing never overwrites the saved widths.
+                final TableColumn resizing = table.getTableHeader() != null
+                        ? table.getTableHeader().getResizingColumn() : null;
+                final Object kind = table.getClientProperty(GRID_KIND_KEY);
+                if (resizing != null && kind != null) {
+                    PropertiesComponent.getInstance()
+                            .setValue(widthKey(kind, resizing.getHeaderValue()), resizing.getWidth(), -1);
+                }
+
                 updateRowHeights(table);
             }
 
@@ -164,15 +206,24 @@ public class GridPanelBuilder {
         return null;
     }
 
-    public JBTable buildRunTable(final Project p, final List<TestCaseDto> testCases, final Set<RunEditorAttributes> attributes, final Map<UUID, TestRunItems> resultsMap) {
-        return buildRunTable(p, testCases, attributes, resultsMap, 0);
-    }
-
     private static void autoSizeColumns(final JBTable table) {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
+        final Object kind = table.getClientProperty(GRID_KIND_KEY);
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
             final TableColumn col = table.getColumnModel().getColumn(i);
+
+            // A width the user set by dragging wins over auto-sizing,
+            // so refreshes and page changes keep the chosen layout.
+            final int savedWidth = kind != null
+                    ? PropertiesComponent.getInstance().getInt(widthKey(kind, col.getHeaderValue()), -1)
+                    : -1;
+            if (savedWidth > 0) {
+                col.setPreferredWidth(savedWidth);
+                tableTotalWidth += savedWidth;
+                continue;
+            }
+
             int maxWidth;
 
             TableCellRenderer headerRenderer = col.getHeaderRenderer();
@@ -211,8 +262,12 @@ public class GridPanelBuilder {
 
         int index = firstItemIndex + 1;
         for (final TestCaseDto tc : testCases) {
-            final TestRunItems runItem = resultsMap.get(tc.getId());
-            if (runItem == null) continue;
+            // Never skip rows: callers map grid rows back to testCases by index,
+            // so a dropped row would make every following row act on the wrong test case.
+            TestRunItems runItem = resultsMap.get(tc.getId());
+            if (runItem == null) {
+                runItem = TestRunItems.builder().id(tc.getId()).tc(tc).build();
+            }
 
             final String[] row = new String[columns.length];
             row[0] = String.valueOf(index++);
@@ -226,10 +281,6 @@ public class GridPanelBuilder {
         final JBTable table = buildTable(columns, rows, false);
         applyColumnVisibility(table, ordered, RunEditorAttributes::getName, attributes);
         return table;
-    }
-
-    public JBTable buildTestTable(final Project p, final List<TestCaseDto> testCases, final Set<TestEditorAttributes> attributes) {
-        return buildTestTable(p, testCases, attributes, 0);
     }
 
     public JBTable buildTestTable(final Project p, final List<TestCaseDto> testCases, final Set<TestEditorAttributes> attributes, final int firstItemIndex) {
@@ -310,13 +361,15 @@ public class GridPanelBuilder {
         }
 
         final JBTable table = new JBTable(model);
+        table.putClientProperty(GRID_KIND_KEY, editable ? "test" : "run");
         // JBTable's IntelliJ UI paints a rollover background over table rows.
         // The grid renderer owns all row colors, so use the standard table UI here.
         table.setUI(new BasicTableUI());
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
-        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.setCellSelectionEnabled(true);
+        // Excel/DataGrip-style selection and clipboard (multi-cell selection,
+        // row selection via the "#" column, TSV copy/cut/paste).
+        GridExcelBehavior.install(table);
         table.setSelectionBackground(SELECTION_BACKGROUND);
         table.setSelectionForeground(table.getForeground());
         installEnterToEdit(table);
@@ -328,6 +381,7 @@ public class GridPanelBuilder {
         table.setExpandableItemsEnabled(false);
         addColumnResizeListener(table);
         addWheelScrollListener(table);
+        installAutoRowHeight(table, model);
         if (editable) {
             table.setDefaultEditor(Object.class, new GridCellEditor());
         }

@@ -73,6 +73,17 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final ModelSyncListener syncListener;
     private final Disposable projectDisposable;
 
+    /**
+     * Child disposable for the current grid table's font-sync subscription;
+     * replaced on every grid rebuild so old subscriptions do not accumulate.
+     */
+    private Disposable gridFontSyncDisposable;
+
+    /**
+     * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
+     */
+    private volatile int loadGeneration;
+
     @Getter
     @NotNull
     private final AbstractToolbarPanel toolBar;
@@ -188,6 +199,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     private void loadDataAsync() {
+        final int generation = ++loadGeneration;
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             indexer.awaitIndexing();
@@ -196,8 +208,13 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
             if (items.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() -> {
+                    if (generation != loadGeneration) return;
+                    allTestCases.clear();
+                    currentTestCases.clear();
+                    unsortedIds.clear();
                     list.setPaintBusy(false);
                     list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
+                    refreshView();
                 });
                 return;
             }
@@ -207,6 +224,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             final TestCaseSorter.SortResult result = TestCaseSorter.sortTestCases(p, items);
 
             ApplicationManager.getApplication().invokeLater(() -> {
+                if (generation != loadGeneration) return;
                 allTestCases.clear();
                 allTestCases.addAll(result.sortedList());
                 currentTestCases.clear();
@@ -273,8 +291,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         final int index = currentTestCases.indexOf(tc);
         if (index == -1) return;
 
-        final int page = (index / pageSize) + 1;
-        final int localIndex = index % pageSize;
+        final int safePageSize = Math.max(1, pageSize);
+        final int page = (index / safePageSize) + 1;
+        final int localIndex = index % safePageSize;
 
         if (page == this.currentPage) {
             list.setSelectedIndex(localIndex);
@@ -299,8 +318,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         sortAndIdentifyUnsorted();
         updateSequenceAndSaveAll();
 
+        // Asynchronous refresh: a synchronous recursive VFS refresh from the EDT is a platform violation.
         final VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(parent.getPath().toFile());
-        if (vDir != null) vDir.refresh(false, true);
+        if (vDir != null) vDir.refresh(true, true);
 
         refreshView();
         selectTestCase(tc);
@@ -454,7 +474,10 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
             gridTable = gridPanelBuilder.buildTestTable(p, pageItems, attributes, (currentPage - 1) * pageSize);
-            FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
+
+            if (gridFontSyncDisposable != null) Disposer.dispose(gridFontSyncDisposable);
+            gridFontSyncDisposable = Disposer.newDisposable(projectDisposable, "testin.testEditor.gridFontSync");
+            FontSync.syncWithNativeEditor(p, gridTable, gridFontSyncDisposable);
 
             gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
             gridTable.getModel().addTableModelListener(new GridEditListener(p, pageItems, model::allContentsChanged));
@@ -539,10 +562,15 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void dispose() {
+        // Releases the message-bus subscriptions (font sync, execution subscriber)
+        // registered against this editor's lifetime.
+        Disposer.dispose(projectDisposable);
+
         for (MouseListener listener : list.getMouseListeners())
             list.removeMouseListener(listener);
 
         toolBar.dispose();
+        statusBar.dispose();
 
         TestCaseDto selectedInThisFile = list.getSelectedValue();
 

@@ -4,7 +4,6 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.ProjectStatus;
 import org.testin.indexer.ProjectIndexer;
@@ -30,14 +29,10 @@ public class TestProjectSelector {
     private boolean isLoading = false;
 
     @Getter
-    @Setter
-    @NotNull
-    private DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList;
+    private final @NotNull DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList;
 
     @Getter
-    @Setter
-    @NotNull
-    private ComboBox<TestProjectDirectoryDto> selectedTestProject;
+    private final @NotNull ComboBox<TestProjectDirectoryDto> selectedTestProject;
 
     public TestProjectSelector(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         this.p = p;

@@ -12,6 +12,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,9 +20,9 @@ import java.util.Map;
 
 public class ExportHtml {
     private static final Map<Character, String> HTML_ESCAPES = Map.of(
-            '&', "&",
-            '<', "<",
-            '>', ">",
+            '&', "&amp;",
+            '<', "&lt;",
+            '>', "&gt;",
             '"', "&#34;",
             '\'', "&#39;"
     );
@@ -32,7 +33,9 @@ public class ExportHtml {
     }
 
     public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile)))) {
+        // Explicit UTF-8: the document declares <meta charset="UTF-8">, and the platform
+        // default charset (e.g. cp1252 on Windows) would mangle non-ASCII text.
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
             writeHtmlDocument(writer, p, sheetsData);
         } catch (final IOException ex) {
             Logger.error(ex.getMessage());

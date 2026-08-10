@@ -9,6 +9,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.AbstractEditorContextMenu;
+import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.IEditor;
 import org.testin.enums.CardHoverAction;
 import org.testin.logger.Logger;
@@ -163,7 +164,9 @@ public class MouseListenerImpl extends MouseAdapter {
 
         float baseSize = list.getFont().getSize2D();
 
-        final Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + 2.0f);
+        // Must match the painted title font, otherwise the hover hit targets drift
+        // away from the drawn icons as the title grows.
+        final Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
         final FontMetrics fm = list.getFontMetrics(titleFont);
 
         int dynamicYBound = fm.getHeight() + JBUI.scale(20);

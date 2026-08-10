@@ -30,6 +30,10 @@ public class CreateJavaPackage implements GeneratorAction {
                 }
 
                 VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));
+                if (vf == null) {
+                    Logger.error("Could not create package directory: " + String.join("/", fqcn));
+                    return;
+                }
                 Logger.info("Package created physically at: " + vf.getPath());
 
             } catch (final IOException ex) {

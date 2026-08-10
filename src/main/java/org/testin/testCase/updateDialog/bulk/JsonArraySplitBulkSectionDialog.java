@@ -310,7 +310,6 @@ public abstract class JsonArraySplitBulkSectionDialog {
                 .setCancelOnWindowDeactivation(false)
                 .setMovable(true)
                 .setResizable(true)
-                // todo, add disposer on close same as @CreateTestCaseUI
                 .createPopup();
 
         Runnable saveLogic = () -> {
@@ -469,6 +468,7 @@ public abstract class JsonArraySplitBulkSectionDialog {
         popup.addListener(new JBPopupListener() {
             @Override
             public void onClosed(@NotNull LightweightWindowEvent event) {
+                Disposer.dispose(docListenerDisposable);
                 if (!leftEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(leftEditor);
                 if (!rightEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(rightEditor);
             }
@@ -479,17 +479,26 @@ public abstract class JsonArraySplitBulkSectionDialog {
     }
 
     private void navigate(final int direction, Editor editor, final List<ItemMarker> markers) {
+        if (markers.isEmpty()) return;
+
         editor.getCaretModel().removeSecondaryCarets();
         int offset = editor.getCaretModel().getOffset();
         int currentIndex = 0;
         for (int i = 0; i < markers.size(); i++) {
-            if (offset >= markers.get(i).startOffset && offset <= markers.get(i).endOffset) {
+            // Use the live marker offsets: the snapshotted startOffset/endOffset
+            // go stale as soon as the user types, sending the caret to the wrong item.
+            final RangeMarker marker = markers.get(i).marker;
+            if (marker != null && marker.isValid()
+                    && offset >= marker.getStartOffset() && offset <= marker.getEndOffset()) {
                 currentIndex = i;
                 break;
             }
         }
         int targetIndex = (currentIndex + direction + markers.size()) % markers.size();
-        editor.getCaretModel().moveToOffset(markers.get(targetIndex).endOffset);
+        final RangeMarker target = markers.get(targetIndex).marker;
+        if (target != null && target.isValid()) {
+            editor.getCaretModel().moveToOffset(target.getEndOffset());
+        }
     }
 
     private int getNearestValidOffset(final int offset, final List<ItemMarker> markers) {

@@ -45,8 +45,8 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(new RunTestCaseAction(p, list));
         add(new NavigateToCodeAction(p, list));
         addSeparator();
-        add(new NextPageAction(p, ui, list));
-        add(new PrevPageAction(p, ui, list));
+        add(new NextPageAction(ui, list));
+        add(new PrevPageAction(ui, list));
     }
 
     @Override

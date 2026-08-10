@@ -53,26 +53,23 @@ public final class TestCaseCacheService implements Disposable {
     }
 
     public void load(final List<TestCaseDto> testCases) {
+        cacheAsync(testCases);
+    }
+
+    public void addNewItems(final List<TestCaseDto> tcs) {
+        cacheAsync(tcs);
+    }
+
+    private void cacheAsync(final List<TestCaseDto> testCases) {
         if (testCases == null || testCases.isEmpty()) return;
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 testCases.forEach(tc -> {
                     addDescription(tc.getDescription());
                     addExpectedResult(tc.getExpectedResult());
                     addModule(tc.getModule());
-                    Optional.of(tc.getSteps()).ifPresent(stepList -> stepList.forEach(this::addStep));
+                    // Jackson can leave steps null on hand-edited JSON despite the field default.
+                    Optional.ofNullable(tc.getSteps()).ifPresent(stepList -> stepList.forEach(this::addStep));
                 }));
-    }
-
-    public void addNewItems(final List<TestCaseDto> tcs) {
-        if (tcs == null || tcs.isEmpty()) return;
-        ApplicationManager.getApplication().executeOnPooledThread(() ->
-                tcs.forEach(tc -> {
-                    this.addDescription(tc.getDescription());
-                    this.addExpectedResult(tc.getExpectedResult());
-                    this.addModule(tc.getModule());
-                    tc.getSteps().forEach(this::addStep);
-                })
-        );
     }
 
     @Override

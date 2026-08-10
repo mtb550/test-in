@@ -128,8 +128,12 @@ public class UpdateRunItemDialog {
                 .addListener(new JBPopupListener() {
                     @Override
                     public void onClosed(@NotNull LightweightWindowEvent event) {
-                        applyChanges();
-                        onSave.accept(runItem);
+                        // Save only on OK; Escape/cancel must not commit, and the Enter
+                        // shortcut must not save twice.
+                        if (event.isOk()) {
+                            applyChanges();
+                            onSave.accept(runItem);
+                        }
                     }
                 })
                 .createPopup();
@@ -149,9 +153,8 @@ public class UpdateRunItemDialog {
         com.intellij.openapi.project.DumbAwareAction saveAction = new com.intellij.openapi.project.DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull com.intellij.openapi.actionSystem.AnActionEvent e) {
+                // closeOk fires onClosed with isOk() == true, which applies and saves once.
                 if (popup != null) {
-                    applyChanges();
-                    onSave.accept(runItem);
                     popup.closeOk(null);
                 }
             }

@@ -23,6 +23,12 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
     @Getter
     private static ViewPanel viewPanel;
 
+    static void onPanelDisposed(final ViewPanel panel) {
+        if (viewPanel == panel) {
+            viewPanel = null;
+        }
+    }
+
     public static ToolWindow getToolWindow(final @NotNull Project p) {
         return ToolWindowManager.getInstance(p).getToolWindow("testin.view");
     }
@@ -70,9 +76,6 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
             toolWindow.getContentManager().addContent(bugsTab);
 
             toolWindow.setTitleActions(new ViewPanelActions().create(viewPanel.getPage(), toolWindow.getComponent()));
-            ///toolWindow.setTitle(Bundle.getPluginName());
-            ///toolWindow.setStripeTitle(Bundle.getPluginName());
-
         });
     }
 

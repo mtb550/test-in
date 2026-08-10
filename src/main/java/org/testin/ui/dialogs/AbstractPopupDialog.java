@@ -6,7 +6,6 @@ import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.statusBar.DialogStatusBar;
-import org.testin.statusBar.IStatusBarItem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,24 +26,10 @@ public abstract class AbstractPopupDialog {
     protected AbstractPopupDialog(final @NotNull Project project,
                                   final @NotNull String title,
                                   final @Nullable Icon titleIcon) {
-        this(project, title, titleIcon, new DialogStatusBar());
-    }
-
-    protected AbstractPopupDialog(final @NotNull Project project,
-                                  final @NotNull String title,
-                                  final @Nullable Icon titleIcon,
-                                  final @NotNull IStatusBarItem[] statusItems) {
-        this(project, title, titleIcon, new DialogStatusBar(statusItems));
-    }
-
-    private AbstractPopupDialog(final @NotNull Project project,
-                                final @NotNull String title,
-                                final @Nullable Icon titleIcon,
-                                final @NotNull DialogStatusBar statusBar) {
         this.project = project;
         this.title = title;
         this.titleIcon = titleIcon;
-        this.statusBar = statusBar;
+        this.statusBar = new DialogStatusBar();
         this.contentPanel = DialogStyle.styleContent(new JBPanel<>(new BorderLayout()));
         this.contentPanel.setBorder(BorderFactory.createEmptyBorder());
         this.contentPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);

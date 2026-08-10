@@ -4,7 +4,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.ui.CheckboxTree;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
@@ -38,7 +37,6 @@ import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
-import org.testin.settings.AppSettingsState;
 import org.testin.testCase.TestCaseSorter;
 import org.testin.testRun.UpdateTestRunStatusAction;
 import org.testin.util.FontSync;
@@ -46,9 +44,6 @@ import org.testin.util.FontSync;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
-import java.nio.file.Path;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -72,8 +67,18 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final Disposable projectDisposable;
-    CheckboxTree checklistTree;
     private final RunExecutionTimer executionTimer = new RunExecutionTimer();
+
+    /**
+     * Child disposable for the current grid table's font-sync subscription;
+     * replaced on every grid rebuild so old subscriptions do not accumulate.
+     */
+    private Disposable gridFontSyncDisposable;
+
+    /**
+     * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
+     */
+    private volatile int loadGeneration;
     private JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout());
     private JBList<TestCaseDto> list;
     private CollectionListModel<TestCaseDto> model;
@@ -165,6 +170,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     private void loadDataAsync() {
+        final int generation = ++loadGeneration;
         if (list != null) {
             list.setPaintBusy(true);
             list.getEmptyText().setText("Loading...");
@@ -203,6 +209,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                 Services.getInstance(p, TestCaseCacheService.class).load(sorted);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
+                    if (generation != loadGeneration) return;
                     allTestCases.clear();
                     allTestCases.addAll(sorted);
                     currentTestCases.clear();
@@ -354,7 +361,9 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         final int total = currentTestCases.size();
         final PageWindow page = PageWindow.of(total, currentPage, pageSize);
         currentPage = page.page();
-        final List<TestCaseDto> pageItems = currentTestCases.subList(page.fromIndex(), page.toIndex());
+        // Copy: listeners retain this list, and a live subList view would throw
+        // ConcurrentModificationException after currentTestCases is next mutated.
+        final List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
         final TestCaseDto selectedItem = list != null ? list.getSelectedValue() : null;
 
@@ -380,7 +389,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private List<TestCaseDto> getCurrentPageItems() {
         final int total = currentTestCases.size();
         final PageWindow page = PageWindow.of(total, currentPage, pageSize);
-        return currentTestCases.subList(page.fromIndex(), page.toIndex());
+        return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
     }
 
     private void rebuildGrid() {
@@ -389,7 +398,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
             gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, (currentPage - 1) * pageSize);
-            FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
+
+            if (gridFontSyncDisposable != null) Disposer.dispose(gridFontSyncDisposable);
+            gridFontSyncDisposable = Disposer.newDisposable(projectDisposable, "testin.runEditor.gridFontSync");
+            FontSync.syncWithNativeEditor(p, gridTable, gridFontSyncDisposable);
 
             gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
             gridTable.addMouseListener(new GridContextMenuListener(gridTable, list, contextMenu, pageItems));
@@ -421,7 +433,6 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public Set<String> getAvailableModules() {
-        Services.getInstance(p, ProjectIndexer.class);
         final Set<String> modules = new HashSet<>();
         for (final TestCaseDto tc : allTestCases) {
             final String module = tc.getModule();
@@ -458,12 +469,16 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void dispose() {
+        // Releases the message-bus subscriptions (font sync) registered against this editor's lifetime.
+        Disposer.dispose(projectDisposable);
+
         executionTimer.dispose();
         if (list != null)
             for (MouseListener listener : list.getMouseListeners())
                 list.removeMouseListener(listener);
 
         toolBar.dispose();
+        if (statusBar != null) statusBar.dispose();
 
         allTestCases.clear();
         resultsMap.clear();
@@ -477,9 +492,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
-        if (list != null) return list;
-        if (checklistTree != null) return checklistTree;
-        return mainPanel;
+        return list != null ? list : mainPanel;
     }
 
     public @NotNull JComponent getComponent() {
@@ -551,43 +564,14 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         TestRunItems runItem = resultsMap.get(currentTc.getId());
 
         if (runItem == null) {
-            updateStatusAndNext(TestStatus.PENDING);
+            // No run data for this case; skip it. Status changes themselves go
+            // through RunStatusService, which owns advance + persist.
+            startTimerForIndex(globalIndex + 1);
             return;
         }
 
         executionTimer.start(runItem, () -> {
             if (list != null) list.repaint();
-        });
-    }
-
-    public void updateStatusAndNext(TestStatus status) {
-        if (currentlyExecutingIndex == -1) return;
-
-        TestCaseDto currentTc = currentTestCases.get(currentlyExecutingIndex);
-        TestRunItems item = resultsMap.get(currentTc.getId());
-
-        if (item != null) {
-            item.setStatus(status);
-            item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-            item.setExecutedBy(Services.getInstance(p, AppSettingsState.class).testerName);
-        }
-
-        persistRunDataAsync();
-        startTimerForIndex(currentlyExecutingIndex + 1);
-    }
-
-    private void persistRunDataAsync() {
-        if (tr == null || parent == null) return;
-
-        ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            try {
-                final Path dirPath = parent.getPath();
-
-                Services.getInstance(p, ProjectIndexer.class).putTestRun(dirPath, tr);
-
-            } catch (final Exception ex) {
-                Logger.error("Failed to persist test run data: " + ex.getMessage());
-            }
         });
     }
 

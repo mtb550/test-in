@@ -86,7 +86,10 @@ public class CreateTestMethod implements GeneratorAction {
         try {
             VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
             if (sourceRoot != null) {
-                VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", packageList).toLowerCase());
+                // Package segments are camelCase (see NameSanitizer.packageName); lowercasing
+                // the directory here would disagree with the emitted package declaration
+                // and with CreateJavaClass, so findClass could never resolve the class.
+                VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", packageList));
                 if (packageDir != null) {
                     String fileName = className + ".java";
                     VirtualFile javaFile = packageDir.findChild(fileName);
@@ -118,7 +121,7 @@ public class CreateTestMethod implements GeneratorAction {
                 return;
             }
 
-            String relativePath = String.join("/", packageList).toLowerCase() + "/" + className + ".java";
+            String relativePath = String.join("/", packageList) + "/" + className + ".java";
             VirtualFile javaFile = sourceRoot.findFileByRelativePath(relativePath);
 
             if (javaFile != null) {
@@ -144,6 +147,11 @@ public class CreateTestMethod implements GeneratorAction {
     }
 
     private void injectMethod(final @NotNull Project p, final PsiClass targetClass, final String methodName, final TestCaseDto tc) {
+        if (tc == null) {
+            Logger.error("injectMethod: no test case data for method '" + methodName + "'");
+            return;
+        }
+
         try {
             PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             PsiFile file = targetClass.getContainingFile();

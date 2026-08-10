@@ -42,7 +42,11 @@ public class ExportDialog extends FramelessDialogWrapper {
 
     private final JBTextField fileNameField = new JBTextField(30);
 
-    private final ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values()).map(FileTypes::getLabel).toArray(String[]::new));
+    // Offer only formats that actually have an export handler (PDF/Word are report-only).
+    private final ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
+            .filter(type -> type.getExportHandler() != null)
+            .map(FileTypes::getLabel)
+            .toArray(String[]::new));
 
     private final Map<String, List<TestCaseDto>> originalSheetsData;
 

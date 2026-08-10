@@ -7,6 +7,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.tree.AsyncTreeModel;
 import com.intellij.ui.tree.StructureTreeModel;
 import com.intellij.ui.treeStructure.SimpleTree;
+import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -18,22 +19,27 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@Getter
 public class ProjectTree implements Disposable {
-    private final @NotNull Project p;
     private final ProjectPanel pp;
     private final JBScrollPane scrollPane;
     private final ProjectTreeStructure treeStructure;
     private final StructureTreeModel<ProjectTreeStructure> structureModel;
     private final AsyncTreeModel treeModel;
+    @Getter
     private final SimpleTree mainTree;
     private final TreeTransferHandler transferHandler;
     private final TreeContextMenu treeContextMenu;
     private final AtomicBoolean refreshScheduled = new AtomicBoolean();
+
+    /**
+     * Path of the project currently shown in the tree. The tree auto-expands when it
+     * loads a different project (startup and selector changes); refreshes of the same
+     * project keep the user's own expand/collapse state.
+     */
+    private volatile String expandedProjectPath;
     private volatile boolean disposed;
 
     public ProjectTree(final @NotNull Project p, final @NotNull ProjectPanel pp) {
-        this.p = p;
         this.pp = pp;
 
         final TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
@@ -76,7 +82,18 @@ public class ProjectTree implements Disposable {
                 final TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
                         pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
                 treeStructure.setSelectedProject(selectedProject);
-                structureModel.invalidateAsync();
+
+                final String projectPath = selectedProject != null ? selectedProject.getPath().toString() : null;
+                final boolean projectChanged = projectPath != null && !projectPath.equals(expandedProjectPath);
+                expandedProjectPath = projectPath;
+
+                structureModel.invalidateAsync().thenRun(() -> {
+                    if (!disposed && projectChanged) {
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                TreeUtil.promiseExpandAll(mainTree));
+                    }
+                });
+
                 mainTree.revalidate();
                 mainTree.repaint();
             } finally {

@@ -140,7 +140,7 @@ public final class TestRunHtmlGenerator {
             results.stream()
                     .filter(r -> r.getStatus() == TestStatus.FAILED)
                     .forEach(item -> {
-                        TestCaseDto d = detailsMap.get(item.getId());
+                        TestCaseDto d = detailsMap != null ? detailsMap.get(item.getId()) : null;
                         String desc = d != null ? d.getDescription() : "";
                         String bugPriority = item.getBugPriority().name();
                         html.append("<tr>")
@@ -164,7 +164,7 @@ public final class TestRunHtmlGenerator {
             results.stream()
                     .filter(r -> r.getStatus() == TestStatus.PENDING)
                     .forEach(item -> {
-                        TestCaseDto d = detailsMap.get(item.getId());
+                        TestCaseDto d = detailsMap != null ? detailsMap.get(item.getId()) : null;
                         String desc = d != null ? d.getDescription() : "";
                         String bugPriority = item.getBugPriority().name();
                         html.append("<tr>")

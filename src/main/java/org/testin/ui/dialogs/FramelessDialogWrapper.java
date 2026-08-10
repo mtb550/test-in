@@ -58,16 +58,8 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
         final JBLabel title = new JBLabel(getTitle());
         title.setForeground(JBUI.CurrentTheme.Popup.headerForeground(true));
         title.setFont(JBFont.label().deriveFont(Font.BOLD, JBUI.Fonts.label().getSize2D() + 2f));
-        if (getTitleIcon() != null) {
-            title.setIcon(getTitleIcon());
-            title.setIconTextGap(JBUI.scale(8));
-        }
         header.add(title, BorderLayout.WEST);
         return header;
-    }
-
-    protected @Nullable javax.swing.Icon getTitleIcon() {
-        return null;
     }
 
     @Override

@@ -26,7 +26,8 @@ public class BranchSelector {
     private final DefaultComboBoxModel<String> model;
 
     private Path projectPath;
-    private String currentBranch = "";
+    // Written from background git tasks and read on the EDT.
+    private volatile String currentBranch = "";
 
     private boolean isUpdating = false;
 

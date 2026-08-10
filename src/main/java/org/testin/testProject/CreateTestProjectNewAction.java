@@ -52,8 +52,9 @@ public class CreateTestProjectNewAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty())
-            e.getPresentation().setEnabled(false);
+        // Both branches, otherwise the action stays disabled for the whole session
+        // once seen without a configured Testin root.
+        e.getPresentation().setEnabled(!Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty());
     }
 
     @Override

@@ -1,44 +1,15 @@
 package org.testin.editorPanel.statusBar;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.KeyboardSet;
 
-public class NextPageAction extends DumbAwareAction {
-    private final @NotNull Project p;
-    private final @NotNull IEditor editor;
+public class NextPageAction extends AbstractPageAction {
 
-    public NextPageAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super("Next Page", "Navigate to the next page", AllIcons.Actions.Forward);
-        this.p = p;
-        this.editor = editor;
-        registerCustomShortcutSet(KeyboardSet.NextTestCase.getCustomShortcut(), list);
-    }
-
-    @Override
-    public void actionPerformed(final @NotNull AnActionEvent e) {
-        if (editor.getCurrentPage() < editor.getTotalPageCount()) {
-            editor.setCurrentPage(editor.getCurrentPage() + 1);
-            editor.refreshView();
-        }
-    }
-
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        int current = editor.getCurrentPage();
-        int total = editor.getTotalPageCount();
-        e.getPresentation().setEnabled(current < total);
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.EDT;
+    public NextPageAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+        super(editor, list, "Next Page", "Navigate to the next page", AllIcons.Actions.Forward, KeyboardSet.NextTestCase, 1);
     }
 }

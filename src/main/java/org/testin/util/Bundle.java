@@ -5,8 +5,6 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.PropertyKey;
 
-import java.util.function.Supplier;
-
 public final class Bundle extends DynamicBundle {
     private static final String BUNDLE = "messages";
 
@@ -19,11 +17,6 @@ public final class Bundle extends DynamicBundle {
     @NotNull
     public static @Nls String message(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, @NotNull Object... params) {
         return INSTANCE.getMessage(key, params);
-    }
-
-    @NotNull
-    public static Supplier<@Nls String> messagePointer(@NotNull @PropertyKey(resourceBundle = BUNDLE) String key, @NotNull Object... params) {
-        return INSTANCE.getLazyMessage(key, params);
     }
 
     @NotNull

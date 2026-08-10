@@ -10,8 +10,11 @@ import org.testin.services.Services;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PushbackReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ImportCsv {
@@ -92,30 +95,60 @@ public class ImportCsv {
         return result;
     }
 
+    /**
+     * Quote-aware CSV parser over the whole character stream. Unlike a per-line
+     * parser, this keeps newlines inside quoted fields (which our own CSV export
+     * produces for multi-line steps), reads UTF-8 explicitly, and strips a BOM.
+     */
     private List<String[]> parseCsvRecords(final File file) {
-        List<String[]> records = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty()) continue;
+        final List<String[]> records = new ArrayList<>();
+        final List<String> fields = new ArrayList<>();
+        final StringBuilder current = new StringBuilder();
 
-                if (records.isEmpty() && line.charAt(0) == '\ufeff') {
-                    line = line.substring(1);
+        try (PushbackReader reader = new PushbackReader(
+                new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)))) {
+
+            boolean inQuotes = false;
+            boolean firstChar = true;
+            int ci;
+            while ((ci = reader.read()) != -1) {
+                final char c = (char) ci;
+
+                if (firstChar) {
+                    firstChar = false;
+                    if (c == '\ufeff') continue; // BOM
                 }
 
-                String[] fields = parseCsvLine(line);
-                boolean allEmpty = true;
-                for (String f : fields) {
-                    if (f != null && !f.isEmpty()) {
-                        allEmpty = false;
-                        break;
+                if (inQuotes) {
+                    if (c == '"') {
+                        final int next = reader.read();
+                        if (next == '"') {
+                            current.append('"'); // escaped quote
+                        } else {
+                            inQuotes = false;
+                            if (next != -1) reader.unread(next);
+                        }
+                    } else {
+                        current.append(c);
                     }
-                }
-                if (!allEmpty) {
-                    records.add(fields);
+                } else if (c == '"') {
+                    inQuotes = true;
+                } else if (c == ',') {
+                    fields.add(current.toString());
+                    current.setLength(0);
+                } else if (c == '\r' || c == '\n') {
+                    if (c == '\r') {
+                        final int next = reader.read();
+                        if (next != '\n' && next != -1) reader.unread(next);
+                    }
+                    endRecord(records, fields, current);
+                } else {
+                    current.append(c);
                 }
             }
+
+            endRecord(records, fields, current);
+
         } catch (final IOException ex) {
             Logger.error("CSV parse failed: " + ex.getMessage());
             throw new RuntimeException(ex);
@@ -123,33 +156,16 @@ public class ImportCsv {
         return records;
     }
 
-    private String[] parseCsvLine(final String line) {
-        List<String> fields = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        boolean inQuotes = false;
-
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
-            if (c == '"') {
-                if (inQuotes) {
-                    if (i + 1 < line.length() && line.charAt(i + 1) == '"') {
-                        current.append('"');
-                        i++;
-                    } else {
-                        inQuotes = false;
-                    }
-                } else {
-                    inQuotes = true;
-                }
-            } else if (c == ',' && !inQuotes) {
-                fields.add(current.toString());
-                current = new StringBuilder();
-            } else {
-                current.append(c);
-            }
-        }
+    private void endRecord(final List<String[]> records, final List<String> fields, final StringBuilder current) {
+        if (fields.isEmpty() && current.isEmpty()) return; // blank line
 
         fields.add(current.toString());
-        return fields.toArray(new String[0]);
+        current.setLength(0);
+
+        final boolean allEmpty = fields.stream().allMatch(f -> f == null || f.isEmpty());
+        if (!allEmpty) {
+            records.add(fields.toArray(new String[0]));
+        }
+        fields.clear();
     }
 }

@@ -1,5 +1,6 @@
 package org.testin.viewPanel;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
@@ -8,14 +9,15 @@ import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ViewPanelExecutionSubscriber {
-    private final Map<String, UUID> uuidToDtoId = new HashMap<>();
+    // Written from the TestNG runner thread and read from the EDT.
+    private final Map<String, UUID> uuidToDtoId = new ConcurrentHashMap<>();
     private final ProjectIndexer indexer;
-    private UUID runningDtoId = null;
+    private volatile UUID runningDtoId = null;
 
     public ViewPanelExecutionSubscriber(final @NotNull Project p, final @NotNull ViewPanel viewPanel) {
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -62,8 +64,10 @@ public class ViewPanelExecutionSubscriber {
                     uuidToDtoId.put(testName, tc.getId());
                 }
 
+                // This callback arrives on the TestNG execution thread;
+                // Swing components may only be touched on the EDT.
                 if (updated)
-                    viewPanel.refreshCurrentView();
+                    ApplicationManager.getApplication().invokeLater(viewPanel::refreshCurrentView);
             }
 
             private UUID parseUuid(final String s) {

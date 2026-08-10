@@ -62,7 +62,9 @@ public class CodeNavigator {
 
                     } catch (final IndexNotReadyException ex) {
                         Logger.trace("index not ready, deferring navigation");
-                        Services.getInstance(p, Notifier.class).softShow(p, "index not ready, deferring navigation");
+                        // Notifications must not be raised from inside a read action on a pooled thread.
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Services.getInstance(p, Notifier.class).softShow(p, "index not ready, deferring navigation"));
                         DumbService.getInstance(p).runWhenSmart(() -> toCode(p, fqcn));
                     }
                 })

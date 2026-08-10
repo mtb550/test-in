@@ -83,7 +83,10 @@ public class ActualResultDialog {
                 .addListener(new JBPopupListener() {
                     @Override
                     public void onClosed(@NotNull LightweightWindowEvent event) {
-                        section.applyTo(runItem);
+                        // Commit only on OK; Escape/cancel must not apply the edit.
+                        if (event.isOk()) {
+                            section.applyTo(runItem);
+                        }
                     }
                 })
                 .createPopup();
@@ -96,8 +99,8 @@ public class ActualResultDialog {
         DumbAwareAction saveAction = new DumbAwareAction() {
             @Override
             public void actionPerformed(@NotNull AnActionEvent e) {
+                // closeOk fires onClosed with isOk() == true, which applies once.
                 if (popup != null) {
-                    section.applyTo(runItem);
                     popup.closeOk(null);
                 }
             }

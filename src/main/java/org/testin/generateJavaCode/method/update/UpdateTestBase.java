@@ -96,6 +96,19 @@ public class UpdateTestBase {
         return end;
     }
 
+    /**
+     * Updates one attribute of the method's @Test annotation and reformats the method.
+     * The concrete update actions only differ in the attribute name and value expression.
+     */
+    protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm,
+                                                 final @NotNull String attrName, final @NotNull String newValue) {
+        final PsiAnnotation testAnnotation = getTestAnnotation(pm);
+        if (testAnnotation == null) return;
+
+        updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue);
+        com.intellij.psi.codeStyle.CodeStyleManager.getInstance(p).reformat(pm);
+    }
+
     // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
     // its @Test method by testName, then apply the specific update inside a write command action.
     protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title, final @NotNull Consumer<PsiMethod> updater) {

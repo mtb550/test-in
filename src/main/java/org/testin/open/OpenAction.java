@@ -36,7 +36,8 @@ public class OpenAction extends DumbAwareAction {
 
         for (TreePath path : paths) {
             final DirectoryDto directoryDto = TreeValueUtil.directoryOf(path.getLastPathComponent());
-            if (directoryDto == null) return;
+            // Skip unresolvable nodes but keep opening the rest of the selection.
+            if (directoryDto == null) continue;
 
 
             if (directoryDto instanceof TestSetDirectoryDto ts) {

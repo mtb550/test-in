@@ -1,10 +1,8 @@
 package org.testin.testCase.updateDialog.bulk;
 
 import com.intellij.openapi.project.Project;
-import groovyjarjarantlr4.v4.runtime.misc.NotNull;
+import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
-
-import java.util.List;
 
 public class ExpectedResultBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
@@ -18,36 +16,17 @@ public class ExpectedResultBulkSectionDialog extends JsonSplitBulkSectionDialog 
     }
 
     @Override
+    protected String getJsonFieldName() {
+        return "expectedResult";
+    }
+
+    @Override
     protected String getOriginalValue(final TestCaseDto tc) {
         return tc.getExpectedResult();
     }
 
     @Override
-    protected void appendJsonItem(final TestCaseDto tc, int index, boolean isLast, StringBuilder leftSb, StringBuilder rightSb, List<int[]> rightEditableRanges) {
-        String id = escapeJson(tc.getId().toString());
-        String escapedDescription = escapeJson(tc.getDescription());
-        String escapedExpectedResult = escapeJson(tc.getExpectedResult());
-
-        String prefix = "  {\n    \"id\": \"" + id + "\",\n    \"description\": \"" + escapedDescription + "\",\n    \"expectedResult\": \"";
-        String suffix = "\"\n  }";
-        String comma = isLast ? "\n" : ",\n";
-
-        leftSb.append(prefix).append(escapedExpectedResult).append(suffix).append(comma);
-
-        rightSb.append(prefix);
-        int startOffset = rightSb.length();
-        rightSb.append(escapedExpectedResult);
-        int endOffset = rightSb.length();
-        rightEditableRanges.add(new int[]{startOffset, endOffset});
-        rightSb.append(suffix).append(comma);
-    }
-
-    @Override
-    protected void applyValues(final List<TestCaseDto> items, final List<String> newValues) {
-        for (int i = 0; i < items.size(); i++) {
-            if (newValues.get(i) != null) {
-                items.get(i).setExpectedResult(newValues.get(i).trim());
-            }
-        }
+    protected void setValue(final TestCaseDto tc, final String value) {
+        tc.setExpectedResult(value);
     }
 }

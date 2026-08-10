@@ -18,7 +18,6 @@ import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.settings.AppSettingsState;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -59,19 +58,12 @@ public final class TestRunWordGenerator {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
 
-                // todo, why clean name not used to naming the word file.
-                String cleanName = tr.getChangeLog().replace(".json", "");
-
                 String projectName = "";
                 TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ProjectPanel.class)
                         .getTestProjectSelector().getSelectedTestProject().getSelectedItem();
                 if (selectedProject != null) {
                     projectName = selectedProject.getName();
                 }
-
-                AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
-                String testerName = settings.testerName.trim();
-                String testerRole = settings.testerRole;
 
                 addText(doc, "TEST SUMMARY REPORT", 18, true, DARK_NAVY, null, 2);
 
@@ -278,7 +270,6 @@ public final class TestRunWordGenerator {
         XWPFTable table = doc.createTable(1, cols);
         table.setWidth("100%");
         table.setWidthType(TableWidthType.PCT);
-        setTableBorders(table);
 
         XWPFTableRow headerRow = table.getRow(0);
         addCaseHeader(headerRow, 0, "#", headerBg);
@@ -346,6 +337,9 @@ public final class TestRunWordGenerator {
             idx++;
         }
 
+        // Must run after the data rows are created — setTableBorders iterates existing rows,
+        // so calling it right after createTable left every data row borderless.
+        setTableBorders(table);
         setTableWidths(table, widthsFor(cols));
     }
 
@@ -448,9 +442,14 @@ public final class TestRunWordGenerator {
         CTBody body = doc.getDocument().getBody();
         CTSectPr sectPr = body.isSetSectPr() ? body.getSectPr() : body.addNewSectPr();
         CTPageMar pgMar = sectPr.isSetPgMar() ? sectPr.getPgMar() : sectPr.addNewPgMar();
-        Object right = pgMar.getRight();
-        long rightTwips = (right instanceof Number) ? ((Number) right).longValue() : 1440L;
-        pgMar.setLeft(rightTwips);
+
+        // Standard 1-inch margins on all four sides. The old code only ever set
+        // the left margin, copied from a right margin that was never initialized.
+        final long marginTwips = 1440L;
+        pgMar.setLeft(marginTwips);
+        pgMar.setRight(marginTwips);
+        pgMar.setTop(marginTwips);
+        pgMar.setBottom(marginTwips);
     }
 
     private int[] widthsFor(int cols) {

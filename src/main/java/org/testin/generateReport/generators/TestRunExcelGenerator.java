@@ -102,7 +102,7 @@ public final class TestRunExcelGenerator {
 
             return os.toByteArray();
         } catch (final IOException ex) {
-            Logger.error("CSV parse failed: " + ex.getMessage());
+            Logger.error("Excel report generation failed: " + ex.getMessage());
             throw new RuntimeException(ex);
         }
     }

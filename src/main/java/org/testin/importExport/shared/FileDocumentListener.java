@@ -1,5 +1,6 @@
 package org.testin.importExport.shared;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.jetbrains.annotations.NotNull;
@@ -60,7 +61,8 @@ public class FileDocumentListener implements DocumentListener {
 
         FileTypes fmt = null;
         for (FileTypes ft : FileTypes.values()) {
-            if (name.endsWith(ft.getExtension())) {
+            // Only formats with an import handler; matching e.g. .html would NPE downstream.
+            if (ft.getImportHandler() != null && name.endsWith(ft.getExtension())) {
                 fmt = ft;
                 break;
             }
@@ -69,21 +71,26 @@ public class FileDocumentListener implements DocumentListener {
         if (fmt == null) return;
         if (importLoader == null) return;
 
-        try {
-            Map<String, List<TestCaseDto>> parsedData = importLoader.apply(importFile, fmt);
+        final FileTypes format = fmt;
 
-            if (parsedData == null || parsedData.isEmpty()) {
-                Services.getInstance(p, Notifier.class).warn(p, "No Data", "No test cases found in the selected file.");
-                return;
+        // Parsing a workbook is heavy I/O; keep it off the EDT — this fires per keystroke.
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            try {
+                Map<String, List<TestCaseDto>> parsedData = importLoader.apply(importFile, format);
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (parsedData == null || parsedData.isEmpty()) {
+                        Services.getInstance(p, Notifier.class).warn(p, "No Data", "No test cases found in the selected file.");
+                        return;
+                    }
+                    onDataLoaded.accept(parsedData);
+                });
+
+            } catch (final Exception ex) {
+                Logger.error("Import parse failed: " + ex.getMessage());
+                ApplicationManager.getApplication().invokeLater(() ->
+                        Services.getInstance(p, Notifier.class).error(p, "Parse Error", ex.getMessage()));
             }
-
-            onDataLoaded.accept(parsedData);
-
-        } catch (final Exception ex) {
-            Logger.error("Import parse failed: " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(
-                    p, "Parse Error", ex.getMessage()
-            );
-        }
+        });
     }
 }

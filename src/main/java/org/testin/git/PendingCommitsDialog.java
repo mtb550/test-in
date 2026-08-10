@@ -79,7 +79,7 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
         // --- Context Menu for Rejecting Changes ---
         JBPopupMenu popupMenu = new JBPopupMenu();
         JMenuItem rejectItem = new JMenuItem("Reject Specific Change");
-        rejectItem.addActionListener(e -> rejectSelectedChange(table, model));
+        rejectItem.addActionListener(e -> rejectSelectedChange(model));
         popupMenu.add(rejectItem);
 
         table.addMouseListener(new MouseAdapter() {
@@ -129,18 +129,16 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
         }
     }
 
-    private void rejectSelectedChange(JBTable table, DefaultTableModel model) {
+    private void rejectSelectedChange(final DefaultTableModel model) {
         int selectedRow = table.getSelectedRow();
-        if (selectedRow < 0) return;
+        if (selectedRow < 0 || selectedRow >= rowDifferences.size()) return;
 
         String testCaseId = (String) model.getValueAt(selectedRow, 0);
         String changeTypeLabel = (String) model.getValueAt(selectedRow, 1);
 
-        TestCaseDiff diff = differences.stream()
-                .filter(d -> d.testCaseId().equals(testCaseId))
-                .findFirst().orElse(null);
-
-        if (diff == null) return;
+        // rowDifferences maps rows to diffs exactly; searching by test case id would
+        // pick the wrong diff when one test case contributes several change rows.
+        TestCaseDiff diff = rowDifferences.get(selectedRow);
 
         try {
             final Path jsonPath = repoRoot.resolve(diff.relativeFilePath());
