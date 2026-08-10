@@ -1,5 +1,6 @@
 package org.testin.editorPanel.grid;
 
+import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextArea;
 
 import javax.swing.*;
@@ -42,9 +43,9 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
     public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
         textArea.setText(value == null ? "" : value.toString());
         textArea.setFont(table.getFont());
-        textArea.setBackground(GridPanelBuilder.rowColor(row));
+        textArea.setBackground(table.getSelectionBackground());
         textArea.setForeground(table.getForeground());
-        textArea.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(table.getSelectionBackground(), 1), BorderFactory.createEmptyBorder(GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING)));
+        textArea.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(JBColor.blue, 1), BorderFactory.createEmptyBorder(GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING, GridPanelBuilder.CELL_PADDING)));
         return textArea;
     }
 

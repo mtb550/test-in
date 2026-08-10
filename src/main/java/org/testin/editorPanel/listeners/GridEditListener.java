@@ -29,9 +29,14 @@ public class GridEditListener implements TableModelListener {
         final int row = e.getFirstRow();
         final int col = e.getColumn();
         if (row < 0 || col <= 0) return;
+        if (!(e.getSource() instanceof DefaultTableModel model)
+                || row >= model.getRowCount()
+                || row >= pageItems.size()
+                || col >= model.getColumnCount()
+                || col - 1 >= TestEditorAttributes.values().length) return;
+
         updating = true;
         try {
-            final DefaultTableModel model = (DefaultTableModel) e.getSource();
             final TestEditorAttributes attr = TestEditorAttributes.values()[col - 1];
             final TestCaseDto tc = pageItems.get(row);
             attr.getImportSetter().execute(p, tc, String.valueOf(model.getValueAt(row, col)));

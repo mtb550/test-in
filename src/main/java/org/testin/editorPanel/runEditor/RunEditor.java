@@ -157,6 +157,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         ArrayList<String> selectionPath = parent.getPath2();
         list.addListSelectionListener(new SelectionListener(p, list, this, selectionPath));
+        list.addListSelectionListener(e -> syncGridSelectionFromList(e.getValueIsAdjusting()));
 
         list.setExpandableItemsEnabled(false);
         refreshView();
@@ -255,6 +256,17 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         refreshView();
     }
 
+    /**
+     * Refreshes status-dependent filtering without losing the page the user is viewing.
+     */
+    public void refreshAfterStatusChange() {
+        final int pageBeforeRefresh = currentPage;
+        currentTestCases.clear();
+        currentTestCases.addAll(getFilteredList());
+        currentPage = pageBeforeRefresh;
+        refreshView();
+    }
+
     @Override
     public void onToolBarFilterResetButtonClicked() {
         currentTestCases.clear();
@@ -291,6 +303,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
         rebuildGrid();
         setCenter(gridScrollPane);
+        SwingUtilities.invokeLater(gridTable::requestFocusInWindow);
     }
 
     @Override
@@ -298,7 +311,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
         FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null)
-            toolBarFilter.resetToolBarFilter();
+            toolBarFilter.clearFilters();
 
         SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
         if (toolBarSearch != null)
@@ -384,16 +397,29 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         return currentTestCases.subList(fromIndex, toIndex);
     }
 
+    private void syncGridSelectionFromList(final boolean adjusting) {
+        if (adjusting || gridTable == null || toolBar.getCurrentView() != ViewMode.GRID_VIEW) return;
+        final int row = list.getSelectedIndex();
+        if (row < 0 || row >= gridTable.getRowCount() || row == gridTable.getSelectedRow()) return;
+        gridTable.changeSelection(row, Math.max(0, gridTable.getSelectedColumn()), false, false);
+    }
+
     private void rebuildGrid() {
         final List<TestCaseDto> pageItems = getCurrentPageItems();
         final Set<RunEditorAttributes> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
-            gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap);
+            gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, (currentPage - 1) * pageSize);
             FontSync.syncWithNativeEditor(p, gridTable, projectDisposable);
 
             gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
             gridTable.addMouseListener(new GridContextMenuListener(gridTable, list, contextMenu, pageItems));
+
+            final TestCaseDto selectedItem = list.getSelectedValue();
+            final int selectedRow = pageItems.indexOf(selectedItem);
+            if (selectedRow >= 0) {
+                gridTable.changeSelection(selectedRow, 0, false, false);
+            }
 
             gridScrollPane = new JBScrollPane(gridTable);
             Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());

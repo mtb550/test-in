@@ -108,6 +108,9 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         this.isSelected = isSelected;
         this.isRowHovered = isRowHovered;
         this.hoveredAction = hoveredAction;
+        if (isSelected) {
+            setBackground(EditorColors.SELECTION_BACKGROUND);
+        }
     }
 
     @Override

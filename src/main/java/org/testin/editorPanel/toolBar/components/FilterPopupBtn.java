@@ -79,12 +79,19 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
     }
 
     public void resetToolBarFilter() {
+        clearFilters();
+        onToolBarFilterReset.run();
+    }
+
+    /**
+     * Clears the UI state without triggering a second editor refresh.
+     */
+    public void clearFilters() {
         selectedPriority.clear();
         selectedGroup.clear();
         selectedModule.clear();
         selectedStatus.clear();
         updateToolBarFilterState();
-        onToolBarFilterReset.run();
     }
 
     private DefaultActionGroup buildActionGroup(final Runnable onToolBarFilterSelectedChanged) {

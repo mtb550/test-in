@@ -129,7 +129,9 @@ public final class RunStatusService {
             if (list != null) {
                 list.repaint();
             }
-            if (editor instanceof IToolBar) {
+            if (editor instanceof RunEditor runEditor) {
+                runEditor.refreshAfterStatusChange();
+            } else if (editor instanceof IToolBar) {
                 ((IToolBar) editor).onToolBarFilterSelectionChanged();
             }
         });

@@ -1,7 +1,7 @@
 package org.testin.editorPanel.listeners;
 
-import com.intellij.ui.JBColor;
 import com.intellij.util.ui.JBUI;
+import org.testin.editorPanel.EditorColors;
 import org.testin.editorPanel.IEditor;
 import org.testin.mappers.dto.TestCaseDto;
 
@@ -11,7 +11,7 @@ import java.awt.*;
 
 public abstract class AbstractListRenderer<U extends IEditor> implements ListCellRenderer<TestCaseDto> {
 
-    private static final Border SELECTED_BORDER = JBUI.Borders.customLine(JBColor.blue, 1);
+    private static final Border SELECTED_BORDER = JBUI.Borders.customLine(EditorColors.SELECTION_BORDER, 1);
     private static final Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
     protected final U editor;
 
