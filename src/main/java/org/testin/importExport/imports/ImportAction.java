@@ -27,11 +27,9 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
-import org.testin.util.Mapper;
 import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,18 +69,6 @@ public class ImportAction extends DumbAwareAction {
             return;
         }
 
-        String dirPathStr = dirDto.getPath().toString().replace('\\', '/');
-        VirtualFile targetDirectory = LocalFileSystem.getInstance().findFileByPath(dirPathStr);
-
-        if (targetDirectory != null && !targetDirectory.isDirectory()) {
-            targetDirectory = targetDirectory.getParent();
-        }
-
-        if (targetDirectory == null) {
-            Services.getInstance(p, Notifier.class).error(p, "Import Error", "The selected path in the Project Panel is invalid.");
-            return;
-        }
-
         ImportDialog dialog = new ImportDialog(p, importAttributes, (file, format) -> format.importToFile(p, ImportAction.this, file));
 
         if (dialog.showAndGet()) {
@@ -93,13 +79,15 @@ public class ImportAction extends DumbAwareAction {
                 return;
             }
 
-            executeImportWriteAction(p, targetDirectory, dirDto, dialog, selectedCasesBySheet);
+            executeImportWriteAction(p, dirDto, selectedCasesBySheet);
         } else {
             Services.getInstance(p, Notifier.class).softShow(p, "Import Cancelled", "Import was cancelled from preview dialog.");
         }
     }
 
-    private void executeImportWriteAction(final @NotNull Project p, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final ImportDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
+    private void executeImportWriteAction(final @NotNull Project p, final DirectoryDto selectedDirDto, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
+
+        final Path targetPath = selectedDirDto.getPath();
 
         // Checked once up front: without the Java plugin the import still runs,
         // only the test-method generation is skipped (with a one-time notice).
@@ -107,11 +95,11 @@ public class ImportAction extends DumbAwareAction {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                TestCaseDto tail = findExistingTail(p, targetDirectory);
+                TestCaseDto tail = findExistingTail(p, targetPath);
                 List<TestCaseDto> flatList = new ArrayList<>();
                 selectedCasesBySheet.values().forEach(flatList::addAll);
 
-                linkAndSaveTestCases(p, targetDirectory, flatList, tail);
+                linkAndSaveTestCases(p, targetPath, flatList, tail);
 
                 for (TestCaseDto tc : flatList) tc.setParent(ts);
 
@@ -124,7 +112,7 @@ public class ImportAction extends DumbAwareAction {
                     }
                 }
 
-                Services.getInstance(p, EditorUtil.class).closeThenOpen(p, targetDirectory, ts);
+                Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts);
                 Services.getInstance(p, Notifier.class).info(p, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
             } else {
@@ -134,15 +122,11 @@ public class ImportAction extends DumbAwareAction {
                     List<TestCaseDto> sheetCases = entry.getValue();
 
                     String cName = Services.getInstance(p, Tools.class).removeSpecialChars(rawSheetName);
-                    Path newDirPath = Path.of(targetDirectory.getPath()).resolve(cName);
+                    Path newDirPath = targetPath.resolve(cName);
                     DirectoryDto dir = new CreateTestSet(p).execute(cName, selectedDirDto, newDirPath);
 
-                    // todo, to be enhanced later
-                    VirtualFile sheetDir = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(newDirPath);
-
-                    TestCaseDto tail = findExistingTail(p, sheetDir);
-                    // todo: change sheetDir from vf to directoryDto
-                    linkAndSaveTestCases(p, sheetDir, sheetCases, tail);
+                    TestCaseDto tail = findExistingTail(p, newDirPath);
+                    linkAndSaveTestCases(p, newDirPath, sheetCases, tail);
 
                     TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
 
@@ -164,16 +148,16 @@ public class ImportAction extends DumbAwareAction {
 
             // Asynchronous refresh: a synchronous recursive VFS refresh inside a
             // write action is disallowed by the platform and can freeze the IDE.
-            targetDirectory.refresh(true, true);
-            ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh()
-            );
+            ApplicationManager.getApplication().invokeLater(() -> {
+                final VirtualFile targetVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
+                if (targetVf != null) targetVf.refresh(true, true);
+                Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
+            });
 
         });
     }
 
-    private void linkAndSaveTestCases(final @NotNull Project p, final VirtualFile dir, final List<TestCaseDto> testCases, final TestCaseDto existingTail) {
-        final Path dirPath = Path.of(dir.getPath());
+    private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath, final List<TestCaseDto> testCases, final TestCaseDto existingTail) {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         TestCaseDto previousNode = existingTail;
@@ -199,25 +183,16 @@ public class ImportAction extends DumbAwareAction {
         }
     }
 
+    /**
+     * The indexer is the source of truth for existing test cases — no need to
+     * re-read JSON files from disk to find the linked-list tail.
+     */
     @Nullable
-    private TestCaseDto findExistingTail(final @NotNull Project p, final VirtualFile directory) {
-        if (directory == null) return null;
-        VirtualFile[] children = directory.getChildren();
-        if (children != null) {
-            for (VirtualFile child : children) {
-                if (!child.isDirectory() && child.getName().endsWith(".json")) {
-                    try (InputStream is = child.getInputStream()) {
-                        TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class);
-                        if (tc.getNext() == null) {
-                            return tc;
-                        }
-                    } catch (final Exception ex) {
-                        Logger.error("Failed to read existing test case: " + ex.getMessage());
-                    }
-                }
-            }
-        }
-        return null;
+    private TestCaseDto findExistingTail(final @NotNull Project p, final @NotNull Path directory) {
+        return Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory).stream()
+                .filter(tc -> tc.getNext() == null)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override

@@ -66,6 +66,24 @@ public class GenerateReportAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        execute();
+    }
+
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(isAvailable());
+    }
+
+    /** True when the current selection resolves to a test run. */
+    public boolean isAvailable() {
+        if (tree != null) {
+            return TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class) != null;
+        }
+        return editor instanceof RunEditor;
+    }
+
+    /** Direct entry point for toolbar buttons — no AnActionEvent required. */
+    public void execute() {
 
         TestRunDirectoryDto tr = null;
 
@@ -82,13 +100,6 @@ public class GenerateReportAction extends DumbAwareAction {
         if (dialog.showAndGet()) {
             processAndSave(p, tr, dialog.getSelectedFormat(), dialog.getSelectedFile());
         }
-    }
-
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        if (tree != null) {
-            e.getPresentation().setEnabled(TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class) != null);
-        } else e.getPresentation().setEnabled(editor instanceof RunEditor);
     }
 
     @Override

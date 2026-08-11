@@ -2,9 +2,6 @@ package org.testin.projectPanel;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
-import com.intellij.openapi.actionSystem.ActionUiKind;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.impl.SimpleDataContext;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
@@ -102,17 +99,7 @@ public final class ProjectPanel implements Disposable {
                     AllIcons.General.Add,
                     "Create your first test project",
                     SimpleTextAttributes.LINK_ATTRIBUTES,
-                    e -> {
-                        final CreateTestProjectAction action = new CreateTestProjectAction(p, this);
-                        final AnActionEvent event = AnActionEvent.createEvent(
-                                SimpleDataContext.getProjectContext(p),
-                                action.getTemplatePresentation().clone(),
-                                "createTestProject",
-                                ActionUiKind.NONE,
-                                null
-                        );
-                        action.actionPerformed(event);
-                    }
+                    e -> new CreateTestProjectAction(p, this).execute()
             );
 
         panel.revalidate();

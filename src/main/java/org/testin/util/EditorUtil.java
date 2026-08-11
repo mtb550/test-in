@@ -57,14 +57,14 @@ public final class EditorUtil {
 
     }
 
-    public void closeThenOpen(final @NotNull Project p, final @NotNull VirtualFile vf, final @NotNull DirectoryDto dir) {
+    public void closeThenOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final FileEditorManager fed = FileEditorManager.getInstance(p);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             VirtualFile targetVf = null;
 
             for (VirtualFile openVf : fed.getOpenFiles()) {
-                if (openVf.getName().equals(vf.getName())) {
+                if (openVf.getName().equals(dir.getName())) {
                     targetVf = openVf;
                     fed.closeFile(openVf);
                     break;

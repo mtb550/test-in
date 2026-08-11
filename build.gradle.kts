@@ -74,6 +74,15 @@ intellijPlatform {
     }
 
     pluginVerification {
+        // Expected findings only: all PSI/TestNG references live in classes
+        // that are class-loaded exclusively behind OptionalPlugin availability
+        // guards (issue #41); the verifier's static analysis cannot see
+        // runtime gating. Patterns match the problem's short description, so
+        // they cannot be scoped to packages — a PSI reference sneaking into
+        // core code must be caught by the runPyCharm smoke test instead.
+        // Update the version in the file on each release.
+        ignoredProblemsFile = file("verifier-ignored-problems.txt")
+
         ides {
             create(IntelliJPlatformType.IntellijIdea, providers.gradleProperty("intellij.version"))
             create(IntelliJPlatformType.PyCharm, "2026.1.3")

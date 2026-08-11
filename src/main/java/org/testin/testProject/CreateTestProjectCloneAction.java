@@ -38,6 +38,11 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        execute();
+    }
+
+    /** Direct entry point for dialog callbacks — no AnActionEvent required. */
+    public void execute() {
 
         if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {
             Services.getInstance(p, Notifier.class).error(p, "Clone Error", "Missing parameters for cloning the project.");

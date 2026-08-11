@@ -29,6 +29,11 @@ public class CreateTestProjectAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        execute();
+    }
+
+    /** Direct entry point for the project panel's empty state — no AnActionEvent required. */
+    public void execute() {
 
         new CreateNodesDialog(p, CreateNodeMenu.TEST_PROJECT, (name, type) -> {
             if (name.trim().isEmpty()) return;
@@ -37,12 +42,12 @@ public class CreateTestProjectAction extends DumbAwareAction {
                 if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
 
                 String projectName = Services.getInstance(p, Tools.class).extractProjectNameFromUrl(name);
-                new CreateTestProjectCloneAction(p, name.trim(), projectName, pp).actionPerformed(e);
+                new CreateTestProjectCloneAction(p, name.trim(), projectName, pp).execute();
                 return;
             }
 
             if (type == DirectoryType.TP) {
-                new CreateTestProjectNewAction(p, pp, name.trim()).actionPerformed(e);
+                new CreateTestProjectNewAction(p, pp, name.trim()).execute();
             }
 
         }).show();

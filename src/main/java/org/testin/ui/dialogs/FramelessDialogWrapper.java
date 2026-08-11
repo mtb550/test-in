@@ -76,7 +76,7 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
         actionMap.put("testin.dialog.ok", new AbstractAction() {
             @Override
             public void actionPerformed(final java.awt.event.ActionEvent event) {
-                performOKAction();
+                doOKAction();
             }
         });
 
