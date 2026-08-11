@@ -9,6 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.util.OptionalPlugin;
 import org.testin.util.Shortcuts;
 import org.testin.util.Tools;
 
@@ -26,6 +27,8 @@ public class NavigateToCodeAction extends DumbAwareAction {
     }
 
     public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarn(p)) return;
+
         ArrayList<String> generatedFqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
         new CodeNavigator().toCode(p, generatedFqcn);
     }

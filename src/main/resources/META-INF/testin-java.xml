@@ -1,0 +1,10 @@
+<!-- Loaded only when the Java plugin (com.intellij.modules.java) is present. -->
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- gutter icons on generated @Test methods -->
+        <codeInsight.lineMarkerProvider
+                language="JAVA"
+                implementationClass="org.testin.gutter.TestMethodGutter"
+        />
+    </extensions>
+</idea-plugin>

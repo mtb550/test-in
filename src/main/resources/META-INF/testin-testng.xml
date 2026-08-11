@@ -1,0 +1,6 @@
+<!-- Loaded only when the TestNG-J plugin is present. Execution features are
+     wired programmatically behind OptionalPlugin.TESTNG checks; this file
+     exists so the optional dependency has a declaration point for future
+     TestNG-scoped extensions. -->
+<idea-plugin>
+</idea-plugin>

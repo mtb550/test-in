@@ -14,6 +14,7 @@ import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.testProject.CreateTestProjectCloneAction;
 import org.testin.testProject.CreateTestProjectNewAction;
+import org.testin.util.OptionalPlugin;
 import org.testin.util.Tools;
 
 public class CreateTestProjectAction extends DumbAwareAction {
@@ -33,6 +34,8 @@ public class CreateTestProjectAction extends DumbAwareAction {
             if (name.trim().isEmpty()) return;
 
             if (type == DirectoryType.IMPORT_TP) {
+                if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
+
                 String projectName = Services.getInstance(p, Tools.class).extractProjectNameFromUrl(name);
                 new CreateTestProjectCloneAction(p, name.trim(), projectName, pp).actionPerformed(e);
                 return;

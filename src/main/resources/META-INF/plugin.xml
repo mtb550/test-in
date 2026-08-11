@@ -2,37 +2,68 @@
 
     <!-- ================================================================== -->
     <!-- Identity                                                           -->
+    <!-- Name, version, vendor and compatibility range are declared once in -->
+    <!-- build.gradle.kts (intellijPlatform.pluginConfiguration) and        -->
+    <!-- patched into this file at build time.                              -->
     <!-- ================================================================== -->
     <id>org.testin</id>
-    <name>Testin</name>
-    <version>2.6</version>
-    <vendor email="mtb550@gmail.com" url="https://github.com/mtb550/test-in">Muteb Almughyiri</vendor>
     <resource-bundle>messages</resource-bundle>
     <description><![CDATA[
-    <b>Testin</b> — A powerful, lightweight Quality Control (QC) and test case management engine built directly into the IntelliJ Platform. Manage your test cases and test runs natively alongside your code — no extra tools, no context switching.<br/><br/>
+    <b>Testin</b> — test case management built into your IDE. Write, organize, execute, and report on your test cases next to your code. No server, no account, no external tool — everything is stored as local files.<br/><br/>
 
-    Designed for quality engineers, developers, and teams using Git, Test In replaces heavy external test management systems with a fast, local-first workflow within a familiar interface.<br/><br/>
-
-    <b>✨ Key Highlights:</b>
+    <b>✨ Manage</b>
     <ul>
-        <li><b>📂 Test Project Tree:</b> Browse test projects, test sets, and test runs in a clear hierarchical tree in your left sidebar. Drag, drop, rename, copy, and paste items exactly like local files.</li>
-        <li><b>✍️ Test Case Editor:</b> Create and edit test cases with rich attributes (steps, expected results, priority, group, module, pre-conditions, and test data). Navigate large suites effortlessly with built-in search, filtering, and pagination.</li>
-        <li><b>🏃 Test Run Manager:</b> Track live execution results (Passed, Failed, Blocked, Untested, Pending), monitor test duration with automated timers, and record execution notes step-by-step.</li>
-        <li><b>📊 View Panel:</b> A dedicated right-side panel showing full test case details, structural metadata, and change history at a glance.</li>
-        <li><b>🧪 Code Integration & Gutter Icons:</b> Execute test cases directly via TestNG by class, method, or suite. Native gutter icons in your Java files let you jump straight to code definitions or run tests in one click.</li>
-        <li><b>📥 One-Click HTML Reporting & Export:</b> Generate and view clean, comprehensive HTML execution reports instantly. Supports importing and exporting configurations using Excel (.xls), CSV, or JSON.</li>
-        <li><b>🔗 Git & Platform Integrations:</b> Track which commit each test run belongs to and map changes using IntelliJ's native Git tools. Designed for seamless roadmapped workflows syncing with Jira, Azure DevOps, and TestRail.</li>
-        <li><b>🔧 Global Configuration:</b> Fine-tune your testing ecosystem, root test folders, automation paths, read-only constraints, and logger levels from a unified settings window.</li>
+        <li><b>📂 Test Project Tree:</b> Organize test projects, test sets, and test runs in a sidebar tree. Create, rename, copy, cut, paste, and drag &amp; drop — just like files.</li>
+        <li><b>✍️ Test Case Editor:</b> Each test case holds steps, expected result, priority, group, module, pre-conditions, and test data. Find anything fast with search, filters, and pagination.</li>
+        <li><b>🧮 Excel-Style Grid:</b> Edit test cases in a spreadsheet view — select rows or cell ranges, copy/cut/paste to and from Excel, rows auto-fit their content, and your column widths are remembered.</li>
+        <li><b>📝 Bulk Editing:</b> Change descriptions, steps, expected results, groups, and more across many test cases in one dialog.</li>
+        <li><b>📊 Details Panel:</b> See the full test case — attributes, metadata, and change history — in a panel on the right.</li>
     </ul>
 
-    <b>📋 Compatibility & Privacy:</b>
+    <b>🏃 Execute</b>
     <ul>
-        <li><b>Local-First Privacy:</b> Zero telemetry, zero data collection, and zero code exfiltration. Your test data stays completely local on your machine.</li>
-        <li><b>IDE Support:</b> Fully compatible with IntelliJ IDEA, PyCharm, GoLand, WebStorm, and other IntelliJ-based variants (build 261+). Requires Java, Git4Idea, and TestNG-J plugin modules.</li>
+        <li><b>Test Runs:</b> Pick test cases into a run and record results — Passed, Failed, Blocked, Untested, Pending — with execution notes and automatic duration timers.</li>
+        <li><b>Automation (with the Java &amp; TestNG plugins):</b> Generate test packages, classes, and methods from your test cases; run them by class or method; jump between a test case and its code with one click or a gutter icon.</li>
+    </ul>
+
+    <b>📤 Share</b>
+    <ul>
+        <li><b>Reports:</b> One-click execution reports as HTML, PDF, Word, or Excel.</li>
+        <li><b>Import &amp; Export:</b> Bring test cases in from Excel, CSV, or JSON — and export them back out, including HTML.</li>
+        <li><b>Git (with the Git plugin):</b> Review and commit test case changes, push and pull directly from the tree, clone a shared test project, and see which commit each run belongs to.</li>
+    </ul>
+
+    <b>📋 Compatibility &amp; Privacy</b>
+    <ul>
+        <li><b>Your data stays yours:</b> Zero telemetry, zero data collection. Everything lives in local files you control.</li>
+        <li><b>IDE Support:</b> Installs on IntelliJ IDEA, PyCharm, GoLand, WebStorm, and other IntelliJ-based IDEs (build 261+). Test management works everywhere; code generation, TestNG execution, and Git features switch on automatically when the Java, TestNG, and Git plugins are present.</li>
     </ul>
 ]]></description>
 
     <change-notes><![CDATA[
+    <b>2.7</b>
+    <ul>
+        <li><b>Multi-IDE Support:</b> Java, TestNG, and Git are now optional dependencies — Testin installs and runs on PyCharm, GoLand, WebStorm, and other IntelliJ-based IDEs. Features that need a missing plugin degrade gracefully with a clear notification instead of failing.</li>
+        <li><b>Accurate Metadata:</b> Plugin metadata is declared once in the build; the compatibility statement is verified against each supported IDE by the JetBrains Plugin Verifier.</li>
+    </ul>
+    <br/>
+    <b>2.6</b>
+    <ul>
+        <li><b>Excel-Style Grid:</b> Row selection from the sequence column, multi-row and multi-cell selection, Excel-compatible copy/cut/paste, and automatic row-height fitting after paste.</li>
+        <li><b>Layout Memory:</b> User column widths survive refreshes; the list view opens by default and loads pages asynchronously.</li>
+        <li><b>Safer Persistence:</b> Run status writes go through a single sequential writer, eliminating corrupted JSON under rapid status changes.</li>
+        <li><b>Zero-Setup Automation Path:</b> The Java test source root is detected automatically at startup — no manual configuration.</li>
+        <li>Many stability fixes: dialog lifecycle cleanups, unified keyboard shortcuts, and grid editing edge cases.</li>
+    </ul>
+    <br/>
+    <b>2.5</b>
+    <ul>
+        <li><b>Grid View:</b> Content-based automatic column sizing with word wrap, uniform cell padding, and inline editing.</li>
+        <li><b>Run Creation Redesign:</b> Collapsible sections, clearer layout, and wider input fields in the test run dialog.</li>
+        <li><b>Font Sync:</b> Editor zoom is mirrored across the view panel for a consistent scale.</li>
+        <li>Drag &amp; drop fixes in the project tree; newly created test cases are selected and scrolled into view.</li>
+    </ul>
+    <br/>
     <b>2.4.1</b>
     <ul>
         <li><b>Instant HTML Reporting:</b> Added a one-click action to instantly generate and view clean, formatted HTML execution reports right from the toolbar.</li>
@@ -50,20 +81,19 @@
 ]]></change-notes>
 
     <!-- ================================================================== -->
-    <!-- Compatibility                                                        -->
-    <!-- ================================================================== -->
-    <idea-version since-build="261"/>
-
-    <!-- ================================================================== -->
-    <!-- Dependencies                                                         -->
+    <!-- Dependencies                                                       -->
+    <!-- Only the platform is required. Java, TestNG and Git are optional   -->
+    <!-- so Testin loads in PyCharm/GoLand/WebStorm; the code checks        -->
+    <!-- org.testin.util.OptionalPlugin before touching their classes.      -->
     <!-- ================================================================== -->
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.java</depends>
-    <depends>Git4Idea</depends>
-    <depends>TestNG-J</depends>
+    <depends optional="true" config-file="testin-java.xml">com.intellij.modules.java</depends>
+    <depends optional="true" config-file="testin-testng.xml">TestNG-J</depends>
+    <depends optional="true" config-file="testin-git.xml">Git4Idea</depends>
 
     <!-- ================================================================== -->
-    <!-- Extensions                                                           -->
+    <!-- Extensions (platform-only; Java-dependent ones live in             -->
+    <!-- testin-java.xml)                                                   -->
     <!-- ================================================================== -->
     <extensions defaultExtensionNs="com.intellij">
         <!-- First run activity -->
@@ -127,12 +157,6 @@
                 key="testin.display.name"
                 bundle="messages"
                 groupId="tools"
-        />
-
-        <!-- gutter -->
-        <codeInsight.lineMarkerProvider
-                language="JAVA"
-                implementationClass="org.testin.gutter.TestMethodGutter"
         />
 
     </extensions>

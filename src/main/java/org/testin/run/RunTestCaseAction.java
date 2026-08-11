@@ -12,6 +12,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestNGRunnerByMethod;
 import org.testin.services.Services;
+import org.testin.util.OptionalPlugin;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public class RunTestCaseAction extends DumbAwareAction {
 
     public void execute(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases) {
         if (testCases.isEmpty()) return;
+        if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
 
         for (TestCaseDto tc : testCases) {
             if (tc == null || "RUNNING".equals(tc.getTempStatus())) continue;

@@ -1,5 +1,7 @@
 package org.testin.editorPanel;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
@@ -14,10 +16,8 @@ import java.util.stream.Collectors;
 /**
  * Shared, null-safe filtering for test and test-run editors.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseFilter {
-
-    private TestCaseFilter() {
-    }
 
     public static @NotNull List<TestCaseDto> filter(
             final @NotNull Collection<TestCaseDto> source,

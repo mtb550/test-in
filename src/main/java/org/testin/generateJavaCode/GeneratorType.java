@@ -1,149 +1,157 @@
 package org.testin.generateJavaCode;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.clazz.CreateJavaClass;
-import org.testin.generateJavaCode.clazz.RemoveJavaClass;
-import org.testin.generateJavaCode.clazz.RenameJavaClass;
-import org.testin.generateJavaCode.method.CreateTestMethod;
-import org.testin.generateJavaCode.method.RemoveTestMethod;
-import org.testin.generateJavaCode.method.RenameTestMethod;
-import org.testin.generateJavaCode.method.update.*;
-import org.testin.generateJavaCode.pkg.CreateJavaPackage;
-import org.testin.generateJavaCode.pkg.RemoveJavaPackage;
-import org.testin.generateJavaCode.pkg.RenameJavaPackage;
+import org.jetbrains.annotations.Nullable;
+import org.testin.generateJavaCode.method.update.NoOpCodeUpdate;
+import org.testin.util.OptionalPlugin;
 
+/**
+ * Every automation-code operation the plugin can perform. Constants carry no
+ * PSI-dependent classes: Java-backed actions are resolved lazily through
+ * {@link GeneratorRegistry}, which is only class-loaded when the Java plugin
+ * is available — so this enum is safe to load in IDEs without Java support
+ * (PyCharm, GoLand, WebStorm, ...).
+ */
 @Getter
-@AllArgsConstructor
 public enum GeneratorType {
     CREATE_TEST_PROJECT(
             "Create Test Project",
-            "Create Automation Test Project",
-            new CreateJavaPackage()
+            "Create Automation Test Project"
     ),
 
     REMOVE_TEST_PROJECT(
             "Remove Test Project",
-            "Remove Automation Test Project",
-            new RemoveJavaPackage()
+            "Remove Automation Test Project"
     ),
 
     RENAME_TEST_PROJECT(
             "Rename Test Project",
-            "Rename Automation Test Project",
-            new RenameJavaPackage()
+            "Rename Automation Test Project"
     ),
 
     CREATE_TEST_SET_PACKAGE(
             "Create Test Set Package",
-            "Create Automation Test Package",
-            new CreateJavaPackage()
+            "Create Automation Test Package"
     ),
 
     REMOVE_TEST_SET_PACKAGE(
             "Remove Test Set Package",
-            "Remove Automation Test Package",
-            new RemoveJavaPackage()
+            "Remove Automation Test Package"
     ),
 
     RENAME_TEST_SET_PACKAGE(
             "Rename Test Set Package",
-            "Rename Automation Test Package",
-            new RenameJavaPackage()
+            "Rename Automation Test Package"
     ),
 
     CREATE_TEST_SET(
             "Create Test Set",
-            "Create Automation Test Class",
-            new CreateJavaClass()
+            "Create Automation Test Class"
     ),
 
     REMOVE_TEST_SET(
             "Remove Test Set",
-            "Remove Automation Test Class",
-            new RemoveJavaClass()
+            "Remove Automation Test Class"
     ),
 
     RENAME_TEST_SET(
             "Rename Test Set",
-            "Rename Automation Test Class",
-            new RenameJavaClass()
+            "Rename Automation Test Class"
     ),
 
     CREATE_TEST_CASE(
             "Create Test Case",
-            "Create Automation Test Method",
-            new CreateTestMethod()
+            "Create Automation Test Method"
     ),
 
     REMOVE_TEST_CASE(
             "Remove Test Case",
-            "Remove Automation Test Method",
-            new RemoveTestMethod()
+            "Remove Automation Test Method"
     ),
 
     RENAME_TEST_CASE(
             "Rename Test Case",
-            "Rename Automation Test Method",
-            new RenameTestMethod()
+            "Rename Automation Test Method"
     ),
 
     UPDATE_TEST_CASE_DESCRIPTION(
             "Update Test Case",
-            "Update Automation Test Method Description & Name",
-            new UpdateTestDescription()
+            "Update Automation Test Method Description & Name"
     ),
 
     UPDATE_TEST_CASE_EXPECTED_RESULT(
             "Update Test Case",
             "Update Automation Test Method Expected Result",
-            new NoOpCodeUpdate("expected result")
+            "expected result"
     ),
 
     UPDATE_TEST_CASE_MODULE(
             "Update Test Case",
             "Update Automation Test Method Module",
-            new NoOpCodeUpdate("module")
+            "module"
     ),
 
     UPDATE_TEST_CASE_TEST_DATA(
             "Update Test Case",
             "Update Automation Test Method Test Data",
-            new NoOpCodeUpdate("test data")
+            "test data"
     ),
 
     UPDATE_TEST_CASE_PRE_CONDITIONS(
             "Update Test Case",
             "Update Automation Test Method Pre Conditions",
-            new NoOpCodeUpdate("pre-conditions")
+            "pre-conditions"
     ),
 
     UPDATE_TEST_CASE_STEPS(
             "Update Test Case",
             "Update Automation Test Method Steps",
-            new NoOpCodeUpdate("steps")
+            "steps"
     ),
 
     UPDATE_TEST_CASE_GROUP(
             "Update Test Case",
-            "Update Automation Test Method Group",
-            new UpdateTestGroup()
+            "Update Automation Test Method Group"
     ),
 
     UPDATE_TEST_CASE_PRIORITY(
             "Update Test Case",
-            "Update Automation Test Method Priority",
-            new UpdateTestPriority()
+            "Update Automation Test Method Priority"
     ),
 
     UPDATE_TEST_CASE_ORDER(
             "Update Test Case",
             "Update Automation Test Method Order",
-            new NoOpCodeUpdate("order")
+            "order"
     );
+
+    /** Returned when the Java plugin is absent: notify once per project, then skip quietly. */
+    private static final GeneratorAction JAVA_UNAVAILABLE = (p, obj) -> OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
 
     private final @NotNull String description;
     private final @NotNull String tooltip;
-    private final @NotNull GeneratorAction action;
+
+    /** Set for data-only fields that never change generated code; null for Java-backed actions. */
+    @Getter(AccessLevel.NONE)
+    private final @Nullable GeneratorAction dataOnlyAction;
+
+    GeneratorType(final @NotNull String description, final @NotNull String tooltip) {
+        this.description = description;
+        this.tooltip = tooltip;
+        this.dataOnlyAction = null;
+    }
+
+    GeneratorType(final @NotNull String description, final @NotNull String tooltip, final @NotNull String dataOnlyField) {
+        this.description = description;
+        this.tooltip = tooltip;
+        this.dataOnlyAction = new NoOpCodeUpdate(dataOnlyField);
+    }
+
+    public @NotNull GeneratorAction getAction() {
+        if (dataOnlyAction != null) return dataOnlyAction;
+        if (!OptionalPlugin.JAVA.isAvailable()) return JAVA_UNAVAILABLE;
+        return GeneratorRegistry.actionFor(this);
+    }
 }

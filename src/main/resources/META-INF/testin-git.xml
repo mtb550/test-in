@@ -1,0 +1,6 @@
+<!-- Loaded only when the Git4Idea plugin is present. Git features are wired
+     programmatically behind OptionalPlugin.GIT checks; this file exists so
+     the optional dependency has a declaration point for future Git-scoped
+     extensions. -->
+<idea-plugin>
+</idea-plugin>

@@ -13,6 +13,7 @@ import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.runner.TestNGRunnerByClass;
 import org.testin.services.Services;
+import org.testin.util.OptionalPlugin;
 import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
@@ -47,6 +48,7 @@ public class RunTestSetAction extends DumbAwareAction {
         Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
         if (userObject instanceof TestSetDirectoryDto ts) {
+            if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
 
             Logger.info(this.getClass() + "directory file: " + ts.getPath().toFile());
             // Build the FQCN the same way the code generator does: strip the

@@ -1,5 +1,7 @@
 package org.testin.git;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
@@ -11,10 +13,8 @@ import java.util.Objects;
 /**
  * Compares user-editable test-case fields and describes how each change can be reverted.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class TestCaseChangeComparator {
-
-    private TestCaseChangeComparator() {
-    }
 
     static @NotNull List<FieldChange> compare(
             final @NotNull TestCaseDto oldState,

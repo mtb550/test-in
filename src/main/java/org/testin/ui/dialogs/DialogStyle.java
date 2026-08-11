@@ -7,6 +7,8 @@ import com.intellij.ui.components.fields.ExtendableTextComponent;
 import com.intellij.ui.components.fields.ExtendableTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -15,10 +17,8 @@ import java.awt.*;
 /**
  * Shared theme-aware content styling for lightweight project popups.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DialogStyle {
-
-    private DialogStyle() {
-    }
 
     public static <T extends JComponent> T styleContent(final T component) {
         component.setOpaque(true);

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.generateJavaCode.method.CreateTestMethod;
+import org.testin.util.OptionalPlugin;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -100,6 +101,10 @@ public class ImportAction extends DumbAwareAction {
 
     private void executeImportWriteAction(final @NotNull Project p, final VirtualFile targetDirectory, final DirectoryDto selectedDirDto, final ImportDialog dialog, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
+        // Checked once up front: without the Java plugin the import still runs,
+        // only the test-method generation is skipped (with a one-time notice).
+        final boolean generateCode = OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
+
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
                 TestCaseDto tail = findExistingTail(p, targetDirectory);
@@ -108,12 +113,15 @@ public class ImportAction extends DumbAwareAction {
 
                 linkAndSaveTestCases(p, targetDirectory, flatList, tail);
 
-                Logger.info("Import: generating test methods for " + flatList.size() + " imported cases");
-                CreateTestMethod syncInjector = new CreateTestMethod();
-                for (TestCaseDto tc : flatList) {
-                    tc.setParent(ts);
-                    List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-                    syncInjector.executeSync(p, tc, fqcn);
+                for (TestCaseDto tc : flatList) tc.setParent(ts);
+
+                if (generateCode) {
+                    Logger.info("Import: generating test methods for " + flatList.size() + " imported cases");
+                    CreateTestMethod syncInjector = new CreateTestMethod();
+                    for (TestCaseDto tc : flatList) {
+                        List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+                        syncInjector.executeSync(p, tc, fqcn);
+                    }
                 }
 
                 Services.getInstance(p, EditorUtil.class).closeThenOpen(p, targetDirectory, ts);
@@ -138,12 +146,15 @@ public class ImportAction extends DumbAwareAction {
 
                     TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
 
-                    Logger.info("Import: generating test methods for sheet '" + cName + "' with " + sheetCases.size() + " cases");
-                    CreateTestMethod syncInjector = new CreateTestMethod();
-                    for (TestCaseDto tc : sheetCases) {
-                        tc.setParent(sheetDto);
-                        List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-                        syncInjector.executeSync(p, tc, fqcn);
+                    for (TestCaseDto tc : sheetCases) tc.setParent(sheetDto);
+
+                    if (generateCode) {
+                        Logger.info("Import: generating test methods for sheet '" + cName + "' with " + sheetCases.size() + " cases");
+                        CreateTestMethod syncInjector = new CreateTestMethod();
+                        for (TestCaseDto tc : sheetCases) {
+                            List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+                            syncInjector.executeSync(p, tc, fqcn);
+                        }
                     }
 
                     totalImported += sheetCases.size();

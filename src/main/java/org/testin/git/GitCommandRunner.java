@@ -5,6 +5,8 @@ import git4idea.commands.Git;
 import git4idea.commands.GitCommand;
 import git4idea.commands.GitCommandResult;
 import git4idea.commands.GitLineHandler;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
@@ -14,10 +16,8 @@ import java.util.Arrays;
 /**
  * Small adapter over IntelliJ Git4Idea command execution.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GitCommandRunner {
-
-    private GitCommandRunner() {
-    }
 
     static @NotNull String execute(
             final @NotNull Project project,

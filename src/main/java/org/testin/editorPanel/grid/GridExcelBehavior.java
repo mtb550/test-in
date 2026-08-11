@@ -12,6 +12,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * Excel / DataGrip-style interaction for the grid tables:
@@ -25,10 +27,8 @@ import java.util.List;
  *       tables simply ignore paste/cut mutations.</li>
  * </ul>
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GridExcelBehavior {
-
-    private GridExcelBehavior() {
-    }
 
     public static void install(final JBTable table) {
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);

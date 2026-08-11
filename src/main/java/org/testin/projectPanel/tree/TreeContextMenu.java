@@ -25,6 +25,7 @@ import org.testin.run.RunTestSetAction;
 import org.testin.services.Services;
 import org.testin.testProject.UpdateTestProjectStatusAction;
 import org.testin.testRun.SetTestRunStatusAction;
+import org.testin.util.OptionalPlugin;
 import org.testin.util.Tools;
 
 import java.util.List;
@@ -65,10 +66,11 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         add(new ImportAction(p, tree));
 
-        addSeparator();
-
-        add(new SyncActionAction(p, tree, pp));
-        add(new ViewPendingCommitsAction(p, tree));
+        if (OptionalPlugin.GIT.isAvailable()) {
+            addSeparator();
+            add(new SyncActionAction(p, tree, pp));
+            add(new ViewPendingCommitsAction(p, tree));
+        }
 
         addSeparator();
         add(new SetTestRunStatusAction(p, tree));

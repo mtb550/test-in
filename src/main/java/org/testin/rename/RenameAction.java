@@ -8,6 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.clazz.RenameJavaClass;
+import org.testin.util.OptionalPlugin;
 import org.testin.generateJavaCode.pkg.RenameJavaPackage;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -75,6 +76,8 @@ public class RenameAction extends DumbAwareAction {
 
     // todo, to be moved to generateCode package and enhance, later
     private void dispatchRenameCodeGenerator(final @NotNull DirectoryDto dir, final @NotNull String newName) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
         if (dir instanceof TestProjectDirectoryDto || dir instanceof TestSetPackageDirectoryDto) {
             new RenameJavaPackage().execute(p, dir, newName);
         } else if (dir instanceof TestSetDirectoryDto tsDir) {

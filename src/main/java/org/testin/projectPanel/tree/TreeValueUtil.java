@@ -1,6 +1,8 @@
 package org.testin.projectPanel.tree;
 
 import com.intellij.ide.util.treeView.NodeDescriptor;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 
@@ -12,10 +14,8 @@ import java.util.List;
 /**
  * Resolves application values from both the async model and legacy Swing paths.
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TreeValueUtil {
-    private TreeValueUtil() {
-    }
-
     public static @Nullable Object valueOf(final @Nullable Object component) {
         if (component instanceof ProjectTreeNode node) {
             return node.getValue();

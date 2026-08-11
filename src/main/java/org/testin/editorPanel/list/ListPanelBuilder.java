@@ -7,6 +7,8 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
 import com.intellij.util.ui.UIUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.editorPanel.IEditor;
@@ -27,10 +29,8 @@ import java.util.function.Supplier;
  * {@code grid/GridPanelBuilder}. The editors keep only their own specifics
  * (renderer, drag-and-drop reordering, model sync).
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ListPanelBuilder {
-
-    private ListPanelBuilder() {
-    }
 
     public static ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable) {
         final CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());

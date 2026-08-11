@@ -1,10 +1,12 @@
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
+
 plugins {
     id("java")
     id("org.jetbrains.intellij.platform")
 }
 
 group = "org.testin"
-version = "2.6"
+version = "2.7"
 
 repositories {
     mavenCentral()
@@ -73,7 +75,10 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            recommended()
+            create(IntelliJPlatformType.IntellijIdea, providers.gradleProperty("intellij.version"))
+            create(IntelliJPlatformType.PyCharm, "2026.1.3")
+            create(IntelliJPlatformType.GoLand, "2026.1.3")
+            create(IntelliJPlatformType.WebStorm, "2026.1.3")
         }
     }
 
@@ -111,6 +116,13 @@ tasks {
 intellijPlatformTesting {
     runIde {
         parallelStream()
+        register("runPyCharm") {
+            type = IntelliJPlatformType.PyCharm
+            version = "2026.1.3"
+            task {
+                jvmArgs("--sun-misc-unsafe-memory-access=allow")
+            }
+        }
     }
 }
 
