@@ -1,6 +1,8 @@
 package org.testin.mappers.markers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.ZonedDateTime;
 
@@ -15,4 +17,14 @@ public interface IMarker {
     @NotNull String getCreatedBy();
 
     @NotNull ZonedDateTime getCreatedAt();
+
+    /**
+     * Human-readable status of the node, or null when the marker carries none.
+     * JsonIgnore everywhere: a derived label must never leak into the
+     * persisted marker JSON.
+     */
+    @JsonIgnore
+    default @Nullable String getStatusLabel() {
+        return null;
+    }
 }

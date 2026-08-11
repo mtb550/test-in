@@ -13,16 +13,14 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.Config;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
-import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
-import org.testin.mappers.markers.TestProjectMarker;
-import org.testin.mappers.markers.TestRunMarker;
+import org.testin.mappers.markers.IMarker;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.FontSync;
 
 import javax.swing.*;
 import java.awt.*;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 
 public class MarkerDetailsViewDialog {
     final @NotNull Project p;
@@ -59,20 +57,12 @@ public class MarkerDetailsViewDialog {
         row = addRow(panel, gbc, "Modified By:", dto.getModifiedBy(), row);
         row = addRow(panel, gbc, "Modified At:", formatDate(dto.getModifiedAt()), row);
 
-        if (dto instanceof TestProjectDirectoryDto projectDto) {
-            TestProjectMarker marker = projectDto.getMarker();
-
-            row = addRow(panel, gbc, "Status:", marker.getStatus() != null ? marker.getStatus().getDescription() : "", row);
-            row = addRow(panel, gbc, "Marker Created By:", marker.getCreatedBy(), row);
-            row = addRow(panel, gbc, "Marker Created At:", formatDate(marker.getCreatedAt()), row);
-
-        } else if (dto instanceof TestRunDirectoryDto runDto) {
-            TestRunMarker marker = runDto.getMarker();
-            row = addRow(panel, gbc, "Status:", marker.getStatus().getLabel(), row);
-            row = addRow(panel, gbc, "Marker Created By:", marker.getCreatedBy(), row);
-            row = addRow(panel, gbc, "Marker Created At:", formatDate(marker.getCreatedAt()), row);
-        }
-        // todo: add TestSetMarker support when implemented
+        // Every node type shows its marker rows through the IMarker contract;
+        // a new marker type needs no new branch here.
+        final IMarker marker = dto.getMarker();
+        row = addRow(panel, gbc, "Status:", Optional.ofNullable(marker.getStatusLabel()).orElse(""), row);
+        row = addRow(panel, gbc, "Marker Created By:", marker.getCreatedBy(), row);
+        row = addRow(panel, gbc, "Marker Created At:", formatDate(marker.getCreatedAt()), row);
 
         GridBagConstraints spacerGbc = new GridBagConstraints();
         spacerGbc.gridy = row;
