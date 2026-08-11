@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
-import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 
 import javax.swing.*;

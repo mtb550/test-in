@@ -59,11 +59,7 @@ public class SetTestRunStatusAction extends DumbAwareAction {
             return;
         }
         final TestRunDirectoryDto dir = TreeValueUtil.valueOf(path.getLastPathComponent(), TestRunDirectoryDto.class);
-        boolean enabled = dir != null &&
-                dir.getMarker().getStatus() != TestRunStatus.COMPLETED &&
-                dir.getMarker().getStatus() != TestRunStatus.CLOSED;
-
-        e.getPresentation().setEnabled(enabled);
+        e.getPresentation().setEnabled(dir != null && !dir.getMarker().getStatus().isTerminal());
     }
 
     @Override

@@ -23,7 +23,7 @@ public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
         if (callbacks instanceof RunEditor editor) {
             TestRunStatus status = editor.getParent().getMarker().getStatus();
 
-            if (status == TestRunStatus.CLOSED || status == TestRunStatus.COMPLETED) {
+            if (status.isTerminal()) {
                 setEnabled(false);
                 setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Nodes.Services));
                 setToolTipText("Execution disabled — run status is " + status.getLabel());

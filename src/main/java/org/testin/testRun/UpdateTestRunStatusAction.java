@@ -42,18 +42,9 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
     public void actionPerformed(final @NotNull AnActionEvent e) {
         if (!(editor instanceof RunEditor runEditor)) return;
 
-        TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
-        TestRunStatus newStatus;
-
-        if (currentStatus == TestRunStatus.CREATED || currentStatus == TestRunStatus.ASSIGNED) {
-            newStatus = TestRunStatus.IN_PROGRESS;
-
-        } else if (currentStatus == TestRunStatus.IN_PROGRESS) {
-            newStatus = TestRunStatus.COMPLETED;
-
-        } else {
-            return;
-        }
+        // The enum owns the lifecycle: ask it where this run goes next.
+        final TestRunStatus newStatus = runEditor.getParent().getMarker().getStatus().nextStatus();
+        if (newStatus == null) return;
 
         applyStatusChange(p, runEditor, newStatus);
     }
@@ -65,23 +56,12 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
             return;
         }
 
-        TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
-        boolean enabled = currentStatus == TestRunStatus.CREATED ||
-                currentStatus == TestRunStatus.ASSIGNED ||
-                currentStatus == TestRunStatus.IN_PROGRESS;
+        final TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
 
-        e.getPresentation().setEnabled(enabled);
-
-        if (currentStatus == TestRunStatus.IN_PROGRESS) {
-            e.getPresentation().setText("Complete Test Run");
-            e.getPresentation().setDescription("Mark test run as completed");
-            e.getPresentation().setIcon(AllIcons.Actions.Checked);
-
-        } else {
-            e.getPresentation().setText("Start Execution");
-            e.getPresentation().setDescription("Start execution of test cases");
-            e.getPresentation().setIcon(AllIcons.Nodes.Services);
-        }
+        e.getPresentation().setEnabled(currentStatus.isAdvanceable());
+        e.getPresentation().setText(currentStatus.getAdvanceLabel());
+        e.getPresentation().setDescription(currentStatus.getAdvanceDescription());
+        e.getPresentation().setIcon(currentStatus.getAdvanceIcon());
     }
 
     @Override
@@ -98,7 +78,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
 
         Logger.trace("Test run status changed: " + editor.getParent().getName() + " = " + newStatus.getLabel());
 
-        if (newStatus == TestRunStatus.COMPLETED || newStatus == TestRunStatus.CLOSED)
+        if (newStatus.isTerminal())
             resetPendingToUntested(editor);
 
         if (newStatus == TestRunStatus.COMPLETED && oldStatus == TestRunStatus.IN_PROGRESS)
