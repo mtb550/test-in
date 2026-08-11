@@ -29,4 +29,9 @@ public class TestRunDirectoryDto extends DirectoryDto {
     public @NotNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
         throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + getClass().getSimpleName());
     }
+
+    @Override
+    public boolean isOpenableInEditor() {
+        return true;
+    }
 }

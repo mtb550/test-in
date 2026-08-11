@@ -30,4 +30,14 @@ public class TestSetDirectoryDto extends DirectoryDto {
         return indexer.getTestSetByPath(folder);
     }
 
+
+    @Override
+    public boolean isTestCaseContainer() {
+        return true;
+    }
+
+    @Override
+    public boolean isOpenableInEditor() {
+        return true;
+    }
 }

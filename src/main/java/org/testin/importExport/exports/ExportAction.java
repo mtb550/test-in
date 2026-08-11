@@ -18,9 +18,7 @@ import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
-import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
@@ -168,9 +166,7 @@ public class ExportAction extends DumbAwareAction {
 
         final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
-        e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto ||
-                userObject instanceof TestSetPackageDirectoryDto ||
-                userObject instanceof TestCasesMainDirectoryDto);
+        e.getPresentation().setEnabled(userObject instanceof DirectoryDto dir && dir.isTestCaseContainer());
 
     }
 

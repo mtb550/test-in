@@ -29,4 +29,9 @@ public class TestSetPackageDirectoryDto extends DirectoryDto {
         return indexer.getTestSetByPath(folder);
     }
 
+
+    @Override
+    public boolean isTestCaseContainer() {
+        return true;
+    }
 }

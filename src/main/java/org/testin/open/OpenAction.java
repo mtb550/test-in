@@ -9,8 +9,6 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
-import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
@@ -37,20 +35,10 @@ public class OpenAction extends DumbAwareAction {
         for (TreePath path : paths) {
             final DirectoryDto directoryDto = TreeValueUtil.directoryOf(path.getLastPathComponent());
             // Skip unresolvable nodes but keep opening the rest of the selection.
-            if (directoryDto == null) continue;
+            if (directoryDto == null || !directoryDto.isOpenableInEditor()) continue;
 
-
-            if (directoryDto instanceof TestSetDirectoryDto ts) {
-                Logger.info("open test set: " + ts.getPath());
-                Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, ts);
-                continue;
-            }
-
-            if (directoryDto instanceof TestRunDirectoryDto tr) {
-                Logger.info("open test run: " + tr.getPath());
-                Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, tr);
-            }
-
+            Logger.info("open: " + directoryDto.getPath());
+            Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, directoryDto);
         }
     }
 
@@ -67,7 +55,7 @@ public class OpenAction extends DumbAwareAction {
         if (paths != null) {
             for (TreePath path : paths) {
                 Object value = TreeValueUtil.valueOf(path.getLastPathComponent());
-                if (value instanceof TestSetDirectoryDto || value instanceof TestRunDirectoryDto) {
+                if (value instanceof DirectoryDto dir && dir.isOpenableInEditor()) {
                     shouldEnable = true;
                     break;
                 }

@@ -61,4 +61,23 @@ public abstract class DirectoryDto {
 
     @Nullable
     public abstract Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer);
+
+    // Capability flags replace the instanceof chains that used to branch on
+    // node type across the actions (issue #37): a new node type declares what
+    // it supports here instead of being hunted for at every call site.
+
+    /** True when the user may rename this node; the fixed root containers say no. */
+    public boolean isRenamable() {
+        return true;
+    }
+
+    /** True when test cases can be imported into or exported from this node. */
+    public boolean isTestCaseContainer() {
+        return false;
+    }
+
+    /** True when the node opens in an editor tab (test sets and test runs). */
+    public boolean isOpenableInEditor() {
+        return false;
+    }
 }

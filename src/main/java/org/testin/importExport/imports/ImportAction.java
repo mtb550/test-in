@@ -18,9 +18,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.dto.dirs.TestCasesMainDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
-import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.nodeCreator.CreateTestSet;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
@@ -61,10 +59,7 @@ public class ImportAction extends DumbAwareAction {
 
         final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
-        if (!(userObject instanceof DirectoryDto dirDto) ||
-                !(dirDto instanceof TestSetDirectoryDto ||
-                        dirDto instanceof TestSetPackageDirectoryDto ||
-                        dirDto instanceof TestCasesMainDirectoryDto)) {
+        if (!(userObject instanceof DirectoryDto dirDto) || !dirDto.isTestCaseContainer()) {
             Services.getInstance(p, Notifier.class).error(p, "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
             return;
         }
@@ -207,9 +202,7 @@ public class ImportAction extends DumbAwareAction {
 
         final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
-        e.getPresentation().setEnabled(userObject instanceof TestSetDirectoryDto ||
-                userObject instanceof TestSetPackageDirectoryDto ||
-                userObject instanceof TestCasesMainDirectoryDto);
+        e.getPresentation().setEnabled(userObject instanceof DirectoryDto dir && dir.isTestCaseContainer());
     }
 
     @Override

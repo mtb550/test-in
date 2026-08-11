@@ -47,8 +47,7 @@ public class RenameAction extends DumbAwareAction {
         if (path == null) return;
 
         final DirectoryDto dir = TreeValueUtil.directoryOf(path.getLastPathComponent());
-        if (dir == null) return;
-        if (dir instanceof TestCasesMainDirectoryDto || dir instanceof TestRunsMainDirectoryDto) return;
+        if (dir == null || !dir.isRenamable()) return;
 
         new RenameDialog(p, dir.getName(), newName -> renameNode(dir, newName)).show();
     }
@@ -91,8 +90,7 @@ public class RenameAction extends DumbAwareAction {
 
         e.getPresentation().setEnabled(path != null &&
                 TreeValueUtil.directoryOf(path.getLastPathComponent()) instanceof DirectoryDto dir &&
-                !(dir instanceof TestCasesMainDirectoryDto) &&
-                !(dir instanceof TestRunsMainDirectoryDto)
+                dir.isRenamable()
         );
     }
 

@@ -29,4 +29,14 @@ public class TestCasesMainDirectoryDto extends DirectoryDto {
         return indexer.getTestSetByPath(folder);
     }
 
+
+    @Override
+    public boolean isRenamable() {
+        return false;
+    }
+
+    @Override
+    public boolean isTestCaseContainer() {
+        return true;
+    }
 }

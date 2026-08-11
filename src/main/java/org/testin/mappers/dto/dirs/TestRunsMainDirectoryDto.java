@@ -29,4 +29,9 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
         return indexer.getTestRunDirByPath(folder);
     }
 
+
+    @Override
+    public boolean isRenamable() {
+        return false;
+    }
 }
