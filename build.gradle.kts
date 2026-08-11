@@ -90,8 +90,10 @@ intellijPlatform {
 
     publishing {
         token.set(System.getenv("JETBRAINS_TOKEN"))
-        //channels.set(listOf("alpha"))
-        channels.set(listOf("default"))
+        // Alpha channel while validating multi-IDE support (issues #38/#41);
+        // switch back to "default" for the stable release.
+        channels.set(listOf("alpha"))
+        //channels.set(listOf("default"))
     }
 
     sandboxContainer.set(layout.projectDirectory.dir(".sandbox"))
