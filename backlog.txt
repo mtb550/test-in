@@ -1,34 +1,3 @@
-TESTIN BACKLOG - ITEMS STILL TO REVIEW
-======================================
-Everything else from the old backlog is now on GitHub: mtb550/test-in issues #2, #6-#37.
-What is left below is what was deliberately skipped, plus items that were never reviewed.
-Source of truth is GitHub - move things out of this file as they become issues.
-Reviewed 11-08-2026.
-
-abbreviations:
-project -> p
-projectPanel -> pp
-tree -> t
-name -> s
-codeGenerator -> cg
-generatorType -> gt
-
-
-NEVER REVIEWED - decide on these first
-======================================
-
-1. move all fonts to setting.
-   (issue #19 only syncs the details panel, #12 only covers dialog fonts.
-    a global font setting exists nowhere.)
-
-2. add new filter for test execution status. shown only in run editor
-   (show: passed, failed, blocked, untested) and not shown in test editor.
-   (issue #10 assumes this filter already exists when it adds Out Of Scope to it.)
-
-3. all ui to be updated to the new ui, frameless and buttonless. remove and add and all ui (important)
-   (issue #12 covers DIALOGS only. editors, panels and the tree are not covered.)
-
-
 SKIPPED - kept for a second look
 ================================
 
@@ -108,10 +77,3 @@ M27. apply check box once update test case, with unified methods for sanitizing 
      packages and classes.
      note: the sanitizing half is clear and worth doing alone. explain what the checkbox is
      for - which field, and what it controls.
-
-
-REMOVED
-=======
-- fix pi report issues.                                   (dropped 11-08-2026)
-- remove sorting in test run and show the path as
-  relationship many to many.                              (dropped 11-08-2026)
