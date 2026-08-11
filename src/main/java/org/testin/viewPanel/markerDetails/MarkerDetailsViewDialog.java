@@ -58,8 +58,8 @@ public class MarkerDetailsViewDialog {
         row = addRow(panel, gbc, "Path:", dto.getPath().toString(), row);
         row = addRow(panel, gbc, "Created By:", marker.getCreatedBy(), row);
         row = addRow(panel, gbc, "Created At:", formatDate(marker.getCreatedAt()), row);
-        row = addRow(panel, gbc, "Modified By:", dto.getModifiedBy(), row);
-        row = addRow(panel, gbc, "Modified At:", formatDate(dto.getModifiedAt()), row);
+        row = addRow(panel, gbc, "Modified By:", marker.getModifiedBy(), row);
+        row = addRow(panel, gbc, "Modified At:", formatDate(marker.getModifiedAt()), row);
         row = addRow(panel, gbc, "Status:", Optional.ofNullable(marker.getStatusLabel()).orElse(""), row);
 
         GridBagConstraints spacerGbc = new GridBagConstraints();

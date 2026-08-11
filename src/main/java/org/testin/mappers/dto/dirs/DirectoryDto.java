@@ -35,30 +35,18 @@ public abstract class DirectoryDto {
     @ToString.Exclude
     private DirectoryDto parent;
 
-    @NonNull
-    @Builder.Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
-    @NonNull
-    @Builder.Default
-    private String createdBy = "";
-
-    @NonNull
-    @Builder.Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime modifiedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
-    @NonNull
-    @Builder.Default
-    private String modifiedBy = "";
-
     /**
      * The node's marker; each subtype's Lombok-generated getter returns its
-     * concrete marker type and satisfies this by covariant return.
+     * concrete marker type and satisfies this by covariant return. Audit info
+     * (created/modified by and when) lives only here — the marker JSON is the
+     * persisted truth, the DTO stores none of it.
      */
     @NonNull
     public abstract IMarker getMarker();
+
+    /** File name of this node's marker JSON inside the directory. */
+    @NonNull
+    public abstract String getMarkerFileName();
 
     @NonNull
     public abstract CreateNodeMenu getMenu();

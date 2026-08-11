@@ -3,6 +3,7 @@ package org.testin.mappers.dto.dirs;
 import org.jetbrains.annotations.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.testin.enums.DirectoryType;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestRunsMainDirectoryMarker;
@@ -33,5 +34,10 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
     @Override
     public boolean isRenamable() {
         return false;
+    }
+
+    @Override
+    public String getMarkerFileName() {
+        return DirectoryType.TRD.getMarker();
     }
 }

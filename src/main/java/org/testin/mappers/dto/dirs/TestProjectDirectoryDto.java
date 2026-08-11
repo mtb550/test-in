@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.enums.DirectoryType;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestProjectMarker;
@@ -43,4 +44,9 @@ public class TestProjectDirectoryDto extends DirectoryDto {
         return indexer.getTestSetPackageByPath(folder);
     }
 
+
+    @Override
+    public String getMarkerFileName() {
+        return DirectoryType.TP.getMarker();
+    }
 }

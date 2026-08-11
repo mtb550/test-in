@@ -16,9 +16,9 @@ import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
+import org.testin.settings.AppSettingsState;
 
 import javax.swing.tree.TreePath;
-import java.time.ZonedDateTime;
 
 public class UpdateTestProjectStatusAction extends DumbAwareAction {
 
@@ -44,8 +44,7 @@ public class UpdateTestProjectStatusAction extends DumbAwareAction {
         try {
             final TestProjectMarker marker = tp.getMarker();
             marker.setStatus(projectStatus);
-            marker.setUpdatedBy(System.getProperty("user.name", ""));
-            marker.setUpdatedAt(ZonedDateTime.now());
+            marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
             tp.setMarker(marker);
 
             Services.getInstance(p, ProjectIndexer.class).persistTestProjectMarker(p, tp);

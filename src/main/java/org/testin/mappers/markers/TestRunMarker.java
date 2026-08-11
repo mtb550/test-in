@@ -32,6 +32,15 @@ public class TestRunMarker implements IMarker {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
+    @NonNull
+    @Builder.Default
+    private String modifiedBy = "";
+
+    @NonNull
+    @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    private ZonedDateTime modifiedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+
     @com.fasterxml.jackson.annotation.JsonIgnore
     @Override
     public String getStatusLabel() {

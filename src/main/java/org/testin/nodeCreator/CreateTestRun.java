@@ -19,7 +19,6 @@ import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
-import org.testin.mappers.markers.MarkerMapper;
 import org.testin.mappers.markers.TestRunMarker;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
@@ -150,7 +149,9 @@ public class CreateTestRun implements NodeCreator {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Services.getInstance(p, ProjectIndexer.class).putTestRun(savePath, tr);
 
-            TestRunMarker marker = Services.getInstance(p, MarkerMapper.class).setTestRunMarker();
+            // Defaults are correct (status CREATED); addTestRunDir stamps the
+            // tester's audit info before the marker's first write.
+            TestRunMarker marker = new TestRunMarker();
             trDir.setMarker(marker);
 
             Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir);

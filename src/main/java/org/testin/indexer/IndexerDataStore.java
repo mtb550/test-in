@@ -13,8 +13,10 @@ import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.*;
+import org.testin.mappers.markers.IMarker;
 import org.testin.mappers.markers.TestRunMarker;
 import org.testin.services.Services;
+import org.testin.settings.AppSettingsState;
 import org.testin.util.FilesUtil;
 
 import java.nio.file.Path;
@@ -154,10 +156,25 @@ final class IndexerDataStore {
 
     private <V extends DirectoryDto> void addDir(final @NotNull Map<String, V> map, final @NotNull V dto,
                                                  final @NotNull String markerFileName, final @NotNull Object marker) {
+        stampIfNew(marker);
         map.put(dto.getPath().toString(), dto);
         childrenIndex.invalidate();
         writeMarker(dto.getPath(), markerFileName, marker);
         refreshDir(dto.getPath());
+    }
+
+    /**
+     * New markers (createdBy still blank) get the full audit stamp before
+     * their first write; markers loaded from disk pass through untouched.
+     */
+    private void stampIfNew(final @NotNull Object marker) {
+        if (marker instanceof IMarker m && m.getCreatedBy().isEmpty()) {
+            m.stampCreated(testerName());
+        }
+    }
+
+    private @NotNull String testerName() {
+        return Services.getInstance(p, AppSettingsState.class).testerName;
     }
 
     private void writeMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
@@ -267,6 +284,8 @@ final class IndexerDataStore {
         testRunsMainDirsByPath.put(tp.getTestRunsDirectory().getPath().toString(), tp.getTestRunsDirectory());
         childrenIndex.invalidate();
 
+        stampIfNew(tp.getTestCasesDirectory().getMarker());
+        stampIfNew(tp.getTestRunsDirectory().getMarker());
         writeMarker(tp.getTestCasesDirectory().getPath(), DirectoryType.TCD.getMarker(), tp.getTestCasesDirectory().getMarker());
         writeMarker(tp.getTestRunsDirectory().getPath(), DirectoryType.TRD.getMarker(), tp.getTestRunsDirectory().getMarker());
         refreshDir(tp.getPath());
@@ -275,6 +294,7 @@ final class IndexerDataStore {
     }
 
     void addTestProjectMarker(final @NotNull Project p, final @NotNull TestProjectDirectoryDto tp) {
+        stampIfNew(tp.getMarker());
         final Path markerPath = tp.getPath().resolve(DirectoryType.TP.getMarker());
         Services.getInstance(p, FilesUtil.class).write(p, markerPath, tp.getMarker());
     }
@@ -308,14 +328,21 @@ final class IndexerDataStore {
         renameDescendantKeys(testCaseStore.getTestSetCaseIds(), oldPath, newPath);
         renameDescendantKeys(testRunsByPath, oldPath, newPath);
         childrenIndex.invalidate();
+
+        // The renamed/moved node itself was modified - record it in the marker,
+        // the persisted home of audit info. Descendants only changed location,
+        // so their own audit stays untouched.
+        final DirectoryDto renamed = findByPath(newPath);
+        if (renamed != null) {
+            renamed.getMarker().touch(testerName());
+            writeMarker(renamed.getPath(), renamed.getMarkerFileName(), renamed.getMarker());
+        }
     }
 
     private void updatePathAndPath2(final @NotNull DirectoryDto dto, final Path newPath, final @Nullable DirectoryDto newParent) {
         dto.setPath(newPath);
         dto.setName(newPath.getFileName().toString());
         dto.setParent(newParent);
-        dto.setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        dto.setModifiedBy(System.getProperty("user.name", ""));
         rebuildPath2(dto);
     }
 
