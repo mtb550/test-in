@@ -50,19 +50,17 @@ public class MarkerDetailsViewDialog {
 
         int row = 0;
 
+        // Creation info comes from the marker - the only place it is stored -
+        // through the IMarker contract; a new marker type needs no new branch.
+        final IMarker marker = dto.getMarker();
+
         row = addRow(panel, gbc, "Name:", dto.getName(), row);
         row = addRow(panel, gbc, "Path:", dto.getPath().toString(), row);
-        row = addRow(panel, gbc, "Created By:", dto.getCreatedBy(), row);
-        row = addRow(panel, gbc, "Created At:", formatDate(dto.getCreatedAt()), row);
+        row = addRow(panel, gbc, "Created By:", marker.getCreatedBy(), row);
+        row = addRow(panel, gbc, "Created At:", formatDate(marker.getCreatedAt()), row);
         row = addRow(panel, gbc, "Modified By:", dto.getModifiedBy(), row);
         row = addRow(panel, gbc, "Modified At:", formatDate(dto.getModifiedAt()), row);
-
-        // Every node type shows its marker rows through the IMarker contract;
-        // a new marker type needs no new branch here.
-        final IMarker marker = dto.getMarker();
         row = addRow(panel, gbc, "Status:", Optional.ofNullable(marker.getStatusLabel()).orElse(""), row);
-        row = addRow(panel, gbc, "Marker Created By:", marker.getCreatedBy(), row);
-        row = addRow(panel, gbc, "Marker Created At:", formatDate(marker.getCreatedAt()), row);
 
         GridBagConstraints spacerGbc = new GridBagConstraints();
         spacerGbc.gridy = row;
