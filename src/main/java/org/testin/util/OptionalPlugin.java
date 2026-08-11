@@ -1,6 +1,7 @@
 package org.testin.util;
 
-import com.intellij.ide.plugins.PluginManagerCore;
+import com.intellij.ide.plugins.PluginManager;
+import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
@@ -48,10 +49,9 @@ public enum OptionalPlugin {
     public boolean isAvailable() {
         Boolean value = available;
         if (value == null) {
-            // Loaded = installed and enabled; a disabled plugin's classes are
-            // just as absent as an uninstalled one's.
-            value = PluginManagerCore.getLoadedPlugins().stream()
-                    .anyMatch(descriptor -> pluginId.equals(descriptor.getPluginId().getIdString()));
+            // Enabled = installed and not disabled; a disabled plugin's classes
+            // are just as absent as an uninstalled one's.
+            value = PluginManager.getInstance().findEnabledPlugin(PluginId.getId(pluginId)) != null;
             available = value;
         }
         return value;

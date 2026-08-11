@@ -1,2 +1,2 @@
-org.testin:2.7:Access to unresolved class com\.intellij\.psi\..*
-org.testin:2.7:(?s)Package 'com\.theoryinpractice' is not found.*
+org.testin:2.7.1:Access to unresolved class com\.intellij\.psi\..*
+org.testin:2.7.1:(?s)Package 'com\.theoryinpractice' is not found.*
