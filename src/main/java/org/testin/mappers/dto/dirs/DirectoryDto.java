@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateNodeMenu;
+import org.testin.mappers.markers.IMarker;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.Config;
 
@@ -52,9 +53,12 @@ public abstract class DirectoryDto {
     @Builder.Default
     private String modifiedBy = "";
 
-    // todo, how to make it
-    //@NotNull
-    //public abstract IMarker getMarker();
+    /**
+     * The node's marker; each subtype's Lombok-generated getter returns its
+     * concrete marker type and satisfies this by covariant return.
+     */
+    @NonNull
+    public abstract IMarker getMarker();
 
     @NonNull
     public abstract CreateNodeMenu getMenu();
