@@ -2,7 +2,6 @@ package org.testin.nodeCreator;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -19,7 +18,7 @@ public class CreateTestSetPackage implements NodeCreator {
     }
 
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull String name, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+    public @NotNull DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
         TestSetPackageDirectoryDto tsp = Services.getInstance(p, DirectoryMapper.class).getTestSetPackageNode(p, newDirPath, parentDir);
 
         Services.getInstance(p, ProjectIndexer.class).addTestSetPackage(tsp);

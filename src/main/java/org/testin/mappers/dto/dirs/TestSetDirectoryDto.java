@@ -1,8 +1,9 @@
 package org.testin.mappers.dto.dirs;
 
+import org.jetbrains.annotations.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestSetMarker;
@@ -20,7 +21,7 @@ public class TestSetDirectoryDto extends DirectoryDto {
     private TestSetMarker marker = new TestSetMarker();
 
     @Override
-    public @NonNull CreateNodeMenu getMenu() {
+    public @NotNull CreateNodeMenu getMenu() {
         return CreateNodeMenu.TEST_SET;
     }
 

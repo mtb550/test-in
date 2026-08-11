@@ -3,7 +3,6 @@ package org.testin.nodeCreator;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 import org.testin.generateJavaCode.GeneratorType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -22,7 +21,7 @@ public class CreateTestSet implements NodeCreator {
     }
 
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull String name, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+    public @NotNull DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
         final TestSetDirectoryDto ts = Services.getInstance(p, DirectoryMapper.class).getTestSetNode(p, newDirPath, parentDir);
 
         Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);

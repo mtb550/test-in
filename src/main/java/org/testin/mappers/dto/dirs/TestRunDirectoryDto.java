@@ -21,12 +21,12 @@ public class TestRunDirectoryDto extends DirectoryDto {
     private TestRunMarker marker = new TestRunMarker();
 
     @Override
-    public @NonNull CreateNodeMenu getMenu() {
+    public @NotNull CreateNodeMenu getMenu() {
         return CreateNodeMenu.TEST_RUN;
     }
 
     @Override
-    public @NonNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
+    public @NotNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
         throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + getClass().getSimpleName());
     }
 }

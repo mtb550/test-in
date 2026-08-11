@@ -2,7 +2,6 @@ package org.testin.nodeCreator;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -19,7 +18,7 @@ public class CreateTestRunPackage implements NodeCreator {
     }
 
     @Override
-    public @NonNull DirectoryDto execute(final @NonNull String name, final DirectoryDto parentDir, final @NonNull Path newDirPath) {
+    public @NotNull DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
         TestRunPackageDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).getTestRunPackageNode(p, newDirPath, parentDir);
 
         // The indexer owns all file/dir I/O: it creates the directory + .trp marker

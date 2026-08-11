@@ -10,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 import org.testin.editorPanel.EditorType;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.indexer.ProjectIndexer;
@@ -116,7 +115,7 @@ public final class EditorUtil {
         }
     }
 
-    private @NonNull List<String> getEntries(final @NotNull FileEditorManager fed) {
+    private @NotNull List<String> getEntries(final @NotNull FileEditorManager fed) {
         final VirtualFile[] openFiles = fed.getOpenFiles();
 
         final List<String> entries = new ArrayList<>();

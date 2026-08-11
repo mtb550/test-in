@@ -15,6 +15,7 @@ import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,10 +36,14 @@ public final class TestRunHtmlGenerator {
         // Compute summary stats
         final List<TestRunItems> results = tr.getResults();
         final int total = results.size();
-        final long passed = results.stream().filter(r -> r.getStatus() == TestStatus.PASSED).count();
-        final long failed = results.stream().filter(r -> r.getStatus() == TestStatus.FAILED).count();
-        final long blocked = results.stream().filter(r -> r.getStatus() == TestStatus.BLOCKED).count();
-        final long pending = results.stream().filter(r -> r.getStatus() == TestStatus.PENDING).count();
+        // One traversal counts every status; a new TestStatus constant is
+        // included automatically instead of needing another filter pass.
+        final Map<TestStatus, Long> counts = results.stream()
+                .collect(Collectors.groupingBy(TestRunItems::getStatus, Collectors.counting()));
+        final long passed = counts.getOrDefault(TestStatus.PASSED, 0L);
+        final long failed = counts.getOrDefault(TestStatus.FAILED, 0L);
+        final long blocked = counts.getOrDefault(TestStatus.BLOCKED, 0L);
+        final long pending = counts.getOrDefault(TestStatus.PENDING, 0L);
         final int passRate = total > 0 ? (int) (passed * 100 / total) : 0;
 
         // Run-level metadata

@@ -162,10 +162,14 @@ public final class TestRunPdfGenerator {
             document.add(sec2);
 
             long total = tr.getResults().size();
-            long passed = tr.getResults().stream().filter(r -> r.getStatus() == TestStatus.PASSED).count();
-            long failed = tr.getResults().stream().filter(r -> r.getStatus() == TestStatus.FAILED).count();
-            long blocked = tr.getResults().stream().filter(r -> r.getStatus() == TestStatus.BLOCKED).count();
-            long pending = tr.getResults().stream().filter(r -> r.getStatus() == TestStatus.PENDING || r.getStatus() == TestStatus.UNTESTED).count();
+            // One traversal counts every status; a new TestStatus constant is
+            // included automatically instead of needing another filter pass.
+            final Map<TestStatus, Long> counts = tr.getResults().stream()
+                    .collect(Collectors.groupingBy(TestRunItems::getStatus, Collectors.counting()));
+            long passed = counts.getOrDefault(TestStatus.PASSED, 0L);
+            long failed = counts.getOrDefault(TestStatus.FAILED, 0L);
+            long blocked = counts.getOrDefault(TestStatus.BLOCKED, 0L);
+            long pending = counts.getOrDefault(TestStatus.PENDING, 0L) + counts.getOrDefault(TestStatus.UNTESTED, 0L);
             long passRate = total > 0 ? (passed * 100 / total) : 0;
 
             document.add(new Paragraph(

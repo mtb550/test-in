@@ -3,7 +3,7 @@ package org.testin.mappers.dto.dirs;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestProjectMarker;
@@ -34,7 +34,7 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     private TestProjectMarker marker = new TestProjectMarker();
 
     @Override
-    public @NonNull CreateNodeMenu getMenu() {
+    public @NotNull CreateNodeMenu getMenu() {
         return CreateNodeMenu.TEST_PROJECT;
     }
 

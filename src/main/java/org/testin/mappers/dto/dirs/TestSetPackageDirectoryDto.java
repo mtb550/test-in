@@ -1,5 +1,6 @@
 package org.testin.mappers.dto.dirs;
 
+import org.jetbrains.annotations.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.testin.enums.CreateNodeMenu;
@@ -19,12 +20,12 @@ public class TestSetPackageDirectoryDto extends DirectoryDto {
     private TestSetPackageMarker marker = new TestSetPackageMarker();
 
     @Override
-    public @NonNull CreateNodeMenu getMenu() {
+    public @NotNull CreateNodeMenu getMenu() {
         return CreateNodeMenu.TEST_SET_PACKAGE;
     }
 
     @Override
-    public @NonNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
+    public @NotNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
         return indexer.getTestSetByPath(folder);
     }
 

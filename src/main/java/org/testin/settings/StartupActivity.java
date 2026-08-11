@@ -6,7 +6,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Key;
 import kotlin.coroutines.Continuation;
-import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Level;
@@ -87,7 +86,7 @@ public final class StartupActivity implements ProjectActivity {
     }
 
     @Override
-    public @NonNull Object execute(@NotNull Project p, @NotNull Continuation<? super kotlin.Unit> continuation) {
+    public @NotNull Object execute(@NotNull Project p, @NotNull Continuation<? super kotlin.Unit> continuation) {
         execute(p);
         return kotlin.Unit.INSTANCE;
     }

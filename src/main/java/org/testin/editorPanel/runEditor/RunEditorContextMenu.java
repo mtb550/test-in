@@ -9,6 +9,7 @@ import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.statusBar.NextPageAction;
 import org.testin.editorPanel.statusBar.PrevPageAction;
+import org.testin.enums.TestStatus;
 import org.testin.generateReport.GenerateReportAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -30,9 +31,11 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         this.p = p;
         this.ui = ui;
 
-        add(new SetTestCaseStatusPassedAction(p, ui, list));
-        add(new SetTestCaseStatusFailedAction(p, ui, list));
-        add(new SetTestCaseStatusBlockedAction(p, ui, list));
+        // One action per user-settable status: a new TestStatus constant shows
+        // up here automatically (issue #37).
+        for (final TestStatus status : TestStatus.values()) {
+            if (status.isUserSettable()) add(new SetTestCaseStatusAction(p, ui, list, status));
+        }
         addSeparator();
         add(new SetActualResultAction(p, ui, list));
         add(new UpdateRunItemAction(p, ui, list));
