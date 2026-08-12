@@ -3,6 +3,8 @@ package org.testin.services;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.Collections;
@@ -15,52 +17,52 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service(Service.Level.PROJECT)
 public final class TestCaseCacheService implements Disposable {
 
-    private final Set<String> descriptions = ConcurrentHashMap.newKeySet();
-    private final Set<String> expectedResults = ConcurrentHashMap.newKeySet();
-    private final Set<String> modules = ConcurrentHashMap.newKeySet();
-    private final Set<String> steps = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<String> descriptions = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<String> expectedResults = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<String> modules = ConcurrentHashMap.newKeySet();
+    private final @NotNull Set<String> steps = ConcurrentHashMap.newKeySet();
 
-    public Set<String> getDescription() {
+    public @NotNull Set<String> getDescription() {
         return Collections.unmodifiableSet(descriptions);
     }
 
-    public Set<String> getExpectedResults() {
+    public @NotNull Set<String> getExpectedResults() {
         return Collections.unmodifiableSet(expectedResults);
     }
 
-    public Set<String> getModules() {
+    public @NotNull Set<String> getModules() {
         return Collections.unmodifiableSet(modules);
     }
 
-    public Set<String> getSteps() {
+    public @NotNull Set<String> getSteps() {
         return Collections.unmodifiableSet(steps);
     }
 
-    public void addDescription(final String t) {
+    public void addDescription(final @Nullable String t) {
         if (t != null && !t.trim().isEmpty()) descriptions.add(t.trim());
     }
 
-    public void addExpectedResult(final String e) {
+    public void addExpectedResult(final @Nullable String e) {
         if (e != null && !e.trim().isEmpty()) expectedResults.add(e.trim());
     }
 
-    public void addModule(final String e) {
+    public void addModule(final @Nullable String e) {
         if (e != null && !e.trim().isEmpty()) modules.add(e.trim());
     }
 
-    public void addStep(final String s) {
+    public void addStep(final @Nullable String s) {
         if (s != null && !s.trim().isEmpty()) steps.add(s.trim());
     }
 
-    public void load(final List<TestCaseDto> testCases) {
+    public void load(final @Nullable List<TestCaseDto> testCases) {
         cacheAsync(testCases);
     }
 
-    public void addNewItems(final List<TestCaseDto> tcs) {
+    public void addNewItems(final @Nullable List<TestCaseDto> tcs) {
         cacheAsync(tcs);
     }
 
-    private void cacheAsync(final List<TestCaseDto> testCases) {
+    private void cacheAsync(final @Nullable List<TestCaseDto> testCases) {
         if (testCases == null || testCases.isEmpty()) return;
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 testCases.forEach(tc -> {

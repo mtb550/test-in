@@ -20,11 +20,11 @@ public final class TestCasePersistService implements Disposable {
         this.p = p;
     }
 
-    public void persist(final Path path, final @Nullable List<TestCaseDto> tcs) {
+    public void persist(final @Nullable Path path, final @Nullable List<TestCaseDto> tcs) {
         if (path == null || tcs == null || tcs.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> ApplicationManager.getApplication().runWriteAction(() -> {
-            for (TestCaseDto tc : tcs) {
+            for (final TestCaseDto tc : tcs) {
                 if (tc == null) continue;
                 Services.getInstance(p, ProjectIndexer.class).putTestCase(path, tc);
             }

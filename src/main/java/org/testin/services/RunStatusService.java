@@ -35,11 +35,11 @@ public final class RunStatusService {
     public void executeNext(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
-        int executingIndex = editor.getCurrentlyExecutingIndex();
+        final int executingIndex = editor.getCurrentlyExecutingIndex();
         if (executingIndex == -1) return;
 
-        TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
-        TestRunItems item = editor.getResultsMap().get(currentTc.getId());
+        final TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
+        final TestRunItems item = editor.getResultsMap().get(currentTc.getId());
 
         if (item != null) {
             item.setStatus(status);
@@ -53,10 +53,10 @@ public final class RunStatusService {
         triggerFilterRefresh(ui, list);
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            UUID currentId = currentTc.getId();
-            boolean stillInList = editor.getCurrentTestCases().stream()
+            final UUID currentId = currentTc.getId();
+            final boolean stillInList = editor.getCurrentTestCases().stream()
                     .anyMatch(t -> t.getId().equals(currentId));
-            int nextIndex = stillInList ? executingIndex + 1 : executingIndex;
+            final int nextIndex = stillInList ? executingIndex + 1 : executingIndex;
             editor.startTimerForIndex(nextIndex);
         });
     }
@@ -64,10 +64,10 @@ public final class RunStatusService {
     public void executeManual(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
-        TestRunItems item = editor.getResultsMap().get(tc.getId());
+        final TestRunItems item = editor.getResultsMap().get(tc.getId());
         if (item == null) return;
 
-        int tcIndex = editor.getCurrentTestCases().indexOf(tc);
+        final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
             editor.stopExecution();
         }
@@ -85,26 +85,26 @@ public final class RunStatusService {
     public void applyStatus(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
-        List<TestCaseDto> selectedItems = list.getSelectedValuesList();
+        final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         if (selectedItems.size() == 1) {
-            TestCaseDto tc = selectedItems.getFirst();
-            int globalIndex = editor.getCurrentTestCases().indexOf(tc);
+            final TestCaseDto tc = selectedItems.getFirst();
+            final int globalIndex = editor.getCurrentTestCases().indexOf(tc);
             if (globalIndex == editor.getCurrentlyExecutingIndex()) {
                 executeNext(p, ui, list, status);
             } else {
                 executeManual(p, ui, tc, status);
             }
         } else {
-            for (TestCaseDto tc : selectedItems) {
-                TestRunItems item = editor.getResultsMap().get(tc.getId());
+            for (final TestCaseDto tc : selectedItems) {
+                final TestRunItems item = editor.getResultsMap().get(tc.getId());
                 if (item != null) {
                     item.setStatus(status);
                     item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
                     item.setExecutedBy(Services.getInstance(p, AppSettingsState.class).testerName);
 
-                    int tcIndex = editor.getCurrentTestCases().indexOf(tc);
+                    final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
                     if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
                         editor.stopExecution();
                     }
@@ -148,7 +148,7 @@ public final class RunStatusService {
         Services.getInstance(p, ProjectIndexer.class).persistRunMarker(runPath, marker);
     }
 
-    private void triggerFilterRefresh(final @NotNull IEditor editor, final JBList<TestCaseDto> list) {
+    private void triggerFilterRefresh(final @NotNull IEditor editor, final @Nullable JBList<TestCaseDto> list) {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (list != null) {
                 list.repaint();
