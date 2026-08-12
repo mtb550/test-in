@@ -1,4 +1,4 @@
-package org.testin.generateJavaCode.pkg;
+package org.testin.codegen.pkg;
 
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
@@ -9,7 +9,7 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.codegen.GeneratorAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.services.Services;

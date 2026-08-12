@@ -1,10 +1,10 @@
-package org.testin.generateJavaCode.pkg;
+package org.testin.codegen.pkg;
 
 import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.codegen.GeneratorAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.services.Services;

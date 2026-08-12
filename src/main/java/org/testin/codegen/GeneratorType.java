@@ -1,10 +1,10 @@
-package org.testin.generateJavaCode;
+package org.testin.codegen;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.generateJavaCode.method.update.NoOpCodeUpdate;
+import org.testin.codegen.method.update.NoOpCodeUpdate;
 import org.testin.util.OptionalPlugin;
 
 /**

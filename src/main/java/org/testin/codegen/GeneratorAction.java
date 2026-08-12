@@ -1,4 +1,4 @@
-package org.testin.generateJavaCode;
+package org.testin.codegen;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;

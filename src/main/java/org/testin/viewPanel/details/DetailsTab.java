@@ -14,7 +14,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
-import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.codegen.GeneratorAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.Config;

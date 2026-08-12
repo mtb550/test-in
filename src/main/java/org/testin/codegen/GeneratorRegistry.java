@@ -1,20 +1,20 @@
-package org.testin.generateJavaCode;
+package org.testin.codegen;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.clazz.CreateJavaClass;
-import org.testin.generateJavaCode.clazz.RemoveJavaClass;
-import org.testin.generateJavaCode.clazz.RenameJavaClass;
-import org.testin.generateJavaCode.method.CreateTestMethod;
-import org.testin.generateJavaCode.method.RemoveTestMethod;
-import org.testin.generateJavaCode.method.RenameTestMethod;
-import org.testin.generateJavaCode.method.update.UpdateTestDescription;
-import org.testin.generateJavaCode.method.update.UpdateTestGroup;
-import org.testin.generateJavaCode.method.update.UpdateTestPriority;
-import org.testin.generateJavaCode.pkg.CreateJavaPackage;
-import org.testin.generateJavaCode.pkg.RemoveJavaPackage;
-import org.testin.generateJavaCode.pkg.RenameJavaPackage;
+import org.testin.codegen.clazz.CreateJavaClass;
+import org.testin.codegen.clazz.RemoveJavaClass;
+import org.testin.codegen.clazz.RenameJavaClass;
+import org.testin.codegen.method.CreateTestMethod;
+import org.testin.codegen.method.RemoveTestMethod;
+import org.testin.codegen.method.RenameTestMethod;
+import org.testin.codegen.method.update.UpdateTestDescription;
+import org.testin.codegen.method.update.UpdateTestGroup;
+import org.testin.codegen.method.update.UpdateTestPriority;
+import org.testin.codegen.pkg.CreateJavaPackage;
+import org.testin.codegen.pkg.RemoveJavaPackage;
+import org.testin.codegen.pkg.RenameJavaPackage;
 
 import java.util.EnumMap;
 import java.util.Map;

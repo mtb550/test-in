@@ -3,7 +3,7 @@ package org.testin.nodeCreator;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.GeneratorType;
+import org.testin.codegen.GeneratorType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.DirectoryMapper;

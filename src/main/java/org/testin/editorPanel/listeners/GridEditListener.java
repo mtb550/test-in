@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
-import org.testin.generateJavaCode.GeneratorType;
+import org.testin.codegen.GeneratorType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;

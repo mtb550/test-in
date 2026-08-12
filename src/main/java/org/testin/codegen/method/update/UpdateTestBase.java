@@ -1,4 +1,4 @@
-package org.testin.generateJavaCode.method.update;
+package org.testin.codegen.method.update;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;

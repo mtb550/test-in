@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
-import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.codegen.GeneratorAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;

@@ -5,7 +5,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.GeneratorType;
+import org.testin.codegen.GeneratorType;
 import org.testin.statusBar.IStatusBarItem;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;

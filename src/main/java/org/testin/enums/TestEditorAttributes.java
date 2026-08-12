@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.Shared;
-import org.testin.generateJavaCode.GeneratorType;
+import org.testin.codegen.GeneratorType;
 import org.testin.importExport.imports.ImportSetter;
 import org.testin.mappers.Config;
 import org.testin.mappers.dto.TestCaseDto;

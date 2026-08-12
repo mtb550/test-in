@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.GeneratorType;
+import org.testin.codegen.GeneratorType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.DirectoryMapper;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;

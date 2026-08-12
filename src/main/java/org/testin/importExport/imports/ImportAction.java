@@ -12,7 +12,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
-import org.testin.generateJavaCode.method.CreateTestMethod;
+import org.testin.codegen.method.CreateTestMethod;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;

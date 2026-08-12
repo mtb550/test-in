@@ -1,4 +1,4 @@
-package org.testin.generateJavaCode.clazz;
+package org.testin.codegen.clazz;
 
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
@@ -6,7 +6,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.GeneratorAction;
+import org.testin.codegen.GeneratorAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;

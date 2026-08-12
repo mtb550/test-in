@@ -7,8 +7,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.clazz.RenameJavaClass;
-import org.testin.generateJavaCode.pkg.RenameJavaPackage;
+import org.testin.codegen.clazz.RenameJavaClass;
+import org.testin.codegen.pkg.RenameJavaPackage;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -102,7 +102,7 @@ public class RenameAction extends DumbAwareAction {
         });
     }
 
-    // todo, to be moved to generateCode package and enhance, later
+    // todo, to be moved to the codegen package and enhanced, later (#51)
     private void dispatchRenameCodeGenerator(final @NotNull DirectoryDto dir, final @NotNull String newName) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
 

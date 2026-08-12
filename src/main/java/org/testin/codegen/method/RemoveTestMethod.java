@@ -1,9 +1,9 @@
-package org.testin.generateJavaCode.method;
+package org.testin.codegen.method;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.generateJavaCode.GeneratorAction;
-import org.testin.generateJavaCode.method.update.UpdateTestBase;
+import org.testin.codegen.GeneratorAction;
+import org.testin.codegen.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 
