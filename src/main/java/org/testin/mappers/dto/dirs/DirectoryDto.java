@@ -118,6 +118,15 @@ public abstract class DirectoryDto {
     }
 
     /**
+     * True when this node may be pasted or dropped into a test run;
+     * test runs and run packages say no — a run holds run items only,
+     * never nested run structure.
+     */
+    public boolean isAllowedInsideTestRun() {
+        return true;
+    }
+
+    /**
      * True when the given node may be pasted or dropped into this one; the
      * test-set family additionally rejects run nodes.
      */

@@ -107,9 +107,26 @@ public class TreeTransferRestrictionsTest {
                 assertFalse(target.acceptsTransferred(source),
                         target.getClass().getSimpleName() + " must reject " + source.getClass().getSimpleName());
             }
-            assertTrue(target.acceptsTransferred(new TestRunDirectoryDto()),
-                    target.getClass().getSimpleName() + " must accept run nodes");
         }
+        assertTrue(new TestRunsMainDirectoryDto().acceptsTransferred(new TestRunPackageDirectoryDto()),
+                "the runs root must accept run packages");
+        assertTrue(new TestRunPackageDirectoryDto().acceptsTransferred(new TestRunPackageDirectoryDto()),
+                "run packages must accept run packages");
+    }
+
+    @Test
+    public void testRunAcceptsNoRunStructure() {
+        final DirectoryDto testRun = new TestRunDirectoryDto();
+
+        assertFalse(testRun.acceptsTransferred(new TestRunDirectoryDto()),
+                "no test run into a test run");
+        assertFalse(testRun.acceptsTransferred(new TestRunPackageDirectoryDto()),
+                "no run package into a test run");
+
+        assertTrue(new TestRunsMainDirectoryDto().acceptsTransferred(new TestRunDirectoryDto()),
+                "the runs root must still accept test runs");
+        assertTrue(new TestRunPackageDirectoryDto().acceptsTransferred(new TestRunDirectoryDto()),
+                "run packages must still accept test runs");
     }
 
     @Test
