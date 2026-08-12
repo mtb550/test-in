@@ -10,11 +10,13 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
-import org.testin.mappers.dto.dirs.*;
+import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
-import org.testin.ui.dialogs.ConfirmationPopupDialog;
+import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.EditorUtil;
 
 import javax.swing.tree.TreePath;
@@ -36,9 +38,7 @@ public class RemoveAction extends DumbAwareAction {
     }
 
     private boolean isRemovable(final Object dir) {
-        return dir instanceof DirectoryDto &&
-                !(dir instanceof TestCasesMainDirectoryDto) &&
-                !(dir instanceof TestRunsMainDirectoryDto);
+        return dir instanceof DirectoryDto dto && dto.isRemovable();
     }
 
     private List<DirectoryDto> getRemovableNodes(final TreePath[] paths) {
@@ -56,21 +56,18 @@ public class RemoveAction extends DumbAwareAction {
         List<DirectoryDto> nodesToRemove = getRemovableNodes(paths);
         if (nodesToRemove.isEmpty()) return;
 
-        String msg = nodesToRemove.size() == 1
+        final String msg = nodesToRemove.size() == 1
                 ? "Remove '" + nodesToRemove.getFirst().getName() + "'?"
                 : "Remove these " + nodesToRemove.size() + " items?";
 
-        new ConfirmationPopupDialog(
-                p,
-                "Confirm Removing",
-                AllIcons.Actions.GC,
-                msg + "\n\nPress Enter to remove or Escape to cancel.",
-                () -> removeNodes(nodesToRemove)
-        ).show();
+        // Single node: its path shows exactly what is being deleted.
+        final String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : null;
+
+        new ConfirmDialog(p, "Confirm Removing", msg, from, null, "Remove", () -> removeNodes(nodesToRemove)).show();
     }
 
     private void removeNodes(final List<DirectoryDto> nodesToRemove) {
-        for (DirectoryDto pkg : nodesToRemove) {
+        for (final DirectoryDto pkg : nodesToRemove) {
 
             if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
                 Services.getInstance(p, EditorUtil.class).close(p, pkg.getName());

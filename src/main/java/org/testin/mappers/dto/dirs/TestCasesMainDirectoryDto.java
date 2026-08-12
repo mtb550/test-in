@@ -37,12 +37,29 @@ public class TestCasesMainDirectoryDto extends DirectoryDto {
     }
 
     @Override
+    public boolean isTransferable() {
+        return false;
+    }
+
+    @Override
+    public boolean isRemovable() {
+        return false;
+    }
+
+    @Override
     public boolean isTestCaseContainer() {
         return true;
     }
 
     @Override
-    public String getMarkerFileName() {
+    public @NotNull String getMarkerFileName() {
         return DirectoryType.TCD.getMarker();
     }
+
+    @Override
+    public boolean acceptsTransferred(final DirectoryDto source) {
+        // Run nodes never land in the test-set family.
+        return super.acceptsTransferred(source) && source.isAllowedInTestSetFamily();
+    }
+
 }

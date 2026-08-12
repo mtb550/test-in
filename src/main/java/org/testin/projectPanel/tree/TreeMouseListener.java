@@ -27,7 +27,7 @@ public class TreeMouseListener extends PopupHandler {
 
     @Override
     public void invokePopup(final Component comp, final int x, final int y) {
-        TreePath selPath = tree.getPathForLocation(x, y);
+        final TreePath selPath = rowPathAt(x, y);
 
         if (selPath != null && TreeValueUtil.directoryOf(selPath.getLastPathComponent()) != null) {
 
@@ -42,7 +42,7 @@ public class TreeMouseListener extends PopupHandler {
 
     @Override
     public void mouseClicked(final MouseEvent e) {
-        TreePath selPath = tree.getPathForLocation(e.getX(), e.getY());
+        final TreePath selPath = rowPathAt(e.getX(), e.getY());
 
         if (selPath == null || TreeValueUtil.directoryOf(selPath.getLastPathComponent()) == null)
             return;
@@ -51,5 +51,21 @@ public class TreeMouseListener extends PopupHandler {
             new OpenAction(p, tree).execute(p);
             e.consume();
         }
+    }
+
+    /**
+     * The whole row responds, not only the label: the wide selection paints
+     * the full width, so clicks in the indentation or right of the text must
+     * hit the same node. Matches the row by Y alone; below the last row is
+     * still a miss.
+     */
+    private TreePath rowPathAt(final int x, final int y) {
+        final int row = tree.getClosestRowForLocation(x, y);
+        if (row < 0) return null;
+
+        final Rectangle bounds = tree.getRowBounds(row);
+        if (bounds == null || y < bounds.y || y >= bounds.y + bounds.height) return null;
+
+        return tree.getPathForRow(row);
     }
 }

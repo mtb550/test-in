@@ -3,28 +3,50 @@ package org.testin.rename;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.ui.dialogs.AbstractInputPopupDialog;
+import org.testin.ui.framework.AbstractFrameworkDialog;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.ui.framework.TextInput;
+import org.testin.util.Shortcuts;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * Rename popup using the shared dynamic input-dialog design.
+ * Renames a tree node. The constructor is the declaration: title, component,
+ * status bar mapping — plus the submit action.
  */
-final class RenameDialog extends AbstractInputPopupDialog {
+final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
 
     private final @NotNull Consumer<@NotNull String> onSubmit;
 
-    RenameDialog(final @NotNull Project project,
-                 final @NotNull String currentName,
-                 final @NotNull Consumer<@NotNull String> onSubmit) {
-        super(project, "Rename", AllIcons.Actions.Edit, "set new name..", currentName);
+    RenameDialog(final @NotNull Project p, final @NotNull String currentName, final @NotNull Consumer<@NotNull String> onSubmit) {
+        super(p);
         this.onSubmit = onSubmit;
-        setLeadingIcon(AllIcons.Actions.Edit);
-        initializeInputPopup();
+
+        title = "Rename";
+
+        components = List.of(
+                ComponentDialogBase.textField()
+                        .icon(AllIcons.Actions.Edit)
+                        .placeholder("set new name..")
+                        .value(currentName)
+                        .build());
+
+        shortcuts = List.of(
+                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", this::submit),
+                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
     }
 
     @Override
-    protected void onSubmit(final @NotNull String value) {
+    protected void submit() {
+        final String value = component().getText().trim();
+        if (value.isEmpty()) {
+            component().showEmptyWarning();
+            return;
+        }
+
         onSubmit.accept(value);
+        closeOk();
     }
 }

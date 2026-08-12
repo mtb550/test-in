@@ -29,6 +29,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+/**
+ * The single owner of file access. No other class may read, write or execute
+ * operations on virtual files (VFS) or physical files — everything goes
+ * through the indexer so its cache objects stay authoritative and every read
+ * is a fast in-memory lookup (e.g. {@link #nodeExists}). Exempt packages:
+ * {@code git}, {@code importExport}, {@code logger}.
+ * <p>
+ * Ordering rule: the cache update (which may persist markers — and marker
+ * writes create directories) runs only <b>after</b> the VFS operation
+ * succeeded, never before. Violating this creates phantom directories and
+ * "already exists in VFS" failures.
+ */
 @Service(Service.Level.PROJECT)
 public final class ProjectIndexer {
 
@@ -397,7 +409,14 @@ public final class ProjectIndexer {
         store.updateRunMarker(p, runPath, marker);
     }
 
-    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath) {
+    /**
+     * Cache lookup, no disk access: true when a tree node exists at the path.
+     */
+    public boolean nodeExists(final @NotNull Path path) {
+        return store.findByPath(path) != null;
+    }
+
+    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {
         Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, "Rename Failed", vf -> {
             try {
                 vf.rename(this, newPath.getFileName().toString());
@@ -405,7 +424,13 @@ public final class ProjectIndexer {
                 Logger.error(ex.getMessage());
                 throw new RuntimeException(ex);
             }
+
+            // The cache update persists the touched marker at the NEW path and
+            // that write creates directories - so it must run only after the
+            // VFS rename succeeded, or the target directory would already
+            // exist and the rename fails with "already exists in VFS".
+            store.renameNode(oldPath, newPath);
+            if (onFinished != null) onFinished.run();
         });
-        store.renameNode(oldPath, newPath);
     }
 }

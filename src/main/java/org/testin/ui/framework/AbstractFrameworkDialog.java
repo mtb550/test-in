@@ -25,6 +25,11 @@ import java.util.List;
 public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
 
     protected final @NotNull Project p;
+
+    // ------------------------------------------------------------------
+    // The declaration — the subclass assigns these in its constructor.
+    // ------------------------------------------------------------------
+
     protected String title;
     /**
      * The dialog's content, top to bottom. The first component is the primary
@@ -40,10 +45,6 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
      */
     protected List<StatusBarShortcut> shortcuts;
     private DialogDto dto;
-
-    // ------------------------------------------------------------------
-    // The declaration — the subclass assigns these in its constructor.
-    // ------------------------------------------------------------------
     private List<IDialogComponent> built;
     private JBPopup popup;
 

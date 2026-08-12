@@ -37,7 +37,19 @@ public class TestSetPackageDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public String getMarkerFileName() {
+    public @NotNull String getMarkerFileName() {
         return DirectoryType.TSP.getMarker();
     }
+
+    @Override
+    public boolean acceptsTransferred(final DirectoryDto source) {
+        // Run nodes never land in the test-set family.
+        return super.acceptsTransferred(source) && source.isAllowedInTestSetFamily();
+    }
+
+    @Override
+    public boolean isAllowedInTestRunFamily() {
+        return false;
+    }
+
 }

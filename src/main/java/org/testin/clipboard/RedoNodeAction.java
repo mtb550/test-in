@@ -7,7 +7,8 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
+import org.testin.projectPanel.tree.TreeUndoService;
+import org.testin.services.Services;
 import org.testin.util.Tools;
 
 import javax.swing.*;
@@ -27,12 +28,20 @@ public class RedoNodeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Logger.info("Tree Redo triggered");
+        Services.getInstance(p, TreeUndoService.class).redo();
+    }
+
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        final TreeUndoService redo = Services.getInstance(p, TreeUndoService.class);
+        e.getPresentation().setEnabled(redo.canRedo());
+        e.getPresentation().setText(redo.canRedo() ? "Redo " + redo.redoDescription() : "Redo");
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        // The undo stacks mutate on the EDT; reading them there avoids races.
+        return ActionUpdateThread.EDT;
     }
 
 }

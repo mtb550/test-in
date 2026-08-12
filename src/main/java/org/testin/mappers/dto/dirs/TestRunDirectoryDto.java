@@ -37,7 +37,19 @@ public class TestRunDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public String getMarkerFileName() {
+    public @NotNull String getMarkerFileName() {
         return DirectoryType.TR.getMarker();
     }
+
+    @Override
+    public boolean isAllowedInTestSetFamily() {
+        return false;
+    }
+
+    @Override
+    public boolean acceptsTransferred(final DirectoryDto source) {
+        // Test-set nodes never land in the run family.
+        return super.acceptsTransferred(source) && source.isAllowedInTestRunFamily();
+    }
+
 }

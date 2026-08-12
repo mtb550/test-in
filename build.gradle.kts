@@ -39,8 +39,11 @@ dependencies {
         testFramework(org.jetbrains.intellij.platform.gradle.TestFrameworkType.Platform)
     }
 
+    // Lombok is a compile-time tool: annotations generate plain Java, nothing
+    // references it at runtime - so it must never be packaged into the plugin
+    // distribution ("implementation" would ship its 2MB jar to the Marketplace).
     listOf(
-        "implementation", "compileOnly", "annotationProcessor", "testCompileOnly", "testAnnotationProcessor"
+        "compileOnly", "annotationProcessor", "testCompileOnly", "testAnnotationProcessor"
     ).forEach { configName ->
         add(configName, libs.lombok)
     }

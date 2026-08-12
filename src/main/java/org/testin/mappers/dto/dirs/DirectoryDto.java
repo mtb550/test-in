@@ -76,4 +76,52 @@ public abstract class DirectoryDto {
     public boolean isOpenableInEditor() {
         return false;
     }
+
+    /**
+     * True when the node can be cut, copied or dragged to another location;
+     * the test project and the fixed root containers say no.
+     */
+    public boolean isTransferable() {
+        return true;
+    }
+
+    /**
+     * True when the user may remove this node; the test project and the fixed
+     * root containers say no.
+     */
+    public boolean isRemovable() {
+        return true;
+    }
+
+    /**
+     * True when transferred nodes may be pasted or dropped into this node;
+     * the test project says no.
+     */
+    public boolean isTransferTarget() {
+        return true;
+    }
+
+    /**
+     * True when this node may be pasted or dropped into the test-set family;
+     * run nodes say no — they live only under the test runs directory.
+     */
+    public boolean isAllowedInTestSetFamily() {
+        return true;
+    }
+
+    /**
+     * True when this node may be pasted or dropped into the run family;
+     * test-set nodes say no — they live only under the test cases directory.
+     */
+    public boolean isAllowedInTestRunFamily() {
+        return true;
+    }
+
+    /**
+     * True when the given node may be pasted or dropped into this one; the
+     * test-set family additionally rejects run nodes.
+     */
+    public boolean acceptsTransferred(final DirectoryDto source) {
+        return isTransferTarget();
+    }
 }

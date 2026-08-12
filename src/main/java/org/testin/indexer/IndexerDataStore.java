@@ -345,7 +345,7 @@ final class IndexerDataStore {
     }
 
     @Nullable
-    private DirectoryDto findByPath(final @NotNull Path path) {
+    DirectoryDto findByPath(final @NotNull Path path) {
         final String key = path.toString();
         for (final Map<String, ? extends DirectoryDto> map : dirMaps) {
             final DirectoryDto dto = map.get(key);

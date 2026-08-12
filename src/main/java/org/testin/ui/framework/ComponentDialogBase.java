@@ -38,14 +38,68 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
     }
 
     /**
-     * Wraps any future component that implements {@link IDialogComponent}.
+     * An input field on its own — the rename-dialog component.
      */
-    public static <C extends IDialogComponent> @NotNull ComponentDialogBase<C> of(final @NotNull C component) {
-        return new ComponentDialogBase<>(component);
+    public static @NotNull TextInputBuilder textField() {
+        return new TextInputBuilder();
+    }
+
+    /**
+     * A plain message — the confirmation-dialog component. The muted From/To
+     * rows show where a transfer goes; pass null to omit either.
+     */
+    public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text,
+                                                                      final @Nullable String from,
+                                                                      final @Nullable String to) {
+        return new ComponentDialogBase<>(new DialogMessage(text, from, to));
+    }
+
+    /**
+     * Framework default: every declared icon renders desaturated, so the
+     * color accents of tree icons (e.g. badge dots) never distract inside
+     * a dialog. Dialogs pass their icons plain.
+     */
+    private static @Nullable Icon desaturate(final @Nullable Icon icon) {
+        return icon == null ? null : IconUtil.desaturate(icon);
     }
 
     public @NotNull C getComponent() {
         return component;
+    }
+
+    /**
+     * Fluent builder for {@link TextInput}.
+     */
+    public static final class TextInputBuilder {
+
+        private @Nullable Icon icon;
+        private @Nullable String placeholder;
+        private @Nullable String value;
+
+        private TextInputBuilder() {
+        }
+
+        public @NotNull TextInputBuilder icon(final @Nullable Icon icon) {
+            this.icon = desaturate(icon);
+            return this;
+        }
+
+        public @NotNull TextInputBuilder placeholder(final @Nullable String placeholder) {
+            this.placeholder = placeholder;
+            return this;
+        }
+
+        /**
+         * The value the field opens with (e.g. the current name on rename).
+         */
+        public @NotNull TextInputBuilder value(final @Nullable String value) {
+            this.value = value;
+            return this;
+        }
+
+        public @NotNull ComponentDialogBase<TextInput> build() {
+            return new ComponentDialogBase<>(new TextInput(icon, placeholder, value));
+        }
     }
 
     /**
@@ -58,15 +112,6 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
         private @Nullable String placeholder;
 
         private TextFieldBuilder() {
-        }
-
-        /**
-         * Framework default: every declared icon renders desaturated, so the
-         * color accents of tree icons (e.g. badge dots) never distract inside
-         * a dialog. Dialogs pass their icons plain.
-         */
-        private static @Nullable Icon desaturate(final @Nullable Icon icon) {
-            return icon == null ? null : IconUtil.desaturate(icon);
         }
 
         /**

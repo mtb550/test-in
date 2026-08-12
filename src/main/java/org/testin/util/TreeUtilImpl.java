@@ -23,11 +23,17 @@ public final class TreeUtilImpl {
 
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
-            VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
-            if (vf != null) {
-                operation.execute(vf);
-            } else {
-                Services.getInstance(p, Notifier.class).error(p, "Could not find path on disk:\n" + path, errorTitle);
+            try {
+                VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
+                if (vf != null) {
+                    operation.execute(vf);
+                } else {
+                    Services.getInstance(p, Notifier.class).error(p, "Could not find path on disk:\n" + path, errorTitle);
+                }
+            } catch (final Exception ex) {
+                // A failed VFS operation is reported, never thrown into the
+                // EDT as an exception dialog (parity with the two-path form).
+                Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
             }
         }));
     }

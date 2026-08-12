@@ -15,7 +15,9 @@ import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
+import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
+import org.testin.projectPanel.tree.TreeUndoService;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
@@ -58,22 +60,46 @@ public class RenameAction extends DumbAwareAction {
     private void renameNode(final @NotNull DirectoryDto dir, final @NotNull String newName) {
         if (newName.isBlank() || newName.equals(dir.getName())) return;
 
+        // A sibling with the new name would make the VFS rename fail with
+        // "already exists" - reject it with a message instead. Existence comes
+        // from the indexer cache - file access is the indexer's alone.
+        final Path parent = dir.getPath().getParent();
+        if (parent != null && Services.getInstance(p, ProjectIndexer.class).nodeExists(parent.resolve(newName))) {
+            Services.getInstance(p, Notifier.class).softShow(p,
+                    "'" + newName + "' already exists in '" + parent.getFileName() + "'");
+            return;
+        }
+
+        final String oldName = dir.getName();
+        applyRename(dir, newName);
+
+        // The dto reference stays valid across renames, so undo and redo are
+        // the same routine with the names swapped.
+        Services.getInstance(p, TreeUndoService.class).push(new TreeUndoService.TreeOperation(
+                "Rename '" + oldName + "'",
+                () -> applyRename(dir, oldName),
+                () -> applyRename(dir, newName)));
+    }
+
+    private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName) {
         Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 
         dispatchRenameCodeGenerator(dir, newName);
 
-        Path oldPath = dir.getPath();
-        Path newPath = oldPath.getParent().resolve(newName);
+        final Path oldPath = dir.getPath();
+        final Path newPath = oldPath.getParent().resolve(newName);
 
-        Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath);
+        // The tree refreshes only after the indexer finished the VFS rename
+        // and updated its cache - refreshing earlier shows stale state.
+        Services.getInstance(p, ProjectIndexer.class).renameNode(oldPath, newPath, () -> {
+            pp.getProjectTree().refresh();
 
-        pp.getProjectTree().refresh();
+            if (dir instanceof TestProjectDirectoryDto) {
+                pp.getTestProjectSelector().loadTestProjectList();
+            }
 
-        if (dir instanceof TestProjectDirectoryDto) {
-            pp.getTestProjectSelector().loadTestProjectList();
-        }
-
-        Logger.info("Success! Renamed to: " + newName);
+            Logger.info("Success! Renamed to: " + newName);
+        });
     }
 
     // todo, to be moved to generateCode package and enhance, later
