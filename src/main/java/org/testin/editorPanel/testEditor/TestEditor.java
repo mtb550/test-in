@@ -60,47 +60,47 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final @NotNull Project p;
 
     @Getter
-    private final TestSetDirectoryDto parent;
+    private final @NotNull TestSetDirectoryDto parent;
 
-    private final JBPanel<?> mainPanel;
+    private final @NotNull JBPanel<?> mainPanel;
 
     @Getter
     private final @NotNull JBList<TestCaseDto> list;
 
-    private final CollectionListModel<TestCaseDto> model;
-    private final TestEditorContextMenu contextMenu;
+    private final @NotNull CollectionListModel<TestCaseDto> model;
+    private final @NotNull TestEditorContextMenu contextMenu;
 
-    private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
-    private final JBScrollPane scrollPane;
-    private final ModelSyncListener syncListener;
-    private final Disposable projectDisposable;
+    private final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
+    private final @NotNull JBScrollPane scrollPane;
+    private final @NotNull ModelSyncListener syncListener;
+    private final @NotNull Disposable projectDisposable;
     /**
      * One counter for every model-replacing operation - data loads and badge
      * sorts alike (#24). Each one bumps and checks it, so a stale in-flight
      * result never overwrites a newer one, whichever kind it is.
      */
-    private final AtomicInteger modelGeneration = new AtomicInteger();
+    private final @NotNull AtomicInteger modelGeneration = new AtomicInteger();
     @Getter
     @NotNull
     private final AbstractToolbarPanel toolBar;
     @Getter
-    private final StatusBar statusBar;
+    private final @NotNull StatusBar statusBar;
     @Getter
-    private final List<TestCaseDto> allTestCases;
+    private final @NotNull List<TestCaseDto> allTestCases;
     @Getter
-    private final Set<UUID> unsortedIds;
+    private final @NotNull Set<UUID> unsortedIds;
     @Getter
-    private final List<TestCaseDto> currentTestCases;
+    private final @NotNull List<TestCaseDto> currentTestCases;
     /**
      * Child disposable for the current grid table's font-sync subscription;
      * replaced on every grid rebuild so old subscriptions do not accumulate.
      */
-    private Disposable gridFontSyncDisposable;
-    private JBTable gridTable;
+    private @Nullable Disposable gridFontSyncDisposable;
+    private @Nullable JBTable gridTable;
 
-    private JBScrollPane gridScrollPane;
+    private @Nullable JBScrollPane gridScrollPane;
 
-    private JComponent currentCenter;
+    private @Nullable JComponent currentCenter;
 
     @Getter
     @Setter
@@ -112,7 +112,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Getter
     @Setter
-    private String hoveredIconAction = null;
+    private @Nullable String hoveredIconAction = null;
 
     @Getter
     @Setter
@@ -241,7 +241,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             for (int i = 0; i < snapshot.size(); i++) {
-                TestCaseDto current = snapshot.get(i);
+                final TestCaseDto current = snapshot.get(i);
                 current.setIsHead(i == 0);
                 current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
             }
@@ -253,11 +253,11 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public void selectTestCase(final TestCaseDto tc) {
+    public void selectTestCase(final @Nullable TestCaseDto tc) {
         if (tc == null) return;
 
         if (!currentTestCases.contains(tc)) {
-            FilterPopupBtn popup = toolBar.getToolbarItem(FilterPopupBtn.class);
+            final FilterPopupBtn popup = toolBar.getToolbarItem(FilterPopupBtn.class);
             if (popup != null) popup.resetToolBarFilter();
 
             currentTestCases.clear();
@@ -289,7 +289,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public void appendNewTestCase(final TestCaseDto tc) {
+    public void appendNewTestCase(final @NotNull TestCaseDto tc) {
         this.allTestCases.add(tc);
         sortAndIdentifyUnsorted(() -> {
             updateSequenceAndSaveAll();
@@ -327,7 +327,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public void onToolBarSearchValueChanged(final String query) {
+    public void onToolBarSearchValueChanged(final @NotNull String query) {
         currentTestCases.clear();
         currentTestCases.addAll(getFilteredList());
         this.currentPage = 1;
@@ -358,9 +358,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarDetailsSelectionChanged() {
         Logger.debug("[details] selectedDetails changed -> " + getSelectedDetails());
-        if (model != null) {
-            model.allContentsChanged();
-        }
+        model.allContentsChanged();
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[details] grid active -> toggling column visibility");
             updateGridColumns();
@@ -389,12 +387,12 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-        FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
+        final FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null) {
             toolBarFilter.clearFilters();
         }
 
-        SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
+        final SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
         if (toolBarSearch != null) {
             toolBarSearch.resetSearchQuery();
         }
@@ -410,9 +408,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public Set<TestEditorAttributes> getSelectedDetails() {
-        AbstractToolbarPanel baseToolBar = getToolBar();
-        TestDetailsPopupBtn popup = baseToolBar.getToolbarItem(TestDetailsPopupBtn.class);
+    public @NotNull Set<TestEditorAttributes> getSelectedDetails() {
+        final AbstractToolbarPanel baseToolBar = getToolBar();
+        final TestDetailsPopupBtn popup = baseToolBar.getToolbarItem(TestDetailsPopupBtn.class);
         if (popup != null) {
             return popup.getSelectedDetails();
         }
@@ -444,7 +442,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         }
     }
 
-    private List<TestCaseDto> getCurrentPageItems() {
+    private @NotNull List<TestCaseDto> getCurrentPageItems() {
         final int totalItems = currentTestCases.size();
         final PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
         return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
@@ -478,7 +476,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         }
     }
 
-    private void setCenter(final JComponent component) {
+    private void setCenter(final @NotNull JComponent component) {
         Logger.debug("[center] setCenter -> " + component.getClass().getSimpleName()
                 + " (had center=" + (currentCenter != null) + ")");
         if (currentCenter != null) {
@@ -490,7 +488,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         mainPanel.repaint();
     }
 
-    private int getTotalPages(final List<TestCaseDto> filtered) {
+    private int getTotalPages(final @NotNull List<TestCaseDto> filtered) {
         return PageWindow.of(filtered.size(), currentPage, pageSize).totalPages();
     }
 
@@ -540,7 +538,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public Set<String> getAvailableModules() {
+    public @NotNull Set<String> getAvailableModules() {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         final Set<String> modules = new HashSet<>();
         for (final TestCaseDto tc : indexer.getTestCasesForTestSet(parent.getPath())) {
@@ -552,12 +550,10 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         return modules;
     }
 
-    private List<TestCaseDto> getFilteredList() {
-        final String query = toolBar.getSearchTxt() != null
-                ? toolBar.getSearchTxt().getSearchQuery() : "";
+    private @NotNull List<TestCaseDto> getFilteredList() {
+        final String query = toolBar.getSearchTxt().getSearchQuery();
 
-        FilterPopupBtn filterPopup;
-        filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
+        final FilterPopupBtn filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
 
         final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
         final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
@@ -579,13 +575,13 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         // registered against this editor's lifetime.
         Disposer.dispose(projectDisposable);
 
-        for (MouseListener listener : list.getMouseListeners())
+        for (final MouseListener listener : list.getMouseListeners())
             list.removeMouseListener(listener);
 
         toolBar.dispose();
         statusBar.dispose();
 
-        TestCaseDto selectedInThisFile = list.getSelectedValue();
+        final TestCaseDto selectedInThisFile = list.getSelectedValue();
 
         final ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
         if (viewer != null)
@@ -595,13 +591,10 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         currentTestCases.clear();
         unsortedIds.clear();
 
-        if (model != null) {
-            model.removeListDataListener(syncListener);
-            model.removeAll();
-        }
+        model.removeListDataListener(syncListener);
+        model.removeAll();
 
-        if (mainPanel != null)
-            mainPanel.removeAll();
+        mainPanel.removeAll();
 
         IEditor.super.dispose();
 
@@ -609,7 +602,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public List<TestCaseDto> getSelectedTestCases() {
+    public @NotNull List<TestCaseDto> getSelectedTestCases() {
         return list.getSelectedValuesList();
     }
 }
