@@ -300,8 +300,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
         rebuildGrid();
-        setCenter(gridScrollPane);
-        SwingUtilities.invokeLater(gridTable::requestFocusInWindow);
+        // rebuildGrid() swallows failures; the grid parts are then still null
+        // and the previous center stays visible instead of an NPE.
+        if (gridScrollPane != null) setCenter(gridScrollPane);
+        if (gridTable != null) SwingUtilities.invokeLater(gridTable::requestFocusInWindow);
     }
 
     @Override
@@ -381,7 +383,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
-            setCenter(gridScrollPane);
+            if (gridScrollPane != null) setCenter(gridScrollPane);
         }
     }
 
