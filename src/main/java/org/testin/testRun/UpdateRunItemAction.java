@@ -7,6 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.TestStatus;
@@ -36,12 +37,12 @@ public class UpdateRunItemAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final TestCaseDto selected = list.getSelectedValue();
+        final @Nullable TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;
 
         if (!(editor instanceof RunEditor runEditor)) return;
 
-        final TestRunItems runItem = runEditor.getResultsMap().get(selected.getId());
+        final @Nullable TestRunItems runItem = runEditor.getResultsMap().get(selected.getId());
         if (runItem == null) return;
 
         Logger.trace("update test run item for: " + selected.getDescription());
@@ -49,10 +50,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
         // The same details dialog that opens automatically on a Failed status;
         // F2 edits without touching the status.
         new FailedResultDialog(p, runItem, () -> {
-            if (runEditor.getParent() != null) {
-                Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), runEditor.getTr());
-            }
-
+            Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), runEditor.getTr());
             list.repaint();
         }).show();
     }
@@ -62,9 +60,9 @@ public class UpdateRunItemAction extends DumbAwareAction {
         // Details belong to failed test cases only - the dialog's title stays
         // truthful and the action reads as what it is.
         boolean enabled = false;
-        final TestCaseDto selected = list.getSelectedValue();
+        final @Nullable TestCaseDto selected = list.getSelectedValue();
         if (selected != null && list.getSelectedValuesList().size() == 1 && editor instanceof RunEditor runEditor) {
-            final TestRunItems item = runEditor.getResultsMap().get(selected.getId());
+            final @Nullable TestRunItems item = runEditor.getResultsMap().get(selected.getId());
             enabled = item != null && item.getStatus() == TestStatus.FAILED;
         }
         e.getPresentation().setEnabled(enabled);

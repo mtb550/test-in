@@ -22,19 +22,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ViewPanel implements Disposable {
-    private final JBPanel<?> detailsTab;
-    private final JBPanel<?> historyTab;
-    private final JBPanel<?> openBugsTab;
+    private final @NotNull JBPanel<?> detailsTab;
+    private final @NotNull JBPanel<?> historyTab;
+    private final @NotNull JBPanel<?> openBugsTab;
 
     @Getter
-    private final JBScrollPane detailsScrollPane;
+    private final @NotNull JBScrollPane detailsScrollPane;
     @Getter
-    private final JBScrollPane historyScrollPane;
+    private final @NotNull JBScrollPane historyScrollPane;
     @Getter
-    private final JBScrollPane openBugsScrollPane;
+    private final @NotNull JBScrollPane openBugsScrollPane;
 
     @Getter
-    private final ViewPagination page;
+    private final @NotNull ViewPagination page;
 
     @Getter
     private final @NotNull Project p;
@@ -61,8 +61,8 @@ public class ViewPanel implements Disposable {
         new ViewPanelExecutionSubscriber(p, this);
     }
 
-    private JBScrollPane createScrollPane(Component view) {
-        JBScrollPane sp = new JBScrollPane(view);
+    private @NotNull JBScrollPane createScrollPane(final @NotNull Component view) {
+        final JBScrollPane sp = new JBScrollPane(view);
         sp.setBorder(null);
         sp.setViewportBorder(null);
         sp.setFocusable(false);
@@ -70,8 +70,8 @@ public class ViewPanel implements Disposable {
         return sp;
     }
 
-    public void show(final @NotNull Project p, final List<TestCaseDto> testCases, final ArrayList<String> path) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
+    public void show(final @NotNull Project p, final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path) {
+        final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw == null || testCases == null || testCases.isEmpty()) return;
 
         tw.show(() -> {
@@ -80,12 +80,12 @@ public class ViewPanel implements Disposable {
         });
     }
 
-    public void show(final List<TestCaseDto> testCases, final ArrayList<String> path) {
+    public void show(final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path) {
         this.show(p, testCases, path);
     }
 
-    public ViewPanel hide() {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
+    public @NotNull ViewPanel hide() {
+        final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw != null && tw.isVisible()) {
             tw.hide(null);
         }
@@ -96,12 +96,12 @@ public class ViewPanel implements Disposable {
         this.updateList(null, null);
     }
 
-    private void selectContent(final ViewTab tab) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
+    private void selectContent(final @NotNull ViewTab tab) {
+        final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw == null) return;
 
-        Content[] contents = tw.getContentManager().getContents();
-        for (Content content : contents) {
+        final Content[] contents = tw.getContentManager().getContents();
+        for (final Content content : contents) {
             if (tab.getDisplayName().equals(content.getDisplayName())) {
                 tw.getContentManager().setSelectedContent(content);
                 break;
@@ -109,11 +109,11 @@ public class ViewPanel implements Disposable {
         }
     }
 
-    public void hide(final TestCaseDto testCaseDtoToMatch) {
-        ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
+    public void hide(final @Nullable TestCaseDto testCaseDtoToMatch) {
+        final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw == null || !tw.isVisible()) return;
 
-        TestCaseDto currentlyShown = this.getCurrentTestCaseDto();
+        final TestCaseDto currentlyShown = this.getCurrentTestCaseDto();
 
         if (currentlyShown != null && testCaseDtoToMatch != null &&
                 currentlyShown.getId().equals(testCaseDtoToMatch.getId())) {
@@ -128,8 +128,8 @@ public class ViewPanel implements Disposable {
     }
 
     public void refreshCurrentView() {
-        TestCaseDto currentTestCaseDto = this.getCurrentTestCaseDto();
-        ArrayList<String> currentPath = this.page.getCurrentPath();
+        final TestCaseDto currentTestCaseDto = this.getCurrentTestCaseDto();
+        final ArrayList<String> currentPath = this.page.getCurrentPath();
 
         new DetailsTab().load(p, detailsTab, currentTestCaseDto, currentPath);
         new HistoryTab().load(historyTab);
@@ -139,7 +139,7 @@ public class ViewPanel implements Disposable {
         detailsTab.repaint();
     }
 
-    public TestCaseDto getCurrentTestCaseDto() {
+    public @Nullable TestCaseDto getCurrentTestCaseDto() {
         return page.getCurrentItem();
     }
 

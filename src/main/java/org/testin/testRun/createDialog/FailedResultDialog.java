@@ -34,15 +34,15 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
         // tc is wired lazily by the run editor; a run item whose test case no
         // longer exists in the test set never gets it assigned.
-        final TestCaseDto tc = runItem.getTc();
+        final @Nullable TestCaseDto tc = runItem.getTc();
 
-        final ComponentDialogBase<TextInput> actualResultField = ComponentDialogBase.textField()
+        final @NotNull ComponentDialogBase<TextInput> actualResultField = ComponentDialogBase.textField()
                 .placeholder("set actual result..")
                 .value(runItem.getActualResult())
                 .build();
         actualResult = actualResultField.getComponent();
 
-        final ComponentDialogBase<RadioSelection<BugSeverity>> severityRadios = ComponentDialogBase.<BugSeverity>radios("Severity")
+        final @NotNull ComponentDialogBase<RadioSelection<BugSeverity>> severityRadios = ComponentDialogBase.<BugSeverity>radios("Severity")
                 .option(BugSeverity.BLOCKER.getName(), BugSeverity.BLOCKER)
                 .option(BugSeverity.MAJOR.getName(), BugSeverity.MAJOR)
                 .option(BugSeverity.MINOR.getName(), BugSeverity.MINOR)
@@ -51,7 +51,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
                 .build();
         severity = severityRadios.getComponent();
 
-        final ComponentDialogBase<RadioSelection<BugPriority>> priorityRadios = ComponentDialogBase.<BugPriority>radios("Priority")
+        final @NotNull ComponentDialogBase<RadioSelection<BugPriority>> priorityRadios = ComponentDialogBase.<BugPriority>radios("Priority")
                 .option(BugPriority.HIGH.getName(), BugPriority.HIGH)
                 .option(BugPriority.MEDIUM.getName(), BugPriority.MEDIUM)
                 .option(BugPriority.LOW.getName(), BugPriority.LOW)
@@ -59,7 +59,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
                 .build();
         priority = priorityRadios.getComponent();
 
-        final ComponentDialogBase<TextArea> errorCaptureArea = ComponentDialogBase.textArea()
+        final @NotNull ComponentDialogBase<TextArea> errorCaptureArea = ComponentDialogBase.textArea()
                 .placeholder("paste error or exception or screenshot..")
                 .value(runItem.getStacktrace())
                 .rows(5)

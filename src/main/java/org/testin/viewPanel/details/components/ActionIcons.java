@@ -28,7 +28,7 @@ public class ActionIcons extends BaseDetails {
     final int INSETS_LEFT = 16;
     final int INSETS_BOTTOM = 0;
     final int INSETS_RIGHT = 16;
-    final Icon navIconRaw = AllIcons.Nodes.Class;
+    final @NotNull Icon navIconRaw = AllIcons.Nodes.Class;
 
     public ActionIcons() {
     }
@@ -57,17 +57,17 @@ public class ActionIcons extends BaseDetails {
 
         navLabel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent e) {
+            public void mouseEntered(final MouseEvent e) {
                 navLabel.setIcon(navIconHover);
             }
 
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseExited(final MouseEvent e) {
                 navLabel.setIcon(navIconBase);
             }
 
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(final MouseEvent e) {
                 new NavigateToCodeAction(p, null).execute(p, dto);
             }
         });
@@ -93,17 +93,17 @@ public class ActionIcons extends BaseDetails {
 
         runLabel.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent e) {
+            public void mouseEntered(final MouseEvent e) {
                 runLabel.setIcon(runIconHover);
             }
 
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseExited(final MouseEvent e) {
                 runLabel.setIcon(runIconBase);
             }
 
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(final MouseEvent e) {
                 currentStatus.executeAction(p, dto, null);
             }
         });

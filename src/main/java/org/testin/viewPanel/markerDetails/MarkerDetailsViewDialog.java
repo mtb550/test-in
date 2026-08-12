@@ -11,6 +11,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.Config;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.markers.IMarker;
@@ -38,12 +39,12 @@ public class MarkerDetailsViewDialog {
     }
 
     public void show(final @NotNull DirectoryDto dto) {
-        JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
+        final JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
         panel.setOpaque(false);
         DialogStyle.styleContent(panel);
         panel.setBorder(JBUI.Borders.empty(10));
 
-        GridBagConstraints gbc = new GridBagConstraints();
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
@@ -62,17 +63,17 @@ public class MarkerDetailsViewDialog {
         row = addRow(panel, gbc, "Modified At:", formatDate(marker.getModifiedAt()), row);
         row = addRow(panel, gbc, "Status:", Optional.ofNullable(marker.getStatusLabel()).orElse(""), row);
 
-        GridBagConstraints spacerGbc = new GridBagConstraints();
+        final GridBagConstraints spacerGbc = new GridBagConstraints();
         spacerGbc.gridy = row;
         spacerGbc.weighty = 1.0;
         panel.add(Box.createVerticalGlue(), spacerGbc);
 
-        JBScrollPane scrollPane = new JBScrollPane(panel);
+        final JBScrollPane scrollPane = new JBScrollPane(panel);
         scrollPane.setBorder(null);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setPreferredSize(new Dimension(600, 400));
 
-        ComponentPopupBuilder builder = JBPopupFactory.getInstance()
+        final ComponentPopupBuilder builder = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(scrollPane, null)
                 .setTitle("Details")
                 .setRequestFocus(true)
@@ -82,7 +83,7 @@ public class MarkerDetailsViewDialog {
                 .setResizable(true)
                 .setMinSize(new Dimension(400, 300));
 
-        JBPopup popup = builder.createPopup();
+        final JBPopup popup = builder.createPopup();
         popup.showCenteredInCurrentWindow(p);
     }
 
@@ -91,7 +92,7 @@ public class MarkerDetailsViewDialog {
         if (valueText.trim().isEmpty())
             return row;
 
-        JTextArea valueArea = new JTextArea(valueText);
+        final JTextArea valueArea = new JTextArea(valueText);
         valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, FontSync.getBaseFontSize() + VALUE_FONT_SIZE_OFFSET));
         valueArea.setLineWrap(true);
         valueArea.setWrapStyleWord(true);
@@ -112,11 +113,11 @@ public class MarkerDetailsViewDialog {
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT);
 
-        JBLabel label = new JBLabel(labelText);
+        final JBLabel label = new JBLabel(labelText);
         label.setForeground(JBColor.GRAY);
         label.setFont(JBFont.label().deriveFont(Font.BOLD, FontSync.getBaseFontSize() + LABEL_FONT_SIZE_OFFSET));
 
-        Dimension prefSize = label.getPreferredSize();
+        final Dimension prefSize = label.getPreferredSize();
         label.setPreferredSize(new Dimension(LABEL_WIDTH, prefSize.height));
         label.setMinimumSize(new Dimension(LABEL_WIDTH, prefSize.height));
 
@@ -133,7 +134,7 @@ public class MarkerDetailsViewDialog {
         return row + 1;
     }
 
-    private String formatDate(final ZonedDateTime dateTime) {
+    private @NotNull String formatDate(final @Nullable ZonedDateTime dateTime) {
         if (dateTime == null) return "";
         return dateTime.format(Config.getDateFormatterPattern());
     }

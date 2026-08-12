@@ -16,7 +16,7 @@ import java.awt.event.MouseEvent;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CollapsiblePanel {
 
-    public static JBPanel<?> build(final @NotNull String title, final @NotNull JComponent content, final boolean initiallyVisible) {
+    public static @NotNull JBPanel<?> build(final @NotNull String title, final @NotNull JComponent content, final boolean initiallyVisible) {
         final JBPanel<?> wrapper = new JBPanel<>(new BorderLayout());
 
         final JBLabel titleLabel = new JBLabel(title);

@@ -13,7 +13,7 @@ public class HistoryTab {
 
     /// TODO: real change history is not implemented yet; show an honest empty state
     /// instead of demo data until it is.
-    public void load(@NotNull JBPanel<?> historyTab) {
+    public void load(final @NotNull JBPanel<?> historyTab) {
         historyTab.removeAll();
 
         final JBLabel emptyState = new JBLabel("No history available yet", SwingConstants.CENTER);

@@ -3,6 +3,7 @@ package org.testin.viewPanel;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.listeners.ITestCaseExecutionListener;
 import org.testin.logger.Logger;
@@ -15,16 +16,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ViewPanelExecutionSubscriber {
     // Written from the TestNG runner thread and read from the EDT.
-    private final Map<String, UUID> uuidToDtoId = new ConcurrentHashMap<>();
-    private final ProjectIndexer indexer;
-    private volatile UUID runningDtoId = null;
+    private final @NotNull Map<String, UUID> uuidToDtoId = new ConcurrentHashMap<>();
+    private final @NotNull ProjectIndexer indexer;
+    private volatile @Nullable UUID runningDtoId = null;
 
     public ViewPanelExecutionSubscriber(final @NotNull Project p, final @NotNull ViewPanel viewPanel) {
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
 
         p.getMessageBus().connect(viewPanel).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
             @Override
-            public void onStatusChanged(@NotNull String testName, @NotNull String status, String error) {
+            public void onStatusChanged(final @NotNull String testName, final @NotNull String status, final String error) {
                 Logger.debug("ViewPanel subscription fired: testName='" + testName + "', status='" + status + "'");
 
                 boolean updated = false;
@@ -70,7 +71,7 @@ public class ViewPanelExecutionSubscriber {
                     ApplicationManager.getApplication().invokeLater(viewPanel::refreshCurrentView);
             }
 
-            private UUID parseUuid(final String s) {
+            private @Nullable UUID parseUuid(final @NotNull String s) {
                 try {
                     return UUID.fromString(s);
                 } catch (final IllegalArgumentException ex) {

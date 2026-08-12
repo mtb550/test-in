@@ -27,7 +27,7 @@ import java.util.Map;
 
 public class NavigationBar extends BaseDetails {
 
-    final Color DEFAULT_TEXT_COLOR = Gray._120;
+    final @NotNull Color DEFAULT_TEXT_COLOR = Gray._120;
     final int SEPARATOR_BORDER_V = 0;
     final int SEPARATOR_BORDER_H = 6;
     final int PANEL_BORDER_TOP = 10;
@@ -39,7 +39,7 @@ public class NavigationBar extends BaseDetails {
     final int GBC_INSETS_BOTTOM = 0;
     final int GBC_INSETS_RIGHT = 16;
 
-    private final ArrayList<String> currentPath;
+    private final @Nullable ArrayList<String> currentPath;
 
     public NavigationBar(final @Nullable ArrayList<String> currentPath) {
         this.currentPath = currentPath;
@@ -50,7 +50,7 @@ public class NavigationBar extends BaseDetails {
         final JBPanel<?> pathPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pathPanel.setOpaque(false);
 
-        float navFontSize = Math.max(8.0f, FontSync.getBaseFontSize() - 1.0f);
+        final float navFontSize = Math.max(8.0f, FontSync.getBaseFontSize() - 1.0f);
 
         if (currentPath != null) {
             for (int i = 0; i < currentPath.size(); i++) {

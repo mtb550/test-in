@@ -27,7 +27,7 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
 
         title = "Create Test Run";
 
-        final ComponentDialogBase<DialogButton> create = ComponentDialogBase.button("Create");
+        final @NotNull ComponentDialogBase<DialogButton> create = ComponentDialogBase.button("Create");
         components = List.of(
                 ComponentDialogBase.of(form),
                 ComponentDialogBase.of(selection),
@@ -41,7 +41,7 @@ public final class RunConfigurationDialog extends AbstractFrameworkDialog<RunCon
 
         // A run without test cases makes no sense - the button follows the
         // checked state live.
-        final DialogButton createButton = create.getComponent();
+        final @NotNull DialogButton createButton = create.getComponent();
         createButton.setEnabled(selection.hasChecked());
         selection.onCheckChanged(() -> createButton.setEnabled(selection.hasChecked()));
     }

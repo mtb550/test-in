@@ -40,7 +40,7 @@ public class Steps extends BaseDetails {
         return addRow(panel, gbc, TestEditorAttributes.STEPS.getName2(), stepsContainer, row);
     }
 
-    private JTextArea createStepComponent(final String text, final int marginBottom) {
+    private @NotNull JTextArea createStepComponent(final @NotNull String text, final int marginBottom) {
         final JTextArea stepArea = new JTextArea(text);
         stepArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
         stepArea.setLineWrap(true);

@@ -20,13 +20,13 @@ public class Badges extends BaseDetails {
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
-        JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
+        final JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         badgesPanel.setOpaque(false);
 
         badgesPanel.add(Shared.createPriorityBadge(dto));
 
         if (!dto.getGroup().isEmpty()) {
-            for (Group group : dto.getGroup()) {
+            for (final Group group : dto.getGroup()) {
                 if (group != null) {
                     badgesPanel.add(Shared.createGroupBadge(group));
                 }

@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestRunConfiguration;
 import org.testin.ui.framework.IDialogComponent;
 
@@ -25,10 +26,10 @@ import java.util.Map;
 @Getter
 public class RunConfigurationForm implements IDialogComponent {
 
-    private final JBPanel<?> wrapper;
-    private final JBTextField changeLog;
-    private final JBTextField commitIdField;
-    private final Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
+    private final @NotNull JBPanel<?> wrapper;
+    private final @NotNull JBTextField changeLog;
+    private final @NotNull JBTextField commitIdField;
+    private final @NotNull Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
 
     public RunConfigurationForm(final @NotNull String runName) {
         changeLog = new JBTextField();
@@ -39,7 +40,7 @@ public class RunConfigurationForm implements IDialogComponent {
         wrapper.add(CollapsiblePanel.build("Configuration details", buildConfigurationPanel(runName), false), BorderLayout.CENTER);
     }
 
-    private JBPanel<?> buildConfigurationPanel(final @NotNull String runName) {
+    private @NotNull JBPanel<?> buildConfigurationPanel(final @NotNull String runName) {
         final JBPanel<?> configurationPanel = new JBPanel<>(new GridBagLayout());
 
         final GridBagConstraints labelGbc = new GridBagConstraints();
@@ -83,7 +84,7 @@ public class RunConfigurationForm implements IDialogComponent {
         return configurationPanel;
     }
 
-    private void addLabeledRow(final JBPanel<?> panel, final GridBagConstraints labelGbc, final GridBagConstraints fieldGbc, final int row, final String label, final JComponent component) {
+    private void addLabeledRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints labelGbc, final @NotNull GridBagConstraints fieldGbc, final int row, final @NotNull String label, final @NotNull JComponent component) {
         final GridBagConstraints lc = (GridBagConstraints) labelGbc.clone();
         lc.gridy = row;
         final JBLabel labelComp = new JBLabel(label);
@@ -96,9 +97,9 @@ public class RunConfigurationForm implements IDialogComponent {
     }
 
     public @NotNull String getFieldValue(final @NotNull TestRunConfiguration field) {
-        final JComponent comp = fieldMap.get(field);
+        final @Nullable JComponent comp = fieldMap.get(field);
         if (comp instanceof ComboBox<?> comboBox) {
-            final Object selected = comboBox.getSelectedItem();
+            final @Nullable Object selected = comboBox.getSelectedItem();
             return selected != null ? selected.toString().trim() : "";
         }
         return "";

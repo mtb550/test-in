@@ -28,7 +28,7 @@ public class Title extends BaseDetails {
 
         final JTextArea mainTitleArea = new JTextArea(finalValue);
 
-        float titleFontSize = FontSync.getBaseFontSize();
+        final float titleFontSize = FontSync.getBaseFontSize();
         mainTitleArea.setFont(JBFont.label().deriveFont(Font.BOLD, titleFontSize));
 
         mainTitleArea.setLineWrap(true);

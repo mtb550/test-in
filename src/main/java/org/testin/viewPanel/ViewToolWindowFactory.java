@@ -10,6 +10,7 @@ import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.settings.StartupActivity;
@@ -21,24 +22,24 @@ import java.util.function.Consumer;
 public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
     @Getter
-    private static ViewPanel viewPanel;
+    private static @Nullable ViewPanel viewPanel;
 
-    static void onPanelDisposed(final ViewPanel panel) {
+    static void onPanelDisposed(final @NotNull ViewPanel panel) {
         if (viewPanel == panel) {
             viewPanel = null;
         }
     }
 
-    public static ToolWindow getToolWindow(final @NotNull Project p) {
+    public static @Nullable ToolWindow getToolWindow(final @NotNull Project p) {
         return ToolWindowManager.getInstance(p).getToolWindow("testin.view");
     }
 
-    public static void showPanel(final @NotNull Project p, final List<TestCaseDto> testCases, final ArrayList<String> path, final Consumer<ViewPanel> onReadyAction) {
-        ToolWindow tw = getToolWindow(p);
+    public static void showPanel(final @NotNull Project p, final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path, final @Nullable Consumer<ViewPanel> onReadyAction) {
+        final ToolWindow tw = getToolWindow(p);
 
         if (tw != null) {
             tw.show(() -> {
-                ViewPanel viewer = getViewPanel();
+                final ViewPanel viewer = getViewPanel();
                 if (viewer != null) {
                     viewer.show(testCases, path);
 
@@ -50,7 +51,7 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
         }
     }
 
-    public static void showPanel(final @NotNull Project p, final List<TestCaseDto> testCases, final ArrayList<String> path) {
+    public static void showPanel(final @NotNull Project p, final @Nullable List<TestCaseDto> testCases, final @Nullable ArrayList<String> path) {
         showPanel(p, testCases, path, null);
     }
 
@@ -65,11 +66,11 @@ public class ViewToolWindowFactory implements ToolWindowFactory, DumbAware {
 
             viewPanel = new ViewPanel(p);
 
-            ContentFactory contentFactory = ContentFactory.getInstance();
+            final ContentFactory contentFactory = ContentFactory.getInstance();
 
-            Content detailsTab = contentFactory.createContent(viewPanel.getDetailsScrollPane(), "Details", false);
-            Content historyTab = contentFactory.createContent(viewPanel.getHistoryScrollPane(), "History", false);
-            Content bugsTab = contentFactory.createContent(viewPanel.getOpenBugsScrollPane(), "Open Bugs", false);
+            final Content detailsTab = contentFactory.createContent(viewPanel.getDetailsScrollPane(), "Details", false);
+            final Content historyTab = contentFactory.createContent(viewPanel.getHistoryScrollPane(), "History", false);
+            final Content bugsTab = contentFactory.createContent(viewPanel.getOpenBugsScrollPane(), "Open Bugs", false);
 
             toolWindow.getContentManager().addContent(detailsTab);
             toolWindow.getContentManager().addContent(historyTab);

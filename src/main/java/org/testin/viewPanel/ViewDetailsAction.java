@@ -29,7 +29,7 @@ public class ViewDetailsAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        List<TestCaseDto> selected = list.getSelectedValuesList();
+        final List<TestCaseDto> selected = list.getSelectedValuesList();
 
         if (selected != null && !selected.isEmpty())
             ViewToolWindowFactory.showPanel(p, selected, path, ViewPanel::focusDetailsTab);

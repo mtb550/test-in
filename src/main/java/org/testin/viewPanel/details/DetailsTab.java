@@ -43,7 +43,7 @@ public class DetailsTab {
     private static final String SHORTCUT_REGISTERED_KEY = "DetailsTab.f2.registered";
 
     final int SCROLL_UNIT_INCREMENT = 16;
-    final String PLACEHOLDER_TEXT = "Select a test case to view details";
+    final @NotNull String PLACEHOLDER_TEXT = "Select a test case to view details";
     final int INSETS_DEFAULT = 5;
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
@@ -85,7 +85,7 @@ public class DetailsTab {
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
-    private void renderStoneLayout(final @NotNull Project p, final JBPanel<?> panel, final TestCaseDto dto, final ArrayList<String> currentPath) {
+    private void renderStoneLayout(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -100,7 +100,7 @@ public class DetailsTab {
      * Rows shown in the details panel, in display order. Rows with custom rendering
      * are dedicated components; plain label/value rows are table-driven.
      */
-    private List<BaseDetails> detailRows(final ArrayList<String> currentPath) {
+    private @NotNull List<BaseDetails> detailRows(final @Nullable ArrayList<String> currentPath) {
         return List.of(
                 new NavigationBar(currentPath),
                 new Id(),
@@ -121,7 +121,7 @@ public class DetailsTab {
         );
     }
 
-    private int setupFixedRows(final @NotNull Project p, final JBPanel<?> panel, final GridBagConstraints gbc, final TestCaseDto dto, final ArrayList<String> currentPath) {
+    private int setupFixedRows(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
         int row = 0;
         for (final BaseDetails component : detailRows(currentPath)) {
             row = component.render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
@@ -129,7 +129,7 @@ public class DetailsTab {
         return row;
     }
 
-    private void addVerticalSpacer(final JBPanel<?> panel, final int lastRow) {
+    private void addVerticalSpacer(final @NotNull JBPanel<?> panel, final int lastRow) {
         final GridBagConstraints spacerGbc = new GridBagConstraints();
         spacerGbc.gridy = lastRow;
         spacerGbc.weighty = SPACER_WEIGHT_Y;
@@ -181,7 +181,7 @@ public class DetailsTab {
             ApplicationManager.getApplication().invokeLater(() -> {
                 final ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
                 if (detailsPanel != null && detailsPanel.getCurrentTestCaseDto() != null) {
-                    boolean isCurrentAffected = tcs.stream()
+                    final boolean isCurrentAffected = tcs.stream()
                             .anyMatch(item -> item.getId().equals(detailsPanel.getCurrentTestCaseDto().getId()));
                     if (isCurrentAffected) {
                         detailsPanel.refreshCurrentView();
