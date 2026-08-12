@@ -22,8 +22,6 @@ public final class StartupActivity implements ProjectActivity {
     private static final Key<Boolean> SOURCE_ROOT_CHECKED = Key.create("testin.sourceRootChecked");
 
     public static void execute(final @NotNull Project p) {
-        Logger.setProject(p);
-
         AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         if (settings.rootTestinPath == null || settings.rootTestinPath.isEmpty()) {

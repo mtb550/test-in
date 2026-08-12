@@ -1,34 +1,16 @@
 package org.testin.logger;
 
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Logger {
 
     private static final StackWalker WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
-    /**
-     * The logger is a static facade usable from non-project contexts, so the active
-     * project is attached lazily (it determines the log file location) and may be null.
-     */
-    @Nullable
-    private static volatile Project p;
-
     private static volatile LoggerService backendService;
-
-    @Nullable
-    public static Project getProject() {
-        return p;
-    }
-
-    public static void setProject(final @NotNull Project p) {
-        Logger.p = p;
-    }
 
     public static void setLogLevel(final @NotNull Level level) {
         LoggerService service = getService();
