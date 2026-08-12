@@ -10,9 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Tools;
-import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
+
+import javax.swing.*;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 public class AutomateTestCaseAction extends DumbAwareAction {
 

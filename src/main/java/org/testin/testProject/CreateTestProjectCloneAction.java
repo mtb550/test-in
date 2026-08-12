@@ -41,7 +41,9 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
         execute();
     }
 
-    /** Direct entry point for dialog callbacks — no AnActionEvent required. */
+    /**
+     * Direct entry point for dialog callbacks — no AnActionEvent required.
+     */
     public void execute() {
 
         if (gitUrl.trim().isEmpty() || projectName.trim().isEmpty()) {

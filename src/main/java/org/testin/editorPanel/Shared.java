@@ -5,11 +5,9 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import org.testin.enums.CardHoverAction;
 import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.util.FontSync;
 
 import javax.swing.*;
 import java.awt.*;

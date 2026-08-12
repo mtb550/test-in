@@ -76,22 +76,30 @@ public enum TestRunStatus {
     private final KeyStroke shortcut;
     private final Icon icon;
 
-    /** Presentation of the advance action while the run is in this status. */
+    /**
+     * Presentation of the advance action while the run is in this status.
+     */
     private final String advanceLabel;
     private final String advanceDescription;
     private final Icon advanceIcon;
 
-    /** The status the advance action moves this run to, or null when terminal. */
+    /**
+     * The status the advance action moves this run to, or null when terminal.
+     */
     public @Nullable TestRunStatus nextStatus() {
         return TRANSITIONS.get(this);
     }
 
-    /** True while the run can still advance to another status. */
+    /**
+     * True while the run can still advance to another status.
+     */
     public boolean isAdvanceable() {
         return TRANSITIONS.containsKey(this);
     }
 
-    /** True when the run has reached a terminal state (completed or closed). */
+    /**
+     * True when the run has reached a terminal state (completed or closed).
+     */
     public boolean isTerminal() {
         return this == COMPLETED || this == CLOSED;
     }

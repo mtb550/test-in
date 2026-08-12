@@ -11,7 +11,6 @@ import org.testin.testCase.createDialog.ICreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
 import org.testin.testCase.updateDialog.bulk.*;
 import org.testin.util.Shortcuts;
-import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.util.function.Function;

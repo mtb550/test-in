@@ -31,12 +31,12 @@ public class TreeMouseListener extends PopupHandler {
 
         if (selPath != null && TreeValueUtil.directoryOf(selPath.getLastPathComponent()) != null) {
 
-                if (!tree.getSelectionModel().isPathSelected(selPath)) {
-                    tree.setSelectionPath(selPath);
-                }
+            if (!tree.getSelectionModel().isPathSelected(selPath)) {
+                tree.setSelectionPath(selPath);
+            }
 
-                ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
-                popupMenu.getComponent().show(comp, x, y);
+            ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
+            popupMenu.getComponent().show(comp, x, y);
         }
     }
 

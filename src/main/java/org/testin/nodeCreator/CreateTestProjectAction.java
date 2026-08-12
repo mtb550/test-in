@@ -6,9 +6,8 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
-import org.testin.nodeCreator.dialogs.CreateNodesDialog;
+import org.testin.nodeCreator.dialogs.CreateProjectDialog;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.Setting;
@@ -32,10 +31,12 @@ public class CreateTestProjectAction extends DumbAwareAction {
         execute();
     }
 
-    /** Direct entry point for the project panel's empty state — no AnActionEvent required. */
+    /**
+     * Direct entry point for the project panel's empty state — no AnActionEvent required.
+     */
     public void execute() {
 
-        new CreateNodesDialog(p, CreateNodeMenu.TEST_PROJECT, (name, type) -> {
+        new CreateProjectDialog(p, (name, type) -> {
             if (name.trim().isEmpty()) return;
 
             if (type == DirectoryType.IMPORT_TP) {

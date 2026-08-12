@@ -1,33 +1,50 @@
 package org.testin.statusBar;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
+/**
+ * Shortcut-hint strip at the bottom of the dialogs, styled like the
+ * platform's popup advertiser bar: tinted background, hairline on top, muted
+ * hint text with the keystroke emphasized.
+ */
 public abstract class StatusBarBase {
-    final String innerSeparator = ": ";
-    final String outerSeparator = ",  ";
+    /**
+     * Between a keystroke and its meaning.
+     */
+    private static final String INNER_SEPARATOR = " ";
+    /**
+     * Between entries — whitespace only, sized to read as a deliberate gap.
+     */
+    private static final String OUTER_SEPARATOR = "       ";
+
     private final JBPanel<?> statusBar;
-    private final Color shortcutColor = JBColor.GRAY;
-    private final Color dotColor = JBColor.GRAY;
-    private final Color labelColor = JBColor.GRAY;
-    private final Color separatorColor = JBColor.GRAY;
+
+    // Keystroke and its meaning read clearly in light and dark; only the
+    // separators stay muted.
+    private final Color shortcutColor = JBUI.CurrentTheme.Label.foreground();
+    private final Color labelColor = JBUI.CurrentTheme.Label.foreground();
+    private final Color dotColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
+    private final Color separatorColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
+
     private final Font font = JBUI.Fonts.smallFont();
-    private final Icon icon = AllIcons.Actions.IntentionBulb;
-    private final Border border = JBUI.Borders.emptyRight(4);
+    private final Font shortcutFont = JBUI.Fonts.smallFont().asBold();
+
+    // A keyboard: says "these are keys".
+    private final Icon icon = AllIcons.General.Keyboard;
+    private final Border border = JBUI.Borders.emptyRight(6);
 
     public StatusBarBase(final IStatusBarItem[] items) {
         this.statusBar = new JBPanel<>(new BorderLayout());
-        this.statusBar.setBorder(JBUI.Borders.empty(6, 10));
+        this.statusBar.setBorder(JBUI.Borders.empty(4, 10));
         this.statusBar.setOpaque(true);
-        this.statusBar.setBackground(UIUtil.getPanelBackground());
+        this.statusBar.setBackground(JBUI.CurrentTheme.Advertiser.background());
 
         updateItems(items);
     }
@@ -47,7 +64,7 @@ public abstract class StatusBarBase {
             contentPanel.add(createLabel(item.getName()));
 
             if (i < items.length - 1) {
-                contentPanel.add(createseparator());
+                contentPanel.add(createSeparator());
             }
         }
 
@@ -66,12 +83,12 @@ public abstract class StatusBarBase {
     private JBLabel createShortcut(final String text) {
         JBLabel label = new JBLabel(text);
         label.setForeground(shortcutColor);
-        label.setFont(font);
+        label.setFont(shortcutFont);
         return label;
     }
 
     private JBLabel createDot() {
-        JBLabel label = new JBLabel(innerSeparator);
+        JBLabel label = new JBLabel(INNER_SEPARATOR);
         label.setForeground(dotColor);
         return label;
     }
@@ -83,9 +100,10 @@ public abstract class StatusBarBase {
         return label;
     }
 
-    private JBLabel createseparator() {
-        JBLabel label = new JBLabel(outerSeparator);
+    private JBLabel createSeparator() {
+        JBLabel label = new JBLabel(OUTER_SEPARATOR);
         label.setForeground(separatorColor);
+        label.setFont(font);
         return label;
     }
 

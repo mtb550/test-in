@@ -5,7 +5,6 @@ import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.RoundedBadge;
-import org.testin.editorPanel.Shared;
 import org.testin.enums.TestCardStatus;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.mappers.dto.TestCaseDto;

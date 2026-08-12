@@ -22,7 +22,9 @@ public final class GitRefs {
 
     private static final Pattern HEAD_BRANCH = Pattern.compile("(?m)^\\s*HEAD branch:\\s*(\\S+)\\s*$");
 
-    /** The HEAD branch reported by {@code git remote show}, or {@code null}. */
+    /**
+     * The HEAD branch reported by {@code git remote show}, or {@code null}.
+     */
     public static @Nullable String parseHeadBranch(final @NotNull String remoteShowOutput) {
         final Matcher matcher = HEAD_BRANCH.matcher(remoteShowOutput);
         return matcher.find() ? matcher.group(1) : null;
@@ -41,7 +43,9 @@ public final class GitRefs {
         return names.isEmpty() ? null : names.getFirst();
     }
 
-    /** The local branch name for a remote branch ({@code origin/main} → {@code main}). */
+    /**
+     * The local branch name for a remote branch ({@code origin/main} → {@code main}).
+     */
     public static @NotNull String localNameOf(final @NotNull String remoteBranchName) {
         return remoteBranchName.substring(remoteBranchName.indexOf('/') + 1);
     }

@@ -34,7 +34,6 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;

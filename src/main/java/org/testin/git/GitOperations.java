@@ -36,11 +36,15 @@ public interface GitOperations {
     @Nullable
     String getDefaultBranch(@NotNull Path path);
 
-    /** Local and remote branch names, sorted, without {@code HEAD} refs. */
+    /**
+     * Local and remote branch names, sorted, without {@code HEAD} refs.
+     */
     @NotNull
     List<String> getAvailableBranches(@NotNull Path path);
 
-    /** No-op when the repository has no remote. */
+    /**
+     * No-op when the repository has no remote.
+     */
     void fetchRemoteBranches(@NotNull Path path);
 
     /**
@@ -50,7 +54,9 @@ public interface GitOperations {
     @Nullable
     String getRemoteName(@NotNull Path path);
 
-    /** Empty string when the remote has no URL configured. */
+    /**
+     * Empty string when the remote has no URL configured.
+     */
     @NotNull
     String getRemoteUrl(@NotNull Path path, @NotNull String remoteName);
 
@@ -71,7 +77,9 @@ public interface GitOperations {
 
     void continueRebase(@NotNull Path path);
 
-    /** {@code pull --rebase --autostash} from the given remote branch. */
+    /**
+     * {@code pull --rebase --autostash} from the given remote branch.
+     */
     void pull(@NotNull Path path, @NotNull String remote, @NotNull String branch);
 
     // ------------------------------------------------------------------
@@ -80,7 +88,9 @@ public interface GitOperations {
 
     void initialize(@NotNull Path path);
 
-    /** Stages and commits only the files behind the selected changes. */
+    /**
+     * Stages and commits only the files behind the selected changes.
+     */
     void stageAndCommit(@NotNull Path path, @NotNull String message, @NotNull Collection<TestCaseDiff> selectedChanges);
 
     void configureRemote(@NotNull Path path, @NotNull String remoteName, @NotNull String remoteUrl);
@@ -97,6 +107,8 @@ public interface GitOperations {
 
     void cloneRepository(@NotNull Path parentDirectory, @NotNull String url, @NotNull String directoryName);
 
-    /** Refreshes the VFS under the repository root after external changes. */
+    /**
+     * Refreshes the VFS under the repository root after external changes.
+     */
     void refreshRoot(@NotNull Path path);
 }

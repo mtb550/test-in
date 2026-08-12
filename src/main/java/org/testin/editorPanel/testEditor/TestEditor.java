@@ -76,34 +76,26 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final JBScrollPane scrollPane;
     private final ModelSyncListener syncListener;
     private final Disposable projectDisposable;
-
+    /**
+     * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
+     */
+    private final AtomicInteger loadGeneration = new AtomicInteger();
+    @Getter
+    @NotNull
+    private final AbstractToolbarPanel toolBar;
+    @Getter
+    private final StatusBar statusBar;
+    @Getter
+    private final List<TestCaseDto> allTestCases;
+    @Getter
+    private final Set<UUID> unsortedIds;
+    @Getter
+    private final List<TestCaseDto> currentTestCases;
     /**
      * Child disposable for the current grid table's font-sync subscription;
      * replaced on every grid rebuild so old subscriptions do not accumulate.
      */
     private Disposable gridFontSyncDisposable;
-
-    /**
-     * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
-     */
-    private final AtomicInteger loadGeneration = new AtomicInteger();
-
-    @Getter
-    @NotNull
-    private final AbstractToolbarPanel toolBar;
-
-    @Getter
-    private final StatusBar statusBar;
-
-    @Getter
-    private final List<TestCaseDto> allTestCases;
-
-    @Getter
-    private final Set<UUID> unsortedIds;
-
-    @Getter
-    private final List<TestCaseDto> currentTestCases;
-
     private JBTable gridTable;
 
     private JBScrollPane gridScrollPane;

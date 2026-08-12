@@ -34,7 +34,9 @@ public class CreateTestProjectNewAction extends DumbAwareAction {
         execute();
     }
 
-    /** Direct entry point for dialog callbacks — no AnActionEvent required. */
+    /**
+     * Direct entry point for dialog callbacks — no AnActionEvent required.
+     */
     public void execute() {
 
         final Path tpPath = Services.getInstance(p, Setting.class).getTestinPath().resolve(tpName);

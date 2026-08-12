@@ -242,7 +242,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 },
                 ex -> {
                     if (git.hasConflicts(repoPath)) showConflictActions(repoPath, remote, branch);
-                    else Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", ex.getMessage());
+                    else
+                        Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", ex.getMessage());
                 });
     }
 

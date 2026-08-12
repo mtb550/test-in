@@ -26,6 +26,14 @@ import java.util.UUID;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
 
+    private static UUID parseUuid(final String value) {
+        try {
+            return UUID.fromString(value);
+        } catch (final IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
     @Override
     protected void collectNavigationMarkers(@NotNull PsiElement element, @NotNull Collection<? super RelatedItemLineMarkerInfo<?>> result) {
         final @NotNull Project p = element.getProject();
@@ -62,14 +70,6 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         );
 
         result.add(marker);
-    }
-
-    private static UUID parseUuid(final String value) {
-        try {
-            return UUID.fromString(value);
-        } catch (final IllegalArgumentException ex) {
-            return null;
-        }
     }
 
     private void openViewPanel(final @NotNull Project p, final @NotNull UUID uuid) {

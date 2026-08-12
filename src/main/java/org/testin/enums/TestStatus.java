@@ -7,8 +7,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.Icon;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
@@ -75,13 +74,19 @@ public enum TestStatus {
     private final @Nullable Color rowColor;
     private final @NotNull String label;
 
-    /** Icon of the set-status action; null for statuses the user cannot set from the menu. */
+    /**
+     * Icon of the set-status action; null for statuses the user cannot set from the menu.
+     */
     private final @Nullable Icon icon;
 
-    /** Keyboard shortcut of the set-status action; null when not user-settable. */
+    /**
+     * Keyboard shortcut of the set-status action; null when not user-settable.
+     */
     private final @Nullable KeyStroke shortcut;
 
-    /** True when applying this status first collects details in a dialog (FAILED). */
+    /**
+     * True when applying this status first collects details in a dialog (FAILED).
+     */
     private final boolean collectsFailureDetails;
 
     TestStatus(final @NotNull String hex, final @NotNull String displayText, final @NotNull SimpleTextAttributes style,
@@ -102,7 +107,9 @@ public enum TestStatus {
         this.collectsFailureDetails = collectsFailureDetails;
     }
 
-    /** True when the user can set this status from the context menu. */
+    /**
+     * True when the user can set this status from the context menu.
+     */
     public boolean isUserSettable() {
         return icon != null;
     }

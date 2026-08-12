@@ -1,10 +1,10 @@
 package org.testin.editorPanel;
 
 import com.intellij.ui.JBColor;
-
-import java.awt.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import java.awt.*;
 
 /**
  * Shared colors for list and grid selection states.

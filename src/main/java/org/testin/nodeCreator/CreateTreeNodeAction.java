@@ -9,9 +9,9 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
-import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
-import org.testin.nodeCreator.dialogs.CreateNodesDialog;
+import org.testin.mappers.dto.dirs.*;
+import org.testin.nodeCreator.dialogs.CreateRunDialog;
+import org.testin.nodeCreator.dialogs.CreateTestDialog;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
@@ -20,6 +20,7 @@ import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import java.util.function.BiConsumer;
 
 public class CreateTreeNodeAction extends DumbAwareAction {
 
@@ -43,7 +44,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
 
         if (path == null || pDir == null) return;
 
-        new CreateNodesDialog(p, pDir.getMenu(), (s, dt) -> {
+        final BiConsumer<String, DirectoryType> onCreate = (s, dt) -> {
 
             if (s.isEmpty()) return;
             final Path newDirPath = pDir.getPath().resolve(s);
@@ -66,7 +67,17 @@ public class CreateTreeNodeAction extends DumbAwareAction {
             if (dt.getCodeGenerator() != null)
                 dt.getCodeGenerator().execute(p, dir);
 
-        }).show();
+        };
+
+        // Each node family has its own declarative dialog (issue #11).
+        if (pDir instanceof TestCasesMainDirectoryDto || pDir instanceof TestSetPackageDirectoryDto) {
+            new CreateTestDialog(p, onCreate).show();
+            return;
+        }
+
+        if (pDir instanceof TestRunsMainDirectoryDto || pDir instanceof TestRunPackageDirectoryDto) {
+            new CreateRunDialog(p, onCreate).show();
+        }
     }
 
     @Override

@@ -127,13 +127,17 @@ public enum GeneratorType {
             "order"
     );
 
-    /** Returned when the Java plugin is absent: notify once per project, then skip quietly. */
+    /**
+     * Returned when the Java plugin is absent: notify once per project, then skip quietly.
+     */
     private static final GeneratorAction JAVA_UNAVAILABLE = (p, obj) -> OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
 
     private final @NotNull String description;
     private final @NotNull String tooltip;
 
-    /** Set for data-only fields that never change generated code; null for Java-backed actions. */
+    /**
+     * Set for data-only fields that never change generated code; null for Java-backed actions.
+     */
     @Getter(AccessLevel.NONE)
     private final @Nullable GeneratorAction dataOnlyAction;
 

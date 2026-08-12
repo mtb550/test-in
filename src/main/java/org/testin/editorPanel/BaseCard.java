@@ -17,13 +17,16 @@ import java.util.Locale;
 import java.util.Map;
 
 public abstract class BaseCard extends JBPanel<BaseCard> {
+    /**
+     * Size delta of the card title over the list font. Shared with the mouse hit-testing
+     * in {@code MouseListenerImpl} so hover targets line up with the painted icons.
+     */
+    public static final float TITLE_FONT_DELTA = 3.0f;
     protected final JBLabel descriptionLabel = new JBLabel();
     protected final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
     protected final Map<String, JBLabel> attributeLabels = new HashMap<>();
-
     protected final JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final BorderLayoutPanel wrapper = new BorderLayoutPanel();
-
     protected boolean isSelected;
     protected boolean isRowHovered;
     protected String hoveredAction;
@@ -55,12 +58,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
 
         add(wrapper, BorderLayout.CENTER);
     }
-
-    /**
-     * Size delta of the card title over the list font. Shared with the mouse hit-testing
-     * in {@code MouseListenerImpl} so hover targets line up with the painted icons.
-     */
-    public static final float TITLE_FONT_DELTA = 3.0f;
 
     public void applyListFont(final Font listFont) {
         float baseSize = listFont.getSize2D();

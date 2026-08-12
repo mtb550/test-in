@@ -7,7 +7,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.TestRunStatus;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;

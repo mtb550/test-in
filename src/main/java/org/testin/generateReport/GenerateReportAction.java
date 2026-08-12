@@ -26,18 +26,18 @@ import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
+import org.testin.util.Tools;
 
+import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import org.testin.util.Tools;
-import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
-import java.awt.event.InputEvent;
 
 public class GenerateReportAction extends DumbAwareAction {
 
@@ -74,7 +74,9 @@ public class GenerateReportAction extends DumbAwareAction {
         e.getPresentation().setEnabled(isAvailable());
     }
 
-    /** True when the current selection resolves to a test run. */
+    /**
+     * True when the current selection resolves to a test run.
+     */
     public boolean isAvailable() {
         if (tree != null) {
             return TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class) != null;
@@ -82,7 +84,9 @@ public class GenerateReportAction extends DumbAwareAction {
         return editor instanceof RunEditor;
     }
 
-    /** Direct entry point for toolbar buttons — no AnActionEvent required. */
+    /**
+     * Direct entry point for toolbar buttons — no AnActionEvent required.
+     */
     public void execute() {
 
         TestRunDirectoryDto tr = null;

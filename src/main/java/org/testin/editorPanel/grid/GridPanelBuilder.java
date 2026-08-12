@@ -33,15 +33,14 @@ import java.util.function.Function;
 public class GridPanelBuilder {
 
     static final int CELL_PADDING = 10;
+    static final Color GRID_COLOR = JBColor.border();
+    static final Color SELECTION_BACKGROUND = EditorColors.SELECTION_BACKGROUND;
     private static final int MAX_COL_WIDTH = 500;
-
     /**
      * Client property holding the table kind ("test"/"run"), used to key the
      * persisted user column widths so they survive grid rebuilds and restarts.
      */
     private static final String GRID_KIND_KEY = "testin.grid.kind";
-    static final Color GRID_COLOR = JBColor.border();
-    static final Color SELECTION_BACKGROUND = EditorColors.SELECTION_BACKGROUND;
     private static final Color EVEN_ROW_COLOR = new JBColor(Gray._245, Gray._60);
     private static final Color ODD_ROW_COLOR = new JBColor(Gray._230, Gray._45);
     private static final Border FIRST_CELL_SELECTION_BORDER = new SelectionCellBorder(true);
@@ -253,6 +252,25 @@ public class GridPanelBuilder {
         ));
     }
 
+    private static void installEnterToEdit(final JBTable table) {
+        final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        final Action startEditing = new AbstractAction() {
+            @Override
+            public void actionPerformed(final java.awt.event.ActionEvent event) {
+                final int row = table.getSelectedRow();
+                final int column = table.getSelectedColumn();
+                if (row < 0 || column < 0 || !table.isCellEditable(row, column)) return;
+                if (table.editCellAt(row, column)) {
+                    final Component editor = table.getEditorComponent();
+                    if (editor != null) editor.requestFocusInWindow();
+                }
+            }
+        };
+        table.getInputMap(JComponent.WHEN_FOCUSED).put(enter, "startEditing");
+        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "startEditing");
+        table.getActionMap().put("startEditing", startEditing);
+    }
+
     public JBTable buildRunTable(final Project p, final List<TestCaseDto> testCases, final Set<RunEditorAttributes> attributes, final Map<UUID, TestRunItems> resultsMap, final int firstItemIndex) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
@@ -304,25 +322,6 @@ public class GridPanelBuilder {
         final JBTable table = buildTable(columns, rows, true);
         applyColumnVisibility(table, ordered, TestEditorAttributes::getName, attributes);
         return table;
-    }
-
-    private static void installEnterToEdit(final JBTable table) {
-        final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
-        final Action startEditing = new AbstractAction() {
-            @Override
-            public void actionPerformed(final java.awt.event.ActionEvent event) {
-                final int row = table.getSelectedRow();
-                final int column = table.getSelectedColumn();
-                if (row < 0 || column < 0 || !table.isCellEditable(row, column)) return;
-                if (table.editCellAt(row, column)) {
-                    final Component editor = table.getEditorComponent();
-                    if (editor != null) editor.requestFocusInWindow();
-                }
-            }
-        };
-        table.getInputMap(JComponent.WHEN_FOCUSED).put(enter, "startEditing");
-        table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(enter, "startEditing");
-        table.getActionMap().put("startEditing", startEditing);
     }
 
     public <E> void applyColumnVisibility(final JBTable table, final List<E> allValues, final Function<E, String> name, final Set<E> selected) {

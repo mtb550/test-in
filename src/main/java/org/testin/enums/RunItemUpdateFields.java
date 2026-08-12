@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.statusBar.IStatusBarItem;
 import org.testin.testRun.updateDialog.UpdateRunItemDialog;
 import org.testin.util.Shortcuts;
-import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 

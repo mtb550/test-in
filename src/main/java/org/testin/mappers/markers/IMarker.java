@@ -18,21 +18,23 @@ public interface IMarker {
 
     @NotNull String getCreatedBy();
 
-    @NotNull ZonedDateTime getCreatedAt();
-
-    @NotNull String getModifiedBy();
-
-    @NotNull ZonedDateTime getModifiedAt();
-
     IMarker setCreatedBy(@NotNull String createdBy);
+
+    @NotNull ZonedDateTime getCreatedAt();
 
     IMarker setCreatedAt(@NotNull ZonedDateTime createdAt);
 
+    @NotNull String getModifiedBy();
+
     IMarker setModifiedBy(@NotNull String modifiedBy);
+
+    @NotNull ZonedDateTime getModifiedAt();
 
     IMarker setModifiedAt(@NotNull ZonedDateTime modifiedAt);
 
-    /** Fills the creation audit info; modified mirrors created at birth. */
+    /**
+     * Fills the creation audit info; modified mirrors created at birth.
+     */
     default void stampCreated(final @NotNull String tester) {
         final ZonedDateTime now = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
         setCreatedBy(tester);
@@ -41,7 +43,9 @@ public interface IMarker {
         setModifiedAt(now);
     }
 
-    /** Records a modification by the given tester, now. */
+    /**
+     * Records a modification by the given tester, now.
+     */
     default void touch(final @NotNull String tester) {
         setModifiedBy(tester);
         setModifiedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));

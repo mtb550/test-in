@@ -9,9 +9,10 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.util.Tools;
-import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
+
+import javax.swing.*;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 public class RedoNodeAction extends DumbAwareAction {
 

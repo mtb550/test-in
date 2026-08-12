@@ -6,10 +6,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-
-import java.awt.*;
 import org.testin.util.Tools;
-import javax.swing.KeyStroke;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class OpenContextMenuAction extends DumbAwareAction {

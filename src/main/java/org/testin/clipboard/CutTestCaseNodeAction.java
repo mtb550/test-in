@@ -14,13 +14,13 @@ import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
-
-import java.awt.datatransfer.StringSelection;
-import java.util.List;
 import org.testin.util.Tools;
-import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
+
+import javax.swing.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.util.List;
 
 public class CutTestCaseNodeAction extends DumbAwareAction {
 

@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.generateJavaCode.method.CreateTestMethod;
-import org.testin.util.OptionalPlugin;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -25,6 +24,7 @@ import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
+import org.testin.util.OptionalPlugin;
 import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;

@@ -38,16 +38,15 @@ public abstract class TestCaseBaseDialog {
     protected final GroupSection groupSection;
     protected final StepsSection stepsSection;
     protected final StatusBarSection statusBarSection;
-    private final List<ICreateTestCaseSection> cachedSections;
-    protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
-    private PropertyChangeListener focusListener;
-
     /**
      * Owns all global registrations of this dialog (application focus listener,
      * per-step shortcuts). Parented to the project, so everything is released
      * even when the popup is torn down without firing onClosed.
      */
     protected final Disposable dialogDisposable;
+    private final List<ICreateTestCaseSection> cachedSections;
+    protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
+    private PropertyChangeListener focusListener;
 
     public TestCaseBaseDialog(final @NotNull Project p) {
         this.p = p;

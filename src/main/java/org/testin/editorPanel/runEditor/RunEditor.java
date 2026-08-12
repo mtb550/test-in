@@ -20,7 +20,10 @@ import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
 import org.testin.editorPanel.list.ListPanelBuilder;
 import org.testin.editorPanel.list.ListView;
-import org.testin.editorPanel.listeners.*;
+import org.testin.editorPanel.listeners.GridContextMenuListener;
+import org.testin.editorPanel.listeners.GridSelectionListener;
+import org.testin.editorPanel.listeners.RunListRenderer;
+import org.testin.editorPanel.listeners.StatusBarListener;
 import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.editorPanel.toolBar.IToolBar;
@@ -70,17 +73,15 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final Disposable projectDisposable;
     private final RunExecutionTimer executionTimer = new RunExecutionTimer();
-
+    /**
+     * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
+     */
+    private final AtomicInteger loadGeneration = new AtomicInteger();
     /**
      * Child disposable for the current grid table's font-sync subscription;
      * replaced on every grid rebuild so old subscriptions do not accumulate.
      */
     private Disposable gridFontSyncDisposable;
-
-    /**
-     * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
-     */
-    private final AtomicInteger loadGeneration = new AtomicInteger();
     private JBPanel<?> mainPanel;
     private JBList<TestCaseDto> list;
     private CollectionListModel<TestCaseDto> model;

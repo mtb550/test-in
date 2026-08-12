@@ -2,6 +2,8 @@ package org.testin.editorPanel.grid;
 
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.ui.table.JBTable;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,8 +14,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 /**
  * Excel / DataGrip-style interaction for the grid tables:

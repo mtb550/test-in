@@ -8,22 +8,25 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.generateJavaCode.clazz.RenameJavaClass;
-import org.testin.util.OptionalPlugin;
 import org.testin.generateJavaCode.pkg.RenameJavaPackage;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.mappers.dto.dirs.*;
+import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
+import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.mappers.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
-
-import javax.swing.tree.TreePath;
-import java.nio.file.Path;
+import org.testin.util.OptionalPlugin;
 import org.testin.util.Tools;
-import javax.swing.KeyStroke;
-import java.awt.event.KeyEvent;
+
+import javax.swing.*;
+import javax.swing.tree.TreePath;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.nio.file.Path;
 
 public class RenameAction extends DumbAwareAction {
 

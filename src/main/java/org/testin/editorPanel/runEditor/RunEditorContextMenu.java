@@ -17,7 +17,9 @@ import org.testin.navigate.NavigateToCodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.run.RunTestCaseAction;
 import org.testin.run.StartExecutionAction;
-import org.testin.testRun.*;
+import org.testin.testRun.SetActualResultAction;
+import org.testin.testRun.SetTestCaseStatusAction;
+import org.testin.testRun.UpdateRunItemAction;
 import org.testin.viewPanel.CloseTestCaseDetailsAction;
 import org.testin.viewPanel.ViewDetailsAction;
 

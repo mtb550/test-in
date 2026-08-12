@@ -1,11 +1,11 @@
 package org.testin.mappers.dto.dirs;
 
-import org.jetbrains.annotations.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.DirectoryType;
 import org.testin.enums.CreateNodeMenu;
+import org.testin.enums.DirectoryType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestSetMarker;
 

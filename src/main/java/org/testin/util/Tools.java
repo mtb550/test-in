@@ -1,13 +1,9 @@
 package org.testin.util;
 
-import com.intellij.openapi.actionSystem.AnAction;
-import com.intellij.openapi.actionSystem.CustomShortcutSet;
-import com.intellij.openapi.actionSystem.DefaultActionGroup;
-import com.intellij.openapi.actionSystem.KeyboardShortcut;
-import com.intellij.openapi.actionSystem.Shortcut;
+import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.components.Service;
+import com.intellij.openapi.keymap.KeymapUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -51,6 +47,22 @@ public final class Tools {
 
     private final NameSanitizer nameSanitizer = new NameSanitizer();
     private final TestDataParser testDataParser = new TestDataParser();
+
+    public static CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
+        return new CustomShortcutSet(key);
+    }
+
+    public static Shortcut keyboardShortcut(final @NotNull KeyStroke key) {
+        return new KeyboardShortcut(key, null);
+    }
+
+    public static String shortcutText(final @NotNull KeyStroke key) {
+        return KeymapUtil.getKeystrokeText(key);
+    }
+
+    public static boolean matches(final @NotNull KeyEvent e, final @NotNull KeyStroke key) {
+        return e.getKeyCode() == key.getKeyCode() && e.getModifiersEx() == key.getModifiers();
+    }
 
     public String sanitizePackageName(final @NotNull String s) {
         return nameSanitizer.packageName(s);
@@ -187,6 +199,11 @@ public final class Tools {
         return nameSanitizer.methodName(description);
     }
 
+    // ------------------------------------------------------------------
+    // Keyboard shortcut helpers (see util.Shortcuts for the shared keys;
+    // single-use keystrokes live as constants in their owning classes).
+    // ------------------------------------------------------------------
+
     public ArrayList<String> buildPath2(final @Nullable List<String> parentPath, final @NotNull String newName) {
         ArrayList<String> newPath = new ArrayList<>();
 
@@ -247,27 +264,6 @@ public final class Tools {
         }
         generatedFqcn.replaceAll(this::sanitizePackageName);
         return generatedFqcn;
-    }
-
-    // ------------------------------------------------------------------
-    // Keyboard shortcut helpers (see util.Shortcuts for the shared keys;
-    // single-use keystrokes live as constants in their owning classes).
-    // ------------------------------------------------------------------
-
-    public static CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
-        return new CustomShortcutSet(key);
-    }
-
-    public static Shortcut keyboardShortcut(final @NotNull KeyStroke key) {
-        return new KeyboardShortcut(key, null);
-    }
-
-    public static String shortcutText(final @NotNull KeyStroke key) {
-        return KeymapUtil.getKeystrokeText(key);
-    }
-
-    public static boolean matches(final @NotNull KeyEvent e, final @NotNull KeyStroke key) {
-        return e.getKeyCode() == key.getKeyCode() && e.getModifiersEx() == key.getModifiers();
     }
 
     public DefaultActionGroup createSubGroup(final @NotNull String title, final @NotNull Icon icon, final @NotNull List<? extends DumbAwareAction> actions) {

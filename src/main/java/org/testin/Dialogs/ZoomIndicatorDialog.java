@@ -19,6 +19,7 @@ import java.awt.event.MouseEvent;
 
 public class ZoomIndicatorDialog {
 
+    private static final Timer HIDE_TIMER = new Timer(5000, e -> hide());
     /**
      * A single indicator popup is enough: zooming always happens in the focused
      * editor, so a new indicator replaces the previous one. One reusable timer
@@ -26,7 +27,6 @@ public class ZoomIndicatorDialog {
      * nothing dangles after the popup is gone.
      */
     private static JBPopup currentPopup;
-    private static final Timer HIDE_TIMER = new Timer(5000, e -> hide());
 
     static {
         HIDE_TIMER.setRepeats(false);

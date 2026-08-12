@@ -10,12 +10,12 @@ import java.util.Set;
 @FunctionalInterface
 public interface FilterMembership<T> {
 
-    void apply(T value, Set<T> selection, boolean selected);
-
     static <T> FilterMembership<T> plain() {
         return (value, selection, selected) -> {
             if (selected) selection.add(value);
             else selection.remove(value);
         };
     }
+
+    void apply(T value, Set<T> selection, boolean selected);
 }

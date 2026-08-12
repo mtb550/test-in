@@ -24,15 +24,12 @@ public class TestProjectSelector {
 
     private final @NotNull Project p;
     private final @NotNull ProjectPanel pp;
-
-    @Getter
-    private boolean isLoading = false;
-
     @Getter
     private final @NotNull DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList;
-
     @Getter
     private final @NotNull ComboBox<TestProjectDirectoryDto> selectedTestProject;
+    @Getter
+    private boolean isLoading = false;
 
     public TestProjectSelector(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         this.p = p;
