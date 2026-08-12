@@ -59,7 +59,7 @@ public final class ProjectIndexer {
      * All run-status disk writes go through this one sequential executor,
      * so writes can never interleave or race each other.
      */
-    private final ExecutorService runWriter =
+    private final @NotNull ExecutorService runWriter =
             AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
@@ -107,7 +107,7 @@ public final class ProjectIndexer {
                 ProgressManager.getInstance()
                         .run(new Task.Backgroundable(p, "Testin indexing - " + projectName, true) {
                             @Override
-                            public void run(@NotNull ProgressIndicator indicator) {
+                            public void run(final @NotNull ProgressIndicator indicator) {
                                 indicator.setIndeterminate(false);
                                 indicator.setFraction(0.0);
                                 indicator.setText("Indexing " + projectName + "...");
@@ -130,7 +130,7 @@ public final class ProjectIndexer {
                             }
 
                             @Override
-                            public void onThrowable(@NotNull Throwable error) {
+                            public void onThrowable(final @NotNull Throwable error) {
                                 indexingLatch.countDown();
                                 Logger.error("Error indexing '" + projectName + "': " + error.getMessage());
                                 finishWithFailure();
@@ -396,7 +396,7 @@ public final class ProjectIndexer {
         }, onFinished);
     }
 
-    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final Runnable onComplete) {
+    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @Nullable Runnable onComplete) {
         if (sourcePaths.isEmpty()) {
             if (onComplete != null) onComplete.run();
             return;
@@ -410,7 +410,7 @@ public final class ProjectIndexer {
                 if (onComplete != null) ApplicationManager.getApplication().invokeLater(onComplete);
             });
         };
-        for (Path sourcePath : sourcePaths) {
+        for (final Path sourcePath : sourcePaths) {
             Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(this, targetVf, sourceVf.getName());

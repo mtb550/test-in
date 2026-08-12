@@ -28,34 +28,34 @@ final class IndexerDataStore {
     private final @NotNull TestCaseSequenceStore testCaseStore;
 
     @Getter
-    private final Map<String, TestProjectDirectoryDto> testProjectsByPath = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestProjectDirectoryDto> testProjectsByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestSetDirectoryDto> testSetsDirByPath = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestSetDirectoryDto> testSetsDirByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestRunDirectoryDto> testRunsDirByPath = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunDirectoryDto> testRunsDirByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestSetPackageDirectoryDto> testSetPackagesByPath = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestSetPackageDirectoryDto> testSetPackagesByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestRunPackageDirectoryDto> testRunPackagesByPath = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunPackageDirectoryDto> testRunPackagesByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestCasesMainDirectoryDto> testCasesMainDirsByPath = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestCasesMainDirectoryDto> testCasesMainDirsByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestRunsMainDirectoryDto> testRunsMainDirsByPath = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunsMainDirectoryDto> testRunsMainDirsByPath = new ConcurrentHashMap<>();
 
     @Getter
-    private final Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
+    private final @NotNull Map<String, TestRunDto> testRunsByPath = new ConcurrentHashMap<>();
 
     /**
      * All directory maps, used by operations that must be applied uniformly
      * (rename, lookup, clear). Keep in sync when adding a new directory kind.
      */
-    private final List<Map<String, ? extends DirectoryDto>> dirMaps = List.of(
+    private final @NotNull List<Map<String, ? extends DirectoryDto>> dirMaps = List.of(
             testProjectsByPath,
             testSetsDirByPath,
             testRunsDirByPath,
@@ -77,48 +77,48 @@ final class IndexerDataStore {
         return testCaseStore.getTestSetCaseIds();
     }
 
-    List<TestCaseDto> getTestCasesForTestSet(final Path testSetPath) {
+    @NotNull List<TestCaseDto> getTestCasesForTestSet(final @NotNull Path testSetPath) {
         return testCaseStore.getForTestSet(testSetPath);
     }
 
     @Nullable
-    TestRunDto getTestRunByPath(final Path testRunPath) {
+    TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
         return testRunsByPath.get(testRunPath.toString());
     }
 
     @Nullable
-    TestRunDirectoryDto getTestRunDirByPath(final Path path) {
+    TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
         return testRunsDirByPath.get(path.toString());
     }
 
     @Nullable
-    TestCaseDto getTestCaseById(final UUID id) {
+    TestCaseDto getTestCaseById(final @NotNull UUID id) {
         return testCaseStore.getTestCasesById().get(id);
     }
 
     @Nullable
-    TestSetDirectoryDto getTestSetDirByPath(final Path path) {
+    TestSetDirectoryDto getTestSetDirByPath(final @NotNull Path path) {
         return testSetsDirByPath.get(path.toString());
     }
 
     @Nullable
-    TestSetPackageDirectoryDto getTestSetPackageByPath(final Path path) {
+    TestSetPackageDirectoryDto getTestSetPackageByPath(final @NotNull Path path) {
         return testSetPackagesByPath.get(path.toString());
     }
 
-    void putTestCase(final Path testSetPath, final TestCaseDto tc) {
+    void putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         testCaseStore.put(testSetPath, tc);
     }
 
-    void removeTestCase(final Path testSetPath, final UUID tcId) {
+    void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         testCaseStore.remove(testSetPath, tcId);
     }
 
-    void updateSequence(final Path testSetPath, final List<TestCaseDto> sortedList) {
+    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList) {
         testCaseStore.updateSequence(testSetPath, sortedList);
     }
 
-    void putTestRun(final Path testRunPath, final TestRunDto tr) {
+    void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
         registerTestRun(testRunPath, tr);
 
         Services.getInstance(p, FilesUtil.class)
@@ -129,15 +129,15 @@ final class IndexerDataStore {
      * Index-only registration; used when the caller persists the JSON itself
      * (e.g. the run-status writer, which snapshots the bytes beforehand).
      */
-    void registerTestRun(final Path testRunPath, final TestRunDto tr) {
+    void registerTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
         testRunsByPath.put(testRunPath.toString(), tr);
     }
 
-    void addTestSet(final TestSetDirectoryDto ts) {
+    void addTestSet(final @NotNull TestSetDirectoryDto ts) {
         addDir(testSetsDirByPath, ts, DirectoryType.TS.getMarker(), ts.getMarker());
     }
 
-    void addTestSetPackage(final TestSetPackageDirectoryDto tsp) {
+    void addTestSetPackage(final @NotNull TestSetPackageDirectoryDto tsp) {
         addDir(testSetPackagesByPath, tsp, DirectoryType.TSP.getMarker(), tsp.getMarker());
     }
 
@@ -331,7 +331,7 @@ final class IndexerDataStore {
         }
     }
 
-    private void updatePathAndPath2(final @NotNull DirectoryDto dto, final Path newPath, final @Nullable DirectoryDto newParent) {
+    private void updatePathAndPath2(final @NotNull DirectoryDto dto, final @NotNull Path newPath, final @Nullable DirectoryDto newParent) {
         dto.setPath(newPath);
         dto.setName(newPath.getFileName().toString());
         dto.setParent(newParent);
@@ -348,7 +348,7 @@ final class IndexerDataStore {
         return null;
     }
 
-    private <V extends DirectoryDto> void renameDescendants(final Map<String, V> map, final Path oldPath, final Path newPath) {
+    private <V extends DirectoryDto> void renameDescendants(final @NotNull Map<String, V> map, final @NotNull Path oldPath, final @NotNull Path newPath) {
         final List<Map.Entry<String, V>> toUpdate = new ArrayList<>();
         for (final Map.Entry<String, V> e : map.entrySet()) {
             final Path p = e.getValue().getPath();
@@ -366,7 +366,7 @@ final class IndexerDataStore {
         }
     }
 
-    private <V> void renameDescendantKeys(final Map<String, V> map, final Path oldPath, final Path newPath) {
+    private <V> void renameDescendantKeys(final @NotNull Map<String, V> map, final @NotNull Path oldPath, final @NotNull Path newPath) {
         final List<String> toMove = new ArrayList<>();
         for (final String key : map.keySet()) {
             final Path p = Path.of(key);
@@ -389,7 +389,7 @@ final class IndexerDataStore {
         dto.setPath2(path2);
     }
 
-    List<DirectoryDto> getChildren(final Path parentPath) {
+    @NotNull List<DirectoryDto> getChildren(final @NotNull Path parentPath) {
         return childrenIndex.get(parentPath, this::allDirectories);
     }
 
@@ -397,7 +397,7 @@ final class IndexerDataStore {
         childrenIndex.invalidate();
     }
 
-    private Collection<DirectoryDto> allDirectories() {
+    private @NotNull Collection<DirectoryDto> allDirectories() {
         // Test projects are included too; they are roots (null parent) and are
         // simply skipped by the children index.
         final List<DirectoryDto> directories = new ArrayList<>();
@@ -407,7 +407,7 @@ final class IndexerDataStore {
         return directories;
     }
 
-    private <V> void renameMapEntry(final Map<String, V> map, final String oldKey, final String newKey, final Consumer<V> updater) {
+    private <V> void renameMapEntry(final @NotNull Map<String, V> map, final @NotNull String oldKey, final @NotNull String newKey, final @NotNull Consumer<V> updater) {
         final V value = map.remove(oldKey);
         if (value != null) {
             updater.accept(value);

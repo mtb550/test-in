@@ -3,6 +3,7 @@ package org.testin.indexer;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
 import org.testin.enums.ProjectStatus;
 import org.testin.logger.Logger;
@@ -24,14 +25,14 @@ import java.util.stream.Stream;
 final class IndexingScanner {
 
     private final @NotNull Project p;
-    private final IndexerDataStore store;
+    private final @NotNull IndexerDataStore store;
 
     IndexingScanner(final @NotNull Project p, final @NotNull IndexerDataStore store) {
         this.p = p;
         this.store = store;
     }
 
-    void scanProject(final Path projectPath, final ProgressIndicator indicator) {
+    void scanProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
             scanProjectContents(projectPath, indicator);
         } finally {
@@ -39,7 +40,7 @@ final class IndexingScanner {
         }
     }
 
-    void scanProject(final Path projectPath) {
+    void scanProject(final @NotNull Path projectPath) {
         try {
             scanProjectContents(projectPath, null);
         } finally {
@@ -47,7 +48,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanProjectContents(final Path projectPath, final ProgressIndicator indicator) {
+    private void scanProjectContents(final @NotNull Path projectPath, final @Nullable ProgressIndicator indicator) {
         try {
             final TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
 
@@ -87,7 +88,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestSets(final Path tcDir, final DirectoryDto parent, final ProgressIndicator indicator) {
+    private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @Nullable ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -107,7 +108,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestSetPackage(final Path path, final DirectoryDto parent, final ProgressIndicator indicator) {
+    private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @Nullable ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(p, path, parent);
@@ -130,8 +131,8 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestSet(final Path path, final DirectoryDto parent,
-                             final ProgressIndicator indicator) {
+    private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent,
+                             final @Nullable ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final TestSetDirectoryDto ts = dirMapper.getTestSetNode(p, path, parent);
@@ -165,12 +166,12 @@ final class IndexingScanner {
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test set '" +
-                    (path != null ? path.getFileName().toString() : "null") + "': " + ex.getMessage());
+                    path.getFileName().toString() + "': " + ex.getMessage());
         }
     }
 
-    private void scanTestRunDirs(final Path trDir, final DirectoryDto parent,
-                                 final ProgressIndicator indicator) {
+    private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent,
+                                 final @Nullable ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(trDir)) {
             final List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -188,8 +189,8 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestRunPackageDir(final Path path, final DirectoryDto parent,
-                                       final ProgressIndicator indicator) {
+    private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent,
+                                       final @Nullable ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
@@ -212,8 +213,8 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestRun(final Path path, final DirectoryDto parent,
-                             final ProgressIndicator indicator) {
+    private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent,
+                             final @Nullable ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final TestRunDirectoryDto tr = dirMapper.getTestRunNode(p, path, parent);
@@ -234,7 +235,7 @@ final class IndexingScanner {
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run '" +
-                    (path != null ? path.getFileName().toString() : "null") + "': " + ex.getMessage());
+                    path.getFileName().toString() + "': " + ex.getMessage());
         }
     }
 }

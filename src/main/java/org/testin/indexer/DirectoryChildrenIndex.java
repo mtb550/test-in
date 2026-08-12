@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  * Cached parent-to-children lookup used by the asynchronous project tree.
  */
 final class DirectoryChildrenIndex {
-    private final Map<Path, List<DirectoryDto>> childrenByParent = new ConcurrentHashMap<>();
+    private final @NotNull Map<Path, List<DirectoryDto>> childrenByParent = new ConcurrentHashMap<>();
     private volatile boolean dirty = true;
 
     @NotNull
@@ -30,13 +30,13 @@ final class DirectoryChildrenIndex {
         dirty = true;
     }
 
-    private void rebuildIfNeeded(final Supplier<Collection<DirectoryDto>> source) {
+    private void rebuildIfNeeded(final @NotNull Supplier<Collection<DirectoryDto>> source) {
         if (!dirty) return;
         synchronized (this) {
             if (!dirty) return;
 
             final Map<Path, List<DirectoryDto>> rebuilt = new ConcurrentHashMap<>();
-            for (DirectoryDto directory : source.get()) {
+            for (final DirectoryDto directory : source.get()) {
                 if (directory.getParent() == null) continue;
                 rebuilt.computeIfAbsent(directory.getParent().getPath(), ignored -> new ArrayList<>()).add(directory);
             }
