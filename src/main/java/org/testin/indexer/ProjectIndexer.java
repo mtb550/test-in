@@ -7,7 +7,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
@@ -476,11 +475,11 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Asynchronous VFS refresh of a directory — file access stays inside the indexer.
+     * Asynchronous VFS refresh of a directory — file access stays inside the
+     * indexer, and callers (often on the EDT) are never blocked on disk.
      */
     public void refreshDirectory(final @NotNull Path path) {
-        final VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
-        if (vf != null) vf.refresh(true, true);
+        LocalFileSystem.getInstance().refreshNioFiles(List.of(path), true, true, null);
     }
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {

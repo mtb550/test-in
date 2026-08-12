@@ -5,8 +5,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBPanel;
@@ -77,9 +75,11 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private final ModelSyncListener syncListener;
     private final Disposable projectDisposable;
     /**
-     * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
+     * One counter for every model-replacing operation - data loads and badge
+     * sorts alike (#24). Each one bumps and checks it, so a stale in-flight
+     * result never overwrites a newer one, whichever kind it is.
      */
-    private final AtomicInteger loadGeneration = new AtomicInteger();
+    private final AtomicInteger modelGeneration = new AtomicInteger();
     @Getter
     @NotNull
     private final AbstractToolbarPanel toolBar;
@@ -175,7 +175,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     private void loadDataAsync() {
-        final int generation = loadGeneration.incrementAndGet();
+        final int generation = modelGeneration.incrementAndGet();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             indexer.awaitIndexing();
@@ -184,7 +184,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
             if (items.isEmpty()) {
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    if (generation != loadGeneration.get()) return;
+                    if (generation != modelGeneration.get()) return;
                     allTestCases.clear();
                     currentTestCases.clear();
                     unsortedIds.clear();
@@ -200,7 +200,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             final SortResult result = TestCaseSorter.sortTestCases(p, items);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                if (generation != loadGeneration.get()) return;
+                if (generation != modelGeneration.get()) return;
                 allTestCases.clear();
                 allTestCases.addAll(result.sortedList());
                 currentTestCases.clear();
@@ -222,8 +222,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     private void onDataSynced() {
-        sortAndIdentifyUnsorted();
-        refreshView();
+        sortAndIdentifyUnsorted(this::refreshView);
     }
 
     @Override
@@ -291,15 +290,16 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void appendNewTestCase(final TestCaseDto tc) {
         this.allTestCases.add(tc);
-        sortAndIdentifyUnsorted();
-        updateSequenceAndSaveAll();
+        sortAndIdentifyUnsorted(() -> {
+            updateSequenceAndSaveAll();
 
-        // Asynchronous refresh: a synchronous recursive VFS refresh from the EDT is a platform violation.
-        final VirtualFile vDir = LocalFileSystem.getInstance().findFileByIoFile(parent.getPath().toFile());
-        if (vDir != null) vDir.refresh(true, true);
+            // VFS refresh goes through the indexer - file access is the
+            // indexer's alone (see CLAUDE.md).
+            Services.getInstance(p, ProjectIndexer.class).refreshDirectory(parent.getPath());
 
-        refreshView();
-        selectTestCase(tc);
+            refreshView();
+            selectTestCase(tc);
+        });
     }
 
     @Override
@@ -488,18 +488,49 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         return PageWindow.of(filtered.size(), currentPage, pageSize).totalPages();
     }
 
-    public void sortAndIdentifyUnsorted() {
-        if (allTestCases.isEmpty()) return;
+    /**
+     * Re-sorts asynchronously, then persists the resulting sequence through
+     * the indexer. The persist must wait for the sort to land - callers use
+     * this instead of running the two steps sequentially themselves.
+     */
+    public void resortAndPersistSequence() {
+        sortAndIdentifyUnsorted(this::updateSequenceAndSaveAll);
+    }
 
+    /**
+     * Recomputes the order and the unsorted-badge ids off the EDT (#24): the
+     * walk runs on a pooled thread and the result is applied back on the EDT,
+     * where onDone continues (persisting, refreshing). Any newer sort or load
+     * bumps the generation, so a stale result never overwrites a newer one.
+     */
+    private void sortAndIdentifyUnsorted(final @NotNull Runnable onDone) {
+        final List<TestCaseDto> snapshot;
         synchronized (allTestCases) {
-            final SortResult result = TestCaseSorter.sortTestCases(p, new ArrayList<>(allTestCases));
-
-            this.allTestCases.clear();
-            this.allTestCases.addAll(result.sortedList());
-
-            this.unsortedIds.clear();
-            this.unsortedIds.addAll(result.unsortedIds());
+            snapshot = new ArrayList<>(allTestCases);
         }
+        if (snapshot.isEmpty()) {
+            onDone.run();
+            return;
+        }
+
+        final int generation = modelGeneration.incrementAndGet();
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            if (generation != modelGeneration.get()) return;
+            final SortResult result = TestCaseSorter.sortTestCases(p, snapshot);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (generation != modelGeneration.get()) return;
+
+                synchronized (allTestCases) {
+                    this.allTestCases.clear();
+                    this.allTestCases.addAll(result.sortedList());
+                }
+                this.unsortedIds.clear();
+                this.unsortedIds.addAll(result.unsortedIds());
+
+                onDone.run();
+            });
+        });
     }
 
     @Override

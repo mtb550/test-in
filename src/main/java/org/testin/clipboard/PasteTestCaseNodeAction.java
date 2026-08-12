@@ -70,9 +70,8 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 });
 
                 sourceUI.getAllTestCases().removeAll(cutItems);
-                if (sourceUI != destUI && sourceUI instanceof TestEditor) {
-                    ((TestEditor) sourceUI).sortAndIdentifyUnsorted();
-                    sourceUI.updateSequenceAndSaveAll();
+                if (sourceUI != destUI && sourceUI instanceof TestEditor sourceEditor) {
+                    sourceEditor.resortAndPersistSequence();
                 }
             }
 
@@ -87,8 +86,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
                 destUI.getAllTestCases().add(clonedTc);
             }
 
-            destUI.sortAndIdentifyUnsorted();
-            destUI.updateSequenceAndSaveAll();
+            destUI.resortAndPersistSequence();
 
             if (isCut) {
                 TestEditorContextMenu.clearCutState();
