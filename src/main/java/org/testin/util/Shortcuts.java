@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.swing.*;
+import java.awt.HeadlessException;
+import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -21,6 +23,9 @@ public enum Shortcuts {
     // Dialog confirm / dismiss
     Enter(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
     Escape(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
+
+    // Toolbar search (test editor + run editor)
+    FocusSearch(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuMask())),
 
     // Item operations shared between the project tree, editors, and details panel
     CreateItem(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK)),
@@ -72,6 +77,18 @@ public enum Shortcuts {
     PriorityLow(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0));
 
     private final KeyStroke key;
+
+    /**
+     * The platform menu modifier (Cmd on macOS, Ctrl elsewhere), same source
+     * as the other cross-platform shortcuts; plain Ctrl in headless test runs.
+     */
+    private static int menuMask() {
+        try {
+            return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
+        } catch (final HeadlessException ex) {
+            return InputEvent.CTRL_DOWN_MASK;
+        }
+    }
 
     public CustomShortcutSet getCustomShortcut() {
         return Tools.customShortcut(key);

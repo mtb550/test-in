@@ -152,6 +152,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         this.toolBar = new TestToolBar(this);
         mainPanel.add(toolBar, BorderLayout.NORTH);
+        toolBar.installSearchFocusShortcut(mainPanel);
 
         this.syncListener = new ModelSyncListener(this, model);
         this.syncListener.setOnUpdateCallback(this::onDataSynced);
@@ -331,6 +332,11 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         currentTestCases.addAll(getFilteredList());
         this.currentPage = 1;
         refreshView();
+    }
+
+    @Override
+    public void onToolBarSearchFocusReleased() {
+        list.requestFocusInWindow();
     }
 
     @Override

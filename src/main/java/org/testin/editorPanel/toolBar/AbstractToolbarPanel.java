@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editorPanel.toolBar.components.FocusSearchAction;
 import org.testin.editorPanel.toolBar.components.GridViewBtn;
 import org.testin.editorPanel.toolBar.components.IToolbarItem;
 import org.testin.editorPanel.toolBar.components.ListViewBtn;
@@ -38,11 +39,20 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
 
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged);
+        this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged, callbacks::onToolBarSearchFocusReleased);
     }
 
     public <T extends IToolbarItem> T getToolbarItem(Class<T> itemClass) {
         return itemClass.cast(toolbarItems.get(itemClass));
+    }
+
+    /**
+     * Registers the search-focus shortcut on the given scope (the editor's
+     * main panel), so the toolbar owns the whole search story: the field, its
+     * callbacks and its shortcut (#18).
+     */
+    public void installSearchFocusShortcut(final @NotNull JComponent scope) {
+        new FocusSearchAction(searchTxt, scope);
     }
 
     protected void layoutComponents() {

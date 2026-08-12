@@ -157,6 +157,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         mainPanel = new JBPanel<>(new BorderLayout());
         mainPanel.add(toolBar, BorderLayout.NORTH);
         mainPanel.add(statusBar, BorderLayout.SOUTH);
+        toolBar.installSearchFocusShortcut(mainPanel);
 
         // List view is the default mode when the editor opens.
         onToolBarSwitchedToListView();
@@ -238,6 +239,11 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         currentTestCases.addAll(getFilteredList());
         currentPage = 1;
         refreshView();
+    }
+
+    @Override
+    public void onToolBarSearchFocusReleased() {
+        if (list != null) list.requestFocusInWindow();
     }
 
     @Override
