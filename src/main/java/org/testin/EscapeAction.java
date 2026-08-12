@@ -74,6 +74,7 @@ public class EscapeAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
+        // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 

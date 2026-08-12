@@ -38,6 +38,7 @@ abstract class AbstractTreeAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
+        // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 }

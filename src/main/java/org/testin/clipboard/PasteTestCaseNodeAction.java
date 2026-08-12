@@ -116,6 +116,7 @@ public class PasteTestCaseNodeAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
+        // BGT on purpose - the clipboard is BGT-safe and update() reads no Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 
