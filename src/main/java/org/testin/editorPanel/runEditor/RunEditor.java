@@ -59,37 +59,37 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private final @NotNull Project p;
 
     @Getter
-    private final TestRunDirectoryDto parent;
+    private final @NotNull TestRunDirectoryDto parent;
 
     @Getter
-    private final List<TestCaseDto> allTestCases;
+    private final @NotNull List<TestCaseDto> allTestCases;
 
     @Getter
-    private final List<TestCaseDto> currentTestCases;
+    private final @NotNull List<TestCaseDto> currentTestCases;
 
     @Getter
     private final @NotNull Map<UUID, TestRunItems> resultsMap;
 
-    private final GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
-    private final Disposable projectDisposable;
-    private final RunExecutionTimer executionTimer = new RunExecutionTimer();
+    private final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
+    private final @NotNull Disposable projectDisposable;
+    private final @NotNull RunExecutionTimer executionTimer = new RunExecutionTimer();
     /**
      * Guards against a stale in-flight load overwriting a newer one (e.g. double refresh).
      */
-    private final AtomicInteger loadGeneration = new AtomicInteger();
+    private final @NotNull AtomicInteger loadGeneration = new AtomicInteger();
     /**
      * Child disposable for the current grid table's font-sync subscription;
      * replaced on every grid rebuild so old subscriptions do not accumulate.
      */
-    private Disposable gridFontSyncDisposable;
-    private JBPanel<?> mainPanel;
-    private JBList<TestCaseDto> list;
-    private CollectionListModel<TestCaseDto> model;
-    private JBTable gridTable;
-    private RunEditorContextMenu contextMenu;
-    private JBScrollPane gridScrollPane;
-    private JBScrollPane listScrollPane;
-    private JComponent currentCenter;
+    private @Nullable Disposable gridFontSyncDisposable;
+    private @NotNull JBPanel<?> mainPanel;
+    private @Nullable JBList<TestCaseDto> list;
+    private @Nullable CollectionListModel<TestCaseDto> model;
+    private @Nullable JBTable gridTable;
+    private @NotNull RunEditorContextMenu contextMenu;
+    private @Nullable JBScrollPane gridScrollPane;
+    private @NotNull JBScrollPane listScrollPane;
+    private @Nullable JComponent currentCenter;
     @Getter
     @Setter
     private int currentPage = 1;
@@ -99,7 +99,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private int pageSize = 50;
 
     @Getter
-    private StatusBar statusBar;
+    private @NotNull StatusBar statusBar;
 
     @Getter
     @NotNull
@@ -107,18 +107,18 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Getter
     @Setter
-    private String hoveredIconAction = null;
+    private @Nullable String hoveredIconAction = null;
 
     @Getter
     @Setter
     private int hoveredIndex = -1;
     @Getter
-    private volatile TestRunDto tr;
+    private volatile @Nullable TestRunDto tr;
 
     @Getter
     private int currentlyExecutingIndex = -1;
 
-    public RunEditor(final @NotNull Project p, final UnifiedVirtualFile vf) {
+    public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         this.p = p;
         this.parent = vf.getTestRun();
 
@@ -176,7 +176,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             try {
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
-                if (tr == null && parent != null) {
+                if (tr == null) {
                     tr = indexer.getTestRunByPath(parent.getPath());
                 }
 
@@ -234,7 +234,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public void onToolBarSearchValueChanged(final String query) {
+    public void onToolBarSearchValueChanged(final @NotNull String query) {
         currentTestCases.clear();
         currentTestCases.addAll(getFilteredList());
         currentPage = 1;
@@ -307,11 +307,11 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-        FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
+        final FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
         if (toolBarFilter != null)
             toolBarFilter.clearFilters();
 
-        SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
+        final SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
         if (toolBarSearch != null)
             toolBarSearch.resetSearchQuery();
 
@@ -333,9 +333,9 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public Set<RunEditorAttributes> getSelectedDetails() {
-        AbstractToolbarPanel baseToolBar = getToolBar();
-        RunDetailsPopupBtn popup = baseToolBar.getToolbarItem(RunDetailsPopupBtn.class);
+    public @NotNull Set<RunEditorAttributes> getSelectedDetails() {
+        final AbstractToolbarPanel baseToolBar = getToolBar();
+        final RunDetailsPopupBtn popup = baseToolBar.getToolbarItem(RunDetailsPopupBtn.class);
         if (popup != null) {
             return popup.getSelectedDetails();
         }
@@ -353,7 +353,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public void appendNewTestCase(final TestCaseDto tc) {
+    public void appendNewTestCase(final @NotNull TestCaseDto tc) {
         this.allTestCases.add(tc);
         refreshView();
     }
@@ -376,9 +376,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             list.setSelectedValue(selectedItem, true);
         }
 
-        if (statusBar != null) {
-            statusBar.updatePaginationState(page.page(), page.totalPages(), total);
-        }
+        statusBar.updatePaginationState(page.page(), page.totalPages(), total);
 
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
@@ -387,7 +385,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         }
     }
 
-    private List<TestCaseDto> getCurrentPageItems() {
+    private @NotNull List<TestCaseDto> getCurrentPageItems() {
         final int total = currentTestCases.size();
         final PageWindow page = PageWindow.of(total, currentPage, pageSize);
         return new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
@@ -420,7 +418,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         }
     }
 
-    private void setCenter(final JComponent component) {
+    private void setCenter(final @NotNull JComponent component) {
         Logger.debug("[center] setCenter -> " + component.getClass().getSimpleName()
                 + " (had center=" + (currentCenter != null) + ")");
         if (currentCenter != null) {
@@ -433,7 +431,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public Set<String> getAvailableModules() {
+    public @NotNull Set<String> getAvailableModules() {
         final Set<String> modules = new HashSet<>();
         for (final TestCaseDto tc : allTestCases) {
             final String module = tc.getModule();
@@ -444,12 +442,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         return modules;
     }
 
-    private List<TestCaseDto> getFilteredList() {
-        final String query = toolBar.getSearchTxt() != null
-                ? toolBar.getSearchTxt().getSearchQuery() : "";
+    private @NotNull List<TestCaseDto> getFilteredList() {
+        final String query = toolBar.getSearchTxt().getSearchQuery();
 
-        FilterPopupBtn filterPopup;
-        filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
+        final FilterPopupBtn filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
 
         final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
         final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
@@ -475,16 +471,16 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         executionTimer.dispose();
         if (list != null)
-            for (MouseListener listener : list.getMouseListeners())
+            for (final MouseListener listener : list.getMouseListeners())
                 list.removeMouseListener(listener);
 
         toolBar.dispose();
-        if (statusBar != null) statusBar.dispose();
+        statusBar.dispose();
 
         allTestCases.clear();
         resultsMap.clear();
         if (model != null) model.removeAll();
-        if (mainPanel != null) mainPanel.removeAll();
+        mainPanel.removeAll();
         IEditor.super.dispose();
 
         Logger.debug("dispose run editor: " + parent.getName() + " - " + parent.getPath());
@@ -505,7 +501,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public void selectTestCase(final TestCaseDto tc) {
+    public void selectTestCase(final @Nullable TestCaseDto tc) {
         if (tc == null) return;
 
         final int index = currentTestCases.indexOf(tc);
@@ -530,39 +526,39 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public Set<UUID> getUnsortedIds() {
+    public @NotNull Set<UUID> getUnsortedIds() {
         return Collections.emptySet();
     }
 
     @Override
-    public List<TestCaseDto> getSelectedTestCases() {
+    public @NotNull List<TestCaseDto> getSelectedTestCases() {
         return list != null ? list.getSelectedValuesList() : Collections.emptyList();
     }
 
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(p, this, list);
+            final UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(p, this, list);
             changeStatus.onExecutionFinished(p, this);
             return;
         }
 
         currentlyExecutingIndex = globalIndex;
 
-        int expectedPage = (globalIndex / pageSize) + 1;
+        final int expectedPage = (globalIndex / pageSize) + 1;
         if (currentPage != expectedPage) {
             currentPage = expectedPage;
             refreshView();
         }
 
-        int localIndex = globalIndex - ((currentPage - 1) * pageSize);
+        final int localIndex = globalIndex - ((currentPage - 1) * pageSize);
 
         if (list != null) {
             list.setSelectedIndex(localIndex);
             list.ensureIndexIsVisible(localIndex);
         }
 
-        TestCaseDto currentTc = currentTestCases.get(globalIndex);
-        TestRunItems runItem = resultsMap.get(currentTc.getId());
+        final TestCaseDto currentTc = currentTestCases.get(globalIndex);
+        final TestRunItems runItem = resultsMap.get(currentTc.getId());
 
         if (runItem == null) {
             // No run data for this case; skip it. Status changes themselves go
@@ -583,7 +579,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onStartExecutionClicked() {
-        UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(p, this, list);
+        final UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(p, this, list);
         changeStatus.applyStatusChange(p, this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
     }

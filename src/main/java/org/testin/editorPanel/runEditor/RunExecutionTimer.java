@@ -2,6 +2,7 @@ package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.TestRunItems;
 
 import javax.swing.*;
@@ -12,7 +13,7 @@ import java.time.Duration;
  */
 final class RunExecutionTimer implements Disposable {
 
-    private Timer timer;
+    private @Nullable Timer timer;
     private long startedAt;
 
     void start(final @NotNull TestRunItems item, final @NotNull Runnable repaint) {

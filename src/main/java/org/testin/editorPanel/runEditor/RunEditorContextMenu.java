@@ -25,9 +25,9 @@ import org.testin.viewPanel.ViewDetailsAction;
 public class RunEditorContextMenu extends AbstractEditorContextMenu {
 
     private final @NotNull Project p;
-    private final IEditor ui;
+    private final @NotNull IEditor ui;
 
-    public RunEditorContextMenu(final @NotNull Project p, final IEditor ui, final DirectoryDto dir, final JBList<TestCaseDto> list) {
+    public RunEditorContextMenu(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         super("Run Editor Context Menu", true);
         this.p = p;
         this.ui = ui;
