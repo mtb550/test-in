@@ -10,12 +10,12 @@ import org.testin.services.Services;
 import java.util.*;
 
 public class TestCaseSorter {
-    public static SortResult sortTestCases(final @NotNull Project p, final List<TestCaseDto> unsortedList) {
-        if (unsortedList == null || unsortedList.isEmpty()) {
+    public static @NotNull SortResult sortTestCases(final @NotNull Project p, final @NotNull List<TestCaseDto> unsortedList) {
+        if (unsortedList.isEmpty()) {
             return new SortResult(new ArrayList<>(), new HashSet<>());
         }
 
-        Map<UUID, TestCaseDto> idMap = Maps.newHashMapWithExpectedSize(unsortedList.size());
+        final Map<UUID, TestCaseDto> idMap = Maps.newHashMapWithExpectedSize(unsortedList.size());
         TestCaseDto head = null;
 
         for (final TestCaseDto tc : unsortedList) {

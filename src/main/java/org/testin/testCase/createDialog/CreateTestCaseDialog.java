@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.ui.dialogs.DialogStyle;
@@ -21,19 +22,19 @@ import java.util.function.Consumer;
 
 public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
-    private JBPopup popup;
+    private @Nullable JBPopup popup;
 
-    public CreateTestCaseDialog(final @NotNull Project p, final Consumer<@NotNull TestCaseDto> onSave) {
+    public CreateTestCaseDialog(final @NotNull Project p, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 
         final TestCaseDto dto = new TestCaseDto();
 
-        IUIAction repackPopup = () -> {
+        final IUIAction repackPopup = () -> {
             if (popup != null) {
                 popup.pack(false, true);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                    final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
                     if (focusOwner instanceof JComponent jComp) {
                         jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
                     }
@@ -41,13 +42,13 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
             }
         };
 
-        JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
+        final JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
-            public Dimension getPreferredSize() {
-                Dimension pref = super.getPreferredSize();
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            public @NotNull Dimension getPreferredSize() {
+                final Dimension pref = super.getPreferredSize();
+                final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 pref.width = Math.max(pref.width, screenSize.width / 2);
-                int maxHeight = (int) (screenSize.height * 0.85);
+                final int maxHeight = (int) (screenSize.height * 0.85);
                 pref.height = Math.min(pref.height, maxHeight);
                 return pref;
             }
@@ -60,12 +61,12 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
         initDynamicStatusBar(mainPanel);
 
-        JBPanel<?> contentPanel = new JBPanel<>();
+        final JBPanel<?> contentPanel = new JBPanel<>();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
-        for (ICreateTestCaseSection section : getAllSections()) {
-            JBPanel<?> slot = new JBPanel<>(new BorderLayout());
+        for (final ICreateTestCaseSection section : getAllSections()) {
+            final JBPanel<?> slot = new JBPanel<>(new BorderLayout());
             slot.setOpaque(false);
             contentPanel.add(slot);
 
@@ -76,11 +77,11 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
             }
         }
 
-        JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
+        final JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
 
-        JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
+        final JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
@@ -91,9 +92,9 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
         scrollPane.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
-            public void componentResized(java.awt.event.ComponentEvent e) {
-                int viewHeight = anchorPanel.getPreferredSize().height;
-                int portHeight = scrollPane.getViewport().getHeight();
+            public void componentResized(final java.awt.event.ComponentEvent e) {
+                final int viewHeight = anchorPanel.getPreferredSize().height;
+                final int portHeight = scrollPane.getViewport().getHeight();
 
                 if (viewHeight > portHeight) {
                     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -118,13 +119,13 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
                 .setResizable(true)
                 .addListener(new JBPopupListener() {
                     @Override
-                    public void onClosed(@NotNull LightweightWindowEvent event) {
+                    public void onClosed(final @NotNull LightweightWindowEvent event) {
                         dispose();
                     }
                 })
                 .createPopup();
 
-        Runnable saveAction = save(dto, onSave, new JBPopup[]{popup});
+        final Runnable saveAction = save(dto, onSave, new JBPopup[]{popup});
 
         // register enter shortcut
         registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);

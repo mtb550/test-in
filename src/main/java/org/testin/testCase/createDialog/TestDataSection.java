@@ -5,6 +5,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
@@ -15,9 +16,9 @@ import java.awt.*;
 
 public class TestDataSection implements ICreateTestCaseSection {
     @Getter
-    private final EditorTextField testDataField;
-    private final JBPanel<?> wrapper;
-    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
+    private final @NotNull EditorTextField testDataField;
+    private final @NotNull JBPanel<?> wrapper;
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public TestDataSection() {
         this.testDataField = new EditorTextField();
@@ -35,26 +36,26 @@ public class TestDataSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JBPanel<?> getWrapper() {
+    public @NotNull JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JBPanel<?> contentPanel) {
+    public void showSection(final @NotNull JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         testDataField.requestFocus();
     }
 
     @Override
-    public void applyTo(final TestCaseDto dto) {
+    public void applyTo(final @NotNull TestCaseDto dto) {
         if (wrapper.getParent() != null) {
             dto.setTestData(testDataField.getText().trim());
         }
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseTestData.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -62,7 +63,7 @@ public class TestDataSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JComponent getFocusComponent() {
+    public @NotNull JComponent getFocusComponent() {
         return testDataField;
     }
 
@@ -72,7 +73,7 @@ public class TestDataSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
         testDataField.setText(dto.getTestData());
     }
 }

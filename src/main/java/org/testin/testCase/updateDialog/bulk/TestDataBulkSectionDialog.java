@@ -11,22 +11,22 @@ public class TestDataBulkSectionDialog extends JsonSplitBulkSectionDialog {
     }
 
     @Override
-    protected String getPopupTitle() {
+    protected @NotNull String getPopupTitle() {
         return "Bulk Edit Test Data (Enter to Save | Tab/Arrows to Navigate)";
     }
 
     @Override
-    protected String getJsonFieldName() {
+    protected @NotNull String getJsonFieldName() {
         return "testData";
     }
 
     @Override
-    protected String getOriginalValue(final TestCaseDto tc) {
+    protected @NotNull String getOriginalValue(final @NotNull TestCaseDto tc) {
         return tc.getTestData();
     }
 
     @Override
-    protected void setValue(final TestCaseDto tc, final String value) {
+    protected void setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
         tc.setTestData(value);
     }
 }

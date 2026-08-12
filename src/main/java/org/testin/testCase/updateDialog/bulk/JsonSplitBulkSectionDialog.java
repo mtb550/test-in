@@ -27,6 +27,7 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.ui.dialogs.DialogStyle;
 
@@ -45,19 +46,19 @@ public abstract class JsonSplitBulkSectionDialog {
         this.p = p;
     }
 
-    protected abstract String getPopupTitle();
+    protected abstract @NotNull String getPopupTitle();
 
     /**
      * JSON key of the edited field, e.g. "testData".
      */
-    protected abstract String getJsonFieldName();
+    protected abstract @NotNull String getJsonFieldName();
 
-    protected abstract String getOriginalValue(final TestCaseDto tc);
+    protected abstract @NotNull String getOriginalValue(final @NotNull TestCaseDto tc);
 
     /**
      * Applies one edited (non-null, trimmed) value to the test case.
      */
-    protected abstract void setValue(final TestCaseDto tc, final String value);
+    protected abstract void setValue(final @NotNull TestCaseDto tc, final @NotNull String value);
 
     /**
      * Whether a value edited to blank may be applied (e.g. a description must not be blanked).
@@ -74,7 +75,7 @@ public abstract class JsonSplitBulkSectionDialog {
         return true;
     }
 
-    protected void applyValues(final List<TestCaseDto> items, final List<String> newValues) {
+    protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<String> newValues) {
         for (int i = 0; i < items.size(); i++) {
             final String raw = newValues.get(i);
             if (raw == null) continue; // unchanged row - never rewrite (see saveLogic)
@@ -86,7 +87,7 @@ public abstract class JsonSplitBulkSectionDialog {
         }
     }
 
-    protected void appendJsonItem(final TestCaseDto tc, final int index, final boolean isLast, final StringBuilder leftSb, final StringBuilder rightSb, final List<int[]> rightEditableRanges) {
+    protected void appendJsonItem(final @NotNull TestCaseDto tc, final int index, final boolean isLast, final @NotNull StringBuilder leftSb, final @NotNull StringBuilder rightSb, final @NotNull List<int[]> rightEditableRanges) {
         final String escapedValue = escapeJson(getOriginalValue(tc));
 
         final StringBuilder prefixSb = new StringBuilder("  {\n    \"id\": \"")
@@ -110,42 +111,42 @@ public abstract class JsonSplitBulkSectionDialog {
         rightSb.append(suffix).append(comma);
     }
 
-    public void show(final List<TestCaseDto> selectedItems, final Consumer<List<TestCaseDto>> updatedItems) {
-        StringBuilder leftSb = new StringBuilder();
-        StringBuilder rightSb = new StringBuilder();
-        List<int[]> rightEditableRanges = new ArrayList<>();
+    public void show(final @NotNull List<TestCaseDto> selectedItems, final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
+        final StringBuilder leftSb = new StringBuilder();
+        final StringBuilder rightSb = new StringBuilder();
+        final List<int[]> rightEditableRanges = new ArrayList<>();
 
         leftSb.append("[\n");
         rightSb.append("[\n");
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            boolean isLast = (i == selectedItems.size() - 1);
+            final boolean isLast = (i == selectedItems.size() - 1);
             appendJsonItem(selectedItems.get(i), i, isLast, leftSb, rightSb, rightEditableRanges);
         }
 
         leftSb.append("]");
         rightSb.append("]");
 
-        Document leftDoc = EditorFactory.getInstance().createDocument(leftSb.toString());
+        final Document leftDoc = EditorFactory.getInstance().createDocument(leftSb.toString());
         leftDoc.setReadOnly(true);
-        Editor leftEditor = EditorFactory.getInstance().createViewer(leftDoc, p);
+        final Editor leftEditor = EditorFactory.getInstance().createViewer(leftDoc, p);
         setupEditorAppearance(leftEditor, p);
 
         leftEditor.getContentComponent().setFocusable(false);
         leftEditor.getSettings().setCaretRowShown(false);
         leftEditor.addEditorMouseListener(new EditorMouseListener() {
             @Override
-            public void mousePressed(@NotNull EditorMouseEvent event) {
+            public void mousePressed(final @NotNull EditorMouseEvent event) {
                 event.consume();
             }
         });
 
-        Document rightDoc = EditorFactory.getInstance().createDocument(rightSb.toString());
-        List<RangeMarker> valueMarkers = new ArrayList<>();
+        final Document rightDoc = EditorFactory.getInstance().createDocument(rightSb.toString());
+        final List<RangeMarker> valueMarkers = new ArrayList<>();
 
         int currentGuardStart = 0;
-        for (int[] range : rightEditableRanges) {
-            RangeMarker marker = rightDoc.createRangeMarker(range[0], range[1]);
+        for (final int[] range : rightEditableRanges) {
+            final RangeMarker marker = rightDoc.createRangeMarker(range[0], range[1]);
             marker.setGreedyToLeft(true);
             marker.setGreedyToRight(true);
             valueMarkers.add(marker);
@@ -162,25 +163,25 @@ public abstract class JsonSplitBulkSectionDialog {
         EditorActionManager.getInstance().setReadonlyFragmentModificationHandler(rightDoc, e -> {
         });
 
-        Editor rightEditor = EditorFactory.getInstance().createEditor(rightDoc, p);
+        final Editor rightEditor = EditorFactory.getInstance().createEditor(rightDoc, p);
         setupEditorAppearance(rightEditor, p);
 
-        List<RangeHighlighter> leftLineHighlighters = new ArrayList<>();
+        final List<RangeHighlighter> leftLineHighlighters = new ArrayList<>();
         Color themeCaretRowColor = rightEditor.getColorsScheme().getColor(EditorColors.CARET_ROW_COLOR);
         if (themeCaretRowColor == null) {
             themeCaretRowColor = new JBColor(Gray._245, Gray._50);
         }
-        TextAttributes leftLineAttr = new TextAttributes();
+        final TextAttributes leftLineAttr = new TextAttributes();
         leftLineAttr.setBackgroundColor(themeCaretRowColor);
 
-        Runnable updateRowHighlights = () -> {
+        final Runnable updateRowHighlights = () -> {
             if (leftEditor.isDisposed() || rightEditor.isDisposed()) return;
-            MarkupModel leftMarkup = leftEditor.getMarkupModel();
-            for (RangeHighlighter h : leftLineHighlighters) leftMarkup.removeHighlighter(h);
+            final MarkupModel leftMarkup = leftEditor.getMarkupModel();
+            for (final RangeHighlighter h : leftLineHighlighters) leftMarkup.removeHighlighter(h);
             leftLineHighlighters.clear();
 
-            for (Caret caret : rightEditor.getCaretModel().getAllCarets()) {
-                int line = rightDoc.getLineNumber(caret.getOffset());
+            for (final Caret caret : rightEditor.getCaretModel().getAllCarets()) {
+                final int line = rightDoc.getLineNumber(caret.getOffset());
                 if (line < leftDoc.getLineCount()) {
                     leftLineHighlighters.add(leftMarkup.addLineHighlighter(
                             line, HighlighterLayer.CARET_ROW, leftLineAttr
@@ -191,13 +192,13 @@ public abstract class JsonSplitBulkSectionDialog {
 
         rightEditor.getCaretModel().addCaretListener(new CaretListener() {
             @Override
-            public void caretPositionChanged(@NotNull CaretEvent event) {
-                Caret caret = event.getCaret();
+            public void caretPositionChanged(final @NotNull CaretEvent event) {
+                final Caret caret = event.getCaret();
 
-                int offset = caret.getOffset();
+                final int offset = caret.getOffset();
                 boolean isInsideEditable = false;
 
-                for (RangeMarker m : valueMarkers) {
+                for (final RangeMarker m : valueMarkers) {
                     if (offset >= m.getStartOffset() && offset <= m.getEndOffset()) {
                         isInsideEditable = true;
                         break;
@@ -205,42 +206,42 @@ public abstract class JsonSplitBulkSectionDialog {
                 }
 
                 if (!isInsideEditable) {
-                    int nearestOffset = getNearestValidOffset(offset, valueMarkers);
+                    final int nearestOffset = getNearestValidOffset(offset, valueMarkers);
                     caret.moveToOffset(nearestOffset);
                 }
                 updateRowHighlights.run();
             }
 
             @Override
-            public void caretAdded(@NotNull CaretEvent event) {
+            public void caretAdded(final @NotNull CaretEvent event) {
                 updateRowHighlights.run();
             }
 
             @Override
-            public void caretRemoved(@NotNull CaretEvent event) {
+            public void caretRemoved(final @NotNull CaretEvent event) {
                 updateRowHighlights.run();
             }
         });
 
-        Disposable docListenerDisposable = Disposer.newDisposable();
-        MarkupModel rightMarkupModel = rightEditor.getMarkupModel();
+        final Disposable docListenerDisposable = Disposer.newDisposable();
+        final MarkupModel rightMarkupModel = rightEditor.getMarkupModel();
         rightDoc.addDocumentListener(new DocumentListener() {
             @Override
-            public void documentChanged(@NotNull DocumentEvent event) {
+            public void documentChanged(final @NotNull DocumentEvent event) {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (rightEditor.isDisposed()) return;
-                    for (RangeHighlighter h : rightMarkupModel.getAllHighlighters()) {
+                    for (final RangeHighlighter h : rightMarkupModel.getAllHighlighters()) {
                         if (h.getLayer() == HighlighterLayer.SELECTION - 1) rightMarkupModel.removeHighlighter(h);
                     }
 
-                    TextAttributes diffAttr = new TextAttributes();
+                    final TextAttributes diffAttr = new TextAttributes();
                     diffAttr.setBackgroundColor(new JBColor(new Color(228, 250, 228), new Color(43, 61, 44)));
 
                     for (int i = 0; i < selectedItems.size(); i++) {
-                        RangeMarker marker = valueMarkers.get(i);
+                        final RangeMarker marker = valueMarkers.get(i);
                         if (marker.isValid()) {
-                            String currentText = rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
-                            String originalText = escapeJson(getOriginalValue(selectedItems.get(i)));
+                            final String currentText = rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
+                            final String originalText = escapeJson(getOriginalValue(selectedItems.get(i)));
 
                             if (!currentText.equals(originalText)) {
                                 rightMarkupModel.addRangeHighlighter(
@@ -256,13 +257,13 @@ public abstract class JsonSplitBulkSectionDialog {
 
 
         leftEditor.getScrollingModel().addVisibleAreaListener(e -> {
-            int targetY = e.getNewRectangle().y;
+            final int targetY = e.getNewRectangle().y;
             if (rightEditor.getScrollingModel().getVerticalScrollOffset() != targetY) {
                 rightEditor.getScrollingModel().scrollVertically(targetY);
             }
         });
         rightEditor.getScrollingModel().addVisibleAreaListener(e -> {
-            int targetY = e.getNewRectangle().y;
+            final int targetY = e.getNewRectangle().y;
             if (leftEditor.getScrollingModel().getVerticalScrollOffset() != targetY) {
                 leftEditor.getScrollingModel().scrollVertically(targetY);
             }
@@ -270,14 +271,14 @@ public abstract class JsonSplitBulkSectionDialog {
 
         rightEditor.addEditorMouseListener(new EditorMouseListener() {
             @Override
-            public void mousePressed(@NotNull EditorMouseEvent event) {
-                MouseEvent e = event.getMouseEvent();
+            public void mousePressed(final @NotNull EditorMouseEvent event) {
+                final MouseEvent e = event.getMouseEvent();
                 if (e.isControlDown() || e.isMetaDown()) {
                     VisualPosition visualPos = rightEditor.xyToVisualPosition(e.getPoint());
                     int offset = rightEditor.logicalPositionToOffset(rightEditor.visualToLogicalPosition(visualPos));
 
                     boolean isInsideEditable = false;
-                    for (RangeMarker m : valueMarkers) {
+                    for (final RangeMarker m : valueMarkers) {
                         if (offset >= m.getStartOffset() && offset <= m.getEndOffset()) {
                             isInsideEditable = true;
                             break;
@@ -285,12 +286,12 @@ public abstract class JsonSplitBulkSectionDialog {
                     }
                     if (!isInsideEditable) {
                         offset = getNearestValidOffset(offset, valueMarkers);
-                        LogicalPosition logPos = rightEditor.offsetToLogicalPosition(offset);
+                        final LogicalPosition logPos = rightEditor.offsetToLogicalPosition(offset);
                         visualPos = rightEditor.logicalToVisualPosition(logPos);
                     }
 
-                    CaretModel caretModel = rightEditor.getCaretModel();
-                    Caret existingCaret = caretModel.getCaretAt(visualPos);
+                    final CaretModel caretModel = rightEditor.getCaretModel();
+                    final Caret existingCaret = caretModel.getCaretAt(visualPos);
                     if (existingCaret != null) {
                         if (caretModel.getCaretCount() > 1) caretModel.removeCaret(existingCaret);
                     } else {
@@ -301,24 +302,24 @@ public abstract class JsonSplitBulkSectionDialog {
             }
         });
 
-        JBSplitter splitter = new JBSplitter(false, 0.5f);
+        final JBSplitter splitter = new JBSplitter(false, 0.5f);
         splitter.setFirstComponent(leftEditor.getComponent());
         splitter.setSecondComponent(rightEditor.getComponent());
 
-        JBPanel<?> statusBar = new JBPanel<>(new BorderLayout());
+        final JBPanel<?> statusBar = new JBPanel<>(new BorderLayout());
         statusBar.setBorder(JBUI.Borders.empty(6, 10));
-        JBLabel shortcutLabel = new JBLabel("💡 Shortcuts:  [Enter] Save   |   [Tab]/[↓] Next   |   [Ctrl+Click] Multi-Caret   |   [Ctrl+Shift+A] All Carets");
+        final JBLabel shortcutLabel = new JBLabel("💡 Shortcuts:  [Enter] Save   |   [Tab]/[↓] Next   |   [Ctrl+Click] Multi-Caret   |   [Ctrl+Shift+A] All Carets");
         shortcutLabel.setForeground(JBColor.GRAY);
         shortcutLabel.setFont(JBUI.Fonts.smallFont());
         statusBar.add(shortcutLabel, BorderLayout.WEST);
 
-        JBPanel<?> panel = new JBPanel<>(new BorderLayout());
+        final JBPanel<?> panel = new JBPanel<>(new BorderLayout());
         DialogStyle.styleContent(panel);
         panel.add(splitter, BorderLayout.CENTER);
         panel.add(statusBar, BorderLayout.SOUTH);
         panel.setPreferredSize(new Dimension(JBUI.scale(1000), JBUI.scale(450)));
 
-        JBPopup popup = JBPopupFactory.getInstance()
+        final JBPopup popup = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(panel, rightEditor.getContentComponent())
                 .setTitle(getPopupTitle())
                 .setRequestFocus(true)
@@ -328,16 +329,16 @@ public abstract class JsonSplitBulkSectionDialog {
                 .setResizable(true)
                 .createPopup();
 
-        Runnable saveLogic = () -> {
-            List<String> newValues = new ArrayList<>();
+        final Runnable saveLogic = () -> {
+            final List<String> newValues = new ArrayList<>();
             for (int i = 0; i < selectedItems.size(); i++) {
-                RangeMarker marker = valueMarkers.get(i);
+                final RangeMarker marker = valueMarkers.get(i);
                 if (marker.isValid()) {
-                    String newText = rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
+                    final String newText = rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
                     // The editor shows newlines flattened to spaces (escapeJson); writing an
                     // untouched row back would permanently flatten the stored multi-line value.
                     // null = "unchanged, skip".
-                    String originalEscaped = escapeJson(getOriginalValue(selectedItems.get(i)));
+                    final String originalEscaped = escapeJson(getOriginalValue(selectedItems.get(i)));
                     newValues.add(newText.equals(originalEscaped) ? null : unescapeJson(newText).trim());
                 } else {
                     newValues.add(null);
@@ -370,7 +371,7 @@ public abstract class JsonSplitBulkSectionDialog {
 
         popup.addListener(new JBPopupListener() {
             @Override
-            public void onClosed(@NotNull LightweightWindowEvent event) {
+            public void onClosed(final @NotNull LightweightWindowEvent event) {
                 Disposer.dispose(docListenerDisposable);
                 if (!leftEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(leftEditor);
                 if (!rightEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(rightEditor);
@@ -389,7 +390,7 @@ public abstract class JsonSplitBulkSectionDialog {
      * Moves the caret to the neighbouring editable value. Uses the live marker
      * offsets, so navigation stays correct while the user is typing.
      */
-    private void navigate(final int direction, final boolean wrap, final Editor editor, final List<RangeMarker> markers) {
+    private void navigate(final int direction, final boolean wrap, final @NotNull Editor editor, final @NotNull List<RangeMarker> markers) {
         if (markers.isEmpty()) return;
 
         editor.getCaretModel().removeSecondaryCarets();
@@ -413,7 +414,7 @@ public abstract class JsonSplitBulkSectionDialog {
     /**
      * Ctrl+Shift+A: one caret at the end of every editable value.
      */
-    private void placeCaretOnAllValues(final Editor editor, final List<RangeMarker> markers) {
+    private void placeCaretOnAllValues(final @NotNull Editor editor, final @NotNull List<RangeMarker> markers) {
         final CaretModel caretModel = editor.getCaretModel();
         caretModel.removeSecondaryCarets();
 
@@ -433,10 +434,10 @@ public abstract class JsonSplitBulkSectionDialog {
         }
     }
 
-    private int getNearestValidOffset(final int offset, final List<RangeMarker> markers) {
+    private int getNearestValidOffset(final int offset, final @NotNull List<RangeMarker> markers) {
         int minDistance = Integer.MAX_VALUE;
         int nearestOffset = offset;
-        for (RangeMarker m : markers) {
+        for (final RangeMarker m : markers) {
             if (Math.abs(offset - m.getStartOffset()) < minDistance) {
                 minDistance = Math.abs(offset - m.getStartOffset());
                 nearestOffset = m.getStartOffset();
@@ -449,19 +450,19 @@ public abstract class JsonSplitBulkSectionDialog {
         return nearestOffset;
     }
 
-    private void setupEditorAppearance(final Editor editor, final @NotNull Project p) {
-        FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
-        EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(p, new com.intellij.testFramework.LightVirtualFile("dummy.json", jsonFileType, ""));
+    private void setupEditorAppearance(final @NotNull Editor editor, final @NotNull Project p) {
+        final FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
+        final EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(p, new com.intellij.testFramework.LightVirtualFile("dummy.json", jsonFileType, ""));
 
         if (editor instanceof EditorEx) {
             ((EditorEx) editor).setHighlighter(highlighter);
         }
 
-        EditorColorsScheme scheme = editor.getColorsScheme();
+        final EditorColorsScheme scheme = editor.getColorsScheme();
         scheme.setEditorFontSize(15f);
         scheme.setLineSpacing(1.4f);
 
-        EditorSettings settings = editor.getSettings();
+        final EditorSettings settings = editor.getSettings();
         settings.setLineNumbersShown(true);
         settings.setLineMarkerAreaShown(false);
         settings.setFoldingOutlineShown(true);
@@ -470,12 +471,12 @@ public abstract class JsonSplitBulkSectionDialog {
         settings.setAdditionalLinesCount(1);
     }
 
-    protected String escapeJson(String str) {
+    protected @NotNull String escapeJson(final @Nullable String str) {
         if (str == null) return "";
         return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
     }
 
-    protected String unescapeJson(String str) {
+    protected @NotNull String unescapeJson(final @Nullable String str) {
         if (str == null) return "";
         return str.replace("\\\"", "\"").replace("\\\\", "\\");
     }

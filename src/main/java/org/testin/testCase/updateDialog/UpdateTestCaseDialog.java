@@ -10,6 +10,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.IUIAction;
 import org.testin.enums.UpdateTestCaseFields;
 import org.testin.mappers.dto.TestCaseDto;
@@ -23,33 +24,33 @@ import java.util.function.Consumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
 
-    private JBPopup popup;
+    private @Nullable JBPopup popup;
 
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 
-        IUIAction repackPopup = () -> {
+        final IUIAction repackPopup = () -> {
             // fillData can run this callback before the popup is created.
             if (popup == null) return;
             popup.pack(false, true);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
                 if (focusOwner instanceof JComponent jComp) {
                     jComp.scrollRectToVisible(new Rectangle(0, 0, jComp.getWidth(), jComp.getHeight()));
                 }
             });
         };
 
-        ICreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
+        final ICreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
 
-        JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
+        final JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
-            public Dimension getPreferredSize() {
-                Dimension pref = super.getPreferredSize();
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            public @NotNull Dimension getPreferredSize() {
+                final Dimension pref = super.getPreferredSize();
+                final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 pref.width = Math.max(pref.width, screenSize.width / 2);
-                int maxHeight = (int) (screenSize.height * 0.85);
+                final int maxHeight = (int) (screenSize.height * 0.85);
                 pref.height = Math.min(pref.height, maxHeight);
                 return pref;
             }
@@ -60,17 +61,17 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         mainPanel.setFocusCycleRoot(true);
         mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
 
-        JBPanel<?> contentPanel = new JBPanel<>();
+        final JBPanel<?> contentPanel = new JBPanel<>();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
-        for (ICreateTestCaseSection section : getAllSections()) {
-            JBPanel<?> slot = new JBPanel<>(new BorderLayout());
+        for (final ICreateTestCaseSection section : getAllSections()) {
+            final JBPanel<?> slot = new JBPanel<>(new BorderLayout());
             slot.setOpaque(false);
 
             section.fillData(existingDto, repackPopup);
 
-            boolean isTarget = (section == targetSection);
+            final boolean isTarget = (section == targetSection);
             section.setEditable(isTarget);
 
             if (isTarget && section instanceof StepsSection s) {
@@ -79,8 +80,8 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
                 }
             }
 
-            boolean showAlways = section instanceof DescriptionSection;
-            boolean showIfNotEmpty = section instanceof ExpectedResultSection && !existingDto.getExpectedResult().isEmpty();
+            final boolean showAlways = section instanceof DescriptionSection;
+            final boolean showIfNotEmpty = section instanceof ExpectedResultSection && !existingDto.getExpectedResult().isEmpty();
 
             if (showAlways || showIfNotEmpty || isTarget) {
                 section.showSection(slot);
@@ -92,11 +93,11 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
             }
         }
 
-        JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
+        final JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
         anchorPanel.setOpaque(false);
         anchorPanel.add(contentPanel, BorderLayout.NORTH);
 
-        JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
+        final JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
         scrollPane.setBorder(JBUI.Borders.empty());
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
@@ -118,13 +119,13 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
                 .setResizable(false)
                 .addListener(new JBPopupListener() {
                     @Override
-                    public void onClosed(@NotNull LightweightWindowEvent event) {
+                    public void onClosed(final @NotNull LightweightWindowEvent event) {
                         dispose();
                     }
                 })
                 .createPopup();
 
-        Runnable saveAction = save(existingDto, onSave, new JBPopup[]{popup});
+        final Runnable saveAction = save(existingDto, onSave, new JBPopup[]{popup});
 
         registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);
     }

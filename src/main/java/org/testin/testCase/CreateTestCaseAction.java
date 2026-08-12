@@ -44,7 +44,7 @@ public class CreateTestCaseAction extends DumbAwareAction {
 
     public void openCreateDialog() {
         new CreateTestCaseDialog(p, tc -> {
-            List<TestCaseDto> tcs = editor.getAllTestCases();
+            final List<TestCaseDto> tcs = editor.getAllTestCases();
 
             final boolean isEmpty = tcs.isEmpty();
             tc.setIsHead(isEmpty);

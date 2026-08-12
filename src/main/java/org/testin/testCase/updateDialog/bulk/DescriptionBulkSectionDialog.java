@@ -11,12 +11,12 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
     }
 
     @Override
-    protected String getPopupTitle() {
+    protected @NotNull String getPopupTitle() {
         return "Bulk Edit Descriptions (Enter to Save | Tab/Arrows to Navigate)";
     }
 
     @Override
-    protected String getJsonFieldName() {
+    protected @NotNull String getJsonFieldName() {
         return "description";
     }
 
@@ -31,12 +31,12 @@ public class DescriptionBulkSectionDialog extends JsonSplitBulkSectionDialog {
     }
 
     @Override
-    protected String getOriginalValue(final TestCaseDto tc) {
+    protected @NotNull String getOriginalValue(final @NotNull TestCaseDto tc) {
         return tc.getDescription();
     }
 
     @Override
-    protected void setValue(final TestCaseDto tc, final String value) {
+    protected void setValue(final @NotNull TestCaseDto tc, final @NotNull String value) {
         tc.setDescription(value);
     }
 }

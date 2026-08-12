@@ -20,10 +20,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class DescriptionSection implements ICreateTestCaseSection {
-    final Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
-    private final TextFieldWithAutoCompletion<String> descriptionField;
-    private final JBPanel<?> wrapper;
+    private final @NotNull TextFieldWithAutoCompletion<String> descriptionField;
+    private final @NotNull JBPanel<?> wrapper;
 
     public DescriptionSection(final @NotNull Project p) {
         this.descriptionField = new TextFieldWithAutoCompletion<>(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
@@ -49,25 +49,25 @@ public class DescriptionSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JBPanel<?> getWrapper() {
+    public @NotNull JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JBPanel<?> contentPanel) {
+    public void showSection(final @NotNull JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         descriptionField.requestFocus();
     }
 
     @Override
-    public void applyTo(final TestCaseDto dto) {
+    public void applyTo(final @NotNull TestCaseDto dto) {
         if (wrapper.getParent() != null && descriptionField.isEnabled())
             dto.setDescription(descriptionField.getText().trim());
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseDescription.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -75,7 +75,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JComponent getFocusComponent() {
+    public @NotNull JComponent getFocusComponent() {
         return descriptionField;
     }
 
@@ -85,7 +85,7 @@ public class DescriptionSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
         descriptionField.setText(dto.getDescription());
     }
 }

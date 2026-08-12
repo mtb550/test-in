@@ -14,20 +14,20 @@ public class StepsBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
     }
 
     @Override
-    protected String getPopupTitle() {
+    protected @NotNull String getPopupTitle() {
         return "Bulk Edit Steps";
     }
 
     @Override
-    protected String getArrayFieldName() {
+    protected @NotNull String getArrayFieldName() {
         return "steps";
     }
 
     @Override
-    protected List<List<String>> extractOriginalValues(final List<TestCaseDto> items) {
-        List<List<String>> originalSteps = new ArrayList<>();
+    protected @NotNull List<List<String>> extractOriginalValues(final @NotNull List<TestCaseDto> items) {
+        final List<List<String>> originalSteps = new ArrayList<>();
 
-        for (TestCaseDto tc : items) {
+        for (final TestCaseDto tc : items) {
             originalSteps.add(new ArrayList<>(tc.getSteps()));
         }
 
@@ -35,13 +35,13 @@ public class StepsBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
     }
 
     @Override
-    protected void applyValues(final List<TestCaseDto> items, final List<List<String>> newValues) {
+    protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
         for (int i = 0; i < items.size(); i++) {
-            List<String> cleanSteps = new ArrayList<>();
+            final List<String> cleanSteps = new ArrayList<>();
 
-            for (String step : newValues.get(i)) {
+            for (final String step : newValues.get(i)) {
                 if (step == null) continue;
-                String cleanStr = step.trim();
+                final String cleanStr = step.trim();
 
                 if (!cleanStr.isEmpty()) {
                     cleanSteps.add(cleanStr);

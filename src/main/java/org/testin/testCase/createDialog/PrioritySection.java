@@ -21,12 +21,12 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class PrioritySection implements ICreateTestCaseSection {
-    private final ComboBox<Priority> priority;
-    private final JBPanel<?> wrapper;
-    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
+    private final @NotNull ComboBox<Priority> priority;
+    private final @NotNull JBPanel<?> wrapper;
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public PrioritySection() {
-        Priority[] activePriorities = Arrays.stream(Priority.values())
+        final Priority[] activePriorities = Arrays.stream(Priority.values())
                 .filter(Priority::isActive)
                 .toArray(Priority[]::new);
 
@@ -54,30 +54,30 @@ public class PrioritySection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JBPanel<?> getWrapper() {
+    public @NotNull JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JBPanel<?> contentPanel) {
+    public void showSection(final @NotNull JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         priority.requestFocus();
     }
 
-    public ComboBox<Priority> getCombo() {
+    public @NotNull ComboBox<Priority> getCombo() {
         return priority;
     }
 
     @Override
-    public void applyTo(final TestCaseDto dto) {
+    public void applyTo(final @NotNull TestCaseDto dto) {
         if (wrapper.getParent() != null) {
             dto.setPriority((Priority) Objects.requireNonNull(priority.getSelectedItem()));
         }
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCasePriority.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -85,7 +85,7 @@ public class PrioritySection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JComponent getFocusComponent() {
+    public @NotNull JComponent getFocusComponent() {
         return priority;
     }
 
@@ -95,7 +95,7 @@ public class PrioritySection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
         priority.setSelectedItem(dto.getPriority());
     }
 }

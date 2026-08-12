@@ -10,16 +10,16 @@ import java.util.stream.Collectors;
 
 public class RemoveTestCaseDialog {
 
-    public static boolean confirmDeleteAction(final @NotNull Project p, final List<TestCaseDto> selected) {
-        if (selected == null || selected.isEmpty()) return false;
+    public static boolean confirmDeleteAction(final @NotNull Project p, final @NotNull List<TestCaseDto> selected) {
+        if (selected.isEmpty()) return false;
 
         final String title = selected.size() == 1 ? "Delete Test Case" : "Delete Test Cases";
-        String message;
+        final String message;
 
         if (selected.size() == 1) {
             message = "Are you sure you want to delete\n'" + selected.getFirst().getDescription() + "'?";
         } else {
-            String displayedDescription = selected.stream()
+            final String displayedDescription = selected.stream()
                     .map(tc -> ". " + tc.getDescription())
                     .collect(Collectors.joining("\n"));
 

@@ -23,12 +23,12 @@ import java.util.Set;
 import java.util.UUID;
 
 public class RemoveTestCaseAction extends DumbAwareAction {
-    private final DirectoryDto dir;
-    private final JBList<TestCaseDto> list;
-    private final CollectionListModel<TestCaseDto> model;
+    private final @NotNull DirectoryDto dir;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull CollectionListModel<TestCaseDto> model;
     private final @NotNull Project p;
 
-    public RemoveTestCaseAction(final @NotNull Project p, final DirectoryDto dir, final JBList<TestCaseDto> list, final CollectionListModel<TestCaseDto> model) {
+    public RemoveTestCaseAction(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
         this.p = p;
         this.dir = dir;
@@ -39,10 +39,10 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        List<TestCaseDto> selectedItems = list.getSelectedValuesList();
+        final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
-        boolean isCutAndSelected = TestEditorContextMenu.isGlobalCutAction() &&
+        final boolean isCutAndSelected = TestEditorContextMenu.isGlobalCutAction() &&
                 selectedItems.stream().allMatch(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()));
 
         if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(p, selectedItems)) {
@@ -52,7 +52,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
     }
 
-    private void performDeletion(final List<TestCaseDto> selectedItems) {
+    private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
         relinkAroundRemoved(selectedItems);
 
         final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
@@ -72,7 +72,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
      * relinking only around first/last selected would leave middle survivors
      * unreachable and silently break the ordering.
      */
-    private void relinkAroundRemoved(final List<TestCaseDto> selectedItems) {
+    private void relinkAroundRemoved(final @NotNull List<TestCaseDto> selectedItems) {
         final Set<UUID> removedIds = new HashSet<>();
         for (final TestCaseDto tc : selectedItems) removedIds.add(tc.getId());
 
@@ -104,7 +104,7 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         }
     }
 
-    private void saveToFile(TestCaseDto item) {
+    private void saveToFile(final @NotNull TestCaseDto item) {
         Services.getInstance(p, ProjectIndexer.class).putTestCase(dir.getPath(), item);
     }
 

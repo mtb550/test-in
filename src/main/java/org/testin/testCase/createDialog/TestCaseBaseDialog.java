@@ -12,6 +12,7 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateTestCaseFields;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
@@ -29,24 +30,24 @@ import java.util.stream.Collectors;
 @Getter
 public abstract class TestCaseBaseDialog {
     protected final @NotNull Project p;
-    protected final DescriptionSection DescriptionSection;
-    protected final ExpectedResultSection expectedResultSection;
-    protected final ModuleSection moduleSection;
-    protected final TestDataSection testDataSection;
-    protected final PreConditionsSection preConditionsSection;
-    protected final PrioritySection prioritySection;
-    protected final GroupSection groupSection;
-    protected final StepsSection stepsSection;
-    protected final StatusBarSection statusBarSection;
+    protected final @NotNull DescriptionSection DescriptionSection;
+    protected final @NotNull ExpectedResultSection expectedResultSection;
+    protected final @NotNull ModuleSection moduleSection;
+    protected final @NotNull TestDataSection testDataSection;
+    protected final @NotNull PreConditionsSection preConditionsSection;
+    protected final @NotNull PrioritySection prioritySection;
+    protected final @NotNull GroupSection groupSection;
+    protected final @NotNull StepsSection stepsSection;
+    protected final @NotNull StatusBarSection statusBarSection;
     /**
      * Owns all global registrations of this dialog (application focus listener,
      * per-step shortcuts). Parented to the project, so everything is released
      * even when the popup is torn down without firing onClosed.
      */
-    protected final Disposable dialogDisposable;
-    private final List<ICreateTestCaseSection> cachedSections;
-    protected Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
-    private PropertyChangeListener focusListener;
+    protected final @NotNull Disposable dialogDisposable;
+    private final @NotNull List<ICreateTestCaseSection> cachedSections;
+    protected final @NotNull Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
+    private @Nullable PropertyChangeListener focusListener;
 
     public TestCaseBaseDialog(final @NotNull Project p) {
         this.p = p;
@@ -77,13 +78,13 @@ public abstract class TestCaseBaseDialog {
         stepsSection.setParentDisposable(dialogDisposable);
     }
 
-    protected void initDynamicStatusBar(JComponent parentPanel) {
+    protected void initDynamicStatusBar(final @NotNull JComponent parentPanel) {
         focusListener = evt -> {
-            Component focusOwner = (Component) evt.getNewValue();
+            final Component focusOwner = (Component) evt.getNewValue();
             if (focusOwner != null && UIUtil.isDescendingFrom(focusOwner, parentPanel)) {
-                for (ICreateTestCaseSection section : getAllSections()) {
+                for (final ICreateTestCaseSection section : getAllSections()) {
                     if (UIUtil.isDescendingFrom(focusOwner, section.getWrapper())) {
-                        IStatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(DescriptionSection));
+                        final IStatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(DescriptionSection));
                         if (items != null) statusBarSection.updateItems(items);
                         return;
                     }
@@ -107,11 +108,11 @@ public abstract class TestCaseBaseDialog {
         Disposer.dispose(dialogDisposable);
     }
 
-    public List<ICreateTestCaseSection> getAllSections() {
+    public @NotNull List<ICreateTestCaseSection> getAllSections() {
         return cachedSections;
     }
 
-    public void registerShortcut(final JComponent component, final CustomShortcutSet shortcutSet, final IUIAction action) {
+    public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull IUIAction action) {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
@@ -124,7 +125,7 @@ public abstract class TestCaseBaseDialog {
                     e.getPresentation().setEnabled(false);
                     return;
                 }
-                if (prioritySection.getCombo() != null && prioritySection.getCombo().isPopupVisible()) {
+                if (prioritySection.getCombo().isPopupVisible()) {
                     e.getPresentation().setEnabled(false);
                     return;
                 }
@@ -139,11 +140,11 @@ public abstract class TestCaseBaseDialog {
         }.registerCustomShortcutSet(shortcutSet, component);
     }
 
-    public Runnable save(final TestCaseDto dto, final Consumer<TestCaseDto> onSave, final JBPopup[] popupWrapper) {
+    public @NotNull Runnable save(final @NotNull TestCaseDto dto, final @NotNull Consumer<@NotNull TestCaseDto> onSave, final @NotNull JBPopup[] popupWrapper) {
         return () -> {
             getAllSections().forEach(section -> section.applyTo(dto));
 
-            String title = dto.getDescription();
+            final String title = dto.getDescription();
             if (DescriptionSection.getWrapper().getParent() == null || !title.trim().isEmpty()) {
                 onSave.accept(dto);
 

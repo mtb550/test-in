@@ -43,7 +43,7 @@ public class UpdateTestCaseAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        List<TestCaseDto> selectedItems = list.getSelectedValuesList();
+        final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
         Logger.trace("update test cases: " + selectedItems.stream().map(TestCaseDto::getDescription).collect(Collectors.joining(", ")));
@@ -62,9 +62,9 @@ public class UpdateTestCaseAction extends DumbAwareAction {
             ApplicationManager.getApplication().invokeLater(() -> {
                 list.repaint();
 
-                ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
+                final ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
                 if (detailsPanel != null && detailsPanel.getCurrentTestCaseDto() != null) {
-                    boolean isCurrentAffected = updatedItems.stream()
+                    final boolean isCurrentAffected = updatedItems.stream()
                             .anyMatch(item -> item.getId().equals(detailsPanel.getCurrentTestCaseDto().getId()));
                     if (isCurrentAffected) {
                         detailsPanel.refreshCurrentView();

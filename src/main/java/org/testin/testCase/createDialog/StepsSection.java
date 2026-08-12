@@ -13,6 +13,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateTestCaseFields;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
@@ -30,16 +31,16 @@ import java.util.List;
 public class StepsSection implements ICreateTestCaseSection {
     private final @NotNull Project p;
     @Getter
-    private final List<TextFieldWithAutoCompletion<String>> stepFields;
-    private final JBPanel<?> stepsContainer;
-    private final JBPanel<?> wrapper;
-    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
+    private final @NotNull List<TextFieldWithAutoCompletion<String>> stepFields;
+    private final @NotNull JBPanel<?> stepsContainer;
+    private final @NotNull JBPanel<?> wrapper;
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     /**
      * Parent for the per-step shortcut registrations; set by the owning dialog.
      */
     @Setter
-    private Disposable parentDisposable;
+    private @Nullable Disposable parentDisposable;
 
     public StepsSection(final @NotNull Project p) {
         this.p = p;
@@ -57,18 +58,18 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JBPanel<?> getWrapper() {
+    public @NotNull JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JBPanel<?> contentPanel) {
+    public void showSection(final @NotNull JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null) {
             contentPanel.add(wrapper);
         }
     }
 
-    public void showSection(final JBPanel<?> contentPanel, final IUIAction repackAction) {
+    public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull IUIAction repackAction) {
         showSection(contentPanel);
         wrapper.setVisible(true);
         addStepField("", repackAction);
@@ -80,36 +81,36 @@ public class StepsSection implements ICreateTestCaseSection {
         });
     }
 
-    public void addStepField(final String text, final IUIAction repackAction) {
-        TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
-        TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(p, provider, false, text != null ? text : "");
+    public void addStepField(final @Nullable String text, final @NotNull IUIAction repackAction) {
+        final TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
+        final TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(p, provider, false, text != null ? text : "");
 
         stepField.setFont(fieldFont);
         stepField.setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (stepFields.size() + 1));
         stepField.setShowPlaceholderWhenFocused(true);
         stepField.setBorder(JBUI.Borders.empty(6, 10));
 
-        JBPanel<?> stepRow = new JBPanel<>(new BorderLayout(JBUI.scale(8), 0));
+        final JBPanel<?> stepRow = new JBPanel<>(new BorderLayout(JBUI.scale(8), 0));
         stepRow.setOpaque(false);
         stepRow.setBorder(JBUI.Borders.emptyBottom(6));
 
-        JBLabel removeButton = new JBLabel(AllIcons.Actions.Cancel);
+        final JBLabel removeButton = new JBLabel(AllIcons.Actions.Cancel);
         removeButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         removeButton.setToolTipText("Remove step " + Shortcuts.CreateTestCaseRemoveStep.getShortcutText());
 
         removeButton.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseEntered(MouseEvent e) {
+            public void mouseEntered(final MouseEvent e) {
                 removeButton.setIcon(AllIcons.General.Remove);
             }
 
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseExited(final MouseEvent e) {
                 removeButton.setIcon(AllIcons.Actions.Cancel);
             }
 
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked(final MouseEvent e) {
                 removeStepAction(stepRow, stepField, repackAction);
             }
         });
@@ -125,7 +126,7 @@ public class StepsSection implements ICreateTestCaseSection {
             removeStepShortcut.registerCustomShortcutSet(Shortcuts.CreateTestCaseRemoveStep.getCustomShortcut(), stepField);
         }
 
-        JBPanel<?> buttonWrapper = new JBPanel<>(new BorderLayout());
+        final JBPanel<?> buttonWrapper = new JBPanel<>(new BorderLayout());
         buttonWrapper.setOpaque(false);
         buttonWrapper.setBorder(JBUI.Borders.emptyRight(4));
         buttonWrapper.add(removeButton, BorderLayout.CENTER);
@@ -137,7 +138,7 @@ public class StepsSection implements ICreateTestCaseSection {
         stepsContainer.add(stepRow);
     }
 
-    private void removeStepAction(JBPanel<?> stepRow, TextFieldWithAutoCompletion<String> stepField, IUIAction repackAction) {
+    private void removeStepAction(final @NotNull JBPanel<?> stepRow, final @NotNull TextFieldWithAutoCompletion<String> stepField, final @NotNull IUIAction repackAction) {
         if (stepFields.size() == 1) {
             stepField.setText("");
             stepField.requestFocus();
@@ -156,10 +157,10 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void applyTo(final TestCaseDto dto) {
+    public void applyTo(final @NotNull TestCaseDto dto) {
         if (wrapper.getParent() != null) {
-            List<String> finalSteps = new ArrayList<>();
-            for (TextFieldWithAutoCompletion<String> sf : stepFields) {
+            final List<String> finalSteps = new ArrayList<>();
+            for (final TextFieldWithAutoCompletion<String> sf : stepFields) {
                 if (!sf.getText().trim().isEmpty()) {
                     finalSteps.add(sf.getText().trim());
                 }
@@ -169,13 +170,13 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseAddStep.getCustomShortcut(), () ->
                 showSection(slot, repackAction));
     }
 
     @Override
-    public JComponent getFocusComponent() {
+    public @NotNull JComponent getFocusComponent() {
         if (!stepFields.isEmpty()) {
             return stepFields.getLast();
         }
@@ -184,11 +185,11 @@ public class StepsSection implements ICreateTestCaseSection {
 
     @Override
     public void setEditable(final boolean editable) {
-        for (TextFieldWithAutoCompletion<String> field : stepFields) {
+        for (final TextFieldWithAutoCompletion<String> field : stepFields) {
             field.setEnabled(editable);
-            Container row = field.getParent();
+            final Container row = field.getParent();
             if (row != null) {
-                for (Component c : row.getComponents()) {
+                for (final Component c : row.getComponents()) {
                     if (c instanceof JBPanel<?> buttonWrapper) {
                         buttonWrapper.setVisible(editable);
                     }
@@ -197,18 +198,16 @@ public class StepsSection implements ICreateTestCaseSection {
         }
     }
 
-    public void setStepsData(List<String> steps, IUIAction repack) {
+    public void setStepsData(final @NotNull List<String> steps, final @NotNull IUIAction repack) {
         stepsContainer.removeAll();
         stepFields.clear();
-        if (steps != null && !steps.isEmpty()) {
-            for (String step : steps) {
-                addStepField(step, repack);
-            }
+        for (final String step : steps) {
+            addStepField(step, repack);
         }
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
         setStepsData(dto.getSteps(), repackAction);
     }
 }

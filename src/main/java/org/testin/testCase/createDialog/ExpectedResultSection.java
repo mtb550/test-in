@@ -19,9 +19,9 @@ import java.awt.*;
 
 public class ExpectedResultSection implements ICreateTestCaseSection {
     @Getter
-    private final TextFieldWithAutoCompletion<String> expectedResultField;
-    private final JBPanel<?> wrapper;
-    Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
+    private final @NotNull TextFieldWithAutoCompletion<String> expectedResultField;
+    private final @NotNull JBPanel<?> wrapper;
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ExpectedResultSection(final @NotNull Project p) {
         this.expectedResultField = new TextFieldWithAutoCompletion<>(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), false, "");
@@ -38,26 +38,26 @@ public class ExpectedResultSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JBPanel<?> getWrapper() {
+    public @NotNull JBPanel<?> getWrapper() {
         return wrapper;
     }
 
     @Override
-    public void showSection(final JBPanel<?> contentPanel) {
+    public void showSection(final @NotNull JBPanel<?> contentPanel) {
         if (wrapper.getParent() == null)
             contentPanel.add(wrapper);
         expectedResultField.requestFocus();
     }
 
     @Override
-    public void applyTo(final TestCaseDto dto) {
+    public void applyTo(final @NotNull TestCaseDto dto) {
         if (wrapper.getParent() != null) {
             dto.setExpectedResult(expectedResultField.getText().trim());
         }
     }
 
     @Override
-    public void setupShortcut(final JComponent mainPanel, final JBPanel<?> slot, final TestCaseBaseDialog base, final IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseExpectedResult.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -65,7 +65,7 @@ public class ExpectedResultSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public JComponent getFocusComponent() {
+    public @NotNull JComponent getFocusComponent() {
         return expectedResultField;
     }
 
@@ -75,7 +75,7 @@ public class ExpectedResultSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final TestCaseDto dto, final IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
         expectedResultField.setText(dto.getExpectedResult());
     }
 }

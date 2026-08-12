@@ -16,22 +16,22 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
     }
 
     @Override
-    protected String getPopupTitle() {
+    protected @NotNull String getPopupTitle() {
         return "Bulk Edit Group";
     }
 
     @Override
-    protected String getArrayFieldName() {
+    protected @NotNull String getArrayFieldName() {
         return "Group";
     }
 
     @Override
-    protected List<List<String>> extractOriginalValues(final List<TestCaseDto> items) {
-        List<List<String>> originalGroups = new ArrayList<>();
+    protected @NotNull List<List<String>> extractOriginalValues(final @NotNull List<TestCaseDto> items) {
+        final List<List<String>> originalGroups = new ArrayList<>();
 
-        for (TestCaseDto tc : items) {
-            List<String> groupStrings = new ArrayList<>();
-            for (Group g : tc.getGroup()) {
+        for (final TestCaseDto tc : items) {
+            final List<String> groupStrings = new ArrayList<>();
+            for (final Group g : tc.getGroup()) {
                 groupStrings.add(g.name());
             }
             originalGroups.add(groupStrings);
@@ -41,17 +41,17 @@ public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
     }
 
     @Override
-    protected void applyValues(final List<TestCaseDto> items, final List<List<String>> newValues) {
+    protected void applyValues(final @NotNull List<TestCaseDto> items, final @NotNull List<List<String>> newValues) {
         for (int i = 0; i < items.size(); i++) {
-            List<Group> enumList = new ArrayList<>();
+            final List<Group> enumList = new ArrayList<>();
 
-            for (String str : newValues.get(i)) {
+            for (final String str : newValues.get(i)) {
                 if (str == null) continue;
-                String cleanStr = str.trim();
+                final String cleanStr = str.trim();
 
                 if (!cleanStr.isEmpty()) {
                     try {
-                        Group g = Group.valueOf(cleanStr.toUpperCase());
+                        final Group g = Group.valueOf(cleanStr.toUpperCase());
                         if (!enumList.contains(g)) {
                             enumList.add(g);
                         }
