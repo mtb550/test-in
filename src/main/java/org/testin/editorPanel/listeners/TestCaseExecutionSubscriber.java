@@ -1,6 +1,7 @@
 package org.testin.editorPanel.listeners;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +26,13 @@ public class TestCaseExecutionSubscriber {
         p.getMessageBus().connect(parentDisposable).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
             @Override
             public void onStatusChanged(final @NotNull String testName, final @NotNull String status, final String error) {
+                // Today's publishers already fire on the EDT, but nothing
+                // enforces that; hop like ViewPanelExecutionSubscriber does,
+                // so the map, runningDtoId and the repaint stay EDT-confined.
+                ApplicationManager.getApplication().invokeLater(() -> handleStatusChanged(testName, status, error));
+            }
+
+            private void handleStatusChanged(final @NotNull String testName, final @NotNull String status, final String error) {
                 Logger.debug("TestEditor subscription fired: testName='" + testName + "', status='" + status + "'");
 
                 boolean updated = false;

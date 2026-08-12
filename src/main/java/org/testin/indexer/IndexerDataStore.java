@@ -1,10 +1,7 @@
 package org.testin.indexer;
 
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -180,12 +177,9 @@ final class IndexerDataStore {
     }
 
     private void refreshDir(final @NotNull Path dirPath) {
-        ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
-            final VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(dirPath);
-            if (vf != null) {
-                vf.refresh(false, true);
-            }
-        }));
+        // Asynchronous, like ProjectIndexer.refreshDirectory - creation flows
+        // run on the EDT and must never block on a synchronous VFS refresh.
+        LocalFileSystem.getInstance().refreshNioFiles(List.of(dirPath), true, true, null);
     }
 
     void removeTestProject(final @NotNull Path path) {
