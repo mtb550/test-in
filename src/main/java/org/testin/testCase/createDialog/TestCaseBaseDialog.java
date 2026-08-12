@@ -148,8 +148,7 @@ public abstract class TestCaseBaseDialog {
             if (DescriptionSection.getWrapper().getParent() == null || !title.trim().isEmpty()) {
                 onSave.accept(dto);
 
-                if (popupWrapper[0] != null)
-                    popupWrapper[0].closeOk(null);
+                popupWrapper[0].closeOk(null);
 
             } else
                 DescriptionSection.setError(true);

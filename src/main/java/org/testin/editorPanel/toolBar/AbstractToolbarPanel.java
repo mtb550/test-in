@@ -6,7 +6,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.toolBar.components.*;
 import org.testin.enums.ViewMode;
 
@@ -39,7 +38,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged, callbacks::onToolBarSearchFocusReleased);
     }
 
-    public <T extends IToolbarItem> @Nullable T getToolbarItem(final @NotNull Class<T> itemClass) {
+    public <T extends IToolbarItem> @NotNull T getToolbarItem(final @NotNull Class<T> itemClass) {
         return itemClass.cast(toolbarItems.get(itemClass));
     }
 
