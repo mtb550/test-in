@@ -3,11 +3,12 @@ package org.testin.editorPanel.toolBar.components;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;
 import com.intellij.openapi.util.text.HtmlChunk;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 public class CreateTestCaseBtn extends AbstractButton implements IToolbarItem {
 
-    public CreateTestCaseBtn(final Runnable onToolBarCreateTestCaseClicked) {
+    public CreateTestCaseBtn(final @NotNull Runnable onToolBarCreateTestCaseClicked) {
         super(null, AllIcons.General.Add);
 
         new HelpTooltip()

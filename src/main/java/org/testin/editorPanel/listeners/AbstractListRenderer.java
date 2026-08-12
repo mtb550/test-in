@@ -1,6 +1,8 @@
 package org.testin.editorPanel.listeners;
 
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.EditorColors;
 import org.testin.editorPanel.IEditor;
 import org.testin.mappers.dto.TestCaseDto;
@@ -11,16 +13,16 @@ import java.awt.*;
 
 public abstract class AbstractListRenderer<U extends IEditor> implements ListCellRenderer<TestCaseDto> {
 
-    private static final Border SELECTED_BORDER = JBUI.Borders.customLine(EditorColors.SELECTION_BORDER, 1);
-    private static final Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
-    protected final U editor;
+    private static final @NotNull Border SELECTED_BORDER = JBUI.Borders.customLine(EditorColors.SELECTION_BORDER, 1);
+    private static final @NotNull Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
+    protected final @NotNull U editor;
 
-    public AbstractListRenderer(final U editor) {
+    public AbstractListRenderer(final @NotNull U editor) {
         this.editor = editor;
     }
 
     @Override
-    public Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
+    public @NotNull Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
         final int globalIndex = ((editor.getCurrentPage() - 1) * editor.getPageSize()) + index;
 
         final boolean isRowHovered = (index == editor.getHoveredIndex());
@@ -33,5 +35,5 @@ public abstract class AbstractListRenderer<U extends IEditor> implements ListCel
         return card;
     }
 
-    protected abstract JComponent bindDataAndGetCard(JList<? extends TestCaseDto> list, TestCaseDto tc, int globalIndex, boolean isSelected, boolean isRowHovered, String hover);
+    protected abstract @NotNull JComponent bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @Nullable String hover);
 }

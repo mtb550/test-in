@@ -2,6 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.runEditor.RunCard;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.mappers.TestRunItems;
@@ -20,7 +21,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
     }
 
     @Override
-    protected JComponent bindDataAndGetCard(@NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final String hover) {
+    protected @NotNull JComponent bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @Nullable String hover) {
         TestRunItems runItem = editor.getResultsMap().get(tc.getId());
 
         // The results map can be transiently empty during a refresh while the list still repaints;

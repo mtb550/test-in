@@ -1,6 +1,8 @@
 package org.testin.editorPanel.toolBar.components;
 
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.util.IconManager;
 
 import javax.swing.*;
@@ -9,7 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public abstract class AbstractButton extends JButton {
-    public AbstractButton(final String tooltip, final Icon icon) {
+    public AbstractButton(final @Nullable String tooltip, final @NotNull Icon icon) {
         super(null, icon);
         setToolTipText(tooltip);
         setFocusable(false);

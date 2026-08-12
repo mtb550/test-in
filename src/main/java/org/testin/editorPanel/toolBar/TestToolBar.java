@@ -1,18 +1,19 @@
 package org.testin.editorPanel.toolBar;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.toolBar.components.*;
 
 import java.util.List;
 
 public class TestToolBar extends AbstractToolbarPanel {
 
-    public TestToolBar(final IToolBar callbacks) {
+    public TestToolBar(final @NotNull IToolBar callbacks) {
         super(callbacks);
         layoutComponents();
     }
 
     @Override
-    public List<IToolbarItem> getCustomComponents() {
+    public @NotNull List<IToolbarItem> getCustomComponents() {
         return List.of(
                 new CreateTestCaseBtn(getCallbacks()::onToolBarCreateTestCaseClicked),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),

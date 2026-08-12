@@ -9,6 +9,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.FontSync;
 import org.testin.util.Shortcuts;
 
@@ -19,27 +20,27 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class StatusBar extends JBPanel<StatusBar> {
-    private final JBLabel statusLabel = new JBLabel();
-    private final JBLabel syncLabel = new JBLabel();
+    private final @NotNull JBLabel statusLabel = new JBLabel();
+    private final @NotNull JBLabel syncLabel = new JBLabel();
 
-    private final Timer clockTimer;
-
-    @Getter
-    private final JButton firstButton = new JButton("<<");
+    private final @NotNull Timer clockTimer;
 
     @Getter
-    private final JButton prevButton = new JButton("<");
-
-    private final JBLabel currentPageLabel = new JBLabel("1:1");
+    private final @NotNull JButton firstButton = new JButton("<<");
 
     @Getter
-    private final JBTextField pageSizeField = new JBTextField("50", 3);
+    private final @NotNull JButton prevButton = new JButton("<");
+
+    private final @NotNull JBLabel currentPageLabel = new JBLabel("1:1");
 
     @Getter
-    private final JButton nextButton = new JButton(">");
+    private final @NotNull JBTextField pageSizeField = new JBTextField("50", 3);
 
     @Getter
-    private final JButton lastButton = new JButton(">>");
+    private final @NotNull JButton nextButton = new JButton(">");
+
+    @Getter
+    private final @NotNull JButton lastButton = new JButton(">>");
 
     public StatusBar() {
         super(new BorderLayout());
@@ -54,8 +55,8 @@ public class StatusBar extends JBPanel<StatusBar> {
         ));
         setBackground(JBUI.CurrentTheme.EditorTabs.background());
 
-        float smallSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
-        Font dynamicSmallFont = JBUI.Fonts.smallFont().deriveFont(smallSize);
+        final float smallSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
+        final Font dynamicSmallFont = JBUI.Fonts.smallFont().deriveFont(smallSize);
 
         statusLabel.setFont(dynamicSmallFont);
         statusLabel.setForeground(UIUtil.getContextHelpForeground());
@@ -110,11 +111,11 @@ public class StatusBar extends JBPanel<StatusBar> {
     }
 
     private void updateClock() {
-        String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        final String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
         syncLabel.setText("System Time: " + currentTime);
     }
 
-    private void makeCompact(final JButton button, final Font font) {
+    private void makeCompact(final @NotNull JButton button, final @NotNull Font font) {
         button.setMargin(JBUI.insets(0, 4));
         button.setFont(font);
         button.setFocusable(false);
@@ -139,7 +140,7 @@ public class StatusBar extends JBPanel<StatusBar> {
         clockTimer.stop();
     }
 
-    public void updateSelectionState(final int[] selectedIndices, final int currentPage, final int pageSize, final int totalCount) {
+    public void updateSelectionState(final int @NotNull [] selectedIndices, final int currentPage, final int pageSize, final int totalCount) {
         final int selectedCount = selectedIndices.length;
 
         if (selectedCount > 1) {

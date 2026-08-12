@@ -6,6 +6,8 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.EditorColors;
 import org.testin.enums.RunEditorAttributes;
 import org.testin.enums.TestEditorAttributes;
@@ -33,35 +35,35 @@ import java.util.function.Function;
 public class GridPanelBuilder {
 
     static final int CELL_PADDING = 10;
-    static final Color GRID_COLOR = JBColor.border();
-    static final Color SELECTION_BACKGROUND = EditorColors.SELECTION_BACKGROUND;
+    static final @NotNull Color GRID_COLOR = JBColor.border();
+    static final @NotNull Color SELECTION_BACKGROUND = EditorColors.SELECTION_BACKGROUND;
     private static final int MAX_COL_WIDTH = 500;
     /**
      * Client property holding the table kind ("test"/"run"), used to key the
      * persisted user column widths so they survive grid rebuilds and restarts.
      */
-    private static final String GRID_KIND_KEY = "testin.grid.kind";
-    private static final Color EVEN_ROW_COLOR = new JBColor(Gray._245, Gray._60);
-    private static final Color ODD_ROW_COLOR = new JBColor(Gray._230, Gray._45);
-    private static final Border FIRST_CELL_SELECTION_BORDER = new SelectionCellBorder(true);
-    private static final Border CELL_SELECTION_BORDER = new SelectionCellBorder(false);
+    private static final @NotNull String GRID_KIND_KEY = "testin.grid.kind";
+    private static final @NotNull Color EVEN_ROW_COLOR = new JBColor(Gray._245, Gray._60);
+    private static final @NotNull Color ODD_ROW_COLOR = new JBColor(Gray._230, Gray._45);
+    private static final @NotNull Border FIRST_CELL_SELECTION_BORDER = new SelectionCellBorder(true);
+    private static final @NotNull Border CELL_SELECTION_BORDER = new SelectionCellBorder(false);
 
-    static Color rowColor(final int row) {
+    static @NotNull Color rowColor(final int row) {
         return row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR;
     }
 
-    public static void resizeToFont(final JBTable table) {
+    public static void resizeToFont(final @NotNull JBTable table) {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
         table.setRowHeight(Math.max(fm.getHeight() + 4, 20));
         autoSizeColumns(table);
         updateRowHeights(table);
     }
 
-    private static TableCellRenderer wrappingRenderer() {
+    private static @NotNull TableCellRenderer wrappingRenderer() {
         return new TableCellRenderer() {
-            private final JTextArea textArea = new JTextArea();
-            private final JPanel wrapper = new JPanel(new GridBagLayout());
-            private final GridBagConstraints c = new GridBagConstraints();
+            private final @NotNull JTextArea textArea = new JTextArea();
+            private final @NotNull JPanel wrapper = new JPanel(new GridBagLayout());
+            private final @NotNull GridBagConstraints c = new GridBagConstraints();
 
             {
                 textArea.setLineWrap(true);
@@ -78,7 +80,7 @@ public class GridPanelBuilder {
             }
 
             @Override
-            public Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
+            public @NotNull Component getTableCellRendererComponent(final JTable table, final Object value, final boolean isSelected, final boolean hasFocus, final int row, final int column) {
 
                 textArea.setText(value == null ? "" : value.toString());
                 textArea.setFont(table.getFont());
@@ -93,8 +95,8 @@ public class GridPanelBuilder {
                     wrapper.setBorder(column == 0 ? FIRST_CELL_SELECTION_BORDER : CELL_SELECTION_BORDER);
 
                 } else {
-                    Border gridBorder = BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR);
-                    Border invisiblePadding = BorderFactory.createEmptyBorder(1, column == 0 ? 1 : 0, 0, 0);
+                    final Border gridBorder = BorderFactory.createMatteBorder(0, 0, 1, 1, GRID_COLOR);
+                    final Border invisiblePadding = BorderFactory.createEmptyBorder(1, column == 0 ? 1 : 0, 0, 0);
                     wrapper.setBorder(BorderFactory.createCompoundBorder(invisiblePadding, gridBorder));
                 }
 
@@ -106,7 +108,7 @@ public class GridPanelBuilder {
         };
     }
 
-    private static void updateRowHeights(final JBTable table) {
+    private static void updateRowHeights(final @NotNull JBTable table) {
         if (table.getRowCount() == 0) return;
         final int baseHeight = table.getRowHeight();
         for (int r = 0; r < table.getRowCount(); r++) {
@@ -128,7 +130,7 @@ public class GridPanelBuilder {
      * value that now wraps to more lines becomes fully visible immediately.
      * Coalesced via invokeLater: a block paste triggers one re-measure, not one per cell.
      */
-    private static void installAutoRowHeight(final JBTable table, final DefaultTableModel model) {
+    private static void installAutoRowHeight(final @NotNull JBTable table, final @NotNull DefaultTableModel model) {
         final AtomicBoolean pending = new AtomicBoolean();
         model.addTableModelListener(e -> {
             if (e.getType() != TableModelEvent.UPDATE) return;
@@ -141,14 +143,14 @@ public class GridPanelBuilder {
         });
     }
 
-    private static void addWheelScrollListener(final JBTable table) {
+    private static void addWheelScrollListener(final @NotNull JBTable table) {
         table.addMouseWheelListener(new MouseAdapter() {
             @Override
             public void mouseWheelMoved(final MouseWheelEvent e) {
                 if (e.isControlDown() || e.isMetaDown()) return;
-                JBScrollPane scrollPane = getScrollPane(e.getComponent());
+                final JBScrollPane scrollPane = getScrollPane(e.getComponent());
                 if (scrollPane != null && e.getComponent() != scrollPane) {
-                    MouseWheelEvent cloned = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
+                    final MouseWheelEvent cloned = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
                     scrollPane.dispatchEvent(cloned);
                     e.consume();
                 }
@@ -156,11 +158,11 @@ public class GridPanelBuilder {
         });
     }
 
-    private static String widthKey(final Object kind, final Object header) {
+    private static @NotNull String widthKey(final @NotNull Object kind, final @Nullable Object header) {
         return "testin.grid.colWidth." + kind + "." + header;
     }
 
-    private static void addColumnResizeListener(final JBTable table) {
+    private static void addColumnResizeListener(final @NotNull JBTable table) {
         table.getColumnModel().addColumnModelListener(new javax.swing.event.TableColumnModelListener() {
             @Override
             public void columnMarginChanged(final javax.swing.event.ChangeEvent e) {
@@ -196,7 +198,7 @@ public class GridPanelBuilder {
         });
     }
 
-    private static JBScrollPane getScrollPane(final Component component) {
+    private static @Nullable JBScrollPane getScrollPane(final @Nullable Component component) {
         Component current = component;
         while (current != null) {
             if (current instanceof JBScrollPane) return (JBScrollPane) current;
@@ -205,7 +207,7 @@ public class GridPanelBuilder {
         return null;
     }
 
-    private static void autoSizeColumns(final JBTable table) {
+    private static void autoSizeColumns(final @NotNull JBTable table) {
         final FontMetrics fm = table.getFontMetrics(table.getFont());
         final Object kind = table.getClientProperty(GRID_KIND_KEY);
         int tableTotalWidth = 0;
@@ -252,7 +254,7 @@ public class GridPanelBuilder {
         ));
     }
 
-    private static void installEnterToEdit(final JBTable table) {
+    private static void installEnterToEdit(final @NotNull JBTable table) {
         final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         final Action startEditing = new AbstractAction() {
             @Override
@@ -271,7 +273,7 @@ public class GridPanelBuilder {
         table.getActionMap().put("startEditing", startEditing);
     }
 
-    public JBTable buildRunTable(final Project p, final List<TestCaseDto> testCases, final Set<RunEditorAttributes> attributes, final Map<UUID, TestRunItems> resultsMap, final int firstItemIndex) {
+    public @NotNull JBTable buildRunTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final int firstItemIndex) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
 
@@ -301,7 +303,7 @@ public class GridPanelBuilder {
         return table;
     }
 
-    public JBTable buildTestTable(final Project p, final List<TestCaseDto> testCases, final Set<TestEditorAttributes> attributes, final int firstItemIndex) {
+    public @NotNull JBTable buildTestTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<TestEditorAttributes> attributes, final int firstItemIndex) {
         Logger.debug("[GridPanelBuilder] buildTestTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final List<TestEditorAttributes> ordered = Arrays.stream(TestEditorAttributes.values()).toList();
 
@@ -324,7 +326,7 @@ public class GridPanelBuilder {
         return table;
     }
 
-    public <E> void applyColumnVisibility(final JBTable table, final List<E> allValues, final Function<E, String> name, final Set<E> selected) {
+    public <E> void applyColumnVisibility(final @NotNull JBTable table, final @NotNull List<E> allValues, final @NotNull Function<E, String> name, final @NotNull Set<E> selected) {
         final TableColumnModel cm = table.getColumnModel();
         while (cm.getColumnCount() > 0) {
             cm.removeColumn(cm.getColumn(cm.getColumnCount() - 1));
@@ -341,13 +343,13 @@ public class GridPanelBuilder {
         autoSizeColumns(table);
     }
 
-    private TableColumn columnFor(final int modelIndex, final String header) {
+    private @NotNull TableColumn columnFor(final int modelIndex, final @NotNull String header) {
         final TableColumn column = new TableColumn(modelIndex);
         column.setHeaderValue(header);
         return column;
     }
 
-    private JBTable buildTable(final String[] columns, final List<String[]> rows, final boolean editable) {
+    private @NotNull JBTable buildTable(final String @NotNull [] columns, final @NotNull List<String[]> rows, final boolean editable) {
         final DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(final int row, final int column) {
@@ -388,7 +390,7 @@ public class GridPanelBuilder {
         return table;
     }
 
-    private <E> String[] buildColumns(final List<E> attributes, final Function<E, String> name) {
+    private <E> String @NotNull [] buildColumns(final @NotNull List<E> attributes, final @NotNull Function<E, String> name) {
         final List<String> columns = new ArrayList<>();
         columns.add("#");
         attributes.forEach(attr -> columns.add(name.apply(attr)));

@@ -32,7 +32,7 @@ import java.util.function.Supplier;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ListPanelBuilder {
 
-    public static ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable) {
+    public static @NotNull ListView build(final @NotNull Project p, final @NotNull Disposable fontSyncDisposable) {
         final CollectionListModel<TestCaseDto> model = new CollectionListModel<>(new ArrayList<>());
 
         final JBList<TestCaseDto> list = new JBList<>(model);

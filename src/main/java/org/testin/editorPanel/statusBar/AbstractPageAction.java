@@ -19,7 +19,7 @@ abstract class AbstractPageAction extends DumbAwareAction {
     private final int delta;
 
     protected AbstractPageAction(final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list,
-                                 final @NotNull String title, final @NotNull String description, final Icon icon,
+                                 final @NotNull String title, final @NotNull String description, final @NotNull Icon icon,
                                  final @NotNull Shortcuts shortcut, final int delta) {
         super(title, description, icon);
         this.editor = editor;

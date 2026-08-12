@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends AbstractButton implements IToolbarItem {
 
     @Getter
-    private final Set<E> selectedDetails = new HashSet<>();
+    private final @NotNull Set<E> selectedDetails = new HashSet<>();
 
     private final @NotNull String propertyKey;
     private final @NotNull List<E> options;
@@ -32,7 +32,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends Abstrac
                                       final @NotNull List<E> options,
                                       final @NotNull Function<E, String> displayName,
                                       final @NotNull Function<String, E> parser,
-                                      final Runnable onToolBarDetailsSelectedChanged) {
+                                      final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         super("Details", AllIcons.Actions.PreviewDetailsVertically);
 
         this.propertyKey = propertyKey;
@@ -62,7 +62,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends Abstrac
         PropertiesComponent.getInstance().setValue(propertyKey, joinedNames);
     }
 
-    private void showDetailsPopup(final Runnable onToolBarDetailsSelectedChanged) {
+    private void showDetailsPopup(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         final CheckBoxList<E> detailsList = new CheckBoxList<>();
         DialogStyle.styleContent(detailsList);
 
@@ -77,9 +77,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends Abstrac
 
             saveProps();
 
-            if (onToolBarDetailsSelectedChanged != null) {
-                onToolBarDetailsSelectedChanged.run();
-            }
+            onToolBarDetailsSelectedChanged.run();
         });
 
         JBPopupFactory.getInstance()

@@ -5,15 +5,16 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.util.Shortcuts;
 import org.testin.viewPanel.ViewPagination;
 
 import javax.swing.*;
 
 public class NextTestCaseAction extends DumbAwareAction {
-    private final ViewPagination controller;
+    private final @Nullable ViewPagination controller;
 
-    public NextTestCaseAction(final ViewPagination controller, final JComponent component) {
+    public NextTestCaseAction(final @Nullable ViewPagination controller, final @Nullable JComponent component) {
         super("Next Test Case", "Go to next test case", AllIcons.Actions.Forward);
         this.controller = controller;
 

@@ -2,6 +2,7 @@ package org.testin.editorPanel.grid;
 
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextArea;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -14,34 +15,34 @@ import java.util.EventObject;
 
 public class GridCellEditor extends AbstractCellEditor implements TableCellEditor {
 
-    private final JBTextArea textArea = new JBTextArea();
+    private final @NotNull JBTextArea textArea = new JBTextArea();
 
     public GridCellEditor() {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setOpaque(true);
 
-        KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
+        final KeyStroke enter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0);
         textArea.getInputMap().put(enter, "stopEditing");
         textArea.getActionMap().put("stopEditing", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 stopCellEditing();
             }
         });
 
-        KeyStroke shiftEnter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK);
+        final KeyStroke shiftEnter = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK);
         textArea.getInputMap().put(shiftEnter, "insertNewLine");
         textArea.getActionMap().put("insertNewLine", new AbstractAction() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(final ActionEvent e) {
                 textArea.append("\n");
             }
         });
     }
 
     @Override
-    public Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
+    public @NotNull Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
         textArea.setText(value == null ? "" : value.toString());
         textArea.setFont(table.getFont());
         textArea.setBackground(table.getSelectionBackground());
@@ -59,7 +60,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
     }
 
     @Override
-    public Object getCellEditorValue() {
+    public @NotNull Object getCellEditorValue() {
         return textArea.getText();
     }
 

@@ -3,6 +3,7 @@ package org.testin.editorPanel;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.enums.TestStatus;
@@ -21,7 +22,7 @@ public final class TestCaseFilter {
 
     public static @NotNull List<TestCaseDto> filter(
             final @NotNull Collection<TestCaseDto> source,
-            final String query,
+            final @Nullable String query,
             final @NotNull Set<Group> groups,
             final @NotNull Set<Priority> priorities,
             final @NotNull Set<String> modules) {
@@ -30,7 +31,7 @@ public final class TestCaseFilter {
 
     public static @NotNull List<TestCaseDto> filter(
             final @NotNull Collection<TestCaseDto> source,
-            final String query,
+            final @Nullable String query,
             final @NotNull Set<Group> groups,
             final @NotNull Set<Priority> priorities,
             final @NotNull Set<String> modules,
@@ -47,13 +48,13 @@ public final class TestCaseFilter {
     }
 
     private static boolean matches(
-            final TestCaseDto testCase,
-            final String query,
-            final Set<Group> groups,
-            final Set<Priority> priorities,
-            final Set<String> modules,
-            final Set<TestStatus> statuses,
-            final Function<UUID, TestRunItems> runItemProvider) {
+            final @NotNull TestCaseDto testCase,
+            final @NotNull String query,
+            final @NotNull Set<Group> groups,
+            final @NotNull Set<Priority> priorities,
+            final @NotNull Set<String> modules,
+            final @NotNull Set<TestStatus> statuses,
+            final @NotNull Function<UUID, TestRunItems> runItemProvider) {
         final boolean matchesSearch = query.isEmpty()
                 || containsIgnoreCase(testCase.getDescription(), query)
                 || testCase.getId().toString().toLowerCase(Locale.ROOT).contains(query)
@@ -71,14 +72,14 @@ public final class TestCaseFilter {
     }
 
     private static boolean matchesStatus(
-            final UUID id,
-            final Set<TestStatus> statuses,
-            final Function<UUID, TestRunItems> runItemProvider) {
+            final @NotNull UUID id,
+            final @NotNull Set<TestStatus> statuses,
+            final @NotNull Function<UUID, TestRunItems> runItemProvider) {
         final TestRunItems runItem = runItemProvider.apply(id);
         return runItem != null && statuses.contains(runItem.getStatus());
     }
 
-    private static boolean containsIgnoreCase(final String value, final String query) {
+    private static boolean containsIgnoreCase(final @Nullable String value, final @NotNull String query) {
         return value != null && value.toLowerCase(Locale.ROOT).contains(query);
     }
 }

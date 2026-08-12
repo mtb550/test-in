@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.Optional;
 
 public class SelectionListener implements ListSelectionListener {
-    private final JBList<TestCaseDto> list;
-    private final IEditor editor;
-    private final ArrayList<String> path;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull IEditor editor;
+    private final @NotNull ArrayList<String> path;
 
     private final @NotNull Project p;
 
-    public SelectionListener(final @NotNull Project p, final JBList<TestCaseDto> list, final IEditor editor, final ArrayList<String> path) {
+    public SelectionListener(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull IEditor editor, final @NotNull ArrayList<String> path) {
         this.p = p;
         this.list = list;
         this.editor = editor;
@@ -33,7 +33,7 @@ public class SelectionListener implements ListSelectionListener {
         if (!e.getValueIsAdjusting()) {
             final List<TestCaseDto> selected = list.getSelectedValuesList();
 
-            if (selected != null && !selected.isEmpty()) {
+            if (!selected.isEmpty()) {
                 list.ensureIndexIsVisible(list.getSelectedIndex());
 
                 Optional.ofNullable(ViewToolWindowFactory.getToolWindow(p))
@@ -42,13 +42,11 @@ public class SelectionListener implements ListSelectionListener {
                         .ifPresent(viewer -> viewer.show(selected, path));
             }
 
-            Optional.ofNullable(editor.getStatusBar()).ifPresent(statusBar ->
-                    statusBar.updateSelectionState(
-                            list.getSelectedIndices(),
-                            editor.getCurrentPage(),
-                            editor.getPageSize(),
-                            editor.getTotalItemsCount()
-                    )
+            editor.getStatusBar().updateSelectionState(
+                    list.getSelectedIndices(),
+                    editor.getCurrentPage(),
+                    editor.getPageSize(),
+                    editor.getTotalItemsCount()
             );
         }
     }

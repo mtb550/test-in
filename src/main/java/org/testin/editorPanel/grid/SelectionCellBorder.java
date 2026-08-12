@@ -1,5 +1,6 @@
 package org.testin.editorPanel.grid;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.EditorColors;
 
 import javax.swing.border.Border;
@@ -9,14 +10,14 @@ import java.awt.*;
  * Selection border for grid cells; keeps the same insets as an unselected cell
  * so selection never changes the cell width or wrapping.
  */
-record SelectionCellBorder(Insets insets) implements Border {
+record SelectionCellBorder(@NotNull Insets insets) implements Border {
 
     SelectionCellBorder(final boolean firstColumn) {
         this(new Insets(1, firstColumn ? 1 : 0, 1, 1));
     }
 
     @Override
-    public Insets getBorderInsets(final Component component) {
+    public @NotNull Insets getBorderInsets(final Component component) {
         return insets;
     }
 

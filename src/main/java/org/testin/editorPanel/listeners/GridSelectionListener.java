@@ -1,6 +1,7 @@
 package org.testin.editorPanel.listeners;
 
 import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.mappers.dto.TestCaseDto;
 
@@ -10,11 +11,11 @@ import javax.swing.event.ListSelectionListener;
 import java.util.List;
 
 public class GridSelectionListener implements ListSelectionListener {
-    private final IEditor editor;
-    private final JBTable table;
-    private final List<TestCaseDto> pageItems;
+    private final @NotNull IEditor editor;
+    private final @NotNull JBTable table;
+    private final @NotNull List<TestCaseDto> pageItems;
 
-    public GridSelectionListener(final IEditor editor, final JBTable table, final List<TestCaseDto> pageItems) {
+    public GridSelectionListener(final @NotNull IEditor editor, final @NotNull JBTable table, final @NotNull List<TestCaseDto> pageItems) {
         this.editor = editor;
         this.table = table;
         this.pageItems = pageItems;

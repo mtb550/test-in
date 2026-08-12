@@ -41,6 +41,7 @@ public class EditorType extends FakeFileType {
     private final Icon icon;
 
     @Getter
+    @NotNull
     private final BiFunction<Project, UnifiedVirtualFile, IEditor> factory;
 
     private EditorType(final @NotNull String name, final @NotNull String description, final @NotNull Icon icon, final @NotNull BiFunction<Project, UnifiedVirtualFile, IEditor> factory) {

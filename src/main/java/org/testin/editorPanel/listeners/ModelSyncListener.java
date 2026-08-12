@@ -3,6 +3,8 @@ package org.testin.editorPanel.listeners;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.ui.CollectionListModel;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.enums.IUpdateCallback;
 import org.testin.mappers.dto.TestCaseDto;
@@ -14,14 +16,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class ModelSyncListener implements ListDataListener {
-    private final TestEditor editor;
-    private final CollectionListModel<TestCaseDto> model;
+    private final @NotNull TestEditor editor;
+    private final @NotNull CollectionListModel<TestCaseDto> model;
     private boolean active = true;
 
     @Setter
-    private IUpdateCallback onUpdateCallback;
+    private @Nullable IUpdateCallback onUpdateCallback;
 
-    public ModelSyncListener(final TestEditor editor, final CollectionListModel<TestCaseDto> model) {
+    public ModelSyncListener(final @NotNull TestEditor editor, final @NotNull CollectionListModel<TestCaseDto> model) {
         this.editor = editor;
         this.model = model;
     }

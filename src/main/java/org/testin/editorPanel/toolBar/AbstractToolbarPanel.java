@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.toolBar.components.FocusSearchAction;
 import org.testin.editorPanel.toolBar.components.GridViewBtn;
 import org.testin.editorPanel.toolBar.components.IToolbarItem;
@@ -22,18 +23,18 @@ import java.util.Map;
 public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel> implements Disposable {
 
     @Getter
-    protected final SearchTxt searchTxt;
+    protected final @NotNull SearchTxt searchTxt;
 
     @Getter
-    private final IToolBar callbacks;
+    private final @NotNull IToolBar callbacks;
 
     @Getter
-    private final Map<Class<? extends IToolbarItem>, IToolbarItem> toolbarItems = new HashMap<>();
+    private final @NotNull Map<Class<? extends IToolbarItem>, IToolbarItem> toolbarItems = new HashMap<>();
 
     @Getter
-    private ViewMode currentView = ViewMode.LIST_VIEW;
+    private @NotNull ViewMode currentView = ViewMode.LIST_VIEW;
 
-    public AbstractToolbarPanel(final IToolBar callbacks) {
+    public AbstractToolbarPanel(final @NotNull IToolBar callbacks) {
         super(new GridBagLayout());
         this.callbacks = callbacks;
 
@@ -42,7 +43,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged, callbacks::onToolBarSearchFocusReleased);
     }
 
-    public <T extends IToolbarItem> T getToolbarItem(Class<T> itemClass) {
+    public <T extends IToolbarItem> @Nullable T getToolbarItem(final @NotNull Class<T> itemClass) {
         return itemClass.cast(toolbarItems.get(itemClass));
     }
 
@@ -56,13 +57,13 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     }
 
     protected void layoutComponents() {
-        GridBagConstraints gbc = new GridBagConstraints();
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
 
-        for (IToolbarItem item : getCustomComponents()) {
+        for (final IToolbarItem item : getCustomComponents()) {
             if (item instanceof JComponent component) {
                 toolbarItems.put(item.getClass(), item);
                 add(component, gbc);
@@ -106,14 +107,12 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         repaint();
     }
 
-    protected abstract List<IToolbarItem> getCustomComponents();
+    protected abstract @NotNull List<IToolbarItem> getCustomComponents();
 
     @Override
     public void dispose() {
         this.removeAll();
         this.toolbarItems.clear();
-        if (this.searchTxt != null) {
-            Disposer.dispose(this.searchTxt);
-        }
+        Disposer.dispose(this.searchTxt);
     }
 }

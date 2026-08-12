@@ -4,6 +4,7 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.ui.table.JBTable;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +31,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GridExcelBehavior {
 
-    public static void install(final JBTable table) {
+    public static void install(final @NotNull JBTable table) {
         table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.setCellSelectionEnabled(true);
         table.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -43,7 +44,7 @@ public final class GridExcelBehavior {
     // Row selection via the sequence column
     // ------------------------------------------------------------------
 
-    private static void installSequenceColumnRowSelection(final JBTable table) {
+    private static void installSequenceColumnRowSelection(final @NotNull JBTable table) {
         // Register ahead of the UI handler: listeners run in order, and ours must
         // consume the press before the table UI applies plain cell selection.
         final MouseListener[] existing = table.getMouseListeners();
@@ -56,7 +57,7 @@ public final class GridExcelBehavior {
     // Clipboard (TSV, Excel-compatible)
     // ------------------------------------------------------------------
 
-    private static void installClipboardActions(final JBTable table) {
+    private static void installClipboardActions(final @NotNull JBTable table) {
         final int menuMask = Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();
         final InputMap inputMap = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C, menuMask), "testin.grid.copy");
@@ -69,7 +70,7 @@ public final class GridExcelBehavior {
         actionMap.put("testin.grid.paste", action(() -> pasteIntoSelection(table)));
     }
 
-    private static Action action(final Runnable body) {
+    private static @NotNull Action action(final @NotNull Runnable body) {
         return new AbstractAction() {
             @Override
             public void actionPerformed(final ActionEvent e) {
@@ -78,7 +79,7 @@ public final class GridExcelBehavior {
         };
     }
 
-    private static void copySelection(final JBTable table, final boolean cut) {
+    private static void copySelection(final @NotNull JBTable table, final boolean cut) {
         final int[] rows = table.getSelectedRows();
         final int[] cols = table.getSelectedColumns();
         if (rows.length == 0 || cols.length == 0) return;
@@ -105,7 +106,7 @@ public final class GridExcelBehavior {
         }
     }
 
-    private static void pasteIntoSelection(final JBTable table) {
+    private static void pasteIntoSelection(final @NotNull JBTable table) {
         final String text = CopyPasteManager.getInstance().getContents(DataFlavor.stringFlavor);
         if (text == null || text.isEmpty()) return;
 
@@ -149,7 +150,7 @@ public final class GridExcelBehavior {
      * Excel TSV quoting: fields containing tabs, newlines, or quotes are wrapped
      * in double quotes with internal quotes doubled.
      */
-    private static String escapeTsvField(final String value) {
+    private static @NotNull String escapeTsvField(final @NotNull String value) {
         if (value.indexOf('\t') < 0 && value.indexOf('\n') < 0 && value.indexOf('\r') < 0 && value.indexOf('"') < 0) {
             return value;
         }
@@ -160,7 +161,7 @@ public final class GridExcelBehavior {
      * Parses Excel-style TSV: fields separated by tabs, records by newlines,
      * quoted fields may contain tabs, newlines, and doubled quotes.
      */
-    private static List<List<String>> parseTsv(final String text) {
+    private static @NotNull List<List<String>> parseTsv(final @NotNull String text) {
         final List<List<String>> records = new ArrayList<>();
         List<String> fields = new ArrayList<>();
         final StringBuilder current = new StringBuilder();

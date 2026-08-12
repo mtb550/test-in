@@ -8,6 +8,8 @@ import com.intellij.ui.components.panels.VerticalLayout;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.intellij.util.ui.components.BorderLayoutPanel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,14 +24,14 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * in {@code MouseListenerImpl} so hover targets line up with the painted icons.
      */
     public static final float TITLE_FONT_DELTA = 3.0f;
-    protected final JBLabel descriptionLabel = new JBLabel();
-    protected final JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
-    protected final Map<String, JBLabel> attributeLabels = new HashMap<>();
-    protected final JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
-    protected final BorderLayoutPanel wrapper = new BorderLayoutPanel();
+    protected final @NotNull JBLabel descriptionLabel = new JBLabel();
+    protected final @NotNull JBPanel<?> badgePanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(10), 0));
+    protected final @NotNull Map<String, JBLabel> attributeLabels = new HashMap<>();
+    protected final @NotNull JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
+    protected final @NotNull BorderLayoutPanel wrapper = new BorderLayoutPanel();
     protected boolean isSelected;
     protected boolean isRowHovered;
-    protected String hoveredAction;
+    protected @Nullable String hoveredAction;
     protected boolean isRunning;
 
     public BaseCard() {
@@ -59,22 +61,22 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    public void applyListFont(final Font listFont) {
-        float baseSize = listFont.getSize2D();
+    public void applyListFont(final @NotNull Font listFont) {
+        final float baseSize = listFont.getSize2D();
 
         descriptionLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + TITLE_FONT_DELTA));
 
-        for (JBLabel lbl : attributeLabels.values()) {
+        for (final JBLabel lbl : attributeLabels.values()) {
             lbl.setFont(listFont.deriveFont(baseSize));
         }
 
-        float badgeSize = Math.max(8.0f, baseSize - 2.0f);
-        for (Component c : badgePanel.getComponents()) {
+        final float badgeSize = Math.max(8.0f, baseSize - 2.0f);
+        for (final Component c : badgePanel.getComponents()) {
             c.setFont(listFont.deriveFont(Font.BOLD, badgeSize));
         }
     }
 
-    protected void updateUI(final int index, final String title, final List<JComponent> badges, final Map<String, String> details) {
+    protected void updateUI(final int index, final @NotNull String title, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details) {
         descriptionLabel.setText(String.format(Locale.ENGLISH, "%d. %s", index + 1, title));
 
         final Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
@@ -87,8 +89,8 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 
         details.forEach((attrName, value) -> {
-            JBLabel lbl = attributeLabels.computeIfAbsent(attrName, k -> {
-                JBLabel newLbl = createDetailLabel();
+            final JBLabel lbl = attributeLabels.computeIfAbsent(attrName, k -> {
+                final JBLabel newLbl = createDetailLabel();
                 content.add(newLbl);
                 return newLbl;
             });
@@ -101,7 +103,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         badgePanel.repaint();
     }
 
-    public void setActionsState(final boolean isSelected, final boolean isRowHovered, final String hoveredAction) {
+    public void setActionsState(final boolean isSelected, final boolean isRowHovered, final @Nullable String hoveredAction) {
         this.isSelected = isSelected;
         this.isRowHovered = isRowHovered;
         this.hoveredAction = hoveredAction;
@@ -120,7 +122,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         }
     }
 
-    private JBLabel createDetailLabel() {
+    private @NotNull JBLabel createDetailLabel() {
         final JBLabel label = new JBLabel();
         label.setForeground(UIUtil.getContextHelpForeground());
         label.setAlignmentX(Component.LEFT_ALIGNMENT);

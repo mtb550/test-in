@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.listeners.ITestCaseExecutionListener;
 import org.testin.logger.Logger;
@@ -16,9 +17,9 @@ import java.util.Map;
 import java.util.UUID;
 
 public class TestCaseExecutionSubscriber {
-    private final Map<String, UUID> uuidToDtoId = new HashMap<>();
-    private final ProjectIndexer indexer;
-    private UUID runningDtoId = null;
+    private final @NotNull Map<String, UUID> uuidToDtoId = new HashMap<>();
+    private final @NotNull ProjectIndexer indexer;
+    private @Nullable UUID runningDtoId = null;
 
     public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull Disposable parentDisposable) {
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -32,7 +33,7 @@ public class TestCaseExecutionSubscriber {
                 ApplicationManager.getApplication().invokeLater(() -> handleStatusChanged(testName, status, error));
             }
 
-            private void handleStatusChanged(final @NotNull String testName, final @NotNull String status, final String error) {
+            private void handleStatusChanged(final @NotNull String testName, final @NotNull String status, final @Nullable String error) {
                 Logger.debug("TestEditor subscription fired: testName='" + testName + "', status='" + status + "'");
 
                 boolean updated = false;
@@ -74,7 +75,7 @@ public class TestCaseExecutionSubscriber {
                     list.repaint();
             }
 
-            private UUID parseUuid(final String s) {
+            private @Nullable UUID parseUuid(final @NotNull String s) {
                 try {
                     return UUID.fromString(s);
                 } catch (final IllegalArgumentException ex) {

@@ -2,6 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestCard;
 import org.testin.editorPanel.testEditor.TestEditor;
@@ -18,7 +19,7 @@ public class TestListRenderer extends AbstractListRenderer<IEditor> {
     }
 
     @Override
-    protected JComponent bindDataAndGetCard(JList<? extends TestCaseDto> list, TestCaseDto tc, int globalIndex, boolean isSelected, boolean isRowHovered, String hover) {
+    protected @NotNull JComponent bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @Nullable String hover) {
         final boolean isUnsorted = editor.getUnsortedIds().contains(tc.getId());
 
         card.updateData(globalIndex, tc, editor.getSelectedDetails(), isUnsorted);

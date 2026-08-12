@@ -17,11 +17,11 @@ import java.util.List;
 
 public class GridEditListener implements TableModelListener {
     private final @NotNull Project p;
-    private final List<TestCaseDto> pageItems;
-    private final Runnable onEdited;
+    private final @NotNull List<TestCaseDto> pageItems;
+    private final @NotNull Runnable onEdited;
     private boolean updating = false;
 
-    public GridEditListener(final @NotNull Project p, final List<TestCaseDto> pageItems, final Runnable onEdited) {
+    public GridEditListener(final @NotNull Project p, final @NotNull List<TestCaseDto> pageItems, final @NotNull Runnable onEdited) {
         this.p = p;
         this.pageItems = pageItems;
         this.onEdited = onEdited;

@@ -4,6 +4,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.FontSync;
 
 import java.awt.*;
@@ -17,14 +18,14 @@ public class RoundedBadge extends JBLabel {
 
     private final int radius;
 
-    public RoundedBadge(final String text, final Color bg) {
+    public RoundedBadge(final @NotNull String text, final @NotNull Color bg) {
         super(text);
         this.radius = BADGE_RADIUS;
         setOpaque(false);
         setBackground(bg);
         setForeground(JBColor.WHITE);
 
-        float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
+        final float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
         setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
 
         setBorder(JBUI.Borders.empty(2, 10));

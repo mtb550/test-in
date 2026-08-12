@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.mappers.dto.TestCaseDto;
 
@@ -12,13 +13,13 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 public class GridContextMenuListener extends MouseAdapter {
-    private final JBTable table;
-    private final JBList<TestCaseDto> list;
-    private final AbstractEditorContextMenu contextMenu;
-    private final List<TestCaseDto> pageItems;
+    private final @NotNull JBTable table;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull AbstractEditorContextMenu contextMenu;
+    private final @NotNull List<TestCaseDto> pageItems;
     private boolean popupShownOnPress;
 
-    public GridContextMenuListener(final JBTable table, final JBList<TestCaseDto> list, final AbstractEditorContextMenu contextMenu, final List<TestCaseDto> pageItems) {
+    public GridContextMenuListener(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu contextMenu, final @NotNull List<TestCaseDto> pageItems) {
         this.table = table;
         this.list = list;
         this.contextMenu = contextMenu;
@@ -39,7 +40,7 @@ public class GridContextMenuListener extends MouseAdapter {
         popupShownOnPress = false;
     }
 
-    private void showPopupIfRequested(final MouseEvent e) {
+    private void showPopupIfRequested(final @NotNull MouseEvent e) {
         if (!e.isPopupTrigger()) return;
         final int row = table.rowAtPoint(e.getPoint());
         final int column = table.columnAtPoint(e.getPoint());

@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.IEditor;
@@ -47,7 +48,7 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mouseClicked(final @NotNull MouseEvent e) {
+    public void mouseClicked(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
         final boolean isClickOnItem = index >= 0 && list.getCellBounds(index, index).contains(e.getPoint());
 
@@ -73,7 +74,7 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mousePressed(final @NotNull MouseEvent e) {
+    public void mousePressed(final MouseEvent e) {
         if (!SwingUtilities.isLeftMouseButton(e)) return;
 
         final int index = list.locationToIndex(e.getPoint());
@@ -101,7 +102,7 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mouseMoved(final @NotNull MouseEvent e) {
+    public void mouseMoved(final MouseEvent e) {
         final int index = list.locationToIndex(e.getPoint());
         CardHoverAction currentAction = null;
 
@@ -136,7 +137,7 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mouseExited(final @NotNull MouseEvent e) {
+    public void mouseExited(final MouseEvent e) {
         if (editor.getHoveredIndex() != -1 || editor.getHoveredIconAction() != null) {
             editor.setHoveredIndex(-1);
             editor.setHoveredIconAction(null);
@@ -146,30 +147,30 @@ public class MouseListenerImpl extends MouseAdapter {
     }
 
     @Override
-    public void mouseWheelMoved(final @NotNull MouseWheelEvent e) {
+    public void mouseWheelMoved(final MouseWheelEvent e) {
         if (e.isControlDown() || e.isMetaDown())
             return;
 
-        JBScrollPane scrollPane = getScrollPane(e.getComponent());
+        final JBScrollPane scrollPane = getScrollPane(e.getComponent());
 
         if (scrollPane != null && e.getComponent() != scrollPane) {
-            MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
+            final MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
             scrollPane.dispatchEvent(clonedEvent);
             e.consume();
         }
     }
 
-    private CardHoverAction getActionAtPoint(final int index, final int xInCell, final int yInCell) {
+    private @Nullable CardHoverAction getActionAtPoint(final int index, final int xInCell, final int yInCell) {
         if (index == -1) return null;
 
-        float baseSize = list.getFont().getSize2D();
+        final float baseSize = list.getFont().getSize2D();
 
         // Must match the painted title font, otherwise the hover hit targets drift
         // away from the drawn icons as the title grows.
         final Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
         final FontMetrics fm = list.getFontMetrics(titleFont);
 
-        int dynamicYBound = fm.getHeight() + JBUI.scale(20);
+        final int dynamicYBound = fm.getHeight() + JBUI.scale(20);
 
         if (yInCell <= dynamicYBound) {
             final TestCaseDto tc = list.getModel().getElementAt(index);
@@ -190,7 +191,7 @@ public class MouseListenerImpl extends MouseAdapter {
         return null;
     }
 
-    private JBScrollPane getScrollPane(final Component component) {
+    private @Nullable JBScrollPane getScrollPane(final @Nullable Component component) {
         Component current = component;
         while (current != null) {
             if (current instanceof JBScrollPane)

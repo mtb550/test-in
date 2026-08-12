@@ -1,5 +1,7 @@
 package org.testin.editorPanel.toolBar.components;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Set;
 
 /**
@@ -10,12 +12,12 @@ import java.util.Set;
 @FunctionalInterface
 public interface FilterMembership<T> {
 
-    static <T> FilterMembership<T> plain() {
+    static <T> @NotNull FilterMembership<T> plain() {
         return (value, selection, selected) -> {
             if (selected) selection.add(value);
             else selection.remove(value);
         };
     }
 
-    void apply(T value, Set<T> selection, boolean selected);
+    void apply(final @NotNull T value, final @NotNull Set<T> selection, final boolean selected);
 }

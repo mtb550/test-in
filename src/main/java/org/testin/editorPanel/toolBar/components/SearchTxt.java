@@ -13,10 +13,10 @@ import java.awt.event.KeyEvent;
 import java.util.function.Consumer;
 
 public class SearchTxt extends SearchTextField implements Disposable, IToolbarItem {
-    private final Timer searchDebounceTimer;
+    private final @NotNull Timer searchDebounceTimer;
     private final @NotNull Runnable onFocusReleased;
 
-    public SearchTxt(final Consumer<String> onToolBarSearchValueChanged, final @NotNull Runnable onFocusReleased) {
+    public SearchTxt(final @NotNull Consumer<String> onToolBarSearchValueChanged, final @NotNull Runnable onFocusReleased) {
         super();
         this.onFocusReleased = onFocusReleased;
 
@@ -51,7 +51,7 @@ public class SearchTxt extends SearchTextField implements Disposable, IToolbarIt
         return super.preprocessEventForTextField(e);
     }
 
-    public String getSearchQuery() {
+    public @NotNull String getSearchQuery() {
         return getText().trim().toLowerCase();
     }
 
@@ -66,7 +66,7 @@ public class SearchTxt extends SearchTextField implements Disposable, IToolbarIt
 
     @Override
     public void dispose() {
-        if (searchDebounceTimer != null && searchDebounceTimer.isRunning()) {
+        if (searchDebounceTimer.isRunning()) {
             searchDebounceTimer.stop();
         }
     }

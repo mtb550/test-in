@@ -21,7 +21,7 @@ public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
 
     public void updateEnabledState() {
         if (callbacks instanceof RunEditor editor) {
-            TestRunStatus status = editor.getParent().getMarker().getStatus();
+            final TestRunStatus status = editor.getParent().getMarker().getStatus();
 
             if (status.isTerminal()) {
                 setEnabled(false);

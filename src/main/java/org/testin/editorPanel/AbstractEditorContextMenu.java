@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBList;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.HashSet;
@@ -15,7 +16,7 @@ import java.util.UUID;
 public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
 
     @Getter
-    private static final Set<UUID> globalPendingCutIds = new HashSet<>();
+    private static final @NotNull Set<UUID> globalPendingCutIds = new HashSet<>();
 
     @Getter
     @Setter
@@ -23,7 +24,7 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
 
     @Getter
     @Setter
-    private static IEditor globalSourceEditorUI = null;
+    private static @Nullable IEditor globalSourceEditorUI = null;
 
     public AbstractEditorContextMenu(final @NotNull String name, final boolean popup) {
         super(name, popup);

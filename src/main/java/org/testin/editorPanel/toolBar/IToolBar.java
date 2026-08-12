@@ -1,9 +1,11 @@
 package org.testin.editorPanel.toolBar;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Set;
 
 public interface IToolBar {
-    void onToolBarSearchValueChanged(final String query);
+    void onToolBarSearchValueChanged(final @NotNull String query);
 
     /**
      * ESC in the search field: focus returns to the editor's list, the filter
@@ -32,5 +34,5 @@ public interface IToolBar {
     default void onStartExecutionClicked() {
     }
 
-    Set<String> getAvailableModules();
+    @NotNull Set<String> getAvailableModules();
 }

@@ -2,6 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.IEditor;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -14,9 +15,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TransferListener extends TransferHandler {
-    private static final DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
+    private static final @NotNull DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
     private final @NotNull IEditor editor;
-    private int[] draggedIndices;
+    private int @Nullable [] draggedIndices;
 
     public TransferListener(final @NotNull IEditor editor) {
         this.editor = editor;
@@ -28,7 +29,7 @@ public class TransferListener extends TransferHandler {
     }
 
     @Override
-    protected Transferable createTransferable(final JComponent c) {
+    protected @Nullable Transferable createTransferable(final JComponent c) {
         if (!(c instanceof JBList<?> rawList)) return null;
 
         draggedIndices = rawList.getSelectedIndices();
@@ -40,7 +41,7 @@ public class TransferListener extends TransferHandler {
 
         return new Transferable() {
             @Override
-            public DataFlavor[] getTransferDataFlavors() {
+            public DataFlavor @NotNull [] getTransferDataFlavors() {
                 return new DataFlavor[]{FLAVOR};
             }
 

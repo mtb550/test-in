@@ -82,7 +82,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
                 .map(tw -> ViewToolWindowFactory.getViewPanel())
                 .ifPresent(viewer -> {
 
-                    if (selected != null && !selected.isEmpty())
+                    if (!selected.isEmpty())
                         viewer.show(selected, vf.getDir().getPath2());
 
                     else viewer.reset();

@@ -50,7 +50,7 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
     @NotNull
     private final IToolBar callbacks;
 
-    public FilterPopupBtn(final @NotNull IToolBar callbacks, final @NotNull Runnable onToolBarFilterReset, final Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier) {
+    public FilterPopupBtn(final @NotNull IToolBar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier) {
         super("Filter", AllIcons.General.Filter);
         this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;
@@ -64,7 +64,7 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
     }
 
     public void updateToolBarFilterState() {
-        int activeFiltersCount = selectedPriority.size() + selectedGroup.size() + selectedModule.size() + selectedStatus.size();
+        final int activeFiltersCount = selectedPriority.size() + selectedGroup.size() + selectedModule.size() + selectedStatus.size();
         if (activeFiltersCount == 0) {
             setText(null);
             setToolTipText("Filter");
@@ -92,20 +92,18 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
         updateToolBarFilterState();
     }
 
-    private DefaultActionGroup buildActionGroup(final Runnable onToolBarFilterSelectedChanged) {
+    private @NotNull DefaultActionGroup buildActionGroup(final @NotNull Runnable onToolBarFilterSelectedChanged) {
         final Runnable onChanged = () -> {
             updateToolBarFilterState();
-            if (onToolBarFilterSelectedChanged != null) {
-                onToolBarFilterSelectedChanged.run();
-            }
+            onToolBarFilterSelectedChanged.run();
         };
 
-        DefaultActionGroup filterResetBtn = new DefaultActionGroup();
+        final DefaultActionGroup filterResetBtn = new DefaultActionGroup();
 
         filterResetBtn.add(new DumbAwareAction("Reset Filters", "Clear active filters", AllIcons.Actions.Cancel) {
             @Override
-            public void update(@NotNull AnActionEvent e) {
-                boolean hasActiveFilters = !selectedPriority.isEmpty() || !selectedGroup.isEmpty() || !selectedModule.isEmpty() || !selectedStatus.isEmpty();
+            public void update(final @NotNull AnActionEvent e) {
+                final boolean hasActiveFilters = !selectedPriority.isEmpty() || !selectedGroup.isEmpty() || !selectedModule.isEmpty() || !selectedStatus.isEmpty();
                 e.getPresentation().setEnabledAndVisible(hasActiveFilters);
             }
 
@@ -116,21 +114,21 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
             }
 
             @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
+            public void actionPerformed(final @NotNull AnActionEvent e) {
                 resetToolBarFilter();
             }
         });
         filterResetBtn.addSeparator();
 
         // priority menu
-        DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
+        final DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
                 filterPriorityMenu.add(new ToggleFilterAction<>(p.getName(), IconManager.createIcon(p.getColor()),
                         p, selectedPriority, Priority::onChange, onChanged)));
         filterResetBtn.add(filterPriorityMenu);
 
         // group menu
-        DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestEditorAttributes.GROUP.getName(), true);
+        final DefaultActionGroup filterGroupMenu = new DefaultActionGroup(TestEditorAttributes.GROUP.getName(), true);
         Arrays.stream(Group.values()).forEach(g -> {
             if (g == Group.REGRESSION) {
                 filterGroupMenu.addSeparator();
@@ -141,9 +139,9 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
         filterResetBtn.add(filterGroupMenu);
 
         // module menu is dynamic: modules come from the currently loaded test cases
-        ActionGroup filterModuleMenu = new ActionGroup("Module", true) {
+        final ActionGroup filterModuleMenu = new ActionGroup("Module", true) {
             @Override
-            public AnAction @NotNull [] getChildren(@Nullable AnActionEvent e) {
+            public AnAction @NotNull [] getChildren(final @Nullable AnActionEvent e) {
                 final List<String> sortedModules = new ArrayList<>(availableModulesSupplier.get());
                 Collections.sort(sortedModules);
 
@@ -158,7 +156,7 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
         filterResetBtn.add(filterModuleMenu);
 
         if (callbacks instanceof RunEditor) {
-            DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
+            final DefaultActionGroup filterStatusMenu = new DefaultActionGroup("Status", true);
             Arrays.stream(TestStatus.values()).forEach(s ->
                     filterStatusMenu.add(new ToggleFilterAction<>(s.name(), null,
                             s, selectedStatus, FilterMembership.plain(), onChanged)));

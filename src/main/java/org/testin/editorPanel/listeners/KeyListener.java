@@ -37,7 +37,7 @@ public class KeyListener extends KeyAdapter {
 
         if (Shortcuts.CopyItem.matches(e)) {
             final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
-            if (selectedCases != null && !selectedCases.isEmpty()) {
+            if (!selectedCases.isEmpty()) {
                 final String titles = selectedCases.stream()
                         .map(TestCaseDto::getDescription)
                         .collect(Collectors.joining("\n"));
@@ -52,7 +52,7 @@ public class KeyListener extends KeyAdapter {
         if (Shortcuts.DeletePackage.matches(e)) {
             final List<TestCaseDto> selectedCases = list.getSelectedValuesList();
 
-            if (selectedCases != null && !selectedCases.isEmpty()) {
+            if (!selectedCases.isEmpty()) {
                 editor.getAllTestCases().removeAll(selectedCases);
                 editor.refreshView();
 

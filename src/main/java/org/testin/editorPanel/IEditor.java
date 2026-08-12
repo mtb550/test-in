@@ -17,11 +17,11 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface IEditor extends Disposable {
-    DirectoryDto getParent();
+    @NotNull DirectoryDto getParent();
 
-    StatusBar getStatusBar();
+    @NotNull StatusBar getStatusBar();
 
-    AbstractToolbarPanel getToolBar();
+    @NotNull AbstractToolbarPanel getToolBar();
 
     int getCurrentPage();
 
@@ -37,27 +37,27 @@ public interface IEditor extends Disposable {
 
     void refreshView();
 
-    List<TestCaseDto> getSelectedTestCases();
+    @NotNull List<TestCaseDto> getSelectedTestCases();
 
-    void appendNewTestCase(final TestCaseDto tc);
+    void appendNewTestCase(final @NotNull TestCaseDto tc);
 
     @NotNull JComponent getComponent();
 
     @Nullable JComponent getPreferredFocusedComponent();
 
-    Set<?> getSelectedDetails();
+    @NotNull Set<?> getSelectedDetails();
 
-    List<TestCaseDto> getAllTestCases();
+    @NotNull List<TestCaseDto> getAllTestCases();
 
     void updateSequenceAndSaveAll();
 
-    void selectTestCase(final TestCaseDto tc);
+    void selectTestCase(final @Nullable TestCaseDto tc);
 
-    Set<UUID> getUnsortedIds();
+    @NotNull Set<UUID> getUnsortedIds();
 
-    String getHoveredIconAction();
+    @Nullable String getHoveredIconAction();
 
-    void setHoveredIconAction(final String action);
+    void setHoveredIconAction(final @Nullable String action);
 
     int getHoveredIndex();
 
