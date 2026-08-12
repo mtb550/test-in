@@ -1,150 +1,114 @@
 package org.testin.testRun.createDialog;
 
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.ui.popup.JBPopupListener;
-import com.intellij.openapi.ui.popup.LightweightWindowEvent;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.testin.enums.BugPriority;
+import org.testin.enums.BugSeverity;
 import org.testin.mappers.TestRunItems;
-import org.testin.ui.dialogs.DialogStyle;
+import org.testin.mappers.dto.TestCaseDto;
+import org.testin.ui.framework.AbstractFrameworkDialog;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.RadioSelection;
+import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.ui.framework.TextArea;
+import org.testin.ui.framework.TextInput;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
-import java.awt.*;
+import java.util.List;
 
-public class FailedResultDialog {
+/**
+ * Collects the failure details when a test case is set to Failed: the actual
+ * result (with the test case's description and expected result as muted
+ * context), bug severity and bug priority — all framework components. Saves
+ * on Enter, cancels on Escape; nothing is applied unless saved.
+ */
+public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
-    private final @NotNull Project p;
-    private final TestRunItems runItem;
-    private final ActualResultSection actualResultSection;
-    private final BugPrioritySection bugPrioritySection;
-    private final BugSeveritySection bugSeveritySection;
-    private final JBPopup popup;
-    private final Runnable onSave;
+    private final @NotNull TestRunItems runItem;
+    private final @NotNull Runnable onSave;
+    private final @NotNull TextInput actualResult;
+    private final @NotNull RadioSelection<BugSeverity> severity;
+    private final @NotNull RadioSelection<BugPriority> priority;
+    private final @NotNull TextArea errorCapture;
 
     public FailedResultDialog(final @NotNull Project p, final @NotNull TestRunItems runItem, final @NotNull Runnable onSave) {
-        this.p = p;
+        super(p);
         this.runItem = runItem;
         this.onSave = onSave;
 
-        this.actualResultSection = new ActualResultSection();
-        this.bugPrioritySection = new BugPrioritySection();
-        this.bugSeveritySection = new BugSeveritySection();
+        // tc is wired lazily by the run editor; a run item whose test case no
+        // longer exists in the test set never gets it assigned.
+        final TestCaseDto tc = runItem.getTc();
 
-        actualResultSection.fillData(runItem);
-        bugPrioritySection.fillData(runItem);
-        bugSeveritySection.fillData(runItem);
+        final ComponentDialogBase<TextInput> actualResultField = ComponentDialogBase.textField()
+                .placeholder("set actual result..")
+                .value(runItem.getActualResult())
+                .build();
+        actualResult = actualResultField.getComponent();
 
-        JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
-            @Override
-            public Dimension getPreferredSize() {
-                Dimension pref = super.getPreferredSize();
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                pref.width = Math.max(pref.width, screenSize.width / 2);
-                int maxHeight = (int) (screenSize.height * 0.85);
-                pref.height = Math.min(pref.height, maxHeight);
-                return pref;
-            }
-        };
+        final ComponentDialogBase<RadioSelection<BugSeverity>> severityRadios = ComponentDialogBase.<BugSeverity>radios("Severity")
+                .option(BugSeverity.BLOCKER.getName(), BugSeverity.BLOCKER)
+                .option(BugSeverity.MAJOR.getName(), BugSeverity.MAJOR)
+                .option(BugSeverity.MINOR.getName(), BugSeverity.MINOR)
+                .option(BugSeverity.ENHANCEMENT.getName(), BugSeverity.ENHANCEMENT)
+                .select(severityOf(runItem))
+                .build();
+        severity = severityRadios.getComponent();
 
-        mainPanel.setBorder(JBUI.Borders.empty());
-        DialogStyle.styleContent(mainPanel);
-        mainPanel.setFocusCycleRoot(true);
-        mainPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
+        final ComponentDialogBase<RadioSelection<BugPriority>> priorityRadios = ComponentDialogBase.<BugPriority>radios("Priority")
+                .option(BugPriority.HIGH.getName(), BugPriority.HIGH)
+                .option(BugPriority.MEDIUM.getName(), BugPriority.MEDIUM)
+                .option(BugPriority.LOW.getName(), BugPriority.LOW)
+                .select(priorityOf(runItem))
+                .build();
+        priority = priorityRadios.getComponent();
 
-        JBPanel<?> contentPanel = new JBPanel<>();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        contentPanel.setBorder(JBUI.Borders.empty(12));
+        final ComponentDialogBase<TextArea> errorCaptureArea = ComponentDialogBase.textArea()
+                .placeholder("paste error or exception or screenshot..")
+                .value(runItem.getStacktrace())
+                .rows(5)
+                .build();
+        errorCapture = errorCaptureArea.getComponent();
 
-        // Actual Result section
-        JBPanel<?> actualSlot = new JBPanel<>(new BorderLayout());
-        actualSlot.setOpaque(false);
-        actualResultSection.showSection(actualSlot);
-        contentPanel.add(actualSlot);
+        title = "Failed Test Case Details";
 
-        // Bug Severity section
-        JBPanel<?> severitySlot = new JBPanel<>(new BorderLayout());
-        severitySlot.setOpaque(false);
-        bugSeveritySection.showSection(severitySlot);
-        contentPanel.add(severitySlot);
+        components = List.of(
+                ComponentDialogBase.details()
+                        .row("Description", tc != null ? tc.getDescription() : null)
+                        .row("Expected", tc != null ? tc.getExpectedResult() : null)
+                        .build(),
+                actualResultField,
+                severityRadios,
+                priorityRadios,
+                errorCaptureArea);
 
-        // Bug Priority section
-        JBPanel<?> prioritySlot = new JBPanel<>(new BorderLayout());
-        prioritySlot.setOpaque(false);
-        bugPrioritySection.showSection(prioritySlot);
-        contentPanel.add(prioritySlot);
-
-        JBPanel<?> anchorPanel = new JBPanel<>(new BorderLayout());
-        anchorPanel.setOpaque(false);
-        anchorPanel.add(contentPanel, BorderLayout.NORTH);
-
-        JBScrollPane scrollPane = new JBScrollPane(anchorPanel);
-        scrollPane.setBorder(JBUI.Borders.empty());
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
-
-        popup = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(mainPanel, actualResultSection.getFocusComponent())
-                .setTitle("Failed Test Case Details")
-                .setRequestFocus(true)
-                .setCancelOnWindowDeactivation(false)
-                .setCancelOnClickOutside(false)
-                .setMovable(false)
-                .setResizable(false)
-                .addListener(new JBPopupListener() {
-                    @Override
-                    public void onClosed(@NotNull LightweightWindowEvent event) {
-                        // Save only on OK. Without this check, Escape/cancel also committed
-                        // the edit, and the Enter shortcut saved twice.
-                        if (event.isOk()) {
-                            applyChanges();
-                            onSave.run();
-                        }
-                    }
-                })
-                .createPopup();
-
-        registerEnterShortcut(mainPanel);
+        shortcuts = List.of(
+                StatusBarShortcut.build(Shortcuts.Enter, "Save", this::submit),
+                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
     }
 
-    private void applyChanges() {
-        actualResultSection.applyTo(runItem);
-        bugPrioritySection.applyTo(runItem);
-        bugSeveritySection.applyTo(runItem);
+    /** EMPTY is a persistence default, not a choice — Enhancement by default. */
+    private static @NotNull BugSeverity severityOf(final @NotNull TestRunItems runItem) {
+        final @Nullable BugSeverity stored = runItem.getBugSeverity();
+        return stored == null || stored == BugSeverity.EMPTY ? BugSeverity.ENHANCEMENT : stored;
     }
 
-    private void registerEnterShortcut(final JComponent component) {
-        DumbAwareAction saveAction = new DumbAwareAction() {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                // closeOk fires onClosed with isOk() == true, which applies and saves once.
-                if (popup != null) {
-                    popup.closeOk(null);
-                }
-            }
-
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.EDT;
-            }
-        };
-        saveAction.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), component);
+    /** EMPTY is a persistence default, not a choice — Low by default. */
+    private static @NotNull BugPriority priorityOf(final @NotNull TestRunItems runItem) {
+        final @Nullable BugPriority stored = runItem.getBugPriority();
+        return stored == null || stored == BugPriority.EMPTY ? BugPriority.LOW : stored;
     }
 
-    public void show() {
-        if (popup != null) {
-            popup.showCenteredInCurrentWindow(p);
-        }
+    @Override
+    protected void submit() {
+        // Applied only on save - Escape must never commit the edit.
+        runItem.setActualResult(actualResult.getText().trim());
+        runItem.setBugSeverity(severity.getSelected());
+        runItem.setBugPriority(priority.getSelected());
+        runItem.setStacktrace(errorCapture.getText().trim());
+
+        onSave.run();
+        closeOk();
     }
 }

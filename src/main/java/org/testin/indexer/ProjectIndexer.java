@@ -6,7 +6,10 @@ import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
+import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
@@ -18,6 +21,8 @@ import org.testin.mappers.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
+import org.testin.util.FilesUtil;
+import org.testin.util.Mapper;
 import org.testin.util.TreeUtilImpl;
 
 import java.io.IOException;
@@ -25,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -274,6 +280,62 @@ public final class ProjectIndexer {
         store.updateSequence(testSetPath, sortedList);
     }
 
+    /**
+     * All run-status disk writes go through this one sequential executor,
+     * so writes can never interleave or race each other.
+     */
+    private final ExecutorService runWriter =
+            AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
+
+    /**
+     * Single-writer persistence for run results: the JSON snapshot is taken on
+     * the calling (EDT) thread — so it can never observe a half-applied
+     * mutation — and the sequential writer performs only the disk I/O, in
+     * submission order.
+     */
+    public void persistRun(final @NotNull Path runPath, final @NotNull TestRunDto tr) {
+        final byte[] snapshot;
+        try {
+            snapshot = Services.getInstance(p, Mapper.class).writeValueAsBytes(tr);
+        } catch (final Exception ex) {
+            Logger.error("Failed to snapshot test run data: " + ex.getMessage());
+            return;
+        }
+
+        runWriter.execute(() -> {
+            try {
+                registerTestRun(runPath, tr);
+                Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(runPath.getFileName() + ".json"), snapshot);
+                Logger.trace("Run results persisted for " + runPath.getFileName());
+            } catch (final Exception ex) {
+                Logger.error("Failed to persist test run data: " + ex.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Same single-writer discipline for the run marker: snapshot on the
+     * calling thread, sequential disk write.
+     */
+    public void persistRunMarker(final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
+        final byte[] snapshot;
+        try {
+            snapshot = Services.getInstance(p, Mapper.class).writeValueAsBytes(marker);
+        } catch (final Exception ex) {
+            Logger.error("Failed to snapshot run marker: " + ex.getMessage());
+            return;
+        }
+
+        runWriter.execute(() -> {
+            try {
+                Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), snapshot);
+                Logger.trace("Marker persisted -> " + marker.getStatus().getLabel());
+            } catch (final Exception ex) {
+                Logger.error("Failed to persist marker: " + ex.getMessage());
+            }
+        });
+    }
+
     public void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {
         store.putTestRun(testRunPath, tr);
     }
@@ -414,6 +476,14 @@ public final class ProjectIndexer {
      */
     public boolean nodeExists(final @NotNull Path path) {
         return store.findByPath(path) != null;
+    }
+
+    /**
+     * Asynchronous VFS refresh of a directory — file access stays inside the indexer.
+     */
+    public void refreshDirectory(final @NotNull Path path) {
+        final VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
+        if (vf != null) vf.refresh(true, true);
     }
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {

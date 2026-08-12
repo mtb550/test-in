@@ -1,6 +1,7 @@
 package org.testin.ui.framework;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +45,13 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
      * triggers it.
      */
     protected List<StatusBarShortcut> shortcuts;
+
+    /**
+     * Optional: a fixed size for large working dialogs. Setting it also makes
+     * the popup resizable and movable.
+     */
+    protected Dimension preferredSize;
+
     private DialogDto dto;
     private List<IDialogComponent> built;
     private JBPopup popup;
@@ -62,11 +70,12 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
     // ------------------------------------------------------------------
 
     /**
-     * The first declared component, typed.
+     * The dialog's primary component, typed: the first declared component
+     * that wants the focus (display-only components never qualify).
      */
     @SuppressWarnings("unchecked")
     protected final @NotNull C component() {
-        return (C) builtComponents().getFirst();
+        return (C) primaryComponent();
     }
 
     public final void show() {
@@ -74,9 +83,16 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         // so its declaration (and its this:: references) is safe to use.
         if (popup == null) {
             final JBPanel<?> contentPanel = buildContentPanel();
-            bindShortcutKeys();
+            bindShortcutKeys(contentPanel);
             bindSubmitGesture();
-            popup = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title(), null).createPopup();
+
+            final ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title(), null);
+            if (preferredSize != null) {
+                contentPanel.setPreferredSize(preferredSize);
+                builder.setResizable(true).setMovable(true);
+            }
+
+            popup = builder.createPopup();
         } else if (popup.isDisposed()) {
             // A JBPopup cannot be reopened after it closes.
             throw new IllegalStateException("This dialog was already shown and closed - create a new instance");
@@ -134,19 +150,39 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         return built;
     }
 
+    private @NotNull IDialogComponent primaryComponent() {
+        for (final IDialogComponent dialogComponent : builtComponents()) {
+            if (dialogComponent.wantsFocus()) return dialogComponent;
+        }
+        return builtComponents().getFirst();
+    }
+
     private @NotNull JComponent focusComponent() {
-        return builtComponents().getFirst().getFocusComponent();
+        return primaryComponent().getFocusComponent();
     }
 
     /**
      * Content = declared components stacked top to bottom + the status bar.
+     * The component claiming {@link IDialogComponent#fillsSpace()} takes the
+     * remaining space; the ones above sit on top, the ones below (e.g. a
+     * button row) at the bottom. When none claims it, the last one fills.
      */
     private @NotNull JBPanel<?> buildContentPanel() {
-        final JBPanel<?> stack = new JBPanel<>();
-        stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
+        final List<IDialogComponent> all = builtComponents();
+
+        int fillIndex = all.size() - 1;
+        for (int i = 0; i < all.size(); i++) {
+            if (all.get(i).fillsSpace()) fillIndex = i;
+        }
+
+        final JBPanel<?> stack = new JBPanel<>(new BorderLayout());
         stack.setOpaque(false);
-        for (final IDialogComponent dialogComponent : builtComponents()) {
-            stack.add(dialogComponent.getPanel());
+        if (fillIndex > 0) {
+            stack.add(verticalStack(all.subList(0, fillIndex)), BorderLayout.NORTH);
+        }
+        stack.add(all.get(fillIndex).getPanel(), BorderLayout.CENTER);
+        if (fillIndex < all.size() - 1) {
+            stack.add(verticalStack(all.subList(fillIndex + 1, all.size())), BorderLayout.SOUTH);
         }
 
         final DialogStatusBar statusBar = new DialogStatusBar();
@@ -156,15 +192,34 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         contentPanel.setBorder(BorderFactory.createEmptyBorder());
         contentPanel.add(stack, BorderLayout.CENTER);
         contentPanel.add(statusBar.getPanel(), BorderLayout.SOUTH);
+
+        // A popup is not a focus cycle root on its own (a DialogWrapper's root
+        // pane was) - without this, Tab wanders instead of cycling through
+        // the dialog's fields in layout order.
+        contentPanel.setFocusCycleRoot(true);
+        contentPanel.setFocusTraversalPolicy(new LayoutFocusTraversalPolicy());
+
         return contentPanel;
     }
 
+    private static @NotNull JBPanel<?> verticalStack(final @NotNull List<IDialogComponent> dialogComponents) {
+        final JBPanel<?> stack = new JBPanel<>();
+        stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
+        stack.setOpaque(false);
+        for (final IDialogComponent dialogComponent : dialogComponents) {
+            stack.add(dialogComponent.getPanel());
+        }
+        return stack;
+    }
+
     /**
-     * Binds every bindable entry's key on the focus component.
+     * Binds every bindable entry's key twice: on each component's focus
+     * component (exact pre-multi-component semantics, overriding any inert
+     * default binding the field may carry) and on the content panel for
+     * whenever the focus is elsewhere inside the dialog.
      */
-    private void bindShortcutKeys() {
+    private void bindShortcutKeys(final @NotNull JBPanel<?> contentPanel) {
         final List<StatusBarShortcut> declared = dto().shortcuts();
-        final JComponent focusComponent = focusComponent();
         final Set<KeyStroke> bound = new HashSet<>();
 
         for (int i = 0; i < declared.size(); i++) {
@@ -181,24 +236,32 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
             }
 
             final String actionKey = "testin.framework.shortcut." + i;
-            focusComponent.getInputMap(JComponent.WHEN_FOCUSED).put(key, actionKey);
-            focusComponent.getActionMap().put(actionKey, new AbstractAction() {
-                @Override
-                public void actionPerformed(final ActionEvent event) {
-                    action.run();
-                }
-            });
+            installKey(contentPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, key, actionKey, action);
+            for (final IDialogComponent dialogComponent : builtComponents()) {
+                if (!dialogComponent.acceptsDialogKeys()) continue;
+                installKey(dialogComponent.getFocusComponent(), JComponent.WHEN_FOCUSED, key, actionKey, action);
+            }
         }
     }
 
+    private static void installKey(final @NotNull JComponent component, final int condition,
+                                   final @NotNull KeyStroke key, final @NotNull String actionKey, final @NotNull Runnable action) {
+        component.getInputMap(condition).put(key, actionKey);
+        component.getActionMap().put(actionKey, new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                action.run();
+            }
+        });
+    }
+
     /**
-     * Every component's own submit gesture triggers the primary action.
+     * Every component's own submit gesture (a click on a selection, an OK
+     * button) triggers the dialog's submit action.
      */
     private void bindSubmitGesture() {
-        dto().shortcuts().stream()
-                .filter(StatusBarShortcut::isBindable)
-                .findFirst()
-                .ifPresent(primary -> builtComponents()
-                        .forEach(dialogComponent -> dialogComponent.onSubmitRequest(Objects.requireNonNull(primary.action()))));
+        for (final IDialogComponent dialogComponent : builtComponents()) {
+            dialogComponent.onSubmitRequest(this::submit);
+        }
     }
 }

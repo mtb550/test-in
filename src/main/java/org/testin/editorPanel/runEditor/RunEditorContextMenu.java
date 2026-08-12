@@ -17,7 +17,6 @@ import org.testin.navigate.NavigateToCodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.run.RunTestCaseAction;
 import org.testin.run.StartExecutionAction;
-import org.testin.testRun.SetActualResultAction;
 import org.testin.testRun.SetTestCaseStatusAction;
 import org.testin.testRun.UpdateRunItemAction;
 import org.testin.viewPanel.CloseTestCaseDetailsAction;
@@ -39,7 +38,6 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
             if (status.isUserSettable()) add(new SetTestCaseStatusAction(p, ui, list, status));
         }
         addSeparator();
-        add(new SetActualResultAction(p, ui, list));
         add(new UpdateRunItemAction(p, ui, list));
         addSeparator();
         add(new ViewDetailsAction(p, list, dir.getPath2()));

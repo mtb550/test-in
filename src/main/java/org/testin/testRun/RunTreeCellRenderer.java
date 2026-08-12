@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class RunTreeCellRendererImpl {
+public final class RunTreeCellRenderer {
 
     public static CheckboxTree.CheckboxTreeCellRenderer create(final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
         return new CheckboxTree.CheckboxTreeCellRenderer() {

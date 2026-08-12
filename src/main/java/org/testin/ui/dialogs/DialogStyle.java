@@ -59,7 +59,8 @@ public final class DialogStyle {
                 .setTitle(title)
                 .setRequestFocus(true)
                 .setCancelOnWindowDeactivation(false)
-                .setCancelOnClickOutside(true)
+                // A click outside never dismisses a dialog - Escape cancels.
+                .setCancelOnClickOutside(false)
                 .setMovable(false)
                 .setResizable(false)
                 .setMinSize(new Dimension(JBUI.scale(350), 0));

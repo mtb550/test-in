@@ -31,7 +31,6 @@ public enum Shortcuts {
     // Card actions (context menu + hover icons)
     RunTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0)),
     NavigateToCode(KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK)),
-    SetActualResult(KeyStroke.getKeyStroke(KeyEvent.VK_A, InputEvent.CTRL_DOWN_MASK)),
 
     // Page navigation (status bar tooltips + page actions)
     NextTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_DOWN_MASK)),
@@ -65,10 +64,6 @@ public enum Shortcuts {
     UpdateTestCaseSteps(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)),
     UpdateTestCasePriority(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
     UpdateTestCaseGroup(KeyStroke.getKeyStroke(KeyEvent.VK_G, 0)),
-
-    // Run item update-menu fields
-    BugSeverity(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK)),
-    BugPriority(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
 
     // Priority selection (bug priority, test case priority, fields enums)
     PriorityEmpty(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)),

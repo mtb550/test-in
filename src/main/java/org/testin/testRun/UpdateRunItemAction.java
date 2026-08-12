@@ -9,15 +9,15 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
+import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.testRun.updateDialog.RunItemUpdateMenuDialog;
+import org.testin.testRun.createDialog.FailedResultDialog;
 import org.testin.util.Shortcuts;
 
-import java.nio.file.Path;
 
 public class UpdateRunItemAction extends DumbAwareAction {
 
@@ -26,7 +26,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
     private final @NotNull JBList<TestCaseDto> list;
 
     public UpdateRunItemAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super("Update Test Run Item", "Update test run item attributes", AllIcons.Actions.Edit);
+        super("Failed Test Case Details", "Edit the failure details of the failed test case", AllIcons.Actions.Edit);
         this.p = p;
         this.editor = editor;
         this.list = list;
@@ -46,12 +46,11 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
         Logger.trace("update test run item for: " + selected.getDescription());
 
-        new RunItemUpdateMenuDialog(p, runItem, updatedItem -> {
-            Logger.trace("run item updated, actual result: " + updatedItem.getActualResult());
-
+        // The same details dialog that opens automatically on a Failed status;
+        // F2 edits without touching the status.
+        new FailedResultDialog(p, runItem, () -> {
             if (runEditor.getParent() != null) {
-                Path dirPath = runEditor.getParent().getPath();
-                Services.getInstance(p, ProjectIndexer.class).putTestRun(dirPath, runEditor.getTr());
+                Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), runEditor.getTr());
             }
 
             list.repaint();
@@ -60,11 +59,20 @@ public class UpdateRunItemAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(!list.isEmpty() && !list.getSelectedValuesList().isEmpty());
+        // Details belong to failed test cases only - the dialog's title stays
+        // truthful and the action reads as what it is.
+        boolean enabled = false;
+        final TestCaseDto selected = list.getSelectedValue();
+        if (selected != null && list.getSelectedValuesList().size() == 1 && editor instanceof RunEditor runEditor) {
+            final TestRunItems item = runEditor.getResultsMap().get(selected.getId());
+            enabled = item != null && item.getStatus() == TestStatus.FAILED;
+        }
+        e.getPresentation().setEnabled(enabled);
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        return ActionUpdateThread.BGT;
+        // update() reads Swing selection and editor state - EDT only.
+        return ActionUpdateThread.EDT;
     }
 }

@@ -1,51 +1,42 @@
 package org.testin.testRun;
 
 import com.intellij.openapi.ui.ComboBox;
-import com.intellij.ui.CheckboxTree;
-import com.intellij.ui.CheckboxTreeBase;
-import com.intellij.ui.CheckedTreeNode;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
-import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestRunConfiguration;
-import org.testin.mappers.TestRunItems;
+import org.testin.ui.framework.IDialogComponent;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.UUID;
 
+/**
+ * The run-configuration part of the create-run dialog: the (fixed) run name,
+ * change log, commit id, and one editable combo per configured field —
+ * collapsible, as before. A framework dialog component; the selection tree is
+ * a separate component.
+ */
 @Getter
-public class CreateTestRunDialog {
+public class RunConfigurationForm implements IDialogComponent {
 
-    private final JBPanel<?> mainPanel;
-    private final CheckboxTree tree;
-
+    private final JBPanel<?> wrapper;
     private final JBTextField changeLog;
     private final JBTextField commitIdField;
     private final Map<TestRunConfiguration, JComponent> fieldMap = new EnumMap<>(TestRunConfiguration.class);
 
-    public CreateTestRunDialog(final @NotNull String runName, final CheckedTreeNode root, final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
-        mainPanel = new JBPanel<>(new BorderLayout());
+    public RunConfigurationForm(final @NotNull String runName) {
         changeLog = new JBTextField();
         commitIdField = new JBTextField();
 
-        final JBPanel<?> configurationPanel = buildConfigurationPanel(runName);
-        mainPanel.add(CollapsiblePanelImpl.build("Configuration details", configurationPanel, false), BorderLayout.NORTH);
-
-        tree = new CheckboxTree(RunTreeCellRendererImpl.create(resultsMap), root, new CheckboxTreeBase.CheckPolicy(true, true, true, true));
-        TreeUtil.expandAll(tree);
-
-        mainPanel.add(new JBScrollPane(tree), BorderLayout.CENTER);
-
-        mainPanel.setPreferredSize(new Dimension(JBUI.scale(900), JBUI.scale(600)));
+        wrapper = new JBPanel<>(new BorderLayout());
+        wrapper.setOpaque(false);
+        wrapper.add(CollapsiblePanel.build("Configuration details", buildConfigurationPanel(runName), false), BorderLayout.CENTER);
     }
 
     private JBPanel<?> buildConfigurationPanel(final @NotNull String runName) {
@@ -111,5 +102,20 @@ public class CreateTestRunDialog {
             return selected != null ? selected.toString().trim() : "";
         }
         return "";
+    }
+
+    @Override
+    public @NotNull JComponent getPanel() {
+        return wrapper;
+    }
+
+    @Override
+    public @NotNull JComponent getFocusComponent() {
+        return changeLog;
+    }
+
+    @Override
+    public void onSubmitRequest(final @NotNull Runnable submit) {
+        // Form fields have no submit gesture of their own; the declared keys confirm.
     }
 }

@@ -4,7 +4,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
-import com.intellij.util.concurrency.AppExecutorUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
-import org.testin.enums.DirectoryType;
 import org.testin.enums.TestRunStatus;
 import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
@@ -23,26 +21,16 @@ import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
 import org.testin.settings.AppSettingsState;
-import org.testin.util.FilesUtil;
-import org.testin.util.Mapper;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
-
-    /**
-     * All run-status disk writes go through this one sequential executor,
-     * so writes can never interleave or race each other.
-     */
-    private final ExecutorService persistExecutor =
-            AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
 
     public void executeNext(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
@@ -129,38 +117,21 @@ public final class RunStatusService {
     }
 
     /**
-     * Single-writer persistence for run results: the JSON snapshot is taken on the
-     * calling (EDT) thread — so it can never observe a half-applied mutation — and
-     * the sequential writer performs only the disk I/O, in submission order.
+     * Persistence goes through the indexer — the single owner of file access
+     * (see CLAUDE.md). The indexer snapshots on this thread and writes through
+     * its sequential run writer.
      */
     public void persistRun(final @NotNull Project p, final @NotNull RunEditor editor) {
         final TestRunDto tr = editor.getTr();
         if (tr == null || editor.getParent() == null) return;
 
-        final Path runPath = editor.getParent().getPath();
-        final byte[] snapshot;
-        try {
-            snapshot = Services.getInstance(p, Mapper.class).writeValueAsBytes(tr);
-        } catch (final Exception ex) {
-            Logger.error("Failed to snapshot test run data: " + ex.getMessage());
-            return;
-        }
-
-        persistExecutor.execute(() -> {
-            try {
-                Services.getInstance(p, ProjectIndexer.class).registerTestRun(runPath, tr);
-                Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(runPath.getFileName() + ".json"), snapshot);
-                Logger.trace("Run results persisted for " + runPath.getFileName());
-            } catch (final Exception ex) {
-                Logger.error("Failed to persist test run data: " + ex.getMessage());
-            }
-        });
+        Services.getInstance(p, ProjectIndexer.class).persistRun(editor.getParent().getPath(), tr);
     }
 
     /**
-     * Single source of truth for the run marker: always updates the indexer-owned
-     * directory DTO (callers may hold another instance of the same run), snapshots
-     * it on the calling thread, and writes through the sequential writer.
+     * Single source of truth for the run marker: always updates the
+     * indexer-owned directory DTO (callers may hold another instance of the
+     * same run), then persists through the indexer.
      */
     public void persistMarker(final @NotNull Project p, final @NotNull Path runPath,
                               final @NotNull TestRunStatus status, final @Nullable ZonedDateTime statusChangedAt) {
@@ -174,22 +145,7 @@ public final class RunStatusService {
         marker.setStatus(status);
         if (statusChangedAt != null) marker.setCreatedAt(statusChangedAt);
 
-        final byte[] snapshot;
-        try {
-            snapshot = Services.getInstance(p, Mapper.class).writeValueAsBytes(marker);
-        } catch (final Exception ex) {
-            Logger.error("Failed to snapshot run marker: " + ex.getMessage());
-            return;
-        }
-
-        persistExecutor.execute(() -> {
-            try {
-                Services.getInstance(p, FilesUtil.class).write(p, runPath.resolve(DirectoryType.TR.getMarker()), snapshot);
-                Logger.trace("Marker persisted -> " + status.getLabel());
-            } catch (final Exception ex) {
-                Logger.error("Failed to persist marker: " + ex.getMessage());
-            }
-        });
+        Services.getInstance(p, ProjectIndexer.class).persistRunMarker(runPath, marker);
     }
 
     private void triggerFilterRefresh(final @NotNull IEditor editor, final JBList<TestCaseDto> list) {

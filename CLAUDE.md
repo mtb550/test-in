@@ -17,6 +17,12 @@ is a fast in-memory lookup.
 
 **Exempt packages** (may access files directly): `git`, `importExport`, `logger`.
 
+In particular: **test runs are saved and read only through the indexer**
+(`putTestRun`, `persistRun`, `persistRunMarker`, `addTestRunDir`,
+`updateRunMarker`, run lookups). The sequential run writer lives inside the
+indexer. Known debt tracked in issue #49: `DirectoryMapper` reads markers
+from disk itself.
+
 ### Ordering inside the indexer
 
 The cache update (which may persist markers — and marker writes create

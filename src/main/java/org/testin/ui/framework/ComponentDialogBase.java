@@ -55,6 +55,37 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
     }
 
     /**
+     * Wraps an application-specific component that implements
+     * {@link IDialogComponent} (e.g. a form built by its own class).
+     */
+    public static <C extends IDialogComponent> @NotNull ComponentDialogBase<C> of(final @NotNull C component) {
+        return new ComponentDialogBase<>(component);
+    }
+
+    /**
+     * A confirm button row — clicking it submits the dialog. For working
+     * dialogs where a visible OK button reads better than an Enter hint.
+     */
+    public static @NotNull ComponentDialogBase<DialogButton> button(final @NotNull String text) {
+        return new ComponentDialogBase<>(new DialogButton(text));
+    }
+
+    /** Read-only context rows — muted caption + value, display only. */
+    public static @NotNull DetailsBuilder details() {
+        return new DetailsBuilder();
+    }
+
+    /** A multi-line text area — e.g. a pasted error or exception. */
+    public static @NotNull TextAreaBuilder textArea() {
+        return new TextAreaBuilder();
+    }
+
+    /** A captioned radio row — one radio per option, one always selected. */
+    public static <T> @NotNull RadioBuilder<T> radios(final @NotNull String caption) {
+        return new RadioBuilder<>(caption);
+    }
+
+    /**
      * Framework default: every declared icon renders desaturated, so the
      * color accents of tree icons (e.g. badge dots) never distract inside
      * a dialog. Dialogs pass their icons plain.
@@ -65,6 +96,97 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
 
     public @NotNull C getComponent() {
         return component;
+    }
+
+    /**
+     * Fluent builder for {@link DialogDetails}.
+     */
+    public static final class DetailsBuilder {
+
+        private final @NotNull List<DialogDetails.Row> rows = new ArrayList<>();
+
+        private DetailsBuilder() {
+        }
+
+        /** One caption/value row; a null or blank value skips the row. */
+        public @NotNull DetailsBuilder row(final @NotNull String caption, final @Nullable String value) {
+            if (value != null && !value.isBlank()) {
+                rows.add(new DialogDetails.Row(caption, value));
+            }
+            return this;
+        }
+
+        public @NotNull ComponentDialogBase<DialogDetails> build() {
+            return new ComponentDialogBase<>(new DialogDetails(List.copyOf(rows)));
+        }
+    }
+
+    /**
+     * Fluent builder for {@link RadioSelection}.
+     */
+    public static final class RadioBuilder<T> {
+
+        private final @NotNull String caption;
+        private final @NotNull List<RadioSelection.Option<T>> options = new ArrayList<>();
+        private @Nullable T selected;
+
+        private RadioBuilder(final @NotNull String caption) {
+            this.caption = caption;
+        }
+
+        public @NotNull RadioBuilder<T> option(final @NotNull String name, final @NotNull T value) {
+            options.add(new RadioSelection.Option<>(name, value));
+            return this;
+        }
+
+        /** The initially selected value — must be one of the options. */
+        public @NotNull RadioBuilder<T> select(final @NotNull T value) {
+            this.selected = value;
+            return this;
+        }
+
+        public @NotNull ComponentDialogBase<RadioSelection<T>> build() {
+            if (options.isEmpty()) {
+                throw new IllegalStateException("radios needs at least one .option(...)");
+            }
+            if (selected == null || options.stream().noneMatch(option -> option.value().equals(selected))) {
+                throw new IllegalStateException("radios needs .select(...) with one of the declared options");
+            }
+            return new ComponentDialogBase<>(new RadioSelection<>(caption, List.copyOf(options), selected));
+        }
+    }
+
+    /**
+     * Fluent builder for {@link TextArea}.
+     */
+    public static final class TextAreaBuilder {
+
+        private @Nullable String placeholder;
+        private @Nullable String value;
+        private int rows = 5;
+
+        private TextAreaBuilder() {
+        }
+
+        public @NotNull TextAreaBuilder placeholder(final @Nullable String placeholder) {
+            this.placeholder = placeholder;
+            return this;
+        }
+
+        public @NotNull TextAreaBuilder value(final @Nullable String value) {
+            this.value = value;
+            return this;
+        }
+
+        /** Preferred visible rows; the area still grows with the dialog. */
+        public @NotNull TextAreaBuilder rows(final int rows) {
+            this.rows = rows;
+            return this;
+        }
+
+        public @NotNull ComponentDialogBase<TextArea> build() {
+            return new ComponentDialogBase<>(new TextArea(placeholder, value, rows));
+        }
     }
 
     /**

@@ -123,6 +123,53 @@ public class FrameworkComponentsTest {
     }
 
     @Test
+    public void radioSelectionStartsOnTheDeclaredDefault() {
+        final RadioSelection<String> radios = ComponentDialogBase.<String>radios("Severity")
+                .option("Major", "MAJOR")
+                .option("Minor", "MINOR")
+                .select("MINOR")
+                .build()
+                .getComponent();
+
+        assertEquals(radios.getSelected(), "MINOR");
+    }
+
+    @Test
+    public void radiosRejectEmptyOptionsAndForeignSelection() {
+        org.testng.Assert.expectThrows(IllegalStateException.class, () ->
+                ComponentDialogBase.<String>radios("x").build());
+
+        org.testng.Assert.expectThrows(IllegalStateException.class, () ->
+                ComponentDialogBase.<String>radios("x").option("A", "A").select("B").build());
+    }
+
+    @Test
+    public void textAreaKeepsValueAndClaimsTheSpace() {
+        final TextArea area = ComponentDialogBase.textArea()
+                .placeholder("paste error or exception or screenshot..")
+                .value("java.lang.RuntimeException")
+                .build()
+                .getComponent();
+
+        assertEquals(area.getText(), "java.lang.RuntimeException");
+        assertTrue(area.fillsSpace(), "the area must claim the dialog's remaining space");
+        assertTrue(!area.acceptsDialogKeys(), "Enter must stay a newline inside the area");
+    }
+
+    @Test
+    public void detailsSkipBlankRowsAndNeverWantFocus() {
+        final DialogDetails details = ComponentDialogBase.details()
+                .row("Description", "shown")
+                .row("Expected", "")
+                .row("Skipped", null)
+                .build()
+                .getComponent();
+
+        assertEquals(((java.awt.Container) details.getPanel()).getComponentCount(), 1, "blank rows are skipped");
+        assertTrue(!details.wantsFocus(), "context rows never take the focus");
+    }
+
+    @Test
     public void builtStatusBarEntryRendersTheKeymapText() {
         final StatusBarShortcut entry = StatusBarShortcut.build(org.testin.util.Shortcuts.Enter, "Confirm", () -> {
         });

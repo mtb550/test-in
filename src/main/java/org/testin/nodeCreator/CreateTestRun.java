@@ -2,9 +2,6 @@ package org.testin.nodeCreator;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CheckedTreeNode;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,11 +17,14 @@ import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
-import org.testin.testRun.CreateTestRunDialog;
-import org.testin.ui.dialogs.FramelessDialogWrapper;
+import org.testin.testRun.RunConfigurationDialog;
+import org.testin.testRun.RunConfigurationForm;
+import org.testin.testRun.RunTreeCellRenderer;
+import org.testin.ui.framework.SelectionTree;
 import org.testin.util.EditorUtil;
 
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -59,28 +59,20 @@ public class CreateTestRun implements NodeCreator {
 
             ApplicationManager.getApplication().invokeLater(() -> {
 
-                final CreateTestRunDialog form = new CreateTestRunDialog(name, root, Collections.emptyMap());
+                final RunConfigurationForm form = new RunConfigurationForm(name);
+                final SelectionTree selection = new SelectionTree(root, RunTreeCellRenderer.create(Collections.emptyMap()));
 
-                FramelessDialogWrapper dialog = new FramelessDialogWrapper(p, true) {
-                    {
-                        setTitle("Create Test Run");
-                        initFrameless();
+                new RunConfigurationDialog(p, form, selection, () -> {
+                    // The popup is not modal - the tree stays live while the
+                    // dialog is open, so the parent may have been removed.
+                    if (!Services.getInstance(p, ProjectIndexer.class).nodeExists(parentDir.getPath())) {
+                        Services.getInstance(p, Notifier.class).softShow(p, "'" + parentDir.getName() + "' no longer exists - test run not created");
+                        return;
                     }
 
-                    @Override
-                    protected javax.swing.JComponent createCenterPanel() {
-                        return form.getMainPanel();
-                    }
-
-                    @Override
-                    protected void doOKAction() {
-                        close(DialogWrapper.OK_EXIT_CODE);
-                        final TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
-                        saveSelectedToJSON(form, root, newDirPath, Services.getInstance(p, ProjectPanel.class), tr);
-                    }
-                };
-
-                dialog.show();
+                    final TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
+                    saveSelectedToJSON(form, selection, newDirPath, Services.getInstance(p, ProjectPanel.class), tr);
+                }).show();
             });
         });
 
@@ -116,21 +108,7 @@ public class CreateTestRun implements NodeCreator {
         return node;
     }
 
-    private void collectCheckedItems(final CheckedTreeNode node, final List<TestRunItems> items) {
-        if (node.getUserObject() instanceof TestCaseDto tc && node.isChecked()) {
-            final TestRunItems item = new TestRunItems();
-            item.setId(tc.getId());
-            item.setStatus(TestStatus.PENDING);
-
-            items.add(item);
-        }
-        for (int i = 0; i < node.getChildCount(); i++) {
-            collectCheckedItems((CheckedTreeNode) node.getChildAt(i), items);
-        }
-    }
-
-
-    private void saveSelectedToJSON(final CreateTestRunDialog form, final CheckedTreeNode root, final Path savePath, final ProjectPanel pp, final TestRunDirectoryDto trDir) {
+    private void saveSelectedToJSON(final RunConfigurationForm form, final SelectionTree selection, final Path savePath, final ProjectPanel pp, final TestRunDirectoryDto trDir) {
         final TestRunDto tr = new TestRunDto()
                 .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
                 .setChangeLog(form.getChangeLog().getText().trim())
@@ -143,7 +121,14 @@ public class CreateTestRun implements NodeCreator {
                 .setDeviceType(form.getFieldValue(TestRunConfiguration.DEVICE_TYPE));
 
         final List<TestRunItems> items = new ArrayList<>();
-        collectCheckedItems(root, items);
+        selection.forEachChecked(checked -> {
+            if (checked instanceof TestCaseDto tc) {
+                final TestRunItems item = new TestRunItems();
+                item.setId(tc.getId());
+                item.setStatus(TestStatus.PENDING);
+                items.add(item);
+            }
+        });
         tr.setResults(items);
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -157,9 +142,8 @@ public class CreateTestRun implements NodeCreator {
             Services.getInstance(p, ProjectIndexer.class).addTestRunDir(trDir);
             Services.getInstance(p, ProjectIndexer.class).updateRunMarker(p, savePath, marker);
 
-            VirtualFile virtualDir = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(savePath.toFile());
-            if (virtualDir != null)
-                virtualDir.refresh(false, true);
+            // File access is the indexer's alone (see CLAUDE.md).
+            Services.getInstance(p, ProjectIndexer.class).refreshDirectory(savePath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 pp.getProjectTree().refresh();
