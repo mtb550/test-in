@@ -56,7 +56,12 @@ public final class ProjectIndexer {
     private final @NotNull AtomicBoolean indexed = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean indexing = new AtomicBoolean(false);
     private final @NotNull AtomicBoolean restoreEditorsOnComplete = new AtomicBoolean(true);
-
+    /**
+     * All run-status disk writes go through this one sequential executor,
+     * so writes can never interleave or race each other.
+     */
+    private final ExecutorService runWriter =
+            AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
     private volatile @NotNull CountDownLatch indexingLatch = new CountDownLatch(1);
 
     public ProjectIndexer(final @NotNull Project p) {
@@ -254,7 +259,6 @@ public final class ProjectIndexer {
         return store.getTestProjectsByPath();
     }
 
-
     public boolean rootExists() {
         final Path root = Services.getInstance(p, Setting.class).getTestinPath();
         return Files.isDirectory(root);
@@ -279,13 +283,6 @@ public final class ProjectIndexer {
     public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList) {
         store.updateSequence(testSetPath, sortedList);
     }
-
-    /**
-     * All run-status disk writes go through this one sequential executor,
-     * so writes can never interleave or race each other.
-     */
-    private final ExecutorService runWriter =
-            AppExecutorUtil.createBoundedApplicationPoolExecutor("Testin Run Status Writer", 1);
 
     /**
      * Single-writer persistence for run results: the JSON snapshot is taken on

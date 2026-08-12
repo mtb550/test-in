@@ -30,17 +30,23 @@ public final class SelectionTree implements IDialogComponent {
         panel = new JBScrollPane(tree);
     }
 
-    /** Visits every checked leaf's user object, depth first. */
+    /**
+     * Visits every checked leaf's user object, depth first.
+     */
     public void forEachChecked(final @NotNull Consumer<Object> visitor) {
         visitChecked(root, visitor);
     }
 
-    /** True when at least one leaf is checked. */
+    /**
+     * True when at least one leaf is checked.
+     */
     public boolean hasChecked() {
         return hasCheckedLeaf(root);
     }
 
-    /** Runs the listener whenever any row's check state changes. */
+    /**
+     * Runs the listener whenever any row's check state changes.
+     */
     public void onCheckChanged(final @NotNull Runnable listener) {
         tree.addCheckboxTreeListener(new CheckboxTreeListener() {
             @Override

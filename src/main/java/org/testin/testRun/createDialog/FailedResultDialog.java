@@ -7,12 +7,7 @@ import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.ui.framework.AbstractFrameworkDialog;
-import org.testin.ui.framework.ComponentDialogBase;
-import org.testin.ui.framework.RadioSelection;
-import org.testin.ui.framework.StatusBarShortcut;
-import org.testin.ui.framework.TextArea;
-import org.testin.ui.framework.TextInput;
+import org.testin.ui.framework.*;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
@@ -88,13 +83,17 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
                 StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
     }
 
-    /** EMPTY is a persistence default, not a choice — Enhancement by default. */
+    /**
+     * EMPTY is a persistence default, not a choice — Enhancement by default.
+     */
     private static @NotNull BugSeverity severityOf(final @NotNull TestRunItems runItem) {
         final @Nullable BugSeverity stored = runItem.getBugSeverity();
         return stored == null || stored == BugSeverity.EMPTY ? BugSeverity.ENHANCEMENT : stored;
     }
 
-    /** EMPTY is a persistence default, not a choice — Low by default. */
+    /**
+     * EMPTY is a persistence default, not a choice — Low by default.
+     */
     private static @NotNull BugPriority priorityOf(final @NotNull TestRunItems runItem) {
         final @Nullable BugPriority stored = runItem.getBugPriority();
         return stored == null || stored == BugPriority.EMPTY ? BugPriority.LOW : stored;

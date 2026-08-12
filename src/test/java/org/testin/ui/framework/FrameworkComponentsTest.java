@@ -153,7 +153,7 @@ public class FrameworkComponentsTest {
 
         assertEquals(area.getText(), "java.lang.RuntimeException");
         assertTrue(area.fillsSpace(), "the area must claim the dialog's remaining space");
-        assertTrue(!area.acceptsDialogKeys(), "Enter must stay a newline inside the area");
+        assertFalse(area.acceptsDialogKeys(), "Enter must stay a newline inside the area");
     }
 
     @Test
@@ -165,8 +165,8 @@ public class FrameworkComponentsTest {
                 .build()
                 .getComponent();
 
-        assertEquals(((java.awt.Container) details.getPanel()).getComponentCount(), 1, "blank rows are skipped");
-        assertTrue(!details.wantsFocus(), "context rows never take the focus");
+        assertEquals(details.getPanel().getComponentCount(), 1, "blank rows are skipped");
+        assertFalse(details.wantsFocus(), "context rows never take the focus");
     }
 
     @Test

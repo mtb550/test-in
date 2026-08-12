@@ -70,17 +70,23 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
         return new ComponentDialogBase<>(new DialogButton(text));
     }
 
-    /** Read-only context rows — muted caption + value, display only. */
+    /**
+     * Read-only context rows — muted caption + value, display only.
+     */
     public static @NotNull DetailsBuilder details() {
         return new DetailsBuilder();
     }
 
-    /** A multi-line text area — e.g. a pasted error or exception. */
+    /**
+     * A multi-line text area — e.g. a pasted error or exception.
+     */
     public static @NotNull TextAreaBuilder textArea() {
         return new TextAreaBuilder();
     }
 
-    /** A captioned radio row — one radio per option, one always selected. */
+    /**
+     * A captioned radio row — one radio per option, one always selected.
+     */
     public static <T> @NotNull RadioBuilder<T> radios(final @NotNull String caption) {
         return new RadioBuilder<>(caption);
     }
@@ -108,7 +114,9 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
         private DetailsBuilder() {
         }
 
-        /** One caption/value row; a null or blank value skips the row. */
+        /**
+         * One caption/value row; a null or blank value skips the row.
+         */
         public @NotNull DetailsBuilder row(final @NotNull String caption, final @Nullable String value) {
             if (value != null && !value.isBlank()) {
                 rows.add(new DialogDetails.Row(caption, value));
@@ -139,7 +147,9 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
             return this;
         }
 
-        /** The initially selected value — must be one of the options. */
+        /**
+         * The initially selected value — must be one of the options.
+         */
         public @NotNull RadioBuilder<T> select(final @NotNull T value) {
             this.selected = value;
             return this;
@@ -178,7 +188,9 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
             return this;
         }
 
-        /** Preferred visible rows; the area still grows with the dialog. */
+        /**
+         * Preferred visible rows; the area still grows with the dialog.
+         */
         public @NotNull TextAreaBuilder rows(final int rows) {
             this.rows = rows;
             return this;

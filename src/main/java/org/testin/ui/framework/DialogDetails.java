@@ -17,10 +17,6 @@ import java.util.List;
  */
 public final class DialogDetails implements IDialogComponent {
 
-    /** One caption/value row. */
-    record Row(@NotNull String caption, @NotNull String value) {
-    }
-
     private final @NotNull JBPanel<?> panel;
 
     DialogDetails(final @NotNull List<Row> rows) {
@@ -39,7 +35,9 @@ public final class DialogDetails implements IDialogComponent {
         }
     }
 
-    /** Long values wrap instead of widening the whole dialog. */
+    /**
+     * Long values wrap instead of widening the whole dialog.
+     */
     private static @NotNull JBLabel wrappingValue(final @NotNull String value) {
         return new JBLabel("<html><div style='width:" + JBUI.scale(420) + "px'>"
                 + StringUtil.escapeXmlEntities(value) + "</div></html>");
@@ -63,5 +61,11 @@ public final class DialogDetails implements IDialogComponent {
     @Override
     public boolean wantsFocus() {
         return false;
+    }
+
+    /**
+     * One caption/value row.
+     */
+    record Row(@NotNull String caption, @NotNull String value) {
     }
 }

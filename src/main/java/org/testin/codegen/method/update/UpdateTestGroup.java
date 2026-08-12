@@ -2,8 +2,8 @@ package org.testin.codegen.method.update;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.Group;
 import org.testin.codegen.GeneratorAction;
+import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.List;

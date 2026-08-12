@@ -53,31 +53,6 @@ public final class TextArea implements IDialogComponent {
         panel.setBorder(JBUI.Borders.emptyTop(8));
     }
 
-    /**
-     * Ctrl+V with an image on the clipboard (e.g. a screenshot) inserts it as
-     * a base64 PNG data-URI; plain text pastes as always. Copy and cut stay
-     * the component's own.
-     */
-    private void installImagePaste() {
-        final Action defaultPaste = area.getActionMap().get(DefaultEditorKit.pasteAction);
-        area.getActionMap().put(DefaultEditorKit.pasteAction, new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                final Transferable contents = CopyPasteManager.getInstance().getContents();
-                if (contents != null && contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
-                    try {
-                        final Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
-                        area.insert(toDataUri(image), area.getCaretPosition());
-                        return;
-                    } catch (final Exception ignored) {
-                        // Unreadable image - fall through to the normal paste.
-                    }
-                }
-                if (defaultPaste != null) defaultPaste.actionPerformed(event);
-            }
-        });
-    }
-
     private static @NotNull String toDataUri(final @NotNull Image image) throws Exception {
         final BufferedImage buffered;
         if (image instanceof BufferedImage alreadyBuffered) {
@@ -101,6 +76,31 @@ public final class TextArea implements IDialogComponent {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
         ImageIO.write(buffered, "png", out);
         return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray());
+    }
+
+    /**
+     * Ctrl+V with an image on the clipboard (e.g. a screenshot) inserts it as
+     * a base64 PNG data-URI; plain text pastes as always. Copy and cut stay
+     * the component's own.
+     */
+    private void installImagePaste() {
+        final Action defaultPaste = area.getActionMap().get(DefaultEditorKit.pasteAction);
+        area.getActionMap().put(DefaultEditorKit.pasteAction, new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                final Transferable contents = CopyPasteManager.getInstance().getContents();
+                if (contents != null && contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
+                    try {
+                        final Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
+                        area.insert(toDataUri(image), area.getCaretPosition());
+                        return;
+                    } catch (final Exception ignored) {
+                        // Unreadable image - fall through to the normal paste.
+                    }
+                }
+                if (defaultPaste != null) defaultPaste.actionPerformed(event);
+            }
+        });
     }
 
     public @NotNull String getText() {

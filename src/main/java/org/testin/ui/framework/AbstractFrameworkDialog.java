@@ -60,14 +60,35 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         this.p = p;
     }
 
-    /**
-     * The dialog's confirm action; wire it in {@link #shortcuts}.
-     */
-    protected abstract void submit();
+    private static @NotNull JBPanel<?> verticalStack(final @NotNull List<IDialogComponent> dialogComponents) {
+        final JBPanel<?> stack = new JBPanel<>();
+        stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
+        stack.setOpaque(false);
+        for (final IDialogComponent dialogComponent : dialogComponents) {
+            stack.add(dialogComponent.getPanel());
+        }
+        return stack;
+    }
 
     // ------------------------------------------------------------------
     // What the shell provides.
     // ------------------------------------------------------------------
+
+    private static void installKey(final @NotNull JComponent component, final int condition,
+                                   final @NotNull KeyStroke key, final @NotNull String actionKey, final @NotNull Runnable action) {
+        component.getInputMap(condition).put(key, actionKey);
+        component.getActionMap().put(actionKey, new AbstractAction() {
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                action.run();
+            }
+        });
+    }
+
+    /**
+     * The dialog's confirm action; wire it in {@link #shortcuts}.
+     */
+    protected abstract void submit();
 
     /**
      * The dialog's primary component, typed: the first declared component
@@ -105,6 +126,10 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         getPopup().closeOk(null);
     }
 
+    // ------------------------------------------------------------------
+    // Assembly.
+    // ------------------------------------------------------------------
+
     protected final void closeCancel() {
         getPopup().cancel();
     }
@@ -115,10 +140,6 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         }
         return popup;
     }
-
-    // ------------------------------------------------------------------
-    // Assembly.
-    // ------------------------------------------------------------------
 
     /**
      * Packages the declared fields exactly once; @NonNull reports a forgotten part.
@@ -202,16 +223,6 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         return contentPanel;
     }
 
-    private static @NotNull JBPanel<?> verticalStack(final @NotNull List<IDialogComponent> dialogComponents) {
-        final JBPanel<?> stack = new JBPanel<>();
-        stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
-        stack.setOpaque(false);
-        for (final IDialogComponent dialogComponent : dialogComponents) {
-            stack.add(dialogComponent.getPanel());
-        }
-        return stack;
-    }
-
     /**
      * Binds every bindable entry's key twice: on each component's focus
      * component (exact pre-multi-component semantics, overriding any inert
@@ -242,17 +253,6 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
                 installKey(dialogComponent.getFocusComponent(), JComponent.WHEN_FOCUSED, key, actionKey, action);
             }
         }
-    }
-
-    private static void installKey(final @NotNull JComponent component, final int condition,
-                                   final @NotNull KeyStroke key, final @NotNull String actionKey, final @NotNull Runnable action) {
-        component.getInputMap(condition).put(key, actionKey);
-        component.getActionMap().put(actionKey, new AbstractAction() {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                action.run();
-            }
-        });
     }
 
     /**

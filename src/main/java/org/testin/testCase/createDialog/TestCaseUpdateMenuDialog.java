@@ -2,8 +2,8 @@ package org.testin.testCase.createDialog;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.UpdateTestCaseFields;
 import org.testin.codegen.GeneratorType;
+import org.testin.enums.UpdateTestCaseFields;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.updateDialog.UpdateTestCaseDialog;

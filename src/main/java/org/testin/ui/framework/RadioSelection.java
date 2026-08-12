@@ -17,10 +17,6 @@ import java.util.Objects;
  */
 public final class RadioSelection<T> implements IDialogComponent {
 
-    /** One selectable option: the text on the radio and the submitted value. */
-    record Option<T>(@NotNull String name, @NotNull T value) {
-    }
-
     private final @NotNull JBPanel<?> panel;
     private final @NotNull JRadioButton firstButton;
     private @NotNull T selected;
@@ -71,5 +67,11 @@ public final class RadioSelection<T> implements IDialogComponent {
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
         // Choosing an option is not a submit gesture; the declared keys save.
+    }
+
+    /**
+     * One selectable option: the text on the radio and the submitted value.
+     */
+    record Option<T>(@NotNull String name, @NotNull T value) {
     }
 }

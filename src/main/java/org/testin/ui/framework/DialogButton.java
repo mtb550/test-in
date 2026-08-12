@@ -29,7 +29,9 @@ public final class DialogButton implements IDialogComponent {
         panel.add(button);
     }
 
-    /** Working dialogs disable the button while the input is incomplete. */
+    /**
+     * Working dialogs disable the button while the input is incomplete.
+     */
     public void setEnabled(final boolean enabled) {
         button.setEnabled(enabled);
     }
