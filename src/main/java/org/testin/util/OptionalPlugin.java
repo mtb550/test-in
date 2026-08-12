@@ -5,6 +5,7 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -37,7 +38,7 @@ public enum OptionalPlugin {
     private final @NotNull String label;
     private final @NotNull String requirement;
     private final @NotNull Key<Boolean> warned;
-    private volatile Boolean available;
+    private volatile @Nullable Boolean available;
 
     OptionalPlugin(final @NotNull String pluginId, final @NotNull String label, final @NotNull String requirement) {
         this.pluginId = pluginId;

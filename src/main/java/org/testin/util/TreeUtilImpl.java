@@ -9,6 +9,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.IVfsBiOperation;
 import org.testin.enums.IVfsOperation;
 import org.testin.notifications.Notifier;
@@ -24,7 +25,7 @@ public final class TreeUtilImpl {
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
-                VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
+                final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
                 if (vf != null) {
                     operation.execute(vf);
                 } else {
@@ -44,17 +45,17 @@ public final class TreeUtilImpl {
 
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
                                  final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation,
-                                 final Runnable onSuccess) {
+                                 final @Nullable Runnable onSuccess) {
         executeVfsAction(p, sourcePath, targetPath, errorTitle, operation, onSuccess, null);
     }
 
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
                                  final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation,
-                                 final Runnable onSuccess, final Runnable onFailure) {
+                                 final @Nullable Runnable onSuccess, final @Nullable Runnable onFailure) {
         ApplicationManager.getApplication().invokeLater(() -> WriteAction.run(() -> {
             try {
-                VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
-                VirtualFile targetVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
+                final @Nullable VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
+                final @Nullable VirtualFile targetVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
 
                 if (sourceVf != null && targetVf != null) {
                     operation.execute(sourceVf, targetVf);
@@ -70,9 +71,9 @@ public final class TreeUtilImpl {
         }));
     }
 
-    public void removeVf(final @NotNull Project p, final Object requester, final Path path) {
+    public void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path) {
         try {
-            VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
+            final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
             if (vf != null) {
                 WriteAction.run(() -> vf.delete(requester));
             }

@@ -27,13 +27,13 @@ import java.util.Optional;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
 public final class EditorUtil {
-    private final String OPEN_EDITORS_KEY = "testin.openEditors";
+    private final @NotNull String OPEN_EDITORS_KEY = "testin.openEditors";
 
     public boolean isOpen(final @NotNull Project p, final @Nullable String s) {
         final FileEditorManager fed = FileEditorManager.getInstance(p);
         final VirtualFile[] openFiles = fed.getOpenFiles();
 
-        for (VirtualFile vf : openFiles) {
+        for (final VirtualFile vf : openFiles) {
             if (s != null && s.equals(vf.getName())) {
                 fed.openFile(vf, true);
                 return true;
@@ -47,7 +47,7 @@ public final class EditorUtil {
         final FileEditorManager fed = FileEditorManager.getInstance(p);
         final VirtualFile[] openFiles = fed.getOpenFiles();
 
-        for (VirtualFile vf : openFiles) {
+        for (final VirtualFile vf : openFiles) {
             if (s.equals(vf.getName())) {
                 fed.closeFile(vf);
                 break;
@@ -62,7 +62,7 @@ public final class EditorUtil {
         ApplicationManager.getApplication().invokeLater(() -> {
             VirtualFile targetVf = null;
 
-            for (VirtualFile openVf : fed.getOpenFiles()) {
+            for (final VirtualFile openVf : fed.getOpenFiles()) {
                 if (openVf.getName().equals(dir.getName())) {
                     targetVf = openVf;
                     fed.closeFile(openVf);

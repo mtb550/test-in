@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -29,7 +30,7 @@ public final class FilesUtil {
      * Writes pre-serialized JSON. Used by the run-status writer, which snapshots
      * the bytes on the EDT and performs only the disk I/O on its worker thread.
      */
-    public void write(final @NotNull Project p, final @NotNull Path path, final byte[] jsonBytes) {
+    public void write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         try {
             writeBytes(path, jsonBytes);
         } catch (final IOException ex) {
@@ -37,8 +38,8 @@ public final class FilesUtil {
         }
     }
 
-    private void writeBytes(final @NotNull Path path, final byte[] jsonBytes) throws IOException {
-        final Path parent = path.getParent();
+    private void writeBytes(final @NotNull Path path, final byte @NotNull [] jsonBytes) throws IOException {
+        final @Nullable Path parent = path.getParent();
         if (parent != null) {
             Files.createDirectories(parent);
         }

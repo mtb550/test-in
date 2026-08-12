@@ -17,7 +17,7 @@ import java.util.TimeZone;
 @Service(Service.Level.PROJECT)
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Mapper {
-    private final ObjectMapper mapper = new ObjectMapper()
+    private final @NotNull ObjectMapper mapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .enable(SerializationFeature.INDENT_OUTPUT)
             .setTimeZone(TimeZone.getDefault());
@@ -74,7 +74,7 @@ public final class Mapper {
         }
     }
 
-    public byte[] writeValueAsBytes(final @NotNull Object value) {
+    public byte @NotNull [] writeValueAsBytes(final @NotNull Object value) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(value);
 

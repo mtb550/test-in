@@ -45,18 +45,18 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Tools {
 
-    private final NameSanitizer nameSanitizer = new NameSanitizer();
-    private final TestDataParser testDataParser = new TestDataParser();
+    private final @NotNull NameSanitizer nameSanitizer = new NameSanitizer();
+    private final @NotNull TestDataParser testDataParser = new TestDataParser();
 
-    public static CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
+    public static @NotNull CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
         return new CustomShortcutSet(key);
     }
 
-    public static Shortcut keyboardShortcut(final @NotNull KeyStroke key) {
+    public static @NotNull Shortcut keyboardShortcut(final @NotNull KeyStroke key) {
         return new KeyboardShortcut(key, null);
     }
 
-    public static String shortcutText(final @NotNull KeyStroke key) {
+    public static @NotNull String shortcutText(final @NotNull KeyStroke key) {
         return KeymapUtil.getKeystrokeText(key);
     }
 
@@ -64,27 +64,27 @@ public final class Tools {
         return e.getKeyCode() == key.getKeyCode() && e.getModifiersEx() == key.getModifiers();
     }
 
-    public String sanitizePackageName(final @NotNull String s) {
+    public @NotNull String sanitizePackageName(final @NotNull String s) {
         return nameSanitizer.packageName(s);
     }
 
-    public String sanitizeClassName(final @NotNull String name) {
+    public @NotNull String sanitizeClassName(final @NotNull String name) {
         return nameSanitizer.className(name);
     }
 
-    public String removeSpecialChars(final @NotNull String s) {
+    public @NotNull String removeSpecialChars(final @NotNull String s) {
         return nameSanitizer.removeSpecialChars(s);
     }
 
-    public Path getProjectPath(final SimpleTree tree) {
+    public @Nullable Path getProjectPath(final @NotNull SimpleTree tree) {
         final Object root = TreeValueUtil.valueOf(tree.getModel().getRoot());
         if (root instanceof TestProjectDirectoryDto dir)
             return dir.getPath();
         return null;
     }
 
-    public DirectoryDto getCurrentSelectedDirectory(final SimpleTree tree) {
-        TreePath path = tree.getSelectionPath();
+    public @Nullable DirectoryDto getCurrentSelectedDirectory(final @NotNull SimpleTree tree) {
+        final TreePath path = tree.getSelectionPath();
         if (path == null) return null;
 
         final Object value = TreeValueUtil.valueOf(path.getLastPathComponent());
@@ -98,11 +98,11 @@ public final class Tools {
     @NotNull
     public String format(final @Nullable String text) {
         if (StringUtil.isEmptyOrSpaces(text)) return "";
-        String s = text.trim();
+        final String s = text.trim();
         return StringUtil.capitalize(s) + ".";
     }
 
-    public String getFormattedDuration(final Duration duration) {
+    public @Nullable String getFormattedDuration(final @Nullable Duration duration) {
         if (duration == null) return null;
         return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
@@ -113,10 +113,10 @@ public final class Tools {
         final VirtualFile cached = Config.getTestSourceRoot();
         if (cached != null && cached.isValid()) return cached;
 
-        Module[] modules = ModuleManager.getInstance(p).getModules();
+        final Module[] modules = ModuleManager.getInstance(p).getModules();
 
-        for (Module module : modules) {
-            List<VirtualFile> sourceRoots = ModuleRootManager.getInstance(module)
+        for (final Module module : modules) {
+            final List<VirtualFile> sourceRoots = ModuleRootManager.getInstance(module)
                     .getSourceRoots(JavaSourceRootType.TEST_SOURCE);
 
             if (!sourceRoots.isEmpty()) {
@@ -144,20 +144,20 @@ public final class Tools {
         return root;
     }
 
-    public void openWithAssociatedProgram(final @NotNull Project p, final VirtualFile virtualFile) {
+    public void openWithAssociatedProgram(final @NotNull Project p, final @Nullable VirtualFile virtualFile) {
         if (virtualFile == null || !virtualFile.exists()) {
             Services.getInstance(p, Notifier.class).error(p, "Open Error", "The file does not exist.");
             return;
         }
 
-        File file = new File(virtualFile.getPath());
+        final File file = new File(virtualFile.getPath());
 
         if (!Desktop.isDesktopSupported()) {
             Services.getInstance(p, Notifier.class).error(p, "System Error", "Desktop operations are not supported on this system.");
             return;
         }
 
-        Desktop desktop = Desktop.getDesktop();
+        final Desktop desktop = Desktop.getDesktop();
 
         if (!desktop.isSupported(Desktop.Action.OPEN)) {
             Services.getInstance(p, Notifier.class).error(p, "System Error", "The 'Open' action is not supported on this system.");
@@ -175,27 +175,27 @@ public final class Tools {
         });
     }
 
-    public String sanitizeDescription(final String rawDesc) {
+    public @NotNull String sanitizeDescription(final @Nullable String rawDesc) {
         return nameSanitizer.description(rawDesc);
     }
 
-    public List<String> parseStepsSafe(final String stepsRaw) {
+    public @NotNull List<String> parseStepsSafe(final @Nullable String stepsRaw) {
         return testDataParser.steps(stepsRaw);
     }
 
-    public Priority parsePrioritySafe(final String priorityStr) {
+    public @NotNull Priority parsePrioritySafe(final @Nullable String priorityStr) {
         return testDataParser.priority(priorityStr);
     }
 
-    public ZonedDateTime parseDateSafe(final String dateStr) {
+    public @NotNull ZonedDateTime parseDateSafe(final @Nullable String dateStr) {
         return testDataParser.date(dateStr);
     }
 
-    public List<Group> parseGroupsSafe(final String rawGroups) {
+    public @NotNull List<Group> parseGroupsSafe(final @Nullable String rawGroups) {
         return testDataParser.groups(rawGroups);
     }
 
-    public String sanitizeMethodName(final String description) {
+    public @NotNull String sanitizeMethodName(final @Nullable String description) {
         return nameSanitizer.methodName(description);
     }
 
@@ -204,8 +204,8 @@ public final class Tools {
     // single-use keystrokes live as constants in their owning classes).
     // ------------------------------------------------------------------
 
-    public ArrayList<String> buildPath2(final @Nullable List<String> parentPath, final @NotNull String newName) {
-        ArrayList<String> newPath = new ArrayList<>();
+    public @NotNull ArrayList<String> buildPath2(final @Nullable List<String> parentPath, final @NotNull String newName) {
+        final ArrayList<String> newPath = new ArrayList<>();
 
         if (parentPath != null) newPath.addAll(parentPath);
         newPath.add(newName);
@@ -213,8 +213,8 @@ public final class Tools {
         return newPath;
     }
 
-    public ArrayList<String> buildFqcnMethod(final @NotNull TestCaseDto tc) {
-        ArrayList<String> generatedFqcn = new ArrayList<>(tc.getParent().getPath2());
+    public @NotNull ArrayList<String> buildFqcnMethod(final @NotNull TestCaseDto tc) {
+        final ArrayList<String> generatedFqcn = new ArrayList<>(tc.getParent().getPath2());
 
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
 
@@ -222,22 +222,22 @@ public final class Tools {
             generatedFqcn.add("DefaultTest");
         }
 
-        int lastIdx = generatedFqcn.size() - 1;
-        String className = sanitizeClassName(generatedFqcn.get(lastIdx));
+        final int lastIdx = generatedFqcn.size() - 1;
+        final String className = sanitizeClassName(generatedFqcn.get(lastIdx));
         generatedFqcn.set(lastIdx, className);
 
-        String methodName = sanitizeMethodName(tc.getDescription());
+        final String methodName = sanitizeMethodName(tc.getDescription());
         generatedFqcn.add(methodName);
 
         for (int i = 0; i < lastIdx; i++) {
-            String pkg = sanitizePackageName(generatedFqcn.get(i));
+            final String pkg = sanitizePackageName(generatedFqcn.get(i));
             generatedFqcn.set(i, pkg);
         }
         return generatedFqcn;
     }
 
     public @NotNull List<String> buildFqcnClass(final @NotNull Project p, final @NotNull DirectoryDto dir) {
-        ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
+        final ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
 
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
 
@@ -245,19 +245,19 @@ public final class Tools {
             Services.getInstance(p, Notifier.class).softShow(p, "empty fqcn , directory: " + dir.getPath());
         }
 
-        int lastIdx = generatedFqcn.size() - 1;
-        String className = sanitizeClassName(generatedFqcn.get(lastIdx));
+        final int lastIdx = generatedFqcn.size() - 1;
+        final String className = sanitizeClassName(generatedFqcn.get(lastIdx));
         generatedFqcn.set(lastIdx, className);
 
         for (int i = 0; i < lastIdx; i++) {
-            String pkg = sanitizePackageName(generatedFqcn.get(i));
+            final String pkg = sanitizePackageName(generatedFqcn.get(i));
             generatedFqcn.set(i, pkg);
         }
         return generatedFqcn;
     }
 
     public @NotNull List<String> buildFqcnPackage(final @NotNull DirectoryDto dir) {
-        ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
+        final ArrayList<String> generatedFqcn = new ArrayList<>(dir.getPath2());
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
         if (generatedFqcn.isEmpty()) {
             generatedFqcn.add("generated");
@@ -266,15 +266,15 @@ public final class Tools {
         return generatedFqcn;
     }
 
-    public DefaultActionGroup createSubGroup(final @NotNull String title, final @NotNull Icon icon, final @NotNull List<? extends DumbAwareAction> actions) {
-        DefaultActionGroup group = new DefaultActionGroup(title, true);
+    public @NotNull DefaultActionGroup createSubGroup(final @NotNull String title, final @NotNull Icon icon, final @NotNull List<? extends DumbAwareAction> actions) {
+        final DefaultActionGroup group = new DefaultActionGroup(title, true);
         group.getTemplatePresentation().setIcon(icon);
-        for (AnAction action : actions)
+        for (final AnAction action : actions)
             group.add(action);
         return group;
     }
 
-    public String extractProjectNameFromUrl(final @NotNull String gitUrl) {
+    public @NotNull String extractProjectNameFromUrl(final @NotNull String gitUrl) {
         return nameSanitizer.projectNameFromUrl(gitUrl);
     }
 }

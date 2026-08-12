@@ -1,5 +1,7 @@
 package org.testin.util;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.mappers.Config;
@@ -17,11 +19,11 @@ import java.util.stream.Collectors;
  */
 final class TestDataParser {
 
-    private static final Pattern MULTI_STEP_LINE = Pattern.compile(".*\\s\\d+[-.].*");
-    private static final Pattern STEP_SEPARATOR = Pattern.compile("(\\s)(?=\\d+[-.])");
-    private static final Pattern STEP_PREFIX = Pattern.compile("^\\d+[-.]\\s*");
+    private static final @NotNull Pattern MULTI_STEP_LINE = Pattern.compile(".*\\s\\d+[-.].*");
+    private static final @NotNull Pattern STEP_SEPARATOR = Pattern.compile("(\\s)(?=\\d+[-.])");
+    private static final @NotNull Pattern STEP_PREFIX = Pattern.compile("^\\d+[-.]\\s*");
 
-    List<String> steps(final String rawSteps) {
+    @NotNull List<String> steps(final @Nullable String rawSteps) {
         if (rawSteps == null || rawSteps.isBlank()) return new ArrayList<>();
         String text = rawSteps;
         if (!text.contains("\n") && MULTI_STEP_LINE.matcher(text).matches()) {
@@ -33,7 +35,7 @@ final class TestDataParser {
                 .collect(Collectors.toList());
     }
 
-    Priority priority(final String value) {
+    @NotNull Priority priority(final @Nullable String value) {
         if (value == null || value.isBlank()) return Priority.LOW;
         try {
             return Priority.valueOf(value.trim().toUpperCase(Locale.ROOT));
@@ -42,7 +44,7 @@ final class TestDataParser {
         }
     }
 
-    ZonedDateTime date(final String value) {
+    @NotNull ZonedDateTime date(final @Nullable String value) {
         if (value == null || value.isBlank()) return now();
         try {
             return LocalDateTime.parse(value, Config.EXCEL_DATE_FORMATTER)
@@ -52,7 +54,7 @@ final class TestDataParser {
         }
     }
 
-    List<Group> groups(final String rawGroups) {
+    @NotNull List<Group> groups(final @Nullable String rawGroups) {
         if (rawGroups == null || rawGroups.isBlank()) return new ArrayList<>();
         return Arrays.stream(rawGroups.split(","))
                 .map(String::trim)
@@ -68,7 +70,7 @@ final class TestDataParser {
                 .collect(Collectors.toList());
     }
 
-    private ZonedDateTime now() {
+    private @NotNull ZonedDateTime now() {
         return ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 }

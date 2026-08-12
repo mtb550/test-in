@@ -1,6 +1,7 @@
 package org.testin.util;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
@@ -9,9 +10,9 @@ import java.util.regex.Pattern;
  */
 final class NameSanitizer {
 
-    private static final Pattern INVALID_NAME = Pattern.compile("[^a-zA-Z0-9 _]");
+    private static final @NotNull Pattern INVALID_NAME = Pattern.compile("[^a-zA-Z0-9 _]");
 
-    String packageName(final @NotNull String value) {
+    @NotNull String packageName(final @NotNull String value) {
         final String cleanName = INVALID_NAME.matcher(value.replace("-test-cases", ""))
                 .replaceAll("").trim();
         final StringBuilder result = new StringBuilder();
@@ -30,7 +31,7 @@ final class NameSanitizer {
         return result.toString();
     }
 
-    String className(final @NotNull String value) {
+    @NotNull String className(final @NotNull String value) {
         if (value.trim().isEmpty()) return "DefaultTest";
         final String cleanName = INVALID_NAME.matcher(value).replaceAll("").trim();
         final StringBuilder result = new StringBuilder();
@@ -44,13 +45,13 @@ final class NameSanitizer {
         return result.append("Test").toString();
     }
 
-    String description(final String rawDescription) {
+    @NotNull String description(final @Nullable String rawDescription) {
         if (rawDescription == null || rawDescription.isBlank()) return "EMPTY_DESCRIPTION";
         final String cleaned = INVALID_NAME.matcher(rawDescription).replaceAll("").trim();
         return cleaned.isEmpty() ? "EMPTY_DESCRIPTION" : cleaned;
     }
 
-    String methodName(final String description) {
+    @NotNull String methodName(final @Nullable String description) {
         if (description == null || description.isEmpty()) return "testMethod";
         final StringBuilder result = new StringBuilder();
         for (final String word : description.split("[^a-zA-Z0-9]+")) {
@@ -65,7 +66,7 @@ final class NameSanitizer {
         return result.toString();
     }
 
-    String removeSpecialChars(final @NotNull String value) {
+    @NotNull String removeSpecialChars(final @NotNull String value) {
         if (value.isEmpty()) return "";
         return value.chars()
                 .mapToObj(c -> isSpecial((char) c) ? "_" : String.valueOf((char) c))
@@ -73,7 +74,7 @@ final class NameSanitizer {
                 .toString();
     }
 
-    String projectNameFromUrl(final @NotNull String gitUrl) {
+    @NotNull String projectNameFromUrl(final @NotNull String gitUrl) {
         String name = gitUrl;
         if (name.endsWith("/")) name = name.substring(0, name.length() - 1);
         if (name.endsWith(".git")) name = name.substring(0, name.length() - 4);

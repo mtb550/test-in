@@ -75,14 +75,14 @@ public class FontSync {
     private static void syncJavaEditorToGlobal(final @NotNull Project p) {
         try {
             if (!p.isDisposed()) {
-                Editor activeEditor = FileEditorManager.getInstance(p).getSelectedTextEditor();
+                final Editor activeEditor = FileEditorManager.getInstance(p).getSelectedTextEditor();
                 if (activeEditor != null) {
-                    float localSize = activeEditor.getColorsScheme().getEditorFontSize();
-                    EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
+                    final float localSize = activeEditor.getColorsScheme().getEditorFontSize();
+                    final EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
 
                     if (localSize != globalScheme.getEditorFontSize()) {
                         globalScheme.setEditorFontSize(localSize);
-                        for (Editor editor : EditorFactory.getInstance().getAllEditors()) {
+                        for (final Editor editor : EditorFactory.getInstance().getAllEditors()) {
                             editor.getColorsScheme().setEditorFontSize(localSize);
                         }
                         ApplicationManager.getApplication().getMessageBus()
@@ -96,13 +96,13 @@ public class FontSync {
         }
     }
 
-    private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, boolean zoomIn) {
+    private static void zoomGlobalIdeEditors(final @NotNull Project p, final @NotNull JComponent component, final boolean zoomIn) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final EditorColorsScheme globalScheme = EditorColorsManager.getInstance().getGlobalScheme();
-            float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), 8.0f, 72.0f);
+            final float newSize = Math.clamp(getBaseFontSize() + (zoomIn ? 1.0f : -1.0f), 8.0f, 72.0f);
 
             globalScheme.setEditorFontSize(newSize);
-            for (Editor editor : EditorFactory.getInstance().getAllEditors())
+            for (final Editor editor : EditorFactory.getInstance().getAllEditors())
                 editor.getColorsScheme().setEditorFontSize(newSize);
 
             ApplicationManager.getApplication().getMessageBus()
@@ -117,10 +117,10 @@ public class FontSync {
     private static void updateComponentFontSize(final @NotNull JComponent component) {
         final float newSize = getBaseFontSize();
         ApplicationManager.getApplication().invokeLater(() -> {
-            Font currentFont = component.getFont();
+            final Font currentFont = component.getFont();
             if (currentFont != null) {
-                float delta = newSize - lastBaseFontSize;
-                boolean rootNeedsUpdate = currentFont.getSize2D() != newSize;
+                final float delta = newSize - lastBaseFontSize;
+                final boolean rootNeedsUpdate = currentFont.getSize2D() != newSize;
                 if (delta != 0.0f || rootNeedsUpdate) {
                     lastBaseFontSize = newSize;
                     component.setFont(currentFont.deriveFont(newSize));
@@ -138,8 +138,8 @@ public class FontSync {
         });
     }
 
-    private static void applyDeltaRecursively(final @NotNull Container container, float delta) {
-        for (Component child : container.getComponents()) {
+    private static void applyDeltaRecursively(final @NotNull Container container, final float delta) {
+        for (final Component child : container.getComponents()) {
             final Font f = child.getFont();
             if (f != null)
                 child.setFont(f.deriveFont(Math.max(8.0f, f.getSize2D() + delta)));

@@ -4,6 +4,7 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Shortcut;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.HeadlessException;
@@ -76,7 +77,7 @@ public enum Shortcuts {
     PriorityMedium(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0)),
     PriorityLow(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0));
 
-    private final KeyStroke key;
+    private final @NotNull KeyStroke key;
 
     /**
      * The platform menu modifier (Cmd on macOS, Ctrl elsewhere), same source
@@ -90,19 +91,19 @@ public enum Shortcuts {
         }
     }
 
-    public CustomShortcutSet getCustomShortcut() {
+    public @NotNull CustomShortcutSet getCustomShortcut() {
         return Tools.customShortcut(key);
     }
 
-    public Shortcut getShortcut() {
+    public @NotNull Shortcut getShortcut() {
         return Tools.keyboardShortcut(key);
     }
 
-    public String getShortcutText() {
+    public @NotNull String getShortcutText() {
         return Tools.shortcutText(key);
     }
 
-    public boolean matches(final KeyEvent e) {
+    public boolean matches(final @NotNull KeyEvent e) {
         return Tools.matches(e, key);
     }
 }
