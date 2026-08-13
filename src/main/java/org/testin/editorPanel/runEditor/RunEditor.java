@@ -120,6 +120,16 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Getter
     private int currentlyExecutingIndex = -1;
 
+    /**
+     * Test case selected before a reload. Held as an id, not as a dto: a reload
+     * hands back different objects for the same test cases and TestCaseDto has no
+     * equals, so identity would not survive it.
+     */
+    private @Nullable UUID selectionToRestore;
+
+    /** Grid column selected before a reload, so the cell comes back, not just the row. */
+    private int gridColumnToRestore = -1;
+
     public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         this.p = p;
         this.parent = vf.getTestRun();
@@ -216,6 +226,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                     allTestCases.addAll(sorted);
                     currentTestCases.clear();
                     currentTestCases.addAll(sorted);
+
+                    // Before refreshView reads currentPage: the reload may have moved
+                    // the remembered test case onto a different page.
+                    jumpToPageOfPendingSelection();
 
                     if (list != null) {
                         list.setPaintBusy(false);
@@ -323,6 +337,8 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         if (toolBarSearch != null)
             toolBarSearch.resetSearchQuery();
 
+        rememberSelection();
+
         this.allTestCases.clear();
         this.currentTestCases.clear();
         this.resultsMap.clear();
@@ -374,15 +390,27 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         // ConcurrentModificationException after currentTestCases is next mutated.
         final List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
-        final TestCaseDto selectedItem = list != null ? list.getSelectedValue() : null;
+        final UUID selectedId = selectionToRestore != null
+                ? selectionToRestore
+                : (list != null && list.getSelectedValue() != null ? list.getSelectedValue().getId() : null);
 
         if (model != null) {
             model.replaceAll(pageItems);
         }
 
-        if (selectedItem != null && pageItems.contains(selectedItem) && list != null) {
-            list.setSelectedValue(selectedItem, true);
+        // Matched by id: a reload hands back different dto instances for the same
+        // test cases, so comparing objects would drop the selection.
+        if (selectedId != null && list != null) {
+            for (final TestCaseDto item : pageItems) {
+                if (selectedId.equals(item.getId())) {
+                    // Selected by value, not by index: the list model owns its own
+                    // ordering, so an index into pageItems is not safe to reuse.
+                    list.setSelectedValue(item, true);
+                    break;
+                }
+            }
         }
+        selectionToRestore = null;
 
         statusBar.updatePaginationState(page.page(), page.totalPages(), total);
 
@@ -391,6 +419,33 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             rebuildGrid();
             if (gridScrollPane != null) setCenter(gridScrollPane);
         }
+    }
+
+    /**
+     * Records the selected test case (and grid column) before the data is reloaded.
+     */
+    private void rememberSelection() {
+        final TestCaseDto selected = list != null ? list.getSelectedValue() : null;
+        selectionToRestore = selected != null ? selected.getId() : null;
+        gridColumnToRestore = gridTable != null ? gridTable.getSelectedColumn() : -1;
+    }
+
+    /**
+     * Moves to whichever page now holds the remembered test case, so a selection
+     * that a reload pushed onto another page is not lost.
+     */
+    private void jumpToPageOfPendingSelection() {
+        if (selectionToRestore == null) return;
+
+        // pageSize is settable; dividing by a stored 0 would throw.
+        final int safePageSize = Math.max(1, pageSize);
+        for (int i = 0; i < currentTestCases.size(); i++) {
+            if (selectionToRestore.equals(currentTestCases.get(i).getId())) {
+                currentPage = (i / safePageSize) + 1;
+                return;
+            }
+        }
+        selectionToRestore = null;
     }
 
     private @NotNull List<TestCaseDto> getCurrentPageItems() {
@@ -424,9 +479,15 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                 final TestCaseDto selectedItem = currentList.getSelectedValue();
                 final int selectedRow = pageItems.indexOf(selectedItem);
                 if (selectedRow >= 0) {
-                    gridTable.changeSelection(selectedRow, 0, false, false);
+                    final int column = gridColumnToRestore >= 0 && gridColumnToRestore < gridTable.getColumnCount()
+                            ? gridColumnToRestore : 0;
+                    gridTable.changeSelection(selectedRow, column, false, false);
+                    gridTable.scrollRectToVisible(gridTable.getCellRect(selectedRow, column, true));
                 }
             }
+            // Cleared whether or not the row was found, so a stale column can never
+            // be applied to an unrelated rebuild.
+            gridColumnToRestore = -1;
 
             gridScrollPane = new JBScrollPane(gridTable);
             Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());
