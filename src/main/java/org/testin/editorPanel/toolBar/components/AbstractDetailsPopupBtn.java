@@ -33,7 +33,10 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends Abstrac
                                       final @NotNull Function<E, String> displayName,
                                       final @NotNull Function<String, E> parser,
                                       final @NotNull Runnable onToolBarDetailsSelectedChanged) {
-        super("Details", AllIcons.Actions.PreviewDetailsVertically);
+        // A checked box, matching the check-box list this button opens. The
+        // previous icon was a framed panel with rules in it, which the New UI
+        // draws almost identically to the List View button beside it.
+        super("Details", AllIcons.Actions.Selectall);
 
         this.propertyKey = propertyKey;
         this.options = options;
