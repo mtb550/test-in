@@ -5,9 +5,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBScrollPane;
+import com.intellij.ui.hover.TableHoverListener;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.testin.editorPanel.EditorColors;
 import org.testin.enums.RunEditorAttributes;
 import org.testin.enums.TestEditorAttributes;
@@ -316,7 +318,7 @@ public class GridPanelBuilder {
             row[0] = String.valueOf(index++);
             int c = 1;
             for (final TestEditorAttributes attr : ordered) {
-                row[c++] = attr.getTestValueExtractor().execute(tc, p);
+                row[c++] = attr.gridValue(p, tc);
             }
             rows.add(row);
         }
@@ -361,11 +363,27 @@ public class GridPanelBuilder {
             model.addRow(row);
         }
 
-        final JBTable table = new JBTable(model);
+        final JBTable table = new JBTable(model) {
+            /**
+             * The grid renderer owns every row colour. JBTable tints the hovered
+             * row after the renderer has run, so the colour is restored here -
+             * removing the hover listener and swapping the UI were not enough on
+             * their own (issue: hover background in grid view).
+             */
+            @Override
+            public @NonNull Component prepareRenderer(final @NonNull TableCellRenderer renderer, final int row, final int column) {
+                final Component component = super.prepareRenderer(renderer, row, column);
+                component.setBackground(isCellSelected(row, column) ? SELECTION_BACKGROUND : rowColor(row));
+                return component;
+            }
+        };
         table.putClientProperty(GRID_KIND_KEY, editable ? "test" : "run");
         // JBTable's IntelliJ UI paints a rollover background over table rows.
         // The grid renderer owns all row colors, so use the standard table UI here.
         table.setUI(new BasicTableUI());
+        // Swapping the UI is not enough: JBTable also attaches a hover listener in
+        // its constructor, which keeps tracking the hovered row and repainting it.
+        TableHoverListener.DEFAULT.removeFrom(table);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         // Excel/DataGrip-style selection and clipboard (multi-cell selection,

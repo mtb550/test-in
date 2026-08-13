@@ -34,6 +34,8 @@ import org.testin.editorPanel.toolBar.components.SearchTxt;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.enums.*;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.EscapeAction;
+import org.testin.viewPanel.GridViewDetailsAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
@@ -176,20 +178,24 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             try {
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
-                if (tr == null) {
-                    tr = indexer.getTestRunByPath(parent.getPath());
+                // Snapshot the volatile field into a local. Re-reading it between
+                // the null check and the call would let another thread clear it.
+                TestRunDto run = tr;
+                if (run == null) {
+                    run = indexer.getTestRunByPath(parent.getPath());
+                    tr = run;
                 }
 
-                if (tr != null) {
-                    final Map<UUID, TestRunItems> newResults = tr.getResults().stream()
+                if (run != null) {
+                    final Map<UUID, TestRunItems> newResults = run.getResults().stream()
                             .collect(Collectors.toMap(TestRunItems::getId, item -> item,
                                     (existingItem, duplicateItem) -> existingItem));
                     resultsMap.putAll(newResults);
                 }
 
                 final List<TestCaseDto> loadedItems = new ArrayList<>();
-                if (tr != null) {
-                    for (final TestRunItems item : tr.getResults()) {
+                if (run != null) {
+                    for (final TestRunItems item : run.getResults()) {
                         final TestCaseDto testCase = indexer.getTestCaseById(item.getId());
                         if (testCase == null) {
                             Logger.warn("Test run references missing test case id=" + item.getId());
@@ -405,12 +411,21 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             FontSync.syncWithNativeEditor(p, gridTable, gridFontSyncDisposable);
 
             gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
-            gridTable.addMouseListener(new GridContextMenuListener(gridTable, list, contextMenu, pageItems));
+            // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
+            new EscapeAction(p, gridTable);
+            // ENTER on the non-editable sequence column opens the details view.
+            new GridViewDetailsAction(p, gridTable, pageItems, parent.getPath2()).installDoubleClick();
+            // Read the nullable field once: the context menu listener needs a real
+            // list, and the selection carried over from list view comes from it.
+            final JBList<TestCaseDto> currentList = list;
+            if (currentList != null) {
+                gridTable.addMouseListener(new GridContextMenuListener(gridTable, currentList, contextMenu, pageItems));
 
-            final TestCaseDto selectedItem = list.getSelectedValue();
-            final int selectedRow = pageItems.indexOf(selectedItem);
-            if (selectedRow >= 0) {
-                gridTable.changeSelection(selectedRow, 0, false, false);
+                final TestCaseDto selectedItem = currentList.getSelectedValue();
+                final int selectedRow = pageItems.indexOf(selectedItem);
+                if (selectedRow >= 0) {
+                    gridTable.changeSelection(selectedRow, 0, false, false);
+                }
             }
 
             gridScrollPane = new JBScrollPane(gridTable);
@@ -585,4 +600,6 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         changeStatus.applyStatusChange(p, this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
     }
+
+
 }

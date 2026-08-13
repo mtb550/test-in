@@ -35,6 +35,7 @@ import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.enums.ViewMode;
 import org.testin.indexer.ProjectIndexer;
+import org.testin.EscapeAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
@@ -45,6 +46,7 @@ import org.testin.testCase.SortResult;
 import org.testin.testCase.TestCaseSorter;
 import org.testin.util.FontSync;
 import org.testin.viewPanel.ViewPanel;
+import org.testin.viewPanel.GridViewDetailsAction;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -105,6 +107,13 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Getter
     @Setter
     private int currentPage = 1;
+    /**
+     * Test case selected before a reload. Held as an id, not as a dto: a refresh
+     * replaces the objects, so identity would not survive it.
+     */
+    private @Nullable UUID selectionToRestore;
+    /** Grid column selected before a reload, so the cell comes back, not just the row. */
+    private int gridColumnToRestore = -1;
 
     @Getter
     @Setter
@@ -211,6 +220,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
                 unsortedIds.addAll(result.unsortedIds());
 
                 result.sortedList().forEach(tc -> tc.setParent(parent));
+
+                // The item may now sit on a different page than before the reload.
+                jumpToPageOfPendingSelection();
 
                 list.setPaintBusy(false);
                 if (allTestCases.isEmpty()) {
@@ -399,6 +411,8 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             toolBarSearch.resetSearchQuery();
         }
 
+        rememberSelection();
+
         this.allTestCases.clear();
         this.currentTestCases.clear();
         this.unsortedIds.clear();
@@ -425,15 +439,27 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         currentPage = page.page();
         final List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
-        final TestCaseDto selectedItem = list.getSelectedValue();
+        final UUID selectedId = selectionToRestore != null
+                ? selectionToRestore
+                : (list.getSelectedValue() != null ? list.getSelectedValue().getId() : null);
 
         syncListener.pause();
         model.replaceAll(pageItems);
         syncListener.resume();
 
-        if (selectedItem != null && pageItems.contains(selectedItem)) {
-            list.setSelectedValue(selectedItem, true);
+        // Matched by id: a reload hands back different dto instances for the
+        // same test cases, so comparing objects would drop the selection.
+        if (selectedId != null) {
+            for (final TestCaseDto item : pageItems) {
+                if (selectedId.equals(item.getId())) {
+                    // Selected by value, not by index: the list model owns its own
+                    // ordering, so an index into pageItems is not safe to reuse.
+                    list.setSelectedValue(item, true);
+                    break;
+                }
+            }
         }
+        selectionToRestore = null;
 
         statusBar.updatePaginationState(page.page(), page.totalPages(), totalItems);
 
@@ -442,6 +468,29 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             rebuildGrid();
             if (gridScrollPane != null) setCenter(gridScrollPane);
         }
+    }
+
+    /** Records the selected test case (and grid column) before the data is reloaded. */
+    private void rememberSelection() {
+        final TestCaseDto selected = list.getSelectedValue();
+        selectionToRestore = selected != null ? selected.getId() : null;
+        gridColumnToRestore = gridTable != null ? gridTable.getSelectedColumn() : -1;
+    }
+
+    /** Moves to whichever page now holds the remembered test case. */
+    private void jumpToPageOfPendingSelection() {
+        if (selectionToRestore == null) return;
+
+        // pageSize comes from settings and is guarded everywhere else in this
+        // class; dividing by a stored 0 would throw.
+        final int safePageSize = Math.max(1, pageSize);
+        for (int i = 0; i < currentTestCases.size(); i++) {
+            if (selectionToRestore.equals(currentTestCases.get(i).getId())) {
+                currentPage = (i / safePageSize) + 1;
+                return;
+            }
+        }
+        selectionToRestore = null;
     }
 
     private @NotNull List<TestCaseDto> getCurrentPageItems() {
@@ -462,14 +511,24 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
             FontSync.syncWithNativeEditor(p, gridTable, gridFontSyncDisposable);
 
             gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
-            gridTable.getModel().addTableModelListener(new GridEditListener(p, pageItems, model::allContentsChanged));
+            gridTable.getModel().addTableModelListener(new GridEditListener(p, pageItems, model::allContentsChanged, parent.getPath()));
+            // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
+            new EscapeAction(p, gridTable);
+            // ENTER on the non-editable sequence column opens the details view.
+            new GridViewDetailsAction(p, gridTable, pageItems, parent.getPath2()).installDoubleClick();
             gridTable.addMouseListener(new GridContextMenuListener(gridTable, list, contextMenu, pageItems));
 
             final TestCaseDto selectedItem = list.getSelectedValue();
             final int selectedRow = pageItems.indexOf(selectedItem);
             if (selectedRow >= 0) {
-                gridTable.changeSelection(selectedRow, 0, false, false);
+                final int column = gridColumnToRestore >= 0 && gridColumnToRestore < gridTable.getColumnCount()
+                        ? gridColumnToRestore : 0;
+                gridTable.changeSelection(selectedRow, column, false, false);
+                gridTable.scrollRectToVisible(gridTable.getCellRect(selectedRow, column, true));
             }
+            // Cleared whether or not the row was found, so a stale column can
+            // never be applied to an unrelated rebuild.
+            gridColumnToRestore = -1;
 
             gridScrollPane = new JBScrollPane(gridTable);
             Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());

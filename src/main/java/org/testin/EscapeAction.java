@@ -8,6 +8,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
+import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
@@ -24,6 +25,7 @@ public class EscapeAction extends DumbAwareAction {
     private final SimpleTree tree;
     private final TreeTransferHandler transferHandler;
     private final JBList<TestCaseDto> list;
+    private final JBTable table;
 
     public EscapeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
@@ -31,6 +33,7 @@ public class EscapeAction extends DumbAwareAction {
         this.tree = tree;
         this.transferHandler = transferHandler;
         this.list = null;
+        this.table = null;
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), tree);
     }
 
@@ -38,9 +41,21 @@ public class EscapeAction extends DumbAwareAction {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
         this.p = p;
         this.list = list;
+        this.table = null;
         this.tree = null;
         this.transferHandler = null;
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), list);
+    }
+
+    /** Grid view: same behaviour as the list, except while a cell is being edited. */
+    public EscapeAction(final @NotNull Project p, final @NotNull JBTable table) {
+        super("Escape Action", "", AllIcons.Actions.InlayGear);
+        this.p = p;
+        this.table = table;
+        this.list = null;
+        this.tree = null;
+        this.transferHandler = null;
+        this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), table);
     }
 
     @Override
@@ -53,23 +68,46 @@ public class EscapeAction extends DumbAwareAction {
         }
 
         if (list != null) {
-            if (TestEditorContextMenu.isGlobalCutAction()) {
-                TestEditorContextMenu.clearCutState();
-            }
-
-            CopyPasteManager.getInstance().setContents(new StringSelection(""));
-
-            ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow(p);
-
-            if (toolWindow != null && toolWindow.isVisible()) {
-                toolWindow.hide(null);
-                return;
-            }
+            clearClipboardState();
+            if (hideViewPanelIfVisible()) return;
 
             if (!list.isSelectionEmpty()) {
                 list.clearSelection();
             }
+            return;
         }
+
+        if (table != null) {
+            // While a cell is open the editor owns ESC: cancel the edit only.
+            if (table.isEditing()) {
+                table.getCellEditor().cancelCellEditing();
+                return;
+            }
+
+            clearClipboardState();
+            if (hideViewPanelIfVisible()) return;
+
+            if (table.getSelectedRowCount() > 0 || table.getSelectedColumnCount() > 0) {
+                table.clearSelection();
+            }
+        }
+    }
+
+    private void clearClipboardState() {
+        if (TestEditorContextMenu.isGlobalCutAction()) {
+            TestEditorContextMenu.clearCutState();
+        }
+        CopyPasteManager.getInstance().setContents(new StringSelection(""));
+    }
+
+    /** True when the view panel was open and has been hidden by this ESC. */
+    private boolean hideViewPanelIfVisible() {
+        final ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow(p);
+        if (toolWindow != null && toolWindow.isVisible()) {
+            toolWindow.hide(null);
+            return true;
+        }
+        return false;
     }
 
     @Override

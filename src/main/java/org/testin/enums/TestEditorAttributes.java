@@ -275,6 +275,16 @@ public enum TestEditorAttributes {
     private final boolean importable;
     private final boolean copyable;
     private final boolean exportable;
+    /**
+     * The value as the grid shows it. Steps get one line each there, so ALT+ENTER
+     * writes the next step; the sequence numbers stay a view-panel concern. Every
+     * other attribute - and every other surface, including exports, clipboard
+     * copy and the import preview - uses the canonical extractor unchanged.
+     */
+    public String gridValue(final Project p, final TestCaseDto tc) {
+        return this == STEPS ? String.join("\n", tc.getSteps()) : testValueExtractor.execute(tc, p);
+    }
+
     private final ValueExtractor<TestCaseDto> testValueExtractor;
     private final DrawItem<TestCaseDto> testDrawItem;
     private final ImportSetter importSetter;
