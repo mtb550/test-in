@@ -8,7 +8,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.GeneratorAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -59,19 +58,22 @@ public class RenameJavaPackage implements GeneratorAction {
         });
     }
 
-    private void updatePackageDeclarations(final @NotNull Project p, final VirtualFile root, final String newTop, final String parentPackage) {
+    private void updatePackageDeclarations(final @NotNull Project p, final @NotNull VirtualFile root,
+                                           final @NotNull String newTop, final @NotNull String parentPackage) {
         updatePackageDeclarationsRecursive(p, root, root, newTop, parentPackage);
     }
 
-    private void updatePackageDeclarationsRecursive(final @NotNull Project p, final VirtualFile root, final VirtualFile dir, final String newTop, final String parentPackage) {
-        for (VirtualFile child : dir.getChildren()) {
+    private void updatePackageDeclarationsRecursive(final @NotNull Project p, final @NotNull VirtualFile root,
+                                                    final @NotNull VirtualFile dir, final @NotNull String newTop,
+                                                    final @NotNull String parentPackage) {
+        for (final VirtualFile child : dir.getChildren()) {
             if (child.isDirectory()) {
                 updatePackageDeclarationsRecursive(p, root, child, newTop, parentPackage);
             } else if ("java".equals(child.getExtension())) {
                 final PsiFile psiFile = PsiManager.getInstance(p).findFile(child);
                 if (psiFile instanceof PsiJavaFile javaFile) {
                     final String newPackage = buildNewPackage(root, child.getParent(), newTop, parentPackage);
-                    if (newPackage != null && !newPackage.equals(javaFile.getPackageName())) {
+                    if (!newPackage.equals(javaFile.getPackageName())) {
                         javaFile.setPackageName(newPackage);
                     }
                 }
@@ -79,13 +81,12 @@ public class RenameJavaPackage implements GeneratorAction {
         }
     }
 
-    private @Nullable String buildNewPackage(final VirtualFile root, final VirtualFile parentDir, final String newTop, final String parentPackage) {
+    private @NotNull String buildNewPackage(final @NotNull VirtualFile root, final @NotNull VirtualFile parentDir,
+                                            final @NotNull String newTop, final @NotNull String parentPackage) {
         final String rel = VfsUtil.getRelativePath(parentDir, root, '/');
-        final String base = (parentPackage == null || parentPackage.isEmpty())
-                ? newTop
-                : parentPackage + "." + newTop;
+        final String base = parentPackage.isEmpty() ? newTop : parentPackage + "." + newTop;
+
         if (rel == null || rel.isEmpty()) return base;
         return base + "." + rel.replace('/', '.');
     }
-
 }

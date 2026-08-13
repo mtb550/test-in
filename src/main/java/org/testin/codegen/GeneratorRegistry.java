@@ -29,7 +29,7 @@ import java.util.Map;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class GeneratorRegistry {
 
-    private static final Map<GeneratorType, GeneratorAction> ACTIONS = new EnumMap<>(GeneratorType.class);
+    private static final @NotNull Map<GeneratorType, GeneratorAction> ACTIONS = new EnumMap<>(GeneratorType.class);
 
     static {
         ACTIONS.put(GeneratorType.CREATE_TEST_PROJECT, new CreateJavaPackage());

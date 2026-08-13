@@ -23,12 +23,12 @@ public class CreateJavaPackage implements GeneratorAction {
 
         WriteAction.run(() -> {
             try {
-                VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRootOrWarn(p);
+                final VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRootOrWarn(p);
                 if (testSourceRoot == null) {
                     return;
                 }
 
-                VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));
+                final VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));
                 if (vf == null) {
                     Logger.error("Could not create package directory: " + String.join("/", fqcn));
                     return;

@@ -35,7 +35,8 @@ public class RenameJavaClass implements GeneratorAction {
             }
 
             final String newClassName = Services.getInstance(p, Tools.class).sanitizeClassName(newName);
-            if (!targetClass.getName().equals(newClassName)) {
+            // Receiver is the non-null side: PsiClass#getName is null for anonymous classes.
+            if (!newClassName.equals(targetClass.getName())) {
                 targetClass.setName(newClassName);
             }
             Logger.info("Renamed test class to: " + newClassName);

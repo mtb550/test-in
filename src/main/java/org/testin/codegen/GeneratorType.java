@@ -130,7 +130,7 @@ public enum GeneratorType {
     /**
      * Returned when the Java plugin is absent: notify once per project, then skip quietly.
      */
-    private static final GeneratorAction JAVA_UNAVAILABLE = (p, obj) -> OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
+    private static final @NotNull GeneratorAction JAVA_UNAVAILABLE = (p, obj) -> OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
 
     private final @NotNull String description;
     private final @NotNull String tooltip;
