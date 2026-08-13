@@ -57,7 +57,7 @@ public abstract class TestCaseBaseDialog {
         this.expectedResultSection = new ExpectedResultSection(p);
         this.moduleSection = new ModuleSection(p);
         this.testDataSection = new TestDataSection();
-        this.preConditionsSection = new PreConditionsSection();
+        this.preConditionsSection = new PreConditionsSection(p);
         this.stepsSection = new StepsSection(p);
         this.prioritySection = new PrioritySection();
         this.groupSection = new GroupSection();
@@ -65,7 +65,7 @@ public abstract class TestCaseBaseDialog {
 
         this.cachedSections = Arrays.stream(CreateTestCaseFields.values())
                 .filter(CreateTestCaseFields::isCreateMenuItem)
-                .map(field -> field.getSectionExtractor().apply(this))
+                .map(field -> field.requireSectionExtractor().apply(this))
                 .toList();
 
         this.statusBarMapping = Arrays.stream(CreateTestCaseFields.values())

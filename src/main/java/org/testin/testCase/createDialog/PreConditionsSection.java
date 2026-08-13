@@ -1,5 +1,6 @@
 package org.testin.testCase.createDialog;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.ui.EditorTextField;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
@@ -10,6 +11,7 @@ import org.testin.enums.CreateTestCaseFields;
 import org.testin.enums.IUIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Shortcuts;
+import org.testin.util.SpellChecker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,8 +22,9 @@ public class PreConditionsSection implements ICreateTestCaseSection {
     private final @NotNull EditorTextField preConditionsField;
     private final @NotNull JBPanel<?> wrapper;
 
-    public PreConditionsSection() {
-        this.preConditionsField = new EditorTextField();
+    public PreConditionsSection(final @NotNull Project p) {
+        this.preConditionsField = SpellChecker.createField(p);
+        this.preConditionsField.setOneLineMode(true);
         this.preConditionsField.setFont(fieldFont);
         this.preConditionsField.setPlaceholder(CreateTestCaseFields.PRE_CONDITIONS.getPlaceholder());
         this.preConditionsField.setShowPlaceholderWhenFocused(true);

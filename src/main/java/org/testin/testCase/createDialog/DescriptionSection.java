@@ -1,6 +1,7 @@
 package org.testin.testCase.createDialog;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBPanel;
@@ -15,6 +16,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.util.Shortcuts;
+import org.testin.util.SpellChecker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,11 +24,14 @@ import java.awt.*;
 public class DescriptionSection implements ICreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 6f);
     @Getter
-    private final @NotNull TextFieldWithAutoCompletion<String> descriptionField;
+    private final @NotNull EditorTextField descriptionField;
     private final @NotNull JBPanel<?> wrapper;
 
     public DescriptionSection(final @NotNull Project p) {
-        this.descriptionField = new TextFieldWithAutoCompletion<>(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()), false, "");
+        this.descriptionField = SpellChecker.createCompletionField(p,
+                new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getDescription(), CreateTestCaseFields.DESCRIPTION.getIcon()),
+                "");
+        this.descriptionField.setOneLineMode(true);
         this.descriptionField.setFont(fieldFont);
         this.descriptionField.setPlaceholder(CreateTestCaseFields.DESCRIPTION.getPlaceholder());
         this.descriptionField.setShowPlaceholderWhenFocused(true);

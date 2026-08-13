@@ -1,6 +1,7 @@
 package org.testin.testCase.createDialog;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
@@ -13,6 +14,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.util.Shortcuts;
+import org.testin.util.SpellChecker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,11 +22,14 @@ import java.awt.*;
 public class ExpectedResultSection implements ICreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
     @Getter
-    private final @NotNull TextFieldWithAutoCompletion<String> expectedResultField;
+    private final @NotNull EditorTextField expectedResultField;
     private final @NotNull JBPanel<?> wrapper;
 
     public ExpectedResultSection(final @NotNull Project p) {
-        this.expectedResultField = new TextFieldWithAutoCompletion<>(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), false, "");
+        this.expectedResultField = SpellChecker.createCompletionField(p,
+                new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()),
+                "");
+        this.expectedResultField.setOneLineMode(true);
         this.expectedResultField.setFont(fieldFont);
         this.expectedResultField.setPlaceholder(CreateTestCaseFields.EXPECTED_RESULT.getPlaceholder());
         this.expectedResultField.setShowPlaceholderWhenFocused(true);

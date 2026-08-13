@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.TextFieldWithAutoCompletionListProvider;
 import com.intellij.ui.components.JBLabel;
@@ -20,6 +21,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.util.Shortcuts;
+import org.testin.util.SpellChecker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +34,7 @@ public class StepsSection implements ICreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
     private final @NotNull Project p;
     @Getter
-    private final @NotNull List<TextFieldWithAutoCompletion<String>> stepFields;
+    private final @NotNull List<EditorTextField> stepFields;
     private final @NotNull JBPanel<?> stepsContainer;
     private final @NotNull JBPanel<?> wrapper;
     /**
@@ -82,8 +84,9 @@ public class StepsSection implements ICreateTestCaseSection {
 
     public void addStepField(final @Nullable String text, final @NotNull IUIAction repackAction) {
         final TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
-        final TextFieldWithAutoCompletion<String> stepField = new TextFieldWithAutoCompletion<>(p, provider, false, text != null ? text : "");
+        final EditorTextField stepField = SpellChecker.createCompletionField(p, provider, text != null ? text : "");
 
+        stepField.setOneLineMode(true);
         stepField.setFont(fieldFont);
         stepField.setPlaceholder(CreateTestCaseFields.STEPS.getPlaceholder() + (stepFields.size() + 1));
         stepField.setShowPlaceholderWhenFocused(true);
@@ -137,7 +140,8 @@ public class StepsSection implements ICreateTestCaseSection {
         stepsContainer.add(stepRow);
     }
 
-    private void removeStepAction(final @NotNull JBPanel<?> stepRow, final @NotNull TextFieldWithAutoCompletion<String> stepField, final @NotNull IUIAction repackAction) {
+    private void removeStepAction(final @NotNull JBPanel<?> stepRow, final @NotNull EditorTextField stepField,
+                                  final @NotNull IUIAction repackAction) {
         if (stepFields.size() == 1) {
             stepField.setText("");
             stepField.requestFocus();
@@ -159,7 +163,7 @@ public class StepsSection implements ICreateTestCaseSection {
     public void applyTo(final @NotNull TestCaseDto dto) {
         if (wrapper.getParent() != null) {
             final List<String> finalSteps = new ArrayList<>();
-            for (final TextFieldWithAutoCompletion<String> sf : stepFields) {
+            for (final EditorTextField sf : stepFields) {
                 if (!sf.getText().trim().isEmpty()) {
                     finalSteps.add(sf.getText().trim());
                 }
@@ -184,7 +188,7 @@ public class StepsSection implements ICreateTestCaseSection {
 
     @Override
     public void setEditable(final boolean editable) {
-        for (final TextFieldWithAutoCompletion<String> field : stepFields) {
+        for (final EditorTextField field : stepFields) {
             field.setEnabled(editable);
             final Container row = field.getParent();
             if (row != null) {

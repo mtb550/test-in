@@ -24,6 +24,13 @@ public enum Shortcuts {
     Enter(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
     Escape(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),
 
+    /**
+     * Spelling corrections in the dialog editors. Bound by the platform, not by
+     * us - declared here only so the status bars render it from one source
+     * instead of spelling "Alt+Enter" out by hand.
+     */
+    Corrections(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK)),
+
     // Toolbar search (test editor + run editor)
     FocusSearch(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuMask())),
 

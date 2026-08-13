@@ -1,6 +1,7 @@
 package org.testin.testCase.createDialog;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.EditorTextField;
 import com.intellij.ui.TextFieldWithAutoCompletion;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
@@ -13,6 +14,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.util.Shortcuts;
+import org.testin.util.SpellChecker;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,11 +22,14 @@ import java.awt.*;
 public class ModuleSection implements ICreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
     @Getter
-    private final @NotNull TextFieldWithAutoCompletion<String> moduleField;
+    private final @NotNull EditorTextField moduleField;
     private final @NotNull JBPanel<?> wrapper;
 
     public ModuleSection(final @NotNull Project p) {
-        this.moduleField = new TextFieldWithAutoCompletion<>(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getModules(), CreateTestCaseFields.MODULE.getIcon()), false, "");
+        this.moduleField = SpellChecker.createCompletionField(p,
+                new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getModules(), CreateTestCaseFields.MODULE.getIcon()),
+                "");
+        this.moduleField.setOneLineMode(true);
         this.moduleField.setFont(fieldFont);
         this.moduleField.setPlaceholder(CreateTestCaseFields.MODULE.getPlaceholder());
         this.moduleField.setShowPlaceholderWhenFocused(true);

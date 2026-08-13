@@ -83,6 +83,30 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null
     ),
 
+    CANCEL(
+            "Cancel",
+            Shortcuts.Escape,
+            null,
+            null,
+            new IStatusBarItem[]{},
+            false,
+            null,
+            null
+    ),
+
+    // Display only: the platform binds Alt+Enter on the editors itself. Shown
+    // only on the fields that actually spell check.
+    CORRECTIONS(
+            "Corrections",
+            null,
+            Shortcuts.Corrections.getShortcutText(),
+            null,
+            new IStatusBarItem[]{},
+            false,
+            null,
+            null
+    ),
+
     ADD_STEP(
             "Add Step",
             Shortcuts.CreateTestCaseAddStep,
@@ -154,7 +178,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             Shortcuts.CreateTestCaseDescription,
             null,
             AllIcons.Actions.Edit,
-            new IStatusBarItem[]{SAVE, NAVIGATE_TAB, DESCRIPTION_SHORTCUT, EXPECTED_RESULT_SHORTCUT, STEPS_SHORTCUT, PRIORITY_SHORTCUT, GROUP_SHORTCUT},
+            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, NAVIGATE_TAB, DESCRIPTION_SHORTCUT, EXPECTED_RESULT_SHORTCUT, STEPS_SHORTCUT, PRIORITY_SHORTCUT, GROUP_SHORTCUT},
             true,
             TestCaseBaseDialog::getDescriptionSection,
             "set description"
@@ -165,7 +189,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             Shortcuts.CreateTestCaseExpectedResult,
             null,
             AllIcons.General.InspectionsOK,
-            new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
+            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, NAVIGATE_TAB},
             true,
             TestCaseBaseDialog::getExpectedResultSection,
             "set expected result"
@@ -176,7 +200,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             Shortcuts.CreateTestCaseModule,
             null,
             AllIcons.General.ContextHelp,
-            new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
+            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, NAVIGATE_TAB},
             true,
             TestCaseBaseDialog::getModuleSection,
             "set module"
@@ -187,7 +211,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             Shortcuts.CreateTestCaseTestData,
             null,
             AllIcons.Nodes.DataTables,
-            new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
+            new IStatusBarItem[]{SAVE, CANCEL, NAVIGATE_TAB},
             true,
             TestCaseBaseDialog::getTestDataSection,
             "set test data"
@@ -198,7 +222,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             Shortcuts.CreateTestCasePreConditions,
             null,
             AllIcons.Actions.StepOut,
-            new IStatusBarItem[]{SAVE, NAVIGATE_TAB},
+            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, NAVIGATE_TAB},
             true,
             TestCaseBaseDialog::getPreConditionsSection,
             "set pre conditions"
@@ -209,7 +233,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             Shortcuts.CreateTestCaseAddStep,
             null,
             AllIcons.Actions.ListFiles,
-            new IStatusBarItem[]{SAVE, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
+            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
             true,
             TestCaseBaseDialog::getStepsSection,
             "set step"
@@ -220,7 +244,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             Shortcuts.CreateTestCasePriority,
             null,
             AllIcons.Nodes.Favorite,
-            new IStatusBarItem[]{SAVE, SET_PRIORITY, NAVIGATE_ARROWS},
+            new IStatusBarItem[]{SAVE, CANCEL, SET_PRIORITY, NAVIGATE_ARROWS},
             true,
             TestCaseBaseDialog::getPrioritySection,
             null
@@ -242,7 +266,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             Shortcuts.CreateTestCaseGroup,
             null,
             AllIcons.Nodes.Tag,
-            new IStatusBarItem[]{SAVE, NAVIGATE_TAB, SELECT_GROUP},
+            new IStatusBarItem[]{SAVE, CANCEL, NAVIGATE_TAB, SELECT_GROUP},
             true,
             TestCaseBaseDialog::getGroupSection,
             null
@@ -256,9 +280,23 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     private final @Nullable String customShortcutText;
     private final @Nullable Icon icon;
     private final IStatusBarItem @NotNull [] statusBarItems;
+
+    /**
+     * True for the constants the create dialog builds a section for. Those - and
+     * only those - carry an icon and a section extractor; the rest are status-bar
+     * hints for keys the sections bind themselves. Use {@link #requireSectionExtractor()}
+     * rather than trusting a caller to have filtered on this flag first.
+     */
     private final boolean createMenuItem;
     private final @Nullable Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
     private final @Nullable String placeholder;
+
+    public @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> requireSectionExtractor() {
+        if (sectionExtractor == null) {
+            throw new IllegalStateException(name + " has no dialog section: it is not a create-dialog field");
+        }
+        return sectionExtractor;
+    }
 
     // todo, to be removed.
     @Override

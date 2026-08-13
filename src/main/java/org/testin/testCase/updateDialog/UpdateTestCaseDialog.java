@@ -127,8 +127,14 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
                 .createPopup();
 
         final Runnable saveAction = save(existingDto, onSave, new JBPopup[]{popup});
+        final JBPopup dialogPopup = popup;
 
         registerShortcut(mainPanel, Shortcuts.Enter.getCustomShortcut(), saveAction::run);
+
+        // Escape is bound rather than left to the popup's own cancel key: once an
+        // editor popup has been open over the dialog - the spelling corrections,
+        // for one - the built-in handler stops seeing the key.
+        registerShortcut(mainPanel, Shortcuts.Escape.getCustomShortcut(), dialogPopup::cancel);
     }
 
     public void show() {
