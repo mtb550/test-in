@@ -3,6 +3,7 @@ package org.testin.enums;
 import com.intellij.ui.JBColor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
@@ -25,8 +26,8 @@ public enum TestCardStatus {
             new JBColor(new Color(255, 100, 100), new Color(180, 50, 50))
     );
 
-    private final String label;
-    private final JBColor badgeColor;
+    private final @NotNull String label;
+    private final @NotNull JBColor badgeColor;
 
     public static @Nullable TestCardStatus from(final String status) {
         for (final TestCardStatus s : values())

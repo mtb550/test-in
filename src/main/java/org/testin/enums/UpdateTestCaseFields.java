@@ -5,6 +5,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.GeneratorType;
 import org.testin.statusBar.IStatusBarItem;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
@@ -210,30 +211,34 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             TestCaseBaseDialog::getGroupSection
     );
 
-    private final String name;
-    private final Shortcuts shortcut;
-    private final String customShortcutText;
-    private final Icon icon;
-    private final IStatusBarItem[] statusBarItems;
+    private final @NotNull String name;
+
+    // The action-only constants (Save, Add Step, ...) are status-bar hints:
+    // they name a key and carry no icon, no code generator and no dialog
+    // section of their own.
+    private final @Nullable Shortcuts shortcut;
+    private final @Nullable String customShortcutText;
+    private final @Nullable Icon icon;
+    private final IStatusBarItem @NotNull [] statusBarItems;
     private final boolean updateMenuItem;
-    private final GeneratorType gt;
-    private final IBulkEditorAction bulkAction;
-    private final Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
+    private final @Nullable GeneratorType gt;
+    private final @Nullable IBulkEditorAction bulkAction;
+    private final @Nullable Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
 
 
     @Override
-    public String getShortcutText() {
+    public @NotNull String getShortcutText() {
         if (customShortcutText != null) {
             return customShortcutText;
         }
         return shortcut != null ? shortcut.getShortcutText() : "";
     }
 
-    public void bindShortcut(final JComponent component, final Runnable onTrigger) {
+    public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onTrigger) {
         if (this.shortcut != null) {
             new DumbAwareAction() {
                 @Override
-                public void actionPerformed(@NotNull com.intellij.openapi.actionSystem.AnActionEvent e) {
+                public void actionPerformed(final @NotNull com.intellij.openapi.actionSystem.AnActionEvent e) {
                     onTrigger.run();
                 }
             }.registerCustomShortcutSet(this.shortcut.getCustomShortcut(), component);

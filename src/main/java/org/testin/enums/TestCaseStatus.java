@@ -2,6 +2,7 @@ package org.testin.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -22,5 +23,5 @@ public enum TestCaseStatus {
             "To Be Updated"
     );
 
-    private final String displayText;
+    private final @NotNull String displayText;
 }

@@ -67,21 +67,23 @@ public enum TestRunStatus {
             AllIcons.Nodes.Services
     );
 
-    private static final Map<TestRunStatus, TestRunStatus> TRANSITIONS = Map.of(
+    private static final @NotNull Map<TestRunStatus, TestRunStatus> TRANSITIONS = Map.of(
             CREATED, IN_PROGRESS,
             ASSIGNED, IN_PROGRESS,
             IN_PROGRESS, COMPLETED
     );
-    private final String label;
-    private final KeyStroke shortcut;
-    private final Icon icon;
+    private final @NotNull String label;
+
+    /** Null for the statuses the tester cannot set directly from the keyboard. */
+    private final @Nullable KeyStroke shortcut;
+    private final @NotNull Icon icon;
 
     /**
      * Presentation of the advance action while the run is in this status.
      */
-    private final String advanceLabel;
-    private final String advanceDescription;
-    private final Icon advanceIcon;
+    private final @NotNull String advanceLabel;
+    private final @NotNull String advanceDescription;
+    private final @NotNull Icon advanceIcon;
 
     /**
      * The status the advance action moves this run to, or null when terminal.
@@ -104,17 +106,17 @@ public enum TestRunStatus {
         return this == COMPLETED || this == CLOSED;
     }
 
-    public String getShortcutText() {
+    public @NotNull String getShortcutText() {
         return Optional.ofNullable(shortcut)
                 .map(Tools::shortcutText)
                 .orElse("");
     }
 
-    public void bindShortcut(final JComponent component, final Runnable onAction) {
+    public void bindShortcut(final @NotNull JComponent component, final @NotNull Runnable onAction) {
         if (shortcut != null) {
             new DumbAwareAction() {
                 @Override
-                public void actionPerformed(@NotNull AnActionEvent e) {
+                public void actionPerformed(final @NotNull AnActionEvent e) {
                     onAction.run();
                 }
             }.registerCustomShortcutSet(Tools.customShortcut(shortcut), component);

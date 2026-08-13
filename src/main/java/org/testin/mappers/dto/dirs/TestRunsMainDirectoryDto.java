@@ -27,7 +27,7 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public @Nullable Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
+    public @Nullable Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
         return indexer.getTestRunDirByPath(folder);
     }
 
@@ -53,7 +53,7 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public boolean acceptsTransferred(final DirectoryDto source) {
+    public boolean acceptsTransferred(final @NotNull DirectoryDto source) {
         // Test-set nodes never land in the run family.
         return super.acceptsTransferred(source) && source.isAllowedInTestRunFamily();
     }

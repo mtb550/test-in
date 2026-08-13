@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.run.RunTestCaseAction;
 
@@ -46,16 +47,16 @@ public enum RunStatus {
             }
     );
 
-    private final String statusName;
-    private final Icon icon;
-    private final String tooltip;
-    private final BiConsumer<TestCaseDto, JBList<TestCaseDto>> action;
+    private final @NotNull String statusName;
+    private final @NotNull Icon icon;
+    private final @NotNull String tooltip;
+    private final @NotNull BiConsumer<TestCaseDto, JBList<TestCaseDto>> action;
 
-    public static RunStatus fromString(final String status) {
+    public static @NotNull RunStatus fromString(final @Nullable String status) {
         if (status == null || status.trim().isEmpty()) {
             return IDLE;
         }
-        for (RunStatus rs : values()) {
+        for (final RunStatus rs : values()) {
             if (rs.statusName.equalsIgnoreCase(status)) {
                 return rs;
             }
@@ -63,7 +64,8 @@ public enum RunStatus {
         return IDLE;
     }
 
-    public void executeAction(final @NotNull Project p, final TestCaseDto dto, final JBList<TestCaseDto> list) {
+    public void executeAction(final @NotNull Project p, final @NotNull TestCaseDto dto,
+                              final @NotNull JBList<TestCaseDto> list) {
         new RunTestCaseAction(p, list).execute(dto);
     }
 }

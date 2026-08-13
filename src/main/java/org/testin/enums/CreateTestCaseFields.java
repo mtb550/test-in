@@ -4,6 +4,8 @@ import com.intellij.icons.AllIcons;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.statusBar.IStatusBarItem;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
@@ -246,18 +248,21 @@ public enum CreateTestCaseFields implements IStatusBarItem {
             null
     );
 
-    private final String name;
-    private final Shortcuts shortcut;
-    private final String customShortcutText;
-    private final Icon icon;
-    private final IStatusBarItem[] statusBarItems;
+    private final @NotNull String name;
+
+    // The *_SHORTCUT constants are status-bar hints only: they name a key and
+    // carry no icon, no placeholder and no dialog section of their own.
+    private final @Nullable Shortcuts shortcut;
+    private final @Nullable String customShortcutText;
+    private final @Nullable Icon icon;
+    private final IStatusBarItem @NotNull [] statusBarItems;
     private final boolean createMenuItem;
-    private final Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
-    private final String placeholder;
+    private final @Nullable Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
+    private final @Nullable String placeholder;
 
     // todo, to be removed.
     @Override
-    public String getShortcutText() {
+    public @NotNull String getShortcutText() {
         if (customShortcutText != null)
             return customShortcutText;
 

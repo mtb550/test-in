@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.swing.*;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -58,7 +59,7 @@ public enum TestRunConfiguration {
             new String[]{"", "Desktop", "Mobile", "Tablet"}
     );
 
-    private final String displayName;
-    private final Icon icon;
-    private final String[] options;
+    private final @NotNull String displayName;
+    private final @NotNull Icon icon;
+    private final @NotNull String[] options;
 }

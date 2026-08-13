@@ -127,7 +127,7 @@ public enum DirectoryType {
             SimpleTextAttributes.REGULAR_ATTRIBUTES
     );
 
-    private static final Map<Class<?>, DirectoryType> BY_CLASS;
+    private static final @NotNull Map<Class<?>, DirectoryType> BY_CLASS;
 
     static {
         final Map<Class<?>, DirectoryType> map = new HashMap<>();
@@ -138,16 +138,24 @@ public enum DirectoryType {
     }
 
     private final @NotNull String description;
-    private final String displayedName;
-    private final @NotNull Icon icon;
-    private final Class<? extends DirectoryDto> clazz;
-    private final String marker;
-    private final Function<Project, NodeCreator> action;
-    private final GeneratorAction codeGenerator;
-    private final RemoveHandler removeHandler;
-    private final SimpleTextAttributes attributes;
 
-    public static @Nullable DirectoryType from(final DirectoryDto dir) {
+    /** Null when the node shows its own name rather than a fixed label. */
+    private final @Nullable String displayedName;
+    private final @NotNull Icon icon;
+    private final @NotNull Class<? extends DirectoryDto> clazz;
+
+    /** Null for IMPORT_TP: a clone target has no marker file of its own. */
+    private final @Nullable String marker;
+
+    // Null where the type does not support that operation: the fixed root
+    // containers cannot be created, some types generate no Java code, and the
+    // roots cannot be removed. Call sites check before invoking.
+    private final @Nullable Function<Project, NodeCreator> action;
+    private final @Nullable GeneratorAction codeGenerator;
+    private final @Nullable RemoveHandler removeHandler;
+    private final @NotNull SimpleTextAttributes attributes;
+
+    public static @Nullable DirectoryType from(final @NotNull DirectoryDto dir) {
         return BY_CLASS.get(dir.getClass());
     }
 }

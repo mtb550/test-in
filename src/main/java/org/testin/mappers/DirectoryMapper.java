@@ -23,7 +23,7 @@ import java.nio.file.Path;
 @Service(Service.Level.PROJECT)
 public final class DirectoryMapper {
 
-    public @NotNull TestProjectDirectoryDto setTestProjectNode(final @NotNull Project p, final Path path) {
+    public @NotNull TestProjectDirectoryDto setTestProjectNode(final @NotNull Project p, final @NotNull Path path) {
         final String fileName = path.getFileName().toString();
 
         final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
@@ -39,7 +39,7 @@ public final class DirectoryMapper {
         return tp;
     }
 
-    public @NotNull TestProjectDirectoryDto getTestProjectNode(final @NotNull Project p, final Path path) {
+    public @NotNull TestProjectDirectoryDto getTestProjectNode(final @NotNull Project p, final @NotNull Path path) {
         final String fileName = path.getFileName().toString();
         try {
             final Mapper mapper = Services.getInstance(p, Mapper.class);
@@ -71,7 +71,7 @@ public final class DirectoryMapper {
         }
     }
 
-    public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project p, final Path path, final TestProjectDirectoryDto tp) {
+    public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project p, final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
         return TestCasesMainDirectoryDto.builder()
                 .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
                 .name(DirectoryType.TCD.getDisplayedName())
@@ -80,7 +80,7 @@ public final class DirectoryMapper {
                 .build();
     }
 
-    public @NotNull TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Project p, final Path path, final TestProjectDirectoryDto tp) {
+    public @NotNull TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Project p, final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
         return TestRunsMainDirectoryDto.builder()
                 .path(path.resolve(DirectoryType.TRD.getDisplayedName()))
                 .name(DirectoryType.TRD.getDisplayedName())
@@ -89,7 +89,7 @@ public final class DirectoryMapper {
                 .build();
     }
 
-    public @NotNull TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
+    public @NotNull TestSetPackageDirectoryDto getTestSetPackageNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestSetPackageDirectoryDto testSetPackageDirectoryDto = TestSetPackageDirectoryDto
@@ -110,7 +110,7 @@ public final class DirectoryMapper {
         }
     }
 
-    public @NotNull TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
+    public @NotNull TestRunPackageDirectoryDto getTestRunPackageNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestRunPackageDirectoryDto testRunPackageDirectoryDto = TestRunPackageDirectoryDto
@@ -131,7 +131,7 @@ public final class DirectoryMapper {
         }
     }
 
-    public @NotNull TestSetDirectoryDto getTestSetNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
+    public @NotNull TestSetDirectoryDto getTestSetNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         try {
             TestSetDirectoryDto testSetDirectoryDto = TestSetDirectoryDto
@@ -155,22 +155,22 @@ public final class DirectoryMapper {
     /**
      * Builds a run node without reading the marker file (used when creating a new run).
      */
-    public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
+    public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         return buildTestRunNode(p, path, parent, null);
     }
 
     /**
      * Builds a run node, reading its marker from disk (used when indexing an existing run).
      */
-    public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Project p, final Path path, final DirectoryDto parent) {
+    public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
         final TestRunMarker marker = readMarkerSafe(Services.getInstance(p, Mapper.class),
                 path.resolve(DirectoryType.TR.getMarker()).toFile(), TestRunMarker.class, "run", fileName);
         return buildTestRunNode(p, path, parent, marker);
     }
 
-    private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final Path path,
-                                                          final DirectoryDto parent, final @Nullable TestRunMarker marker) {
+    private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final @NotNull Path path,
+                                                          final @NotNull DirectoryDto parent, final @Nullable TestRunMarker marker) {
         final String fileName = path.getFileName().toString();
         try {
             final var builder = TestRunDirectoryDto
@@ -193,7 +193,7 @@ public final class DirectoryMapper {
         }
     }
 
-    private <M> M readMarkerSafe(final @NotNull Mapper mapper, final @NotNull File file, final @NotNull Class<M> type, final String kind, final String name) {
+    private <M> @NotNull M readMarkerSafe(final @NotNull Mapper mapper, final @NotNull File file, final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
         try {
             return mapper.readValue(file, type);
         } catch (final Exception ex) {

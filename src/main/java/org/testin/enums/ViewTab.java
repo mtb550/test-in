@@ -2,6 +2,7 @@ package org.testin.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -10,6 +11,6 @@ public enum ViewTab {
     HISTORY("History"),
     OPEN_BUGS("Open Bugs");
 
-    private final String displayName;
+    private final @NotNull String displayName;
 
 }

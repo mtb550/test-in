@@ -1,8 +1,9 @@
 package org.testin.enums;
 
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
 public interface IVfsBiOperation {
-    void execute(VirtualFile sourceVf, VirtualFile targetVf);
+    void execute(final @NotNull VirtualFile sourceVf, final @NotNull VirtualFile targetVf);
 }

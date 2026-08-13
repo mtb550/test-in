@@ -26,7 +26,7 @@ public class TestRunPackageDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public @NotNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
+    public @NotNull Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
         throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + getClass().getSimpleName());
     }
 
@@ -47,7 +47,7 @@ public class TestRunPackageDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public boolean acceptsTransferred(final DirectoryDto source) {
+    public boolean acceptsTransferred(final @NotNull DirectoryDto source) {
         // Test-set nodes never land in the run family.
         return super.acceptsTransferred(source) && source.isAllowedInTestRunFamily();
     }

@@ -2,6 +2,7 @@ package org.testin.enums;
 
 import com.intellij.ui.JBColor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
@@ -34,14 +35,14 @@ public enum Priority {
             Shortcuts.PriorityLow
     );
 
-    private final String name;
+    private final @NotNull String name;
     private final int value;
-    private final Color color;
+    private final @NotNull Color color;
     private final boolean active;
-    private final Shortcuts shortcut;
-    private final BiConsumer<Set<Priority>, Boolean> action;
+    private final @NotNull Shortcuts shortcut;
+    private final @NotNull BiConsumer<Set<Priority>, Boolean> action;
 
-    Priority(final String name, final int value, final Color color, final boolean active, final Shortcuts shortcut) {
+    Priority(final @NotNull String name, final int value, final @NotNull Color color, final boolean active, final @NotNull Shortcuts shortcut) {
         this.name = name;
         this.value = value;
         this.color = color;
@@ -55,7 +56,7 @@ public enum Priority {
 
     }
 
-    public void onChange(final Set<Priority> set, final boolean state) {
+    public void onChange(final @NotNull Set<Priority> set, final boolean state) {
         action.accept(set, state);
     }
 }

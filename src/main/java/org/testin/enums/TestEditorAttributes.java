@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.GeneratorType;
 import org.testin.editorPanel.Shared;
 import org.testin.importExport.imports.ImportSetter;
@@ -268,21 +269,23 @@ public enum TestEditorAttributes {
             null
     );
 
-    private final String name;
-    private final String name2;
+    private final @NotNull String name;
+    private final @NotNull String name2;
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
     private final boolean importable;
     private final boolean copyable;
     private final boolean exportable;
-    private final ValueExtractor<TestCaseDto> testValueExtractor;
-    private final DrawItem<TestCaseDto> testDrawItem;
-    private final ImportSetter importSetter;
+    private final @NotNull ValueExtractor<TestCaseDto> testValueExtractor;
+
+    /** Null for attributes shown as a plain detail row rather than a badge. */
+    private final @Nullable DrawItem<TestCaseDto> testDrawItem;
+    private final @NotNull ImportSetter importSetter;
     /**
      * Automation code update to run when this attribute changes; null when the
      * attribute has no effect on the generated Java code.
      */
-    private final GeneratorType generatorType;
+    private final @Nullable GeneratorType generatorType;
 
     /**
      * The value as the grid shows it. Steps get one line each there, so ALT+ENTER
@@ -290,7 +293,7 @@ public enum TestEditorAttributes {
      * other attribute - and every other surface, including exports, clipboard
      * copy and the import preview - uses the canonical extractor unchanged.
      */
-    public String gridValue(final Project p, final TestCaseDto tc) {
+    public @NotNull String gridValue(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         return this == STEPS ? String.join("\n", tc.getSteps()) : testValueExtractor.execute(tc, p);
     }
 

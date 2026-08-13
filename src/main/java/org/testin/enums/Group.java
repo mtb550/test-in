@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 public enum Group {
@@ -55,12 +56,12 @@ public enum Group {
             true
     );
 
-    private final String name;
+    private final @NotNull String name;
     private final boolean active;
     private final boolean assignable;
-    private final BiConsumer<Set<Group>, Boolean> action;
+    private final @NotNull BiConsumer<Set<Group>, Boolean> action;
 
-    Group(final String name, final boolean active, final boolean assignable) {
+    Group(final @NotNull String name, final boolean active, final boolean assignable) {
         this.name = name;
         this.active = active;
         this.assignable = assignable;
@@ -71,7 +72,7 @@ public enum Group {
         };
     }
 
-    public void onChange(final Set<Group> set, final boolean state) {
+    public void onChange(final @NotNull Set<Group> set, final boolean state) {
         action.accept(set, state);
     }
 }

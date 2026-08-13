@@ -2,6 +2,7 @@ package org.testin.mappers.dto.dirs;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateNodeMenu;
 import org.testin.indexer.ProjectIndexer;
@@ -28,8 +29,9 @@ public abstract class DirectoryDto {
     @Builder.Default
     private ArrayList<String> path2 = new ArrayList<>();
 
+    /** Null for the root node: nothing above the test project. */
     @ToString.Exclude
-    private DirectoryDto parent;
+    private @Nullable DirectoryDto parent;
 
     /**
      * The node's marker; each subtype's Lombok-generated getter returns its
@@ -50,7 +52,7 @@ public abstract class DirectoryDto {
     public abstract CreateNodeMenu getMenu();
 
     @Nullable
-    public abstract Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer);
+    public abstract Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer);
 
     // Capability flags replace the instanceof chains that used to branch on
     // node type across the actions (issue #37): a new node type declares what
@@ -130,7 +132,7 @@ public abstract class DirectoryDto {
      * True when the given node may be pasted or dropped into this one; the
      * test-set family additionally rejects run nodes.
      */
-    public boolean acceptsTransferred(final DirectoryDto source) {
+    public boolean acceptsTransferred(final @NotNull DirectoryDto source) {
         return isTransferTarget();
     }
 }

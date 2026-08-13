@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.generateReport.generators.TestRunExcelGenerator;
 import org.testin.generateReport.generators.TestRunHtmlGenerator;
 import org.testin.generateReport.generators.TestRunPdfGenerator;
@@ -103,23 +104,38 @@ public enum FileTypes {
 
     // todo: add XML object.
 
-    private final String label;
-    private final String extension;
-    private final String infoMessage;
-    private final ExportHandler exportHandler;
-    private final ImportHandler importHandler;
-    private final ReportHandler reportHandler;
+    private final @NotNull String label;
+    private final @NotNull String extension;
 
-    public void exportToFile(final @NotNull Project p, final @NotNull ExportAction exportAction, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+    /** The import-dialog hint; null for formats that need no explanation. */
+    private final @Nullable String infoMessage;
+
+    // Null where the format does not support that direction: PDF and WORD are
+    // report-only, HTML has no importer. Callers pick a format by filtering on
+    // the handler they need, so the accessors below fail loudly rather than
+    // NPE'ing if a new call site forgets.
+    private final @Nullable ExportHandler exportHandler;
+    private final @Nullable ImportHandler importHandler;
+    private final @Nullable ReportHandler reportHandler;
+
+    public void exportToFile(final @NotNull Project p, final @NotNull ExportAction exportAction,
+                             final @NotNull File destFile,
+                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+        if (exportHandler == null) throw new IllegalStateException(label + " cannot be exported to");
         exportHandler.execute(p, exportAction, destFile, sheetsData);
     }
 
-    public Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p, final @NotNull ImportAction importAction, final @NotNull File importFile) {
+    public @NotNull Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p,
+                                                                final @NotNull ImportAction importAction,
+                                                                final @NotNull File importFile) {
+        if (importHandler == null) throw new IllegalStateException(label + " cannot be imported from");
         return importHandler.execute(p, importAction, importFile);
     }
 
-    public byte[] generateReport(final @NotNull Project p, final TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
+                                           final @NotNull TestRunDto tr,
+                                           final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+        if (reportHandler == null) throw new IllegalStateException(label + " has no report generator");
         return reportHandler.execute(p, trDir, tr, detailsMap);
     }
-
 }

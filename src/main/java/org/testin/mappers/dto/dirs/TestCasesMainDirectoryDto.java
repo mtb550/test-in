@@ -26,7 +26,7 @@ public class TestCasesMainDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public @NotNull Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
+    public @NotNull Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
         return indexer.getTestSetByPath(folder);
     }
 
@@ -57,7 +57,7 @@ public class TestCasesMainDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public boolean acceptsTransferred(final DirectoryDto source) {
+    public boolean acceptsTransferred(final @NotNull DirectoryDto source) {
         // Run nodes never land in the test-set family.
         return super.acceptsTransferred(source) && source.isAllowedInTestSetFamily();
     }

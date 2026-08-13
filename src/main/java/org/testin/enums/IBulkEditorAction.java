@@ -9,5 +9,6 @@ import java.util.function.Consumer;
 
 @FunctionalInterface
 public interface IBulkEditorAction {
-    void execute(final @NotNull Project p, final List<TestCaseDto> items, final Consumer<List<TestCaseDto>> updatedItems);
+    void execute(final @NotNull Project p, final @NotNull List<TestCaseDto> items,
+                 final @NotNull Consumer<List<TestCaseDto>> updatedItems);
 }

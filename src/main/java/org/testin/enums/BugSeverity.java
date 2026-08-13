@@ -2,6 +2,7 @@ package org.testin.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 @AllArgsConstructor
 public enum BugSeverity {
@@ -26,6 +27,6 @@ public enum BugSeverity {
     );
 
     @Getter
-    private final String name;
+    private final @NotNull String name;
 
 }

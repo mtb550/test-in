@@ -2,6 +2,7 @@ package org.testin.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 @Getter
@@ -17,7 +18,7 @@ public enum CardHoverAction {
             "Run Test Case F5"
     );
 
-    private final String tooltip;
-    private final Shortcuts shortcut;
-    private final String hintText;
+    private final @NotNull String tooltip;
+    private final @NotNull Shortcuts shortcut;
+    private final @NotNull String hintText;
 }

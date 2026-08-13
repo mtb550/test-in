@@ -40,7 +40,7 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public @Nullable Object resolveDirectoryObject(final Path folder, final ProjectIndexer indexer) {
+    public @Nullable Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
         return indexer.getTestSetPackageByPath(folder);
     }
 

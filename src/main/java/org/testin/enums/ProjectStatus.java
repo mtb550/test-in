@@ -2,6 +2,7 @@ package org.testin.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 @Getter
 @AllArgsConstructor
@@ -30,7 +31,7 @@ public enum ProjectStatus {
             "Archive test project"
     );
 
-    private final String description;
-    private final String buttonName;
-    private final String buttonDescription;
+    private final @NotNull String description;
+    private final @NotNull String buttonName;
+    private final @NotNull String buttonDescription;
 }
