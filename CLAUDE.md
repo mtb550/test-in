@@ -29,6 +29,29 @@ The cache update (which may persist markers — and marker writes create
 directories) must run **after** the VFS operation succeeds, never before.
 Violating this creates phantom directories and "already exists in VFS" errors.
 
+### Threading — Swing only on the EDT
+
+Swing components are read and written only on the EDT. Anything else that runs
+during a UI action moves off it.
+
+- Short work with no UI of its own (badge recomputes, filtering, sorting):
+  `ApplicationManager.getApplication().executeOnPooledThread(...)`, finishing
+  with `invokeLater` to touch Swing. No progress indicator.
+- Long work the user should see and be able to cancel (indexing, Git, report
+  generation): `Task.Backgroundable`, which gets an indicator and participates
+  in cancellation.
+
+If a pooled recompute is slow enough to want a progress bar, cache the result
+instead of backgrounding it harder. Actions declare `ActionUpdateThread.EDT`
+when their `update()` reads Swing state.
+
+### Formatting is display-only
+
+Rendering may reformat a value; saving never does. The stored JSON is always
+byte-identical to what the tester typed. Editable surfaces — grid cells, editor
+fields — load the **raw** value when editing begins, so formatted text can never
+be committed back into storage.
+
 ## Code conventions
 
 - The `Project` object is always named `p`: `final @NotNull Project p`.
@@ -49,6 +72,13 @@ Violating this creates phantom directories and "already exists in VFS" errors.
 
 - **GitHub is the source of truth**: stories/bugs live in `mtb550/test-in`
   issues, not local files. Muteb works across several machines.
+- The git remote still reads `https://github.com/mtb550/TestGit.git`. The repo
+  was renamed to `test-in` and GitHub redirects, so always pass
+  `--repo mtb550/test-in` explicitly to `gh` rather than letting it infer the
+  repository from the remote.
+- Write new stories straight to an issue with `gh`; update an existing one with
+  `gh issue edit <n> --repo mtb550/test-in --body-file ...` instead of opening a
+  duplicate. Read current state with `gh issue view` before assuming anything.
 - Tests live under `src/test` only; the plugin distribution must never
   contain test classes or compile-time-only dependencies (Lombok is
   `compileOnly` + `annotationProcessor`, never `implementation`).

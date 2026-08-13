@@ -7,3 +7,6 @@
 build/
 *.html
 *.py
+
+# Claude Code: share .claude/, keep per-machine overrides local
+.claude/settings.local.json
