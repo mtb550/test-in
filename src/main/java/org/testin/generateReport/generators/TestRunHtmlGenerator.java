@@ -2,6 +2,7 @@ package org.testin.generateReport.generators;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
@@ -31,7 +32,9 @@ public final class TestRunHtmlGenerator {
     final String LIGHT_BG = "#f2f5fa";
     final String BORDER_COLOR = "#d0d7e5";
 
-    public String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public @NotNull String generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
+                                    final @NotNull TestRunDto tr,
+                                    final @NotNull Map<UUID, TestCaseDto> detailsMap) {
 
         // Compute summary stats
         final List<TestRunItems> results = tr.getResults();
@@ -145,9 +148,9 @@ public final class TestRunHtmlGenerator {
             results.stream()
                     .filter(r -> r.getStatus() == TestStatus.FAILED)
                     .forEach(item -> {
-                        TestCaseDto d = detailsMap != null ? detailsMap.get(item.getId()) : null;
-                        String desc = d != null ? d.getDescription() : "";
-                        String bugPriority = item.getBugPriority().name();
+                        final TestCaseDto d = detailsMap.get(item.getId());
+                        final String desc = d != null ? d.getDescription() : "";
+                        final String bugPriority = item.getBugPriority().name();
                         html.append("<tr>")
                                 .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
                                 .append("<td>").append(escapedHtml(desc)).append("</td>")
@@ -169,9 +172,9 @@ public final class TestRunHtmlGenerator {
             results.stream()
                     .filter(r -> r.getStatus() == TestStatus.PENDING)
                     .forEach(item -> {
-                        TestCaseDto d = detailsMap != null ? detailsMap.get(item.getId()) : null;
-                        String desc = d != null ? d.getDescription() : "";
-                        String bugPriority = item.getBugPriority().name();
+                        final TestCaseDto d = detailsMap.get(item.getId());
+                        final String desc = d != null ? d.getDescription() : "";
+                        final String bugPriority = item.getBugPriority().name();
                         html.append("<tr>")
                                 .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
                                 .append("<td>").append(escapedHtml(desc)).append("</td>")
@@ -195,21 +198,23 @@ public final class TestRunHtmlGenerator {
         return html.toString();
     }
 
-    private void overviewRow(final StringBuilder html, final String label, final String value) {
+    private void overviewRow(final @NotNull StringBuilder html, final @NotNull String label,
+                             final @Nullable String value) {
         html.append("<tr>")
                 .append("<td class='label'>").append(label).append("</td>")
                 .append("<td class='value'>").append(escapedHtml(value)).append("</td>")
                 .append("</tr>");
     }
 
-    private void summaryCard(final StringBuilder html, final String value, final String label, final String color) {
+    private void summaryCard(final @NotNull StringBuilder html, final @NotNull String value,
+                             final @NotNull String label, final @NotNull String color) {
         html.append("<div class='summary-card'>")
                 .append("<div class='card-value' style='color: ").append(color).append(";'>").append(value).append("</div>")
                 .append("<div class='card-label'>").append(label).append("</div>")
                 .append("</div>");
     }
 
-    private String escapedHtml(final String text) {
+    private @NotNull String escapedHtml(final @Nullable String text) {
         if (text == null || text.isEmpty()) return "";
         return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }

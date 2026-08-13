@@ -68,7 +68,9 @@ public final class TestRunPdfGenerator {
             BugSeverity.MAJOR, DARK_YELLOW
     );
 
-    public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
+                                     final @NotNull TestRunDto tr,
+                                     final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         // try-with-resources: closing the Document also closes the PdfDocument and
         // PdfWriter, including on any failure path inside the body.
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -304,7 +306,13 @@ public final class TestRunPdfGenerator {
     }
 
 
-    private void buildCaseTable(Document document, String sectionNumber, String sectionTitle, String descriptionFmt, long count, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap, PdfFont boldFont, PdfFont regularFont, DeviceRgb headerBg, boolean withPriority, boolean withSeverity, boolean withActualResult, Predicate<TestRunItems> filter) {
+    private void buildCaseTable(final @NotNull Document document, final @NotNull String sectionNumber,
+                                final @NotNull String sectionTitle, final @NotNull String descriptionFmt,
+                                final long count, final @NotNull TestRunDto tr,
+                                final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull PdfFont boldFont,
+                                final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg,
+                                final boolean withPriority, final boolean withSeverity,
+                                final boolean withActualResult, final @NotNull Predicate<TestRunItems> filter) {
         document.add(new Paragraph(sectionNumber + ". " + sectionTitle)
                 .setFont(boldFont)
                 .setFontSize(13)
@@ -352,17 +360,12 @@ public final class TestRunPdfGenerator {
                             .setTextAlignment(TextAlignment.CENTER)));
 
             // Test Case column
-            String tcName = "";
-            if (detailsMap != null) {
-                TestCaseDto tc = detailsMap.get(item.getId());
-                if (tc != null) {
-                    tcName = tc.getDescription();
-                }
-            }
+            final TestCaseDto tc = detailsMap.get(item.getId());
+            String tcName = tc != null ? tc.getDescription() : "";
             if (tcName.isEmpty()) {
                 tcName = "—";
             }
-            Cell testCaseCell = new Cell()
+            final Cell testCaseCell = new Cell()
                     .setBackgroundColor(rowBg)
                     .setBorder(new SolidBorder(BORDER_GRAY, 1))
                     .setPaddingTop(4).setPaddingBottom(4).setPaddingLeft(6).setPaddingRight(6);
@@ -412,7 +415,8 @@ public final class TestRunPdfGenerator {
         document.add(table);
     }
 
-    private void addCaseTableHeader(Table table, String text, DeviceRgb bgColor, PdfFont boldFont) {
+    private void addCaseTableHeader(final @NotNull Table table, final @NotNull String text,
+                                    final @NotNull DeviceRgb bgColor, final @NotNull PdfFont boldFont) {
         table.addCell(new Cell()
                 .setBackgroundColor(bgColor)
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))
@@ -422,7 +426,8 @@ public final class TestRunPdfGenerator {
                         .setTextAlignment(TextAlignment.CENTER)));
     }
 
-    private void addOverviewRow(Table table, String label, String value, PdfFont boldFont, PdfFont regularFont) {
+    private void addOverviewRow(final @NotNull Table table, final @NotNull String label, final @NotNull String value,
+                                final @NotNull PdfFont boldFont, final @NotNull PdfFont regularFont) {
         table.addCell(new Cell()
                 .setBackgroundColor(LIGHT_BG)
                 .setBorder(new SolidBorder(BORDER_GRAY, 1))
@@ -437,7 +442,8 @@ public final class TestRunPdfGenerator {
                         .setFont(regularFont).setFontSize(10.5f).setFontColor(BLACK)));
     }
 
-    private void addStatCell(Table table, String number, String label, DeviceRgb numberColor, PdfFont boldFont) {
+    private void addStatCell(final @NotNull Table table, final @NotNull String number, final @NotNull String label,
+                             final @NotNull DeviceRgb numberColor, final @NotNull PdfFont boldFont) {
         Cell cell = new Cell()
                 .setBackgroundColor(LIGHT_BG)
                 .setBorder(Border.NO_BORDER)

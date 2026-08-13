@@ -20,11 +20,13 @@ import java.util.UUID;
 
 public final class TestRunExcelGenerator {
 
-    public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
+                                     final @NotNull TestRunDto tr,
+                                     final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 
-            Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
-            Worksheet ws = wb.newWorksheet("Test Run Report");
+            final Workbook wb = new Workbook(os, Bundle.getPluginName(), "1.0");
+            final Worksheet ws = wb.newWorksheet("Test Run Report");
 
             ws.value(0, 0, "Test Run Report:");
             ws.style(0, 0).bold().fontSize(14).set();
@@ -52,17 +54,17 @@ public final class TestRunExcelGenerator {
             ws.range(row, 0, row, 8).style().bold().fillColor("E0E0E0").set();
 
             row++;
-            for (var result : tr.getResults()) {
-                UUID id = result.getId();
+            for (final var result : tr.getResults()) {
+                final UUID id = result.getId();
                 ws.value(row, 0, id.toString());
 
-                TestCaseDto details = (detailsMap != null) ? detailsMap.get(id) : null;
-                String title = details != null ? details.getDescription() : "N/A";
-                String expectedResult = details != null ? details.getExpectedResult() : "N/A";
+                final TestCaseDto details = detailsMap.get(id);
+                final String title = details != null ? details.getDescription() : "N/A";
+                final String expectedResult = details != null ? details.getExpectedResult() : "N/A";
 
                 ws.value(row, 1, title);
 
-                TestStatus statusEnum = result.getStatus();
+                final TestStatus statusEnum = result.getStatus();
                 ws.value(row, 2, statusEnum.name());
                 ws.style(row, 2).fontColor(statusEnum.getHex()).bold().set();
 
@@ -75,7 +77,7 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 5, result.getBugPriority().getName());
                 ws.style(row, 5).bold().set();
 
-                String formattedDuration = Services.getInstance(p, Tools.class).getFormattedDuration(result.getDuration());
+                final String formattedDuration = Services.getInstance(p, Tools.class).getFormattedDuration(result.getDuration());
                 ws.value(row, 6, formattedDuration);
 
                 ws.value(row, 7, expectedResult);

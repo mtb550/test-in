@@ -30,21 +30,23 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
 
     private final @NotNull Project p;
 
-    private final TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
+    private final @NotNull TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
 
-    private final JBTextField fileNameField = new JBTextField(30);
+    private final @NotNull JBTextField fileNameField = new JBTextField(30);
 
-    private final ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
+    private final @NotNull ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
             .filter(type -> type.getReportHandler() != null)
             .map(FileTypes::getLabel)
             .toArray(String[]::new));
-    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
-    @Getter
-    private FileTypes selectedFormat;
-    @Getter
-    private File selectedFile;
+    private final @NotNull JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
 
-    public GenerateReportDialog(final @NotNull Project p, final String suggestedFileName) {
+    /** Both null until the dialog is accepted; read by the caller only after showAndGet. */
+    @Getter
+    private @Nullable FileTypes selectedFormat;
+    @Getter
+    private @Nullable File selectedFile;
+
+    public GenerateReportDialog(final @NotNull Project p, final @NotNull String suggestedFileName) {
         super(p, true);
         this.p = p;
 
@@ -53,7 +55,7 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
         fileNameField.setText(suggestedFileName);
         formatCombo.setSelectedItem("PDF");
 
-        FileChooserDescriptor descriptor = FileChooserDescriptorFactory
+        final FileChooserDescriptor descriptor = FileChooserDescriptorFactory
                 .createSingleFolderDescriptor()
                 .withTitle("Select Destination Folder")
                 .withDescription("Choose the folder to save the report in");
@@ -63,22 +65,21 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
         initFrameless();
         setSize(450, 200);
 
-        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
+        final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
             folderField.setText(defaultFolder);
         } else {
-            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(
+            final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(
                     folderField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
             folderField.addActionListener(browseListener);
             ApplicationManager.getApplication().invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }
     }
 
-    @Nullable
     @Override
-    protected JComponent createCenterPanel() {
-        JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+    protected @NotNull JComponent createCenterPanel() {
+        final JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(4, 4, 4, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -110,7 +111,7 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
         gbc.weightx = 1.0;
         panel.add(formatCombo, gbc);
 
-        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
+        final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
             gbc.gridx = 0;
             gbc.gridy = 3;
@@ -127,7 +128,7 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
 
     @Override
     protected void doOKAction() {
-        String folder = folderField.getText().trim();
+        final String folder = folderField.getText().trim();
         String fileName = fileNameField.getText().trim();
         if (fileName.isEmpty()) {
             fileNameField.requestFocus();
@@ -138,12 +139,16 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
             return;
         }
 
-        String selectedLabel = (String) formatCombo.getSelectedItem();
-        FileTypes fmt = FileTypes.valueOf(selectedLabel);
+        final String selectedLabel = (String) formatCombo.getSelectedItem();
+        if (selectedLabel == null) {
+            formatCombo.requestFocus();
+            return;
+        }
+        final FileTypes fmt = FileTypes.valueOf(selectedLabel);
 
-        String ext = fmt.getExtension();
+        final String ext = fmt.getExtension();
         if (!fileName.endsWith(ext)) {
-            int dot = fileName.lastIndexOf('.');
+            final int dot = fileName.lastIndexOf('.');
             fileName = dot >= 0 ? fileName.substring(0, dot) + ext : fileName + ext;
         }
 

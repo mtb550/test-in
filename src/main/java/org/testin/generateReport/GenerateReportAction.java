@@ -41,7 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GenerateReportAction extends DumbAwareAction {
 
-    private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
+    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
     private final @NotNull Project p;
     private final @Nullable SimpleTree tree;
     private final @Nullable IEditor editor;
@@ -99,11 +99,15 @@ public class GenerateReportAction extends DumbAwareAction {
 
         if (tr == null) return;
 
-        String suggestedName = tr.getPath().getFileName().toString() + "_Report";
-        GenerateReportDialog dialog = new GenerateReportDialog(p, suggestedName);
-        if (dialog.showAndGet()) {
-            processAndSave(p, tr, dialog.getSelectedFormat(), dialog.getSelectedFile());
-        }
+        final String suggestedName = tr.getPath().getFileName().toString() + "_Report";
+        final GenerateReportDialog dialog = new GenerateReportDialog(p, suggestedName);
+        if (!dialog.showAndGet()) return;
+
+        // Set together when the dialog accepts; a cancelled dialog never gets here.
+        final FileTypes format = dialog.getSelectedFormat();
+        if (format == null) return;
+
+        processAndSave(p, tr, format, dialog.getSelectedFile());
     }
 
     @Override
@@ -111,36 +115,37 @@ public class GenerateReportAction extends DumbAwareAction {
         return ActionUpdateThread.EDT;
     }
 
-    private void processAndSave(final @NotNull Project p, final TestRunDirectoryDto tr, final FileTypes format, final File outputFile) {
+    private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr,
+                                final @NotNull FileTypes format, final @Nullable File outputFile) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
-                Path dirPath = tr.getPath();
+                final Path dirPath = tr.getPath();
 
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                TestRunDto runData = indexer.getTestRunByPath(dirPath);
+                final TestRunDto runData = indexer.getTestRunByPath(dirPath);
                 if (runData == null) {
                     Services.getInstance(p, Notifier.class).error(p, "Report Error",
                             "No test run data found at: " + dirPath);
                     return;
                 }
 
-                Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
+                final Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
 
-                byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
+                final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
 
-                File reportFile;
+                final File reportFile;
                 if (outputFile != null) {
                     reportFile = outputFile;
                 } else {
-                    String cleanName = runData.getChangeLog().replace(".json", "");
-                    String rawTimestamp = java.time.ZonedDateTime.now().format(Config.getDateFormatterPattern());
-                    String safeTimestamp = rawTimestamp.replace(":", "-").replace("/", "-");
+                    final String cleanName = runData.getChangeLog().replace(".json", "");
+                    final String rawTimestamp = java.time.ZonedDateTime.now().format(Config.getDateFormatterPattern());
+                    final String safeTimestamp = rawTimestamp.replace(":", "-").replace("/", "-");
                     reportFile = dirPath.resolve(cleanName + "_Report_" + safeTimestamp + format.getExtension()).toFile();
                 }
 
                 Files.write(reportFile.toPath(), fileBytes);
 
-                NotificationAction openAction = NotificationAction.createSimple("Open report", () -> {
+                final NotificationAction openAction = NotificationAction.createSimple("Open report", () -> {
 
                     try {
                         java.awt.Desktop.getDesktop().open(reportFile);
@@ -149,9 +154,9 @@ public class GenerateReportAction extends DumbAwareAction {
                     }
                 });
 
-                NotificationAction copyAction = new NotificationAction("Copy path") {
+                final NotificationAction copyAction = new NotificationAction("Copy path") {
                     @Override
-                    public void actionPerformed(@NotNull AnActionEvent e, @NotNull Notification notification) {
+                    public void actionPerformed(final @NotNull AnActionEvent e, final @NotNull Notification notification) {
                         CopyPasteManager.getInstance().setContents(new StringSelection(reportFile.getAbsolutePath()));
                     }
                 };
@@ -171,7 +176,7 @@ public class GenerateReportAction extends DumbAwareAction {
         });
     }
 
-    private Map<UUID, TestCaseDto> fetchTestCaseDetails(final @NotNull Project p, final TestRunDto tr) {
+    private @NotNull Map<UUID, TestCaseDto> fetchTestCaseDetails(final @NotNull Project p, final @NotNull TestRunDto tr) {
         final Map<UUID, TestCaseDto> detailsMap = new ConcurrentHashMap<>();
 
         if (tr.getResults().isEmpty()) {

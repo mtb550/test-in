@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
@@ -54,7 +55,9 @@ public final class TestRunWordGenerator {
             BugSeverity.MAJOR, DARK_YELLOW
     );
 
-    public byte[] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
+                                     final @NotNull TestRunDto tr,
+                                     final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
 
@@ -176,17 +179,19 @@ public final class TestRunWordGenerator {
         }
     }
 
-    private XWPFParagraph addText(XWPFDocument doc, String text, int size, boolean bold, String color, String bottomBorder, int spacingAfterPt) {
-        XWPFParagraph p = doc.createParagraph();
+    private @NotNull XWPFParagraph addText(final @NotNull XWPFDocument doc, final @NotNull String text, final int size,
+                                           final boolean bold, final @NotNull String color,
+                                           final @Nullable String bottomBorder, final int spacingAfterPt) {
+        final XWPFParagraph p = doc.createParagraph();
         p.setSpacingAfter(spacingAfterPt * 20);
-        XWPFRun run = p.createRun();
+        final XWPFRun run = p.createRun();
         run.setText(text);
         run.setFontSize(size);
         run.setFontFamily("Calibri");
         run.setBold(bold);
         run.setColor(color);
         if (bottomBorder != null) {
-            CTBorder bottom = p.getCTPPr().addNewPBdr().addNewBottom();
+            final CTBorder bottom = p.getCTPPr().addNewPBdr().addNewBottom();
             bottom.setVal(STBorder.Enum.forString("single"));
             bottom.setSz(BigInteger.valueOf(16));
             bottom.setColor(bottomBorder);
@@ -194,32 +199,34 @@ public final class TestRunWordGenerator {
         return p;
     }
 
-    private void setItalic(XWPFParagraph p) {
-        for (XWPFRun run : p.getRuns()) {
+    private void setItalic(final @NotNull XWPFParagraph p) {
+        for (final XWPFRun run : p.getRuns()) {
             run.setItalic(true);
         }
     }
 
-    private void addHeading(XWPFDocument doc, String text, int beforePt, int afterPt) {
-        XWPFParagraph p = doc.createParagraph();
+    private void addHeading(final @NotNull XWPFDocument doc, final @NotNull String text, final int beforePt,
+                            final int afterPt) {
+        final XWPFParagraph p = doc.createParagraph();
         p.setSpacingBefore(beforePt * 20);
         p.setSpacingAfter(afterPt * 20);
-        XWPFRun run = p.createRun();
+        final XWPFRun run = p.createRun();
         run.setText(text);
         run.setFontSize(13);
         run.setFontFamily("Calibri");
         run.setBold(true);
         run.setColor(DARK_NAVY);
-        CTBorder headingBottom = p.getCTPPr().addNewPBdr().addNewBottom();
+        final CTBorder headingBottom = p.getCTPPr().addNewPBdr().addNewBottom();
         headingBottom.setVal(STBorder.Enum.forString("single"));
         headingBottom.setSz(BigInteger.valueOf(8));
         headingBottom.setColor(DARK_NAVY);
     }
 
-    private void addOverviewRow(XWPFTable table, int rowIdx, String label, String value) {
-        XWPFTableRow row = rowIdx == 0 ? table.getRow(0) : table.createRow();
-        XWPFTableCell labelCell = row.getCell(0);
-        XWPFTableCell valueCell = row.getCell(1);
+    private void addOverviewRow(final @NotNull XWPFTable table, final int rowIdx, final @NotNull String label,
+                                final @NotNull String value) {
+        final XWPFTableRow row = rowIdx == 0 ? table.getRow(0) : table.createRow();
+        final XWPFTableCell labelCell = row.getCell(0);
+        final XWPFTableCell valueCell = row.getCell(1);
         shadeCell(labelCell, LIGHT_BG);
         setCellPadding(labelCell, 4, 8, 4, 8);
         setCellPadding(valueCell, 4, 8, 4, 8);
@@ -227,19 +234,20 @@ public final class TestRunWordGenerator {
         setCellText(valueCell, value, 10, false, BLACK);
     }
 
-    private void addStatCell(XWPFTable table, int col, String number, String label, String numberColor) {
-        XWPFTableRow row = table.getRow(0);
-        XWPFTableCell cell = row.getCell(col);
+    private void addStatCell(final @NotNull XWPFTable table, final int col, final @NotNull String number,
+                             final @NotNull String label, final @NotNull String numberColor) {
+        final XWPFTableRow row = table.getRow(0);
+        final XWPFTableCell cell = row.getCell(col);
         shadeCell(cell, LIGHT_BG);
         setCellPadding(cell, 8, 6, 8, 6);
         setCellText(cell, number, 20, true, numberColor);
 
         cell.getParagraphs().getFirst().setAlignment(ParagraphAlignment.CENTER);
 
-        XWPFParagraph lp = cell.addParagraph();
+        final XWPFParagraph lp = cell.addParagraph();
         lp.setAlignment(ParagraphAlignment.CENTER);
         lp.setSpacingBefore(80);
-        XWPFRun lrun = lp.createRun();
+        final XWPFRun lrun = lp.createRun();
         lrun.setText(label);
         lrun.setFontSize(9);
         lrun.setFontFamily("Calibri");
@@ -247,26 +255,32 @@ public final class TestRunWordGenerator {
         lrun.setColor(DARK_GRAY);
     }
 
-    private void addColoredBody(XWPFDocument doc, String heading, String headingColor, String body) {
-        XWPFParagraph hp = doc.createParagraph();
+    private void addColoredBody(final @NotNull XWPFDocument doc, final @NotNull String heading,
+                                final @NotNull String headingColor, final @NotNull String body) {
+        final XWPFParagraph hp = doc.createParagraph();
         hp.setSpacingAfter(0);
-        XWPFRun hrun = hp.createRun();
+        final XWPFRun hrun = hp.createRun();
         hrun.setText(heading);
         hrun.setFontSize(11);
         hrun.setFontFamily("Calibri");
         hrun.setBold(true);
         hrun.setColor(headingColor);
 
-        XWPFParagraph bp = doc.createParagraph();
+        final XWPFParagraph bp = doc.createParagraph();
         bp.setSpacingAfter(120);
-        XWPFRun brun = bp.createRun();
+        final XWPFRun brun = bp.createRun();
         brun.setText(body);
         brun.setFontSize(11);
         brun.setFontFamily("Calibri");
         brun.setColor(BLACK);
     }
 
-    private void buildCaseTable(XWPFDocument doc, String sectionNumber, String sectionTitle, String descriptionFmt, long count, TestRunDto tr, Map<UUID, TestCaseDto> detailsMap, String headerBg, boolean withPriority, boolean withSeverity, boolean withActualResult, Predicate<TestRunItems> filter) {
+    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber,
+                                final @NotNull String sectionTitle, final @NotNull String descriptionFmt,
+                                final long count, final @NotNull TestRunDto tr,
+                                final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg,
+                                final boolean withPriority, final boolean withSeverity,
+                                final boolean withActualResult, final @NotNull Predicate<TestRunItems> filter) {
         addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
         addText(doc, String.format(descriptionFmt, count), 11, false, BLACK, null, 12);
 
@@ -299,11 +313,8 @@ public final class TestRunWordGenerator {
             XWPFTableCell tcCell = row.getCell(1);
             shadeCell(tcCell, rowBg);
             setCellPadding(tcCell, 4, 6, 4, 6);
-            String tcName = "";
-            if (detailsMap != null) {
-                TestCaseDto tc = detailsMap.get(item.getId());
-                if (tc != null) tcName = tc.getDescription();
-            }
+            final TestCaseDto tc = detailsMap.get(item.getId());
+            String tcName = tc != null ? tc.getDescription() : "";
             if (tcName.isEmpty()) tcName = "—";
             setCellText(tcCell, tcName, 9, false, BLACK);
 
@@ -347,17 +358,19 @@ public final class TestRunWordGenerator {
         setTableWidths(table, widthsFor(cols));
     }
 
-    private void addCaseHeader(XWPFTableRow headerRow, int col, String text, String bgColor) {
-        XWPFTableCell cell = headerRow.getCell(col);
+    private void addCaseHeader(final @NotNull XWPFTableRow headerRow, final int col, final @NotNull String text,
+                               final @NotNull String bgColor) {
+        final XWPFTableCell cell = headerRow.getCell(col);
         shadeCell(cell, bgColor);
         setCellPadding(cell, 5, 6, 5, 6);
         setCellText(cell, text, 9, true, WHITE);
     }
 
-    private void setCellText(XWPFTableCell cell, String text, int size, boolean bold, String color) {
-        XWPFParagraph p = cell.getParagraphs().getFirst();
+    private void setCellText(final @NotNull XWPFTableCell cell, final @NotNull String text, final int size,
+                             final boolean bold, final @NotNull String color) {
+        final XWPFParagraph p = cell.getParagraphs().getFirst();
         if (p.getRuns().isEmpty()) {
-            XWPFRun run = p.createRun();
+            final XWPFRun run = p.createRun();
             run.setText(text);
             run.setFontSize(size);
             run.setFontFamily("Calibri");
@@ -365,7 +378,7 @@ public final class TestRunWordGenerator {
             run.setColor(color);
 
         } else {
-            XWPFRun run = p.getRuns().getFirst();
+            final XWPFRun run = p.getRuns().getFirst();
             run.setText(text, 0);
             run.setFontSize(size);
             run.setFontFamily("Calibri");
@@ -374,48 +387,49 @@ public final class TestRunWordGenerator {
         }
     }
 
-    private void shadeCell(XWPFTableCell cell, String hex) {
+    private void shadeCell(final @NotNull XWPFTableCell cell, final @NotNull String hex) {
         getTcPr(cell).addNewShd().setFill(hex);
     }
 
-    private void setCellPadding(XWPFTableCell cell, int topPt, int leftPt, int bottomPt, int rightPt) {
-        CTTcMar mar = getTcPr(cell).addNewTcMar();
-        CTTblWidth top = mar.addNewTop();
+    private void setCellPadding(final @NotNull XWPFTableCell cell, final int topPt, final int leftPt,
+                                final int bottomPt, final int rightPt) {
+        final CTTcMar mar = getTcPr(cell).addNewTcMar();
+        final CTTblWidth top = mar.addNewTop();
         top.setW(topPt * 20);
         top.setType(STTblWidth.Enum.forString("dxa"));
-        CTTblWidth left = mar.addNewLeft();
+        final CTTblWidth left = mar.addNewLeft();
         left.setW(leftPt * 20);
         left.setType(STTblWidth.Enum.forString("dxa"));
-        CTTblWidth bottom = mar.addNewBottom();
+        final CTTblWidth bottom = mar.addNewBottom();
         bottom.setW(bottomPt * 20);
         bottom.setType(STTblWidth.Enum.forString("dxa"));
-        CTTblWidth right = mar.addNewRight();
+        final CTTblWidth right = mar.addNewRight();
         right.setW(rightPt * 20);
         right.setType(STTblWidth.Enum.forString("dxa"));
     }
 
-    private CTTcPr getTcPr(XWPFTableCell cell) {
-        CTTc ct = cell.getCTTc();
+    private @NotNull CTTcPr getTcPr(final @NotNull XWPFTableCell cell) {
+        final CTTc ct = cell.getCTTc();
         return ct.isSetTcPr() ? ct.getTcPr() : ct.addNewTcPr();
     }
 
-    private void setTableBorders(XWPFTable table) {
-        for (XWPFTableRow row : table.getRows()) {
-            for (XWPFTableCell cell : row.getTableCells()) {
-                CTTcBorders borders = getTcPr(cell).addNewTcBorders();
-                CTBorder top = borders.addNewTop();
+    private void setTableBorders(final @NotNull XWPFTable table) {
+        for (final XWPFTableRow row : table.getRows()) {
+            for (final XWPFTableCell cell : row.getTableCells()) {
+                final CTTcBorders borders = getTcPr(cell).addNewTcBorders();
+                final CTBorder top = borders.addNewTop();
                 top.setColor(BORDER_GRAY);
                 top.setSz(BigInteger.valueOf(4));
                 top.setVal(STBorder.Enum.forString("single"));
-                CTBorder bottom = borders.addNewBottom();
+                final CTBorder bottom = borders.addNewBottom();
                 bottom.setColor(BORDER_GRAY);
                 bottom.setSz(BigInteger.valueOf(4));
                 bottom.setVal(STBorder.Enum.forString("single"));
-                CTBorder left = borders.addNewLeft();
+                final CTBorder left = borders.addNewLeft();
                 left.setColor(BORDER_GRAY);
                 left.setSz(BigInteger.valueOf(4));
                 left.setVal(STBorder.Enum.forString("single"));
-                CTBorder right = borders.addNewRight();
+                final CTBorder right = borders.addNewRight();
                 right.setColor(BORDER_GRAY);
                 right.setSz(BigInteger.valueOf(4));
                 right.setVal(STBorder.Enum.forString("single"));
@@ -423,29 +437,29 @@ public final class TestRunWordGenerator {
         }
     }
 
-    private void setTableWidths(XWPFTable table, int... percents) {
-        XWPFTableRow row = table.getRow(0);
+    private void setTableWidths(final @NotNull XWPFTable table, final int... percents) {
+        final XWPFTableRow row = table.getRow(0);
         for (int i = 0; i < row.getTableCells().size() && i < percents.length; i++) {
             getTcPr(row.getCell(i)).addNewTcW().setW(percents[i] * 100);
             getTcPr(row.getCell(i)).getTcW().setType(STTblWidth.Enum.forString("pct"));
         }
     }
 
-    private void addFooter(XWPFDocument doc, String date) {
-        XWPFFooter footer = doc.createFooter(HeaderFooterType.DEFAULT);
-        XWPFParagraph p = footer.createParagraph();
+    private void addFooter(final @NotNull XWPFDocument doc, final @NotNull String date) {
+        final XWPFFooter footer = doc.createFooter(HeaderFooterType.DEFAULT);
+        final XWPFParagraph p = footer.createParagraph();
         p.setAlignment(ParagraphAlignment.CENTER);
-        XWPFRun run = p.createRun();
+        final XWPFRun run = p.createRun();
         run.setText(date + "  |  Generated automatically by Testin IntelliJ plugin.");
         run.setFontSize(8);
         run.setFontFamily("Calibri");
         run.setColor(DARK_GRAY);
     }
 
-    private void applyPageMargins(XWPFDocument doc) {
-        CTBody body = doc.getDocument().getBody();
-        CTSectPr sectPr = body.isSetSectPr() ? body.getSectPr() : body.addNewSectPr();
-        CTPageMar pgMar = sectPr.isSetPgMar() ? sectPr.getPgMar() : sectPr.addNewPgMar();
+    private void applyPageMargins(final @NotNull XWPFDocument doc) {
+        final CTBody body = doc.getDocument().getBody();
+        final CTSectPr sectPr = body.isSetSectPr() ? body.getSectPr() : body.addNewSectPr();
+        final CTPageMar pgMar = sectPr.isSetPgMar() ? sectPr.getPgMar() : sectPr.addNewPgMar();
 
         // Standard 1-inch margins on all four sides. The old code only ever set
         // the left margin, copied from a right margin that was never initialized.
@@ -456,7 +470,7 @@ public final class TestRunWordGenerator {
         pgMar.setBottom(marginTwips);
     }
 
-    private int[] widthsFor(int cols) {
+    private int @NotNull [] widthsFor(final int cols) {
         return COLUMN_WIDTHS.getOrDefault(cols, new int[]{3, 77, 10, 10});
     }
 }
