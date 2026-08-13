@@ -7,9 +7,7 @@ import org.testin.logger.Logger;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Local Git repository operations used by the pending-commit workflow.
@@ -30,10 +28,7 @@ public final class GitCommitService {
             final @NotNull Path repositoryPath,
             final @NotNull String message,
             final @NotNull Collection<TestCaseDiff> selectedChanges) {
-        final Set<String> paths = selectedChanges.stream()
-                .map(TestCaseDiff::relativeFilePath)
-                .map(path -> path.toString().replace('\\', '/'))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        final Set<String> paths = GitRefs.repoRelativePaths(selectedChanges);
         if (paths.isEmpty()) throw new IllegalArgumentException("No Git changes were selected");
 
         GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "add", "--"));

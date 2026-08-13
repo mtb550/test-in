@@ -18,15 +18,13 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * Repository lookup and branch operations backed by IntelliJ Git4Idea.
+ * Repository lookup and branch operations backed by IntelliJ Git4Idea. The naming
+ * and selection rules themselves live in {@link GitRefs}, which is testable
+ * without an IDE; this class only runs the commands and hands their output over.
  */
 public final class GitRepositoryService {
-
-    private static final Pattern HEAD_BRANCH = Pattern.compile("(?m)^\\s*HEAD branch:\\s*(\\S+)\\s*$");
 
     private final @NotNull Project project;
 
@@ -69,8 +67,8 @@ public final class GitRepositoryService {
         if (remoteName == null) return currentBranch;
         try {
             final String remoteInfo = GitCommandRunner.execute(project, path, "git", "remote", "show", remoteName);
-            final Matcher matcher = HEAD_BRANCH.matcher(remoteInfo);
-            return matcher.find() ? matcher.group(1) : currentBranch;
+            final String headBranch = GitRefs.parseHeadBranch(remoteInfo);
+            return headBranch != null ? headBranch : currentBranch;
         } catch (final RuntimeException ignored) {
             return currentBranch;
         }
@@ -113,12 +111,7 @@ public final class GitRepositoryService {
 
     public @Nullable String getRemoteName(final @NotNull Path path) {
         try {
-            final List<String> remotes = GitCommandRunner.execute(project, path, "git", "remote").lines()
-                    .map(String::trim)
-                    .filter(name -> !name.isEmpty())
-                    .toList();
-            if (remotes.contains("origin")) return "origin";
-            return remotes.isEmpty() ? null : remotes.getFirst();
+            return GitRefs.chooseRemote(GitCommandRunner.execute(project, path, "git", "remote").lines().toList());
         } catch (final RuntimeException ignored) {
             return null;
         }
@@ -130,7 +123,7 @@ public final class GitRepositoryService {
                 .map(GitRemoteBranch::getName)
                 .anyMatch(branch::equals);
         if (remoteBranch) {
-            final String localBranch = branch.substring(branch.indexOf('/') + 1);
+            final String localBranch = GitRefs.localNameOf(branch);
             if (repository.getBranches().findLocalBranch(localBranch) == null) {
                 GitCommandRunner.execute(project, path, "git", "checkout", "-b", localBranch, "--track", branch);
                 return localBranch;
