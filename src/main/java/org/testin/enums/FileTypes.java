@@ -118,6 +118,19 @@ public enum FileTypes {
     private final @Nullable ImportHandler importHandler;
     private final @Nullable ReportHandler reportHandler;
 
+    /**
+     * The format the format combo boxes show under this label, or null when the
+     * label matches nothing. The combos are filled from {@link #getLabel()}, so
+     * they must be read back the same way - {@code valueOf} would only work for
+     * as long as every label happens to equal its constant name.
+     */
+    public static @Nullable FileTypes fromLabel(final @NotNull String label) {
+        for (final FileTypes type : values())
+            if (type.label.equals(label)) return type;
+
+        return null;
+    }
+
     public void exportToFile(final @NotNull Project p, final @NotNull ExportAction exportAction,
                              final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {

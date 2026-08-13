@@ -140,11 +140,11 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
         }
 
         final String selectedLabel = (String) formatCombo.getSelectedItem();
-        if (selectedLabel == null) {
+        final FileTypes fmt = selectedLabel == null ? null : FileTypes.fromLabel(selectedLabel);
+        if (fmt == null) {
             formatCombo.requestFocus();
             return;
         }
-        final FileTypes fmt = FileTypes.valueOf(selectedLabel);
 
         final String ext = fmt.getExtension();
         if (!fileName.endsWith(ext)) {
