@@ -68,7 +68,7 @@ public final class GitCommitService {
      * Appends the path set after the fixed arguments. Call sites include the
      * {@code "--"} separator explicitly so the full command stays readable.
      */
-    private String[] withPaths(final Set<String> paths, final String... fixedArgs) {
+    private @NotNull String[] withPaths(final @NotNull Set<String> paths, final @NotNull String... fixedArgs) {
         final String[] result = Arrays.copyOf(fixedArgs, fixedArgs.length + paths.size());
         int index = fixedArgs.length;
         for (final String path : paths) result[index++] = path;

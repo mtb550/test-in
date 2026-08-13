@@ -15,6 +15,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import git4idea.GitUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
@@ -46,7 +47,7 @@ public class SyncActionAction extends DumbAwareAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        Path repoPath = getActiveProjectPath();
+        final Path repoPath = getActiveProjectPath();
 
         if (repoPath == null) {
             Services.getInstance(p, Notifier.class).error(p, "Sync Error", "Could not determine the active project. Please select a project in the tree.");
@@ -60,7 +61,7 @@ public class SyncActionAction extends DumbAwareAction {
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Syncing with remote", true) {
             @Override
-            public void run(@NotNull ProgressIndicator indicator) {
+            public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
                 try {
@@ -100,7 +101,7 @@ public class SyncActionAction extends DumbAwareAction {
         });
     }
 
-    private void showConflictActions(final Path repoPath) {
+    private void showConflictActions(final @NotNull Path repoPath) {
         final NotificationAction continueAction = NotificationAction.createSimple(
                 "Continue Rebase", () -> finishRebase(repoPath, false));
         final NotificationAction abortAction = NotificationAction.createSimple(
@@ -113,10 +114,10 @@ public class SyncActionAction extends DumbAwareAction {
                 abortAction);
     }
 
-    private void finishRebase(final Path repoPath, final boolean abort) {
+    private void finishRebase(final @NotNull Path repoPath, final boolean abort) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, abort ? "Aborting rebase" : "Continuing rebase", false) {
             @Override
-            public void run(@NotNull ProgressIndicator indicator) {
+            public void run(final @NotNull ProgressIndicator indicator) {
                 try {
                     if (abort) {
                         sync.abortRebase(repoPath);
@@ -138,7 +139,7 @@ public class SyncActionAction extends DumbAwareAction {
         });
     }
 
-    private void refreshAfterSync(final Path repoPath) {
+    private void refreshAfterSync(final @NotNull Path repoPath) {
         refreshRepository(repoPath);
         ApplicationManager.getApplication().invokeLater(() -> {
             Services.getInstance(p, Notifier.class).info(p, "Sync Successful", "Your project is now up to date with the remote repository.");
@@ -146,26 +147,23 @@ public class SyncActionAction extends DumbAwareAction {
         });
     }
 
-    private void refreshRepository(final Path repoPath) {
+    private void refreshRepository(final @NotNull Path repoPath) {
         final VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile());
         if (vFile != null) GitUtil.refreshVfsInRoot(vFile);
         Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
     }
 
-    private Path getActiveProjectPath() {
-        TreePath selectionPath = tree.getSelectionPath();
+    private @Nullable Path getActiveProjectPath() {
+        final TreePath selectionPath = tree.getSelectionPath();
         if (selectionPath != null) {
-            for (Object component : selectionPath.getPath()) {
-                TestProjectDirectoryDto project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class);
+            for (final Object component : selectionPath.getPath()) {
+                final TestProjectDirectoryDto project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class);
                 if (project != null) return project.getPath();
             }
         }
 
-        TestProjectDirectoryDto prj = TreeValueUtil.valueOf(tree.getModel().getRoot(), TestProjectDirectoryDto.class);
-        if (prj != null) {
-            return prj.getPath();
-        }
-        return null;
+        final TestProjectDirectoryDto root = TreeValueUtil.valueOf(tree.getModel().getRoot(), TestProjectDirectoryDto.class);
+        return root == null ? null : root.getPath();
     }
 
     @Override

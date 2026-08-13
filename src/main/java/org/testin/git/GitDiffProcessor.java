@@ -67,13 +67,12 @@ public final class GitDiffProcessor {
         return revision == null ? null : revision.getContent();
     }
 
-    private static Path pathOf(final @NotNull Change change) {
-        final ContentRevision revision = change.getAfterRevision() != null
-                ? change.getAfterRevision()
-                : change.getBeforeRevision();
+    private static @Nullable Path pathOf(final @NotNull Change change) {
+        final ContentRevision afterRevision = change.getAfterRevision();
+        final ContentRevision revision = afterRevision != null ? afterRevision : change.getBeforeRevision();
         if (revision == null) return null;
+
         final FilePath file = revision.getFile();
         return Path.of(file.getPath()).toAbsolutePath().normalize();
     }
-
 }

@@ -11,6 +11,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeValueUtil;
@@ -33,7 +34,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
     private final @NotNull GitRepositoryService git;
     private final @NotNull GitCommitService commits;
-    private Notification pushNotification;
+    /** Live only between a successful commit and the push that expires it. */
+    private @Nullable Notification pushNotification;
 
     public ViewPendingCommitsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
@@ -77,7 +79,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         scanForChanges(p, path);
     }
 
-    private void scanForChanges(final @NotNull Project p, final Path path) {
+    private void scanForChanges(final @NotNull Project p, final @NotNull Path path) {
         GitBackgroundTask.run(p, "Scanning for changes", true,
                 indicator -> {
                     final List<TestCaseDiff> changes = GitDiffProcessor.getPendingChanges(p, path);
@@ -86,7 +88,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
     }
 
-    private void reviewChanges(final @NotNull Project p, final Path path, final List<TestCaseDiff> changes) {
+    private void reviewChanges(final @NotNull Project p, final @NotNull Path path,
+                               final @NotNull List<TestCaseDiff> changes) {
         if (changes.isEmpty()) {
             Services.getInstance(p, Notifier.class).info(p, "No Changes", "Your test cases are up to date in this project.");
             return;
@@ -119,9 +122,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
     private void performCommitWorkflow(
             final @NotNull Project p,
-            final Path repoPath,
-            final String commitMessage,
-            final Collection<TestCaseDiff> selectedChanges) {
+            final @NotNull Path repoPath,
+            final @NotNull String commitMessage,
+            final @NotNull Collection<TestCaseDiff> selectedChanges) {
         GitBackgroundTask.run(p, "Committing to local Git", false,
                 indicator -> {
                     indicator.setText("Staging and committing files...");
@@ -150,7 +153,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 });
     }
 
-    private void initializeGitRepository(final @NotNull Project p, final Path repoPath) {
+    private void initializeGitRepository(final @NotNull Project p, final @NotNull Path repoPath) {
         GitBackgroundTask.run(p, "Initializing git repository", false,
                 indicator -> {
                     commits.initialize(repoPath);
@@ -160,7 +163,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage()));
     }
 
-    private void pushToRemote(final @NotNull Project p, final Path repoPath) {
+    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath) {
         GitBackgroundTask.run(p, "Checking Git remote", false,
                 indicator -> {
                     final String remoteName = git.getRemoteName(repoPath);
@@ -170,7 +173,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                         throw new IllegalStateException("Could not determine the repository default branch.");
                     }
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        if (remoteUrl.isEmpty()) {
+                        // A null remote name always yields an empty URL above; naming it here
+                        // keeps the "already configured" branch provably non-null.
+                        if (remoteName == null || remoteUrl.isEmpty()) {
                             configureRemoteAndPush(p, repoPath, remoteName == null ? "origin" : remoteName, branch);
                         } else {
                             executeGitPush(p, repoPath, remoteName, branch);
@@ -180,7 +185,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Could not read the Git remote: " + ex.getMessage()));
     }
 
-    private void configureRemoteAndPush(final @NotNull Project p, final Path repoPath, final String remoteName, final String branch) {
+    private void configureRemoteAndPush(final @NotNull Project p, final @NotNull Path repoPath,
+                                        final @NotNull String remoteName, final @NotNull String branch) {
         final String remoteUrl = Messages.showInputDialog(
                 p,
                 "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
@@ -200,7 +206,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
     }
 
-    private void executeGitPush(final @NotNull Project p, final Path repoPath, final String remote, final String branch) {
+    private void executeGitPush(final @NotNull Project p, final @NotNull Path repoPath,
+                                final @NotNull String remote, final @NotNull String branch) {
         GitBackgroundTask.run(p, "Pushing to Remote", false,
                 indicator -> {
                     indicator.setText("Syncing with remote (pull --rebase, then push)...");
@@ -219,7 +226,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 });
     }
 
-    private void showConflictActions(final Path repoPath, final String remote, final String branch) {
+    private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote,
+                                     final @NotNull String branch) {
         Services.getInstance(p, Notifier.class).warnWithActions(
                 p,
                 "Git Conflicts",
@@ -228,7 +236,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 NotificationAction.createSimple("Abort Rebase", () -> finishRebase(repoPath, remote, branch, true)));
     }
 
-    private void finishRebase(final Path repoPath, final String remote, final String branch, final boolean abort) {
+    private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote,
+                              final @NotNull String branch, final boolean abort) {
         GitBackgroundTask.run(p, abort ? "Aborting rebase" : "Continuing rebase", false,
                 indicator -> {
                     if (abort) {
@@ -249,9 +258,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
 
     private void promptAndSetGitIdentity(
             final @NotNull Project p,
-            final Path repoPath,
-            final String pendingCommitMessage,
-            final Collection<TestCaseDiff> selectedChanges) {
+            final @NotNull Path repoPath,
+            final @NotNull String pendingCommitMessage,
+            final @NotNull Collection<TestCaseDiff> selectedChanges) {
         ApplicationManager.getApplication().invokeLater(() -> {
             final GitIdentityDialog dialog = new GitIdentityDialog(p);
             if (!dialog.showAndGet()) return;
@@ -277,11 +286,11 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
         });
     }
 
-    private boolean isIdentityError(final String message) {
+    private boolean isIdentityError(final @Nullable String message) {
         if (message == null) return false;
+
         final String normalized = message.toLowerCase(Locale.ROOT);
         return normalized.contains("author identity unknown")
                 || normalized.contains("please tell me who you are");
     }
-
 }

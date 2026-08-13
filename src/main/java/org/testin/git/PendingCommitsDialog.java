@@ -25,12 +25,16 @@ import java.util.List;
 public class PendingCommitsDialog extends FramelessDialogWrapper {
 
     private final @NotNull Project p;
-    private final List<TestCaseDiff> differences;
-    private final Path repoRoot;
-    private final List<TestCaseDiff> rowDifferences = new ArrayList<>();
-    private JBTable table;
+    private final @NotNull List<TestCaseDiff> differences;
+    private final @NotNull Path repoRoot;
+    private final @NotNull List<TestCaseDiff> rowDifferences = new ArrayList<>();
 
-    public PendingCommitsDialog(@NotNull Project p, List<TestCaseDiff> differences, Path repoRoot) {
+    /** Built by {@link #createCenterPanel()}; null until the dialog has been laid out. */
+    private @Nullable JBTable table;
+
+    public PendingCommitsDialog(final @NotNull Project p,
+                                final @NotNull List<TestCaseDiff> differences,
+                                final @NotNull Path repoRoot) {
         super(p, true);
         this.p = p;
         this.differences = differences;
@@ -39,22 +43,21 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
         initFrameless();
     }
 
-    @Nullable
     @Override
-    protected JComponent createCenterPanel() {
-        JBPanel<?> panel = new JBPanel<>(new BorderLayout());
+    protected @NotNull JComponent createCenterPanel() {
+        final JBPanel<?> panel = new JBPanel<>(new BorderLayout());
 
-        String[] columns = {"Test Case ID", "Change Type", "Test Case Description", "Old Value", "New Value"};
-        DefaultTableModel model = new DefaultTableModel(columns, 0) {
+        final String[] columns = {"Test Case ID", "Change Type", "Test Case Description", "Old Value", "New Value"};
+        final DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(final int row, final int column) {
                 return false;
             }
         };
 
-        for (TestCaseDiff diff : differences) {
-            for (FieldChange fc : diff.fieldChanges()) {
-                String description = getDescriptionForRow(diff, fc);
+        for (final TestCaseDiff diff : differences) {
+            for (final FieldChange fc : diff.fieldChanges()) {
+                final String description = getDescriptionForRow(diff, fc);
                 model.addRow(new Object[]{
                         diff.testCaseId(),
                         fc.changeType().getLabel(),
@@ -66,40 +69,41 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
             }
         }
 
-        table = new JBTable(model);
-        table.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        if (table.getRowCount() > 0) table.addRowSelectionInterval(0, table.getRowCount() - 1);
-        table.setFillsViewportHeight(true);
-        table.getColumnModel().getColumn(0).setPreferredWidth(100);
-        table.getColumnModel().getColumn(1).setPreferredWidth(120);
-        table.getColumnModel().getColumn(2).setPreferredWidth(200);
-        table.getColumnModel().getColumn(3).setPreferredWidth(200);
-        table.getColumnModel().getColumn(4).setPreferredWidth(200);
+        final JBTable builtTable = new JBTable(model);
+        table = builtTable;
+        builtTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        if (builtTable.getRowCount() > 0) builtTable.addRowSelectionInterval(0, builtTable.getRowCount() - 1);
+        builtTable.setFillsViewportHeight(true);
+        builtTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+        builtTable.getColumnModel().getColumn(1).setPreferredWidth(120);
+        builtTable.getColumnModel().getColumn(2).setPreferredWidth(200);
+        builtTable.getColumnModel().getColumn(3).setPreferredWidth(200);
+        builtTable.getColumnModel().getColumn(4).setPreferredWidth(200);
 
         // --- Context Menu for Rejecting Changes ---
-        JBPopupMenu popupMenu = new JBPopupMenu();
-        JMenuItem rejectItem = new JMenuItem("Reject Specific Change");
+        final JBPopupMenu popupMenu = new JBPopupMenu();
+        final JMenuItem rejectItem = new JMenuItem("Reject Specific Change");
         rejectItem.addActionListener(e -> rejectSelectedChange(model));
         popupMenu.add(rejectItem);
 
-        table.addMouseListener(new MouseAdapter() {
+        builtTable.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseReleased(MouseEvent e) {
+            public void mouseReleased(final @NotNull MouseEvent e) {
                 if (e.isPopupTrigger() || SwingUtilities.isRightMouseButton(e)) {
-                    int r = table.rowAtPoint(e.getPoint());
-                    if (r >= 0 && r < table.getRowCount()) {
-                        table.setRowSelectionInterval(r, r);
+                    final int r = builtTable.rowAtPoint(e.getPoint());
+                    if (r >= 0 && r < builtTable.getRowCount()) {
+                        builtTable.setRowSelectionInterval(r, r);
                     } else {
-                        table.clearSelection();
+                        builtTable.clearSelection();
                     }
-                    if (table.getSelectedRow() >= 0) {
+                    if (builtTable.getSelectedRow() >= 0) {
                         popupMenu.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
             }
         });
 
-        panel.add(new JBScrollPane(table), BorderLayout.CENTER);
+        panel.add(new JBScrollPane(builtTable), BorderLayout.CENTER);
         panel.setPreferredSize(new Dimension(900, 400));
 
         return panel;
@@ -114,55 +118,57 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
         return List.copyOf(selected);
     }
 
-    private String getDescriptionForRow(TestCaseDiff diff, FieldChange fc) {
-        if (diff.type() == DiffType.ADDED) {
-            TestCaseDto newState = diff.newState();
-            return newState != null ? newState.getDescription() : fc.newValue();
-
-        } else if (diff.type() == DiffType.DELETED) {
-            TestCaseDto oldState = diff.oldState();
+    private @Nullable String getDescriptionForRow(final @NotNull TestCaseDiff diff, final @NotNull FieldChange fc) {
+        if (diff.type() == DiffType.DELETED) {
+            final TestCaseDto oldState = diff.oldState();
             return oldState != null ? oldState.getDescription() : fc.oldValue();
-
-        } else {
-            TestCaseDto newState = diff.newState();
-            return newState != null ? newState.getDescription() : fc.newValue();
         }
+
+        final TestCaseDto newState = diff.newState();
+        return newState != null ? newState.getDescription() : fc.newValue();
     }
 
-    private void rejectSelectedChange(final DefaultTableModel model) {
-        int selectedRow = table.getSelectedRow();
-        if (selectedRow < 0 || selectedRow >= rowDifferences.size()) return;
+    private void rejectSelectedChange(final @NotNull DefaultTableModel model) {
+        final JBTable selectionSource = table;
+        if (selectionSource == null) return;
 
-        String testCaseId = (String) model.getValueAt(selectedRow, 0);
-        String changeTypeLabel = (String) model.getValueAt(selectedRow, 1);
+        final int selectedRow = selectionSource.getSelectedRow();
+        if (selectedRow < 0 || selectedRow >= rowDifferences.size()) return;
 
         // rowDifferences maps rows to diffs exactly; searching by test case id would
         // pick the wrong diff when one test case contributes several change rows.
-        TestCaseDiff diff = rowDifferences.get(selectedRow);
+        final TestCaseDiff diff = rowDifferences.get(selectedRow);
+
+        // The row's change-type label says which field this row reverts; a diff can
+        // contribute several rows, so it cannot be read off the diff itself.
+        final String changeTypeLabel = (String) model.getValueAt(selectedRow, 1);
 
         try {
-            final Path jsonPath = repoRoot.resolve(diff.relativeFilePath());
-            final Path testSetPath = jsonPath.getParent();
+            final Path testSetPath = repoRoot.resolve(diff.relativeFilePath()).getParent();
+            if (testSetPath == null) return;
+
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            final UUID testCaseId = UUID.fromString(diff.testCaseId());
 
             if (diff.type() == DiffType.ADDED) {
-                indexer.removeTestCase(testSetPath, UUID.fromString(testCaseId));
+                indexer.removeTestCase(testSetPath, testCaseId);
                 removeRow(selectedRow, model);
             } else if (diff.type() == DiffType.MODIFIED) {
-                final TestCaseDto currentDto = indexer.getTestCaseById(UUID.fromString(testCaseId));
+                final TestCaseDto currentDto = indexer.getTestCaseById(testCaseId);
                 final TestCaseDto oldDto = diff.oldState();
-
-                if (currentDto == null)
-                    return;
+                if (currentDto == null || oldDto == null) return;
 
                 final ChangeType changeType = ChangeType.fromLabel(changeTypeLabel);
-                if (changeType != null && changeType.getRevertAction() != null)
-                    changeType.getRevertAction().apply(currentDto, oldDto);
+                final RevertAction revertAction = changeType == null ? null : changeType.getRevertAction();
+                if (revertAction != null) revertAction.apply(currentDto, oldDto);
 
                 indexer.putTestCase(testSetPath, currentDto);
                 removeRow(selectedRow, model);
-            } else if (diff.type() == DiffType.DELETED && diff.oldState() != null) {
-                indexer.putTestCase(testSetPath, diff.oldState());
+            } else if (diff.type() == DiffType.DELETED) {
+                final TestCaseDto oldDto = diff.oldState();
+                if (oldDto == null) return;
+
+                indexer.putTestCase(testSetPath, oldDto);
                 removeRow(selectedRow, model);
             }
         } catch (final Exception ex) {
@@ -170,7 +176,7 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
         }
     }
 
-    private void removeRow(final int row, final DefaultTableModel model) {
+    private void removeRow(final int row, final @NotNull DefaultTableModel model) {
         model.removeRow(row);
         if (row >= 0 && row < rowDifferences.size()) rowDifferences.remove(row);
     }

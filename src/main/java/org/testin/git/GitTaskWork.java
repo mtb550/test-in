@@ -1,6 +1,7 @@
 package org.testin.git;
 
 import com.intellij.openapi.progress.ProgressIndicator;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Background body of a {@link GitBackgroundTask}; may throw, the task reports
@@ -8,5 +9,5 @@ import com.intellij.openapi.progress.ProgressIndicator;
  */
 @FunctionalInterface
 public interface GitTaskWork {
-    void run(ProgressIndicator indicator) throws Exception;
+    void run(final @NotNull ProgressIndicator indicator) throws Exception;
 }

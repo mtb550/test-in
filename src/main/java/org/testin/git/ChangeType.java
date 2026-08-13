@@ -2,6 +2,7 @@ package org.testin.git;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Getter
@@ -65,10 +66,12 @@ public enum ChangeType {
             (current, old) -> current.setPreConditions(old.getPreConditions())
     );
 
-    private final String label;
-    private final RevertAction revertAction;
+    private final @NotNull String label;
 
-    public static @Nullable ChangeType fromLabel(final String label) {
+    /** Null for add/remove: creating or deleting a whole test case has no field to revert. */
+    private final @Nullable RevertAction revertAction;
+
+    public static @Nullable ChangeType fromLabel(final @Nullable String label) {
         for (final ChangeType type : values())
             if (type.label.equals(label)) return type;
 

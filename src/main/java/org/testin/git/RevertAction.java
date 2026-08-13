@@ -1,8 +1,9 @@
 package org.testin.git;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
 
 @FunctionalInterface
 public interface RevertAction {
-    void apply(final TestCaseDto currentDto, final TestCaseDto oldDto);
+    void apply(final @NotNull TestCaseDto currentDto, final @NotNull TestCaseDto oldDto);
 }

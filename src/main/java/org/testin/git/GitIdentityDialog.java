@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.ui.dialogs.FramelessDialogWrapper;
 
@@ -14,9 +15,9 @@ import javax.swing.*;
  */
 final class GitIdentityDialog extends FramelessDialogWrapper {
 
-    private final JBTextField nameField = new JBTextField();
-    private final JBTextField emailField = new JBTextField();
-    private final JBCheckBox globalCheckBox = new JBCheckBox("Set globally");
+    private final @NotNull JBTextField nameField = new JBTextField();
+    private final @NotNull JBTextField emailField = new JBTextField();
+    private final @NotNull JBCheckBox globalCheckBox = new JBCheckBox("Set globally");
 
     GitIdentityDialog(final @Nullable Project project) {
         super(project, true);
@@ -25,7 +26,7 @@ final class GitIdentityDialog extends FramelessDialogWrapper {
     }
 
     @Override
-    protected @Nullable JComponent createCenterPanel() {
+    protected @NotNull JComponent createCenterPanel() {
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent("Name:", nameField)
                 .addLabeledComponent("Email:", emailField)
@@ -34,15 +35,15 @@ final class GitIdentityDialog extends FramelessDialogWrapper {
     }
 
     @Override
-    public @Nullable JComponent getPreferredFocusedComponent() {
+    public @NotNull JComponent getPreferredFocusedComponent() {
         return nameField;
     }
 
-    String getUserName() {
+    @NotNull String getUserName() {
         return nameField.getText();
     }
 
-    String getUserEmail() {
+    @NotNull String getUserEmail() {
         return emailField.getText();
     }
 
