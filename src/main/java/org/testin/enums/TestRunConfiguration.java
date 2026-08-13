@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import javax.swing.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Getter
 @AllArgsConstructor
@@ -61,5 +62,7 @@ public enum TestRunConfiguration {
 
     private final @NotNull String displayName;
     private final @NotNull Icon icon;
-    private final @NotNull String[] options;
+
+    /** Null for free-text fields; set only by those offering a fixed choice. */
+    private final @Nullable String[] options;
 }

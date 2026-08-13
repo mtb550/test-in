@@ -3,6 +3,7 @@ package org.testin.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.GeneratorType;
 import org.testin.mappers.dto.dirs.*;
 
@@ -80,6 +81,8 @@ public enum CreateNodeMenu {
     private final @NotNull Class<?> targetDtoClass;
     private final @NotNull DirectoryType targetParentType;
     private final @NotNull String placeholder;
-    private final @NotNull GeneratorType generatorType;
+
+    /** Null for the nodes that generate no code - the container directories. */
+    private final @Nullable GeneratorType generatorType;
 
 }

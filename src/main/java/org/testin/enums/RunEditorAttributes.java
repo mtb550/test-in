@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.Shared;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.TestRunItems;
@@ -132,7 +133,9 @@ public enum RunEditorAttributes {
     private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
     private final @NotNull ValueExtractor<TestRunItems> runValueExtractor;
-    private final @NotNull DrawItem<TestRunItems> runDrawItem;
+
+    /** Null for every attribute rendered as plain text; set only by those drawn as badges. */
+    private final @Nullable DrawItem<TestRunItems> runDrawItem;
 
     public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         if (runDrawItem != null) badges.addAll(runDrawItem.execute(runItem));
