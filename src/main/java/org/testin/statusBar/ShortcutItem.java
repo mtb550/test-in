@@ -1,17 +1,19 @@
 package org.testin.statusBar;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Plain name + shortcut pair for the dialog status bars.
  */
-record ShortcutItem(String name, String shortcutText) implements IStatusBarItem {
+record ShortcutItem(@NotNull String name, @NotNull String shortcutText) implements IStatusBarItem {
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
     @Override
-    public String getShortcutText() {
+    public @NotNull String getShortcutText() {
         return shortcutText;
     }
 }

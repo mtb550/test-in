@@ -1,7 +1,9 @@
 package org.testin.statusBar;
 
-public interface IStatusBarItem {
-    String getShortcutText();
+import org.jetbrains.annotations.NotNull;
 
-    String getName();
+public interface IStatusBarItem {
+    @NotNull String getShortcutText();
+
+    @NotNull String getName();
 }

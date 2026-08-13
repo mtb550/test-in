@@ -1,6 +1,7 @@
 package org.testin.logger;
 
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @AllArgsConstructor
 public enum Level {
@@ -13,6 +14,6 @@ public enum Level {
     FATAL(5, "FATAL");
 
     public final int priority;
-    public final String paddedName;
+    public final @NotNull String paddedName;
 
 }

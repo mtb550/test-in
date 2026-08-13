@@ -11,6 +11,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -26,7 +27,8 @@ import java.util.UUID;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
 
-    private static UUID parseUuid(final String value) {
+    /** Null when the annotation's testName is not a UUID at all. */
+    private static @Nullable UUID parseUuid(final @NotNull String value) {
         try {
             return UUID.fromString(value);
         } catch (final IllegalArgumentException ex) {

@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Logger {
@@ -58,7 +59,8 @@ public final class Logger {
             System.out.println("[" + level.paddedName + "] [" + callerClass + "] " + message);
     }
 
-    private static LoggerService getService() {
+    /** Null before the application is up: callers fall back to stdout. */
+    private static @Nullable LoggerService getService() {
         if (backendService == null) {
             if (ApplicationManager.getApplication() != null) {
                 backendService = ApplicationManager.getApplication().getService(LoggerService.class);

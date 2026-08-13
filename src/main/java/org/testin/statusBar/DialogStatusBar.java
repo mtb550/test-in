@@ -1,5 +1,6 @@
 package org.testin.statusBar;
 
+import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 /**
@@ -14,7 +15,7 @@ public final class DialogStatusBar extends StatusBarBase {
         });
     }
 
-    private DialogStatusBar(final IStatusBarItem[] items) {
+    private DialogStatusBar(final IStatusBarItem @NotNull [] items) {
         super(items);
     }
 }

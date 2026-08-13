@@ -8,6 +8,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -37,11 +38,11 @@ public class RemoveAction extends DumbAwareAction {
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
 
-    private boolean isRemovable(final Object dir) {
+    private boolean isRemovable(final @Nullable Object dir) {
         return dir instanceof DirectoryDto dto && dto.isRemovable();
     }
 
-    private List<DirectoryDto> getRemovableNodes(final TreePath[] paths) {
+    private @NotNull List<DirectoryDto> getRemovableNodes(final TreePath @Nullable [] paths) {
         return TreeValueUtil.selectedDirectories(paths).stream()
                 .filter(this::isRemovable)
                 .toList();

@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -18,29 +19,29 @@ public abstract class StatusBarBase {
     /**
      * Between a keystroke and its meaning.
      */
-    private static final String INNER_SEPARATOR = " ";
+    private static final @NotNull String INNER_SEPARATOR = " ";
     /**
      * Between entries — whitespace only, sized to read as a deliberate gap.
      */
-    private static final String OUTER_SEPARATOR = "       ";
+    private static final @NotNull String OUTER_SEPARATOR = "       ";
 
-    private final JBPanel<?> statusBar;
+    private final @NotNull JBPanel<?> statusBar;
 
     // Keystroke and its meaning read clearly in light and dark; only the
     // separators stay muted.
-    private final Color shortcutColor = JBUI.CurrentTheme.Label.foreground();
-    private final Color labelColor = JBUI.CurrentTheme.Label.foreground();
-    private final Color dotColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
-    private final Color separatorColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
+    private final @NotNull Color shortcutColor = JBUI.CurrentTheme.Label.foreground();
+    private final @NotNull Color labelColor = JBUI.CurrentTheme.Label.foreground();
+    private final @NotNull Color dotColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
+    private final @NotNull Color separatorColor = JBUI.CurrentTheme.ContextHelp.FOREGROUND;
 
-    private final Font font = JBUI.Fonts.smallFont();
-    private final Font shortcutFont = JBUI.Fonts.smallFont().asBold();
+    private final @NotNull Font font = JBUI.Fonts.smallFont();
+    private final @NotNull Font shortcutFont = JBUI.Fonts.smallFont().asBold();
 
     // A keyboard: says "these are keys".
-    private final Icon icon = AllIcons.General.Keyboard;
-    private final Border border = JBUI.Borders.emptyRight(6);
+    private final @NotNull Icon icon = AllIcons.General.Keyboard;
+    private final @NotNull Border border = JBUI.Borders.emptyRight(6);
 
-    public StatusBarBase(final IStatusBarItem[] items) {
+    public StatusBarBase(final IStatusBarItem @NotNull [] items) {
         this.statusBar = new JBPanel<>(new BorderLayout());
         this.statusBar.setBorder(JBUI.Borders.empty(4, 10));
         this.statusBar.setOpaque(true);
@@ -49,16 +50,16 @@ public abstract class StatusBarBase {
         updateItems(items);
     }
 
-    public void updateItems(final IStatusBarItem[] items) {
+    public void updateItems(final IStatusBarItem @NotNull [] items) {
         this.statusBar.removeAll();
 
-        JBPanel<?> contentPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        final JBPanel<?> contentPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         contentPanel.setOpaque(false);
 
         contentPanel.add(setStatusBarIcon());
 
         for (int i = 0; i < items.length; i++) {
-            IStatusBarItem item = items[i];
+            final IStatusBarItem item = items[i];
             contentPanel.add(createShortcut(item.getShortcutText()));
             contentPanel.add(createDot());
             contentPanel.add(createLabel(item.getName()));
@@ -74,40 +75,40 @@ public abstract class StatusBarBase {
         this.statusBar.repaint();
     }
 
-    private JBLabel setStatusBarIcon() {
-        JBLabel label = new JBLabel(icon);
+    private @NotNull JBLabel setStatusBarIcon() {
+        final JBLabel label = new JBLabel(icon);
         label.setBorder(border);
         return label;
     }
 
-    private JBLabel createShortcut(final String text) {
-        JBLabel label = new JBLabel(text);
+    private @NotNull JBLabel createShortcut(final @NotNull String text) {
+        final JBLabel label = new JBLabel(text);
         label.setForeground(shortcutColor);
         label.setFont(shortcutFont);
         return label;
     }
 
-    private JBLabel createDot() {
-        JBLabel label = new JBLabel(INNER_SEPARATOR);
+    private @NotNull JBLabel createDot() {
+        final JBLabel label = new JBLabel(INNER_SEPARATOR);
         label.setForeground(dotColor);
         return label;
     }
 
-    private JBLabel createLabel(final String text) {
-        JBLabel label = new JBLabel(text);
+    private @NotNull JBLabel createLabel(final @NotNull String text) {
+        final JBLabel label = new JBLabel(text);
         label.setForeground(labelColor);
         label.setFont(font);
         return label;
     }
 
-    private JBLabel createSeparator() {
-        JBLabel label = new JBLabel(OUTER_SEPARATOR);
+    private @NotNull JBLabel createSeparator() {
+        final JBLabel label = new JBLabel(OUTER_SEPARATOR);
         label.setForeground(separatorColor);
         label.setFont(font);
         return label;
     }
 
-    public JBPanel<?> getPanel() {
+    public @NotNull JBPanel<?> getPanel() {
         return statusBar;
     }
 }
