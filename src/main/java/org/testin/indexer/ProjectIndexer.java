@@ -343,34 +343,38 @@ public final class ProjectIndexer {
         store.registerTestRun(testRunPath, tr);
     }
 
-    public void removeTestProject(final @NotNull Path path) {
-        removeVf(path);
-        store.removeTestProject(path);
+    public void removeTestProject(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+        removeVf(path, () -> store.removeTestProject(path), onRemoved);
     }
 
-    public void removeTestSet(final @NotNull Path path) {
-        removeVf(path);
-        store.removeTestSet(path);
+    public void removeTestSet(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+        removeVf(path, () -> store.removeTestSet(path), onRemoved);
     }
 
-    public void removeTestRun(final @NotNull Path path) {
-        removeVf(path);
-        store.removeTestRun(path);
+    public void removeTestRun(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+        removeVf(path, () -> store.removeTestRun(path), onRemoved);
     }
 
-    public void removeTestSetPackage(final @NotNull Path path) {
-        removeVf(path);
-        store.removeTestSetPackage(path);
+    public void removeTestSetPackage(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+        removeVf(path, () -> store.removeTestSetPackage(path), onRemoved);
     }
 
-    public void removeTestRunPackage(final @NotNull Path path) {
-        removeVf(path);
-        store.removeTestRunPackage(path);
+    public void removeTestRunPackage(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+        removeVf(path, () -> store.removeTestRunPackage(path), onRemoved);
     }
 
-    private void removeVf(final @NotNull Path path) {
-        Services.getInstance(p, TreeUtilImpl.class).removeVf(p, this, path);
-        VirtualFileManager.getInstance().syncRefresh();
+    /**
+     * Deletes on disk, refreshes, and only then updates the cache — the order
+     * CLAUDE.md requires. The refresh is asynchronous now: the synchronous one
+     * ran on the EDT, and a full VFS refresh there is a slow operation.
+     */
+    private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate,
+                          final @NotNull Runnable onRemoved) {
+        Services.getInstance(p, TreeUtilImpl.class).removeVf(p, this, path,
+                () -> VirtualFileManager.getInstance().asyncRefresh(() -> {
+                    cacheUpdate.run();
+                    onRemoved.run();
+                }));
     }
 
     public void moveNode(final @NotNull Path oldPath,

@@ -3,13 +3,13 @@ package org.testin.remove;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
+import org.testin.enums.RemoveHandler;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
@@ -22,6 +22,7 @@ import org.testin.util.EditorUtil;
 
 import javax.swing.tree.TreePath;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.testin.util.Shortcuts.DeletePackage;
 
@@ -67,24 +68,32 @@ public class RemoveAction extends DumbAwareAction {
         new ConfirmDialog(p, "Confirm Removing", msg, from, null, "Remove", () -> removeNodes(nodesToRemove)).show();
     }
 
-    private void removeNodes(final List<DirectoryDto> nodesToRemove) {
+    private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {
+        if (nodesToRemove.isEmpty()) return;
+
+        // Removal is asynchronous now, so the tree is rebuilt once the last node
+        // is actually gone rather than immediately after the loop - at which
+        // point none of them would have been removed yet.
+        final AtomicInteger pending = new AtomicInteger(nodesToRemove.size());
+        final Runnable onRemoved = () -> {
+            if (pending.decrementAndGet() != 0) return;
+
+            pp.getProjectTree().updateNodes();
+            Logger.info("Removed " + nodesToRemove.size() + " node(s).");
+        };
+
         for (final DirectoryDto pkg : nodesToRemove) {
 
             if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
                 Services.getInstance(p, EditorUtil.class).close(p, pkg.getName());
 
             final DirectoryType type = DirectoryType.from(pkg);
-            if (type != null && type.getRemoveHandler() != null)
-                type.getRemoveHandler().remove(p, pkg);
+            final RemoveHandler handler = type == null ? null : type.getRemoveHandler();
 
-
+            // A node with no handler still has to count, or the tree never rebuilds.
+            if (handler == null) onRemoved.run();
+            else handler.remove(p, pkg, onRemoved);
         }
-
-        ApplicationManager.getApplication().invokeLater(() -> {
-            pp.getProjectTree().updateNodes();
-            Logger.info("Removed " + nodesToRemove.size() + " node(s).");
-        });
-
     }
 
     @Override

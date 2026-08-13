@@ -87,15 +87,32 @@ public final class TreeUtilImpl {
         });
     }
 
-    public void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path) {
-        try {
-            final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(path.toFile());
-            if (vf != null) {
-                WriteAction.run(() -> vf.delete(requester));
-            }
-        } catch (final IOException ex) {
-            Services.getInstance(p, Notifier.class).error(p, "Could not delete file: " + ex.getMessage(), "Error");
-        }
+    /**
+     * Deletes the file, then runs {@code onDeleted} on the EDT.
+     * <p>
+     * The callback exists because the lookup has to leave the EDT, which makes
+     * the delete asynchronous; callers that update the indexer cache afterwards
+     * must wait for it. It runs whether or not the file was there: a path that
+     * has already gone still has to be cleared from the cache, which is what the
+     * synchronous version did by simply returning.
+     */
+    public void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
+                         final @NotNull Runnable onDeleted) {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                WriteAction.run(() -> {
+                    try {
+                        if (vf != null) vf.delete(requester);
+                    } catch (final IOException ex) {
+                        Services.getInstance(p, Notifier.class).error(p, "Could not delete file: " + ex.getMessage(), "Error");
+                    }
+                });
+
+                onDeleted.run();
+            });
+        });
     }
 
 }

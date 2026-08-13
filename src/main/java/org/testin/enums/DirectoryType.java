@@ -30,10 +30,10 @@ public enum DirectoryType {
             ".tp",
             null,
             (p, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
-            (p, dir) -> {
-                Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath());
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath(), () -> {
                 GeneratorType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
-            },
+                onRemoved.run();
+            }),
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
 
@@ -69,10 +69,10 @@ public enum DirectoryType {
             ".tsp",
             CreateTestSetPackage::new,
             (p, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
-            (p, dir) -> {
-                Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath());
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath(), () -> {
                 GeneratorType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
-            },
+                onRemoved.run();
+            }),
             SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
@@ -84,7 +84,7 @@ public enum DirectoryType {
             ".trp",
             CreateTestRunPackage::new,
             null,
-            (p, dir) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath()),
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath(), onRemoved),
             SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
@@ -96,10 +96,10 @@ public enum DirectoryType {
             ".ts",
             CreateTestSet::new,
             (p, dir) -> GeneratorType.CREATE_TEST_SET.getAction().execute(p, dir),
-            (p, dir) -> {
-                Services.getInstance(p, ProjectIndexer.class).removeTestSet(dir.getPath());
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSet(dir.getPath(), () -> {
                 GeneratorType.REMOVE_TEST_SET.getAction().execute(p, dir);
-            },
+                onRemoved.run();
+            }),
             SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
@@ -111,7 +111,7 @@ public enum DirectoryType {
             ".tr",
             CreateTestRun::new,
             null,
-            (p, dir) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath()),
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath(), onRemoved),
             SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
 
