@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.open.OpenAction;
 
 import javax.swing.*;
@@ -16,17 +17,18 @@ import java.awt.event.MouseEvent;
 
 public class TreeMouseListener extends PopupHandler {
     private final @NotNull Project p;
-    private final SimpleTree tree;
-    private final TreeContextMenu treeContextMenu;
+    private final @NotNull SimpleTree tree;
+    private final @NotNull TreeContextMenu treeContextMenu;
 
-    public TreeMouseListener(final @NotNull Project p, final SimpleTree tree, final TreeContextMenu treeContextMenu) {
+    public TreeMouseListener(final @NotNull Project p, final @NotNull SimpleTree tree,
+                             final @NotNull TreeContextMenu treeContextMenu) {
         this.p = p;
         this.tree = tree;
         this.treeContextMenu = treeContextMenu;
     }
 
     @Override
-    public void invokePopup(final Component comp, final int x, final int y) {
+    public void invokePopup(final @NotNull Component comp, final int x, final int y) {
         final TreePath selPath = rowPathAt(x, y);
 
         if (selPath != null && TreeValueUtil.directoryOf(selPath.getLastPathComponent()) != null) {
@@ -35,13 +37,13 @@ public class TreeMouseListener extends PopupHandler {
                 tree.setSelectionPath(selPath);
             }
 
-            ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
+            final ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
             popupMenu.getComponent().show(comp, x, y);
         }
     }
 
     @Override
-    public void mouseClicked(final MouseEvent e) {
+    public void mouseClicked(final @NotNull MouseEvent e) {
         final TreePath selPath = rowPathAt(e.getX(), e.getY());
 
         if (selPath == null || TreeValueUtil.directoryOf(selPath.getLastPathComponent()) == null)
@@ -59,7 +61,7 @@ public class TreeMouseListener extends PopupHandler {
      * hit the same node. Matches the row by Y alone; below the last row is
      * still a miss.
      */
-    private TreePath rowPathAt(final int x, final int y) {
+    private @Nullable TreePath rowPathAt(final int x, final int y) {
         final int row = tree.getClosestRowForLocation(x, y);
         if (row < 0) return null;
 

@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RefreshAction extends DumbAwareAction {
     private final @NotNull Project p;
-    private final ProjectPanel pp;
-    private final AtomicBoolean refreshGuard = new AtomicBoolean(false);
+    private final @NotNull ProjectPanel pp;
+    private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
     public RefreshAction(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         super("Refresh", "Re-index and reload tree", AllIcons.Actions.Refresh);
@@ -58,15 +58,8 @@ public class RefreshAction extends DumbAwareAction {
     }
 
     @Override
-    public void update(final @NotNull AnActionEvent e) {
-
-        boolean hasTree = pp.getProjectTree().getMainTree() != null;
-        e.getPresentation().setEnabled(hasTree);
-    }
-
-    @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
+        // BGT on purpose - this action has no update() reading Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 }

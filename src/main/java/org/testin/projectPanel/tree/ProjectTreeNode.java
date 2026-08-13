@@ -5,6 +5,7 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.tree.LeafState;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.ProjectStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -22,7 +23,7 @@ import java.util.List;
 public final class ProjectTreeNode extends AbstractTreeNode<Object> {
     private final @NotNull Project project;
 
-    public ProjectTreeNode(final @NotNull Project project, final Object value) {
+    public ProjectTreeNode(final @NotNull Project project, final @Nullable Object value) {
         super(project, value);
         this.project = project;
     }
@@ -43,7 +44,7 @@ public final class ProjectTreeNode extends AbstractTreeNode<Object> {
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             indexer.awaitIndexing();
             final List<ProjectTreeNode> children = new ArrayList<>();
-            for (DirectoryDto child : indexer.getChildren(directory.getPath())) {
+            for (final DirectoryDto child : indexer.getChildren(directory.getPath())) {
                 children.add(child(child));
             }
             return children;
@@ -54,14 +55,14 @@ public final class ProjectTreeNode extends AbstractTreeNode<Object> {
         }
     }
 
-    private ProjectTreeNode child(final Object value) {
+    private @NotNull ProjectTreeNode child(final @NotNull Object value) {
         final ProjectTreeNode child = new ProjectTreeNode(project, value);
         child.setParent(this);
         return child;
     }
 
     @Override
-    public LeafState getLeafState() {
+    public @NotNull LeafState getLeafState() {
         return getValue() instanceof DirectoryDto ? LeafState.ASYNC : LeafState.ALWAYS;
     }
 

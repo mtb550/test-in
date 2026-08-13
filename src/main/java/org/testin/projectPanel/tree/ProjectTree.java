@@ -10,6 +10,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.projectPanel.ProjectPanel;
@@ -20,29 +21,29 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ProjectTree implements Disposable {
-    private final ProjectPanel pp;
-    private final JBScrollPane scrollPane;
-    private final ProjectTreeStructure treeStructure;
-    private final StructureTreeModel<ProjectTreeStructure> structureModel;
-    private final AsyncTreeModel treeModel;
+    private final @NotNull ProjectPanel pp;
+    private final @NotNull JBScrollPane scrollPane;
+    private final @NotNull ProjectTreeStructure treeStructure;
+    private final @NotNull StructureTreeModel<ProjectTreeStructure> structureModel;
+    private final @NotNull AsyncTreeModel treeModel;
     @Getter
-    private final SimpleTree mainTree;
-    private final TreeTransferHandler transferHandler;
-    private final TreeContextMenu treeContextMenu;
-    private final AtomicBoolean refreshScheduled = new AtomicBoolean();
+    private final @NotNull SimpleTree mainTree;
+    private final @NotNull TreeTransferHandler transferHandler;
+    private final @NotNull TreeContextMenu treeContextMenu;
+    private final @NotNull AtomicBoolean refreshScheduled = new AtomicBoolean();
 
     /**
      * Path of the project currently shown in the tree. The tree auto-expands when it
      * loads a different project (startup and selector changes); refreshes of the same
-     * project keep the user's own expand/collapse state.
+     * project keep the user's own expand/collapse state. Null while no project is selected.
      */
-    private volatile String expandedProjectPath;
+    private volatile @Nullable String expandedProjectPath;
     private volatile boolean disposed;
 
     public ProjectTree(final @NotNull Project p, final @NotNull ProjectPanel pp) {
         this.pp = pp;
 
-        final TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
+        final @Nullable TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
                 pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
         this.treeStructure = new ProjectTreeStructure(p, selectedProject);
         this.structureModel = new StructureTreeModel<>(treeStructure, this);
@@ -79,11 +80,11 @@ public class ProjectTree implements Disposable {
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
                 if (disposed) return;
-                final TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
+                final @Nullable TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
                         pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
                 treeStructure.setSelectedProject(selectedProject);
 
-                final String projectPath = selectedProject != null ? selectedProject.getPath().toString() : null;
+                final @Nullable String projectPath = selectedProject != null ? selectedProject.getPath().toString() : null;
                 final boolean projectChanged = projectPath != null && !projectPath.equals(expandedProjectPath);
                 expandedProjectPath = projectPath;
 
@@ -106,7 +107,7 @@ public class ProjectTree implements Disposable {
         pp.getTestProjectSelector().loadTestProjectList();
     }
 
-    public JComponent getComponent() {
+    public @NotNull JComponent getComponent() {
         return scrollPane;
     }
 

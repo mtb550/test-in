@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.ProjectStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -44,7 +45,7 @@ public class TestProjectSelector {
         selectedTestProject.addActionListener(e -> {
             if (isLoading) return;
 
-            TestProjectDirectoryDto selected = (TestProjectDirectoryDto) selectedTestProject.getSelectedItem();
+            final TestProjectDirectoryDto selected = (TestProjectDirectoryDto) selectedTestProject.getSelectedItem();
             if (selected != null)
                 PropertiesComponent.getInstance(p).setValue(SELECTED_PROJECT_KEY, selected.getName());
         });
@@ -59,12 +60,14 @@ public class TestProjectSelector {
         Logger.info("TestProjectSelector.loadTestProjectList()");
 
         final Object currentSelected = selectedTestProject.getSelectedItem();
-        final String currentSelectedName = currentSelected instanceof TestProjectDirectoryDto ? ((TestProjectDirectoryDto) currentSelected).getName() : null;
+        final @Nullable String currentSelectedName = currentSelected instanceof TestProjectDirectoryDto selectedProject
+                ? selectedProject.getName()
+                : null;
 
         isLoading = true;
-        TestProjectDirectoryDto projectToSelect;
+        final TestProjectDirectoryDto projectToSelect;
         try {
-            final String savedProjectName = PropertiesComponent.getInstance(p).getValue(SELECTED_PROJECT_KEY);
+            final @Nullable String savedProjectName = PropertiesComponent.getInstance(p).getValue(SELECTED_PROJECT_KEY);
 
             testProjectList.removeAllElements();
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -86,27 +89,16 @@ public class TestProjectSelector {
 
             selectedTestProject.setEnabled(true);
 
-            projectToSelect = testProjectList.getElementAt(0);
+            // The name the combo already shows wins; a saved name from a previous
+            // session only applies when it names a different project.
+            final TestProjectDirectoryDto restored = savedProjectName != null && !savedProjectName.equals(currentSelectedName)
+                    ? findByName(savedProjectName)
+                    : null;
+            final TestProjectDirectoryDto current = findByName(currentSelectedName);
 
-            if (currentSelectedName != null) {
-                for (int i = 0; i < testProjectList.getSize(); i++) {
-                    TestProjectDirectoryDto item = testProjectList.getElementAt(i);
-                    if (currentSelectedName.equals(item.getName())) {
-                        projectToSelect = item;
-                        break;
-                    }
-                }
-            }
-
-            if (savedProjectName != null && !savedProjectName.equals(currentSelectedName)) {
-                for (int i = 0; i < testProjectList.getSize(); i++) {
-                    TestProjectDirectoryDto item = testProjectList.getElementAt(i);
-                    if (savedProjectName.equals(item.getName())) {
-                        projectToSelect = item;
-                        break;
-                    }
-                }
-            }
+            projectToSelect = restored != null ? restored
+                    : current != null ? current
+                    : testProjectList.getElementAt(0);
 
             selectedTestProject.setSelectedItem(projectToSelect);
 
@@ -114,12 +106,20 @@ public class TestProjectSelector {
             isLoading = false;
         }
 
-        if (projectToSelect != null) {
-            if (pp.getPanel().getComponentCount() == 0) {
-                pp.setupMainLayout();
-            }
-            filterByTestProject(projectToSelect);
+        if (pp.getPanel().getComponentCount() == 0) {
+            pp.setupMainLayout();
         }
+        filterByTestProject(projectToSelect);
+    }
+
+    private @Nullable TestProjectDirectoryDto findByName(final @Nullable String name) {
+        if (name == null) return null;
+
+        for (int i = 0; i < testProjectList.getSize(); i++) {
+            final TestProjectDirectoryDto item = testProjectList.getElementAt(i);
+            if (name.equals(item.getName())) return item;
+        }
+        return null;
     }
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {

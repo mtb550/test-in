@@ -16,24 +16,24 @@ import java.util.List;
  * Transferable for tree drag-and-drop and clipboard: carries the node payload
  * plus a file-list flavor so nodes can be dropped onto external targets.
  */
-record NodesTransferable(TreeTransferPayload payload) implements Transferable {
+record NodesTransferable(@NotNull TreeTransferPayload payload) implements Transferable {
 
     @Override
-    public DataFlavor[] getTransferDataFlavors() {
+    public @NotNull DataFlavor[] getTransferDataFlavors() {
         return new DataFlavor[]{TreeTransferHandler.NODE_FLAVOR, DataFlavor.javaFileListFlavor};
     }
 
     @Override
-    public boolean isDataFlavorSupported(final DataFlavor flavor) {
+    public boolean isDataFlavorSupported(final @NotNull DataFlavor flavor) {
         return TreeTransferHandler.NODE_FLAVOR.equals(flavor) || DataFlavor.javaFileListFlavor.equals(flavor);
     }
 
     @Override
-    public @NotNull Object getTransferData(final DataFlavor flavor) throws UnsupportedFlavorException {
+    public @NotNull Object getTransferData(final @NotNull DataFlavor flavor) throws UnsupportedFlavorException {
         if (TreeTransferHandler.NODE_FLAVOR.equals(flavor)) return payload;
         if (DataFlavor.javaFileListFlavor.equals(flavor)) {
             final List<File> files = new ArrayList<>();
-            for (DirectoryDto node : payload.nodes()) {
+            for (final DirectoryDto node : payload.nodes()) {
                 if (node instanceof TestSetDirectoryDto || node instanceof TestRunDirectoryDto)
                     files.add(node.getPath().toFile());
             }

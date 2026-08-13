@@ -11,9 +11,11 @@ import javax.swing.*;
 public class RendererImpl extends ColoredListCellRenderer<TestProjectDirectoryDto> {
 
     @Override
-    protected void customizeCellRenderer(@NotNull JList<? extends TestProjectDirectoryDto> list, final @NotNull TestProjectDirectoryDto value, final int index, final boolean selected, final boolean hasFocus) {
-        boolean isActive = value.getMarker().getStatus() == ProjectStatus.ACTIVE;
-        SimpleTextAttributes attributes = isActive ? SimpleTextAttributes.REGULAR_ATTRIBUTES : SimpleTextAttributes.GRAYED_ATTRIBUTES;
+    protected void customizeCellRenderer(final @NotNull JList<? extends TestProjectDirectoryDto> list,
+                                         final @NotNull TestProjectDirectoryDto value, final int index,
+                                         final boolean selected, final boolean hasFocus) {
+        final boolean isActive = value.getMarker().getStatus() == ProjectStatus.ACTIVE;
+        final SimpleTextAttributes attributes = isActive ? SimpleTextAttributes.REGULAR_ATTRIBUTES : SimpleTextAttributes.GRAYED_ATTRIBUTES;
         append(value.getName(), attributes);
 
         if (!isActive)

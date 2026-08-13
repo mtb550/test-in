@@ -3,6 +3,7 @@ package org.testin.projectPanel.tree;
 import com.intellij.ide.util.treeView.NodeDescriptor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 
@@ -38,17 +39,18 @@ public final class TreeValueUtil {
         return path == null ? null : directoryOf(path.getLastPathComponent());
     }
 
-    public static List<DirectoryDto> selectedDirectories(final @Nullable TreePath[] paths) {
+    public static @NotNull List<DirectoryDto> selectedDirectories(final @Nullable TreePath[] paths) {
         if (paths == null) return List.of();
+
         final List<DirectoryDto> values = new ArrayList<>(paths.length);
-        for (TreePath path : paths) {
+        for (final TreePath path : paths) {
             final DirectoryDto directory = selectedDirectory(path);
             if (directory != null) values.add(directory);
         }
         return values;
     }
 
-    public static <T> @Nullable T valueOf(final @Nullable Object component, final Class<T> type) {
+    public static <T> @Nullable T valueOf(final @Nullable Object component, final @NotNull Class<T> type) {
         final Object value = valueOf(component);
         return type.isInstance(value) ? type.cast(value) : null;
     }

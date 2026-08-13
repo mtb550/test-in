@@ -8,6 +8,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -38,14 +39,14 @@ public class TreeTransferHandler extends TransferHandler {
             new DataFlavor(TreeTransferPayload.class, "Testin tree nodes");
 
     private final @NotNull Project p;
-    private final SimpleTree tree;
-    private final Runnable refresh;
+    private final @NotNull SimpleTree tree;
+    private final @NotNull Runnable refresh;
     @Getter
-    private final Set<DirectoryDto> selectedNodes;
+    private final @NotNull Set<DirectoryDto> selectedNodes;
     private int clipboardAction = COPY;
 
-    public TreeTransferHandler(final @NotNull Project p, final SimpleTree tree,
-                               final Set<DirectoryDto> selectedNodes, final Runnable refresh) {
+    public TreeTransferHandler(final @NotNull Project p, final @NotNull SimpleTree tree,
+                               final @NotNull Set<DirectoryDto> selectedNodes, final @NotNull Runnable refresh) {
         this.p = p;
         this.tree = tree;
         this.selectedNodes = selectedNodes;
@@ -57,7 +58,7 @@ public class TreeTransferHandler extends TransferHandler {
      * clipboard survives switching projects, so a cut in project A must not
      * paste into project B. Unresolvable ownership rejects.
      */
-    static boolean sameTestProject(final DirectoryDto source, final DirectoryDto target) {
+    static boolean sameTestProject(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         final DirectoryDto sourceProject = owningProject(source);
         final DirectoryDto targetProject = owningProject(target);
 
@@ -65,7 +66,8 @@ public class TreeTransferHandler extends TransferHandler {
                 && sourceProject.getPath().equals(targetProject.getPath());
     }
 
-    private static DirectoryDto owningProject(final DirectoryDto node) {
+    /** Null when the node hangs outside any test project - ownership unresolvable. */
+    private static @Nullable DirectoryDto owningProject(final @NotNull DirectoryDto node) {
         DirectoryDto current = node;
         while (current != null && !(current instanceof TestProjectDirectoryDto)) {
             current = current.getParent();
@@ -73,7 +75,7 @@ public class TreeTransferHandler extends TransferHandler {
         return current;
     }
 
-    private static String describe(final List<DirectoryDto> sources) {
+    private static @NotNull String describe(final @NotNull List<DirectoryDto> sources) {
         return sources.size() == 1 ? "'" + sources.getFirst().getName() + "'" : sources.size() + " items";
     }
 
@@ -84,7 +86,8 @@ public class TreeTransferHandler extends TransferHandler {
      * ("already exists"). Applies to copy and move alike. The occupied check
      * is injected so the rules stay testable without an indexer.
      */
-    static boolean isValidDestination(final DirectoryDto source, final DirectoryDto target, final Predicate<Path> occupied) {
+    static boolean isValidDestination(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target,
+                                      final @NotNull Predicate<Path> occupied) {
         final Path sourcePath = source.getPath().normalize();
         final Path targetPath = target.getPath().normalize();
 
@@ -94,12 +97,12 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    public int getSourceActions(final JComponent c) {
+    public int getSourceActions(final @NotNull JComponent c) {
         return COPY_OR_MOVE;
     }
 
     @Override
-    protected Transferable createTransferable(final JComponent c) {
+    protected @Nullable Transferable createTransferable(final @NotNull JComponent c) {
         final List<DirectoryDto> directories = transferableSelection();
         if (directories.isEmpty()) return null;
 
@@ -114,7 +117,7 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * A small theme-colored pill with the dragged name or count.
      */
-    private BufferedImage createDragImage(final String text) {
+    private @NotNull BufferedImage createDragImage(final @NotNull String text) {
         final Font font = tree.getFont();
         final FontMetrics metrics = tree.getFontMetrics(font);
         final int padX = JBUI.scale(10);
@@ -143,14 +146,14 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * Only nodes that declare themselves transferable can be cut, copied or dragged.
      */
-    private List<DirectoryDto> transferableSelection() {
+    private @NotNull List<DirectoryDto> transferableSelection() {
         return TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()
                 .filter(DirectoryDto::isTransferable)
                 .toList();
     }
 
     @Override
-    public boolean canImport(final TransferSupport support) {
+    public boolean canImport(final @NotNull TransferSupport support) {
         if (!support.isDataFlavorSupported(NODE_FLAVOR)) return false;
         final DirectoryDto target = targetDirectory(support);
         final boolean valid = target != null && target.isTransferTarget() && anySourceLands(support, target);
@@ -172,7 +175,7 @@ public class TreeTransferHandler extends TransferHandler {
      * Same-JVM transfer data is readable during dragOver; if the platform
      * refuses, stay permissive - importData re-checks everything anyway.
      */
-    private boolean anySourceLands(final TransferSupport support, final DirectoryDto target) {
+    private boolean anySourceLands(final @NotNull TransferSupport support, final @NotNull DirectoryDto target) {
         try {
             final TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
             for (final DirectoryDto source : payload.nodes()) {
@@ -185,7 +188,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    public boolean importData(final TransferSupport support) {
+    public boolean importData(final @NotNull TransferSupport support) {
         if (!canImport(support)) return false;
 
         try {
@@ -225,7 +228,8 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * Only the sources the target accepts and that can actually land on it.
      */
-    private List<DirectoryDto> transferableSources(final DirectoryDto[] nodes, final DirectoryDto target, final int action) {
+    private @NotNull List<DirectoryDto> transferableSources(final DirectoryDto @NotNull [] nodes,
+                                                            final @NotNull DirectoryDto target, final int action) {
         if (action != COPY && action != MOVE) return List.of();
 
         final List<DirectoryDto> accepted = new ArrayList<>();
@@ -238,7 +242,7 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * True when the source may be pasted or dropped into the target at all.
      */
-    public boolean canTransferInto(final DirectoryDto source, final DirectoryDto target) {
+    public boolean canTransferInto(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         // Existence comes from the indexer cache - file access is the
         // indexer's alone (see CLAUDE.md).
         return target.acceptsTransferred(source)
@@ -249,7 +253,7 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * True when only a name collision at the target blocks this source.
      */
-    private boolean isNameCollision(final DirectoryDto source, final DirectoryDto target) {
+    private boolean isNameCollision(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
         return target.acceptsTransferred(source)
                 && isValidDestination(source, target, path -> false)
                 && Services.getInstance(p, ProjectIndexer.class).nodeExists(target.getPath().resolve(source.getName()));
@@ -258,7 +262,7 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * Small soft balloon naming what could not land because the name is taken.
      */
-    public void notifyNameCollisions(final DirectoryDto[] nodes, final DirectoryDto target) {
+    public void notifyNameCollisions(final DirectoryDto @NotNull [] nodes, final @NotNull DirectoryDto target) {
         final List<DirectoryDto> collided = new ArrayList<>();
         for (final DirectoryDto source : nodes) {
             if (isNameCollision(source, target)) collided.add(source);
@@ -269,7 +273,8 @@ public class TreeTransferHandler extends TransferHandler {
         Services.getInstance(p, Notifier.class).softShow(p, describe(collided) + verb + target.getName() + "'");
     }
 
-    private boolean transfer(final int action, final List<DirectoryDto> sources, final DirectoryDto target) {
+    private boolean transfer(final int action, final @NotNull List<DirectoryDto> sources,
+                             final @NotNull DirectoryDto target) {
         if (action == MOVE) {
             moveNodes(sources, target);
         } else {
@@ -281,7 +286,7 @@ public class TreeTransferHandler extends TransferHandler {
         return true;
     }
 
-    private DirectoryDto targetDirectory(final TransferSupport support) {
+    private @Nullable DirectoryDto targetDirectory(final @NotNull TransferSupport support) {
         if (support.isDrop()) {
             final TreePath path = dropPath(support);
             return path == null ? null : TreeValueUtil.directoryOf(path.getLastPathComponent());
@@ -289,7 +294,7 @@ public class TreeTransferHandler extends TransferHandler {
         return TreeValueUtil.selectedDirectory(tree.getSelectionPath());
     }
 
-    private TreePath dropPath(final TransferSupport support) {
+    private @Nullable TreePath dropPath(final @NotNull TransferSupport support) {
         if (support.getDropLocation() instanceof SimpleTree.DropLocation dropLocation) {
             return dropLocation.getPath();
         }
@@ -299,7 +304,7 @@ public class TreeTransferHandler extends TransferHandler {
         return null;
     }
 
-    private int resolveAction(final TransferSupport support, final TreeTransferPayload payload) {
+    private int resolveAction(final @NotNull TransferSupport support, final @NotNull TreeTransferPayload payload) {
         if (!support.isDrop()) {
             return payload.clipboardAction() == MOVE ? MOVE : COPY;
         }
@@ -311,7 +316,7 @@ public class TreeTransferHandler extends TransferHandler {
         return MOVE;
     }
 
-    private void moveNodes(final List<DirectoryDto> sources, final DirectoryDto target) {
+    private void moveNodes(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
         // Captured before the move - the dtos' paths change underneath.
         final List<Path> oldPaths = sources.stream().map(DirectoryDto::getPath).toList();
         final List<Path> newPaths = sources.stream()
@@ -326,7 +331,7 @@ public class TreeTransferHandler extends TransferHandler {
                 () -> moveBatch(oldPaths, newPaths)));
     }
 
-    private void moveBatch(final List<Path> from, final List<Path> to) {
+    private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to) {
         final AtomicInteger remaining = new AtomicInteger(from.size());
         for (int i = 0; i < from.size(); i++) {
             Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), () -> {
@@ -336,7 +341,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    protected void exportDone(final JComponent source, final Transferable data, final int action) {
+    protected void exportDone(final @Nullable JComponent source, final @Nullable Transferable data, final int action) {
         if (action != MOVE) resetLastAction();
     }
 
@@ -346,7 +351,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     @Override
-    public void exportToClipboard(final JComponent comp, final Clipboard clip, final int action) {
+    public void exportToClipboard(final @NotNull JComponent comp, final @NotNull Clipboard clip, final int action) {
         clipboardAction = action;
         try {
             super.exportToClipboard(comp, clip, action);
@@ -372,10 +377,9 @@ public class TreeTransferHandler extends TransferHandler {
         return contents != null && importData(new TransferSupport(tree, contents));
     }
 
-    private void updateClipboardState(final int action, final List<DirectoryDto> directories) {
+    private void updateClipboardState(final int action, final @NotNull List<DirectoryDto> directories) {
         selectedNodes.clear();
         if (action == MOVE) selectedNodes.addAll(directories);
         tree.repaint();
     }
-
 }

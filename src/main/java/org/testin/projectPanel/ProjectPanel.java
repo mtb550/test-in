@@ -53,7 +53,7 @@ public final class ProjectPanel implements Disposable {
             Logger.info("ProjectPanel.setupMainLayout(): projects found");
 
             panel.setLayout(new BorderLayout());
-            JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
+            final JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
             topBar.add(testProjectSelector.getSelectedTestProject(), BorderLayout.NORTH);
 
             topBar.add(branchSelector.getComponent(), BorderLayout.SOUTH);
@@ -74,7 +74,7 @@ public final class ProjectPanel implements Disposable {
     public void showEmptyState() {
         panel.removeAll();
         panel.getEmptyText().clear();
-        StatusText emptyText = panel.getEmptyText();
+        final StatusText emptyText = panel.getEmptyText();
 
         emptyText.clear();
         emptyText.setText(String.format("Welcome to %s", Bundle.getPluginName()), SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES);

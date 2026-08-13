@@ -8,6 +8,7 @@ import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
+import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
@@ -19,7 +20,7 @@ public class TreeDropHandler implements FileDropHandler {
 
     @Override
     public @Nullable Object handleDrop(final @NotNull FileDropEvent event, final @NotNull Continuation<? super Boolean> continuation) {
-        final @NotNull Project p = event.getProject();
+        final Project p = event.getProject();
         final Transferable transferable = event.getTransferable();
 
         if (!transferable.isDataFlavorSupported(TreeTransferHandler.NODE_FLAVOR)) {
@@ -30,7 +31,7 @@ public class TreeDropHandler implements FileDropHandler {
             final TreeTransferPayload payload = (TreeTransferPayload) transferable.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                for (org.testin.mappers.dto.dirs.DirectoryDto node : payload.nodes()) {
+                for (final DirectoryDto node : payload.nodes()) {
 
                     if (node instanceof TestSetDirectoryDto ts) {
                         Logger.info("dragged Test set: " + ts.getName());

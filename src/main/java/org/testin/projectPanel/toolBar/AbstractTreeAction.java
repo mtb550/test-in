@@ -18,7 +18,8 @@ abstract class AbstractTreeAction extends DumbAwareAction {
     private final @NotNull Consumer<SimpleTree> operation;
 
     protected AbstractTreeAction(final @NotNull ProjectPanel pp,
-                                 final @NotNull String title, final @NotNull String description, final Icon icon,
+                                 final @NotNull String title, final @NotNull String description,
+                                 final @NotNull Icon icon,
                                  final @NotNull Consumer<SimpleTree> operation) {
         super(title, description, icon);
         this.pp = pp;
@@ -27,18 +28,12 @@ abstract class AbstractTreeAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final SimpleTree tree = pp.getProjectTree().getMainTree();
-        if (tree != null) operation.accept(tree);
-    }
-
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabled(pp.getProjectTree().getMainTree() != null);
+        operation.accept(pp.getProjectTree().getMainTree());
     }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
+        // BGT on purpose - this action has no update() reading Swing state; do not switch to EDT (#52).
         return ActionUpdateThread.BGT;
     }
 }

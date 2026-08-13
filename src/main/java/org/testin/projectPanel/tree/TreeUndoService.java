@@ -16,8 +16,8 @@ import java.util.Deque;
 public final class TreeUndoService {
 
     private static final int LIMIT = 20;
-    private final Deque<TreeOperation> undoStack = new ArrayDeque<>();
-    private final Deque<TreeOperation> redoStack = new ArrayDeque<>();
+    private final @NotNull Deque<TreeOperation> undoStack = new ArrayDeque<>();
+    private final @NotNull Deque<TreeOperation> redoStack = new ArrayDeque<>();
 
     /**
      * Records a just-performed operation.

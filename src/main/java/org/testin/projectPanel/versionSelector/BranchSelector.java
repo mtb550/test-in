@@ -7,6 +7,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.git.GitRepositoryService;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -20,18 +21,22 @@ import java.util.List;
 
 public class BranchSelector {
     private final @NotNull Project p;
-    private final ProjectPanel pp;
-    private final GitRepositoryService git;
-    private final ComboBox<String> comboBox;
-    private final DefaultComboBoxModel<String> model;
+    private final @NotNull ProjectPanel pp;
+    private final @NotNull GitRepositoryService git;
+    private final @NotNull ComboBox<String> comboBox;
+    private final @NotNull DefaultComboBoxModel<String> model;
 
-    private Path projectPath;
-    // Written from background git tasks and read on the EDT.
-    private volatile String currentBranch = "";
+    /** Null while no project is selected, or the selected one has no path. */
+    private @Nullable Path projectPath;
+
+    // Written from background git tasks and read on the EDT. Empty, never null,
+    // when no branch is known yet.
+    private volatile @NotNull String currentBranch = "";
 
     private boolean isUpdating = false;
 
-    public BranchSelector(final @NotNull Project p, final ProjectPanel pp, final TestProjectDirectoryDto testProjectDirectory) {
+    public BranchSelector(final @NotNull Project p, final @NotNull ProjectPanel pp,
+                          final @Nullable TestProjectDirectoryDto testProjectDirectory) {
         this.p = p;
         this.pp = pp;
         this.git = new GitRepositoryService(p);
@@ -46,8 +51,9 @@ public class BranchSelector {
         updateProject(testProjectDirectory);
     }
 
-    public void updateProject(final TestProjectDirectoryDto testProjectDirectory) {
-        this.projectPath = testProjectDirectory != null ? testProjectDirectory.getPath() : null;
+    public void updateProject(final @Nullable TestProjectDirectoryDto testProjectDirectory) {
+        final Path path = testProjectDirectory != null ? testProjectDirectory.getPath() : null;
+        this.projectPath = path;
 
         isUpdating = true;
         try {
@@ -58,29 +64,33 @@ public class BranchSelector {
             isUpdating = false;
         }
 
-        if (projectPath != null) {
-            if (git.isRepository(projectPath)) {
-                isUpdating = true;
-                model.addElement("Loading branches...");
-                isUpdating = false;
-
-                loadGitBranches();
-            } else {
-                isUpdating = true;
-                model.addElement("Not a Git repository");
-                isUpdating = false;
-            }
+        if (path == null) {
+            showPlaceholder("No project path found");
+        } else if (git.isRepository(path)) {
+            showPlaceholder("Loading branches...");
+            loadGitBranches(path);
         } else {
-            isUpdating = true;
-            model.addElement("No project path found");
+            showPlaceholder("Not a Git repository");
+        }
+    }
+
+    /**
+     * Adds a non-branch entry without letting the selection listener treat it as
+     * a checkout request.
+     */
+    private void showPlaceholder(final @NotNull String text) {
+        isUpdating = true;
+        try {
+            model.addElement(text);
+        } finally {
             isUpdating = false;
         }
     }
 
-    private void onSelection(final ActionEvent e) {
+    private void onSelection(final @NotNull ActionEvent e) {
         if (isUpdating) return;
 
-        String selectedBranch = getSelectedBranch();
+        final String selectedBranch = getSelectedBranch();
 
         if (selectedBranch == null || selectedBranch.equals("No branches found") ||
                 selectedBranch.equals("Loading branches...") || selectedBranch.equals(currentBranch)) {
@@ -90,18 +100,21 @@ public class BranchSelector {
         checkoutBranchAndRefreshTree(selectedBranch);
     }
 
-    private void checkoutBranchAndRefreshTree(final String targetBranch) {
-        if (projectPath == null) return;
+    private void checkoutBranchAndRefreshTree(final @NotNull String targetBranch) {
+        // Captured before the task starts: the field can be reassigned by a
+        // project switch while the checkout is still running.
+        final Path repositoryPath = projectPath;
+        if (repositoryPath == null) return;
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking out branch: " + targetBranch, false) {
             @Override
-            public void run(@NotNull ProgressIndicator indicator) {
+            public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
-                    currentBranch = git.checkout(projectPath, targetBranch);
+                    currentBranch = git.checkout(repositoryPath, targetBranch);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        TestProjectDirectoryDto currentProject = pp.getTestProjectSelector().getSelectedTestProject().getItem();
+                        final TestProjectDirectoryDto currentProject = pp.getTestProjectSelector().getSelectedTestProject().getItem();
                         if (currentProject != null) {
                             pp.getProjectTree().refresh();
                         }
@@ -125,20 +138,20 @@ public class BranchSelector {
         });
     }
 
-    private void loadGitBranches() {
+    private void loadGitBranches(final @NotNull Path repositoryPath) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Fetching Git branches", false) {
             @Override
-            public void run(@NotNull ProgressIndicator indicator) {
+            public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
                 try {
                     try {
-                        git.fetchRemoteBranches(projectPath);
+                        git.fetchRemoteBranches(repositoryPath);
                     } catch (final Exception fetchError) {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(p, Notifier.class).warn(p, "Git Fetch Warning", "Could not refresh remote branches: " + fetchError.getMessage()));
                     }
-                    List<String> branches = git.getAvailableBranches(projectPath);
-                    String loadedCurrentBranch = git.getCurrentBranch(projectPath);
+                    final List<String> branches = git.getAvailableBranches(repositoryPath);
+                    final String loadedCurrentBranch = git.getCurrentBranch(repositoryPath);
                     if (loadedCurrentBranch != null) currentBranch = loadedCurrentBranch;
 
                     ApplicationManager.getApplication().invokeLater(() -> {
@@ -147,7 +160,7 @@ public class BranchSelector {
                             model.removeAllElements();
 
                             if (!branches.isEmpty()) {
-                                for (String branch : branches) {
+                                for (final String branch : branches) {
                                     model.addElement(branch);
                                 }
 
@@ -155,7 +168,8 @@ public class BranchSelector {
                                     comboBox.setSelectedItem(currentBranch);
                                 } else {
                                     comboBox.setSelectedIndex(0);
-                                    currentBranch = (String) comboBox.getSelectedItem();
+                                    final String selected = getSelectedBranch();
+                                    currentBranch = selected == null ? "" : selected;
                                 }
 
                                 comboBox.setEnabled(true);
@@ -185,11 +199,11 @@ public class BranchSelector {
         });
     }
 
-    public JComponent getComponent() {
+    public @NotNull JComponent getComponent() {
         return comboBox;
     }
 
-    public String getSelectedBranch() {
+    public @Nullable String getSelectedBranch() {
         return (String) comboBox.getSelectedItem();
     }
 }
