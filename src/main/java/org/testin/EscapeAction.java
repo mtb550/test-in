@@ -11,6 +11,7 @@ import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -22,10 +23,14 @@ import java.awt.datatransfer.StringSelection;
 
 public class EscapeAction extends DumbAwareAction {
     private final @NotNull Project p;
-    private final SimpleTree tree;
-    private final TreeTransferHandler transferHandler;
-    private final JBList<TestCaseDto> list;
-    private final JBTable table;
+
+    // Exactly one of tree / list / table is set, by the constructor that was
+    // used; the surface this action was registered on is the one that is
+    // non-null. transferHandler accompanies the tree.
+    private final @Nullable SimpleTree tree;
+    private final @Nullable TreeTransferHandler transferHandler;
+    private final @Nullable JBList<TestCaseDto> list;
+    private final @Nullable JBTable table;
 
     public EscapeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
