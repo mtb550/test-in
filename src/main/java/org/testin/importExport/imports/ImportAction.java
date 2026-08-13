@@ -6,8 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -129,11 +127,11 @@ public class ImportAction extends DumbAwareAction {
 
             // Asynchronous refresh: a synchronous recursive VFS refresh inside a
             // write action is disallowed by the platform and can freeze the IDE.
-            ApplicationManager.getApplication().invokeLater(() -> {
-                final VirtualFile targetVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
-                if (targetVf != null) targetVf.refresh(true, true);
-                Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
-            });
+            // The indexer owns the refresh and runs the whole call, lookup
+            // included, off the EDT.
+            Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
+            ApplicationManager.getApplication().invokeLater(() ->
+                    Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh());
 
         });
     }

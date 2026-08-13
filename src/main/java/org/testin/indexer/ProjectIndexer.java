@@ -475,11 +475,11 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Asynchronous VFS refresh of a directory — file access stays inside the
-     * indexer, and callers (often on the EDT) are never blocked on disk.
+     * VFS refresh of a directory — file access stays inside the indexer, and
+     * callers (often on the EDT) are never blocked on disk.
      */
     public void refreshDirectory(final @NotNull Path path) {
-        LocalFileSystem.getInstance().refreshNioFiles(List.of(path), true, true, null);
+        store.refreshDir(path);
     }
 
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {

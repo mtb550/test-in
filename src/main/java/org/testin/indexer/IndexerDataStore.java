@@ -1,5 +1,6 @@
 package org.testin.indexer;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import lombok.Getter;
@@ -176,10 +177,18 @@ final class IndexerDataStore {
         Services.getInstance(p, FilesUtil.class).write(p, dirPath.resolve(markerFileName), marker);
     }
 
-    private void refreshDir(final @NotNull Path dirPath) {
-        // Asynchronous, like ProjectIndexer.refreshDirectory - creation flows
-        // run on the EDT and must never block on a synchronous VFS refresh.
-        LocalFileSystem.getInstance().refreshNioFiles(List.of(dirPath), true, true, null);
+    /**
+     * VFS refresh of a directory, off whichever thread asked for it.
+     * <p>
+     * The {@code async} flag of {@code refreshNioFiles} only defers the refresh
+     * itself: resolving the paths to VirtualFiles happens on the calling thread
+     * and reads the VFS persistence, which is a slow operation the EDT is not
+     * allowed to perform. Creation flows run on the EDT, so the whole call moves
+     * to a pooled thread rather than only the refresh it schedules.
+     */
+    void refreshDir(final @NotNull Path dirPath) {
+        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                LocalFileSystem.getInstance().refreshNioFiles(List.of(dirPath), true, true, null));
     }
 
     void removeTestProject(final @NotNull Path path) {
