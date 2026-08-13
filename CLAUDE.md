@@ -72,10 +72,6 @@ be committed back into storage.
 
 - **GitHub is the source of truth**: stories/bugs live in `mtb550/test-in`
   issues, not local files. Muteb works across several machines.
-- The git remote still reads `https://github.com/mtb550/TestGit.git`. The repo
-  was renamed to `test-in` and GitHub redirects, so always pass
-  `--repo mtb550/test-in` explicitly to `gh` rather than letting it infer the
-  repository from the remote.
 - Write new stories straight to an issue with `gh`; update an existing one with
   `gh issue edit <n> --repo mtb550/test-in --body-file ...` instead of opening a
   duplicate. Read current state with `gh issue view` before assuming anything.
