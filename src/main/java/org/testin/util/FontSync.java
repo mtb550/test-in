@@ -24,8 +24,14 @@ import java.awt.event.MouseWheelEvent;
 
 public class FontSync {
 
+    /**
+     * Base size this component was last scaled to. Held per component: a single
+     * shared value let whichever component updated first consume the change,
+     * leaving every other subscriber's children at the old size.
+     */
+    private static final String LAST_BASE_SIZE = "testin.fontSync.lastBaseSize";
+
     private static boolean isGlobalWatcherActive = false;
-    private static float lastBaseFontSize = getBaseFontSize();
 
     public static float getBaseFontSize() {
         return EditorColorsManager.getInstance().getGlobalScheme().getEditorFontSize();
@@ -119,10 +125,16 @@ public class FontSync {
         ApplicationManager.getApplication().invokeLater(() -> {
             final Font currentFont = component.getFont();
             if (currentFont != null) {
-                final float delta = newSize - lastBaseFontSize;
+                // Each subscriber tracks its own last size, so a font change
+                // scales every synced component's children - not just the
+                // first one the message bus happens to notify.
+                final Object stored = component.getClientProperty(LAST_BASE_SIZE);
+                final float lastSize = stored instanceof Float previous ? previous : newSize;
+
+                final float delta = newSize - lastSize;
                 final boolean rootNeedsUpdate = currentFont.getSize2D() != newSize;
                 if (delta != 0.0f || rootNeedsUpdate) {
-                    lastBaseFontSize = newSize;
+                    component.putClientProperty(LAST_BASE_SIZE, newSize);
                     component.setFont(currentFont.deriveFont(newSize));
                     if (component instanceof JBList) {
                         component.updateUI();
