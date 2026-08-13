@@ -40,7 +40,7 @@ public class TestCaseUpdateMenuDialog {
                 UpdateTestCaseFields::bindShortcut,
                 selectedItem -> {
 
-                    final GeneratorType gt = selectedItem.getGt();
+                    final GeneratorType gt = selectedItem.requireGt();
                     Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
 
                     if (isSingle) {
@@ -50,7 +50,7 @@ public class TestCaseUpdateMenuDialog {
                         }).show();
 
                     } else {
-                        selectedItem.getBulkAction().execute(p, items, list -> {
+                        selectedItem.requireBulkAction().execute(p, items, list -> {
                             Logger.trace("Bulk Edit Save -> changeType = " + gt);
                             updatedItems.accept(list, gt);
                         });

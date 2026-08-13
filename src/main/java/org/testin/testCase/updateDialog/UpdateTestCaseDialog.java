@@ -20,6 +20,7 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class UpdateTestCaseDialog extends TestCaseBaseDialog {
@@ -42,7 +43,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
             });
         };
 
-        final ICreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
+        final ICreateTestCaseSection targetSection = selectedItem.requireSectionExtractor().apply(this);
 
         final JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
@@ -131,6 +132,8 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
     }
 
     public void show() {
-        popup.showCenteredInCurrentWindow(p);
+        // Assigned at the end of the constructor; @Nullable only because the
+        // repack callback above can fire before that point.
+        Objects.requireNonNull(popup, "popup is created in the constructor").showCenteredInCurrentWindow(p);
     }
 }

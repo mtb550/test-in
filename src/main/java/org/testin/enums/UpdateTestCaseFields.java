@@ -220,11 +220,37 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     private final @Nullable String customShortcutText;
     private final @Nullable Icon icon;
     private final IStatusBarItem @NotNull [] statusBarItems;
+
+    /**
+     * True for the constants the update menu offers. Those - and only those -
+     * carry an icon, a generator type, a bulk action and a dialog section; the
+     * rest are status-bar hints for keys the sections bind themselves. Use the
+     * {@code require*} accessors below rather than trusting a caller to have
+     * filtered on this flag first.
+     */
     private final boolean updateMenuItem;
     private final @Nullable GeneratorType gt;
     private final @Nullable IBulkEditorAction bulkAction;
     private final @Nullable Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
 
+    public @NotNull GeneratorType requireGt() {
+        return require(gt, "generator type");
+    }
+
+    public @NotNull IBulkEditorAction requireBulkAction() {
+        return require(bulkAction, "bulk action");
+    }
+
+    public @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> requireSectionExtractor() {
+        return require(sectionExtractor, "dialog section");
+    }
+
+    private <T> @NotNull T require(final @Nullable T value, final @NotNull String what) {
+        if (value == null) {
+            throw new IllegalStateException(name + " has no " + what + ": it is not an updatable field");
+        }
+        return value;
+    }
 
     @Override
     public @NotNull String getShortcutText() {
