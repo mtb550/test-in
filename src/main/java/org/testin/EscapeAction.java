@@ -47,7 +47,9 @@ public class EscapeAction extends DumbAwareAction {
         this.registerCustomShortcutSet(Shortcuts.Escape.getCustomShortcut(), list);
     }
 
-    /** Grid view: same behaviour as the list, except while a cell is being edited. */
+    /**
+     * Grid view: same behaviour as the list, except while a cell is being edited.
+     */
     public EscapeAction(final @NotNull Project p, final @NotNull JBTable table) {
         super("Escape Action", "", AllIcons.Actions.InlayGear);
         this.p = p;
@@ -100,7 +102,9 @@ public class EscapeAction extends DumbAwareAction {
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
     }
 
-    /** True when the view panel was open and has been hidden by this ESC. */
+    /**
+     * True when the view panel was open and has been hidden by this ESC.
+     */
     private boolean hideViewPanelIfVisible() {
         final ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow(p);
         if (toolWindow != null && toolWindow.isVisible()) {

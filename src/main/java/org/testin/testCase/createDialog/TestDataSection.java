@@ -15,10 +15,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class TestDataSection implements ICreateTestCaseSection {
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
     @Getter
     private final @NotNull EditorTextField testDataField;
     private final @NotNull JBPanel<?> wrapper;
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public TestDataSection() {
         this.testDataField = new EditorTextField();

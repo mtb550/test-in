@@ -18,10 +18,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ExpectedResultSection implements ICreateTestCaseSection {
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
     @Getter
     private final @NotNull TextFieldWithAutoCompletion<String> expectedResultField;
     private final @NotNull JBPanel<?> wrapper;
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public ExpectedResultSection(final @NotNull Project p) {
         this.expectedResultField = new TextFieldWithAutoCompletion<>(p, new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getExpectedResults(), CreateTestCaseFields.EXPECTED_RESULT.getIcon()), false, "");

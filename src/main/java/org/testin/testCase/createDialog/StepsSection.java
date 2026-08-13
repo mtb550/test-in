@@ -29,13 +29,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StepsSection implements ICreateTestCaseSection {
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
     private final @NotNull Project p;
     @Getter
     private final @NotNull List<TextFieldWithAutoCompletion<String>> stepFields;
     private final @NotNull JBPanel<?> stepsContainer;
     private final @NotNull JBPanel<?> wrapper;
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
-
     /**
      * Parent for the per-step shortcut registrations; set by the owning dialog.
      */

@@ -20,9 +20,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GroupSection implements ICreateTestCaseSection {
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 1f);
     private final @NotNull JBPanel<?> group;
     private final @NotNull JBPanel<?> wrapper;
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 1f);
 
     public GroupSection() {
         this.group = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(4), JBUI.scale(4)));

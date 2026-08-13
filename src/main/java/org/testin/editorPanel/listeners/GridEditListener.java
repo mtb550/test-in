@@ -21,7 +21,9 @@ public class GridEditListener implements TableModelListener {
     private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> pageItems;
     private final @NotNull Runnable onEdited;
-    /** The test set this grid belongs to; the grid never mixes test sets. */
+    /**
+     * The test set this grid belongs to; the grid never mixes test sets.
+     */
     private final @NotNull Path testSetPath;
     private boolean updating = false;
 

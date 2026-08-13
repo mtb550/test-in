@@ -15,10 +15,10 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PreConditionsSection implements ICreateTestCaseSection {
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
     @Getter
     private final @NotNull EditorTextField preConditionsField;
     private final @NotNull JBPanel<?> wrapper;
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
 
     public PreConditionsSection() {
         this.preConditionsField = new EditorTextField();

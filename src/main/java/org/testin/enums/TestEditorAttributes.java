@@ -275,6 +275,15 @@ public enum TestEditorAttributes {
     private final boolean importable;
     private final boolean copyable;
     private final boolean exportable;
+    private final ValueExtractor<TestCaseDto> testValueExtractor;
+    private final DrawItem<TestCaseDto> testDrawItem;
+    private final ImportSetter importSetter;
+    /**
+     * Automation code update to run when this attribute changes; null when the
+     * attribute has no effect on the generated Java code.
+     */
+    private final GeneratorType generatorType;
+
     /**
      * The value as the grid shows it. Steps get one line each there, so ALT+ENTER
      * writes the next step; the sequence numbers stay a view-panel concern. Every
@@ -284,16 +293,6 @@ public enum TestEditorAttributes {
     public String gridValue(final Project p, final TestCaseDto tc) {
         return this == STEPS ? String.join("\n", tc.getSteps()) : testValueExtractor.execute(tc, p);
     }
-
-    private final ValueExtractor<TestCaseDto> testValueExtractor;
-    private final DrawItem<TestCaseDto> testDrawItem;
-    private final ImportSetter importSetter;
-
-    /**
-     * Automation code update to run when this attribute changes; null when the
-     * attribute has no effect on the generated Java code.
-     */
-    private final GeneratorType generatorType;
 
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         if (testDrawItem != null) badges.addAll(testDrawItem.execute(tc));

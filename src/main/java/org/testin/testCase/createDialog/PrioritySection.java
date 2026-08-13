@@ -21,9 +21,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 public class PrioritySection implements ICreateTestCaseSection {
+    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
     private final @NotNull ComboBox<Priority> priority;
     private final @NotNull JBPanel<?> wrapper;
-    final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
 
     public PrioritySection() {
         final Priority[] activePriorities = Arrays.stream(Priority.values())

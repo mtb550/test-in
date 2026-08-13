@@ -47,7 +47,9 @@ public class GridViewDetailsAction extends DumbAwareAction {
         showDetails(table.getSelectedRow());
     }
 
-    /** Opens the details view for a row; shared by the ENTER key and the double click. */
+    /**
+     * Opens the details view for a row; shared by the ENTER key and the double click.
+     */
     public void showDetails(final int row) {
         if (row < 0 || row >= pageItems.size()) return;
 

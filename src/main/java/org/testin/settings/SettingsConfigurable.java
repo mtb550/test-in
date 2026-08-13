@@ -22,7 +22,6 @@ import org.testin.settings.Dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 
 import javax.swing.*;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
 

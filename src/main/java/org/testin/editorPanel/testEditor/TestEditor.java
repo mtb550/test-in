@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.EscapeAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.TestCaseFilter;
@@ -35,7 +36,6 @@ import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.enums.ViewMode;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.EscapeAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
@@ -45,8 +45,8 @@ import org.testin.testCase.CreateTestCaseAction;
 import org.testin.testCase.SortResult;
 import org.testin.testCase.TestCaseSorter;
 import org.testin.util.FontSync;
-import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.GridViewDetailsAction;
+import org.testin.viewPanel.ViewPanel;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -112,7 +112,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
      * replaces the objects, so identity would not survive it.
      */
     private @Nullable UUID selectionToRestore;
-    /** Grid column selected before a reload, so the cell comes back, not just the row. */
+    /**
+     * Grid column selected before a reload, so the cell comes back, not just the row.
+     */
     private int gridColumnToRestore = -1;
 
     @Getter
@@ -470,14 +472,18 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         }
     }
 
-    /** Records the selected test case (and grid column) before the data is reloaded. */
+    /**
+     * Records the selected test case (and grid column) before the data is reloaded.
+     */
     private void rememberSelection() {
         final TestCaseDto selected = list.getSelectedValue();
         selectionToRestore = selected != null ? selected.getId() : null;
         gridColumnToRestore = gridTable != null ? gridTable.getSelectedColumn() : -1;
     }
 
-    /** Moves to whichever page now holds the remembered test case. */
+    /**
+     * Moves to whichever page now holds the remembered test case.
+     */
     private void jumpToPageOfPendingSelection() {
         if (selectionToRestore == null) return;
 

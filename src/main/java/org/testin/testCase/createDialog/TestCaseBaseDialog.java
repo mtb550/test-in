@@ -45,8 +45,8 @@ public abstract class TestCaseBaseDialog {
      * even when the popup is torn down without firing onClosed.
      */
     protected final @NotNull Disposable dialogDisposable;
-    private final @NotNull List<ICreateTestCaseSection> cachedSections;
     protected final @NotNull Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
+    private final @NotNull List<ICreateTestCaseSection> cachedSections;
     private @Nullable PropertyChangeListener focusListener;
 
     public TestCaseBaseDialog(final @NotNull Project p) {
