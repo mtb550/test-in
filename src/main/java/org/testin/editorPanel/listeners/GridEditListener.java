@@ -57,7 +57,6 @@ public class GridEditListener implements TableModelListener {
             attr.getImportSetter().execute(p, tc, String.valueOf(model.getValueAt(row, col)));
             final Object after = attr.gridValue(p, tc);
 
-
             // Always write the normalised value back to the cell - it renumbers
             // steps and drops blank entries even when nothing really changed.
             model.setValueAt(after, row, col);
@@ -65,12 +64,8 @@ public class GridEditListener implements TableModelListener {
             // Committing a cell without editing it must not rewrite the JSON or
             // regenerate code. Comparing the extracted values, not the raw text,
             // means a cosmetic difference alone is correctly treated as no change.
-            if (Objects.equals(before, after)) {
-                Logger.info("[grid] " + attr.name() + " unchanged - nothing written");
-                return;
-            }
+            if (Objects.equals(before, after)) return;
 
-            Logger.info("[grid] " + attr.name() + " changed, writing " + tc.getId() + " to " + testSetPath);
             persistAndGenerate(tc, attr);
             onEdited.run();
         } finally {

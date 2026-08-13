@@ -145,7 +145,6 @@ public class SettingsTest {
 
         final AppSettingsState stored = new AppSettingsState();
         stored.rootTestinPath = "C:/testin";
-        stored.readMode = true;
         stored.openTreeOnStartup = false;
         stored.logLevel = "DEBUG";
         stored.testerName = "Omar";
@@ -155,7 +154,6 @@ public class SettingsTest {
         settings.loadState(stored);
 
         assertEquals(settings.rootTestinPath, "C:/testin");
-        assertTrue(settings.readMode);
         assertFalse(settings.openTreeOnStartup);
         assertEquals(settings.logLevel, "DEBUG");
         assertEquals(settings.testerName, "Omar");

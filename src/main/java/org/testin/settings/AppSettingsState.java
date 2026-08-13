@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 public final class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
 
     public String rootTestinPath = "";
-    public boolean readMode = false;
     public boolean openTreeOnStartup = true;
     public String logLevel = "INFO";
     public String defaultDownloadFolder = "";
