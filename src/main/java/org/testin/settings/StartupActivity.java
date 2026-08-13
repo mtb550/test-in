@@ -25,13 +25,17 @@ public final class StartupActivity implements ProjectActivity {
     private static final Key<Boolean> SOURCE_ROOT_CHECKED = Key.create("testin.sourceRootChecked");
 
     public static void execute(final @NotNull Project p) {
-        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         if (settings.rootTestinPath == null || settings.rootTestinPath.isEmpty()) {
             Logger.info("First run detected — saving default settings to testinSettings.xml");
-            settings.logLevel = Level.INFO.name();
         }
 
+        // Defaulted unconditionally: a settings file with no level at all would
+        // otherwise reach Level.valueOf(null) and fail the whole startup.
+        if (settings.logLevel == null || settings.logLevel.isBlank()) {
+            settings.logLevel = Level.INFO.name();
+        }
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
         Logger.info("StartupActivity.execute()");
@@ -113,7 +117,8 @@ public final class StartupActivity implements ProjectActivity {
     }
 
     @Override
-    public @NotNull Object execute(@NotNull Project p, @NotNull Continuation<? super kotlin.Unit> continuation) {
+    public @NotNull Object execute(final @NotNull Project p,
+                                   final @NotNull Continuation<? super kotlin.Unit> continuation) {
         execute(p);
         openTreePanel(p);
         return kotlin.Unit.INSTANCE;

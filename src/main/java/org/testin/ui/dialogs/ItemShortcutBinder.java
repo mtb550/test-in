@@ -1,5 +1,7 @@
 package org.testin.ui.dialogs;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 
 /**
@@ -8,5 +10,5 @@ import javax.swing.*;
  */
 @FunctionalInterface
 public interface ItemShortcutBinder<T> {
-    void bind(T item, JComponent component, Runnable onTrigger);
+    void bind(final @NotNull T item, final @NotNull JComponent component, final @NotNull Runnable onTrigger);
 }

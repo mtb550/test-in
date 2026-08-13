@@ -9,6 +9,7 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -20,13 +21,13 @@ import java.awt.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DialogStyle {
 
-    public static <T extends JComponent> T styleContent(final T component) {
+    public static <T extends JComponent> @NotNull T styleContent(final @NotNull T component) {
         component.setOpaque(true);
         component.setBackground(UIUtil.getPanelBackground());
         return component;
     }
 
-    public static void setLeadingIcon(final ExtendableTextField textField, final Icon icon) {
+    public static void setLeadingIcon(final @NotNull ExtendableTextField textField, final @Nullable Icon icon) {
         if (icon == null) {
             textField.setExtensions();
             return;
@@ -34,7 +35,7 @@ public final class DialogStyle {
 
         textField.setExtensions(new ExtendableTextComponent.Extension() {
             @Override
-            public Icon getIcon(final boolean hovered) {
+            public @NotNull Icon getIcon(final boolean hovered) {
                 return icon;
             }
 
@@ -50,10 +51,10 @@ public final class DialogStyle {
         });
     }
 
-    public static ComponentPopupBuilder createPopupBuilder(final JComponent content,
-                                                           final JComponent focusComponent,
-                                                           final String title,
-                                                           final @Nullable Icon titleIcon) {
+    public static @NotNull ComponentPopupBuilder createPopupBuilder(final @NotNull JComponent content,
+                                                                    final @NotNull JComponent focusComponent,
+                                                                    final @NotNull String title,
+                                                                    final @Nullable Icon titleIcon) {
         final ComponentPopupBuilder builder = JBPopupFactory.getInstance()
                 .createComponentPopupBuilder(content, focusComponent)
                 .setTitle(title)

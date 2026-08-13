@@ -38,14 +38,12 @@ public final class Setting {
         return !normalize(before).equals(normalize(after));
     }
 
-    @NotNull
-    public Path getTestinPath() {
+    public @NotNull Path getTestinPath() {
         return normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath);
     }
 
     public void setTestinPath(final @Nullable Path path) {
-        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         settings.rootTestinPath = path != null ? path.toString() : "";
     }
-
 }

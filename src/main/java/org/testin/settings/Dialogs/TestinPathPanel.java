@@ -9,6 +9,7 @@ import com.intellij.openapi.util.IconLoader;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -23,8 +24,8 @@ import java.nio.file.Path;
 public final class TestinPathPanel {
 
     private final @NotNull Project p;
-    private final TextFieldWithBrowseButton pathField = new TextFieldWithBrowseButton();
-    private final JButton openFolderBtn = new JButton("Open");
+    private final @NotNull TextFieldWithBrowseButton pathField = new TextFieldWithBrowseButton();
+    private final @NotNull JButton openFolderBtn = new JButton("Open");
 
     public TestinPathPanel(final @NotNull Project p) {
         this.p = p;
@@ -63,48 +64,48 @@ public final class TestinPathPanel {
     private void setupValidationListener() {
         pathField.getTextField().getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(final @NotNull DocumentEvent e) {
                 updateOpenButtonState();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(final @NotNull DocumentEvent e) {
                 updateOpenButtonState();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(final @NotNull DocumentEvent e) {
                 updateOpenButtonState();
             }
         });
     }
 
     private void updateOpenButtonState() {
-        String pathStr = pathField.getText();
+        final String pathStr = pathField.getText();
         if (pathStr.trim().isEmpty()) {
             openFolderBtn.setEnabled(false);
             return;
         }
         try {
-            Path path = Path.of(pathStr);
+            final Path path = Path.of(pathStr);
             openFolderBtn.setEnabled(Files.exists(path) && Files.isDirectory(path));
         } catch (final Exception ex) {
             openFolderBtn.setEnabled(false);
         }
     }
 
-    public JBPanel<?> getComponent() {
-        JBPanel<?> panel = new JBPanel<>(new BorderLayout(5, 0));
+    public @NotNull JBPanel<?> getComponent() {
+        final JBPanel<?> panel = new JBPanel<>(new BorderLayout(5, 0));
         panel.add(pathField, BorderLayout.CENTER);
         panel.add(openFolderBtn, BorderLayout.EAST);
         return panel;
     }
 
-    public String getPathText() {
+    public @NotNull String getPathText() {
         return pathField.getText();
     }
 
-    public void setPathText(final String text) {
+    public void setPathText(final @Nullable String text) {
         pathField.setText(text != null ? text : "");
     }
 }

@@ -6,10 +6,12 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 /**
  * Shared presentation for project-owned dialogs.
@@ -39,17 +41,18 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
     }
 
     @Override
-    protected final Action[] createActions() {
+    protected final Action @NotNull [] createActions() {
         return new Action[0];
     }
 
+    /** No south panel at all: the frameless presentation has no button row. */
     @Override
-    protected final JComponent createSouthPanel() {
+    protected final @Nullable JComponent createSouthPanel() {
         return null;
     }
 
     @Override
-    protected JComponent createNorthPanel() {
+    protected @NotNull JComponent createNorthPanel() {
         final JBPanel<?> header = new JBPanel<>(new BorderLayout());
         header.setOpaque(true);
         header.setBackground(JBUI.CurrentTheme.Popup.headerBackground(true));
@@ -63,7 +66,7 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
     }
 
     @Override
-    protected javax.swing.border.Border createContentPaneBorder() {
+    protected javax.swing.border.@NotNull Border createContentPaneBorder() {
         return JBUI.Borders.empty(4, 16, 16, 16);
     }
 
@@ -75,7 +78,7 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
         inputMap.put(KeyStroke.getKeyStroke("ENTER"), "testin.dialog.ok");
         actionMap.put("testin.dialog.ok", new AbstractAction() {
             @Override
-            public void actionPerformed(final java.awt.event.ActionEvent event) {
+            public void actionPerformed(final @NotNull ActionEvent event) {
                 doOKAction();
             }
         });
@@ -83,7 +86,7 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
         inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "testin.dialog.cancel");
         actionMap.put("testin.dialog.cancel", new AbstractAction() {
             @Override
-            public void actionPerformed(final java.awt.event.ActionEvent event) {
+            public void actionPerformed(final @NotNull ActionEvent event) {
                 doCancelAction();
             }
         });

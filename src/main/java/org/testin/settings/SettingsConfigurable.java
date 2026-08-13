@@ -12,7 +12,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.projectPanel.ProjectPanel;
@@ -27,12 +26,12 @@ import java.util.Objects;
 
 public final class SettingsConfigurable implements Configurable {
 
-    private final TestinPathPanel testinPathPanel;
-    private final JBTextField testerNameField = new JBTextField();
-    private final JBTextField testerRoleField = new JBTextField();
-    private final TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
-    private final JBCheckBox openTreeOnStartupCheckBox = new JBCheckBox("Open the Testin panel when a project opens");
-    private final ComboBox<String> logLevelComboBox;
+    private final @NotNull TestinPathPanel testinPathPanel;
+    private final @NotNull JBTextField testerNameField = new JBTextField();
+    private final @NotNull JBTextField testerRoleField = new JBTextField();
+    private final @NotNull TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
+    private final @NotNull JBCheckBox openTreeOnStartupCheckBox = new JBCheckBox("Open the Testin panel when a project opens");
+    private final @NotNull ComboBox<String> logLevelComboBox;
     private final @NotNull Project p;
 
     public SettingsConfigurable(final @NotNull Project p) {
@@ -42,13 +41,12 @@ public final class SettingsConfigurable implements Configurable {
     }
 
     @Override
-    public String getDisplayName() {
+    public @NotNull String getDisplayName() {
         return Bundle.getPluginName();
     }
 
-    @Nullable
     @Override
-    public JComponent createComponent() {
+    public @NotNull JComponent createComponent() {
         downloadFolderField.addBrowseFolderListener(p, FileChooserDescriptorFactory.createSingleFolderDescriptor()
                         .withTitle("Select Default Download Folder")
                         .withDescription("Choose the default folder for imports, exports, and reports"),
@@ -73,7 +71,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().equals(settings.rootTestinPath);
         modified |= openTreeOnStartupCheckBox.isSelected() != settings.openTreeOnStartup;
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
@@ -85,7 +83,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public void apply() {
-        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         // Decided before the fields are overwritten: a moved root is the only change
         // that invalidates the tree, and re-indexing is far too heavy to run for a
@@ -94,14 +92,15 @@ public final class SettingsConfigurable implements Configurable {
 
         settings.rootTestinPath = testinPathPanel.getPathText();
         settings.openTreeOnStartup = openTreeOnStartupCheckBox.isSelected();
-        settings.logLevel = (String) logLevelComboBox.getSelectedItem();
+        final String selectedLogLevel = (String) logLevelComboBox.getSelectedItem();
+        settings.logLevel = selectedLogLevel != null ? selectedLogLevel : Level.INFO.name();
         settings.testerName = testerNameField.getText();
         settings.testerRole = testerRoleField.getText();
         settings.defaultDownloadFolder = downloadFolderField.getText();
 
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
-        Setting setting = Services.getInstance(p, Setting.class);
+        final Setting setting = Services.getInstance(p, Setting.class);
         setting.setTestinPath(Setting.normalize(settings.rootTestinPath));
 
         if (rootChanged) {
@@ -112,7 +111,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public void reset() {
-        AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
         testinPathPanel.setPathText(settings.rootTestinPath);
         openTreeOnStartupCheckBox.setSelected(settings.openTreeOnStartup);

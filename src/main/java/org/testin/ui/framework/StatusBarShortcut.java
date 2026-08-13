@@ -36,12 +36,12 @@ public record StatusBarShortcut(@Nullable Shortcuts shortcut,
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return name;
     }
 
     @Override
-    public String getShortcutText() {
+    public @NotNull String getShortcutText() {
         return displayText;
     }
 }

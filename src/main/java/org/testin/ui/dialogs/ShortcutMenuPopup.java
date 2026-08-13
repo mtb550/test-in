@@ -70,7 +70,7 @@ public final class ShortcutMenuPopup<T> {
         popup.showCenteredInCurrentWindow(p);
     }
 
-    private void registerShortcuts(final JBList<T> list, final JBPopup popup) {
+    private void registerShortcuts(final @NotNull JBList<T> list, final @NotNull JBPopup popup) {
         final Runnable triggerSelection = () -> {
             if (list.getSelectedValue() != null) {
                 select(list.getSelectedValue(), popup);
@@ -95,7 +95,7 @@ public final class ShortcutMenuPopup<T> {
 
         list.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(final MouseEvent e) {
+            public void mouseClicked(final @NotNull MouseEvent e) {
                 final int idx = list.locationToIndex(e.getPoint());
                 if (idx >= 0) {
                     list.setSelectedIndex(idx);
@@ -105,7 +105,7 @@ public final class ShortcutMenuPopup<T> {
         });
     }
 
-    private void select(final T item, final JBPopup popup) {
+    private void select(final @NotNull T item, final @NotNull JBPopup popup) {
         onSelection.accept(item);
         popup.closeOk(null);
     }
