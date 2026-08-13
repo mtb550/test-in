@@ -73,7 +73,9 @@ public final class SpellChecker {
                                                                  final @NotNull String text) {
         final EditorTextField field = createField(p);
 
-        final PsiFile psiFile = ReadAction.compute(
+        // Blocking rather than cancellable: this runs while the dialog is being
+        // built and the field cannot be returned half-made.
+        final PsiFile psiFile = ReadAction.computeBlocking(
                 () -> PsiDocumentManager.getInstance(p).getPsiFile(field.getDocument()));
 
         if (psiFile == null) {
