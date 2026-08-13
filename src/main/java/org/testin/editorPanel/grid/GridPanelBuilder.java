@@ -9,7 +9,6 @@ import com.intellij.ui.hover.TableHoverListener;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jspecify.annotations.NonNull;
 import org.testin.editorPanel.EditorColors;
 import org.testin.enums.RunEditorAttributes;
 import org.testin.enums.TestEditorAttributes;
@@ -371,7 +370,7 @@ public class GridPanelBuilder {
              * their own (issue: hover background in grid view).
              */
             @Override
-            public @NonNull Component prepareRenderer(final @NonNull TableCellRenderer renderer, final int row, final int column) {
+            public @NotNull Component prepareRenderer(final @NotNull TableCellRenderer renderer, final int row, final int column) {
                 final Component component = super.prepareRenderer(renderer, row, column);
                 component.setBackground(isCellSelected(row, column) ? SELECTION_BACKGROUND : rowColor(row));
                 return component;
