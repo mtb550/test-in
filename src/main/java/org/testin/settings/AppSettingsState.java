@@ -13,6 +13,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
 
     public String rootTestinPath = "";
     public boolean readMode = false;
+    public boolean openTreeOnStartup = true;
     public String logLevel = "INFO";
     public String defaultDownloadFolder = "";
     public String testerName = "";

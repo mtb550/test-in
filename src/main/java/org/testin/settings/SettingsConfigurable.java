@@ -33,6 +33,7 @@ public final class SettingsConfigurable implements Configurable {
     private final JBTextField testerRoleField = new JBTextField();
     private final TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
     private final JBCheckBox readModeCheckBox = new JBCheckBox("Enable read mode (view only)");
+    private final JBCheckBox openTreeOnStartupCheckBox = new JBCheckBox("Open the Testin panel when a project opens");
     private final ComboBox<String> logLevelComboBox;
     private final @NotNull Project p;
 
@@ -61,6 +62,8 @@ public final class SettingsConfigurable implements Configurable {
                 .addVerticalGap(5)
                 .addComponent(readModeCheckBox)
                 .addVerticalGap(5)
+                .addComponent(openTreeOnStartupCheckBox)
+                .addVerticalGap(5)
                 .addLabeledComponent("Log level: ", logLevelComboBox)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel("Tester name: "), testerNameField, 1, false)
@@ -77,6 +80,7 @@ public final class SettingsConfigurable implements Configurable {
         AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().equals(settings.rootTestinPath);
         modified |= readModeCheckBox.isSelected() != settings.readMode;
+        modified |= openTreeOnStartupCheckBox.isSelected() != settings.openTreeOnStartup;
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
         modified |= !testerNameField.getText().equals(settings.testerName);
         modified |= !testerRoleField.getText().equals(settings.testerRole);
@@ -88,8 +92,14 @@ public final class SettingsConfigurable implements Configurable {
     public void apply() {
         AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
+        // Decided before the fields are overwritten: a moved root is the only change
+        // that invalidates the tree, and re-indexing is far too heavy to run for a
+        // renamed tester.
+        final boolean rootChanged = Setting.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
+
         settings.rootTestinPath = testinPathPanel.getPathText();
         settings.readMode = readModeCheckBox.isSelected();
+        settings.openTreeOnStartup = openTreeOnStartupCheckBox.isSelected();
         settings.logLevel = (String) logLevelComboBox.getSelectedItem();
         settings.testerName = testerNameField.getText();
         settings.testerRole = testerRoleField.getText();
@@ -98,15 +108,12 @@ public final class SettingsConfigurable implements Configurable {
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
         Setting setting = Services.getInstance(p, Setting.class);
+        setting.setTestinPath(Setting.normalize(settings.rootTestinPath));
 
-        if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty()) {
-            setting.setTestinPath(Path.of(settings.rootTestinPath));
-        } else {
-            setting.setTestinPath(Path.of(""));
+        if (rootChanged) {
+            final ProjectPanel pp = Services.getInstance(p, ProjectPanel.class);
+            new RefreshAction(p, pp).execute();
         }
-
-        final ProjectPanel pp = Services.getInstance(p, ProjectPanel.class);
-        if (pp != null) new RefreshAction(p, pp).execute();
     }
 
     @Override
@@ -115,6 +122,7 @@ public final class SettingsConfigurable implements Configurable {
 
         testinPathPanel.setPathText(settings.rootTestinPath);
         readModeCheckBox.setSelected(settings.readMode);
+        openTreeOnStartupCheckBox.setSelected(settings.openTreeOnStartup);
         logLevelComboBox.setSelectedItem(settings.logLevel);
         testerNameField.setText(settings.testerName);
         testerRoleField.setText(settings.testerRole);

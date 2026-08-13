@@ -17,13 +17,30 @@ public final class Setting {
         this.p = p;
     }
 
-    @NotNull
-    public Path getTestinPath() {
-        String path = Services.getInstance(p, AppSettingsState.class).rootTestinPath;
-        if (path == null || path.trim().isEmpty()) {
+    /**
+     * A stored root as a path. Missing, empty and whitespace-only values all mean
+     * "no root configured" and normalise to the empty path, so callers have one
+     * thing to check rather than three.
+     */
+    public static @NotNull Path normalize(final @Nullable String rawPath) {
+        if (rawPath == null || rawPath.trim().isEmpty()) {
             return Path.of("");
         }
-        return Path.of(path.trim());
+        return Path.of(rawPath.trim());
+    }
+
+    /**
+     * True when an Apply moved the Testin root. The tree is built from the indexer,
+     * so only a different root makes a reload necessary - every other setting is
+     * read live where it is used.
+     */
+    public static boolean isRootChanged(final @Nullable String before, final @Nullable String after) {
+        return !normalize(before).equals(normalize(after));
+    }
+
+    @NotNull
+    public Path getTestinPath() {
+        return normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath);
     }
 
     public void setTestinPath(final @Nullable Path path) {
