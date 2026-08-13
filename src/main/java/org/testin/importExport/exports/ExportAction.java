@@ -13,6 +13,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
@@ -31,7 +32,7 @@ import java.util.*;
 
 public class ExportAction extends DumbAwareAction {
 
-    protected final List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
+    protected final @NotNull List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isExportable)
             .toList();
     private final @NotNull Project p;
@@ -52,25 +53,25 @@ public class ExportAction extends DumbAwareAction {
         final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
         if (!(userObject instanceof DirectoryDto dirDto)) return;
 
-        VirtualFile targetDir = resolveTargetDir(dirDto);
+        final VirtualFile targetDir = resolveTargetDir(dirDto);
         if (targetDir == null) return;
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Exporting test cases", true) {
             @Override
-            public void run(@NotNull ProgressIndicator indicator) {
+            public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
+                final Map<String, List<TestCaseDto>> sheets = gatherData(targetDir, dirDto);
                 if (sheets.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(p, Notifier.class).warn(p, "Export Empty", "No test cases found."));
                     return;
                 }
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    ExportDialog dialog = new ExportDialog(p, exportAttributes, sheets, targetDir);
+                    final ExportDialog dialog = new ExportDialog(p, exportAttributes, sheets, targetDir);
                     if (!dialog.showAndGet()) return;
 
-                    FileTypes format = dialog.getSelectedFormat();
-                    File destFile = dialog.getSelectedFile();
+                    final FileTypes format = dialog.getSelectedFormat();
+                    final File destFile = dialog.getSelectedFile();
                     if (destFile == null) return;
 
                     try {
@@ -84,17 +85,18 @@ public class ExportAction extends DumbAwareAction {
         });
     }
 
-    public Map<String, List<TestCaseDto>> gatherData(final VirtualFile targetDirectory, final DirectoryDto dirDto) {
-        Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
+    public @NotNull Map<String, List<TestCaseDto>> gatherData(final @NotNull VirtualFile targetDirectory,
+                                                              final @NotNull DirectoryDto dirDto) {
+        final Map<String, List<TestCaseDto>> allSheets = new LinkedHashMap<>();
 
         if (dirDto instanceof TestSetDirectoryDto) {
             allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(p, targetDirectory));
         } else {
-            VirtualFile[] children = targetDirectory.getChildren();
+            final VirtualFile[] children = targetDirectory.getChildren();
             if (children != null) {
-                for (VirtualFile child : children) {
+                for (final VirtualFile child : children) {
                     if (child.isDirectory()) {
-                        List<TestCaseDto> tcs = loadTestCasesInOrder(p, child);
+                        final List<TestCaseDto> tcs = loadTestCasesInOrder(p, child);
                         if (!tcs.isEmpty()) {
                             allSheets.put(child.getName(), tcs);
                         }
@@ -105,25 +107,25 @@ public class ExportAction extends DumbAwareAction {
         return allSheets;
     }
 
-    public VirtualFile resolveTargetDir(final DirectoryDto dirDto) {
-        VirtualFile target = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
-        if (target != null && !target.isDirectory()) {
-            target = target.getParent();
-        }
-        return target;
+    /** Null when the path is not in the VFS; a file resolves to its parent directory. */
+    public @Nullable VirtualFile resolveTargetDir(final @NotNull DirectoryDto dirDto) {
+        final VirtualFile target = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
+        if (target == null) return null;
+
+        return target.isDirectory() ? target : target.getParent();
     }
 
-    public List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final VirtualFile dir) {
-        Map<UUID, TestCaseDto> tcMap = new HashMap<>();
+    public @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final @NotNull VirtualFile dir) {
+        final Map<UUID, TestCaseDto> tcMap = new HashMap<>();
         TestCaseDto head = null;
 
-        VirtualFile[] files = dir.getChildren();
+        final VirtualFile[] files = dir.getChildren();
         if (files == null) return Collections.emptyList();
 
-        for (VirtualFile file : files) {
+        for (final VirtualFile file : files) {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
-                    TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class);
+                    final TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class);
                     tcMap.put(tc.getId(), tc);
                     if (Boolean.TRUE.equals(tc.getIsHead())) {
                         head = tc;
@@ -138,7 +140,7 @@ public class ExportAction extends DumbAwareAction {
             return new ArrayList<>(tcMap.values());
         }
 
-        List<TestCaseDto> orderedList = new ArrayList<>();
+        final List<TestCaseDto> orderedList = new ArrayList<>();
         TestCaseDto current = head;
 
         while (current != null) {

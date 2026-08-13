@@ -9,9 +9,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class SelectAllHeaderListener extends MouseAdapter {
-    private final DefaultTableModel model;
-    private final JBCheckBox headerCheckbox;
-    private final JBTable table;
+    private final @NotNull DefaultTableModel model;
+    private final @NotNull JBCheckBox headerCheckbox;
+    private final @NotNull JBTable table;
 
     public SelectAllHeaderListener(final @NotNull JBTable table, final @NotNull DefaultTableModel model, final @NotNull JBCheckBox headerCheckbox) {
         this.table = table;
@@ -21,9 +21,9 @@ public class SelectAllHeaderListener extends MouseAdapter {
 
     @Override
     public void mouseClicked(final @NotNull MouseEvent e) {
-        int col = table.columnAtPoint(e.getPoint());
+        final int col = table.columnAtPoint(e.getPoint());
         if (col == 0) {
-            boolean newState = !headerCheckbox.isSelected();
+            final boolean newState = !headerCheckbox.isSelected();
             headerCheckbox.setSelected(newState);
 
             for (int i = 0; i < model.getRowCount(); i++) {

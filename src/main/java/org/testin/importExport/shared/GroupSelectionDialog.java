@@ -16,24 +16,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GroupSelectionDialog extends FramelessDialogWrapper {
-    private final JBList<String> list;
+    private final @NotNull JBList<String> list;
 
-    public GroupSelectionDialog(final @NotNull Project p, String currentSelection) {
+    public GroupSelectionDialog(final @NotNull Project p, final @Nullable String currentSelection) {
         super(p, true);
         setTitle("Select Groups");
 
-        DefaultListModel<String> model = new DefaultListModel<>();
-        for (Group g : Group.values()) {
+        final DefaultListModel<String> model = new DefaultListModel<>();
+        for (final Group g : Group.values()) {
             model.addElement(g.getName());
         }
         list = new JBList<>(model);
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
         if (currentSelection != null && !currentSelection.isBlank()) {
-            List<String> selectedList = Arrays.stream(currentSelection.split(","))
+            final List<String> selectedList = Arrays.stream(currentSelection.split(","))
                     .map(String::trim).toList();
 
-            List<Integer> indices = new ArrayList<>();
+            final List<Integer> indices = new ArrayList<>();
             for (int i = 0; i < model.getSize(); i++) {
                 if (selectedList.contains(model.getElementAt(i))) {
                     indices.add(i);
@@ -45,15 +45,14 @@ public class GroupSelectionDialog extends FramelessDialogWrapper {
         initFrameless();
     }
 
-    @Nullable
     @Override
-    protected JComponent createCenterPanel() {
-        JBPanel<?> panel = new JBPanel<>(new BorderLayout());
+    protected @NotNull JComponent createCenterPanel() {
+        final JBPanel<?> panel = new JBPanel<>(new BorderLayout());
         panel.add(new JBScrollPane(list), BorderLayout.CENTER);
         return panel;
     }
 
-    public String getSelectedGroupsStr() {
+    public @NotNull String getSelectedGroupsStr() {
         return String.join(", ", list.getSelectedValuesList());
     }
 }

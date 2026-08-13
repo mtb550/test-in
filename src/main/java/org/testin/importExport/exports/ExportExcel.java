@@ -27,14 +27,15 @@ public class ExportExcel {
         this.exportAction = exportAction;
     }
 
-    public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
+                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try (Workbook workbook = new XSSFWorkbook()) {
-            CellStyle headerStyle = workbook.createCellStyle();
-            Font headerFont = workbook.createFont();
+            final CellStyle headerStyle = workbook.createCellStyle();
+            final Font headerFont = workbook.createFont();
             headerFont.setBold(true);
             headerStyle.setFont(headerFont);
 
-            for (Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
+            for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
                 String safeSheetName = entry.getKey().replaceAll("[\\\\/*?\\[\\]]", "_");
                 if (safeSheetName.length() > 31) {
                     safeSheetName = safeSheetName.substring(0, 31);
@@ -43,22 +44,21 @@ public class ExportExcel {
                     safeSheetName = safeSheetName.substring(0, 28) + "...";
                 }
 
-                Sheet sheet = workbook.createSheet(safeSheetName);
-                List<TestCaseDto> testCases = entry.getValue();
+                final Sheet sheet = workbook.createSheet(safeSheetName);
 
-                Row headerRow = sheet.createRow(0);
+                final Row headerRow = sheet.createRow(0);
                 for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
-                    Cell cell = headerRow.createCell(i);
+                    final Cell cell = headerRow.createCell(i);
                     cell.setCellValue(exportAction.exportAttributes.get(i).getName());
                     cell.setCellStyle(headerStyle);
                 }
 
                 int rowIndex = 1;
-                for (TestCaseDto tc : testCases) {
-                    Row row = sheet.createRow(rowIndex++);
+                for (final TestCaseDto tc : entry.getValue()) {
+                    final Row row = sheet.createRow(rowIndex++);
                     for (int i = 0; i < exportAction.exportAttributes.size(); i++) {
-                        Cell cell = row.createCell(i);
-                        String val = exportAction.exportAttributes.get(i).getTestValueExtractor().execute(tc, p);
+                        final Cell cell = row.createCell(i);
+                        final String val = exportAction.exportAttributes.get(i).getTestValueExtractor().execute(tc, p);
                         cell.setCellValue(val != null ? val : "");
                     }
                 }
@@ -80,7 +80,7 @@ public class ExportExcel {
                 Services.getInstance(p, Notifier.class).infoWithActions(p,
                         "Export Complete", "Exported to: " + destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
-                            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+                            final VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
                             Services.getInstance(p, Tools.class).openWithAssociatedProgram(p, vf);
                         }))
         );

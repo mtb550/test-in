@@ -2,14 +2,15 @@ package org.testin.importExport.shared;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 
 public class GroupMultiSelectEditor extends AbstractCellEditor implements TableCellEditor {
-    private final JButton button = new JButton();
-    private String currentValue = "";
+    private final @NotNull JButton button = new JButton();
+    private @NotNull String currentValue = "";
 
     public GroupMultiSelectEditor(final @NotNull Project p) {
         button.setBorderPainted(false);
@@ -18,7 +19,7 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
         button.setForeground(UIManager.getColor("Table.selectionForeground"));
 
         button.addActionListener(e -> {
-            GroupSelectionDialog dialog = new GroupSelectionDialog(p, currentValue);
+            final GroupSelectionDialog dialog = new GroupSelectionDialog(p, currentValue);
             if (dialog.showAndGet()) {
                 currentValue = dialog.getSelectedGroupsStr();
             }
@@ -27,14 +28,15 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
     }
 
     @Override
-    public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+    public @NotNull Component getTableCellEditorComponent(final @NotNull JTable table, final @Nullable Object value,
+                                                          final boolean isSelected, final int row, final int column) {
         currentValue = value != null ? value.toString() : "";
         button.setText(currentValue);
         return button;
     }
 
     @Override
-    public Object getCellEditorValue() {
+    public @NotNull Object getCellEditorValue() {
         return currentValue;
     }
 }

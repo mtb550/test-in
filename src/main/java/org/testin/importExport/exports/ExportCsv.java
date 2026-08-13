@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -26,22 +27,21 @@ public class ExportCsv {
         this.exportAction = exportAction;
     }
 
-    public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
+                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
-            List<String> headerNames = exportAction.exportAttributes.stream()
+            final List<String> headerNames = exportAction.exportAttributes.stream()
                     .map(TestEditorAttributes::getName)
                     .toList();
 
             writer.write(String.join(",", headerNames));
             writer.newLine();
 
-            for (Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
-                List<TestCaseDto> testCases = entry.getValue();
-                for (TestCaseDto tc : testCases) {
-                    List<String> rowValues = new ArrayList<>();
-                    for (TestEditorAttributes attr : exportAction.exportAttributes) {
-                        String val = attr.getTestValueExtractor().execute(tc, p);
-                        rowValues.add(escapeCsvField(val != null ? val : ""));
+            for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
+                for (final TestCaseDto tc : entry.getValue()) {
+                    final List<String> rowValues = new ArrayList<>();
+                    for (final TestEditorAttributes attr : exportAction.exportAttributes) {
+                        rowValues.add(escapeCsvField(attr.getTestValueExtractor().execute(tc, p)));
                     }
                     writer.write(String.join(",", rowValues));
                     writer.newLine();
@@ -55,13 +55,13 @@ public class ExportCsv {
         ApplicationManager.getApplication().invokeLater(() ->
                 Services.getInstance(p, Notifier.class).infoWithActions(p, "Export Complete", "Exported to: " + destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
-                            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+                            final VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
                             Services.getInstance(p, Tools.class).openWithAssociatedProgram(p, vf);
                         }))
         );
     }
 
-    private String escapeCsvField(final String value) {
+    private @NotNull String escapeCsvField(final @Nullable String value) {
         if (value == null) return "";
 
         if (value.contains(",") ||

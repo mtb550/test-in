@@ -36,29 +36,32 @@ public class ExportDialog extends FramelessDialogWrapper {
 
     private final @NotNull Project p;
 
-    private final List<TestEditorAttributes> exportAttributes;
+    private final @NotNull List<TestEditorAttributes> exportAttributes;
 
-    private final TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
+    private final @NotNull TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
 
-    private final JBTextField fileNameField = new JBTextField(30);
+    private final @NotNull JBTextField fileNameField = new JBTextField(30);
 
     // Offer only formats that actually have an export handler (PDF/Word are report-only).
-    private final ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
+    private final @NotNull ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
             .filter(type -> type.getExportHandler() != null)
             .map(FileTypes::getLabel)
             .toArray(String[]::new));
 
-    private final Map<String, List<TestCaseDto>> originalSheetsData;
+    private final @NotNull Map<String, List<TestCaseDto>> originalSheetsData;
 
-    private final JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
+    private final @NotNull JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
+
+    /** Both null until the dialog is accepted; read by the caller only after showAndGet. */
+    @Getter
+    private @Nullable FileTypes selectedFormat;
 
     @Getter
-    private FileTypes selectedFormat;
+    private @Nullable File selectedFile;
 
-    @Getter
-    private File selectedFile;
-
-    public ExportDialog(final @NotNull Project p, final List<TestEditorAttributes> exportAttributes, final Map<String, List<TestCaseDto>> sheetsData, final VirtualFile exportTarget) {
+    public ExportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> exportAttributes,
+                        final @NotNull Map<String, List<TestCaseDto>> sheetsData,
+                        final @NotNull VirtualFile exportTarget) {
         super(p, true);
         this.p = p;
         this.exportAttributes = exportAttributes;
@@ -66,11 +69,10 @@ public class ExportDialog extends FramelessDialogWrapper {
 
         setTitle("Export Test Cases");
 
-        String dirName = exportTarget.getName();
-        fileNameField.setText(dirName);
+        fileNameField.setText(exportTarget.getName());
         formatCombo.setSelectedItem(FileTypes.XLSX.getLabel());
 
-        FileChooserDescriptor descriptor = FileChooserDescriptorFactory
+        final FileChooserDescriptor descriptor = FileChooserDescriptorFactory
                 .createSingleFolderDescriptor()
                 .withTitle("Select Export Folder")
                 .withDescription("Choose the folder to save the export file in");
@@ -80,23 +82,22 @@ public class ExportDialog extends FramelessDialogWrapper {
         initFrameless();
         setSize(900, 600);
 
-        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
+        final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
             folderField.setText(defaultFolder);
         } else {
-            ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(folderField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
+            final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(folderField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
             folderField.addActionListener(browseListener);
             ApplicationManager.getApplication().invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }
     }
 
-    @Nullable
     @Override
-    protected JComponent createCenterPanel() {
-        JBPanel<?> panel = new JBPanel<>(new BorderLayout());
+    protected @NotNull JComponent createCenterPanel() {
+        final JBPanel<?> panel = new JBPanel<>(new BorderLayout());
 
-        JBPanel<?> topPanel = new JBPanel<>(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
+        final JBPanel<?> topPanel = new JBPanel<>(new GridBagLayout());
+        final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(4, 4, 4, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
@@ -127,7 +128,7 @@ public class ExportDialog extends FramelessDialogWrapper {
         gbc.weightx = 1.0;
         topPanel.add(formatCombo, gbc);
 
-        String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
+        final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
         if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
             gbc.gridx = 0;
             gbc.gridy = 3;
@@ -148,7 +149,7 @@ public class ExportDialog extends FramelessDialogWrapper {
 
     @Override
     protected void doOKAction() {
-        String folder = folderField.getText().trim();
+        final String folder = folderField.getText().trim();
         String fileName = fileNameField.getText().trim();
         if (fileName.isEmpty()) {
             fileNameField.requestFocus();
@@ -158,11 +159,17 @@ public class ExportDialog extends FramelessDialogWrapper {
             folderField.getTextField().requestFocus();
             return;
         }
-        FileTypes fmt = FileTypes.valueOf((String) formatCombo.getSelectedItem());
 
-        String ext = fmt.getExtension();
+        final String selectedLabel = (String) formatCombo.getSelectedItem();
+        if (selectedLabel == null) {
+            formatCombo.requestFocus();
+            return;
+        }
+        final FileTypes fmt = FileTypes.valueOf(selectedLabel);
+
+        final String ext = fmt.getExtension();
         if (!fileName.endsWith(ext)) {
-            int dot = fileName.lastIndexOf('.');
+            final int dot = fileName.lastIndexOf('.');
             fileName = dot >= 0 ? fileName.substring(0, dot) + ext : fileName + ext;
         }
 

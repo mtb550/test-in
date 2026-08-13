@@ -16,17 +16,16 @@ import java.io.InputStream;
 import java.util.*;
 
 public class ImportExcel {
-    private final ImportAction importAction;
+    private final @NotNull ImportAction importAction;
 
     public ImportExcel(final @NotNull ImportAction importAction) {
         this.importAction = importAction;
     }
 
-    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final File file) {
-        Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+    public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
+        final Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try {
-            Map<String, List<TestCaseDto>> parsed = parseFile(p, file);
-            result.putAll(parsed);
+            result.putAll(parseFile(p, file));
         } catch (final Exception ex) {
             Logger.error("Excel import parse failed: " + ex.getMessage());
             Services.getInstance(p, Notifier.class).error(p, "Excel Parse Error", ex.getMessage());
@@ -34,8 +33,8 @@ public class ImportExcel {
         return result;
     }
 
-    public Map<String, List<TestCaseDto>> parseFile(final @NotNull Project p, final File file) {
-        Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+    public @NotNull Map<String, List<TestCaseDto>> parseFile(final @NotNull Project p, final @NotNull File file) {
+        final Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try (InputStream fis = new FileInputStream(file);
              Workbook workbook = WorkbookFactory.create(fis)) {
             parseWorkbook(workbook, p, result);
@@ -47,33 +46,34 @@ public class ImportExcel {
         return result;
     }
 
-    private void parseWorkbook(final Workbook workbook, final @NotNull Project p, final Map<String, List<TestCaseDto>> result) {
-        DataFormatter dataFormatter = new DataFormatter();
+    private void parseWorkbook(final @NotNull Workbook workbook, final @NotNull Project p,
+                               final @NotNull Map<String, List<TestCaseDto>> result) {
+        final DataFormatter dataFormatter = new DataFormatter();
 
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             if (workbook.isSheetHidden(i) || workbook.isSheetVeryHidden(i)) continue;
 
-            Sheet sheet = workbook.getSheetAt(i);
-            String sheetName = sheet.getSheetName();
+            final Sheet sheet = workbook.getSheetAt(i);
+            final String sheetName = sheet.getSheetName();
 
-            Row headerRow = sheet.getRow(0);
+            final Row headerRow = sheet.getRow(0);
             if (headerRow == null) continue;
 
-            Map<String, Integer> headerIndexMap = new HashMap<>();
+            final Map<String, Integer> headerIndexMap = new HashMap<>();
 
-            for (Cell cell : headerRow) {
-                String headerName = dataFormatter.formatCellValue(cell).trim();
-                for (TestEditorAttributes reqCol : importAction.importAttributes) {
+            for (final Cell cell : headerRow) {
+                final String headerName = dataFormatter.formatCellValue(cell).trim();
+                for (final TestEditorAttributes reqCol : importAction.importAttributes) {
                     if (reqCol.getName().equalsIgnoreCase(headerName)) {
                         headerIndexMap.put(reqCol.getName().toLowerCase(), cell.getColumnIndex());
                     }
                 }
             }
 
-            List<TestCaseDto> sheetList = new ArrayList<>();
+            final List<TestCaseDto> sheetList = new ArrayList<>();
 
             for (int r = 1; r <= sheet.getLastRowNum(); r++) {
-                Row row = sheet.getRow(r);
+                final Row row = sheet.getRow(r);
                 if (row == null) continue;
 
                 boolean isRowEmpty = true;
@@ -89,14 +89,12 @@ public class ImportExcel {
                 currentTestCase.setNext(null);
                 currentTestCase.setIsHead(null);
 
-                for (TestEditorAttributes attr : TestEditorAttributes.values()) {
+                for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
                     if (attr.isImportable()) {
-                        Integer colIndex = headerIndexMap.get(attr.getName().toLowerCase());
-                        String rawValue = "";
-                        if (colIndex != null) {
-                            Cell dataCell = row.getCell(colIndex);
-                            rawValue = dataFormatter.formatCellValue(dataCell).trim();
-                        }
+                        final Integer colIndex = headerIndexMap.get(attr.getName().toLowerCase());
+                        final String rawValue = colIndex == null
+                                ? ""
+                                : dataFormatter.formatCellValue(row.getCell(colIndex)).trim();
                         attr.getImportSetter().execute(p, currentTestCase, rawValue);
                     }
                 }

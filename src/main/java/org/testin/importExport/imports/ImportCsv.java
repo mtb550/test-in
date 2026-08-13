@@ -13,18 +13,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class ImportCsv {
-    private final ImportAction importAction;
+    private final @NotNull ImportAction importAction;
 
     public ImportCsv(final @NotNull ImportAction importAction) {
         this.importAction = importAction;
     }
 
-    public Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final File file) {
-        Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
+    public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
+        final Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();
         try {
-            List<TestCaseDto> testCases = parseFile(p, file);
+            final List<TestCaseDto> testCases = parseFile(p, file);
             if (!testCases.isEmpty()) {
-                String name = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
+                final String name = file.getName().replaceAll("\\.csv$", "").replaceAll("[\\\\/*?\\[\\]]", "_");
                 result.put(name, testCases);
             }
         } catch (final Exception ex) {
@@ -34,22 +34,22 @@ public class ImportCsv {
         return result;
     }
 
-    public List<TestCaseDto> parseFile(final @NotNull Project p, final File file) {
+    public @NotNull List<TestCaseDto> parseFile(final @NotNull Project p, final @NotNull File file) {
         return parseCsvFile(file, p);
     }
 
-    private List<TestCaseDto> parseCsvFile(final File file, final @NotNull Project p) {
-        List<TestCaseDto> result = new ArrayList<>();
-        List<String[]> records = parseCsvRecords(file);
+    private @NotNull List<TestCaseDto> parseCsvFile(final @NotNull File file, final @NotNull Project p) {
+        final List<TestCaseDto> result = new ArrayList<>();
+        final List<String[]> records = parseCsvRecords(file);
 
         if (records.isEmpty()) return result;
 
-        String[] headers = records.getFirst();
-        Map<String, Integer> headerIndexMap = new HashMap<>();
+        final String[] headers = records.getFirst();
+        final Map<String, Integer> headerIndexMap = new HashMap<>();
 
         for (int i = 0; i < headers.length; i++) {
-            String headerName = headers[i].trim();
-            for (TestEditorAttributes reqCol : importAction.importAttributes) {
+            final String headerName = headers[i].trim();
+            for (final TestEditorAttributes reqCol : importAction.importAttributes) {
                 if (reqCol.getName().equalsIgnoreCase(headerName)) {
                     headerIndexMap.put(reqCol.getName().toLowerCase(), i);
                 }
@@ -57,10 +57,10 @@ public class ImportCsv {
         }
 
         for (int r = 1; r < records.size(); r++) {
-            String[] values = records.get(r);
+            final String[] values = records.get(r);
 
             boolean isRowEmpty = true;
-            for (String val : values) {
+            for (final String val : values) {
                 if (val != null && !val.trim().isEmpty()) {
                     isRowEmpty = false;
                     break;
@@ -72,12 +72,12 @@ public class ImportCsv {
             currentTestCase.setNext(null);
             currentTestCase.setIsHead(null);
 
-            for (TestEditorAttributes attr : TestEditorAttributes.values()) {
+            for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
                 if (attr.isImportable()) {
-                    Integer colIndex = headerIndexMap.get(attr.getName().toLowerCase());
+                    final Integer colIndex = headerIndexMap.get(attr.getName().toLowerCase());
                     String rawValue = "";
                     if (colIndex != null && colIndex < values.length) {
-                        String val = values[colIndex];
+                        final String val = values[colIndex];
                         rawValue = val != null ? val.trim() : "";
                     }
                     attr.getImportSetter().execute(p, currentTestCase, rawValue);
@@ -95,7 +95,7 @@ public class ImportCsv {
      * parser, this keeps newlines inside quoted fields (which our own CSV export
      * produces for multi-line steps), reads UTF-8 explicitly, and strips a BOM.
      */
-    private List<String[]> parseCsvRecords(final File file) {
+    private @NotNull List<String[]> parseCsvRecords(final @NotNull File file) {
         final List<String[]> records = new ArrayList<>();
         final List<String> fields = new ArrayList<>();
         final StringBuilder current = new StringBuilder();
@@ -151,7 +151,8 @@ public class ImportCsv {
         return records;
     }
 
-    private void endRecord(final List<String[]> records, final List<String> fields, final StringBuilder current) {
+    private void endRecord(final @NotNull List<String[]> records, final @NotNull List<String> fields,
+                           final @NotNull StringBuilder current) {
         if (fields.isEmpty() && current.isEmpty()) return; // blank line
 
         fields.add(current.toString());

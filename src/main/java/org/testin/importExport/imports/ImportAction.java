@@ -36,7 +36,7 @@ import java.util.Map;
 
 public class ImportAction extends DumbAwareAction {
 
-    protected final List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
+    protected final @NotNull List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportable)
             .toList();
     private final @NotNull Project p;
@@ -64,10 +64,10 @@ public class ImportAction extends DumbAwareAction {
             return;
         }
 
-        ImportDialog dialog = new ImportDialog(p, importAttributes, (file, format) -> format.importToFile(p, ImportAction.this, file));
+        final ImportDialog dialog = new ImportDialog(p, importAttributes, (file, format) -> format.importToFile(p, ImportAction.this, file));
 
         if (dialog.showAndGet()) {
-            Map<String, List<TestCaseDto>> selectedCasesBySheet = dialog.getSelectedTestCasesBySheet();
+            final Map<String, List<TestCaseDto>> selectedCasesBySheet = dialog.getSelectedTestCasesBySheet();
 
             if (selectedCasesBySheet.isEmpty()) {
                 Services.getInstance(p, Notifier.class).softShow(p, "No Selection", "No test cases were selected for import.");
@@ -80,7 +80,8 @@ public class ImportAction extends DumbAwareAction {
         }
     }
 
-    private void executeImportWriteAction(final @NotNull Project p, final DirectoryDto selectedDirDto, final Map<String, List<TestCaseDto>> selectedCasesBySheet) {
+    private void executeImportWriteAction(final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto,
+                                          final @NotNull Map<String, List<TestCaseDto>> selectedCasesBySheet) {
 
         final Path targetPath = selectedDirDto.getPath();
 
@@ -90,51 +91,36 @@ public class ImportAction extends DumbAwareAction {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                TestCaseDto tail = findExistingTail(p, targetPath);
-                List<TestCaseDto> flatList = new ArrayList<>();
+                final TestCaseDto tail = findExistingTail(p, targetPath);
+                final List<TestCaseDto> flatList = new ArrayList<>();
                 selectedCasesBySheet.values().forEach(flatList::addAll);
 
                 linkAndSaveTestCases(p, targetPath, flatList, tail);
 
-                for (TestCaseDto tc : flatList) tc.setParent(ts);
+                for (final TestCaseDto tc : flatList) tc.setParent(ts);
 
-                if (generateCode) {
-                    Logger.info("Import: generating test methods for " + flatList.size() + " imported cases");
-                    CreateTestMethod syncInjector = new CreateTestMethod();
-                    for (TestCaseDto tc : flatList) {
-                        List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-                        syncInjector.executeSync(p, tc, fqcn);
-                    }
-                }
+                if (generateCode) generateTestMethods(p, flatList, ts.getName());
 
                 Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts);
                 Services.getInstance(p, Notifier.class).info(p, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
 
             } else {
                 int totalImported = 0;
-                for (Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
-                    String rawSheetName = entry.getKey();
-                    List<TestCaseDto> sheetCases = entry.getValue();
+                for (final Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
+                    final List<TestCaseDto> sheetCases = entry.getValue();
 
-                    String cName = Services.getInstance(p, Tools.class).removeSpecialChars(rawSheetName);
-                    Path newDirPath = targetPath.resolve(cName);
-                    DirectoryDto dir = new CreateTestSet(p).execute(cName, selectedDirDto, newDirPath);
+                    final String cName = Services.getInstance(p, Tools.class).removeSpecialChars(entry.getKey());
+                    final Path newDirPath = targetPath.resolve(cName);
+                    final DirectoryDto dir = new CreateTestSet(p).execute(cName, selectedDirDto, newDirPath);
 
-                    TestCaseDto tail = findExistingTail(p, newDirPath);
+                    final TestCaseDto tail = findExistingTail(p, newDirPath);
                     linkAndSaveTestCases(p, newDirPath, sheetCases, tail);
 
-                    TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
+                    final TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
 
-                    for (TestCaseDto tc : sheetCases) tc.setParent(sheetDto);
+                    for (final TestCaseDto tc : sheetCases) tc.setParent(sheetDto);
 
-                    if (generateCode) {
-                        Logger.info("Import: generating test methods for sheet '" + cName + "' with " + sheetCases.size() + " cases");
-                        CreateTestMethod syncInjector = new CreateTestMethod();
-                        for (TestCaseDto tc : sheetCases) {
-                            List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-                            syncInjector.executeSync(p, tc, fqcn);
-                        }
-                    }
+                    if (generateCode) generateTestMethods(p, sheetCases, cName);
 
                     totalImported += sheetCases.size();
                 }
@@ -152,12 +138,29 @@ public class ImportAction extends DumbAwareAction {
         });
     }
 
-    private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath, final List<TestCaseDto> testCases, final TestCaseDto existingTail) {
+    /**
+     * Generates the automation test method for each imported case. The target
+     * name only labels the log line.
+     */
+    private void generateTestMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
+                                     final @NotNull String targetName) {
+        Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");
+
+        final CreateTestMethod syncInjector = new CreateTestMethod();
+        for (final TestCaseDto tc : testCases) {
+            final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+            syncInjector.executeSync(p, tc, fqcn);
+        }
+    }
+
+    private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath,
+                                      final @NotNull List<TestCaseDto> testCases,
+                                      final @Nullable TestCaseDto existingTail) {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         TestCaseDto previousNode = existingTail;
 
-        for (TestCaseDto currentTestCase : testCases) {
+        for (final TestCaseDto currentTestCase : testCases) {
             if (previousNode == null) {
                 currentTestCase.setIsHead(true);
 
@@ -173,7 +176,7 @@ public class ImportAction extends DumbAwareAction {
             indexer.putTestCase(dirPath, existingTail);
         }
 
-        for (TestCaseDto tc : testCases) {
+        for (final TestCaseDto tc : testCases) {
             indexer.putTestCase(dirPath, tc);
         }
     }
@@ -182,8 +185,7 @@ public class ImportAction extends DumbAwareAction {
      * The indexer is the source of truth for existing test cases — no need to
      * re-read JSON files from disk to find the linked-list tail.
      */
-    @Nullable
-    private TestCaseDto findExistingTail(final @NotNull Project p, final @NotNull Path directory) {
+    private @Nullable TestCaseDto findExistingTail(final @NotNull Project p, final @NotNull Path directory) {
         return Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory).stream()
                 .filter(tc -> tc.getNext() == null)
                 .findFirst()

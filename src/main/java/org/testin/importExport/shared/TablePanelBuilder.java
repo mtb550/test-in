@@ -24,33 +24,35 @@ import java.util.function.Consumer;
 
 public class TablePanelBuilder {
 
-    public String[] buildColumnNames(final @NotNull List<TestEditorAttributes> attributes) {
-        List<String> columnNames = new ArrayList<>();
+    public String @NotNull [] buildColumnNames(final @NotNull List<TestEditorAttributes> attributes) {
+        final List<String> columnNames = new ArrayList<>();
         columnNames.add("");
         columnNames.add("#");
-        for (TestEditorAttributes attr : attributes) {
+        for (final TestEditorAttributes attr : attributes) {
             columnNames.add(attr.getName());
         }
         return columnNames.toArray(new String[0]);
     }
 
-    public DefaultTableModel createModel(final @NotNull Project p, List<TestEditorAttributes> importAttributes, final @NotNull List<TestCaseDto> testCases) {
-        String[] columns = buildColumnNames(importAttributes);
-        DefaultTableModel model = new DefaultTableModel(columns, 0) {
+    public @NotNull DefaultTableModel createModel(final @NotNull Project p,
+                                                  final @NotNull List<TestEditorAttributes> importAttributes,
+                                                  final @NotNull List<TestCaseDto> testCases) {
+        final String[] columns = buildColumnNames(importAttributes);
+        final DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
-            public Class<?> getColumnClass(int columnIndex) {
+            public @NotNull Class<?> getColumnClass(final int columnIndex) {
                 return columnIndex == 0 ? Boolean.class : String.class;
             }
 
             @Override
-            public boolean isCellEditable(int row, int column) {
+            public boolean isCellEditable(final int row, final int column) {
                 return column == 0 || column >= 2;
             }
         };
 
         int index = 1;
-        for (TestCaseDto tc : testCases) {
-            Object[] rowData = new Object[columns.length];
+        for (final TestCaseDto tc : testCases) {
+            final Object[] rowData = new Object[columns.length];
             rowData[0] = Boolean.TRUE;
             rowData[1] = String.valueOf(index++);
 
@@ -62,15 +64,15 @@ public class TablePanelBuilder {
         return model;
     }
 
-    public JBTable buildTable(final @NotNull DefaultTableModel model, final @NotNull Project p) {
-        JBTable table = new JBTable(model);
+    public @NotNull JBTable buildTable(final @NotNull DefaultTableModel model, final @NotNull Project p) {
+        final JBTable table = new JBTable(model);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
 
-        TableColumn importColumn = table.getColumnModel().getColumn(0);
+        final TableColumn importColumn = table.getColumnModel().getColumn(0);
 
-        JBCheckBox headerCheckbox = new JBCheckBox();
+        final JBCheckBox headerCheckbox = new JBCheckBox();
         headerCheckbox.setSelected(true);
         headerCheckbox.setHorizontalAlignment(SwingConstants.CENTER);
         headerCheckbox.setToolTipText("Select All / Deselect All");
@@ -82,14 +84,14 @@ public class TablePanelBuilder {
         );
 
         try {
-            TableColumn priorityCol = table.getColumn("Priority");
-            ComboBox<String> priorityBox = new ComboBox<>();
-            for (Priority pr : Priority.values()) {
+            final TableColumn priorityCol = table.getColumn("Priority");
+            final ComboBox<String> priorityBox = new ComboBox<>();
+            for (final Priority pr : Priority.values()) {
                 priorityBox.addItem(pr.getName());
             }
             priorityCol.setCellEditor(new DefaultCellEditor(priorityBox));
 
-            TableColumn groupCol = table.getColumn("Group");
+            final TableColumn groupCol = table.getColumn("Group");
             groupCol.setCellEditor(new GroupMultiSelectEditor(p));
         } catch (final IllegalArgumentException ex) {
             Logger.error(ex.getMessage());
@@ -103,20 +105,19 @@ public class TablePanelBuilder {
     public void autoSizeColumns(final @NotNull JBTable table) {
         int tableTotalWidth = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
-            TableColumn col = table.getColumnModel().getColumn(i);
-            int maxWidth;
+            final TableColumn col = table.getColumnModel().getColumn(i);
 
             TableCellRenderer headerRenderer = col.getHeaderRenderer();
             if (headerRenderer == null) {
                 headerRenderer = table.getTableHeader().getDefaultRenderer();
             }
-            Component headerComp = headerRenderer.getTableCellRendererComponent(
+            final Component headerComp = headerRenderer.getTableCellRendererComponent(
                     table, col.getHeaderValue(), false, false, 0, i);
-            maxWidth = headerComp.getPreferredSize().width;
+            int maxWidth = headerComp.getPreferredSize().width;
 
             for (int r = 0; r < table.getRowCount(); r++) {
-                TableCellRenderer renderer = table.getCellRenderer(r, i);
-                Component comp = table.prepareRenderer(renderer, r, i);
+                final TableCellRenderer renderer = table.getCellRenderer(r, i);
+                final Component comp = table.prepareRenderer(renderer, r, i);
                 maxWidth = Math.max(comp.getPreferredSize().width, maxWidth);
             }
 
@@ -125,8 +126,8 @@ public class TablePanelBuilder {
             tableTotalWidth += maxWidth;
         }
 
-        int tableTotalHeight = table.getRowHeight() * Math.max(3, table.getRowCount());
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        final int tableTotalHeight = table.getRowHeight() * Math.max(3, table.getRowCount());
+        final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
         table.setPreferredScrollableViewportSize(new Dimension(
                 Math.min(tableTotalWidth, (int) (screenSize.width * 0.85)),
@@ -134,18 +135,17 @@ public class TablePanelBuilder {
         ));
     }
 
-    public JBTabbedPane createTabbedPane(final @NotNull Map<String, List<TestCaseDto>> sheetsData, final @NotNull List<TestEditorAttributes> attributes, final @NotNull Project p, final @NotNull Consumer<DefaultTableModel> modelCustomizer) {
-        JBTabbedPane tabbedPane = new JBTabbedPane();
+    public @NotNull JBTabbedPane createTabbedPane(final @NotNull Map<String, List<TestCaseDto>> sheetsData,
+                                                  final @NotNull List<TestEditorAttributes> attributes,
+                                                  final @NotNull Project p,
+                                                  final @NotNull Consumer<DefaultTableModel> modelCustomizer) {
+        final JBTabbedPane tabbedPane = new JBTabbedPane();
 
-        for (Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
-            String sheetName = entry.getKey();
-            List<TestCaseDto> testCases = entry.getValue();
-
-            DefaultTableModel model = createModel(p, attributes, testCases);
+        for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
+            final DefaultTableModel model = createModel(p, attributes, entry.getValue());
             modelCustomizer.accept(model);
 
-            JBTable table = buildTable(model, p);
-            tabbedPane.addTab(sheetName, new JBScrollPane(table));
+            tabbedPane.addTab(entry.getKey(), new JBScrollPane(buildTable(model, p)));
         }
 
         return tabbedPane;

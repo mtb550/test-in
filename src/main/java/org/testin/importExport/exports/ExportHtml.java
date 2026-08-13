@@ -5,6 +5,7 @@ import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ExportHtml {
-    private static final Map<Character, String> HTML_ESCAPES = Map.of(
+    private static final @NotNull Map<Character, String> HTML_ESCAPES = Map.of(
             '&', "&amp;",
             '<', "&lt;",
             '>', "&gt;",
@@ -32,7 +33,8 @@ public class ExportHtml {
         this.exportAction = exportAction;
     }
 
-    public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
+                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         // Explicit UTF-8: the document declares <meta charset="UTF-8">, and the platform
         // default charset (e.g. cp1252 on Windows) would mangle non-ASCII text.
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(destFile), StandardCharsets.UTF_8))) {
@@ -47,7 +49,8 @@ public class ExportHtml {
                         .infoWithActions(p, "Export Complete", "Exported to: " + destFile.getName(), NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
     }
 
-    private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project p, final Map<String, List<TestCaseDto>> sheetsData) {
+    private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project p,
+                                   final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try {
             writer.write("<!DOCTYPE html>");
             writer.newLine();
@@ -89,7 +92,7 @@ public class ExportHtml {
 
             int totalExported = 0;
 
-            for (Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
+            for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
                 final String sheetName = entry.getKey();
                 final List<TestCaseDto> testCases = entry.getValue();
 
@@ -102,17 +105,16 @@ public class ExportHtml {
                 writer.newLine();
 
                 writer.write("<tr>");
-                for (TestEditorAttributes attr : exportAction.exportAttributes) {
+                for (final TestEditorAttributes attr : exportAction.exportAttributes) {
                     writer.write("<th>" + htmlEscape(attr.getName()) + "</th>");
                 }
                 writer.write("</tr>");
                 writer.newLine();
 
-                for (TestCaseDto tc : testCases) {
+                for (final TestCaseDto tc : testCases) {
                     writer.write("<tr>");
-                    for (TestEditorAttributes attr : exportAction.exportAttributes) {
-                        String val = attr.getTestValueExtractor().execute(tc, p);
-                        writer.write("<td>" + htmlEscape(val) + "</td>");
+                    for (final TestEditorAttributes attr : exportAction.exportAttributes) {
+                        writer.write("<td>" + htmlEscape(attr.getTestValueExtractor().execute(tc, p)) + "</td>");
                     }
                     writer.write("</tr>");
                     writer.newLine();
@@ -126,7 +128,7 @@ public class ExportHtml {
             writer.write("<p><em>Total test cases exported: " + totalExported + "</em></p>");
             writer.newLine();
 
-            String exportDate = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss zzz"));
+            final String exportDate = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss zzz"));
             writer.write("<p><em>Exported on: " + htmlEscape(exportDate) + "</em></p>");
             writer.newLine();
 
@@ -140,11 +142,12 @@ public class ExportHtml {
         }
     }
 
-    private String htmlEscape(final String value) {
+    private @NotNull String htmlEscape(final @Nullable String value) {
         if (value == null) return "";
-        StringBuilder sb = new StringBuilder(value.length());
+
+        final StringBuilder sb = new StringBuilder(value.length());
         for (int i = 0; i < value.length(); i++) {
-            char c = value.charAt(i);
+            final char c = value.charAt(i);
             final String rep = HTML_ESCAPES.get(c);
             if (rep != null) sb.append(rep);
             else sb.append(c);

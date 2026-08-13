@@ -18,16 +18,14 @@ import java.util.Map;
 
 public class ExportJson {
 
-    public ExportJson() {
-    }
-
-    public void exportToFile(final @NotNull Project p, final File destFile, final Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
+                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         Services.getInstance(p, FilesUtil.class).write(p, destFile.toPath(), sheetsData);
 
         ApplicationManager.getApplication().invokeLater(() ->
                 Services.getInstance(p, Notifier.class).infoWithActions(p, "Export Complete", "Exported to: " + destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
-                            VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
+                            final VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
                             Services.getInstance(p, Tools.class).openWithAssociatedProgram(p, vf);
                         }))
         );
