@@ -74,7 +74,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     private final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
     private final @NotNull JBScrollPane scrollPane;
-    private final @NotNull ModelSyncListener syncListener;
+    private final @NotNull ModelChangeNotifier modelChangeNotifier;
     private final @NotNull Disposable projectDisposable;
     /**
      * One counter for every model-replacing operation - data loads and badge
@@ -157,7 +157,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         list.setDropMode(DropMode.INSERT);
         list.setTransferHandler(new TransferListener(this));
         list.setCellRenderer(new TestListRenderer(p, this));
-        list.addKeyListener(new KeyListener(p, list, this));
+        list.addKeyListener(new KeyListener(p, list));
 
         this.pageSize = PropertiesComponent.getInstance().getInt("testin.pageSize", 50);
 
@@ -165,9 +165,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         mainPanel.add(toolBar, BorderLayout.NORTH);
         toolBar.installSearchFocusShortcut(mainPanel);
 
-        this.syncListener = new ModelSyncListener(this, model);
-        this.syncListener.setOnUpdateCallback(this::onDataSynced);
-        this.model.addListDataListener(syncListener);
+        this.modelChangeNotifier = new ModelChangeNotifier();
+        this.modelChangeNotifier.setOnUpdateCallback(this::onDataSynced);
+        this.model.addListDataListener(modelChangeNotifier);
 
         this.contextMenu = new TestEditorContextMenu(p, this, parent, list, model);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
@@ -242,9 +242,6 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void updateSequenceAndSaveAll() {
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
-
         final List<TestCaseDto> snapshot;
         synchronized (this.allTestCases) {
             snapshot = new ArrayList<>(this.allTestCases);
@@ -342,8 +339,6 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarSearchValueChanged(final @NotNull String query) {
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
         this.currentPage = 1;
         refreshView();
     }
@@ -355,16 +350,12 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onToolBarFilterSelectionChanged() {
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
         this.currentPage = 1;
         refreshView();
     }
 
     @Override
     public void onToolBarFilterResetButtonClicked() {
-        currentTestCases.clear();
-        currentTestCases.addAll(getFilteredList());
         this.currentPage = 1;
         refreshView();
     }
@@ -436,6 +427,14 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     public void refreshView() {
+        // Recomputed here rather than by the callers: the view is a filtered page
+        // of the master list, so anything that changes that list - a delete, a
+        // paste, a reorder - has to show at once. Leaving it to whoever changed
+        // the data means the one caller that forgets leaves a deleted test case
+        // on screen until the next explicit refresh.
+        currentTestCases.clear();
+        currentTestCases.addAll(getFilteredList());
+
         final int totalItems = currentTestCases.size();
         final PageWindow page = PageWindow.of(totalItems, currentPage, pageSize);
         currentPage = page.page();
@@ -445,9 +444,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
                 ? selectionToRestore
                 : (list.getSelectedValue() != null ? list.getSelectedValue().getId() : null);
 
-        syncListener.pause();
+        modelChangeNotifier.pause();
         model.replaceAll(pageItems);
-        syncListener.resume();
+        modelChangeNotifier.resume();
 
         // Matched by id: a reload hands back different dto instances for the
         // same test cases, so comparing objects would drop the selection.
@@ -658,7 +657,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         currentTestCases.clear();
         unsortedIds.clear();
 
-        model.removeListDataListener(syncListener);
+        model.removeListDataListener(modelChangeNotifier);
         model.removeAll();
 
         mainPanel.removeAll();

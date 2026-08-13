@@ -10,6 +10,7 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GeneratorType;
+import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
@@ -24,13 +25,17 @@ import java.util.UUID;
 
 public class RemoveTestCaseAction extends DumbAwareAction {
     private final @NotNull DirectoryDto dir;
+    private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull CollectionListModel<TestCaseDto> model;
     private final @NotNull Project p;
 
-    public RemoveTestCaseAction(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    public RemoveTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull DirectoryDto dir,
+                                final @NotNull JBList<TestCaseDto> list,
+                                final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
         this.p = p;
+        this.editor = editor;
         this.dir = dir;
         this.list = list;
         this.model = model;
@@ -54,6 +59,13 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
     private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
         relinkAroundRemoved(selectedItems);
+
+        // Off the editor's master list first. The list model holds only the
+        // current page, while the next sequence write persists every entry of
+        // the master list - so a case left there is written back to disk after
+        // its file has been deleted, and comes back on the next re-index as an
+        // unsorted orphan.
+        editor.getAllTestCases().removeAll(selectedItems);
 
         final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
         for (final TestCaseDto tc : selectedItems) {

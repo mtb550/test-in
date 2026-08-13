@@ -43,7 +43,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         add(new CopyTestCaseNodeAction(p, list));
         add(new CutTestCaseNodeAction(p, ui, list));
         add(new PasteTestCaseNodeAction(p, ui, list));
-        add(new RemoveTestCaseAction(p, dir, list, model));
+        add(new RemoveTestCaseAction(p, ui, dir, list, model));
 
         addSeparator();
 

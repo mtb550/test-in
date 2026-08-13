@@ -18,6 +18,7 @@ import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.mappers.markers.TestRunMarker;
 import org.testin.services.Services;
+import org.testin.services.TestCaseCacheService;
 import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
@@ -277,6 +278,17 @@ public final class ProjectIndexer {
 
     public void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         store.removeTestCase(testSetPath, tcId);
+
+        // The completion cache is derived from the test cases, so it has to shrink
+        // with them - otherwise a deleted description keeps being offered.
+        Services.getInstance(p, TestCaseCacheService.class).reload(this::getAllTestCases);
+    }
+
+    /**
+     * Every indexed test case, across all test sets.
+     */
+    public @NotNull List<TestCaseDto> getAllTestCases() {
+        return List.copyOf(store.getTestCasesById().values());
     }
 
     public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList) {

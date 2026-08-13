@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 
 @Service(Service.Level.PROJECT)
@@ -21,6 +23,7 @@ public final class TestCaseCacheService implements Disposable {
     private final @NotNull Set<String> expectedResults = ConcurrentHashMap.newKeySet();
     private final @NotNull Set<String> modules = ConcurrentHashMap.newKeySet();
     private final @NotNull Set<String> steps = ConcurrentHashMap.newKeySet();
+    private final @NotNull AtomicBoolean reloadScheduled = new AtomicBoolean();
 
     public @NotNull Set<String> getDescription() {
         return Collections.unmodifiableSet(descriptions);
@@ -62,16 +65,48 @@ public final class TestCaseCacheService implements Disposable {
         cacheAsync(tcs);
     }
 
+    /**
+     * Rebuilds the cache from the given test cases, dropping anything they no
+     * longer mention.
+     * <p>
+     * Deleting a test case cannot simply remove its values: another test case may
+     * use the same module or the same step, and dropping those would empty the
+     * completion for cases that still exist. Rebuilding from what remains is the
+     * only answer that is right in both directions.
+     */
+    public void reload(final @NotNull Supplier<@Nullable List<TestCaseDto>> source) {
+        // Bursts collapse into one rebuild: deleting fifty cases asks fifty times
+        // and the answer is the same each time. The flag is cleared before the
+        // source is read, so a removal landing after that still gets a pass of
+        // its own. The source is a supplier for the same reason - the rebuild
+        // must read what remains when it runs, not when it was asked.
+        if (!reloadScheduled.compareAndSet(false, true)) return;
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            reloadScheduled.set(false);
+
+            final List<TestCaseDto> testCases = source.get();
+
+            descriptions.clear();
+            expectedResults.clear();
+            modules.clear();
+            steps.clear();
+
+            if (testCases != null) testCases.forEach(this::cache);
+        });
+    }
+
     private void cacheAsync(final @Nullable List<TestCaseDto> testCases) {
         if (testCases == null || testCases.isEmpty()) return;
-        ApplicationManager.getApplication().executeOnPooledThread(() ->
-                testCases.forEach(tc -> {
-                    addDescription(tc.getDescription());
-                    addExpectedResult(tc.getExpectedResult());
-                    addModule(tc.getModule());
-                    // Jackson can leave steps null on hand-edited JSON despite the field default.
-                    Optional.ofNullable(tc.getSteps()).ifPresent(stepList -> stepList.forEach(this::addStep));
-                }));
+        ApplicationManager.getApplication().executeOnPooledThread(() -> testCases.forEach(this::cache));
+    }
+
+    private void cache(final @NotNull TestCaseDto tc) {
+        addDescription(tc.getDescription());
+        addExpectedResult(tc.getExpectedResult());
+        addModule(tc.getModule());
+        // Jackson can leave steps null on hand-edited JSON despite the field default.
+        Optional.ofNullable(tc.getSteps()).ifPresent(stepList -> stepList.forEach(this::addStep));
     }
 
     @Override
