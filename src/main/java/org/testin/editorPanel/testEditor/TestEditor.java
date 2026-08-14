@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
 import org.testin.editorPanel.EditorCenter;
+import org.testin.editorPanel.EditorFilters;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.TestCaseFilter;
@@ -31,8 +32,6 @@ import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.TestToolBar;
 import org.testin.editorPanel.toolBar.components.FilterPopupBtn;
 import org.testin.editorPanel.toolBar.components.TestDetailsPopupBtn;
-import org.testin.enums.Group;
-import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.enums.ViewMode;
 import org.testin.indexer.ProjectIndexer;
@@ -582,21 +581,15 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     private @NotNull List<TestCaseDto> getFilteredList() {
-        final String query = toolBar.getSearchTxt().getSearchQuery();
-
-        final FilterPopupBtn filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
-
-        final Set<Group> groupFilter = filterPopup.getSelectedGroup();
-        final Set<Priority> priorityFilter = filterPopup.getSelectedPriority();
-        final Set<String> moduleFilter = filterPopup.getSelectedModule();
+        final EditorFilters filters = EditorFilters.of(toolBar);
 
         synchronized (allTestCases) {
             return TestCaseFilter.filter(
                     allTestCases,
-                    query,
-                    groupFilter,
-                    priorityFilter,
-                    moduleFilter);
+                    filters.query(),
+                    filters.groups(),
+                    filters.priorities(),
+                    filters.modules());
         }
     }
 

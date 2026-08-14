@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
 import org.testin.editorPanel.EditorCenter;
+import org.testin.editorPanel.EditorFilters;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.TestCaseFilter;
@@ -492,22 +493,17 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     }
 
     private @NotNull List<TestCaseDto> getFilteredList() {
-        final String query = toolBar.getSearchTxt().getSearchQuery();
-
-        final FilterPopupBtn filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
-
-        final Set<Group> groupFilter = filterPopup.getSelectedGroup();
-        final Set<Priority> priorityFilter = filterPopup.getSelectedPriority();
-        final Set<String> moduleFilter = filterPopup.getSelectedModule();
-        final Set<TestStatus> statusFilter = filterPopup.getSelectedStatus();
+        final EditorFilters filters = EditorFilters.of(toolBar);
+        // Status is the run editor's alone - a test case does not have one.
+        final Set<TestStatus> statusFilter = toolBar.getToolbarItem(FilterPopupBtn.class).getSelectedStatus();
 
         synchronized (allTestCases) {
             return TestCaseFilter.filter(
                     allTestCases,
-                    query,
-                    groupFilter,
-                    priorityFilter,
-                    moduleFilter,
+                    filters.query(),
+                    filters.groups(),
+                    filters.priorities(),
+                    filters.modules(),
                     statusFilter,
                     resultsMap::get);
         }
