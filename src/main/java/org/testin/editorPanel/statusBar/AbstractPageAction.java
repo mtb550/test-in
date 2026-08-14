@@ -47,6 +47,10 @@ abstract class AbstractPageAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
+        // EDT although update() reads no Swing component: the page state it does
+        // read is owned by the EDT - actionPerformed writes currentPage there -
+        // so a background read would enable or disable the button from a stale
+        // page number (#52).
         return ActionUpdateThread.EDT;
     }
 }

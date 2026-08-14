@@ -35,6 +35,9 @@ public class NextTestCaseAction extends DumbAwareAction {
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
+        // EDT although update() reads no Swing component: ViewPagination's index
+        // and item list are plain fields mutated on the EDT, so a background
+        // read would enable the button from a stale position (#52).
         return ActionUpdateThread.EDT;
     }
 }
