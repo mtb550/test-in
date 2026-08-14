@@ -12,7 +12,7 @@ public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
     private final @NotNull IToolBar callbacks;
 
     public StartExecutionBtn(final @NotNull IToolBar callbacks, final @NotNull Runnable onStartExecutionClicked) {
-        super("Start Execution", AllIcons.Nodes.Services);
+        super("Start Execution", AllIcons.Actions.Execute);
         this.callbacks = callbacks;
 
         addActionListener(e -> onStartExecutionClicked.run());
@@ -20,19 +20,19 @@ public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
 
 
     public void updateEnabledState() {
-        if (callbacks instanceof RunEditor editor) {
-            final TestRunStatus status = editor.getParent().getMarker().getStatus();
+        if (!(callbacks instanceof RunEditor editor)) return;
 
-            if (status.isTerminal()) {
-                setEnabled(false);
-                setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Nodes.Services));
-                setToolTipText("Execution disabled — run status is " + status.getLabel());
+        setEnabled(editor.canStartExecution());
+        setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Actions.Execute));
+        setToolTipText(tooltipFor(editor));
+    }
 
-            } else {
-                setEnabled(true);
-                setIcon(AllIcons.Nodes.Services);
-                setToolTipText("Start Execution");
-            }
-        }
+    private static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
+        if (editor.isExecuting()) return "Execution in progress";
+
+        final TestRunStatus status = editor.getParent().getMarker().getStatus();
+        return status.isTerminal()
+                ? "Execution disabled — run status is " + status.getLabel()
+                : "Start Execution";
     }
 }

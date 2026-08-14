@@ -643,9 +643,34 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         });
     }
 
+    /**
+     * True while test cases are being executed: startTimerForIndex sets the
+     * index for each one and stopExecution clears it.
+     */
+    public boolean isExecuting() {
+        return currentlyExecutingIndex >= 0;
+    }
+
+    /**
+     * Whether execution may start. Asked by both the toolbar button and the
+     * context menu action, which used to answer it differently.
+     */
+    public boolean canStartExecution() {
+        return !isExecuting() && !parent.getMarker().getStatus().isTerminal();
+    }
+
+    /**
+     * Repaints the Start button after the execution state changes - the status
+     * alone does not say whether a run is under way.
+     */
+    private void refreshStartButton() {
+        toolBar.getToolbarItem(StartExecutionBtn.class).updateEnabledState();
+    }
+
     public void stopExecution() {
         executionTimer.stop();
         currentlyExecutingIndex = -1;
+        refreshStartButton();
     }
 
     @Override
@@ -655,6 +680,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         new UpdateTestRunStatusAction(p, this, currentList).applyStatusChange(p, this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
+        refreshStartButton();
     }
 
 
