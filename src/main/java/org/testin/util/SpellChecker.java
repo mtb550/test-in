@@ -31,10 +31,11 @@ import java.util.List;
  * The checker runs as an inspection, so it only works on an editor that has
  * both a project and a PSI file behind its document. The platform's own
  * customization returns silently when either is missing, which makes a field
- * look supported when it is not - so the fields are built here rather than
- * configured after the fact, and switching the checker on over an existing
- * {@code TextFieldWithAutoCompletion} is deliberately not offered, because it
- * does not work.
+ * look supported when it is not.
+ * <p>
+ * So the fields are built here rather than configured after the fact. Switching
+ * the checker on over an existing {@code TextFieldWithAutoCompletion} is
+ * deliberately not offered, because it does not work.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SpellChecker {
