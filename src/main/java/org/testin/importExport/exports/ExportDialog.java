@@ -5,6 +5,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
+import com.intellij.ui.SimpleListCellRenderer;
 import com.intellij.openapi.ui.ComponentWithBrowseButton;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -43,10 +44,10 @@ public class ExportDialog extends FramelessDialogWrapper {
     private final @NotNull JBTextField fileNameField = new JBTextField(30);
 
     // Offer only formats that actually have an export handler (PDF/Word are report-only).
-    private final @NotNull ComboBox<String> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
-            .filter(type -> type.getExportHandler() != null)
-            .map(FileTypes::getLabel)
-            .toArray(String[]::new));
+    // Offer only formats that actually have an export handler (PDF/Word are report-only).
+    private final @NotNull ComboBox<FileTypes> formatCombo = new ComboBox<>(Arrays.stream(FileTypes.values())
+            .filter(FileTypes::isExportable)
+            .toArray(FileTypes[]::new));
 
     private final @NotNull Map<String, List<TestCaseDto>> originalSheetsData;
 
@@ -72,7 +73,11 @@ public class ExportDialog extends FramelessDialogWrapper {
         setTitle("Export Test Cases");
 
         fileNameField.setText(exportTarget.getName());
-        formatCombo.setSelectedItem(FileTypes.XLSX.getLabel());
+        formatCombo.setSelectedItem(FileTypes.XLSX);
+        // The combo holds the format itself and renders its label, so the
+        // selection needs no lookup back from text.
+        formatCombo.setRenderer(SimpleListCellRenderer.create("", FileTypes::getLabel));
+
 
         final FileChooserDescriptor descriptor = FileChooserDescriptorFactory
                 .createSingleFolderDescriptor()
@@ -162,8 +167,7 @@ public class ExportDialog extends FramelessDialogWrapper {
             return;
         }
 
-        final String selectedLabel = (String) formatCombo.getSelectedItem();
-        final FileTypes fmt = selectedLabel == null ? null : FileTypes.fromLabel(selectedLabel);
+        final FileTypes fmt = (FileTypes) formatCombo.getSelectedItem();
         if (fmt == null) {
             formatCombo.requestFocus();
             return;
