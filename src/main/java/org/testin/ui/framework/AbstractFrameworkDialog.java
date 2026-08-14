@@ -98,6 +98,9 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
      * The dialog's primary component, typed: the first declared component
      * that wants the focus (display-only components never qualify).
      */
+    // Unchecked by necessity and safe by construction: a dialog names its own
+    // type parameter and declares its own components, so the first one that
+    // wants the focus is the C it said it was.
     @SuppressWarnings("unchecked")
     protected final @NotNull C component() {
         return (C) primaryComponent();
