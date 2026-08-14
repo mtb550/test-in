@@ -13,10 +13,8 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.codegen.GeneratorAction;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.logger.Logger;
 import org.testin.mappers.Config;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -179,15 +177,7 @@ public class DetailsTab {
             Services.getInstance(p, Notifier.class).softShow(p, "Updated..");
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                final ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
-                if (detailsPanel != null)
-                    detailsPanel.refreshIfShowing(tcs);
-
-                Logger.trace("Generating automation code: " + gt);
-                final GeneratorAction action = gt.getAction();
-                final TestCaseDto firstItem = tcs.getFirst();
-
-                ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, firstItem));
+                TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt);
             });
         }).show();
     }

@@ -7,7 +7,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.indexer.ProjectIndexer;
@@ -17,8 +16,6 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testCase.createDialog.TestCaseUpdateMenuDialog;
 import org.testin.util.Shortcuts;
-import org.testin.viewPanel.ViewPanel;
-import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -61,16 +58,7 @@ public class UpdateTestCaseAction extends DumbAwareAction {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 list.repaint();
-
-                final ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
-                if (detailsPanel != null)
-                    detailsPanel.refreshIfShowing(updatedItems);
-
-                Logger.trace("Generating automation code: " + gt);
-                final GeneratorAction action = gt.getAction();
-                final TestCaseDto firstItem = updatedItems.getFirst();
-
-                ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, firstItem));
+                TestCaseUpdateMenuDialog.applyAftermath(p, updatedItems, gt);
             });
         }).show();
     }

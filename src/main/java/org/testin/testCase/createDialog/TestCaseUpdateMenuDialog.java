@@ -2,12 +2,16 @@ package org.testin.testCase.createDialog;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import com.intellij.openapi.application.ApplicationManager;
+import org.testin.codegen.GeneratorAction;
 import org.testin.codegen.GeneratorType;
 import org.testin.enums.UpdateTestCaseFields;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.updateDialog.UpdateTestCaseDialog;
 import org.testin.ui.dialogs.ShortcutMenuPopup;
+import org.testin.viewPanel.ViewPanel;
+import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -22,6 +26,26 @@ public class TestCaseUpdateMenuDialog {
         this.p = p;
         this.items = items;
         this.updatedItems = updatedItems;
+    }
+
+    /**
+     * What follows an accepted update, wherever it was started from: the view
+     * panel catches up if it is showing one of the cases, and the automation
+     * code is regenerated off the EDT.
+     * <p>
+     * Every caller of this dialog needs both, and each had written both out, so
+     * a change to what an update entails had to be made once per call site.
+     */
+    public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated,
+                                      final @NotNull GeneratorType gt) {
+        final ViewPanel viewPanel = ViewToolWindowFactory.getViewPanel();
+        if (viewPanel != null) viewPanel.refreshIfShowing(updated);
+
+        Logger.trace("Generating automation code: " + gt);
+        final GeneratorAction action = gt.getAction();
+        final TestCaseDto first = updated.getFirst();
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, first));
     }
 
     public void show() {
