@@ -30,7 +30,8 @@ public class TestCaseSorter {
         final Set<UUID> unsortedIds = new HashSet<>();
 
         if (head == null) {
-            Services.getInstance(p, Notifier.class).softShow(p, "Warning", "No Head found in test cases.");
+            Services.getInstance(p, Notifier.class).softShow(p, "Order Unknown",
+                    "These test cases have no starting point, so they are shown in file order.");
             unsortedList.forEach(tc -> unsortedIds.add(tc.getId()));
             return new SortResult(unsortedList, unsortedIds);
         }

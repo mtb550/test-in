@@ -58,13 +58,13 @@ public class CodeNavigator {
                             });
 
                         } else
-                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).softShow(p, "Navigation Error: ", "Class Not Found: " + className));
+                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).softShow(p, "Navigation Failed", "Class not found: " + className));
 
                     } catch (final IndexNotReadyException ex) {
                         Logger.trace("index not ready, deferring navigation");
                         // Notifications must not be raised from inside a read action on a pooled thread.
                         ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).softShow(p, "index not ready, deferring navigation"));
+                                Services.getInstance(p, Notifier.class).softShow(p, "Waiting for indexing"));
                         DumbService.getInstance(p).runWhenSmart(() -> toCode(p, fqcn));
                     }
                 })

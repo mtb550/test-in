@@ -267,7 +267,8 @@ public final class Tools {
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
 
         if (generatedFqcn.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softShow(p, "empty fqcn , directory: " + dir.getPath());
+            Services.getInstance(p, Notifier.class).softShow(p, "Class Name Unknown",
+                    "'" + dir.getName() + "' sits outside a test cases directory, so no automation class name could be built.");
         }
 
         final int lastIdx = generatedFqcn.size() - 1;
