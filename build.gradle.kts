@@ -129,7 +129,6 @@ tasks {
 
 intellijPlatformTesting {
     runIde {
-        parallelStream()
         register("runPyCharm") {
             type = IntelliJPlatformType.PyCharm
             version = "2026.1.3"
