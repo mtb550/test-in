@@ -5,7 +5,6 @@ import com.intellij.ide.util.treeView.AbstractTreeNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.tree.LeafState;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.enums.ProjectStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
