@@ -33,6 +33,11 @@ public enum Shortcuts {
      */
     Corrections(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK)),
 
+    // Bulk JSON editors: add and remove an array item, caret on every value
+    AddArrayItem(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)),
+    RemoveArrayItem(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.SHIFT_DOWN_MASK)),
+    CaretOnEveryValue(KeyStroke.getKeyStroke(KeyEvent.VK_A, menuMask() | InputEvent.SHIFT_DOWN_MASK)),
+
     // Toolbar search (test editor + run editor)
     FocusSearch(KeyStroke.getKeyStroke(KeyEvent.VK_F, menuMask())),
 

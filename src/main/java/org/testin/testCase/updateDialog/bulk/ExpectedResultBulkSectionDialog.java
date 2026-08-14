@@ -2,17 +2,22 @@ package org.testin.testCase.updateDialog.bulk;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 public class ExpectedResultBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
-    public ExpectedResultBulkSectionDialog(final @NotNull Project p) {
-        super(p);
+    public ExpectedResultBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
+                                            final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
+        super(p, selectedItems, updatedItems);
     }
 
     @Override
     protected @NotNull String getPopupTitle() {
-        return "Bulk Edit Expected Results (Enter to Save | Tab/Arrows to Navigate)";
+        return "Bulk Edit Expected Results";
     }
 
     @Override

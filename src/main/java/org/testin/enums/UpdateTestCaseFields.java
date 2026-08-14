@@ -38,7 +38,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             Shortcuts.UpdateTestCaseDescription,
             AllIcons.Actions.Edit,
             GeneratorType.UPDATE_TEST_CASE_DESCRIPTION,
-            (p, items, updatedItems) -> new DescriptionBulkSectionDialog(p).show(items, updatedItems),
+            (p, items, updatedItems) -> new DescriptionBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getDescriptionSection,
             new TestCaseDialogKey[]{CORRECTIONS}
     ),
@@ -48,7 +48,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             Shortcuts.UpdateTestCaseExpectedResult,
             AllIcons.General.InspectionsOK,
             GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT,
-            (p, items, updatedItems) -> new ExpectedResultBulkSectionDialog(p).show(items, updatedItems),
+            (p, items, updatedItems) -> new ExpectedResultBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getExpectedResultSection,
             new TestCaseDialogKey[]{CORRECTIONS}
     ),
@@ -58,7 +58,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             Shortcuts.UpdateTestCaseModule,
             AllIcons.General.ContextHelp,
             GeneratorType.UPDATE_TEST_CASE_MODULE,
-            (p, items, updatedItems) -> new ModuleBulkSectionDialog(p).show(items, updatedItems),
+            (p, items, updatedItems) -> new ModuleBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getModuleSection,
             new TestCaseDialogKey[]{CORRECTIONS}
     ),
@@ -68,7 +68,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             Shortcuts.UpdateTestCaseTestData,
             AllIcons.Nodes.DataTables,
             GeneratorType.UPDATE_TEST_CASE_TEST_DATA,
-            (p, items, updatedItems) -> new TestDataBulkSectionDialog(p).show(items, updatedItems),
+            (p, items, updatedItems) -> new TestDataBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getTestDataSection,
             new TestCaseDialogKey[]{}
     ),
@@ -78,7 +78,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             Shortcuts.UpdateTestCasePreConditions,
             AllIcons.Actions.StepOut,
             GeneratorType.UPDATE_TEST_CASE_PRE_CONDITIONS,
-            (p, items, updatedItems) -> new PreConditionsBulkSectionDialog(p).show(items, updatedItems),
+            (p, items, updatedItems) -> new PreConditionsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPreConditionsSection,
             new TestCaseDialogKey[]{CORRECTIONS}
     ),
@@ -88,7 +88,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             Shortcuts.UpdateTestCaseSteps,
             AllIcons.Actions.ListFiles,
             GeneratorType.UPDATE_TEST_CASE_STEPS,
-            (p, items, updatedItems) -> new StepsBulkSectionDialog(p).show(items, updatedItems),
+            (p, items, updatedItems) -> new StepsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStepsSection,
             new TestCaseDialogKey[]{CORRECTIONS, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE}
     ),
@@ -98,7 +98,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             Shortcuts.UpdateTestCasePriority,
             AllIcons.Nodes.Favorite,
             GeneratorType.UPDATE_TEST_CASE_PRIORITY,
-            (p, items, updatedItems) -> new PriorityBulkSectionDialog(p).show(items, updatedItems),
+            (p, items, updatedItems) -> new PriorityBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPrioritySection,
             new TestCaseDialogKey[]{NAVIGATE_ARROWS, SET_PRIORITY}
     ),
@@ -108,7 +108,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             Shortcuts.UpdateTestCaseGroup,
             AllIcons.Nodes.Tag,
             GeneratorType.UPDATE_TEST_CASE_GROUP,
-            (p, items, updatedItems) -> new GroupBulkSectionDialog(p).show(items, updatedItems),
+            (p, items, updatedItems) -> new GroupBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getGroupSection,
             new TestCaseDialogKey[]{NAVIGATE_TAB, SELECT_GROUP}
     );
