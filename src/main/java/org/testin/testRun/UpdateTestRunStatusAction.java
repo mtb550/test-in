@@ -44,10 +44,10 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         final TestRunStatus newStatus = runEditor.getParent().getMarker().getStatus().nextStatus();
         if (newStatus == null) return;
 
-        applyStatusChange(p, runEditor, newStatus);
+        applyStatusChange(runEditor, newStatus);
     }
 
-    public void applyStatusChange(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestRunStatus newStatus) {
+    public void applyStatusChange(final @NotNull RunEditor editor, final @NotNull TestRunStatus newStatus) {
         TestRunMarker marker = editor.getParent().getMarker();
         TestRunStatus oldStatus = marker.getStatus();
 
@@ -62,7 +62,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         if (newStatus == TestRunStatus.COMPLETED && oldStatus == TestRunStatus.IN_PROGRESS)
             editor.stopExecution();
 
-        persist(p, editor, marker);
+        persist(editor, marker);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
@@ -80,7 +80,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         Services.getInstance(p, Notifier.class).softShow(p, newStatus.getLabel());
     }
 
-    public void onExecutionFinished(final @NotNull Project p, final @NotNull RunEditor editor) {
+    public void onExecutionFinished(final @NotNull RunEditor editor) {
         editor.stopExecution();
 
         TestRunMarker marker = editor.getParent().getMarker();
@@ -89,7 +89,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
 
         resetPendingToUntested(editor);
 
-        persist(p, editor, marker);
+        persist(editor, marker);
 
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
@@ -115,7 +115,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
      * Both writes go through the single-writer RunStatusService: state is
      * snapshotted on the EDT, so later clicks can never tear the persisted JSON.
      */
-    private void persist(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestRunMarker marker) {
+    private void persist(final @NotNull RunEditor editor, final @NotNull TestRunMarker marker) {
         final RunStatusService statusService = Services.getInstance(p, RunStatusService.class);
         statusService.persistMarker(p, editor.getParent().getPath(), marker.getStatus(), marker.getCreatedAt());
         statusService.persistRun(p, editor);

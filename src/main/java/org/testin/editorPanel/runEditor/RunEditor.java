@@ -429,7 +429,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     private void jumpToPageOfPendingSelection() {
         final int page = PageWindow.pageContaining(selectionToRestore, currentTestCases, pageSize);
 
-        // Not on any page any more - the case was deleted or filtered out, so
+        // Not on any page anymore - the case was deleted or filtered out, so
         // there is nothing left to restore.
         if (page == 0) selectionToRestore = null;
         else currentPage = page;
@@ -583,7 +583,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             final JBList<TestCaseDto> currentList = list;
             if (currentList == null) return;
 
-            new UpdateTestRunStatusAction(p, this, currentList).onExecutionFinished(p, this);
+            new UpdateTestRunStatusAction(p, this, currentList).onExecutionFinished(this);
             return;
         }
 
@@ -652,7 +652,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         final JBList<TestCaseDto> currentList = list;
         if (currentList == null) return;
 
-        new UpdateTestRunStatusAction(p, this, currentList).applyStatusChange(p, this, TestRunStatus.IN_PROGRESS);
+        new UpdateTestRunStatusAction(p, this, currentList).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
         refreshStartButton();
     }
