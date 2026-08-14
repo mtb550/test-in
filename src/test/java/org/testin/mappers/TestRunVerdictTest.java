@@ -79,11 +79,26 @@ public class TestRunVerdictTest {
     }
 
     @Test
-    public void blockingAFailedCaseKeepsTheBugForNow() {
+    public void aCaseBlockedInBetweenStillClearsWhenItFinallyPasses() {
         final TestRunItems item = failedWithBug();
 
-        // Only FAILED -> PASSED clears today. Blocked is not a pass, so the bug
-        // that was reported may still be real - see the note on recordVerdict.
+        // The route does not matter, only the destination: details collected
+        // while failing are just as stale after a detour through Blocked.
+        item.recordVerdict(TestStatus.BLOCKED, "tester");
+        item.recordVerdict(TestStatus.PASSED, "tester");
+
+        assertEquals(item.getBugSeverity(), BugSeverity.EMPTY);
+        assertEquals(item.getBugPriority(), BugPriority.EMPTY);
+        assertEquals(item.getActualResult(), "");
+        assertEquals(item.getStacktrace(), "");
+    }
+
+    @Test
+    public void blockingAFailedCaseKeepsTheDetails() {
+        final TestRunItems item = failedWithBug();
+
+        // Blocked is not a pass - the reported bug may still be real, so only
+        // passing clears. See the note on recordVerdict.
         item.recordVerdict(TestStatus.BLOCKED, "tester");
 
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR);
