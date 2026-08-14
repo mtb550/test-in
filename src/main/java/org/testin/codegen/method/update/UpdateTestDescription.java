@@ -3,12 +3,12 @@ package org.testin.codegen.method.update;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorAction;
+import org.testin.codegen.GenAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 
-public class UpdateTestDescription extends UpdateTestBase implements GeneratorAction {
+public class UpdateTestDescription extends UpdateTestBase implements GenAction {
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {

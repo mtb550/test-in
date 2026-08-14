@@ -3,7 +3,7 @@ package org.testin.codegen.method.update;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorAction;
+import org.testin.codegen.GenAction;
 import org.testin.logger.Logger;
 
 /**
@@ -12,7 +12,7 @@ import org.testin.logger.Logger;
  * {@code @Test} annotation attribute to change.
  */
 @AllArgsConstructor
-public final class NoOpCodeUpdate implements GeneratorAction {
+public final class NoOpCodeUpdate implements GenAction {
 
     private final @NotNull String fieldName;
 

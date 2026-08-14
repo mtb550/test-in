@@ -3,8 +3,8 @@ package org.testin.testCase.createDialog;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import com.intellij.openapi.application.ApplicationManager;
-import org.testin.codegen.GeneratorAction;
-import org.testin.codegen.GeneratorType;
+import org.testin.codegen.GenAction;
+import org.testin.codegen.GenType;
 import org.testin.enums.UpdateTestCaseFields;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -20,9 +20,9 @@ public class TestCaseUpdateMenuDialog {
 
     private final @NotNull Project p;
     private final @NotNull List<TestCaseDto> items;
-    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GeneratorType> updatedItems;
+    private final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType> updatedItems;
 
-    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GeneratorType> updatedItems) {
+    public TestCaseUpdateMenuDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull BiConsumer<@NotNull List<TestCaseDto>, @NotNull GenType> updatedItems) {
         this.p = p;
         this.items = items;
         this.updatedItems = updatedItems;
@@ -37,12 +37,12 @@ public class TestCaseUpdateMenuDialog {
      * a change to what an update entails had to be made once per call site.
      */
     public static void applyAftermath(final @NotNull Project p, final @NotNull List<TestCaseDto> updated,
-                                      final @NotNull GeneratorType gt) {
+                                      final @NotNull GenType gt) {
         final ViewPanel viewPanel = ViewToolWindowFactory.getViewPanel();
         if (viewPanel != null) viewPanel.refreshIfShowing(updated);
 
         Logger.trace("Generating automation code: " + gt);
-        final GeneratorAction action = gt.getAction();
+        final GenAction action = gt.getAction();
         final TestCaseDto first = updated.getFirst();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> action.execute(p, first));
@@ -61,7 +61,7 @@ public class TestCaseUpdateMenuDialog {
                 UpdateTestCaseFields::bindShortcut,
                 selectedItem -> {
 
-                    final GeneratorType gt = selectedItem.getGt();
+                    final GenType gt = selectedItem.getGt();
                     Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
 
                     if (isSingle) {

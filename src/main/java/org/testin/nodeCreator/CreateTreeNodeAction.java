@@ -57,7 +57,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);
 
-            dt.getCodeGenerator().execute(p, dir);
+            dt.getCodegen().execute(p, dir);
 
         };
 

@@ -6,7 +6,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorAction;
+import org.testin.codegen.GenAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
@@ -14,7 +14,7 @@ import org.testin.util.Tools;
 
 import java.util.List;
 
-public class RenameJavaClass implements GeneratorAction {
+public class RenameJavaClass implements GenAction {
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {

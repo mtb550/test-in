@@ -9,7 +9,7 @@ import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.codegen.GeneratorType;
+import org.testin.codegen.GenType;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.indexer.ProjectIndexer;
@@ -86,7 +86,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
         final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);
         for (final TestCaseDto tc : selectedItems) {
             indexer.removeTestCase(dir.getPath(), tc.getId());
-            GeneratorType.REMOVE_TEST_CASE.getAction().execute(p, tc);
+            GenType.REMOVE_TEST_CASE.getAction().execute(p, tc);
         }
 
         for (int i = selectedItems.size() - 1; i >= 0; i--) {

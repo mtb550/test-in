@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.codegen.GeneratorType;
+import org.testin.codegen.GenType;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.mappers.dto.TestCaseDto;
@@ -59,7 +59,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
             Services.getInstance(p, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
             Services.getInstance(p, Notifier.class).softShow(p, "Created");
 
-            GeneratorType.CREATE_TEST_CASE.getAction().execute(p, tc);
+            GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
 
             ApplicationManager.getApplication().invokeLater(() -> editor.selectTestCase(tc));
 

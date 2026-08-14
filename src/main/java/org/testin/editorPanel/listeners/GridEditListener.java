@@ -3,7 +3,7 @@ package org.testin.editorPanel.listeners;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorType;
+import org.testin.codegen.GenType;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -84,7 +84,7 @@ public class GridEditListener implements TableModelListener {
             return;
         }
 
-        final GeneratorType generator = attr.getGeneratorType();
+        final GenType generator = attr.getGenType();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc);

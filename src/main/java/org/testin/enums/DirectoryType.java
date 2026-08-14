@@ -6,9 +6,9 @@ import com.intellij.ui.SimpleTextAttributes;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorAction;
+import org.testin.codegen.GenAction;
+import org.testin.codegen.GenType;
 import org.testin.codegen.NoJavaCode;
-import org.testin.codegen.GeneratorType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.nodeCreator.*;
 import org.testin.services.Services;
@@ -25,9 +25,9 @@ public enum DirectoryType {
             AllIcons.Nodes.Project,
             ".tp",
             p -> new NotCreatableFromTree("Test Project"),
-            (p, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
+            (p, dir) -> GenType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath(), removed -> {
-                if (removed) GeneratorType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
+                if (removed) GenType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             }),
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
@@ -61,9 +61,9 @@ public enum DirectoryType {
             AllIcons.Nodes.WebFolder,
             ".tsp",
             CreateTestSetPackage::new,
-            (p, dir) -> GeneratorType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
+            (p, dir) -> GenType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath(), removed -> {
-                if (removed) GeneratorType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
+                if (removed) GenType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             }),
             SimpleTextAttributes.REGULAR_ATTRIBUTES
@@ -86,9 +86,9 @@ public enum DirectoryType {
             AllIcons.Vcs.Changelist,
             ".ts",
             CreateTestSet::new,
-            (p, dir) -> GeneratorType.CREATE_TEST_SET.getAction().execute(p, dir),
+            (p, dir) -> GenType.CREATE_TEST_SET.getAction().execute(p, dir),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSet(dir.getPath(), removed -> {
-                if (removed) GeneratorType.REMOVE_TEST_SET.getAction().execute(p, dir);
+                if (removed) GenType.REMOVE_TEST_SET.getAction().execute(p, dir);
                 onRemoved.accept(removed);
             }),
             SimpleTextAttributes.REGULAR_ATTRIBUTES
@@ -126,7 +126,7 @@ public enum DirectoryType {
      * Never null: a type that produces no Java carries {@link NoJavaCode}, so
      * callers run it either way rather than testing whether one exists.
      */
-    private final @NotNull GeneratorAction codeGenerator;
+    private final @NotNull GenAction codegen;
 
     private final @NotNull RemoveHandler removeHandler;
     private final @NotNull SimpleTextAttributes attributes;

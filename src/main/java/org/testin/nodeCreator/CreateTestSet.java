@@ -4,7 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorType;
+import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.DirectoryMapper;
@@ -25,7 +25,7 @@ public class CreateTestSet implements NodeCreator {
         Services.getInstance(p, ProjectIndexer.class).addTestSet(ts);
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
-                GeneratorType.CREATE_TEST_SET.getAction().execute(p, ts);
+                GenType.CREATE_TEST_SET.getAction().execute(p, ts);
             } catch (final Exception ex) {
                 Logger.error("Failed to create Java class: " + ex.getMessage());
             }

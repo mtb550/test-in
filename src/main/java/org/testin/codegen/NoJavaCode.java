@@ -15,7 +15,7 @@ import org.testin.logger.Logger;
  * ask whether there is a generator at all.
  */
 @AllArgsConstructor
-public final class NoJavaCode implements GeneratorAction {
+public final class NoJavaCode implements GenAction {
 
     private final @NotNull String nodeType;
 

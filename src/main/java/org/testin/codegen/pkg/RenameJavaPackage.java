@@ -8,7 +8,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorAction;
+import org.testin.codegen.GenAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
@@ -17,7 +17,7 @@ import org.testin.util.Tools;
 import java.io.IOException;
 import java.util.List;
 
-public class RenameJavaPackage implements GeneratorAction {
+public class RenameJavaPackage implements GenAction {
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {

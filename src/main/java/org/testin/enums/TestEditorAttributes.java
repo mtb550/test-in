@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorType;
+import org.testin.codegen.GenType;
 import org.testin.editorPanel.Shared;
 import org.testin.importExport.imports.ImportSetter;
 import org.testin.mappers.Config;
@@ -35,7 +35,7 @@ public enum TestEditorAttributes {
             (tc, p) -> String.valueOf(tc.getId()),
             (p, tc, v) -> {
             },
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     ),
 
     /// TODO:: added to tool bar details, to be shown but disabled
@@ -49,7 +49,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getDescription(),
             (p, tc, v) -> tc.setDescription(Services.getInstance(p, Tools.class).sanitizeDescription(v)),
-            GeneratorType.UPDATE_TEST_CASE_DESCRIPTION
+            GenType.UPDATE_TEST_CASE_DESCRIPTION
     ),
 
     EXPECTED_RESULT(
@@ -62,7 +62,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getExpectedResult(),
             (p, tc, v) -> tc.setExpectedResult(v),
-            GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT
+            GenType.UPDATE_TEST_CASE_EXPECTED_RESULT
     ),
 
     STEPS(
@@ -75,7 +75,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> String.join(", ", tc.getSteps()),
             (p, tc, v) -> tc.setSteps(Services.getInstance(p, Tools.class).parseStepsSafe(v)),
-            GeneratorType.UPDATE_TEST_CASE_STEPS
+            GenType.UPDATE_TEST_CASE_STEPS
     ),
 
     PRIORITY(
@@ -88,7 +88,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getPriority().getName(),
             (p, tc, v) -> tc.setPriority(Services.getInstance(p, Tools.class).parsePrioritySafe(v)),
-            GeneratorType.UPDATE_TEST_CASE_PRIORITY
+            GenType.UPDATE_TEST_CASE_PRIORITY
     ) {
         @Override
         public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges,
@@ -108,7 +108,7 @@ public enum TestEditorAttributes {
             (tc, p) -> String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc)),
             (p, tc, v) -> {
             },
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     ),
 
     REFERENCE(
@@ -121,7 +121,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getReference(),
             (p, tc, v) -> tc.setReference(v),
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     ),
 
     TEST_DATA(
@@ -134,7 +134,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getTestData(),
             (p, tc, v) -> tc.setTestData(v),
-            GeneratorType.UPDATE_TEST_CASE_TEST_DATA
+            GenType.UPDATE_TEST_CASE_TEST_DATA
     ),
 
     PRE_CONDITIONS(
@@ -147,7 +147,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getPreConditions(),
             (p, tc, v) -> tc.setPreConditions(v),
-            GeneratorType.UPDATE_TEST_CASE_PRE_CONDITIONS
+            GenType.UPDATE_TEST_CASE_PRE_CONDITIONS
     ),
 
     GROUP(
@@ -160,7 +160,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
             (p, tc, v) -> tc.setGroup(Services.getInstance(p, Tools.class).parseGroupsSafe(v)),
-            GeneratorType.UPDATE_TEST_CASE_GROUP
+            GenType.UPDATE_TEST_CASE_GROUP
     ) {
         @Override
         public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges,
@@ -180,7 +180,7 @@ public enum TestEditorAttributes {
             (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
             (p, tc, v) -> {
             },
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     ),
 
     ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
@@ -195,7 +195,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getModule(),
             (p, tc, v) -> tc.setModule(v),
-            GeneratorType.UPDATE_TEST_CASE_MODULE
+            GenType.UPDATE_TEST_CASE_MODULE
     ),
 
     STATUS(
@@ -208,7 +208,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getStatus().getDisplayText(),
             (p, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v)),
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     ),
 
     CREATE_BY(
@@ -221,7 +221,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getCreatedBy(),
             (p, tc, v) -> tc.setCreatedBy(v),
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     ),
 
     UPDATE_BY(
@@ -234,7 +234,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getUpdatedBy(),
             (p, tc, v) -> tc.setUpdatedBy(v),
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     ),
 
     CREATE_AT(
@@ -247,7 +247,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
             (p, tc, v) -> tc.setCreatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     ),
 
     UPDATE_AT(
@@ -260,7 +260,7 @@ public enum TestEditorAttributes {
             true,
             (tc, p) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
             (p, tc, v) -> tc.setUpdatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
-            GeneratorType.NO_CODE_CHANGE
+            GenType.NO_CODE_CHANGE
     );
 
     private final @NotNull String name;
@@ -276,7 +276,7 @@ public enum TestEditorAttributes {
     /**
      * Automation code update to run when this attribute changes.
      */
-    private final @NotNull GeneratorType generatorType;
+    private final @NotNull GenType genType;
 
     /**
      * The value as the grid shows it. Steps get one line each there, so ALT+ENTER

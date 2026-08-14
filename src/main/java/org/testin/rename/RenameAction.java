@@ -100,7 +100,7 @@ public class RenameAction extends AbstractProjectTreeAction {
                              final @Nullable Runnable onDone) {
         Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 
-        dispatchRenameCodeGenerator(dir, newName);
+        dispatchRenameCodegen(dir, newName);
 
         final Path oldPath = dir.getPath();
         final Path newPath = oldPath.getParent().resolve(newName);
@@ -122,7 +122,7 @@ public class RenameAction extends AbstractProjectTreeAction {
 
 
     // todo, to be moved to the codegen package and enhanced, later (#51)
-    private void dispatchRenameCodeGenerator(final @NotNull DirectoryDto dir, final @NotNull String newName) {
+    private void dispatchRenameCodegen(final @NotNull DirectoryDto dir, final @NotNull String newName) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
 
         if (dir instanceof TestProjectDirectoryDto || dir instanceof TestSetPackageDirectoryDto) {

@@ -6,7 +6,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorType;
+import org.testin.codegen.GenType;
 import org.testin.statusBar.IStatusBarItem;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
@@ -37,7 +37,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Description",
             Shortcuts.UpdateTestCaseDescription,
             AllIcons.Actions.Edit,
-            GeneratorType.UPDATE_TEST_CASE_DESCRIPTION,
+            GenType.UPDATE_TEST_CASE_DESCRIPTION,
             (p, items, updatedItems) -> new DescriptionBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getDescriptionSection,
             new TestCaseDialogKey[]{CORRECTIONS}
@@ -47,7 +47,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Expected Results",
             Shortcuts.UpdateTestCaseExpectedResult,
             AllIcons.General.InspectionsOK,
-            GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT,
+            GenType.UPDATE_TEST_CASE_EXPECTED_RESULT,
             (p, items, updatedItems) -> new ExpectedResultBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getExpectedResultSection,
             new TestCaseDialogKey[]{CORRECTIONS}
@@ -57,7 +57,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Module",
             Shortcuts.UpdateTestCaseModule,
             AllIcons.General.ContextHelp,
-            GeneratorType.UPDATE_TEST_CASE_MODULE,
+            GenType.UPDATE_TEST_CASE_MODULE,
             (p, items, updatedItems) -> new ModuleBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getModuleSection,
             new TestCaseDialogKey[]{CORRECTIONS}
@@ -67,7 +67,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Test Data",
             Shortcuts.UpdateTestCaseTestData,
             AllIcons.Nodes.DataTables,
-            GeneratorType.UPDATE_TEST_CASE_TEST_DATA,
+            GenType.UPDATE_TEST_CASE_TEST_DATA,
             (p, items, updatedItems) -> new TestDataBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getTestDataSection,
             new TestCaseDialogKey[]{}
@@ -77,7 +77,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Pre Conditions",
             Shortcuts.UpdateTestCasePreConditions,
             AllIcons.Actions.StepOut,
-            GeneratorType.UPDATE_TEST_CASE_PRE_CONDITIONS,
+            GenType.UPDATE_TEST_CASE_PRE_CONDITIONS,
             (p, items, updatedItems) -> new PreConditionsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPreConditionsSection,
             new TestCaseDialogKey[]{CORRECTIONS}
@@ -87,7 +87,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Steps",
             Shortcuts.UpdateTestCaseSteps,
             AllIcons.Actions.ListFiles,
-            GeneratorType.UPDATE_TEST_CASE_STEPS,
+            GenType.UPDATE_TEST_CASE_STEPS,
             (p, items, updatedItems) -> new StepsBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getStepsSection,
             new TestCaseDialogKey[]{CORRECTIONS, ADD_STEP, REMOVE_STEP, NAVIGATE_TAB, AUTO_COMPLETE}
@@ -97,7 +97,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Priority",
             Shortcuts.UpdateTestCasePriority,
             AllIcons.Nodes.Favorite,
-            GeneratorType.UPDATE_TEST_CASE_PRIORITY,
+            GenType.UPDATE_TEST_CASE_PRIORITY,
             (p, items, updatedItems) -> new PriorityBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getPrioritySection,
             new TestCaseDialogKey[]{NAVIGATE_ARROWS, SET_PRIORITY}
@@ -107,7 +107,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
             "Group",
             Shortcuts.UpdateTestCaseGroup,
             AllIcons.Nodes.Tag,
-            GeneratorType.UPDATE_TEST_CASE_GROUP,
+            GenType.UPDATE_TEST_CASE_GROUP,
             (p, items, updatedItems) -> new GroupBulkSectionDialog(p, items, updatedItems).open(),
             TestCaseBaseDialog::getGroupSection,
             new TestCaseDialogKey[]{NAVIGATE_TAB, SELECT_GROUP}
@@ -116,7 +116,7 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     private final @NotNull String name;
     private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;
-    private final @NotNull GeneratorType gt;
+    private final @NotNull GenType gt;
     private final @NotNull IBulkEditorAction bulkAction;
     private final @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
 

@@ -10,7 +10,7 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.codegen.GeneratorAction;
+import org.testin.codegen.GenAction;
 import org.testin.enums.Group;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -20,7 +20,7 @@ import org.testin.util.Tools;
 import java.io.IOException;
 import java.util.List;
 
-public class CreateTestMethod implements GeneratorAction {
+public class CreateTestMethod implements GenAction {
 
     /**
      * The pieces of a fully qualified method name: everything before the method

@@ -10,12 +10,12 @@ import org.testin.util.OptionalPlugin;
 /**
  * Every automation-code operation the plugin can perform. Constants carry no
  * PSI-dependent classes: Java-backed actions are resolved lazily through
- * {@link GeneratorRegistry}, which is only class-loaded when the Java plugin
+ * {@link GenRegistry}, which is only class-loaded when the Java plugin
  * is available — so this enum is safe to load in IDEs without Java support
  * (PyCharm, GoLand, WebStorm, ...).
  */
 @Getter
-public enum GeneratorType {
+public enum GenType {
     CREATE_TEST_PROJECT(
             "Create Test Project",
             "Create Automation Test Project"
@@ -141,7 +141,7 @@ public enum GeneratorType {
     /**
      * Returned when the Java plugin is absent: notify once per project, then skip quietly.
      */
-    private static final @NotNull GeneratorAction JAVA_UNAVAILABLE = (p, obj) -> OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
+    private static final @NotNull GenAction JAVA_UNAVAILABLE = (p, obj) -> OptionalPlugin.JAVA.isAvailableOrWarnOnce(p);
 
     private final @NotNull String description;
     private final @NotNull String tooltip;
@@ -150,23 +150,23 @@ public enum GeneratorType {
      * Set for data-only fields that never change generated code; null for Java-backed actions.
      */
     @Getter(AccessLevel.NONE)
-    private final @Nullable GeneratorAction dataOnlyAction;
+    private final @Nullable GenAction dataOnlyAction;
 
-    GeneratorType(final @NotNull String description, final @NotNull String tooltip) {
+    GenType(final @NotNull String description, final @NotNull String tooltip) {
         this.description = description;
         this.tooltip = tooltip;
         this.dataOnlyAction = null;
     }
 
-    GeneratorType(final @NotNull String description, final @NotNull String tooltip, final @NotNull String dataOnlyField) {
+    GenType(final @NotNull String description, final @NotNull String tooltip, final @NotNull String dataOnlyField) {
         this.description = description;
         this.tooltip = tooltip;
         this.dataOnlyAction = new NoOpCodeUpdate(dataOnlyField);
     }
 
-    public @NotNull GeneratorAction getAction() {
+    public @NotNull GenAction getAction() {
         if (dataOnlyAction != null) return dataOnlyAction;
         if (!OptionalPlugin.JAVA.isAvailable()) return JAVA_UNAVAILABLE;
-        return GeneratorRegistry.actionFor(this);
+        return GenRegistry.actionFor(this);
     }
 }

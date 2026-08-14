@@ -2,13 +2,13 @@ package org.testin.codegen.method.update;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.GeneratorAction;
+import org.testin.codegen.GenAction;
 import org.testin.enums.Group;
 import org.testin.mappers.dto.TestCaseDto;
 
 import java.util.List;
 
-public class UpdateTestGroup extends UpdateTestBase implements GeneratorAction {
+public class UpdateTestGroup extends UpdateTestBase implements GenAction {
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
