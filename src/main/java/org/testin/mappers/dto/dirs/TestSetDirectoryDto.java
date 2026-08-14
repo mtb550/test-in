@@ -5,10 +5,8 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestSetMarker;
 
-import java.nio.file.Path;
 
 @Setter
 @Getter
@@ -21,10 +19,6 @@ public class TestSetDirectoryDto extends DirectoryDto {
     private TestSetMarker marker = new TestSetMarker();
 
 
-    @Override
-    public @Nullable Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
-        return indexer.getTestSetByPath(folder);
-    }
 
 
     @Override

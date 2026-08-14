@@ -4,10 +4,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestRunPackageMarker;
 
-import java.nio.file.Path;
 
 @Setter
 @Getter
@@ -20,10 +18,6 @@ public class TestRunPackageDirectoryDto extends DirectoryDto {
     private TestRunPackageMarker marker = new TestRunPackageMarker();
 
 
-    @Override
-    public @NotNull Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
-        throw new RuntimeException("Could not resolve directory " + folder + ", parent: " + getClass().getSimpleName());
-    }
 
 
     @Override

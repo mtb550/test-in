@@ -5,7 +5,6 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.IMarker;
 
 import java.nio.file.Path;
@@ -50,8 +49,6 @@ public abstract class DirectoryDto {
     @NonNull
     public abstract String getMarkerFileName();
 
-    @Nullable
-    public abstract Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer);
 
     // Capability flags replace the instanceof chains that used to branch on
     // node type across the actions (issue #37): a new node type declares what
