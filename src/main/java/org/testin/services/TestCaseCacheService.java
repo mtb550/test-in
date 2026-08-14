@@ -101,7 +101,7 @@ public final class TestCaseCacheService implements Disposable {
                 addTo(newExpectedResults, tc.getExpectedResult());
                 addTo(newModules, tc.getModule());
                 // Jackson can leave steps null on hand-edited JSON despite the field default.
-                Optional.ofNullable(tc.getSteps()).ifPresent(stepList -> stepList.forEach(s -> addTo(newSteps, s)));
+                Optional.of(tc.getSteps()).ifPresent(stepList -> stepList.forEach(s -> addTo(newSteps, s)));
             }
 
             replace(descriptions, newDescriptions);
@@ -134,7 +134,7 @@ public final class TestCaseCacheService implements Disposable {
         addExpectedResult(tc.getExpectedResult());
         addModule(tc.getModule());
         // Jackson can leave steps null on hand-edited JSON despite the field default.
-        Optional.ofNullable(tc.getSteps()).ifPresent(stepList -> stepList.forEach(this::addStep));
+        Optional.of(tc.getSteps()).ifPresent(stepList -> stepList.forEach(this::addStep));
     }
 
     @Override

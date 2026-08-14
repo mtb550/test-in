@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.RoundedBadge;
 import org.testin.enums.RunStatus;
-import org.testin.enums.TestCardStatus;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.mappers.dto.TestCaseDto;
 
@@ -43,15 +42,7 @@ public class TestCard extends BaseCard {
         final RunStatus runStatus = tc.getTempStatus();
         this.isRunning = runStatus == RunStatus.RUNNING;
 
-        if (runStatus != RunStatus.IDLE) {
-            final TestCardStatus status = TestCardStatus.from(runStatus);
-            if (status != null) {
-                badges.add(new RoundedBadge(status.getLabel(), status.getBadgeColor()));
-            } else {
-                final JBColor gray = new JBColor(new Color(180, 180, 180), new Color(120, 120, 120));
-                badges.add(new RoundedBadge(runStatus.name(), gray));
-            }
-        }
+        if (runStatus.hasBadge()) badges.add(new RoundedBadge(runStatus.getBadgeLabel(), runStatus.getBadgeColor()));
 
         updateUI(index, TestEditorAttributes.DESCRIPTION.getTestValueExtractor().execute(tc, p), badges, details);
     }
