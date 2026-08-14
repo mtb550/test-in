@@ -239,8 +239,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                             list.getEmptyText().setText("No test cases found in this run.");
                         }
                     }
-                    final StartExecutionBtn startBtn = toolBar.getToolbarItem(StartExecutionBtn.class);
-                    if (startBtn != null) startBtn.updateEnabledState();
+                    toolBar.getToolbarItem(StartExecutionBtn.class).updateEnabledState();
                     refreshView();
                 });
             } catch (final Exception ex) {
@@ -331,13 +330,8 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-        final FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
-        if (toolBarFilter != null)
-            toolBarFilter.clearFilters();
-
-        final SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
-        if (toolBarSearch != null)
-            toolBarSearch.resetSearchQuery();
+        toolBar.getToolbarItem(FilterPopupBtn.class).clearFilters();
+        toolBar.getToolbarItem(SearchTxt.class).resetSearchQuery();
 
         rememberSelection();
 
@@ -360,12 +354,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public @NotNull Set<RunEditorAttributes> getSelectedDetails() {
-        final AbstractToolbarPanel baseToolBar = getToolBar();
-        final RunDetailsPopupBtn popup = baseToolBar.getToolbarItem(RunDetailsPopupBtn.class);
-        if (popup != null) {
-            return popup.getSelectedDetails();
-        }
-        return Collections.emptySet();
+        return getToolBar().getToolbarItem(RunDetailsPopupBtn.class).getSelectedDetails();
     }
 
     @Override
@@ -527,10 +516,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         final FilterPopupBtn filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
 
-        final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
-        final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
-        final Set<String> moduleFilter = filterPopup != null ? filterPopup.getSelectedModule() : Collections.emptySet();
-        final Set<TestStatus> statusFilter = filterPopup != null ? filterPopup.getSelectedStatus() : Collections.emptySet();
+        final Set<Group> groupFilter = filterPopup.getSelectedGroup();
+        final Set<Priority> priorityFilter = filterPopup.getSelectedPriority();
+        final Set<String> moduleFilter = filterPopup.getSelectedModule();
+        final Set<TestStatus> statusFilter = filterPopup.getSelectedStatus();
 
         synchronized (allTestCases) {
             return TestCaseFilter.filter(

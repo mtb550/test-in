@@ -117,10 +117,7 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
     }
 
     private void updateStartButton(final @NotNull RunEditor editor) {
-        StartExecutionBtn startBtn = editor.getToolBar().getToolbarItem(StartExecutionBtn.class);
-        if (startBtn != null) {
-            startBtn.updateEnabledState();
-        }
+        editor.getToolBar().getToolbarItem(StartExecutionBtn.class).updateEnabledState();
     }
 
 }

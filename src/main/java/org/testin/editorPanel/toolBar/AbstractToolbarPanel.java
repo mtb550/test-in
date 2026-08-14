@@ -38,8 +38,20 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         this.searchTxt = new SearchTxt(callbacks::onToolBarSearchValueChanged, callbacks::onToolBarSearchFocusReleased);
     }
 
+    /**
+     * The toolbar's item of that class.
+     * <p>
+     * Throws rather than returning null: every caller names a concrete button
+     * that its own toolbar registers, so a miss is a wiring mistake and not a
+     * state to handle. The {@code @NotNull} contract already made the platform's
+     * instrumentation throw here — this only says which class was missing.
+     */
     public <T extends IToolbarItem> @NotNull T getToolbarItem(final @NotNull Class<T> itemClass) {
-        return itemClass.cast(toolbarItems.get(itemClass));
+        final IToolbarItem item = toolbarItems.get(itemClass);
+        if (item == null) {
+            throw new IllegalStateException(itemClass.getSimpleName() + " is not registered on " + getClass().getSimpleName());
+        }
+        return itemClass.cast(item);
     }
 
     /**

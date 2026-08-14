@@ -268,8 +268,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         if (tc == null) return;
 
         if (!currentTestCases.contains(tc)) {
-            final FilterPopupBtn popup = toolBar.getToolbarItem(FilterPopupBtn.class);
-            if (popup != null) popup.resetToolBarFilter();
+            toolBar.getToolbarItem(FilterPopupBtn.class).resetToolBarFilter();
 
             currentTestCases.clear();
             currentTestCases.addAll(getFilteredList());
@@ -394,15 +393,8 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-        final FilterPopupBtn toolBarFilter = toolBar.getToolbarItem(FilterPopupBtn.class);
-        if (toolBarFilter != null) {
-            toolBarFilter.clearFilters();
-        }
-
-        final SearchTxt toolBarSearch = toolBar.getToolbarItem(SearchTxt.class);
-        if (toolBarSearch != null) {
-            toolBarSearch.resetSearchQuery();
-        }
+        toolBar.getToolbarItem(FilterPopupBtn.class).clearFilters();
+        toolBar.getToolbarItem(SearchTxt.class).resetSearchQuery();
 
         rememberSelection();
 
@@ -418,12 +410,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public @NotNull Set<TestEditorAttributes> getSelectedDetails() {
-        final AbstractToolbarPanel baseToolBar = getToolBar();
-        final TestDetailsPopupBtn popup = baseToolBar.getToolbarItem(TestDetailsPopupBtn.class);
-        if (popup != null) {
-            return popup.getSelectedDetails();
-        }
-        return Collections.emptySet();
+        return getToolBar().getToolbarItem(TestDetailsPopupBtn.class).getSelectedDetails();
     }
 
     public void refreshView() {
@@ -621,9 +608,9 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         final FilterPopupBtn filterPopup = toolBar.getToolbarItem(FilterPopupBtn.class);
 
-        final Set<Group> groupFilter = filterPopup != null ? filterPopup.getSelectedGroup() : Collections.emptySet();
-        final Set<Priority> priorityFilter = filterPopup != null ? filterPopup.getSelectedPriority() : Collections.emptySet();
-        final Set<String> moduleFilter = filterPopup != null ? filterPopup.getSelectedModule() : Collections.emptySet();
+        final Set<Group> groupFilter = filterPopup.getSelectedGroup();
+        final Set<Priority> priorityFilter = filterPopup.getSelectedPriority();
+        final Set<String> moduleFilter = filterPopup.getSelectedModule();
 
         synchronized (allTestCases) {
             return TestCaseFilter.filter(
