@@ -77,7 +77,7 @@ public class RenameAction extends AbstractProjectTreeAction {
         }
 
         final String oldName = dir.getName();
-        applyRename(dir, newName, () -> confirmRenamed(parent.resolve(newName)));
+        applyRename(dir, newName, () -> Services.getInstance(p, Notifier.class).softShow(p, "Renamed"));
 
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.
@@ -120,16 +120,6 @@ public class RenameAction extends AbstractProjectTreeAction {
         });
     }
 
-    /**
-     * Read back from the indexer cache rather than assumed: renameNode is
-     * asynchronous and runs its callback whether the VFS rename succeeded or
-     * failed, and a failure raises its own error balloon.
-     */
-    private void confirmRenamed(final @NotNull Path renamed) {
-        if (!Services.getInstance(p, ProjectIndexer.class).nodeExists(renamed)) return;
-
-        Services.getInstance(p, Notifier.class).softShow(p, "Renamed");
-    }
 
     // todo, to be moved to the codegen package and enhanced, later (#51)
     private void dispatchRenameCodeGenerator(final @NotNull DirectoryDto dir, final @NotNull String newName) {

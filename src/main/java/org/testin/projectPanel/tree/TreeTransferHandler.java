@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntConsumer;
 import java.util.function.Predicate;
 
 /**
@@ -282,10 +283,9 @@ public class TreeTransferHandler extends TransferHandler {
             moveNodes(sources, target);
         } else {
             final List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
-            final List<Path> copies = sources.stream().map(source -> target.getPath().resolve(source.getName())).toList();
-            Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), () -> {
+            Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
                 refresh.run();
-                confirmLanded("pasted", copies);
+                confirmLanded("pasted", copied);
             });
         }
 
@@ -294,13 +294,10 @@ public class TreeTransferHandler extends TransferHandler {
 
     /**
      * Confirms what actually arrived, for both the clipboard paste and the drop.
-     * Copy and move run their completion callback whether the VFS operation
-     * succeeded or failed - a failure raises its own error balloon - so the
-     * result is read back from the indexer cache instead of assumed (#62).
+     * The count comes from the indexer, which reports how many of the operations
+     * it ran succeeded (#66, F2).
      */
-    private void confirmLanded(final @NotNull String outcome, final @NotNull List<Path> paths) {
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final int landed = (int) paths.stream().filter(indexer::nodeExists).count();
+    private void confirmLanded(final @NotNull String outcome, final int landed) {
         if (landed == 0) return;
 
         Services.getInstance(p, Notifier.class).softShowCounted(p, "Node", outcome, landed);
@@ -343,7 +340,7 @@ public class TreeTransferHandler extends TransferHandler {
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
 
-        moveBatch(oldPaths, newPaths, () -> confirmLanded("moved", newPaths));
+        moveBatch(oldPaths, newPaths, moved -> confirmLanded("moved", moved));
 
         Services.getInstance(p, TreeUndoService.class).push(new TreeUndoService.TreeOperation(
                 "Move " + describe(sources),
@@ -361,17 +358,20 @@ public class TreeTransferHandler extends TransferHandler {
      * the nodes moved would double-report one keystroke.
      */
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to,
-                           final @Nullable Runnable onDone) {
+                           final @Nullable IntConsumer onDone) {
         final AtomicInteger remaining = new AtomicInteger(from.size());
+        final AtomicInteger moved = new AtomicInteger();
+
         for (int i = 0; i < from.size(); i++) {
-            Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), () -> {
+            Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), wasMoved -> {
                 // The move is asynchronous, so this can land after the project
                 // closed; refreshing a disposed tree throws.
                 if (p.isDisposed()) return;
+                if (wasMoved) moved.incrementAndGet();
                 if (remaining.decrementAndGet() != 0) return;
 
                 refresh.run();
-                if (onDone != null) onDone.run();
+                if (onDone != null) onDone.accept(moved.get());
             });
         }
     }
