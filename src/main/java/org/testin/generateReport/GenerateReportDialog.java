@@ -153,8 +153,14 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
 
         final String ext = fmt.getExtension();
         if (!fileName.endsWith(ext)) {
+            // Only a tail that is itself a known extension is replaced. Cutting at
+            // the last dot regardless turned "Sprint 1.2 Report" into "Sprint 1.pdf".
             final int dot = fileName.lastIndexOf('.');
-            fileName = dot >= 0 ? fileName.substring(0, dot) + ext : fileName + ext;
+            final String tail = dot >= 0 ? fileName.substring(dot) : "";
+            final boolean tailIsAnExtension = Arrays.stream(FileTypes.values())
+                    .anyMatch(type -> type.getExtension().equalsIgnoreCase(tail));
+
+            fileName = tailIsAnExtension ? fileName.substring(0, dot) + ext : fileName + ext;
         }
 
         selectedFile = new File(folder, fileName);
