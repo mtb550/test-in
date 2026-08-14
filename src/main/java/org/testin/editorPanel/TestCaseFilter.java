@@ -26,7 +26,10 @@ public final class TestCaseFilter {
             final @NotNull Set<Group> groups,
             final @NotNull Set<Priority> priorities,
             final @NotNull Set<String> modules) {
-        return filter(source, query, groups, priorities, modules, Collections.emptySet(), ignored -> null);
+        // No run items on this path - the test editor has no statuses to filter
+        // by. An empty map says that; a function returning null only implies it.
+        return filter(source, query, groups, priorities, modules, Collections.emptySet(),
+                Collections.<UUID, TestRunItems>emptyMap()::get);
     }
 
     public static @NotNull List<TestCaseDto> filter(
