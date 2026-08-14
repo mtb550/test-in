@@ -79,19 +79,22 @@ public class TestRunItems {
     /**
      * Records a tester's verdict: the status, when it was reached, and by whom.
      * <p>
-     * Passing clears the bug severity and priority. They are only ever collected
-     * by the failure dialog, so once a case passes they describe a bug that is
-     * no longer being reported - and they would otherwise survive into the run
-     * JSON and every report generated from it.
+     * Passing clears everything the failure described - the bug severity and
+     * priority, the actual result, and the stacktrace. All four are only ever
+     * collected while a case is failing, so once it passes they describe a
+     * failure that no longer exists, and they would otherwise survive into the
+     * run JSON and into every report generated from it.
      * <p>
      * It lives here rather than at the three call sites in {@code RunStatusService}
-     * that used to set these three fields by hand, so the clearing cannot be
-     * bypassed by whichever path applies the status.
+     * that used to set these fields by hand, so the clearing cannot be bypassed
+     * by whichever path applies the status.
      */
     public void recordVerdict(final @NotNull TestStatus next, final @NotNull String tester) {
         if (status == TestStatus.FAILED && next == TestStatus.PASSED) {
             bugSeverity = BugSeverity.EMPTY;
             bugPriority = BugPriority.EMPTY;
+            actualResult = "";
+            stacktrace = "";
         }
 
         status = next;

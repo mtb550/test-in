@@ -25,11 +25,13 @@ public class TestRunVerdictTest {
                 .status(TestStatus.FAILED)
                 .bugSeverity(BugSeverity.MAJOR)
                 .bugPriority(BugPriority.HIGH)
+                .actualResult("NPE on the login button")
+                .stacktrace("java.lang.NullPointerException at Login.click(Login.java:42)")
                 .build();
     }
 
     @Test
-    public void passingAFailedCaseClearsTheBug() {
+    public void passingAFailedCaseClearsEverythingTheFailureDescribed() {
         final TestRunItems item = failedWithBug();
 
         item.recordVerdict(TestStatus.PASSED, "tester");
@@ -37,6 +39,8 @@ public class TestRunVerdictTest {
         assertEquals(item.getStatus(), TestStatus.PASSED);
         assertEquals(item.getBugSeverity(), BugSeverity.EMPTY);
         assertEquals(item.getBugPriority(), BugPriority.EMPTY);
+        assertEquals(item.getActualResult(), "", "the failure text describes a failure that no longer exists");
+        assertEquals(item.getStacktrace(), "", "likewise the stacktrace");
     }
 
     @Test
@@ -47,6 +51,7 @@ public class TestRunVerdictTest {
 
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR, "re-failing must not wipe the details");
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
+        assertEquals(item.getActualResult(), "NPE on the login button");
     }
 
     @Test
@@ -83,5 +88,7 @@ public class TestRunVerdictTest {
 
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR);
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
+        assertEquals(item.getActualResult(), "NPE on the login button");
+        assertEquals(item.getStacktrace().isEmpty(), false);
     }
 }
