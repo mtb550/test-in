@@ -42,9 +42,7 @@ public final class RunStatusService {
         final TestRunItems item = editor.getResultsMap().get(currentTc.getId());
 
         if (item != null) {
-            item.setStatus(status);
-            item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-            item.setExecutedBy(Services.getInstance(p, AppSettingsState.class).testerName);
+            item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
         }
 
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
@@ -72,9 +70,7 @@ public final class RunStatusService {
             editor.stopExecution();
         }
 
-        item.setStatus(status);
-        item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        item.setExecutedBy(Services.getInstance(p, AppSettingsState.class).testerName);
+        item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
 
         Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
@@ -100,9 +96,7 @@ public final class RunStatusService {
             for (final TestCaseDto tc : selectedItems) {
                 final TestRunItems item = editor.getResultsMap().get(tc.getId());
                 if (item != null) {
-                    item.setStatus(status);
-                    item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-                    item.setExecutedBy(Services.getInstance(p, AppSettingsState.class).testerName);
+                    item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
 
                     final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
                     if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
