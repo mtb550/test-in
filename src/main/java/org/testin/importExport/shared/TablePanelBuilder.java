@@ -3,8 +3,6 @@ package org.testin.importExport.shared;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.JBTabbedPane;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.Priority;
@@ -19,7 +17,6 @@ import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class TablePanelBuilder {
 
@@ -134,21 +131,4 @@ public class TablePanelBuilder {
         ));
     }
 
-    /**
-     * One read-through tab per sheet. Callers that keep their models - the ones
-     * that read back what the tester ticked - build their tabs themselves.
-     */
-    public @NotNull JBTabbedPane createTabbedPane(final @NotNull Map<String, List<TestCaseDto>> sheetsData,
-                                                  final @NotNull List<TestEditorAttributes> attributes,
-                                                  final @NotNull Project p) {
-        final JBTabbedPane tabbedPane = new JBTabbedPane();
-
-        for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
-            final DefaultTableModel model = createModel(p, attributes, entry.getValue());
-
-            tabbedPane.addTab(entry.getKey(), new JBScrollPane(buildTable(model, p)));
-        }
-
-        return tabbedPane;
-    }
 }
