@@ -75,4 +75,23 @@ public class TestRunItems {
     @NotNull
     @Builder.Default
     private String stacktrace = "";
+
+    /**
+     * The test case, for the rendering path, where it is always present.
+     * <p>
+     * {@code RunEditor} skips run items whose test case has been deleted and
+     * assigns {@code tc} to every one it keeps, so an item that reaches a
+     * renderer or a grid row has one. This states that invariant where it is
+     * relied on, instead of eight unchecked {@code getTc()} calls that read
+     * like oversights. If it ever fails, it fails by name rather than as an
+     * NPE inside a Swing paint.
+     *
+     * @throws IllegalStateException if called on an item the editor filtered out
+     */
+    public @NotNull TestCaseDto requireTc() {
+        if (tc == null)
+            throw new IllegalStateException("Run item " + id + " has no test case; it should not have reached the editor");
+
+        return tc;
+    }
 }

@@ -25,32 +25,32 @@ public enum RunEditorAttributes {
             "Description",
             true,
             true,
-            (item, p) -> item.getTc().getDescription()
+            (item, p) -> item.requireTc().getDescription()
     ),
 
     EXPECTED_RESULT(
             "Expected Result",
             true,
             true,
-            (item, p) -> item.getTc().getExpectedResult()
+            (item, p) -> item.requireTc().getExpectedResult()
     ),
 
     STEPS(
             "Steps",
             true,
             true,
-            (item, p) -> String.join(", ", item.getTc().getSteps())
+            (item, p) -> String.join(", ", item.requireTc().getSteps())
     ),
 
     PRIORITY(
             "Priority",
             true,
             true,
-            (item, p) -> item.getTc().getPriority().getName()
+            (item, p) -> item.requireTc().getPriority().getName()
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            badges.add(Shared.createPriorityBadge(runItem.getTc()));
+            badges.add(Shared.createPriorityBadge(runItem.requireTc()));
         }
     },
 
@@ -58,11 +58,11 @@ public enum RunEditorAttributes {
             "Group",
             true,
             true,
-            (item, p) -> item.getTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
+            (item, p) -> item.requireTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
     ) {
         @Override
         public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-            runItem.getTc().getGroup().stream().map(Shared::createGroupBadge).forEach(badges::add);
+            runItem.requireTc().getGroup().stream().map(Shared::createGroupBadge).forEach(badges::add);
         }
     },
 
@@ -121,7 +121,7 @@ public enum RunEditorAttributes {
             true,
             true,
             (item, p) -> {
-                final TestCaseDto tc = item.getTc();
+                final TestCaseDto tc = item.requireTc();
                 return String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc));
             }
     );
