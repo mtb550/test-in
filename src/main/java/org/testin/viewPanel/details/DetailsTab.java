@@ -176,9 +176,7 @@ public class DetailsTab {
 
             Services.getInstance(p, Notifier.class).softShow(p, "Updated..");
 
-            ApplicationManager.getApplication().invokeLater(() -> {
-                TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt);
-            });
+            ApplicationManager.getApplication().invokeLater(() -> TestCaseUpdateMenuDialog.applyAftermath(p, tcs, gt));
         }).show();
     }
 
