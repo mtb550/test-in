@@ -10,13 +10,12 @@ import org.testin.util.Shortcuts;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.KeyEvent;
-import java.util.function.Consumer;
 
 public class SearchTxt extends SearchTextField implements Disposable, IToolbarItem {
     private final @NotNull Timer searchDebounceTimer;
     private final @NotNull Runnable onFocusReleased;
 
-    public SearchTxt(final @NotNull Consumer<String> onToolBarSearchValueChanged, final @NotNull Runnable onFocusReleased) {
+    public SearchTxt(final @NotNull Runnable onToolBarSearchValueChanged, final @NotNull Runnable onFocusReleased) {
         super();
         this.onFocusReleased = onFocusReleased;
 
@@ -26,7 +25,7 @@ public class SearchTxt extends SearchTextField implements Disposable, IToolbarIt
         getTextEditor().setToolTipText("Search (" + Shortcuts.FocusSearch.getShortcutText() + "), "
                 + Shortcuts.Escape.getShortcutText() + " to leave");
 
-        searchDebounceTimer = new Timer(300, e -> onToolBarSearchValueChanged.accept(getSearchQuery()));
+        searchDebounceTimer = new Timer(300, e -> onToolBarSearchValueChanged.run());
         searchDebounceTimer.setRepeats(false);
 
         addDocumentListener(new DocumentAdapter() {

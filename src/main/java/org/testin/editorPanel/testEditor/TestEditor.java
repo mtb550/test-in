@@ -36,7 +36,6 @@ import org.testin.enums.TestEditorAttributes;
 import org.testin.enums.ViewMode;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.notifications.Notifier;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
@@ -323,6 +322,12 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         return getTotalPages(currentTestCases);
     }
 
+    /**
+     * Reported as not reachable from the entry points, and kept: this and
+     * {@link #getPreferredFocusedComponent()} are the {@code FileEditor}
+     * contract. The platform calls them when it shows the tab; no code in the
+     * plugin does, and no inspection can see that call (#61).
+     */
     public @NotNull JComponent getComponent() {
         return mainPanel;
     }
@@ -337,7 +342,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     }
 
     @Override
-    public void onToolBarSearchValueChanged(final @NotNull String query) {
+    public void onToolBarSearchValueChanged() {
         this.currentPage = 1;
         refreshView();
     }
