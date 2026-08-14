@@ -9,6 +9,8 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
@@ -38,6 +40,8 @@ public class CopyTestCaseAction extends DumbAwareAction {
                 .collect(Collectors.joining("\n"));
 
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
+
+        Services.getInstance(p, Notifier.class).softShow(p, "Copied");
     }
 
     @Override

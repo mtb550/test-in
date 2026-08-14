@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
@@ -44,6 +45,8 @@ public class CopyTestCaseNodeAction extends DumbAwareAction {
 
                 String json = Services.getInstance(p, Mapper.class).writeValueAsString(tcs);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
+
+                Services.getInstance(p, Notifier.class).softShow(p, "Test case copied");
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());
