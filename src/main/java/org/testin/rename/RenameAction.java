@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.codegen.clazz.RenameJavaClass;
 import org.testin.codegen.pkg.RenameJavaPackage;
@@ -67,7 +68,7 @@ public class RenameAction extends AbstractProjectTreeAction {
         }
 
         final String oldName = dir.getName();
-        applyRename(dir, newName);
+        applyRename(dir, newName, parent == null ? null : () -> confirmRenamed(parent.resolve(newName)));
 
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.
@@ -78,6 +79,16 @@ public class RenameAction extends AbstractProjectTreeAction {
     }
 
     private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName) {
+        applyRename(dir, newName, null);
+    }
+
+    /**
+     * The undo and redo reverses pass no {@code onDone}: they are confirmed as
+     * "Undone" and "Redone" by their own actions, and a second balloon saying it
+     * was renamed would double-report one keystroke (#62).
+     */
+    private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName,
+                             final @Nullable Runnable onDone) {
         Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 
         dispatchRenameCodeGenerator(dir, newName);
@@ -95,7 +106,20 @@ public class RenameAction extends AbstractProjectTreeAction {
             }
 
             Logger.info("Success! Renamed to: " + newName);
+
+            if (onDone != null) onDone.run();
         });
+    }
+
+    /**
+     * Read back from the indexer cache rather than assumed: renameNode is
+     * asynchronous and runs its callback whether the VFS rename succeeded or
+     * failed, and a failure raises its own error balloon.
+     */
+    private void confirmRenamed(final @NotNull Path renamed) {
+        if (!Services.getInstance(p, ProjectIndexer.class).nodeExists(renamed)) return;
+
+        Services.getInstance(p, Notifier.class).softShow(p, "Renamed");
     }
 
     // todo, to be moved to the codegen package and enhanced, later (#51)
