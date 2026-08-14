@@ -60,7 +60,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
     @Override
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu) {
         new EscapeAction(p, list);
-        new OpenContextMenuAction(p, list, menu);
+        new OpenContextMenuAction(list, menu);
         new CloseTestCaseDetailsAction(list);
     }
 }

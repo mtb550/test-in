@@ -18,7 +18,6 @@ import java.awt.event.MouseWheelEvent;
 import java.util.Optional;
 
 public class Shared {
-    private static final int BADGE_RADIUS = 20;
 
     public static @NotNull JBLabel createPriorityBadge(final @NotNull TestCaseDto tc) {
         return Optional.of(tc.getPriority())

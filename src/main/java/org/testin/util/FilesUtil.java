@@ -52,12 +52,5 @@ public final class FilesUtil {
         Logger.error("path" + path);
     }
 
-    public void createDirectories(final @NotNull Path path) {
-        try {
-            Files.createDirectories(path);
-        } catch (final IOException ex) {
-            Logger.error("Exception: " + ex.getMessage());
-        }
-    }
 
 }

@@ -191,7 +191,4 @@ public class GenerateReportAction extends DumbAwareAction {
         return detailsMap;
     }
 
-    public @Nullable JBList<TestCaseDto> getList() {
-        return list;
-    }
 }

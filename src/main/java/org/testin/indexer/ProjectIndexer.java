@@ -246,10 +246,6 @@ public final class ProjectIndexer {
         return store.getTestSetDirByPath(path);
     }
 
-    public @Nullable TestSetPackageDirectoryDto getTestSetPackageByPath(final @NotNull Path path) {
-        return store.getTestSetPackageByPath(path);
-    }
-
     public @Nullable TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
         return store.getTestRunDirByPath(path);
     }

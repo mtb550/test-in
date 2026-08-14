@@ -60,10 +60,6 @@ public final class Notifier {
         notify(p, null, message, NotificationType.INFORMATION);
     }
 
-    public void warn(final @NotNull Project p, final @NotNull String message) {
-        notify(p, null, message, NotificationType.WARNING);
-    }
-
     public void error(final @NotNull Project p, final @NotNull String message) {
         notify(p, null, message, NotificationType.ERROR);
     }

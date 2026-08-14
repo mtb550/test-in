@@ -49,10 +49,6 @@ public final class TreeUtilImpl {
         });
     }
 
-    public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath, final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation) {
-        executeVfsAction(p, sourcePath, targetPath, errorTitle, operation, null);
-    }
-
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
                                  final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation,
                                  final @Nullable Runnable onSuccess) {

@@ -29,7 +29,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected final @NotNull Map<String, JBLabel> attributeLabels = new HashMap<>();
     protected final @NotNull JBPanel<?> content = new JBPanel<>(new VerticalLayout(JBUI.scale(4)));
     protected final @NotNull BorderLayoutPanel wrapper = new BorderLayoutPanel();
-    protected boolean isSelected;
     protected boolean isRowHovered;
     protected @Nullable String hoveredAction;
     protected boolean isRunning;
@@ -104,7 +103,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     }
 
     public void setActionsState(final boolean isSelected, final boolean isRowHovered, final @Nullable String hoveredAction) {
-        this.isSelected = isSelected;
         this.isRowHovered = isRowHovered;
         this.hoveredAction = hoveredAction;
         if (isSelected) {

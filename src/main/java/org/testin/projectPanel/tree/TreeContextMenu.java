@@ -84,7 +84,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
     public void registerShortcuts(final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
         new EscapeAction(p, tree, transferHandler);
-        new OpenContextMenuAction(p, tree, this);
+        new OpenContextMenuAction(tree, this);
 
     }
 

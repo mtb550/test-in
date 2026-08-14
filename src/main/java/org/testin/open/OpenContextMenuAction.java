@@ -2,7 +2,6 @@ package org.testin.open;
 
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -15,23 +14,20 @@ import java.awt.event.KeyEvent;
 public class OpenContextMenuAction extends DumbAwareAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_CONTEXT_MENU, 0);
-    private final @NotNull Project p;
     private final SimpleTree tree;
     private final JBList<?> list;
     private final DefaultActionGroup cm;
 
-    public OpenContextMenuAction(final @NotNull Project p, final SimpleTree tree, final DefaultActionGroup cm) {
+    public OpenContextMenuAction(final SimpleTree tree, final DefaultActionGroup cm) {
         super("Show Context Menu");
-        this.p = p;
         this.tree = tree;
         this.cm = cm;
         this.list = null;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 
-    public OpenContextMenuAction(final @NotNull Project p, final JBList<?> list, final DefaultActionGroup cm) {
+    public OpenContextMenuAction(final JBList<?> list, final DefaultActionGroup cm) {
         super("Show Context Menu");
-        this.p = p;
         this.list = list;
         this.cm = cm;
         this.tree = null;
