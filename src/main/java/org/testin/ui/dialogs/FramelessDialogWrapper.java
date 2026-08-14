@@ -45,7 +45,9 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
         return new Action[0];
     }
 
-    /** No south panel at all: the frameless presentation has no button row. */
+    /**
+     * No south panel at all: the frameless presentation has no button row.
+     */
     @Override
     protected final @Nullable JComponent createSouthPanel() {
         return null;

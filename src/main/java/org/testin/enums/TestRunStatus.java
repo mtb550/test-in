@@ -74,7 +74,9 @@ public enum TestRunStatus {
     );
     private final @NotNull String label;
 
-    /** Null for the statuses the tester cannot set directly from the keyboard. */
+    /**
+     * Null for the statuses the tester cannot set directly from the keyboard.
+     */
     private final @Nullable KeyStroke shortcut;
     private final @NotNull Icon icon;
 

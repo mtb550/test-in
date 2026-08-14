@@ -27,7 +27,9 @@ import java.util.UUID;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
 
-    /** Null when the annotation's testName is not a UUID at all. */
+    /**
+     * Null when the annotation's testName is not a UUID at all.
+     */
     private static @Nullable UUID parseUuid(final @NotNull String value) {
         try {
             return UUID.fromString(value);

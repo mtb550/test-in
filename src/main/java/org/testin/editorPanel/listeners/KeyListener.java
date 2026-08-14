@@ -7,7 +7,6 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;

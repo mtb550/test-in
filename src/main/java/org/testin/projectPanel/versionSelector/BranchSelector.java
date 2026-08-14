@@ -26,7 +26,9 @@ public class BranchSelector {
     private final @NotNull ComboBox<String> comboBox;
     private final @NotNull DefaultComboBoxModel<String> model;
 
-    /** Null while no project is selected, or the selected one has no path. */
+    /**
+     * Null while no project is selected, or the selected one has no path.
+     */
     private @Nullable Path projectPath;
 
     // Written from background git tasks and read on the EDT. Empty, never null,

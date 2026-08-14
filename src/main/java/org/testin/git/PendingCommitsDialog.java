@@ -29,7 +29,9 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
     private final @NotNull Path repoRoot;
     private final @NotNull List<TestCaseDiff> rowDifferences = new ArrayList<>();
 
-    /** Built by {@link #createCenterPanel()}; null until the dialog has been laid out. */
+    /**
+     * Built by {@link #createCenterPanel()}; null until the dialog has been laid out.
+     */
     private @Nullable JBTable table;
 
     public PendingCommitsDialog(final @NotNull Project p,

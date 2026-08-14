@@ -29,7 +29,9 @@ public abstract class DirectoryDto {
     @Builder.Default
     private ArrayList<String> path2 = new ArrayList<>();
 
-    /** Null for the root node: nothing above the test project. */
+    /**
+     * Null for the root node: nothing above the test project.
+     */
     @ToString.Exclude
     private @Nullable DirectoryDto parent;
 

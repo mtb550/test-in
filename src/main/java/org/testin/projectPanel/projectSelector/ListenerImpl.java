@@ -13,7 +13,9 @@ import java.awt.event.ActionListener;
 public class ListenerImpl implements ActionListener {
     private final @NotNull ProjectPanel pp;
 
-    /** Null until the first selection; compared against to swallow repeat events. */
+    /**
+     * Null until the first selection; compared against to swallow repeat events.
+     */
     private @Nullable TestProjectDirectoryDto lastSelected = null;
 
     public ListenerImpl(final @NotNull ProjectPanel pp) {

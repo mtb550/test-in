@@ -127,7 +127,9 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
      */
     private @Nullable UUID selectionToRestore;
 
-    /** Grid column selected before a reload, so the cell comes back, not just the row. */
+    /**
+     * Grid column selected before a reload, so the cell comes back, not just the row.
+     */
     private int gridColumnToRestore = -1;
 
     public RunEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {

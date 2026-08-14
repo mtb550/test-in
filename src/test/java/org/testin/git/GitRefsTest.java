@@ -17,6 +17,11 @@ import static org.testng.Assert.assertNull;
  */
 public class GitRefsTest {
 
+    private static TestCaseDiff diff(final Path relativePath) {
+        return new TestCaseDiff(UUID.randomUUID().toString(), relativePath, DiffType.MODIFIED,
+                TestCaseDto.builder().build(), TestCaseDto.builder().build(), List.of());
+    }
+
     @Test
     public void readsTheHeadBranchOutOfRemoteShowOutput() {
         final String remoteShow = """
@@ -92,10 +97,5 @@ public class GitRefsTest {
 
         assertEquals(List.copyOf(paths),
                 List.of("testCases/login/case-1.json", "testCases/login/case-2.json"));
-    }
-
-    private static TestCaseDiff diff(final Path relativePath) {
-        return new TestCaseDiff(UUID.randomUUID().toString(), relativePath, DiffType.MODIFIED,
-                TestCaseDto.builder().build(), TestCaseDto.builder().build(), List.of());
     }
 }

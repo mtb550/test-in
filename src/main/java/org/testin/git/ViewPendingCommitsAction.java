@@ -34,7 +34,9 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
     private final @NotNull SimpleTree tree;
     private final @NotNull GitRepositoryService git;
     private final @NotNull GitCommitService commits;
-    /** Live only between a successful commit and the push that expires it. */
+    /**
+     * Live only between a successful commit and the push that expires it.
+     */
     private @Nullable Notification pushNotification;
 
     public ViewPendingCommitsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {

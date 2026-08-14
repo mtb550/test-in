@@ -139,12 +139,16 @@ public enum DirectoryType {
 
     private final @NotNull String description;
 
-    /** Null when the node shows its own name rather than a fixed label. */
+    /**
+     * Null when the node shows its own name rather than a fixed label.
+     */
     private final @Nullable String displayedName;
     private final @NotNull Icon icon;
     private final @NotNull Class<? extends DirectoryDto> clazz;
 
-    /** Null for IMPORT_TP: a clone target has no marker file of its own. */
+    /**
+     * Null for IMPORT_TP: a clone target has no marker file of its own.
+     */
     private final @Nullable String marker;
 
     // Null where the type does not support that operation: the fixed root

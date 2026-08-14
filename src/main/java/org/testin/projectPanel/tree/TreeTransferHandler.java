@@ -66,7 +66,9 @@ public class TreeTransferHandler extends TransferHandler {
                 && sourceProject.getPath().equals(targetProject.getPath());
     }
 
-    /** Null when the node hangs outside any test project - ownership unresolvable. */
+    /**
+     * Null when the node hangs outside any test project - ownership unresolvable.
+     */
     private static @Nullable DirectoryDto owningProject(final @NotNull DirectoryDto node) {
         DirectoryDto current = node;
         while (current != null && !(current instanceof TestProjectDirectoryDto)) {

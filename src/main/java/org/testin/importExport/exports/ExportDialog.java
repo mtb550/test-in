@@ -52,7 +52,9 @@ public class ExportDialog extends FramelessDialogWrapper {
 
     private final @NotNull JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
 
-    /** Both null until the dialog is accepted; read by the caller only after showAndGet. */
+    /**
+     * Both null until the dialog is accepted; read by the caller only after showAndGet.
+     */
     @Getter
     private @Nullable FileTypes selectedFormat;
 

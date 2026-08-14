@@ -40,12 +40,10 @@ public class ImportDialog extends FramelessDialogWrapper {
     private final @NotNull TextFieldWithBrowseButton fileField = new TextFieldWithBrowseButton();
 
     private final @NotNull JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
-
-    private @NotNull Map<String, List<TestCaseDto>> originalSheetsData = new LinkedHashMap<>();
-
     // Created here rather than in createCenterPanel: the file listener can call
     // onDataLoaded as soon as the dialog is constructed.
     private final @NotNull JBTabbedPane tableTabbedPane = new JBTabbedPane();
+    private @NotNull Map<String, List<TestCaseDto>> originalSheetsData = new LinkedHashMap<>();
 
     public ImportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes,
                         final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {

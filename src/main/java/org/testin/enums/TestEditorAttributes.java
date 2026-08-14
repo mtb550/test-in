@@ -278,7 +278,9 @@ public enum TestEditorAttributes {
     private final boolean exportable;
     private final @NotNull ValueExtractor<TestCaseDto> testValueExtractor;
 
-    /** Null for attributes shown as a plain detail row rather than a badge. */
+    /**
+     * Null for attributes shown as a plain detail row rather than a badge.
+     */
     private final @Nullable DrawItem<TestCaseDto> testDrawItem;
     private final @NotNull ImportSetter importSetter;
     /**

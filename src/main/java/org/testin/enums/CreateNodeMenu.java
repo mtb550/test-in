@@ -82,7 +82,9 @@ public enum CreateNodeMenu {
     private final @NotNull DirectoryType targetParentType;
     private final @NotNull String placeholder;
 
-    /** Null for the nodes that generate no code - the container directories. */
+    /**
+     * Null for the nodes that generate no code - the container directories.
+     */
     private final @Nullable GeneratorType generatorType;
 
 }

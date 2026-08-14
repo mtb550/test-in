@@ -68,7 +68,9 @@ public enum ChangeType {
 
     private final @NotNull String label;
 
-    /** Null for add/remove: creating or deleting a whole test case has no field to revert. */
+    /**
+     * Null for add/remove: creating or deleting a whole test case has no field to revert.
+     */
     private final @Nullable RevertAction revertAction;
 
     public static @Nullable ChangeType fromLabel(final @Nullable String label) {

@@ -1,10 +1,10 @@
 package org.testin.enums;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 import java.util.function.BiConsumer;
-import org.jetbrains.annotations.NotNull;
 
 @Getter
 public enum Group {

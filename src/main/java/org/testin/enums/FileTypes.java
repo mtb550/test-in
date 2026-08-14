@@ -107,7 +107,9 @@ public enum FileTypes {
     private final @NotNull String label;
     private final @NotNull String extension;
 
-    /** The import-dialog hint; null for formats that need no explanation. */
+    /**
+     * The import-dialog hint; null for formats that need no explanation.
+     */
     private final @Nullable String infoMessage;
 
     // Null where the format does not support that direction: PDF and WORD are

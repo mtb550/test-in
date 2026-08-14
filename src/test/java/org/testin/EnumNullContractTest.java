@@ -4,12 +4,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.annotations.Test;
 
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -38,37 +36,6 @@ public class EnumNullContractTest {
 
     private static final @NotNull Path SOURCE_ROOT = Paths.get("src", "main", "java");
     private static final @NotNull String ROOT_PACKAGE = "org.testin";
-
-    @Test
-    public void everyEnumConstantHonoursItsNullContract() throws Exception {
-        final List<String> breaches = new ArrayList<>();
-        final List<String> skipped = new ArrayList<>();
-
-        final List<Class<?>> enums = findEnums();
-        if (enums.isEmpty()) fail("No enums found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
-        System.out.println("Checked " + enums.size() + " enums");
-
-        for (final Class<?> type : enums) {
-            try {
-                // Initialises the class, which builds every constant.
-                type.getEnumConstants();
-            } catch (final Throwable t) {
-                final Throwable cause = rootCause(t);
-                if (isNullContractBreach(cause)) breaches.add(type.getName() + ": " + cause.getMessage());
-                else skipped.add(type.getName() + ": " + cause);
-            }
-        }
-
-        if (!skipped.isEmpty()) {
-            System.out.println("Enums that could not initialise for reasons unrelated to nullability:");
-            skipped.forEach(s -> System.out.println("  " + s));
-        }
-
-        if (!breaches.isEmpty()) {
-            fail("An enum constant passes null to a field annotated @NotNull. Annotate the field @Nullable if "
-                    + "null is legitimate, or give the constant a value:\n  " + String.join("\n  ", breaches));
-        }
-    }
 
     private static @NotNull List<Class<?>> findEnums() throws Exception {
         final ClassLoader loader = EnumNullContractTest.class.getClassLoader();
@@ -124,5 +91,36 @@ public class EnumNullContractTest {
         Throwable current = t;
         while (current.getCause() != null && current.getCause() != current) current = current.getCause();
         return current;
+    }
+
+    @Test
+    public void everyEnumConstantHonoursItsNullContract() throws Exception {
+        final List<String> breaches = new ArrayList<>();
+        final List<String> skipped = new ArrayList<>();
+
+        final List<Class<?>> enums = findEnums();
+        if (enums.isEmpty()) fail("No enums found under " + ROOT_PACKAGE + ": the scan is looking in the wrong place");
+        System.out.println("Checked " + enums.size() + " enums");
+
+        for (final Class<?> type : enums) {
+            try {
+                // Initialises the class, which builds every constant.
+                type.getEnumConstants();
+            } catch (final Throwable t) {
+                final Throwable cause = rootCause(t);
+                if (isNullContractBreach(cause)) breaches.add(type.getName() + ": " + cause.getMessage());
+                else skipped.add(type.getName() + ": " + cause);
+            }
+        }
+
+        if (!skipped.isEmpty()) {
+            System.out.println("Enums that could not initialise for reasons unrelated to nullability:");
+            skipped.forEach(s -> System.out.println("  " + s));
+        }
+
+        if (!breaches.isEmpty()) {
+            fail("An enum constant passes null to a field annotated @NotNull. Annotate the field @Nullable if "
+                    + "null is legitimate, or give the constant a value:\n  " + String.join("\n  ", breaches));
+        }
     }
 }

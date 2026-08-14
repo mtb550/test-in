@@ -59,7 +59,9 @@ public final class Logger {
             System.out.println("[" + level.paddedName + "] [" + callerClass + "] " + message);
     }
 
-    /** Null before the application is up: callers fall back to stdout. */
+    /**
+     * Null before the application is up: callers fall back to stdout.
+     */
     private static @Nullable LoggerService getService() {
         if (backendService == null) {
             if (ApplicationManager.getApplication() != null) {

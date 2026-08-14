@@ -107,7 +107,9 @@ public class ExportAction extends DumbAwareAction {
         return allSheets;
     }
 
-    /** Null when the path is not in the VFS; a file resolves to its parent directory. */
+    /**
+     * Null when the path is not in the VFS; a file resolves to its parent directory.
+     */
     public @Nullable VirtualFile resolveTargetDir(final @NotNull DirectoryDto dirDto) {
         final VirtualFile target = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
         if (target == null) return null;

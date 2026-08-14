@@ -34,6 +34,17 @@ public class FileDocumentListener implements DocumentListener {
         this.importLoader = importLoader;
     }
 
+    /**
+     * The format that can read this file name, or null when nothing can. Only
+     * formats with an import handler count; matching e.g. .html would NPE downstream.
+     */
+    private static @Nullable FileTypes importableFormatOf(final @NotNull String fileName) {
+        for (final FileTypes type : FileTypes.values()) {
+            if (type.getImportHandler() != null && fileName.endsWith(type.getExtension())) return type;
+        }
+        return null;
+    }
+
     @Override
     public void insertUpdate(final @NotNull DocumentEvent e) {
         triggerLoadIfValid();
@@ -82,16 +93,5 @@ public class FileDocumentListener implements DocumentListener {
                         Services.getInstance(p, Notifier.class).error(p, "Parse Error", ex.getMessage()));
             }
         });
-    }
-
-    /**
-     * The format that can read this file name, or null when nothing can. Only
-     * formats with an import handler count; matching e.g. .html would NPE downstream.
-     */
-    private static @Nullable FileTypes importableFormatOf(final @NotNull String fileName) {
-        for (final FileTypes type : FileTypes.values()) {
-            if (type.getImportHandler() != null && fileName.endsWith(type.getExtension())) return type;
-        }
-        return null;
     }
 }

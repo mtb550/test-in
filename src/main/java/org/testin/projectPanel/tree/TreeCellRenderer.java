@@ -14,7 +14,9 @@ import javax.swing.*;
 import java.util.Set;
 
 public class TreeCellRenderer extends ColoredTreeCellRenderer {
-    /** Shared with the transfer handler: the nodes currently cut, drawn grayed. */
+    /**
+     * Shared with the transfer handler: the nodes currently cut, drawn grayed.
+     */
     private final @NotNull Set<DirectoryDto> selectedNodes;
 
     public TreeCellRenderer(final @NotNull Set<DirectoryDto> selectedNodes) {

@@ -134,7 +134,9 @@ public enum RunEditorAttributes {
     private final boolean defaultToolBarSelected;
     private final @NotNull ValueExtractor<TestRunItems> runValueExtractor;
 
-    /** Null for every attribute rendered as plain text; set only by those drawn as badges. */
+    /**
+     * Null for every attribute rendered as plain text; set only by those drawn as badges.
+     */
     private final @Nullable DrawItem<TestRunItems> runDrawItem;
 
     public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
