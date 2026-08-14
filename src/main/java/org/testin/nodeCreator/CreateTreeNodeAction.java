@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.DirectoryType;
-import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.nodeCreator.dialogs.CreateRunDialog;
 import org.testin.nodeCreator.dialogs.CreateTestDialog;
@@ -49,11 +48,6 @@ public class CreateTreeNodeAction extends DumbAwareAction {
             if (s.isEmpty()) return;
             final Path newDirPath = pDir.getPath().resolve(s);
 
-            if (dt.getAction() == null) {
-                Logger.info("No creation logic defined for type: " + dt);
-                return;
-            }
-
             DirectoryDto dir = dt.getAction().apply(p).execute(s, pDir, newDirPath);
             Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
 
@@ -64,8 +58,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);
 
-            if (dt.getCodeGenerator() != null)
-                dt.getCodeGenerator().execute(p, dir);
+            dt.getCodeGenerator().execute(p, dir);
 
         };
 

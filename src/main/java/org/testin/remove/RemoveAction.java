@@ -8,8 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.DirectoryType;
-import org.testin.enums.RemoveHandler;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
@@ -87,12 +85,7 @@ public class RemoveAction extends DumbAwareAction {
             if (pkg instanceof TestSetDirectoryDto || pkg instanceof TestRunDirectoryDto)
                 Services.getInstance(p, EditorUtil.class).close(p, pkg.getName());
 
-            final DirectoryType type = DirectoryType.from(pkg);
-            final RemoveHandler handler = type == null ? null : type.getRemoveHandler();
-
-            // A node with no handler still has to count, or the tree never rebuilds.
-            if (handler == null) onRemoved.run();
-            else handler.remove(p, pkg, onRemoved);
+            pkg.getType().getRemoveHandler().remove(p, pkg, onRemoved);
         }
     }
 

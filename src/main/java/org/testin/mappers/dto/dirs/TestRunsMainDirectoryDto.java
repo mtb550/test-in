@@ -58,4 +58,8 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
         return super.acceptsTransferred(source) && source.isAllowedInTestRunFamily();
     }
 
+    @Override
+    public @NotNull DirectoryType getType() {
+        return DirectoryType.TRD;
+    }
 }

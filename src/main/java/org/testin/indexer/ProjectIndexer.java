@@ -375,6 +375,19 @@ public final class ProjectIndexer {
     }
 
     /**
+     * Removes nothing: the Test Cases and Test Runs containers go with their
+     * test project and are never deleted on their own.
+     * <p>
+     * The callback still runs. RemoveAction counts completions to know when to
+     * rebuild the tree, so a node that quietly did nothing would leave the
+     * count short and the tree never rebuilt.
+     */
+    public void removeFixedContainer(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+        Logger.info("Not removed: " + path.getFileName() + " belongs to its test project");
+        onRemoved.run();
+    }
+
+    /**
      * Deletes on disk, refreshes, and only then updates the cache — the order
      * CLAUDE.md requires. The refresh is asynchronous now: the synchronous one
      * ran on the EDT, and a full VFS refresh there is a slow operation.

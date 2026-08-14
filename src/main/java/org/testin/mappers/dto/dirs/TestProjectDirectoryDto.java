@@ -72,4 +72,9 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     public boolean isTransferTarget() {
         return false;
     }
+
+    @Override
+    public @NotNull DirectoryType getType() {
+        return DirectoryType.TP;
+    }
 }

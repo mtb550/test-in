@@ -60,4 +60,8 @@ public class TestRunDirectoryDto extends DirectoryDto {
                 && source.isAllowedInsideTestRun();
     }
 
+    @Override
+    public @NotNull DirectoryType getType() {
+        return DirectoryType.TR;
+    }
 }

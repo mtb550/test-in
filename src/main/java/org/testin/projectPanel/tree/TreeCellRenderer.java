@@ -38,7 +38,8 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                 append(value != null ? value.toString() : "", SimpleTextAttributes.REGULAR_ATTRIBUTES);
                 return;
             }
-            final DirectoryType type = DirectoryType.from(dir);
+            final DirectoryType type = dir.getType();
+
             final TestRunStatus runStatus = dir instanceof TestRunDirectoryDto trDir ? trDir.getMarker().getStatus() : null;
 
             // A run is drawn as its status, not as its kind: the tree then says

@@ -15,7 +15,7 @@ public enum CreateNodeMenu {
 
     TEST_PROJECT(
             "Create Project",
-            List.of(DirectoryType.TP, DirectoryType.IMPORT_TP),
+            List.of(),
             TestProjectDirectoryDto.class,
             DirectoryType.TP,
             "set name or paste url..",
