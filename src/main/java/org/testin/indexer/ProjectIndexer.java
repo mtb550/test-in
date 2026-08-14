@@ -178,14 +178,6 @@ public final class ProjectIndexer {
         }
     }
 
-    public void dispose() {
-        store.clearAll();
-        indexed.set(false);
-        indexing.set(false);
-        indexingLatch = new CountDownLatch(1);
-        Logger.info("Indexer disposed");
-    }
-
     public void resetForReindex() {
         restoreEditorsOnComplete.set(false);
         store.clearAll();

@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,15 +43,6 @@ public final class GitRepositoryService {
         } catch (final VcsException ignored) {
             return null;
         }
-    }
-
-    public @NotNull List<String> getLocalBranches(final @NotNull Path path) {
-        final GitRepository repository = findRepository(path);
-        if (repository == null) return List.of();
-        return repository.getBranches().getLocalBranches().stream()
-                .map(GitLocalBranch::getName)
-                .sorted(Comparator.naturalOrder())
-                .toList();
     }
 
     public @Nullable String getCurrentBranch(final @NotNull Path path) {
@@ -95,11 +85,6 @@ public final class GitRepositoryService {
                 .forEach(branches::add);
 
         return branches.stream().sorted().toList();
-    }
-
-    public @NotNull String getRemoteUrl(final @NotNull Path path) throws VcsException {
-        final String remoteName = getRemoteName(path);
-        return remoteName == null ? "" : getRemoteUrl(path, remoteName);
     }
 
     public @NotNull String getRemoteUrl(final @NotNull Path path, final @NotNull String remoteName) throws VcsException {
