@@ -130,7 +130,9 @@ public final class DestinationForm implements IDialogComponent {
      * last dot regardless turned "Sprint 1.2 Report" into "Sprint 1.pdf" - the
      * file was written, under a name the tester did not choose.
      */
-    private static @NotNull String withExtension(final @NotNull String fileName, final @NotNull String extension) {
+    // Package-private rather than private so the naming rule can be tested
+    // without a Project and a Swing form behind it.
+    static @NotNull String withExtension(final @NotNull String fileName, final @NotNull String extension) {
         if (fileName.endsWith(extension)) return fileName;
 
         final int dot = fileName.lastIndexOf('.');
