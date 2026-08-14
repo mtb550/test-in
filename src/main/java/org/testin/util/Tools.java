@@ -102,11 +102,28 @@ public final class Tools {
         return null;
     }
 
+    /**
+     * A value as the details panel shows it: capitalised, and ended with a full
+     * stop unless it already ends in something that closes it (#22).
+     * <p>
+     * Display only. The stored JSON is always what the tester typed - the
+     * editable surfaces load the raw value, never this.
+     */
     @NotNull
-    public String format(final @Nullable String text) {
+    public static String format(final @Nullable String text) {
         if (StringUtil.isEmptyOrSpaces(text)) return "";
+
         final String s = text.trim();
-        return StringUtil.capitalize(s) + ".";
+        return StringUtil.capitalize(s) + (endsClosed(s) ? "" : ".");
+    }
+
+    /**
+     * True when a full stop would be wrong: the text already ends in
+     * punctuation, or in a character that means it is not a sentence - a URL or
+     * a path ending in '/', a parenthesised note, a code snippet.
+     */
+    private static boolean endsClosed(final @NotNull String s) {
+        return ".!?:;/)".indexOf(s.charAt(s.length() - 1)) >= 0;
     }
 
     public @Nullable String getFormattedDuration(final @Nullable Duration duration) {

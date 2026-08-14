@@ -32,7 +32,7 @@ public class Steps extends BaseDetails {
         for (int i = 0; i < steps.size(); i++) {
             if (steps.get(i).isBlank()) continue;
 
-            final String stepText = (i + 1) + "- " + Services.getInstance(p, Tools.class).format(steps.get(i));
+            final String stepText = (i + 1) + "- " + Tools.format(steps.get(i));
             final int marginBottom = (i == steps.size() - 1) ? 0 : MARGIN_BOTTOM_PER_STEP;
             stepsContainer.add(createStepComponent(stepText, marginBottom));
         }

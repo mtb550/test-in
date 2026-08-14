@@ -23,7 +23,7 @@ public class Title extends BaseDetails {
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
 
-        final String titleText = Services.getInstance(p, Tools.class).format(dto.getDescription());
+        final String titleText = Tools.format(dto.getDescription());
         final String finalValue = titleText.trim().isEmpty() ? "-" : titleText;
 
         final JTextArea mainTitleArea = new JTextArea(finalValue);
