@@ -62,20 +62,12 @@ public class ImportAction extends DumbAwareAction {
             return;
         }
 
-        final ImportDialog dialog = new ImportDialog(p, importAttributes, (file, format) -> format.importToFile(p, ImportAction.this, file));
-
-        if (dialog.showAndGet()) {
-            final Map<String, List<TestCaseDto>> selectedCasesBySheet = dialog.getSelectedTestCasesBySheet();
-
-            if (selectedCasesBySheet.isEmpty()) {
-                Services.getInstance(p, Notifier.class).softShow(p, "No Selection", "No test cases were selected for import.");
-                return;
-            }
-
-            executeImportWriteAction(p, dirDto, selectedCasesBySheet);
-        } else {
-            Services.getInstance(p, Notifier.class).softShow(p, "Import Cancelled", "Import was cancelled from preview dialog.");
-        }
+        // The framework dialog reports through this callback rather than a
+        // return code, and only ever with a non-empty selection.
+        new ImportDialog(p, importAttributes,
+                (file, format) -> format.importToFile(p, ImportAction.this, file),
+                selectedCasesBySheet -> executeImportWriteAction(p, dirDto, selectedCasesBySheet))
+                .show();
     }
 
     private void executeImportWriteAction(final @NotNull Project p, final @NotNull DirectoryDto selectedDirDto,
