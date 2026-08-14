@@ -1,4 +1,5 @@
 .gradle/
+.inspection/
 .idea/*
 !.idea/inspectionProfiles/
 # The spellchecker's project vocabulary, shared for the same reason the

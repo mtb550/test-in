@@ -26,8 +26,10 @@
 #>
 
 param(
-    # Where the XML output and the two reports are written. Under build/, which is gitignored.
-    [string] $OutputDir = 'build/inspection',
+    # Where the XML output and the two reports are written. Deliberately not
+    # under build/: ./gradlew clean deletes that, and the findings list is what
+    # you work from for the next hour. Gitignored instead.
+    [string] $OutputDir = '.inspection',
 
     # Restrict the run to a subdirectory. Defaults to the production sources,
     # which is the point: .sandbox holds a whole IDE installation from
