@@ -48,7 +48,7 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
             for (final TestCaseDto tc : updatedItems)
                 indexer.putTestCase(path, tc);
 
-            Services.getInstance(p, Notifier.class).softShow(p, "Updated..");
+            Services.getInstance(p, Notifier.class).softShow(p, "Updated");
 
             if (editor instanceof IToolBar)
                 ((IToolBar) editor).onToolBarFilterSelectionChanged();

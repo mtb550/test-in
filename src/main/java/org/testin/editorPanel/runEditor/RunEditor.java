@@ -333,7 +333,6 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing..");
         toolBar.clearFiltersAndSearch();
 
         rememberSelection();

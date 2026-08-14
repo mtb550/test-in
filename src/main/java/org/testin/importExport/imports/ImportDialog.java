@@ -52,7 +52,7 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
                 ComponentDialogBase.button("Import"));
 
         shortcuts = List.of(
-                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::cancel));
+                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(900), JBUI.scale(600));
 
@@ -80,8 +80,4 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
         closeOk();
     }
 
-    private void cancel() {
-        Services.getInstance(p, Notifier.class).softShow(p, "Import Cancelled", "Import was cancelled from preview dialog.");
-        closeCancel();
-    }
 }

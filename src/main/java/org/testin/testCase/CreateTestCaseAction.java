@@ -57,7 +57,7 @@ public class CreateTestCaseAction extends AbstractProjectAction {
             Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             Services.getInstance(p, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);
-            Services.getInstance(p, Notifier.class).softShow(p, "Created..");
+            Services.getInstance(p, Notifier.class).softShow(p, "Created");
 
             GeneratorType.CREATE_TEST_CASE.getAction().execute(p, tc);
 

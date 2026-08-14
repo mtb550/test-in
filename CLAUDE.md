@@ -67,6 +67,19 @@ be committed back into storage.
 - Dialogs are built on the declarative framework (`org.testin.ui.framework`):
   a dialog assigns `title`, `components`, `shortcuts` in its constructor and
   implements `submit()`. Never hand-build popup layouts.
+- **Every state-changing action confirms itself** with one soft notification at
+  the point it succeeded: `Services.getInstance(p, Notifier.class).softShow(p,
+  "Copied")`. The message names the **outcome in the past tense**, one or two
+  words, no trailing dots — `Copied`, `Pasted`, `Renamed`, `Removed`, `Passed`.
+  Three words only where two things on the same screen could be meant: `Node
+  copied` against `Test case copied`. A bulk operation notifies once with a
+  count — `Removed 4`, never four balloons.
+  <p>
+  Not around `actionPerformed`: an action that returns early, opens a
+  confirmation, or hands off to a background task would report a success that has
+  not happened. Put the call after the work, inside whatever `try` could fail.
+  Actions that only move the view — paging, escape, opening a details panel —
+  stay silent, or the tester learns to ignore all of them (#62).
 - **American English**, in comments and in text a tester reads. The platform API
   this is written against is American (`Color`, `EditorColors`, `normalize`), so
   British spellings put two dialects in one sentence — a comment about "the caret

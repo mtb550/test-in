@@ -31,14 +31,22 @@ public class RunTestCaseAction extends AbstractProjectAction {
         if (testCases.isEmpty()) return;
         if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
 
+        int started = 0;
+
         for (TestCaseDto tc : testCases) {
             if (tc == null || tc.getTempStatus() == RunStatus.RUNNING) continue;
 
             p.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(tc.getId().toString().toLowerCase(), RunStatus.RUNNING, null);
 
-            Services.getInstance(p, Notifier.class).softShow(p, "Running Test Case: ", tc.getDescription());
             Services.getInstance(p, TestNGRunnerByMethod.class).runTestMethod(p, tc);
+            started++;
         }
+
+        // Once for the click, not once per case: running a page of twelve used
+        // to raise twelve balloons. Nothing is said when every case was already
+        // running, because nothing was started.
+        if (started == 1) Services.getInstance(p, Notifier.class).softShow(p, "Running");
+        else if (started > 1) Services.getInstance(p, Notifier.class).softShow(p, "Running " + started);
     }
 
     public void execute(final @NotNull TestCaseDto tc) {

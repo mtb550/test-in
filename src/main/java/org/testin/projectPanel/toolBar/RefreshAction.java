@@ -31,7 +31,6 @@ public class RefreshAction extends AbstractProjectAction {
         }
 
         Logger.info("Refresh: re-indexing started");
-        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing..");
 
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.resetForReindex();
@@ -48,6 +47,11 @@ public class RefreshAction extends AbstractProjectAction {
 
                 refreshGuard.set(false);
                 Logger.info("Refresh: tree rebuilt");
+
+                // At the end, not the start: the tree is only usable now, and a
+                // click that found a refresh already running returned above
+                // without saying anything.
+                Services.getInstance(p, Notifier.class).softShow(p, "Refreshed");
             });
         });
     }
