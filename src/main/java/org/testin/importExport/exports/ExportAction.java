@@ -156,19 +156,9 @@ public class ExportAction extends DumbAwareAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
+        final DirectoryDto selected = TreeValueUtil.singleSelectedDirectory(tree);
 
-        final TreePath path = tree.getSelectionPath();
-        final int selectionCount = tree.getSelectionCount();
-
-        if (selectionCount != 1 || path == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
-
-        e.getPresentation().setEnabled(userObject instanceof DirectoryDto dir && dir.isTestCaseContainer());
-
+        e.getPresentation().setEnabled(selected != null && selected.isTestCaseContainer());
     }
 
     @Override

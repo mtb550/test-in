@@ -1,6 +1,7 @@
 package org.testin.projectPanel.tree;
 
 import com.intellij.ide.util.treeView.NodeDescriptor;
+import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -37,6 +38,20 @@ public final class TreeValueUtil {
 
     public static @Nullable DirectoryDto selectedDirectory(final @Nullable TreePath path) {
         return path == null ? null : directoryOf(path.getLastPathComponent());
+    }
+
+    /**
+     * The directory selected on its own, or null when nothing is selected, more
+     * than one thing is, or the selection is not a directory.
+     * <p>
+     * The enablement rule the tree actions share: "exactly one, and it is a
+     * directory". Each of them used to spell it out, so a change to what counts
+     * as a selection had to be made once per action.
+     */
+    public static @Nullable DirectoryDto singleSelectedDirectory(final @NotNull SimpleTree tree) {
+        if (tree.getSelectionCount() != 1) return null;
+
+        return selectedDirectory(tree.getSelectionPath());
     }
 
     public static @NotNull List<DirectoryDto> selectedDirectories(final @Nullable TreePath[] paths) {
