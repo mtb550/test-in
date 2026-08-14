@@ -37,6 +37,7 @@ import org.testin.enums.TestEditorAttributes;
 import org.testin.enums.ViewMode;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.notifications.Notifier;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
@@ -393,6 +394,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
+        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing...");
         toolBar.getToolbarItem(FilterPopupBtn.class).clearFilters();
         toolBar.getToolbarItem(SearchTxt.class).resetSearchQuery();
 
