@@ -40,7 +40,7 @@ public class FileDocumentListener implements DocumentListener {
      */
     private static @Nullable FileTypes importableFormatOf(final @NotNull String fileName) {
         for (final FileTypes type : FileTypes.values()) {
-            if (type.getImportHandler() != null && fileName.endsWith(type.getExtension())) return type;
+            if (type.isImportable() && fileName.endsWith(type.getExtension())) return type;
         }
         return null;
     }

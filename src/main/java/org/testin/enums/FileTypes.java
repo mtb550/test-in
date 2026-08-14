@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.generateReport.generators.TestRunExcelGenerator;
 import org.testin.generateReport.generators.TestRunHtmlGenerator;
 import org.testin.generateReport.generators.TestRunPdfGenerator;
@@ -30,10 +29,10 @@ public enum FileTypes {
     XLS(
             "XLS",
             ".xls",
-            null,
+            "",
             (p, export, destFile, sheets) -> new ExportExcel(export).exportToFile(p, destFile, sheets),
             (p, imports, importFile) -> new ImportExcel(imports).processImport(p, importFile),
-            null
+            ReportHandler.UNSUPPORTED
     ),
 
     XLSX(
@@ -54,10 +53,10 @@ public enum FileTypes {
     JSON(
             "JSON",
             ".json",
-            null,
+            "",
             (p, export, destFile, sheets) -> new ExportJson().exportToFile(p, destFile, sheets),
             (p, imports, importFile) -> new ImportJson().processImport(p, importFile),
-            null
+            ReportHandler.UNSUPPORTED
     ),
 
     CSV(
@@ -72,33 +71,33 @@ public enum FileTypes {
                     The CSV should use comma as delimiter. Values containing commas or newlines must be quoted with double quotes.""",
             (p, export, destFile, sheets) -> new ExportCsv(export).exportToFile(p, destFile, sheets),
             (p, imports, importFile) -> new ImportCsv(imports).processImport(p, importFile),
-            null
+            ReportHandler.UNSUPPORTED
     ),
 
     HTML(
             "HTML",
             ".html",
-            null,
+            "",
             (p, export, destFile, sheets) -> new ExportHtml(export).exportToFile(p, destFile, sheets),
-            null,
+            ImportHandler.UNSUPPORTED,
             (p, trDir, tr, detailsMap) -> new TestRunHtmlGenerator().generate(p, trDir, tr, detailsMap).getBytes(StandardCharsets.UTF_8)
     ),
 
     PDF(
             "PDF",
             ".pdf",
-            null,
-            null,
-            null,
+            "",
+            ExportHandler.UNSUPPORTED,
+            ImportHandler.UNSUPPORTED,
             (p, trDir, tr, detailsMap) -> new TestRunPdfGenerator().generate(p, trDir, tr, detailsMap)
     ),
 
     WORD(
             "WORD",
             ".docx",
-            null,
-            null,
-            null,
+            "",
+            ExportHandler.UNSUPPORTED,
+            ImportHandler.UNSUPPORTED,
             (p, trDir, tr, detailsMap) -> new TestRunWordGenerator().generate(p, trDir, tr, detailsMap)
     );
 
@@ -108,49 +107,49 @@ public enum FileTypes {
     private final @NotNull String extension;
 
     /**
-     * The import-dialog hint; null for formats that need no explanation.
+     * The import-dialog hint; empty for formats that need no explanation.
      */
-    private final @Nullable String infoMessage;
+    private final @NotNull String infoMessage;
 
-    // Null where the format does not support that direction: PDF and WORD are
-    // report-only, HTML has no importer. Callers pick a format by filtering on
-    // the handler they need, so the accessors below fail loudly rather than
-    // NPE'ing if a new call site forgets.
-    private final @Nullable ExportHandler exportHandler;
-    private final @Nullable ImportHandler importHandler;
-    private final @Nullable ReportHandler reportHandler;
+    // PDF and WORD are report-only and HTML has no importer, so those carry the
+    // handler's UNSUPPORTED instance. Ask what a format supports with the
+    // is* methods below - a handler is always present, so its absence is not
+    // the question to ask.
+    private final @NotNull ExportHandler exportHandler;
+    private final @NotNull ImportHandler importHandler;
+    private final @NotNull ReportHandler reportHandler;
 
-    /**
-     * The format the format combo boxes show under this label, or null when the
-     * label matches nothing. The combos are filled from {@link #getLabel()}, so
-     * they must be read back the same way - {@code valueOf} would only work for
-     * as long as every label happens to equal its constant name.
-     */
-    public static @Nullable FileTypes fromLabel(final @NotNull String label) {
-        for (final FileTypes type : values())
-            if (type.label.equals(label)) return type;
+    public boolean isExportable() {
+        return exportHandler != ExportHandler.UNSUPPORTED;
+    }
 
-        return null;
+    public boolean isImportable() {
+        return importHandler != ImportHandler.UNSUPPORTED;
+    }
+
+    public boolean isReportable() {
+        return reportHandler != ReportHandler.UNSUPPORTED;
     }
 
     public void exportToFile(final @NotNull Project p, final @NotNull ExportAction exportAction,
                              final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
-        if (exportHandler == null) throw new IllegalStateException(label + " cannot be exported to");
+        // Checked here rather than left to the handler, so the failure names the format.
+        if (!isExportable()) throw new IllegalStateException(label + " cannot be exported to");
         exportHandler.execute(p, exportAction, destFile, sheetsData);
     }
 
     public @NotNull Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p,
                                                                 final @NotNull ImportAction importAction,
                                                                 final @NotNull File importFile) {
-        if (importHandler == null) throw new IllegalStateException(label + " cannot be imported from");
+        if (!isImportable()) throw new IllegalStateException(label + " cannot be imported from");
         return importHandler.execute(p, importAction, importFile);
     }
 
     public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
                                            final @NotNull TestRunDto tr,
                                            final @NotNull Map<UUID, TestCaseDto> detailsMap) {
-        if (reportHandler == null) throw new IllegalStateException(label + " has no report generator");
+        if (!isReportable()) throw new IllegalStateException(label + " has no report generator");
         return reportHandler.execute(p, trDir, tr, detailsMap);
     }
 }
