@@ -57,18 +57,27 @@ public class RenameAction extends AbstractProjectTreeAction {
     private void renameNode(final @NotNull DirectoryDto dir, final @NotNull String newName) {
         if (newName.isBlank() || newName.equals(dir.getName())) return;
 
+        // No parent means a filesystem root, which is not a node this tree can
+        // rename. Asked first because applyRename resolves the new path against
+        // the parent and would throw on null - the collision check below already
+        // guarded for it while the rename itself did not (#66, F3).
+        final Path parent = dir.getPath().getParent();
+        if (parent == null) {
+            Logger.warn("Rename refused, no parent directory: " + dir.getPath());
+            return;
+        }
+
         // A sibling with the new name would make the VFS rename fail with
         // "already exists" - reject it with a message instead. Existence comes
         // from the indexer cache - file access is the indexer's alone.
-        final Path parent = dir.getPath().getParent();
-        if (parent != null && Services.getInstance(p, ProjectIndexer.class).nodeExists(parent.resolve(newName))) {
+        if (Services.getInstance(p, ProjectIndexer.class).nodeExists(parent.resolve(newName))) {
             Services.getInstance(p, Notifier.class).softShow(p,
                     "'" + newName + "' already exists in '" + parent.getFileName() + "'");
             return;
         }
 
         final String oldName = dir.getName();
-        applyRename(dir, newName, parent == null ? null : () -> confirmRenamed(parent.resolve(newName)));
+        applyRename(dir, newName, () -> confirmRenamed(parent.resolve(newName)));
 
         // The dto reference stays valid across renames, so undo and redo are
         // the same routine with the names swapped.
