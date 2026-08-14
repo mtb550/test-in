@@ -366,20 +366,19 @@ public class TreeTransferHandler extends TransferHandler {
         updateClipboardState(action, transferableSelection());
     }
 
-    public boolean copySelectionToClipboard(final boolean cut) {
+    public void copySelectionToClipboard(final boolean cut) {
         final List<DirectoryDto> directories = transferableSelection();
-        if (directories.isEmpty()) return false;
+        if (directories.isEmpty()) return;
 
         final int action = cut ? MOVE : COPY;
         CopyPasteManager.getInstance().setContents(new NodesTransferable(new TreeTransferPayload(
                 directories.toArray(DirectoryDto[]::new), action)));
         updateClipboardState(action, directories);
-        return true;
     }
 
-    public boolean pasteFromClipboard() {
+    public void pasteFromClipboard() {
         final Transferable contents = CopyPasteManager.getInstance().getContents();
-        return contents != null && importData(new TransferSupport(tree, contents));
+        if (contents != null) importData(new TransferSupport(tree, contents));
     }
 
     private void updateClipboardState(final int action, final @NotNull List<DirectoryDto> directories) {
