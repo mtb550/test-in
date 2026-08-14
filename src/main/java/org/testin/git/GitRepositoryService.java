@@ -13,11 +13,13 @@ import git4idea.repo.GitRepository;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.logger.Logger;
 
 import java.nio.file.Path;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * Repository lookup and branch operations backed by IntelliJ Git4Idea. The naming
@@ -85,11 +87,21 @@ public final class GitRepositoryService {
         return branches.stream().sorted().toList();
     }
 
-    public @NotNull String getRemoteUrl(final @NotNull Path path, final @NotNull String remoteName) throws VcsException {
+    /**
+     * Empty when there is no such remote, and equally when reading the config
+     * failed — both callers already treat an empty URL as "no remote is
+     * configured", which is what an unreadable config amounts to.
+     */
+    public @NotNull String getRemoteUrl(final @NotNull Path path, final @NotNull String remoteName) {
         final VirtualFile root = LocalFileSystem.getInstance().findFileByNioFile(path);
         if (root == null) return "";
-        final String remote = git4idea.config.GitConfigUtil.getValue(project, root, "remote." + remoteName + ".url");
-        return remote == null ? "" : remote.trim();
+        try {
+            final String remote = git4idea.config.GitConfigUtil.getValue(project, root, "remote." + remoteName + ".url");
+            return remote == null ? "" : remote.trim();
+        } catch (final VcsException ex) {
+            Logger.error("Could not read remote." + remoteName + ".url: " + ex.getMessage());
+            return "";
+        }
     }
 
     public @Nullable String getRemoteName(final @NotNull Path path) {
@@ -100,22 +112,40 @@ public final class GitRepositoryService {
         }
     }
 
-    public @NotNull String checkout(final @NotNull Path path, final @NotNull String branch) throws VcsException {
-        final GitRepository repository = requireRepository(path);
-        final boolean remoteBranch = repository.getBranches().getRemoteBranches().stream()
-                .map(GitRemoteBranch::getName)
-                .anyMatch(branch::equals);
-        if (remoteBranch) {
-            final String localBranch = GitRefs.localNameOf(branch);
-            if (repository.getBranches().findLocalBranch(localBranch) == null) {
-                GitCommandRunner.execute(project, path, "git", "checkout", "-b", localBranch, "--track", branch);
-                return localBranch;
-            }
+    /**
+     * The branch that is now checked out, or null when the checkout failed —
+     * which the caller reads as "put the branch box back where it was". The git
+     * reason goes to the log rather than into the caller's balloon: it is
+     * command output, and the sentence the tester needs (uncommitted changes)
+     * is the caller's to write.
+     */
+    public @Nullable String checkout(final @NotNull Path path, final @NotNull String branch) {
+        final GitRepository repository = findRepository(path);
+        if (repository == null) {
+            Logger.error("Checkout failed, no Git repository at: " + path);
+            return null;
         }
 
-        final GitCommandResult result = Git.getInstance().checkout(repository, branch, null, false, false);
-        result.throwOnError();
-        return branch;
+        try {
+            final boolean remoteBranch = repository.getBranches().getRemoteBranches().stream()
+                    .map(GitRemoteBranch::getName)
+                    .anyMatch(branch::equals);
+            if (remoteBranch) {
+                final String localBranch = GitRefs.localNameOf(branch);
+                if (repository.getBranches().findLocalBranch(localBranch) == null) {
+                    GitCommandRunner.execute(project, path, "git", "checkout", "-b", localBranch, "--track", branch);
+                    return localBranch;
+                }
+            }
+
+            final GitCommandResult result = Git.getInstance().checkout(repository, branch, null, false, false);
+            result.throwOnError();
+            return branch;
+
+        } catch (final VcsException | RuntimeException ex) {
+            Logger.error("Checkout of '" + branch + "' failed: " + ex.getMessage());
+            return null;
+        }
     }
 
     public boolean hasConflicts(final @NotNull Path path) {
@@ -126,22 +156,37 @@ public final class GitRepositoryService {
         return result.success() && !result.getOutput().isEmpty();
     }
 
-    public void abortRebase(final @NotNull Path path) throws VcsException {
-        final GitRepository repository = requireRepository(path);
-        Git.getInstance().rebaseAbort(repository).throwOnError();
+    /**
+     * False when the abort did not happen. The caller decides what to say: a
+     * rebase that still has conflicts is re-offered rather than reported as a
+     * plain failure, and only this method's caller knows that.
+     */
+    public boolean abortRebase(final @NotNull Path path) {
+        return rebase(path, "abort", repository -> Git.getInstance().rebaseAbort(repository));
     }
 
-    public void continueRebase(final @NotNull Path path) throws VcsException {
-        final GitRepository repository = requireRepository(path);
-        Git.getInstance().rebaseContinue(repository).throwOnError();
+    /**
+     * False when the rebase did not continue — see {@link #abortRebase}.
+     */
+    public boolean continueRebase(final @NotNull Path path) {
+        return rebase(path, "continue", repository -> Git.getInstance().rebaseContinue(repository));
     }
 
-    private @NotNull GitRepository requireRepository(final @NotNull Path path) throws VcsException {
+    private boolean rebase(final @NotNull Path path, final @NotNull String operation,
+                           final @NotNull Function<GitRepository, GitCommandResult> command) {
         final GitRepository repository = findRepository(path);
         if (repository == null) {
-            throw new VcsException("Git repository not found: " + path);
+            Logger.error("Rebase " + operation + " failed, no Git repository at: " + path);
+            return false;
         }
-        return repository;
+
+        try {
+            command.apply(repository).throwOnError();
+            return true;
+        } catch (final VcsException | RuntimeException ex) {
+            Logger.error("Rebase " + operation + " failed: " + ex.getMessage());
+            return false;
+        }
     }
 }
 

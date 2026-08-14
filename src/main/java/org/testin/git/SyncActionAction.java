@@ -109,27 +109,41 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                 abortAction);
     }
 
+    /**
+     * Conflicts still in the way are not a failure the tester can read and act
+     * on — they are the same situation that raised the conflict notification in
+     * the first place, so it is raised again with its two buttons.
+     */
+    private void reportRebaseFailure(final @NotNull Path repoPath, final @NotNull String message) {
+        ApplicationManager.getApplication().invokeLater(() -> {
+            if (sync.hasConflicts(repoPath)) showConflictActions(repoPath);
+            else Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", message);
+        });
+    }
+
     private void finishRebase(final @NotNull Path repoPath, final boolean abort) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, abort ? "Aborting rebase" : "Continuing rebase", false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
-                try {
-                    if (abort) {
-                        sync.abortRebase(repoPath);
-                        refreshRepository(repoPath);
-                        ApplicationManager.getApplication().invokeLater(() ->
-                                Services.getInstance(p, Notifier.class).info(p, "Git Conflict Resolution", "Rebase aborted."));
-                    } else {
-                        sync.continueRebase(repoPath);
-                        refreshAfterSync(repoPath);
+                // The reason is logged by the service; what is left here is the
+                // choice it cannot make - conflicts that remain are re-offered
+                // rather than reported as a plain failure (#63).
+                if (abort) {
+                    if (!sync.abortRebase(repoPath)) {
+                        reportRebaseFailure(repoPath, "Could not abort the rebase.");
+                        return;
                     }
-                } catch (final Exception ex) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (sync.hasConflicts(repoPath)) showConflictActions(repoPath);
-                        else
-                            Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", ex.getMessage());
-                    });
+                    refreshRepository(repoPath);
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Services.getInstance(p, Notifier.class).info(p, "Git Conflict Resolution", "Rebase aborted."));
+                    return;
                 }
+
+                if (!sync.continueRebase(repoPath)) {
+                    reportRebaseFailure(repoPath, "Could not continue the rebase.");
+                    return;
+                }
+                refreshAfterSync(repoPath);
             }
         });
     }

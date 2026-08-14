@@ -238,10 +238,13 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                               final @NotNull String branch, final boolean abort) {
         GitBackgroundTask.run(p, abort ? "Aborting rebase" : "Continuing rebase", false,
                 indicator -> {
+                    // GitTaskWork declares throws so a lambda can report failure
+                    // to the task's error handler - which is where the conflict
+                    // recovery below lives. The git reason is already logged (#63).
                     if (abort) {
-                        git.abortRebase(repoPath);
+                        if (!git.abortRebase(repoPath)) throw new IllegalStateException("Could not abort the rebase.");
                     } else {
-                        git.continueRebase(repoPath);
+                        if (!git.continueRebase(repoPath)) throw new IllegalStateException("Could not continue the rebase.");
                         commits.push(repoPath, remote, branch);
                     }
                     ApplicationManager.getApplication().invokeLater(() ->

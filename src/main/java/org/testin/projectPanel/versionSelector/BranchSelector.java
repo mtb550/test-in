@@ -112,32 +112,45 @@ public class BranchSelector {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                try {
-                    currentBranch = git.checkout(repositoryPath, targetBranch);
 
+                // Null means the checkout did not happen; the git reason is
+                // already in testin.log, and the sentence worth showing is the
+                // one below rather than the command's output (#63).
+                final @Nullable String checkedOut = git.checkout(repositoryPath, targetBranch);
+                if (checkedOut == null) {
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        final TestProjectDirectoryDto currentProject = pp.getTestProjectSelector().getSelectedTestProject().getItem();
-                        if (currentProject != null) {
-                            pp.getProjectTree().refresh();
-                        }
+                        restoreSelectedBranch();
+                        Services.getInstance(p, Notifier.class).error(p, "Git Checkout Failed",
+                                "Could not checkout " + targetBranch + ". Do you have uncommitted changes?");
                     });
-
-                } catch (final Exception ex) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        isUpdating = true;
-                        try {
-                            if (!currentBranch.isEmpty()) {
-                                comboBox.setSelectedItem(currentBranch);
-                            }
-                        } finally {
-                            isUpdating = false;
-                        }
-
-                        Services.getInstance(p, Notifier.class).error(p, "Git Checkout Failed", "Could not checkout " + targetBranch + ". Do you have uncommitted changes?\n" + ex.getMessage());
-                    });
+                    return;
                 }
+
+                currentBranch = checkedOut;
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    final TestProjectDirectoryDto currentProject = pp.getTestProjectSelector().getSelectedTestProject().getItem();
+                    if (currentProject != null) {
+                        pp.getProjectTree().refresh();
+                    }
+                });
             }
         });
+    }
+
+    /**
+     * Puts the box back on the branch that is actually checked out — the failed
+     * selection is still showing, and leaving it there says the checkout worked.
+     */
+    private void restoreSelectedBranch() {
+        isUpdating = true;
+        try {
+            if (!currentBranch.isEmpty()) {
+                comboBox.setSelectedItem(currentBranch);
+            }
+        } finally {
+            isUpdating = false;
+        }
     }
 
     private void loadGitBranches(final @NotNull Path repositoryPath) {

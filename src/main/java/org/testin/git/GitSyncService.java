@@ -27,11 +27,11 @@ public final class GitSyncService {
         return repositories.hasConflicts(repositoryPath);
     }
 
-    public void abortRebase(final @NotNull Path repositoryPath) throws com.intellij.openapi.vcs.VcsException {
-        repositories.abortRebase(repositoryPath);
+    public boolean abortRebase(final @NotNull Path repositoryPath) {
+        return repositories.abortRebase(repositoryPath);
     }
 
-    public void continueRebase(final @NotNull Path repositoryPath) throws com.intellij.openapi.vcs.VcsException {
-        repositories.continueRebase(repositoryPath);
+    public boolean continueRebase(final @NotNull Path repositoryPath) {
+        return repositories.continueRebase(repositoryPath);
     }
 }
