@@ -48,7 +48,7 @@ public final class GitDiffProcessor {
                         relativePath,
                         mapper);
                 if (diff != null) result.add(diff);
-            } catch (final VcsException | RuntimeException ex) {
+            } catch (final RuntimeException ex) {
                 throw new IllegalStateException("Failed to read Git change " + relativePath, ex);
             }
         }
@@ -63,8 +63,19 @@ public final class GitDiffProcessor {
         };
     }
 
-    private static @Nullable String contentOf(final @Nullable ContentRevision revision) throws VcsException {
-        return revision == null ? null : revision.getContent();
+    /**
+     * Null when there is no such revision — an added file has no "before", a
+     * deleted one no "after". A revision that exists but cannot be read is not
+     * that case: returning null for it would turn a modified file into an added
+     * one in the review, so it is raised instead, and the caller adds the path.
+     */
+    private static @Nullable String contentOf(final @Nullable ContentRevision revision) {
+        if (revision == null) return null;
+        try {
+            return revision.getContent();
+        } catch (final VcsException ex) {
+            throw new IllegalStateException("Could not read revision " + revision.getRevisionNumber().asString(), ex);
+        }
     }
 
     private static @Nullable Path pathOf(final @NotNull Change change) {

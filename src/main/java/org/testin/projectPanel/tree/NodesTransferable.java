@@ -28,6 +28,13 @@ record NodesTransferable(@NotNull TreeTransferPayload payload) implements Transf
         return TreeTransferHandler.NODE_FLAVOR.equals(flavor) || DataFlavor.javaFileListFlavor.equals(flavor);
     }
 
+    /**
+     * The {@code throws} stays deliberately, and is one of the two exceptions to
+     * the rule in CLAUDE.md that a method handles its own failures. AWT's
+     * {@link java.awt.datatransfer.Transferable} contract is that an unsupported
+     * flavor throws; catching it here would hand the platform's drag-and-drop a
+     * wrong object instead of telling it the flavor is not available (#63).
+     */
     @Override
     public @NotNull Object getTransferData(final @NotNull DataFlavor flavor) throws UnsupportedFlavorException {
         if (TreeTransferHandler.NODE_FLAVOR.equals(flavor)) return payload;
