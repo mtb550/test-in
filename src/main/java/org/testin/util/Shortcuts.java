@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
+import org.intellij.lang.annotations.MagicConstant;
+
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
@@ -89,6 +91,7 @@ public enum Shortcuts {
      * The platform menu modifier (Cmd on macOS, Ctrl elsewhere), same source
      * as the other cross-platform shortcuts; plain Ctrl in headless test runs.
      */
+    @MagicConstant(flagsFromClass = InputEvent.class)
     private static int menuMask() {
         try {
             return Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx();

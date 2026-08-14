@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBPanel;
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.statusBar.DialogStatusBar;
 import org.testin.statusBar.IStatusBarItem;
@@ -74,7 +75,10 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
     // What the shell provides.
     // ------------------------------------------------------------------
 
-    private static void installKey(final @NotNull JComponent component, final int condition,
+    private static void installKey(final @NotNull JComponent component,
+                                   final @MagicConstant(intValues = {JComponent.WHEN_FOCUSED,
+                                           JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT,
+                                           JComponent.WHEN_IN_FOCUSED_WINDOW}) int condition,
                                    final @NotNull KeyStroke key, final @NotNull String actionKey, final @NotNull Runnable action) {
         component.getInputMap(condition).put(key, actionKey);
         component.getActionMap().put(actionKey, new AbstractAction() {
