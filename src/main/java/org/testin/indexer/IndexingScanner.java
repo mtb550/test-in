@@ -2,6 +2,7 @@ package org.testin.indexer;
 
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
@@ -22,15 +23,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+@AllArgsConstructor
 final class IndexingScanner {
 
     private final @NotNull Project p;
     private final @NotNull IndexerDataStore store;
-
-    IndexingScanner(final @NotNull Project p, final @NotNull IndexerDataStore store) {
-        this.p = p;
-        this.store = store;
-    }
 
     void scanProject(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {

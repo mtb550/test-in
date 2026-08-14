@@ -2,6 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Shortcuts;
@@ -20,14 +21,10 @@ import java.util.stream.Collectors;
  * already binds the same key on this list, so handling it here as well ran two
  * different deletions for one keypress - one of them without the confirmation.
  */
+@AllArgsConstructor
 public class KeyListener extends KeyAdapter {
     private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
-
-    public KeyListener(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        this.p = p;
-        this.list = list;
-    }
 
     @Override
     public void keyPressed(final KeyEvent e) {

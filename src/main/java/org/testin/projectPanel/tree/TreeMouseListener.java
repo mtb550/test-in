@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.ActionPopupMenu;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.PopupHandler;
 import com.intellij.ui.treeStructure.SimpleTree;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.open.OpenAction;
@@ -15,17 +16,11 @@ import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 
+@AllArgsConstructor
 public class TreeMouseListener extends PopupHandler {
     private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
     private final @NotNull TreeContextMenu treeContextMenu;
-
-    public TreeMouseListener(final @NotNull Project p, final @NotNull SimpleTree tree,
-                             final @NotNull TreeContextMenu treeContextMenu) {
-        this.p = p;
-        this.tree = tree;
-        this.treeContextMenu = treeContextMenu;
-    }
 
     @Override
     public void invokePopup(final @NotNull Component comp, final int x, final int y) {

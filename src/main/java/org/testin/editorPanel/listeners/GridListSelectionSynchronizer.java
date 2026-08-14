@@ -2,6 +2,7 @@ package org.testin.editorPanel.listeners;
 
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.event.ListSelectionEvent;
@@ -12,18 +13,11 @@ import java.util.function.Supplier;
 /**
  * Keeps the visible grid cell aligned with the list selection.
  */
+@AllArgsConstructor
 public final class GridListSelectionSynchronizer implements ListSelectionListener {
     private final @NotNull JBList<?> list;
     private final @NotNull Supplier<JBTable> tableSupplier;
     private final @NotNull BooleanSupplier gridActiveSupplier;
-
-    public GridListSelectionSynchronizer(final @NotNull JBList<?> list,
-                                         final @NotNull Supplier<JBTable> tableSupplier,
-                                         final @NotNull BooleanSupplier gridActiveSupplier) {
-        this.list = list;
-        this.tableSupplier = tableSupplier;
-        this.gridActiveSupplier = gridActiveSupplier;
-    }
 
     @Override
     public void valueChanged(final ListSelectionEvent event) {
