@@ -91,7 +91,7 @@ public enum DirectoryType {
     TS(
             "Test Set",
             null,
-            AllIcons.FileTypes.Text,
+            AllIcons.Vcs.Changelist,
             TestSetDirectoryDto.class,
             ".ts",
             CreateTestSet::new,
@@ -106,7 +106,7 @@ public enum DirectoryType {
     TR(
             "Test Run",
             null,
-            AllIcons.Nodes.Services,
+            AllIcons.Toolwindows.ToolWindowRunWithCoverage,
             TestRunDirectoryDto.class,
             ".tr",
             CreateTestRun::new,

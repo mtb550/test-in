@@ -25,7 +25,7 @@ public enum TestRunStatus {
     CREATED(
             "Created",
             null,
-            AllIcons.Nodes.Test,
+            AllIcons.General.Add,
             "Start Execution",
             "Start execution of test cases",
             AllIcons.Nodes.Services
@@ -34,7 +34,7 @@ public enum TestRunStatus {
     IN_PROGRESS(
             "In Progress",
             null,
-            AllIcons.Actions.Execute,
+            AllIcons.Actions.BuildAutoReloadChanges,
             "Complete Test Run",
             "Mark test run as completed",
             AllIcons.Actions.Checked
@@ -43,7 +43,7 @@ public enum TestRunStatus {
     COMPLETED(
             "Completed",
             KeyStroke.getKeyStroke(KeyEvent.VK_2, 0),
-            AllIcons.Actions.Checked,
+            AllIcons.Toolwindows.ToolWindowCoverage,
             "Start Execution",
             "Start execution of test cases",
             AllIcons.Nodes.Services
@@ -52,7 +52,7 @@ public enum TestRunStatus {
     ASSIGNED(
             "Assigned",
             KeyStroke.getKeyStroke(KeyEvent.VK_1, 0),
-            AllIcons.General.User,
+            AllIcons.Gutter.ExtAnnotation,
             "Start Execution",
             "Start execution of test cases",
             AllIcons.Nodes.Services
