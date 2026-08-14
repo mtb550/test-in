@@ -19,6 +19,7 @@ import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Shortcuts;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,15 +94,25 @@ public class RemoveTestCaseAction extends DumbAwareAction {
      * selections: each removed run is bridged by its surrounding survivors —
      * relinking only around first/last selected would leave middle survivors
      * unreachable and silently break the ordering.
+     * <p>
+     * Walks the editor's master list rather than the page model. The model holds
+     * one page, so deleting the first case on page two would look like deleting
+     * the head - page one's last case would keep pointing at a removed id.
      */
     private void relinkAroundRemoved(final @NotNull List<TestCaseDto> selectedItems) {
         final Set<UUID> removedIds = new HashSet<>();
         for (final TestCaseDto tc : selectedItems) removedIds.add(tc.getId());
 
+        final List<TestCaseDto> source = editor.getAllTestCases();
+        final List<TestCaseDto> all;
+        synchronized (source) {
+            all = new ArrayList<>(source);
+        }
+
         TestCaseDto prevSurvivor = null;
         int i = 0;
-        while (i < model.getSize()) {
-            final TestCaseDto tc = model.getElementAt(i);
+        while (i < all.size()) {
+            final TestCaseDto tc = all.get(i);
             if (!removedIds.contains(tc.getId())) {
                 prevSurvivor = tc;
                 i++;
@@ -110,8 +121,8 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
             // A run of removed rows: find the survivor after it.
             int j = i;
-            while (j < model.getSize() && removedIds.contains(model.getElementAt(j).getId())) j++;
-            final TestCaseDto nextSurvivor = j < model.getSize() ? model.getElementAt(j) : null;
+            while (j < all.size() && removedIds.contains(all.get(j).getId())) j++;
+            final TestCaseDto nextSurvivor = j < all.size() ? all.get(j) : null;
 
             if (prevSurvivor == null) {
                 if (Boolean.TRUE.equals(tc.getIsHead()) && nextSurvivor != null) {
