@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeUndoService;
 import org.testin.services.Services;
 import org.testin.util.Tools;
@@ -26,7 +27,15 @@ public class UndoNodeAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Services.getInstance(p, TreeUndoService.class).undo();
+        final TreeUndoService undo = Services.getInstance(p, TreeUndoService.class);
+
+        // Asked before, not after: undo() returns silently on an empty stack, so
+        // notifying unconditionally would claim an undo that never ran. The
+        // presentation is disabled in that case, but a shortcut can still fire.
+        if (!undo.canUndo()) return;
+
+        undo.undo();
+        Services.getInstance(p, Notifier.class).softShow(p, "Undone");
     }
 
     @Override

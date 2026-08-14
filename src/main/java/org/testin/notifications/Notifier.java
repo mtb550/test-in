@@ -35,6 +35,16 @@ public final class Notifier {
     }
 
     /**
+     * Confirms an operation that ran over a selection: "Node copied" for one,
+     * "Nodes copied 3" for several. Here rather than at the call sites so that
+     * every bulk action pluralizes and counts the same way (#62).
+     */
+    public void softShowCounted(final @NotNull Project p, final @NotNull String noun,
+                                final @NotNull String outcome, final int count) {
+        softShow(p, count == 1 ? noun + " " + outcome : noun + "s " + outcome + " " + count);
+    }
+
+    /**
      * Lightweight fading balloon anchored to the IDE status bar.
      */
     private void showBalloon(final @NotNull Project p, final @NotNull String htmlContent) {

@@ -282,10 +282,28 @@ public class TreeTransferHandler extends TransferHandler {
             moveNodes(sources, target);
         } else {
             final List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
-            Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), refresh);
+            final List<Path> copies = sources.stream().map(source -> target.getPath().resolve(source.getName())).toList();
+            Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), () -> {
+                refresh.run();
+                confirmLanded("pasted", copies);
+            });
         }
 
         resetLastAction();
+    }
+
+    /**
+     * Confirms what actually arrived, for both the clipboard paste and the drop.
+     * Copy and move run their completion callback whether the VFS operation
+     * succeeded or failed - a failure raises its own error balloon - so the
+     * result is read back from the indexer cache instead of assumed (#62).
+     */
+    private void confirmLanded(final @NotNull String outcome, final @NotNull List<Path> paths) {
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final int landed = (int) paths.stream().filter(indexer::nodeExists).count();
+        if (landed == 0) return;
+
+        Services.getInstance(p, Notifier.class).softShowCounted(p, "Node", outcome, landed);
     }
 
     private @Nullable DirectoryDto targetDirectory(final @NotNull TransferSupport support) {
@@ -325,7 +343,7 @@ public class TreeTransferHandler extends TransferHandler {
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
 
-        moveBatch(oldPaths, newPaths);
+        moveBatch(oldPaths, newPaths, () -> confirmLanded("moved", newPaths));
 
         Services.getInstance(p, TreeUndoService.class).push(new TreeUndoService.TreeOperation(
                 "Move " + describe(sources),
@@ -334,13 +352,26 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to) {
+        moveBatch(from, to, null);
+    }
+
+    /**
+     * The undo and redo reverses pass no {@code onDone}: they are confirmed as
+     * "Undone" and "Redone" by their own actions, and a second balloon saying
+     * the nodes moved would double-report one keystroke.
+     */
+    private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to,
+                           final @Nullable Runnable onDone) {
         final AtomicInteger remaining = new AtomicInteger(from.size());
         for (int i = 0; i < from.size(); i++) {
             Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), () -> {
                 // The move is asynchronous, so this can land after the project
                 // closed; refreshing a disposed tree throws.
                 if (p.isDisposed()) return;
-                if (remaining.decrementAndGet() == 0) refresh.run();
+                if (remaining.decrementAndGet() != 0) return;
+
+                refresh.run();
+                if (onDone != null) onDone.run();
             });
         }
     }
@@ -374,6 +405,13 @@ public class TreeTransferHandler extends TransferHandler {
         CopyPasteManager.getInstance().setContents(new NodesTransferable(new TreeTransferPayload(
                 directories.toArray(DirectoryDto[]::new), action)));
         updateClipboardState(action, directories);
+
+        // Here rather than in CopyNodeAction and CutNodeAction: this is the point
+        // that knows the clipboard was actually written, how many nodes went on
+        // it, and which of the two it was. A copy changes nothing on screen, so
+        // without this the tester has no way to tell it happened.
+        Services.getInstance(p, Notifier.class)
+                .softShowCounted(p, "Node", cut ? "cut" : "copied", directories.size());
     }
 
     public void pasteFromClipboard() {

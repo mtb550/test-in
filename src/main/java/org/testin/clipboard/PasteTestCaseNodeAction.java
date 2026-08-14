@@ -16,6 +16,7 @@ import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
@@ -73,6 +74,8 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
                 }
             }
 
+            int pasted = 0;
+
             for (TestCaseDto tc : pastedCases) {
                 if (tc == null) continue;
 
@@ -80,6 +83,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
                 clonedTc.setParent(destUI.getParent());
                 destUI.getAllTestCases().add(clonedTc);
+                pasted++;
             }
 
             destUI.resortAndPersistSequence();
@@ -87,6 +91,10 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
             if (isCut) {
                 TestEditorContextMenu.clearCutState();
             }
+
+            // Inside the invokeLater and after the persist: the action itself
+            // returns long before the cases exist (#62).
+            if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "pasted", pasted);
         });
     }
 

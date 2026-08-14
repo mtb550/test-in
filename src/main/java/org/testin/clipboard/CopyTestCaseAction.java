@@ -39,7 +39,9 @@ public class CopyTestCaseAction extends AbstractProjectAction {
 
         Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null);
 
-        Services.getInstance(p, Notifier.class).softShow(p, "Copied");
+        // Not just "Copied": the same list also offers Copy Node, which puts the
+        // case itself on the clipboard rather than its readable details (#62).
+        Services.getInstance(p, Notifier.class).softShow(p, "Details copied");
     }
 
     @Override

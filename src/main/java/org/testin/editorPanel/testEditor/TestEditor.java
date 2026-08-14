@@ -155,7 +155,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         // Test editor specifics: manual reordering by drag-and-drop and the card renderer.
         list.setDragEnabled(true);
         list.setDropMode(DropMode.INSERT);
-        list.setTransferHandler(new TransferListener(this));
+        list.setTransferHandler(new TransferListener(p, this));
         list.setCellRenderer(new TestListRenderer(p, this));
         list.addKeyListener(new KeyListener(p, list));
 
