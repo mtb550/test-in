@@ -45,14 +45,12 @@ public class GenerateReportAction extends DumbAwareAction {
     private final @NotNull Project p;
     private final @Nullable SimpleTree tree;
     private final @Nullable IEditor editor;
-    private final @Nullable JBList<TestCaseDto> list;
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super("Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
         this.p = p;
         this.tree = tree;
         this.editor = null;
-        this.list = null;
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
@@ -60,7 +58,6 @@ public class GenerateReportAction extends DumbAwareAction {
         this.p = p;
         this.tree = null;
         this.editor = editor;
-        this.list = list;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 

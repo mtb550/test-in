@@ -102,11 +102,6 @@ final class IndexerDataStore {
         return testSetsDirByPath.get(path.toString());
     }
 
-    @Nullable
-    TestSetPackageDirectoryDto getTestSetPackageByPath(final @NotNull Path path) {
-        return testSetPackagesByPath.get(path.toString());
-    }
-
     void putTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
         testCaseStore.put(testSetPath, tc);
     }

@@ -51,12 +51,6 @@ public final class TreeUtilImpl {
 
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
                                  final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation,
-                                 final @Nullable Runnable onSuccess) {
-        executeVfsAction(p, sourcePath, targetPath, errorTitle, operation, onSuccess, null);
-    }
-
-    public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
-                                 final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation,
                                  final @Nullable Runnable onSuccess, final @Nullable Runnable onFailure) {
         // Both lookups off the EDT, the operation on it - see the single-path form.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
