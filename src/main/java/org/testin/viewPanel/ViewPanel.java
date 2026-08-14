@@ -19,6 +19,7 @@ import org.testin.viewPanel.openBugs.OpenBugsTab;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ViewPanel implements Disposable {
@@ -137,6 +138,19 @@ public class ViewPanel implements Disposable {
 
         detailsTab.revalidate();
         detailsTab.repaint();
+    }
+
+    /**
+     * Refreshes the panel when the case on display is one of those updated.
+     * The callers used to work this out from outside, asking the panel three
+     * questions in a row; whether a refresh is needed is the panel's own business.
+     */
+    public void refreshIfShowing(final @NotNull Collection<TestCaseDto> updated) {
+        final TestCaseDto current = getCurrentTestCaseDto();
+        if (current == null) return;
+
+        if (updated.stream().anyMatch(item -> item.getId().equals(current.getId())))
+            refreshCurrentView();
     }
 
     public @Nullable TestCaseDto getCurrentTestCaseDto() {

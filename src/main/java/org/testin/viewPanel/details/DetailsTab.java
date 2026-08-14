@@ -180,13 +180,8 @@ public class DetailsTab {
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 final ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
-                if (detailsPanel != null && detailsPanel.getCurrentTestCaseDto() != null) {
-                    final boolean isCurrentAffected = tcs.stream()
-                            .anyMatch(item -> item.getId().equals(detailsPanel.getCurrentTestCaseDto().getId()));
-                    if (isCurrentAffected) {
-                        detailsPanel.refreshCurrentView();
-                    }
-                }
+                if (detailsPanel != null)
+                    detailsPanel.refreshIfShowing(tcs);
 
                 Logger.trace("Generating automation code: " + gt);
                 final GeneratorAction action = gt.getAction();

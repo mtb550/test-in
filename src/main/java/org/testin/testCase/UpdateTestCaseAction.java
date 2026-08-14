@@ -63,13 +63,8 @@ public class UpdateTestCaseAction extends DumbAwareAction {
                 list.repaint();
 
                 final ViewPanel detailsPanel = ViewToolWindowFactory.getViewPanel();
-                if (detailsPanel != null && detailsPanel.getCurrentTestCaseDto() != null) {
-                    final boolean isCurrentAffected = updatedItems.stream()
-                            .anyMatch(item -> item.getId().equals(detailsPanel.getCurrentTestCaseDto().getId()));
-                    if (isCurrentAffected) {
-                        detailsPanel.refreshCurrentView();
-                    }
-                }
+                if (detailsPanel != null)
+                    detailsPanel.refreshIfShowing(updatedItems);
 
                 Logger.trace("Generating automation code: " + gt);
                 final GeneratorAction action = gt.getAction();
