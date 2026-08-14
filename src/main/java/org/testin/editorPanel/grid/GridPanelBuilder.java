@@ -4,12 +4,12 @@ import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.ui.hover.TableHoverListener;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.EditorColors;
+import org.testin.editorPanel.Shared;
 import org.testin.enums.RunEditorAttributes;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
@@ -148,13 +148,7 @@ public class GridPanelBuilder {
         table.addMouseWheelListener(new MouseAdapter() {
             @Override
             public void mouseWheelMoved(final MouseWheelEvent e) {
-                if (e.isControlDown() || e.isMetaDown()) return;
-                final JBScrollPane scrollPane = getScrollPane(e.getComponent());
-                if (scrollPane != null && e.getComponent() != scrollPane) {
-                    final MouseWheelEvent cloned = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
-                    scrollPane.dispatchEvent(cloned);
-                    e.consume();
-                }
+                Shared.forwardWheelToScrollPane(e);
             }
         });
     }
@@ -197,15 +191,6 @@ public class GridPanelBuilder {
             public void columnSelectionChanged(final javax.swing.event.ListSelectionEvent e) {
             }
         });
-    }
-
-    private static @Nullable JBScrollPane getScrollPane(final @Nullable Component component) {
-        Component current = component;
-        while (current != null) {
-            if (current instanceof JBScrollPane) return (JBScrollPane) current;
-            current = current.getParent();
-        }
-        return null;
     }
 
     private static void autoSizeColumns(final @NotNull JBTable table) {

@@ -5,13 +5,13 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.editorPanel.BaseCard;
 import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.Shared;
 import org.testin.enums.CardHoverAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -148,16 +148,7 @@ public class MouseListenerImpl extends MouseAdapter {
 
     @Override
     public void mouseWheelMoved(final MouseWheelEvent e) {
-        if (e.isControlDown() || e.isMetaDown())
-            return;
-
-        final JBScrollPane scrollPane = getScrollPane(e.getComponent());
-
-        if (scrollPane != null && e.getComponent() != scrollPane) {
-            final MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
-            scrollPane.dispatchEvent(clonedEvent);
-            e.consume();
-        }
+        Shared.forwardWheelToScrollPane(e);
     }
 
     private @Nullable CardHoverAction getActionAtPoint(final int index, final int xInCell, final int yInCell) {
@@ -186,18 +177,6 @@ public class MouseListenerImpl extends MouseAdapter {
 
             if (xInCell >= navStartX && xInCell <= runStartX) return CardHoverAction.NAVIGATE_TO_TEST_METHOD;
             if (xInCell > runStartX && xInCell <= runEndX) return CardHoverAction.RUN_TEST_CASE;
-        }
-
-        return null;
-    }
-
-    private @Nullable JBScrollPane getScrollPane(final @Nullable Component component) {
-        Component current = component;
-        while (current != null) {
-            if (current instanceof JBScrollPane)
-                return (JBScrollPane) current;
-
-            current = current.getParent();
         }
 
         return null;
