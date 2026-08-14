@@ -11,6 +11,7 @@ import org.testin.enums.DirectoryType;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.nodeCreator.dialogs.CreateRunDialog;
 import org.testin.nodeCreator.dialogs.CreateTestDialog;
+import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
@@ -47,8 +48,11 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
             Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
 
             // Asynchronous creators (test runs) return null and run their own
-            // follow-up once their dialog completes.
+            // follow-up once their dialog completes - including their own
+            // confirmation, which is why this one sits after the null check.
             if (dir == null) return;
+
+            Services.getInstance(p, Notifier.class).softShow(p, "Node created");
 
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);

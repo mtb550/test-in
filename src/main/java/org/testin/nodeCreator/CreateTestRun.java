@@ -153,6 +153,10 @@ public class CreateTestRun implements NodeCreator {
                 pp.getProjectTree().refresh();
                 Services.getInstance(p, EditorUtil.class).openIfNotOpen(p, trDir);
 
+                // Here rather than in CreateTreeNodeAction: creating a run is
+                // asynchronous, and the action returns while the dialog is still
+                // open (#62).
+                Services.getInstance(p, Notifier.class).softShow(p, "Run created");
             });
 
         });

@@ -15,6 +15,7 @@ import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Shortcuts;
@@ -63,7 +64,13 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
                 ? "Remove '" + selectedItems.getFirst().getDescription() + "'?"
                 : "Remove these " + selectedItems.size() + " test cases?";
 
-        new ConfirmDialog(p, "Confirm Removing", msg, dir.getPath().toString(), null, "Remove", delete).show();
+        new ConfirmDialog(p, "Confirm Removing", msg, dir.getPath().toString(), null, "Remove", () -> {
+            delete.run();
+
+            // Inside the confirmation callback, not around actionPerformed: a
+            // cancelled dialog removes nothing and says nothing (#62).
+            Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "removed", selectedItems.size());
+        }).show();
     }
 
     private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
