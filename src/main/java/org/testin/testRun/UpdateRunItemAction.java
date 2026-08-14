@@ -15,6 +15,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.mappers.dto.TestRunDto;
 import org.testin.services.Services;
 import org.testin.testRun.createDialog.FailedResultDialog;
 import org.testin.util.Shortcuts;
@@ -50,7 +51,16 @@ public class UpdateRunItemAction extends DumbAwareAction {
         // The same details dialog that opens automatically on a Failed status;
         // F2 edits without touching the status.
         new FailedResultDialog(p, runItem, () -> {
-            Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), runEditor.getTr());
+            final TestRunDto tr = runEditor.getTr();
+
+            // The editor nulls tr while it reloads. Persisting is the whole point
+            // of the callback, so say the edit was dropped rather than lose it quietly.
+            if (tr == null) {
+                Logger.warn("Run item edited while the run was reloading; not persisted");
+                return;
+            }
+
+            Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), tr);
             list.repaint();
         }).show();
     }

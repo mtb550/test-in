@@ -20,48 +20,39 @@ public enum RunStatus {
     IDLE(
             AllIcons.RunConfigurations.TestState.Run,
             "Run Test Case",
-            "",
             null
     ),
 
     PASSED(
             AllIcons.RunConfigurations.TestPassed,
             "Run Test Case",
-            "Passed",
-            new JBColor(new Color(100, 200, 100), new Color(50, 150, 50))
+            new Badge("Passed", new JBColor(new Color(100, 200, 100), new Color(50, 150, 50)))
     ),
 
     FAILED(
             AllIcons.RunConfigurations.TestFailed,
             "Run Test Case",
-            "Failed",
-            new JBColor(new Color(255, 100, 100), new Color(180, 50, 50))
+            new Badge("Failed", new JBColor(new Color(255, 100, 100), new Color(180, 50, 50)))
     ),
 
     RUNNING(
             AllIcons.Actions.Suspend,
             "Test case is Running...",
-            "Running",
-            new JBColor(new Color(255, 200, 100), new Color(200, 150, 50))
+            new Badge("Running", new JBColor(new Color(255, 200, 100), new Color(200, 150, 50)))
     );
 
     private final @NotNull Icon icon;
     private final @NotNull String tooltip;
 
     /**
-     * The card badge for this status, empty for IDLE - a case nobody has run
-     * carries no badge at all.
+     * The card badge, null for IDLE - a case nobody has run carries no badge.
+     * <p>
+     * Label and colour are one fact, so they are one field: a status cannot end
+     * up with a label and no colour to draw it in.
      */
-    private final @NotNull String badgeLabel;
+    private final @Nullable Badge badge;
 
-    /**
-     * Null only for IDLE, which draws no badge to colour.
-     */
-    private final @Nullable JBColor badgeColor;
-
-    public boolean hasBadge() {
-        return badgeColor != null;
-    }
+    public record Badge(@NotNull String label, @NotNull JBColor color) {}
 
 
     /**

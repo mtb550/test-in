@@ -42,7 +42,8 @@ public class TestCard extends BaseCard {
         final RunStatus runStatus = tc.getTempStatus();
         this.isRunning = runStatus == RunStatus.RUNNING;
 
-        if (runStatus.hasBadge()) badges.add(new RoundedBadge(runStatus.getBadgeLabel(), runStatus.getBadgeColor()));
+        final RunStatus.Badge badge = runStatus.getBadge();
+        if (badge != null) badges.add(new RoundedBadge(badge.label(), badge.color()));
 
         updateUI(index, TestEditorAttributes.DESCRIPTION.getTestValueExtractor().execute(tc, p), badges, details);
     }
