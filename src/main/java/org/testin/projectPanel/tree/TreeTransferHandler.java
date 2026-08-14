@@ -220,7 +220,8 @@ public class TreeTransferHandler extends TransferHandler {
                 return true;
             }
 
-            return transfer(action, sources, target);
+            transfer(action, sources, target);
+            return true;
         } catch (final Exception ex) {
             Logger.error("Tree transfer failed: " + ex.getMessage());
             return false;
