@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 public final class TestRunHtmlGenerator {
 
@@ -136,54 +137,21 @@ public final class TestRunHtmlGenerator {
         html.append("</div>");
 
         // SECTION 3: Failed Test Cases
-        if (failed > 0) {
-            html.append("<div class='section-title-bar'><div class='section-title'>3. Failed Test Cases</div></div>");
-            html.append("<div class='summary-text'>The following <b>").append(failed).append("</b> cases failed and require remediation.</div>");
-            html.append("<table class='detail-table'>")
-                    .append("<tr><th>#</th><th>Test Case</th><th>Priority</th></tr>");
-
-            final AtomicInteger seq = new AtomicInteger(1);
-            results.stream()
-                    .filter(r -> r.getStatus() == TestStatus.FAILED)
-                    .forEach(item -> {
-                        final TestCaseDto d = detailsMap.get(item.getId());
-                        final String desc = d != null ? d.getDescription() : "";
-                        final String bugPriority = item.getBugPriority().name();
-                        html.append("<tr>")
-                                .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
-                                .append("<td>").append(escapedHtml(desc)).append("</td>")
-                                .append("<td>").append(bugPriority).append("</td>")
-                                .append("</tr>");
-                    });
-            html.append("</table>");
-        }
+        if (failed > 0)
+            appendCaseTable(html, 3, "Failed Test Cases",
+                    "The following <b>" + failed + "</b> cases failed and require remediation.",
+                    results, detailsMap, r -> r.getStatus() == TestStatus.FAILED);
 
         // SECTION 4: Pending Test Cases
-        if (pending > 0) {
-            int sectionNum = failed > 0 ? 4 : 3;
-            html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNum).append(". Pending Test Cases</div></div>");
-            html.append("<div class='summary-text'>The following <b>").append(pending).append("</b> cases are pending execution.</div>");
-            html.append("<table class='detail-table'>")
-                    .append("<tr><th>#</th><th>Test Case</th><th>Priority</th></tr>");
-
-            final AtomicInteger seq = new AtomicInteger(1);
-            results.stream()
+        if (pending > 0)
+            appendCaseTable(html, failed > 0 ? 4 : 3, "Pending Test Cases",
+                    "The following <b>" + pending + "</b> cases are pending execution.",
+                    results, detailsMap,
                     // Must match how the count above is reached: TestRunSummary treats
                     // pending as PENDING + UNTESTED, because completing a run turns one
-                    // into the other.
-                    .filter(r -> r.getStatus() == TestStatus.PENDING || r.getStatus() == TestStatus.UNTESTED)
-                    .forEach(item -> {
-                        final TestCaseDto d = detailsMap.get(item.getId());
-                        final String desc = d != null ? d.getDescription() : "";
-                        final String bugPriority = item.getBugPriority().name();
-                        html.append("<tr>")
-                                .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
-                                .append("<td>").append(escapedHtml(desc)).append("</td>")
-                                .append("<td>").append(bugPriority).append("</td>")
-                                .append("</tr>");
-                    });
-            html.append("</table>");
-        }
+                    // into the other. Filtering on PENDING alone printed the heading and
+                    // the count, then an empty table, on every completed run.
+                    r -> r.getStatus() == TestStatus.PENDING || r.getStatus() == TestStatus.UNTESTED);
 
         // FOOTER
         html.append("<div class='footer'>")
@@ -197,6 +165,38 @@ public final class TestRunHtmlGenerator {
 
         html.append("</body></html>");
         return html.toString();
+    }
+
+    /**
+     * A numbered section listing the cases the filter accepts. Failed and Pending
+     * differ only in the number, the heading, the blurb and that filter - the
+     * table itself is one shape, so it is written once.
+     */
+    private void appendCaseTable(final @NotNull StringBuilder html, final int sectionNumber,
+                                 final @NotNull String title, final @NotNull String blurb,
+                                 final @NotNull List<TestRunItems> results,
+                                 final @NotNull Map<UUID, TestCaseDto> detailsMap,
+                                 final @NotNull Predicate<TestRunItems> filter) {
+
+        html.append("<div class='section-title-bar'><div class='section-title'>").append(sectionNumber).append(". ").append(title).append("</div></div>");
+        html.append("<div class='summary-text'>").append(blurb).append("</div>");
+        html.append("<table class='detail-table'>")
+                .append("<tr><th>#</th><th>Test Case</th><th>Priority</th></tr>");
+
+        final AtomicInteger seq = new AtomicInteger(1);
+        results.stream()
+                .filter(filter)
+                .forEach(item -> {
+                    final TestCaseDto d = detailsMap.get(item.getId());
+                    final String desc = d != null ? d.getDescription() : "";
+                    final String bugPriority = item.getBugPriority().name();
+                    html.append("<tr>")
+                            .append("<td class='seq'>").append(seq.getAndIncrement()).append("</td>")
+                            .append("<td>").append(escapedHtml(desc)).append("</td>")
+                            .append("<td>").append(bugPriority).append("</td>")
+                            .append("</tr>");
+                });
+        html.append("</table>");
     }
 
     private void overviewRow(final @NotNull StringBuilder html, final @NotNull String label,
