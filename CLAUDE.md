@@ -60,13 +60,19 @@ be committed back into storage.
 - Nullability: org.jetbrains `@NotNull`/`@Nullable` everywhere; Lombok
   `@NonNull` only on DTO/marker fields (it generates runtime checks there).
   Never jspecify.
-- Node behaviour is declared on the node: capability flags on `DirectoryDto`
+- Node behavior is declared on the node: capability flags on `DirectoryDto`
   (`isRenamable`, `isTransferable`, `acceptsTransferred`, ...) instead of
   instanceof chains at call sites. Enums carry their own presentation and
   actions (see `TestStatus`, `TestRunStatus`).
 - Dialogs are built on the declarative framework (`org.testin.ui.framework`):
   a dialog assigns `title`, `components`, `shortcuts` in its constructor and
   implements `submit()`. Never hand-build popup layouts.
+- **American English**, in comments and in text a tester reads. The platform API
+  this is written against is American (`Color`, `EditorColors`, `normalize`), so
+  British spellings put two dialects in one sentence — a comment about "the caret
+  row colour" directly above `EditorColors.CARET_ROW_COLOR`. It is a convention
+  rather than a cleanup because it does not stay fixed otherwise: #48 normalized
+  28 of them, and the next few comments written put six back.
 - A method handles its own failures: no `throws` on the signature. Catch inside,
   log through `Logger`, and notify when a tester action triggered it — a catch
   that does neither is worse than the `throws` it replaced. Two exceptions, both

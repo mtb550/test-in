@@ -210,7 +210,7 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
             if (all.get(i).canFillSpace()) fillIndex = i;
         }
 
-        // Every component refused it; something has to go in the centre.
+        // Every component refused it; something has to go in the center.
         if (fillIndex < 0) fillIndex = all.size() - 1;
 
         final JBPanel<?> stack = new JBPanel<>(new BorderLayout());

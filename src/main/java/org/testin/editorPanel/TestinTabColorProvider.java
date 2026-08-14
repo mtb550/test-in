@@ -33,12 +33,12 @@ public final class TestinTabColorProvider implements EditorTabColorProvider {
     }
 
     /**
-     * The tab title colour for a Testin editor; every other file is left to the
+     * The tab title color for a Testin editor; every other file is left to the
      * platform.
      */
     // The method is @ApiStatus.Experimental on EditorTabColorProvider, and
-    // overriding it is the only way to colour a tab title - the stable half of
-    // the interface colours the background. Accepted deliberately: if the
+    // overriding it is the only way to color a tab title - the stable half of
+    // the interface colors the background. Accepted deliberately: if the
     // platform drops it, the @Override stops compiling rather than silently
     // never being called.
     @SuppressWarnings("UnstableApiUsage")

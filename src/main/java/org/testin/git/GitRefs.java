@@ -52,7 +52,7 @@ public final class GitRefs {
      * typed by the tester, and mistaking one for a URL would send them to a
      * clone they never asked for.
      */
-    // "http://" here is a scheme being recognised, not a link being followed:
+    // "http://" here is a scheme being recognized, not a link being followed:
     // this decides whether the tester typed a clone URL. Refusing to match it
     // would not make anything more secure, it would stop plain-http remotes
     // being clonable at all.

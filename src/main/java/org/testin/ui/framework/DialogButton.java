@@ -52,10 +52,11 @@ public final class DialogButton implements IDialogComponent {
     }
 
     /**
-     * A button row is the wrong thing to hand spare space to. Without this, a
-     * dialog that declares no filler at all - a form and a button, say - gave it
-     * to the last component, which is this one, and the button drifted into the
-     * middle of the dialog instead of sitting at the bottom.
+     * A button row is the wrong thing to hand spare space to.
+     * <p>
+     * Without this, a dialog that declares no filler at all - a form and a
+     * button, say - gave the space to its last component, which is this one. The
+     * button then drifted into the middle instead of sitting at the bottom.
      */
     @Override
     public boolean canFillSpace() {
