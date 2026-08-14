@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.notifications.Notifier;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.services.RunStatusService;
@@ -44,6 +45,10 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
                         ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
                 Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
+
+                // The status names itself, as verdicts do: "Completed", "Closed".
+                // Inside the menu callback, so a dismissed menu says nothing (#62).
+                Services.getInstance(p, Notifier.class).softShow(p, selectedStatus.getLabel());
             }).show();
         }
     }

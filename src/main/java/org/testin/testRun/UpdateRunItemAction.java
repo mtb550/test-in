@@ -16,6 +16,7 @@ import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.testRun.createDialog.FailedResultDialog;
 import org.testin.util.Shortcuts;
@@ -59,6 +60,10 @@ public class UpdateRunItemAction extends AbstractProjectAction {
 
             Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), tr);
             list.repaint();
+
+            // After the persist and past the reload guard above: an edit that was
+            // dropped rather than saved must not report itself as saved (#62).
+            Services.getInstance(p, Notifier.class).softShow(p, "Details updated");
         }).show();
     }
 

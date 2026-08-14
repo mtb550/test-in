@@ -16,6 +16,7 @@ import org.testin.logger.Logger;
 import org.testin.mappers.TestRunItems;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
@@ -73,6 +74,10 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
 
             updateStartButton(editor);
         });
+
+        // The status names itself. Start Run routes through here rather than
+        // notifying for itself, so pressing it says "In Progress" once (#62).
+        Services.getInstance(p, Notifier.class).softShow(p, newStatus.getLabel());
     }
 
     public void onExecutionFinished(final @NotNull Project p, final @NotNull RunEditor editor) {
@@ -91,6 +96,8 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
             editor.getStatusBar().updatePaginationState(editor.getCurrentPage(), editor.getTotalPageCount(), editor.getTotalItemsCount());
             updateStartButton(editor);
         });
+
+        Services.getInstance(p, Notifier.class).softShow(p, TestRunStatus.COMPLETED.getLabel());
     }
 
     private void resetPendingToUntested(final @NotNull RunEditor editor) {
