@@ -25,7 +25,6 @@ import org.testin.services.Services;
 import org.testin.util.Mapper;
 
 import javax.swing.tree.TreePath;
-import java.io.File;
 import java.io.InputStream;
 import java.util.*;
 
