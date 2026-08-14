@@ -79,7 +79,7 @@ public class CreateTestRun implements NodeCreator {
         return null;
     }
 
-    private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final boolean isRoot,
+    private @Nullable DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final boolean isRoot,
                                                                final @Nullable DirectoryDto thisNodeDto) {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.awaitIndexing();
