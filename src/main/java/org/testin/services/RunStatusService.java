@@ -20,6 +20,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
 import org.testin.mappers.markers.TestRunMarker;
+import org.testin.notifications.Notifier;
 import org.testin.settings.AppSettingsState;
 
 import java.nio.file.Path;
@@ -49,6 +50,10 @@ public final class RunStatusService {
         persistRun(p, editor);
         triggerFilterRefresh(ui, list);
 
+        // Only when a verdict was actually recorded: a missing run item leaves
+        // the status exactly as it was.
+        if (item != null) confirmVerdict(p, status, 1);
+
         ApplicationManager.getApplication().invokeLater(() -> {
             final UUID currentId = currentTc.getId();
             final boolean stillInList = editor.getCurrentTestCases().stream()
@@ -75,6 +80,8 @@ public final class RunStatusService {
 
         persistRun(p, editor);
         triggerFilterRefresh(ui, null);
+
+        confirmVerdict(p, status, 1);
     }
 
     public void applyStatus(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
@@ -92,10 +99,13 @@ public final class RunStatusService {
                 executeManual(p, ui, tc, status);
             }
         } else {
+            int recorded = 0;
+
             for (final TestCaseDto tc : selectedItems) {
                 final TestRunItems item = editor.getResultsMap().get(tc.getId());
                 if (item != null) {
                     item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
+                    recorded++;
 
                     final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
                     if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
@@ -106,7 +116,22 @@ public final class RunStatusService {
 
             persistRun(p, editor);
             triggerFilterRefresh(ui, list);
+
+            confirmVerdict(p, status, recorded);
         }
+    }
+
+    /**
+     * The verdict is its own confirmation: "Passed" for one, "Passed 4" for a
+     * selection. Once per gesture — the single-selection branch of
+     * {@link #applyStatus} routes through {@link #executeNext} or
+     * {@link #executeManual}, which confirm for themselves (#62).
+     */
+    private void confirmVerdict(final @NotNull Project p, final @NotNull TestStatus status, final int count) {
+        if (count == 0) return;
+
+        final String label = status.getLabel();
+        Services.getInstance(p, Notifier.class).softShow(p, count == 1 ? label : label + " " + count);
     }
 
     /**
