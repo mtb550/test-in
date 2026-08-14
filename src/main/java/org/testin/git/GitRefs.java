@@ -46,6 +46,25 @@ public final class GitRefs {
     /**
      * The local branch name for a remote branch ({@code origin/main} → {@code main}).
      */
+    /**
+     * True when the text names a repository to clone rather than a project to
+     * create.
+     * <p>
+     * The create-project dialog takes one field for both, so this is what
+     * decides which happens. Deliberately narrow: a project name is free text
+     * typed by the tester, and mistaking one for a URL would send them to a
+     * clone they never asked for.
+     */
+    public static boolean isRepositoryUrl(final @NotNull String text) {
+        final String value = text.trim();
+        return value.startsWith("http://")
+                || value.startsWith("https://")
+                || value.startsWith("ssh://")
+                || value.startsWith("git://")
+                || value.startsWith("git@")
+                || value.endsWith(".git");
+    }
+
     public static @NotNull String localNameOf(final @NotNull String remoteBranchName) {
         return remoteBranchName.substring(remoteBranchName.indexOf('/') + 1);
     }

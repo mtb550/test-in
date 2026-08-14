@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.DirectoryType;
+import org.testin.git.GitRefs;
 import org.testin.nodeCreator.dialogs.CreateProjectDialog;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
@@ -36,20 +36,18 @@ public class CreateTestProjectAction extends DumbAwareAction {
      */
     public void execute() {
 
-        new CreateProjectDialog(p, (name, type) -> {
-            if (name.trim().isEmpty()) return;
-
-            if (type == DirectoryType.IMPORT_TP) {
-                if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
-
-                String projectName = Services.getInstance(p, Tools.class).extractProjectNameFromUrl(name);
-                new CreateTestProjectCloneAction(p, name.trim(), projectName, pp).execute();
+        new CreateProjectDialog(p, name -> {
+            // What was typed decides: a repository URL is cloned, anything else
+            // is a name for a new project.
+            if (!GitRefs.isRepositoryUrl(name)) {
+                new CreateTestProjectNewAction(p, pp, name).execute();
                 return;
             }
 
-            if (type == DirectoryType.TP) {
-                new CreateTestProjectNewAction(p, pp, name.trim()).execute();
-            }
+            if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
+
+            final String projectName = Services.getInstance(p, Tools.class).extractProjectNameFromUrl(name);
+            new CreateTestProjectCloneAction(p, name, projectName, pp).execute();
 
         }).show();
     }

@@ -6,38 +6,39 @@ import org.testin.enums.DirectoryType;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.StatusBarShortcut;
-import org.testin.ui.framework.TextFieldWithSelections;
+import org.testin.ui.framework.TextInput;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
- * Creates a test project — new, or imported by cloning a Git URL. The
- * constructor is the declaration: title, components, status bar mapping —
- * plus the submit action.
+ * Creates a test project — new, or imported by cloning a Git URL.
+ * <p>
+ * One field, no choice to make: what was typed says which it is. A repository
+ * URL is clonable and a project name is not, so asking the tester to also pick
+ * from a list was asking them to repeat themselves — and to be wrong. The
+ * placeholder already promised this ("set name or paste url..") long before the
+ * dialog behaved that way.
  */
-public final class CreateProjectDialog extends AbstractFrameworkDialog<TextFieldWithSelections<DirectoryType>> {
+public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput> {
 
-    private final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate;
+    private final @NotNull Consumer<@NotNull String> onCreate;
 
-    public CreateProjectDialog(final @NotNull Project p, final @NotNull BiConsumer<@NotNull String, @NotNull DirectoryType> onCreate) {
+    public CreateProjectDialog(final @NotNull Project p, final @NotNull Consumer<@NotNull String> onCreate) {
         super(p);
         this.onCreate = onCreate;
 
         title = "Create Project";
 
         components = List.of(
-                ComponentDialogBase.<DirectoryType>textFieldWithSelections()
+                ComponentDialogBase.textField()
                         .icon(DirectoryType.TP.getIcon())
                         .placeholder("set name or paste url..")
-                        .selection(DirectoryType.TP.getIcon(), "Test Project", "Creates an empty test project", DirectoryType.TP)
-                        .selection(DirectoryType.IMPORT_TP.getIcon(), "Import Project (Git)", "Clones from a repository URL", DirectoryType.IMPORT_TP)
                         .build());
 
         shortcuts = List.of(
                 StatusBarShortcut.build(Shortcuts.Enter, "Confirm", this::submit),
-                StatusBarShortcut.hint("↑ ↓", "Select"),
                 StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
     }
 
@@ -49,7 +50,7 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextField
             return;
         }
 
-        onCreate.accept(name, component().getSelectedValue());
+        onCreate.accept(name);
         closeOk();
     }
 }
