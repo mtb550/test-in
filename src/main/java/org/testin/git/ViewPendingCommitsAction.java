@@ -234,8 +234,8 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                 p,
                 "Git Conflicts",
                 "Pull stopped because conflicts must be resolved in the IDE before continuing.",
-                NotificationAction.createSimple("Continue Rebase", () -> finishRebase(repoPath, remote, branch, false)),
-                NotificationAction.createSimple("Abort Rebase", () -> finishRebase(repoPath, remote, branch, true)));
+                NotificationAction.createSimple("Continue rebase", () -> finishRebase(repoPath, remote, branch, false)),
+                NotificationAction.createSimple("Abort rebase", () -> finishRebase(repoPath, remote, branch, true)));
     }
 
     private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote,

@@ -103,9 +103,9 @@ public class SyncActionAction extends DumbAwareAction {
 
     private void showConflictActions(final @NotNull Path repoPath) {
         final NotificationAction continueAction = NotificationAction.createSimple(
-                "Continue Rebase", () -> finishRebase(repoPath, false));
+                "Continue rebase", () -> finishRebase(repoPath, false));
         final NotificationAction abortAction = NotificationAction.createSimple(
-                "Abort Rebase", () -> finishRebase(repoPath, true));
+                "Abort rebase", () -> finishRebase(repoPath, true));
         Services.getInstance(p, Notifier.class).warnWithActions(
                 p,
                 "Git Conflicts",
