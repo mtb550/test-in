@@ -54,7 +54,7 @@ public final class TestRunHtmlGenerator {
         final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         final String testerName = settings.testerName;
         final String testerRole = settings.testerRole;
-        final String executedBy = testerName; // todo, to be changed to be like pdf generator calss, get all executed by values.
+        final String executedBy = testerName; // todo, to be changed to be like the PDF generator class, get all executed by values.
         final String execDate = trDir.getMarker().getCreatedAt().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.US));
         final String runStatus = trDir.getMarker().getStatus().getLabel();
 

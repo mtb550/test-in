@@ -1,6 +1,9 @@
 .gradle/
 .idea/*
 !.idea/inspectionProfiles/
+# The spellchecker's project vocabulary, shared for the same reason the
+# inspection profile is: otherwise every machine rebuilds the same word list.
+!.idea/dictionaries/
 .intellijPlatform/
 .run/
 .sandbox/
