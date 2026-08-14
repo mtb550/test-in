@@ -15,9 +15,12 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Lifecycle status of a test run. Constants carry their transitions and the
- * presentation of the advance action, so status rules live here instead of
- * being re-implemented as if-chains at the call sites (issue #37).
+ * Lifecycle status of a test run. Constants carry their own icon, keyboard
+ * shortcut and transition, so status rules live here instead of being
+ * re-implemented as if-chains at the call sites (issue #37).
+ * <p>
+ * The icon is what the project tree draws for a run node, so a cycle's state
+ * is readable without opening it.
  */
 @Getter
 @AllArgsConstructor
@@ -25,46 +28,31 @@ public enum TestRunStatus {
     CREATED(
             "Created",
             null,
-            AllIcons.General.Add,
-            "Start Execution",
-            "Start execution of test cases",
-            AllIcons.Nodes.Services
+            AllIcons.General.Add
     ),
 
     IN_PROGRESS(
             "In Progress",
             null,
-            AllIcons.Actions.BuildAutoReloadChanges,
-            "Complete Test Run",
-            "Mark test run as completed",
-            AllIcons.Actions.Checked
+            AllIcons.Actions.BuildAutoReloadChanges
     ),
 
     COMPLETED(
             "Completed",
             KeyStroke.getKeyStroke(KeyEvent.VK_2, 0),
-            AllIcons.Toolwindows.ToolWindowCoverage,
-            "Start Execution",
-            "Start execution of test cases",
-            AllIcons.Nodes.Services
+            AllIcons.Toolwindows.ToolWindowCoverage
     ),
 
     ASSIGNED(
             "Assigned",
             KeyStroke.getKeyStroke(KeyEvent.VK_1, 0),
-            AllIcons.Gutter.ExtAnnotation,
-            "Start Execution",
-            "Start execution of test cases",
-            AllIcons.Nodes.Services
+            AllIcons.Gutter.ExtAnnotation
     ), //todo, later, use xml to add tester's name dynamic
 
     CLOSED(
             "Closed",
             KeyStroke.getKeyStroke(KeyEvent.VK_3, 0),
-            AllIcons.Actions.Cancel,
-            "Start Execution",
-            "Start execution of test cases",
-            AllIcons.Nodes.Services
+            AllIcons.Actions.Cancel
     );
 
     private static final @NotNull Map<TestRunStatus, TestRunStatus> TRANSITIONS = Map.of(
@@ -81,24 +69,10 @@ public enum TestRunStatus {
     private final @NotNull Icon icon;
 
     /**
-     * Presentation of the advance action while the run is in this status.
-     */
-    private final @NotNull String advanceLabel;
-    private final @NotNull String advanceDescription;
-    private final @NotNull Icon advanceIcon;
-
-    /**
      * The status the advance action moves this run to, or null when terminal.
      */
     public @Nullable TestRunStatus nextStatus() {
         return TRANSITIONS.get(this);
-    }
-
-    /**
-     * True while the run can still advance to another status.
-     */
-    public boolean isAdvanceable() {
-        return TRANSITIONS.containsKey(this);
     }
 
     /**

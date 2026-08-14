@@ -1,7 +1,6 @@
 package org.testin.testRun;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.DumbAwareAction;
@@ -47,27 +46,6 @@ public class UpdateTestRunStatusAction extends DumbAwareAction {
         if (newStatus == null) return;
 
         applyStatusChange(p, runEditor, newStatus);
-    }
-
-    @Override
-    public void update(final @NotNull AnActionEvent e) {
-        if (!(editor instanceof RunEditor runEditor)) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        final TestRunStatus currentStatus = runEditor.getParent().getMarker().getStatus();
-
-        e.getPresentation().setEnabled(currentStatus.isAdvanceable());
-        e.getPresentation().setText(currentStatus.getAdvanceLabel());
-        e.getPresentation().setDescription(currentStatus.getAdvanceDescription());
-        e.getPresentation().setIcon(currentStatus.getAdvanceIcon());
-    }
-
-    @Override
-    public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - update() reads only fields/services, never Swing state; do not switch to EDT (#52).
-        return ActionUpdateThread.BGT;
     }
 
     public void applyStatusChange(final @NotNull Project p, final @NotNull RunEditor editor, final @NotNull TestRunStatus newStatus) {

@@ -6,6 +6,7 @@ import com.intellij.ui.SimpleTextAttributes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
+import org.testin.enums.TestRunStatus;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
@@ -38,11 +39,15 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                 return;
             }
             final DirectoryType type = DirectoryType.from(dir);
+            final TestRunStatus runStatus = dir instanceof TestRunDirectoryDto trDir ? trDir.getMarker().getStatus() : null;
 
-            setIcon(type.getIcon());
+            // A run is drawn as its status, not as its kind: the tree then says
+            // where every cycle stands without opening any of them. Every other
+            // node takes the icon of what it is.
+            setIcon(runStatus != null ? runStatus.getIcon() : type.getIcon());
             append(dir.getName(), selectedNodes.contains(dir) ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
             append(" ");
-            append(dir instanceof TestRunDirectoryDto trDir ? trDir.getMarker().getStatus().getLabel() : "", SimpleTextAttributes.GRAY_ATTRIBUTES);
+            append(runStatus != null ? runStatus.getLabel() : "", SimpleTextAttributes.GRAY_ATTRIBUTES);
 
         } catch (final Exception ex) {
             Logger.error("Error rendering tree node: " + ex.getMessage());
