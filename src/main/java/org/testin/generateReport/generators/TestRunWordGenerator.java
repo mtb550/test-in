@@ -110,20 +110,13 @@ public final class TestRunWordGenerator {
                 setTableBorders(overviewTable);
 
                 addHeading(doc, "2. Execution Summary", 20, 12);
-
-                long total = tr.getResults().size();
                 // One traversal counts every status; a new TestStatus constant is
                 // included automatically instead of needing another filter pass.
                 final TestRunSummary summary = TestRunSummary.of(tr.getResults());
-                long passed = summary.passed();
-                long failed = summary.failed();
-                long blocked = summary.blocked();
-                long pending = summary.pending();
-                long passRate = summary.passRate();
 
                 addText(doc, String.format(
                         "A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.",
-                        total, passRate), 11, false, BLACK, null, 12);
+                        summary.total(), summary.passRate()), 11, false, BLACK, null, 12);
 
                 XWPFTable statsTable = doc.createTable(1, 5);
                 statsTable.setWidth("100%");
@@ -131,32 +124,32 @@ public final class TestRunWordGenerator {
                 setTableBorders(statsTable);
                 setTableWidths(statsTable, 20, 20, 20, 20, 20);
 
-                addStatCell(statsTable, 0, String.valueOf(total), "Total Cases", DARK_NAVY);
-                addStatCell(statsTable, 1, String.valueOf(passed), "Passed", GREEN);
-                addStatCell(statsTable, 2, String.valueOf(failed), "Failed", RED);
-                addStatCell(statsTable, 3, String.valueOf(pending + blocked), "Blocked", DARK_YELLOW);
-                addStatCell(statsTable, 4, passRate + "%", "Pass Rate", MEDIUM_BLUE);
+                addStatCell(statsTable, 0, String.valueOf(summary.total()), "Total Cases", DARK_NAVY);
+                addStatCell(statsTable, 1, String.valueOf(summary.passed()), "Passed", GREEN);
+                addStatCell(statsTable, 2, String.valueOf(summary.failed()), "Failed", RED);
+                addStatCell(statsTable, 3, String.valueOf(summary.pending() + summary.blocked()), "Blocked", DARK_YELLOW);
+                addStatCell(statsTable, 4, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
 
                 addHeading(doc, "3. Result Analysis", 20, 12);
-                addColoredBody(doc, "Passed (" + passed + "): ", GREEN, "n\\a");
-                addColoredBody(doc, "Failed (" + failed + "): ", RED, "n\\a");
-                addColoredBody(doc, "Pending (" + (pending + blocked) + "): ", DARK_YELLOW, "n\\a");
+                addColoredBody(doc, "Passed (" + summary.passed() + "): ", GREEN, "n\\a");
+                addColoredBody(doc, "Failed (" + summary.failed() + "): ", RED, "n\\a");
+                addColoredBody(doc, "Pending (" + (summary.pending() + summary.blocked()) + "): ", DARK_YELLOW, "n\\a");
 
-                if (failed > 0) {
+                if (summary.failed() > 0) {
                     buildCaseTable(doc, "4", "Failed Test Cases",
                             "The following %d cases failed and require remediation. Real-user identification validation is the primary defect cluster.",
-                            failed, tr, detailsMap, RED, true, true, true,
+                            summary.failed(), tr, detailsMap, RED, true, true, true,
                             item -> item.getStatus() == TestStatus.FAILED);
                 }
 
-                if (passed > 0) {
+                if (summary.passed() > 0) {
                     buildCaseTable(doc, "5", "Passed Test Cases",
                             "The following %d cases passed validation and behaved as expected across all verification points.",
-                            passed, tr, detailsMap, GREEN, false, false, false,
+                            summary.passed(), tr, detailsMap, GREEN, false, false, false,
                             item -> item.getStatus() == TestStatus.PASSED);
                 }
 
-                long pendingTotal = pending + blocked;
+                long pendingTotal = summary.pending() + summary.blocked();
                 if (pendingTotal > 0) {
                     buildCaseTable(doc, "6", "Pending Test Cases",
                             "The following %d cases were not executed in this cycle, primarily blocked by environment/data dependencies. They are carried forward to the next run.",

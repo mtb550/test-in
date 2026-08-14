@@ -161,19 +161,12 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(9)
                     .setMarginTop(20);
             document.add(sec2);
-
-            long total = tr.getResults().size();
             // One traversal counts every status; a new TestStatus constant is
             // included automatically instead of needing another filter pass.
             final TestRunSummary summary = TestRunSummary.of(tr.getResults());
-            long passed = summary.passed();
-            long failed = summary.failed();
-            long blocked = summary.blocked();
-            long pending = summary.pending();
-            long passRate = summary.passRate();
 
             document.add(new Paragraph(
-                    String.format("A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.", total, passRate))
+                    String.format("A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.", summary.total(), summary.passRate()))
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(12));
 
@@ -182,11 +175,11 @@ public final class TestRunPdfGenerator {
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
-            addStatCell(statsTable, String.valueOf(total), "Total Cases", DARK_NAVY, boldFont);
-            addStatCell(statsTable, String.valueOf(passed), "Passed", GREEN, boldFont);
-            addStatCell(statsTable, String.valueOf(failed), "Failed", RED, boldFont);
-            addStatCell(statsTable, String.valueOf(pending + blocked), "Blocked", DARK_YELLOW, boldFont);
-            addStatCell(statsTable, passRate + "%", "Pass Rate", MEDIUM_BLUE, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.total()), "Total Cases", DARK_NAVY, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.passed()), "Passed", GREEN, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.failed()), "Failed", RED, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.pending() + summary.blocked()), "Blocked", DARK_YELLOW, boldFont);
+            addStatCell(statsTable, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE, boldFont);
 
             document.add(statsTable);
 
@@ -203,7 +196,7 @@ public final class TestRunPdfGenerator {
 
             // Passed
             Paragraph passedHeading = new Paragraph()
-                    .add(new Paragraph("Passed (" + passed + "): ")
+                    .add(new Paragraph("Passed (" + summary.passed() + "): ")
                             .setFont(boldFont).setFontSize(11).setFontColor(GREEN)
                             .setMarginBottom(0));
             document.add(passedHeading);
@@ -216,7 +209,7 @@ public final class TestRunPdfGenerator {
 
             // Failed
             Paragraph failedHeading = new Paragraph()
-                    .add(new Paragraph("Failed (" + failed + "): ")
+                    .add(new Paragraph("Failed (" + summary.failed() + "): ")
                             .setFont(boldFont).setFontSize(11).setFontColor(RED)
                             .setMarginBottom(0));
             document.add(failedHeading);
@@ -229,7 +222,7 @@ public final class TestRunPdfGenerator {
 
             // Pending
             Paragraph pendingHeading = new Paragraph()
-                    .add(new Paragraph("Pending (" + (pending + blocked) + "): ")
+                    .add(new Paragraph("Pending (" + (summary.pending() + summary.blocked()) + "): ")
                             .setFont(boldFont).setFontSize(11).setFontColor(DARK_YELLOW)
                             .setMarginBottom(0));
             document.add(pendingHeading);
@@ -241,24 +234,24 @@ public final class TestRunPdfGenerator {
             document.add(pendingBody);
 
             // SECTION 4: FAILED TEST CASES (only if any failures exist)
-            if (failed > 0) {
+            if (summary.failed() > 0) {
 
                 buildCaseTable(document, "4", "Failed Test Cases",
                         "The following %d cases failed and require remediation. Real-user identification validation is the primary defect cluster.",
-                        failed, tr, detailsMap, boldFont, regularFont, RED, true, true, true,
+                        summary.failed(), tr, detailsMap, boldFont, regularFont, RED, true, true, true,
                         item -> item.getStatus() == TestStatus.FAILED);
             }
 
             // SECTION 5: PASSED TEST CASES (only if any passed exist)
-            if (passed > 0) {
+            if (summary.passed() > 0) {
                 buildCaseTable(document, "5", "Passed Test Cases",
                         "The following %d cases passed validation and behaved as expected across all verification points.",
-                        passed, tr, detailsMap, boldFont, regularFont, GREEN, false, false, false,
+                        summary.passed(), tr, detailsMap, boldFont, regularFont, GREEN, false, false, false,
                         item -> item.getStatus() == TestStatus.PASSED);
             }
 
             // SECTION 6: PENDING TEST CASES (only if any pending exist)
-            long pendingTotal = pending + blocked;
+            long pendingTotal = summary.pending() + summary.blocked();
             if (pendingTotal > 0) {
                 buildCaseTable(document, "6", "Pending Test Cases",
                         "The following %d cases were not executed in this cycle, primarily blocked by environment/data dependencies. They are carried forward to the next run.",
