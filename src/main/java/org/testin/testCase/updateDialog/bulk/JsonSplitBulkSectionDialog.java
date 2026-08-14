@@ -438,6 +438,10 @@ public abstract class JsonSplitBulkSectionDialog {
         int minDistance = Integer.MAX_VALUE;
         int nearestOffset = offset;
         for (final RangeMarker m : markers) {
+            // An invalidated marker still answers getStartOffset, with an offset
+            // the document no longer has.
+            if (!m.isValid()) continue;
+
             if (Math.abs(offset - m.getStartOffset()) < minDistance) {
                 minDistance = Math.abs(offset - m.getStartOffset());
                 nearestOffset = m.getStartOffset();
