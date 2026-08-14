@@ -89,6 +89,11 @@ public class BranchSelector {
         }
     }
 
+    /**
+     * The event is reported as unused, and the parameter stays: this is an
+     * {@code ActionListener} target, so the signature is the contract rather
+     * than a choice. The selected branch comes from the box, not the event (#61).
+     */
     private void onSelection(final @NotNull ActionEvent e) {
         if (isUpdating) return;
 
