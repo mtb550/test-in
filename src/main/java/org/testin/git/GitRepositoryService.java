@@ -74,7 +74,7 @@ public final class GitRepositoryService {
         }
     }
 
-    public void fetchRemoteBranches(final @NotNull Path path) throws VcsException {
+    public void fetchRemoteBranches(final @NotNull Path path) {
         if (getRemoteName(path) == null) return;
         GitCommandRunner.execute(project, path, "git", "fetch", "--all", "--prune");
         final GitRepository repository = findRepository(path);
