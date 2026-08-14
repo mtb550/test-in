@@ -47,7 +47,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
         addSeparator();
 
-        add(new AutomateTestCaseAction(list));
+        add(new AutomateTestCaseAction(p, list));
         add(new RunTestCaseAction(p, list));
         add(new NavigateToCodeAction(p, list));
 
