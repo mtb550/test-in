@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.PathManager;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -79,7 +80,14 @@ public final class LoggerService implements Disposable {
                     written += message.length() + 1;
 
                     if (written >= MAX_LOG_SIZE) {
-                        writer = rollOver(writer);
+                        final @Nullable BufferedWriter rolled = rollOver(writer);
+
+                        // The roll-over closed the old writer before it failed, so
+                        // there is nothing left to write into. Stop draining rather
+                        // than write into a closed stream.
+                        if (rolled == null) return;
+
+                        writer = rolled;
                         written = 0;
                     }
                 }
@@ -94,11 +102,21 @@ public final class LoggerService implements Disposable {
     /**
      * The log survives shutdown, so it is capped instead: on exceeding the
      * limit the file rolls to a single .1 backup and starts fresh.
+     * <p>
+     * Null when the roll-over failed. The failure cannot be logged — this is the
+     * thread that drains the log queue, and a Logger call here would report the
+     * logger's own failure into the logger. It is the one catch in the plugin
+     * that stays silent, and it says so rather than declaring {@code throws} and
+     * letting the writeLoop's catch-all decide.
      */
-    private BufferedWriter rollOver(final @NotNull BufferedWriter writer) throws IOException {
-        writer.close();
-        Files.move(logFile, logFile.resolveSibling("testin.log.1"), StandardCopyOption.REPLACE_EXISTING);
-        return Files.newBufferedWriter(logFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+    private @Nullable BufferedWriter rollOver(final @NotNull BufferedWriter writer) {
+        try {
+            writer.close();
+            Files.move(logFile, logFile.resolveSibling("testin.log.1"), StandardCopyOption.REPLACE_EXISTING);
+            return Files.newBufferedWriter(logFile, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        } catch (final IOException ex) {
+            return null;
+        }
     }
 
     public void log(@NotNull Level level, @NotNull String callerClass, @NotNull String message) {

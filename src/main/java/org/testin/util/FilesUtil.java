@@ -19,11 +19,7 @@ import java.nio.file.Path;
 public final class FilesUtil {
 
     public <T> void write(final @NotNull Project p, final @NotNull Path path, final @NotNull T content) {
-        try {
-            writeBytes(path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
-        } catch (final IOException ex) {
-            reportWriteFailure(p, path, ex);
-        }
+        writeBytes(p, path, Services.getInstance(p, Mapper.class).writeValueAsBytes(content));
     }
 
     /**
@@ -31,19 +27,19 @@ public final class FilesUtil {
      * the bytes on the EDT and performs only the disk I/O on its worker thread.
      */
     public void write(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
+        writeBytes(p, path, jsonBytes);
+    }
+
+    private void writeBytes(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
         try {
-            writeBytes(path, jsonBytes);
+            final @Nullable Path parent = path.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Files.write(path, jsonBytes);
         } catch (final IOException ex) {
             reportWriteFailure(p, path, ex);
         }
-    }
-
-    private void writeBytes(final @NotNull Path path, final byte @NotNull [] jsonBytes) throws IOException {
-        final @Nullable Path parent = path.getParent();
-        if (parent != null) {
-            Files.createDirectories(parent);
-        }
-        Files.write(path, jsonBytes);
     }
 
     private void reportWriteFailure(final @NotNull Project p, final @NotNull Path path, final @NotNull IOException ex) {

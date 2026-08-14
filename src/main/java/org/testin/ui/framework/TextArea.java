@@ -7,6 +7,7 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.logger.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -14,9 +15,11 @@ import javax.swing.text.DefaultEditorKit;
 import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Base64;
 
 /**
@@ -53,7 +56,13 @@ public final class TextArea implements IDialogComponent {
         panel.setBorder(JBUI.Borders.emptyTop(8));
     }
 
-    private static @NotNull String toDataUri(final @NotNull Image image) throws Exception {
+    /**
+     * Null when the image cannot be encoded, which the caller reads as "paste it
+     * as text instead". It used to signal that by throwing, so a genuine encoding
+     * failure and an image the clipboard had not finished loading arrived at the
+     * same catch and neither was logged.
+     */
+    private static @Nullable String toDataUri(final @NotNull Image image) {
         final BufferedImage buffered;
         if (image instanceof BufferedImage alreadyBuffered) {
             buffered = alreadyBuffered;
@@ -62,7 +71,7 @@ public final class TextArea implements IDialogComponent {
             final int height = image.getHeight(null);
             // A not-yet-loaded async image reports -1; the caller falls back
             // to the normal text paste.
-            if (width <= 0 || height <= 0) throw new IllegalStateException("image not loaded");
+            if (width <= 0 || height <= 0) return null;
 
             buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             final Graphics2D g = buffered.createGraphics();
@@ -73,9 +82,14 @@ public final class TextArea implements IDialogComponent {
             }
         }
 
-        final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ImageIO.write(buffered, "png", out);
-        return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray());
+        try {
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ImageIO.write(buffered, "png", out);
+            return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray());
+        } catch (final IOException ex) {
+            Logger.error("Could not encode a pasted image as PNG: " + ex.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -92,10 +106,15 @@ public final class TextArea implements IDialogComponent {
                 if (contents != null && contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
                     try {
                         final Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
-                        area.insert(toDataUri(image), area.getCaretPosition());
-                        return;
-                    } catch (final Exception ignored) {
-                        // Unreadable image - fall through to the normal paste.
+                        final @Nullable String dataUri = toDataUri(image);
+                        if (dataUri != null) {
+                            area.insert(dataUri, area.getCaretPosition());
+                            return;
+                        }
+                    } catch (final UnsupportedFlavorException | IOException ex) {
+                        // The clipboard would not hand over the image it just said
+                        // it had - fall through to the normal paste.
+                        Logger.warn("Could not read the pasted image: " + ex.getMessage());
                     }
                 }
                 if (defaultPaste != null) defaultPaste.actionPerformed(event);
