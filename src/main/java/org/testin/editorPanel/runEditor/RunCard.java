@@ -2,8 +2,8 @@ package org.testin.editorPanel.runEditor;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
-import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 import org.testin.editorPanel.BaseCard;
 import org.testin.enums.RunEditorAttributes;
 import org.testin.mappers.TestRunItems;
@@ -24,7 +24,7 @@ public class RunCard extends BaseCard {
     }
 
     @Override
-    public void applyListFont(final Font listFont) {
+    public void applyListFont(final @NonNull Font listFont) {
         super.applyListFont(listFont);
     }
 
@@ -42,8 +42,7 @@ public class RunCard extends BaseCard {
 
         if (statusLabel != null) {
             statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
-            final Color statusColor = runItem.getStatus().getRowColor();
-            statusLabel.setForeground(Objects.requireNonNullElseGet(statusColor, UIUtil::getContextHelpForeground));
+            statusLabel.setForeground(runItem.getStatus().getRowColor());
         }
 
     }

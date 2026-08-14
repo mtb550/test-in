@@ -31,16 +31,15 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
     private final @NotNull TestStatus status;
 
     public SetTestCaseStatusAction(final @NotNull Project p, final @NotNull IEditor editor,
-                                   final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
-        super(status.getLabel(), "Set test case status to " + status.getLabel(), status.getIcon());
+                                   final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status,
+                                   final @NotNull TestStatus.MenuEntry entry) {
+        super(status.getLabel(), "Set test case status to " + status.getLabel(), entry.icon());
         this.p = p;
         this.editor = editor;
         this.list = list;
         this.status = status;
 
-        if (status.getShortcut() != null) {
-            this.registerCustomShortcutSet(Tools.customShortcut(status.getShortcut()), list);
-        }
+        this.registerCustomShortcutSet(Tools.customShortcut(entry.shortcut()), list);
     }
 
     @Override
