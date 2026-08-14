@@ -127,7 +127,7 @@ public final class TestRunPdfGenerator {
             if (!tr.getChangeLog().isEmpty())
                 addOverviewRow(overviewTable, TestRunConfiguration.CHANGE_LOG.getDisplayName(), tr.getChangeLog(), boldFont, regularFont);
 
-            addOverviewRow(overviewTable, TestRunConfiguration.COMMIT_ID.getDisplayName(), tr.getCommitId().isEmpty() ? "n\\a" : tr.getCommitId(), boldFont, regularFont);
+            addOverviewRow(overviewTable, TestRunConfiguration.COMMIT_ID.getDisplayName(), tr.getCommitId().isEmpty() ? "n/a" : tr.getCommitId(), boldFont, regularFont);
 
             if (!tr.getPlatform().isEmpty() || !tr.getComponent().isEmpty())
                 addOverviewRow(overviewTable, TestRunConfiguration.PLATFORM.getDisplayName() + ", " + TestRunConfiguration.COMPONENT.getDisplayName(), tr.getPlatform() + ", " + tr.getComponent(), boldFont, regularFont);
@@ -196,42 +196,24 @@ public final class TestRunPdfGenerator {
 
             // Passed
             Paragraph passedHeading = new Paragraph()
-                    .add(new Paragraph("Passed (" + summary.passed() + "): ")
+                    .add(new Paragraph("Passed (" + summary.passed() + ")")
                             .setFont(boldFont).setFontSize(11).setFontColor(GREEN)
-                            .setMarginBottom(0));
+                            .setMarginBottom(6));
             document.add(passedHeading);
-
-            Paragraph passedBody = new Paragraph(
-                    "n\\a")
-                    .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
-                    .setMarginBottom(6);
-            document.add(passedBody);
 
             // Failed
             Paragraph failedHeading = new Paragraph()
-                    .add(new Paragraph("Failed (" + summary.failed() + "): ")
+                    .add(new Paragraph("Failed (" + summary.failed() + ")")
                             .setFont(boldFont).setFontSize(11).setFontColor(RED)
-                            .setMarginBottom(0));
+                            .setMarginBottom(6));
             document.add(failedHeading);
-
-            Paragraph failedBody = new Paragraph(
-                    "n\\a.")
-                    .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
-                    .setMarginBottom(6);
-            document.add(failedBody);
 
             // Pending
             Paragraph pendingHeading = new Paragraph()
-                    .add(new Paragraph("Pending (" + (summary.pending() + summary.blocked()) + "): ")
+                    .add(new Paragraph("Pending (" + (summary.pending() + summary.blocked()) + ")")
                             .setFont(boldFont).setFontSize(11).setFontColor(DARK_YELLOW)
-                            .setMarginBottom(0));
+                            .setMarginBottom(6));
             document.add(pendingHeading);
-
-            Paragraph pendingBody = new Paragraph(
-                    "n\\a")
-                    .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
-                    .setMarginBottom(6);
-            document.add(pendingBody);
 
             // SECTION 4: FAILED TEST CASES (only if any failures exist)
             if (summary.failed() > 0) {

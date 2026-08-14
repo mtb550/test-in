@@ -131,9 +131,9 @@ public final class TestRunWordGenerator {
                 addStatCell(statsTable, 4, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
 
                 addHeading(doc, "3. Result Analysis", 20, 12);
-                addColoredBody(doc, "Passed (" + summary.passed() + "): ", GREEN, "n\\a");
-                addColoredBody(doc, "Failed (" + summary.failed() + "): ", RED, "n\\a");
-                addColoredBody(doc, "Pending (" + (summary.pending() + summary.blocked()) + "): ", DARK_YELLOW, "n\\a");
+                addColoredCount(doc, "Passed (" + summary.passed() + ")", GREEN);
+                addColoredCount(doc, "Failed (" + summary.failed() + ")", RED);
+                addColoredCount(doc, "Pending (" + (summary.pending() + summary.blocked()) + ")", DARK_YELLOW);
 
                 if (summary.failed() > 0) {
                     buildCaseTable(doc, "4", "Failed Test Cases",
@@ -247,24 +247,21 @@ public final class TestRunWordGenerator {
         lrun.setColor(DARK_GRAY);
     }
 
-    private void addColoredBody(final @NotNull XWPFDocument doc, final @NotNull String heading,
-                                final @NotNull String headingColor, final @NotNull String body) {
+    /**
+     * One coloured count in the result analysis. It carries the spacing the body
+     * paragraph below it used to provide.
+     */
+    private void addColoredCount(final @NotNull XWPFDocument doc, final @NotNull String heading,
+                                 final @NotNull String headingColor) {
         final XWPFParagraph hp = doc.createParagraph();
-        hp.setSpacingAfter(0);
+        hp.setSpacingAfter(120);
+
         final XWPFRun hrun = hp.createRun();
         hrun.setText(heading);
         hrun.setFontSize(11);
         hrun.setFontFamily("Calibri");
         hrun.setBold(true);
         hrun.setColor(headingColor);
-
-        final XWPFParagraph bp = doc.createParagraph();
-        bp.setSpacingAfter(120);
-        final XWPFRun brun = bp.createRun();
-        brun.setText(body);
-        brun.setFontSize(11);
-        brun.setFontFamily("Calibri");
-        brun.setColor(BLACK);
     }
 
     private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber,
