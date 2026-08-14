@@ -49,7 +49,7 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
         Services.getInstance(p, ProjectIndexer.class).addTestProject(tp);
         pp.getTestProjectSelector().addTestProject(tp);
         pp.getProjectTree().updateNodes();
-        Services.getInstance(p, Notifier.class).info(p, "New Test Project", String.format("Test Project %s has been added", tpName));
+        Services.getInstance(p, Notifier.class).softShow(p, "Project created");
 
         GeneratorType.CREATE_TEST_PROJECT.getAction().execute(p, tp);
     }

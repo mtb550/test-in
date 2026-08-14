@@ -72,7 +72,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                             pp.getTestProjectSelector().addTestProject(clonedProject);
 
                         pp.getProjectTree().updateNodes();
-                        Services.getInstance(p, Notifier.class).info(p, "Clone Successful", "Project '" + projectName + "' was cloned successfully.");
+                        Services.getInstance(p, Notifier.class).softShow(p, "Project cloned");
                     });
 
                 } catch (final Exception ex) {
