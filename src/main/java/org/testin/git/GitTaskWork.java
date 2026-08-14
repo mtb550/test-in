@@ -15,5 +15,12 @@ import org.jetbrains.annotations.NotNull;
  */
 @FunctionalInterface
 public interface GitTaskWork {
+
+    // RedundantThrows is right about the fact and wrong about the conclusion: no
+    // implementation throws a checked exception, because #63 converted the git
+    // service to return its failures. The declaration is what lets a lambda
+    // raise one when it needs the task's error handler, which
+    // ViewPendingCommitsAction.finishRebase does.
+    @SuppressWarnings("RedundantThrows")
     void run(final @NotNull ProgressIndicator indicator) throws Exception;
 }

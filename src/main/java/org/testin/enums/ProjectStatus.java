@@ -21,7 +21,7 @@ public enum ProjectStatus {
 
     // Reported as never used, and kept: the status is persisted in the test
     // project marker, so a marker already on disk can hold "Removed" and
-    // deleting the constant makes it fail to deserialise. No inspection can see
+    // deleting the constant makes it fail to deserialize. No inspection can see
     // that, because the only reader is Jackson (#61).
     REMOVED(
             "Removed",
