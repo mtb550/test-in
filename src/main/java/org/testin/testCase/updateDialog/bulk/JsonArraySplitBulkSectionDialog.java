@@ -69,11 +69,18 @@ public abstract class JsonArraySplitBulkSectionDialog extends AbstractFrameworkD
                 StatusBarShortcut.build(Shortcuts.RemoveArrayItem, "Remove", this::removeItemAtCarets),
                 StatusBarShortcut.build(Shortcuts.TabNext, "Next", () -> editors.navigate(1, true)),
                 StatusBarShortcut.build(Shortcuts.TabPrevious, "Previous", () -> editors.navigate(-1, true)),
+                // The arrows wrap here, unlike the value dialog: an array item is
+                // one line, so the caret has nowhere else to go.
+                StatusBarShortcut.build(Shortcuts.ArrowDown, "Next", () -> editors.navigate(1, true)),
+                StatusBarShortcut.build(Shortcuts.ArrowUp, "Previous", () -> editors.navigate(-1, true)),
                 StatusBarShortcut.build(Shortcuts.CaretOnEveryValue, "All Carets", this::caretOnEveryValue),
                 StatusBarShortcut.hint("Ctrl+Click", "Multi-Caret"),
                 StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(1100), JBUI.scale(550));
+
+        // The editor listens to the action system, not to Swing key bindings.
+        editors.bindKeysToEditor(shortcuts);
     }
 
     // ------------------------------------------------------------------

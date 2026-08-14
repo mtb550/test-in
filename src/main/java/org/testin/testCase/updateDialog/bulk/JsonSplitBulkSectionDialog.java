@@ -61,6 +61,9 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
                 StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
 
         preferredSize = new Dimension(JBUI.scale(1000), JBUI.scale(450));
+
+        // The editor listens to the action system, not to Swing key bindings.
+        editors.bindKeysToEditor(shortcuts);
     }
 
     // ------------------------------------------------------------------

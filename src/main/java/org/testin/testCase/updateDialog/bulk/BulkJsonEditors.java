@@ -1,8 +1,12 @@
 package org.testin.testCase.updateDialog.bulk;
 
 import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.colors.EditorColors;
@@ -17,12 +21,17 @@ import com.intellij.ui.JBSplitter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.ui.framework.IDialogComponent;
+import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.IntFunction;
 
 /**
@@ -386,6 +395,56 @@ final class BulkJsonEditors implements IDialogComponent {
     @Override
     public boolean fillsSpace() {
         return true;
+    }
+
+    /**
+     * False because a Swing key binding on an editor is not reached: an IntelliJ
+     * editor consumes keys through its own action handlers first, so Enter
+     * inserted a newline instead of saving. {@link #bindKeysToEditor} registers
+     * the same declaration through the action system instead.
+     */
+    @Override
+    public boolean acceptsDialogKeys() {
+        return false;
+    }
+
+    /**
+     * Binds the dialog's declared shortcuts on the editor through the action
+     * system, which is what an editor listens to. The declaration is still the
+     * one source - the status bar renders from it and this binds from it.
+     */
+    void bindKeysToEditor(final @NotNull List<StatusBarShortcut> shortcuts) {
+        final JComponent target = rightEditor.getContentComponent();
+
+        for (final StatusBarShortcut shortcut : shortcuts) {
+            if (!shortcut.isBindable()) continue;
+
+            final Shortcuts key = Objects.requireNonNull(shortcut.shortcut());
+            final Runnable action = Objects.requireNonNull(shortcut.action());
+            register(action, key.getKey(), target);
+
+            // Shift+Enter saves as well. It is not advertised: it exists so the
+            // gesture that normally inserts a line break cannot put a newline
+            // inside a value the JSON shape says is one line.
+            if (key == Shortcuts.Enter) {
+                register(action, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), target);
+            }
+        }
+    }
+
+    private static void register(final @NotNull Runnable body, final @NotNull KeyStroke keyStroke,
+                                 final @NotNull JComponent target) {
+        new DumbAwareAction() {
+            @Override
+            public void actionPerformed(final @NotNull AnActionEvent e) {
+                body.run();
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.EDT;
+            }
+        }.registerCustomShortcutSet(new CustomShortcutSet(keyStroke), target);
     }
 
     /**
