@@ -1,11 +1,7 @@
 package org.testin.viewPanel.details.components;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
-import com.intellij.util.ui.JBFont;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
@@ -15,16 +11,6 @@ import javax.swing.*;
 import java.awt.*;
 
 public abstract class BaseDetails {
-
-    final int LABEL_WIDTH = 255;
-    final int LABEL_INSETS_TOP = 12;
-    final int LABEL_INSETS_LEFT = 16;
-    final int LABEL_INSETS_BOTTOM = 12;
-    final int LABEL_INSETS_RIGHT = 8;
-    final int VALUE_INSETS_TOP = 12;
-    final int VALUE_INSETS_LEFT = 0;
-    final int VALUE_INSETS_BOTTOM = 12;
-    final int VALUE_INSETS_RIGHT = 16;
 
     protected float getLabelFontSize() {
         return FontSync.getBaseFontSize();
@@ -37,50 +23,10 @@ public abstract class BaseDetails {
     public abstract int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow);
 
     protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @Nullable String valueText, final int row) {
-
-        if (valueText == null || valueText.trim().isEmpty())
-            return row;
-
-        final JTextArea valueArea = new JTextArea(valueText);
-        valueArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
-        valueArea.setLineWrap(true);
-        valueArea.setWrapStyleWord(true);
-        valueArea.setOpaque(false);
-        valueArea.setEditable(false);
-        valueArea.setBorder(null);
-
-        return addRow(panel, gbc, labelText, valueArea, row);
+        return LabelValueRow.add(panel, gbc, labelText, valueText, getLabelFontSize(), getValueFontSize(), row);
     }
 
     protected int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull String labelText, final @NotNull JComponent valueComponent, final int row) {
-
-        gbc.gridy = row;
-        gbc.gridwidth = 1;
-
-        gbc.gridx = 0;
-        gbc.weightx = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = JBUI.insets(LABEL_INSETS_TOP, LABEL_INSETS_LEFT, LABEL_INSETS_BOTTOM, LABEL_INSETS_RIGHT);
-
-        final JBLabel label = new JBLabel(labelText);
-        label.setForeground(JBColor.GRAY);
-        label.setFont(JBFont.label().deriveFont(Font.BOLD, getLabelFontSize()));
-
-        final Dimension prefSize = label.getPreferredSize();
-        label.setPreferredSize(new Dimension(LABEL_WIDTH, prefSize.height));
-        label.setMinimumSize(new Dimension(LABEL_WIDTH, prefSize.height));
-
-        panel.add(label, gbc);
-
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.insets = JBUI.insets(VALUE_INSETS_TOP, VALUE_INSETS_LEFT, VALUE_INSETS_BOTTOM, VALUE_INSETS_RIGHT);
-
-        panel.add(valueComponent, gbc);
-
-        return row + 1;
+        return LabelValueRow.add(panel, gbc, labelText, valueComponent, getLabelFontSize(), row);
     }
 }
