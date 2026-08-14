@@ -39,7 +39,7 @@ public final class DialogMessage implements IDialogComponent {
 
     private static @NotNull JBLabel pathRow(final @NotNull String caption, final @NotNull String path, final int topGap) {
         final JBLabel label = new JBLabel(caption + ":  " + path);
-        label.setFont(JBUI.Fonts.smallFont());
+        label.setFont(JBUI.Fonts.label());
         label.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
         label.setBorder(JBUI.Borders.emptyTop(topGap));
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
