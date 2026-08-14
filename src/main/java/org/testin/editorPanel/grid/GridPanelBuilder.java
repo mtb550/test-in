@@ -362,7 +362,7 @@ public class GridPanelBuilder {
             }
         };
         table.putClientProperty(GRID_KIND_KEY, editable ? "test" : "run");
-        // JBTable's IntelliJ UI paints a rollover background over table rows.
+        // The IntelliJ table UI paints a rollover background over table rows.
         // The grid renderer owns all row colors, so use the standard table UI here.
         table.setUI(new BasicTableUI());
         // Swapping the UI is not enough: JBTable also attaches a hover listener in

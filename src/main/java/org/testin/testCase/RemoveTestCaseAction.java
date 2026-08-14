@@ -73,9 +73,9 @@ public class RemoveTestCaseAction extends DumbAwareAction {
 
         // Off the editor's master list first. The list model holds only the
         // current page, while the next sequence write persists every entry of
-        // the master list - so a case left there is written back to disk after
-        // its file has been deleted, and comes back on the next re-index as an
-        // unsorted orphan.
+        // the master list.
+        // So a case left there is written back to disk after its file has been
+        // deleted, and comes back on the next re-index as an unsorted orphan.
         editor.getAllTestCases().removeAll(selectedItems);
 
         final var indexer = Services.getInstance(p, org.testin.indexer.ProjectIndexer.class);

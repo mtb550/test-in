@@ -57,7 +57,7 @@ public class GridViewDetailsAction extends DumbAwareAction {
     }
 
     /**
-     * Double click on the sequence column opens the details view too, so the
+     * Double-click on the sequence column opens the details view too, so the
      * grid offers the same two gestures as the list.
      */
     public void installDoubleClick() {

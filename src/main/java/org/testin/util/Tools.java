@@ -121,7 +121,7 @@ public final class Tools {
     /**
      * True when a full stop would be wrong: the text already ends in
      * punctuation, or in a character that means it is not a sentence - a URL or
-     * a path ending in '/', a parenthesised note, a code snippet.
+     * a path ending in '/', a parenthesized note, a code snippet.
      */
     private static boolean endsClosed(final @NotNull String s) {
         return ".!?:;/)".indexOf(s.charAt(s.length() - 1)) >= 0;

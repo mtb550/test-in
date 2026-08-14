@@ -381,7 +381,7 @@ public abstract class JsonSplitBulkSectionDialog {
     }
 
     /**
-     * Moves the caret to the neighbouring editable value. Uses the live marker
+     * Moves the caret to the neighboring editable value. Uses the live marker
      * offsets, so navigation stays correct while the user is typing.
      */
     private void navigate(final int direction, final boolean wrap, final @NotNull Editor editor, final @NotNull List<RangeMarker> markers) {

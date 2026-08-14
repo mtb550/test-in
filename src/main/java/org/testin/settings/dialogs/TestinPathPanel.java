@@ -36,7 +36,7 @@ public final class TestinPathPanel {
 
     private void setupField() {
         ((JBTextField) pathField.getTextField()).getEmptyText()
-                .setText("Example -> c:\\users\\{username}\\documents\\testin");
+                .setText("Example -> C:\\Users\\{username}\\Documents\\Testin");
 
         pathField.addBrowseFolderListener(
                 null,

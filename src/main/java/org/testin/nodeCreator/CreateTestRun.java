@@ -83,10 +83,11 @@ public class CreateTestRun implements NodeCreator {
      * The node for a folder, with its test cases or its child folders under it.
      * <p>
      * Always returns a node. It used to return null for an empty test set or an
-     * empty container and take an isRoot flag to exempt the top of the tree,
-     * which gave one method two contracts - the root could never be null and a
-     * child routinely was. The caller below drops the empties instead, which is
-     * the same behavior and one rule.
+     * empty container, and take an isRoot flag to exempt the top of the tree.
+     * That gave one method two contracts: the root could never be null and a
+     * child routinely was.
+     * <p>
+     * The caller below drops the empties instead - the same behavior, one rule.
      */
     private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder,
                                                                final @NotNull DirectoryDto thisNodeDto) {

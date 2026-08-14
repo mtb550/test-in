@@ -14,9 +14,11 @@ import java.awt.event.KeyEvent;
 
 /**
  * Execution status of a test case. Constants carry their own presentation and
- * action wiring (label, icon, shortcut, extra-dialog flag), so adding a status
- * means adding one constant here — not writing a new action class, wiring a
- * new shortcut, and remembering a new menu entry (see issue #37).
+ * action wiring: label, icon, shortcut, extra-dialog flag.
+ * <p>
+ * So adding a status means adding one constant here. It does not mean writing a
+ * new action class, wiring a new shortcut, and remembering a new menu entry
+ * (see issue #37).
  */
 @Getter
 @AllArgsConstructor

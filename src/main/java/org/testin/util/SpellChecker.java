@@ -44,11 +44,13 @@ public final class SpellChecker {
      * completion.
      * <p>
      * Built through {@link EditorTextFieldProvider} rather than with
-     * {@code new EditorTextField(...)}, because the plain constructors hand the
-     * field a bare {@code EditorFactory} document with no PSI file behind it -
-     * and the checker is an inspection, so no PSI file means no checking, however
-     * the field is configured afterwards. This is the same construction the
-     * platform uses for the commit message field.
+     * {@code new EditorTextField(...)}: the plain constructors hand the field a
+     * bare {@code EditorFactory} document with no PSI file behind it. The
+     * checker is an inspection, so no PSI file means no checking, however the
+     * field is configured afterward.
+     * <p>
+     * This is the same construction the platform uses for the commit message
+     * field.
      */
     public static @NotNull EditorTextField createField(final @NotNull Project p) {
         final List<EditorCustomization> customizations = new ArrayList<>();

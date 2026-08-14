@@ -319,7 +319,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private void moveNodes(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
-        // Captured before the move - the dtos' paths change underneath.
+        // Captured before the move - the DTO paths change underneath.
         final List<Path> oldPaths = sources.stream().map(DirectoryDto::getPath).toList();
         final List<Path> newPaths = sources.stream()
                 .map(source -> target.getPath().resolve(source.getName()))

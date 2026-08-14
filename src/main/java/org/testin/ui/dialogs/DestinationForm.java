@@ -96,7 +96,7 @@ public final class DestinationForm implements IDialogComponent {
     /**
      * The destination, or null when a field is still empty - in which case the
      * offending field takes the focus and the dialog stays open. Remembers the
-     * folder when asked to.
+     * folder when the checkbox is ticked.
      */
     public @Nullable Destination resolve() {
         final String folder = folderField.getText().trim();

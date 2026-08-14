@@ -91,10 +91,10 @@ public final class TreeUtilImpl {
      * Deletes the file, then runs {@code onDeleted} on the EDT.
      * <p>
      * The callback exists because the lookup has to leave the EDT, which makes
-     * the delete asynchronous; callers that update the indexer cache afterwards
-     * must wait for it. It runs whether or not the file was there: a path that
-     * has already gone still has to be cleared from the cache, which is what the
-     * synchronous version did by simply returning.
+     * the deletion asynchronous; callers that update the indexer cache afterward
+     * must wait for it. It runs regardless of whether the file was there: a path
+     * that has already gone still has to be cleared from the cache, which is
+     * what the synchronous version did by simply returning.
      */
     public void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
                          final @NotNull Runnable onDeleted) {

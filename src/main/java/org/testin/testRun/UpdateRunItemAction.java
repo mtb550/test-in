@@ -53,7 +53,7 @@ public class UpdateRunItemAction extends DumbAwareAction {
         new FailedResultDialog(p, runItem, () -> {
             final TestRunDto tr = runEditor.getTr();
 
-            // The editor nulls tr while it reloads. Persisting is the whole point
+            // The editor nulls the run while it reloads. Persisting is the whole point
             // of the callback, so say the edit was dropped rather than lose it quietly.
             if (tr == null) {
                 Logger.warn("Run item edited while the run was reloading; not persisted");

@@ -90,7 +90,7 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
     }
 
     /**
-     * The dialog's confirm action; wire it in {@link #shortcuts}.
+     * What the dialog does when it is confirmed; wire it in {@link #shortcuts}.
      */
     protected abstract void submit();
 

@@ -67,7 +67,7 @@ public class ExportAction extends DumbAwareAction {
                 ApplicationManager.getApplication().invokeLater(() -> {
                     // The framework dialog reports through this callback rather
                     // than a return code, so the destination is never read back
-                    // out of a dialog that was cancelled.
+                    // out of a dialog that was canceled.
                     new ExportDialog(p, exportAttributes, sheets, targetDir, (format, destFile) -> {
                         try {
                             format.exportToFile(p, ExportAction.this, destFile, sheets);

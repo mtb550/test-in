@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 /**
  * The import working dialog: source form on top, one preview tab per sheet
  * filling the middle, a visible Import button at the bottom. Reports the cases
- * the tester ticked through its callback, so a cancelled dialog can never be
+ * the tester ticked through its callback, so a canceled dialog can never be
  * read back for a selection.
  */
 public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {

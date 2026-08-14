@@ -519,10 +519,10 @@ public final class ProjectIndexer {
                 throw new RuntimeException(ex);
             }
 
-            // The cache update persists the touched marker at the NEW path and
-            // that write creates directories - so it must run only after the
-            // VFS rename succeeded, or the target directory would already
-            // exist and the rename fails with "already exists in VFS".
+            // The cache update persists the touched marker at the NEW path, and
+            // that write creates directories. So it must run only after the VFS
+            // rename succeeded: otherwise the target directory already exists
+            // and the rename fails with "already exists in VFS".
             store.renameNode(oldPath, newPath);
             if (onFinished != null) onFinished.run();
         });
