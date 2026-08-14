@@ -4,9 +4,9 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.SimpleTextAttributes;
 import com.intellij.util.ui.UIUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,6 +19,7 @@ import java.awt.event.KeyEvent;
  * new shortcut, and remembering a new menu entry (see issue #37).
  */
 @Getter
+@AllArgsConstructor
 public enum TestStatus {
     PASSED(
             "008000",
@@ -27,6 +28,7 @@ public enum TestStatus {
             JBColor.GREEN,
             "Passed",
             new MenuEntry(AllIcons.Actions.Checked, KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
+            true,
             false
     ),
 
@@ -37,6 +39,7 @@ public enum TestStatus {
             JBColor.RED.darker(),
             "Failed",
             new MenuEntry(AllIcons.Actions.Cancel, KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
+            true,
             true
     ),
 
@@ -47,6 +50,7 @@ public enum TestStatus {
             JBColor.ORANGE,
             "Blocked",
             new MenuEntry(AllIcons.Actions.Pause, KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
+            true,
             false
     ),
 
@@ -57,7 +61,13 @@ public enum TestStatus {
             // Lazy because it comes from the theme: resolved at class-load time it
             // would keep the colour of whichever theme happened to be active then.
             JBColor.lazy(UIUtil::getContextHelpForeground),
-            "Pending"
+            "Pending",
+            new MenuEntry(AllIcons.Actions.Restart, KeyStroke.getKeyStroke(KeyEvent.VK_N, 0)),
+            // Off the menu: the run owns it. It means "queued to run", and a run
+            // only clears it on completion, so a tester setting it afterwards
+            // leaves a state nothing reconciles.
+            false,
+            false
     ),
 
     UNTESTED(
@@ -65,7 +75,12 @@ public enum TestStatus {
             " [Untested]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             JBColor.GRAY.brighter(),
-            "Untested"
+            "Untested",
+            new MenuEntry(AllIcons.Actions.Rollback, KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)),
+            // On the menu as "clear my verdict": marking a case Failed and then
+            // finding you tested the wrong build had no way back.
+            true,
+            false
     );
 
     private final @NotNull String hex;
@@ -75,30 +90,22 @@ public enum TestStatus {
     private final @NotNull String label;
 
     /**
-     * How this status appears on the status menu, or null for the ones the
-     * tester cannot set. One field rather than two, so an icon without a
-     * shortcut - a status offered with no key to apply it - cannot be written.
+     * How this status appears on the status menu. One field rather than two, so
+     * an icon without a shortcut - a status offered with no key to apply it -
+     * cannot be written.
      */
-    private final @Nullable MenuEntry menuEntry;
+    private final @NotNull MenuEntry menuEntry;
+
+    /**
+     * Whether the status menu offers it. Separate from the entry above so that
+     * offering a status is one flag rather than inventing a presentation for it.
+     */
+    private final boolean addedToMenu;
 
     /**
      * True when applying this status first collects details in a dialog (FAILED).
      */
     private final boolean collectsFailureDetails;
-
-    TestStatus(final @NotNull String hex, final @NotNull String displayText, final @NotNull SimpleTextAttributes style, final @NotNull Color rowColor, final @NotNull String label) {
-        this(hex, displayText, style, rowColor, label, null, false);
-    }
-
-    TestStatus(final @NotNull String hex, final @NotNull String displayText, final @NotNull SimpleTextAttributes style, final @NotNull Color rowColor, final @NotNull String label, final @Nullable MenuEntry menuEntry, final boolean collectsFailureDetails) {
-        this.hex = hex;
-        this.displayText = displayText;
-        this.style = style;
-        this.rowColor = rowColor;
-        this.label = label;
-        this.menuEntry = menuEntry;
-        this.collectsFailureDetails = collectsFailureDetails;
-    }
 
     /**
      * The status menu's presentation of a status it offers: the icon of its

@@ -35,8 +35,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         // One action per user-settable status: a new TestStatus constant shows
         // up here automatically (issue #37).
         for (final TestStatus status : TestStatus.values()) {
-            final TestStatus.MenuEntry entry = status.getMenuEntry();
-            if (entry != null) add(new SetTestCaseStatusAction(p, ui, list, status, entry));
+            if (status.isAddedToMenu()) add(new SetTestCaseStatusAction(p, ui, list, status, status.getMenuEntry()));
         }
         addSeparator();
         add(new UpdateRunItemAction(p, ui, list));
