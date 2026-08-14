@@ -68,7 +68,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
             delete.run();
 
             // Inside the confirmation callback, not around actionPerformed: a
-            // cancelled dialog removes nothing and says nothing (#62).
+            // canceled dialog removes nothing and says nothing (#62).
             Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "removed", selectedItems.size());
         }).show();
     }

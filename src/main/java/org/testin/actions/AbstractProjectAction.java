@@ -16,7 +16,7 @@ import javax.swing.*;
  * here (#59). The field and its assignment were therefore copied into every
  * action: two lines each, saying the same thing.
  * <p>
- * This holds constructor arguments and nothing else. No behaviour belongs on it:
+ * This holds constructor arguments and nothing else. No behavior belongs on it:
  * every action would inherit a method most of them do not want, and an action's
  * {@code actionPerformed} and {@code getActionUpdateThread} are its own.
  */

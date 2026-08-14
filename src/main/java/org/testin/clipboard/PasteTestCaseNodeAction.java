@@ -92,8 +92,8 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
                 TestEditorContextMenu.clearCutState();
             }
 
-            // Inside the invokeLater and after the persist: the action itself
-            // returns long before the cases exist (#62).
+            // Inside the invokeLater and after the sequence is persisted: the
+            // action itself returns long before the cases exist (#62).
             if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "pasted", pasted);
         });
     }
