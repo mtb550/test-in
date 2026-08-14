@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public class ListViewBtn extends AbstractButton implements IToolbarItem {
 
     public ListViewBtn(final @NotNull Runnable onSwitchToList) {
-        super("List View", AllIcons.Actions.ListFiles);
+        super("List View", AllIcons.General.LayoutEditorOnly);
 
         addActionListener(e -> onSwitchToList.run());
     }
