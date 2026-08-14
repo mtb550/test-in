@@ -3,6 +3,7 @@ package org.testin.editorPanel.listeners;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.IEditor;
 import org.testin.mappers.dto.TestCaseDto;
@@ -14,19 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 public class SelectionListener implements ListSelectionListener {
+    private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull IEditor editor;
     private final @NotNull ArrayList<String> path;
-
-    private final @NotNull Project p;
-
-    public SelectionListener(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull IEditor editor, final @NotNull ArrayList<String> path) {
-        this.p = p;
-        this.list = list;
-        this.editor = editor;
-        this.path = path;
-    }
 
     @Override
     public void valueChanged(final ListSelectionEvent e) {

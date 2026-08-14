@@ -5,6 +5,7 @@ import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.dto.TestCaseDto;
@@ -15,17 +16,12 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor {
 
-    private final @NotNull IEditor editor;
-    private final @NotNull UnifiedVirtualFile vf;
     private final @NotNull Project p;
-
-    public UnifiedFileEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf, final @NotNull IEditor editor) {
-        this.p = p;
-        this.vf = vf;
-        this.editor = editor;
-    }
+    private final @NotNull UnifiedVirtualFile vf;
+    private final @NotNull IEditor editor;
 
     @Override
     public @NotNull JComponent getComponent() {

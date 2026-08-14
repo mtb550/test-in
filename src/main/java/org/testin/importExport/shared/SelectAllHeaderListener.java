@@ -2,22 +2,18 @@ package org.testin.importExport.shared;
 
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.table.JBTable;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+@AllArgsConstructor
 public class SelectAllHeaderListener extends MouseAdapter {
+    private final @NotNull JBTable table;
     private final @NotNull DefaultTableModel model;
     private final @NotNull JBCheckBox headerCheckbox;
-    private final @NotNull JBTable table;
-
-    public SelectAllHeaderListener(final @NotNull JBTable table, final @NotNull DefaultTableModel model, final @NotNull JBCheckBox headerCheckbox) {
-        this.table = table;
-        this.model = model;
-        this.headerCheckbox = headerCheckbox;
-    }
 
     @Override
     public void mouseClicked(final @NotNull MouseEvent e) {
