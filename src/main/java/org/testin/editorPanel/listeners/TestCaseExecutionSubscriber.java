@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.enums.RunStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.listeners.ITestCaseExecutionListener;
 import org.testin.logger.Logger;
@@ -26,14 +27,14 @@ public class TestCaseExecutionSubscriber {
 
         p.getMessageBus().connect(parentDisposable).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
             @Override
-            public void onStatusChanged(final @NotNull String testName, final @NotNull String status, final String error) {
+            public void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final String error) {
                 // Today's publishers already fire on the EDT, but nothing
                 // enforces that; hop like ViewPanelExecutionSubscriber does,
                 // so the map, runningDtoId and the repaint stay EDT-confined.
                 ApplicationManager.getApplication().invokeLater(() -> handleStatusChanged(testName, status, error));
             }
 
-            private void handleStatusChanged(final @NotNull String testName, final @NotNull String status, final @Nullable String error) {
+            private void handleStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final @Nullable String error) {
                 Logger.debug("TestEditor subscription fired: testName='" + testName + "', status='" + status + "'");
 
                 boolean updated = false;
@@ -63,7 +64,7 @@ public class TestCaseExecutionSubscriber {
                     }
                 }
 
-                if (!updated && "RUNNING".equals(status) && runningDtoId != null && !uuidToDtoId.containsKey(testName)) {
+                if (!updated && status == RunStatus.RUNNING && runningDtoId != null && !uuidToDtoId.containsKey(testName)) {
                     final TestCaseDto tc = indexer.getTestCaseById(runningDtoId);
                     if (tc != null) {
                         Logger.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");

@@ -7,6 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.enums.RunStatus;
 import org.testin.listeners.ITestCaseExecutionListener;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -33,9 +34,9 @@ public class RunTestCaseAction extends DumbAwareAction {
         if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
 
         for (TestCaseDto tc : testCases) {
-            if (tc == null || "RUNNING".equals(tc.getTempStatus())) continue;
+            if (tc == null || tc.getTempStatus() == RunStatus.RUNNING) continue;
 
-            p.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(tc.getId().toString().toLowerCase(), "RUNNING", null);
+            p.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(tc.getId().toString().toLowerCase(), RunStatus.RUNNING, null);
 
             Services.getInstance(p, Notifier.class).softShow(p, "Running Test Case: ", tc.getDescription());
             Services.getInstance(p, TestNGRunnerByMethod.class).runTestMethod(p, tc);

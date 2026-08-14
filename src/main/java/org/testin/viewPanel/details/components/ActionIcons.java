@@ -73,7 +73,7 @@ public class ActionIcons extends BaseDetails {
         });
 
         final JBLabel runLabel = new JBLabel();
-        final RunStatus currentStatus = RunStatus.fromString(dto.getTempStatus());
+        final RunStatus currentStatus = dto.getTempStatus();
         final Icon currentRunIconRaw = currentStatus.getIcon();
         final Icon runIconBase = IconUtil.scale(currentRunIconRaw, runLabel, BASE_SCALE);
         final Icon runIconHover = IconUtil.scale(currentRunIconRaw, runLabel, HOVER_SCALE);

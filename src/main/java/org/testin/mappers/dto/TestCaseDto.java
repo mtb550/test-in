@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
 import org.testin.enums.Group;
+import org.testin.enums.RunStatus;
 import org.testin.enums.Priority;
 import org.testin.enums.TestCaseStatus;
 import org.testin.mappers.Config;
@@ -101,7 +102,7 @@ public final class TestCaseDto {
     @JsonIgnore
     @NonNull
     @Builder.Default
-    private volatile String tempStatus = "";
+    private volatile RunStatus tempStatus = RunStatus.IDLE;
 
     @JsonIgnore
     @NonNull

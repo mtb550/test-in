@@ -17,7 +17,6 @@ import java.util.function.BiConsumer;
 @AllArgsConstructor
 public enum RunStatus {
     IDLE(
-            "IDLE",
             AllIcons.RunConfigurations.TestState.Run,
             "Run Test Case",
             (tc, list) -> {
@@ -25,14 +24,13 @@ public enum RunStatus {
     ),
 
     PASSED(
-            "PASSED",
             AllIcons.RunConfigurations.TestPassed,
             "Run Test Case",
             (tc, list) -> {
             }
     ),
 
-    FAILED("FAILED",
+    FAILED(
             AllIcons.RunConfigurations.TestFailed,
             "Run Test Case",
             (tc, list) -> {
@@ -40,29 +38,16 @@ public enum RunStatus {
     ),
 
     RUNNING(
-            "RUNNING",
             AllIcons.Actions.Suspend,
             "Test case is Running...",
             (tc, list) -> {
             }
     );
 
-    private final @NotNull String statusName;
     private final @NotNull Icon icon;
     private final @NotNull String tooltip;
     private final @NotNull BiConsumer<TestCaseDto, JBList<TestCaseDto>> action;
 
-    public static @NotNull RunStatus fromString(final @Nullable String status) {
-        if (status == null || status.trim().isEmpty()) {
-            return IDLE;
-        }
-        for (final RunStatus rs : values()) {
-            if (rs.statusName.equalsIgnoreCase(status)) {
-                return rs;
-            }
-        }
-        return IDLE;
-    }
 
     /**
      * Runs the test case. The list is the component the run action binds its

@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.enums.RunStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.listeners.ITestCaseExecutionListener;
 import org.testin.logger.Logger;
@@ -25,7 +26,7 @@ public class ViewPanelExecutionSubscriber {
 
         p.getMessageBus().connect(viewPanel).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
             @Override
-            public void onStatusChanged(final @NotNull String testName, final @NotNull String status, final String error) {
+            public void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final String error) {
                 Logger.debug("ViewPanel subscription fired: testName='" + testName + "', status='" + status + "'");
 
                 boolean updated = false;
@@ -60,7 +61,7 @@ public class ViewPanelExecutionSubscriber {
                 // Snapshotted: the field is volatile, so re-reading it after the
                 // check could see a different value.
                 final UUID runningId = runningDtoId;
-                if (!updated && "RUNNING".equals(status) && runningId != null && !uuidToDtoId.containsKey(testName)) {
+                if (!updated && status == RunStatus.RUNNING && runningId != null && !uuidToDtoId.containsKey(testName)) {
                     final TestCaseDto tc = indexer.getTestCaseById(runningId);
                     if (tc == null) return;
 

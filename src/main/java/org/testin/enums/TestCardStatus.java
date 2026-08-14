@@ -29,9 +29,15 @@ public enum TestCardStatus {
     private final @NotNull String label;
     private final @NotNull JBColor badgeColor;
 
-    public static @Nullable TestCardStatus from(final String status) {
+    /**
+     * The badge for a run status, or null for the ones that get none.
+     * <p>
+     * Matched by name: this enum names the same three states RunStatus does and
+     * adds a label and a colour to them. Worth merging into it.
+     */
+    public static @Nullable TestCardStatus from(final @NotNull RunStatus status) {
         for (final TestCardStatus s : values())
-            if (s.name().equals(status)) return s;
+            if (s.name().equals(status.name())) return s;
 
         return null;
     }

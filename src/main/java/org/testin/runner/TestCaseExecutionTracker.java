@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
+import org.testin.enums.RunStatus;
 import org.testin.listeners.ITestCaseExecutionListener;
 
 public class TestCaseExecutionTracker {
@@ -26,7 +27,7 @@ public class TestCaseExecutionTracker {
         p.getMessageBus().connect(p).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
             @Override
             public void onTestStarted(final @NotNull SMTestProxy test) {
-                broadcastStatusChange(p, test.getPresentableName().toLowerCase(), "RUNNING", null);
+                broadcastStatusChange(p, test.getPresentableName().toLowerCase(), RunStatus.RUNNING, null);
             }
 
             @Override
@@ -34,18 +35,18 @@ public class TestCaseExecutionTracker {
                 String testName = test.getPresentableName().toLowerCase();
 
                 if (test.isPassed())
-                    broadcastStatusChange(p, testName, "PASSED", null);
+                    broadcastStatusChange(p, testName, RunStatus.PASSED, null);
 
                 else if (test.isDefect())
-                    broadcastStatusChange(p, testName, "FAILED", test.getErrorMessage());
+                    broadcastStatusChange(p, testName, RunStatus.FAILED, test.getErrorMessage());
 
                 else
-                    broadcastStatusChange(p, testName, "FAILED", test.getErrorMessage() != null ? test.getErrorMessage() : "Skipped/Terminated");
+                    broadcastStatusChange(p, testName, RunStatus.FAILED, test.getErrorMessage() != null ? test.getErrorMessage() : "Skipped/Terminated");
             }
         });
     }
 
-    private static void broadcastStatusChange(final @NotNull Project p, final @NotNull String testName, final @NotNull String status, final String error) {
+    private static void broadcastStatusChange(final @NotNull Project p, final @NotNull String testName, final @NotNull RunStatus status, final String error) {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!p.isDisposed()) {
                 p.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(testName, status, error);
