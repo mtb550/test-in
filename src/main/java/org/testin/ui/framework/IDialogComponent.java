@@ -6,7 +6,7 @@ import javax.swing.*;
 
 /**
  * The contract every framework dialog component follows. A component owns its
- * own layout and internal behaviour (navigation, selection sync); the dialog
+ * own layout and internal behavior (navigation, selection sync); the dialog
  * owns the title, the status bar and the shortcut-to-action mapping.
  */
 public interface IDialogComponent {

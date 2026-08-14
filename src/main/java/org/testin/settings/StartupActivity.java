@@ -101,7 +101,7 @@ public final class StartupActivity implements ProjectActivity {
 
         final ToolWindowManager manager = ToolWindowManager.getInstance(p);
 
-        // Waits for the tool window manager to finish initialising - asking it for a
+        // Waits for the tool window manager to finish initializing - asking it for a
         // tool window any earlier returns null.
         manager.invokeLater(() -> {
             if (p.isDisposed()) return;

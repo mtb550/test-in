@@ -19,7 +19,7 @@ import java.awt.event.MouseEvent;
  * covered, so a repaint of the button alone never repaints the toolbar behind
  * it. The stock painting does not keep that promise here - with the content
  * area unfilled it draws an icon and leaves the rest untouched, so those pixels
- * keep whatever was drawn there before. Filling from the toolbar's own colour
+ * keep whatever was drawn there before. Filling from the toolbar's own color
  * keeps the promise and keeps the button invisible at rest.
  */
 public abstract class AbstractButton extends JButton {
@@ -40,7 +40,7 @@ public abstract class AbstractButton extends JButton {
         // Every pixel inside the bounds is still covered - paintComponent fills
         // them - but it has to be this class that does it, not the look and feel.
         // While opaque, the UI fills the whole rectangle with Button.background
-        // before anything else is drawn, which is the wrong colour here and
+        // before anything else is drawn, which is the wrong color here and
         // erases the hover pill along with it.
         setOpaque(false);
 

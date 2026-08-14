@@ -97,7 +97,7 @@
     <!-- ================================================================== -->
     <extensions defaultExtensionNs="com.intellij">
         <!-- Tab titles of Testin editors use the normal foreground, not the
-             "unknown file" colour their non-physical virtual file would get -->
+             "unknown file" color their non-physical virtual file would get -->
         <editorTabColorProvider implementation="org.testin.editorPanel.TestinTabColorProvider" order="first"/>
 
         <!-- First run activity -->

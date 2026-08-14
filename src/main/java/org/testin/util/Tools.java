@@ -64,7 +64,7 @@ public final class Tools {
      * Whether the event is this shortcut.
      * <p>
      * Built into a KeyStroke and compared, rather than comparing the modifier
-     * masks: KeyStroke normalises what it is given to carry both the old and the
+     * masks: KeyStroke normalizes what it is given to carry both the old and the
      * extended bits, while KeyEvent.getModifiersEx reports only the extended
      * ones. Ctrl+C therefore compared 130 against 128 and never matched.
      */
@@ -104,7 +104,7 @@ public final class Tools {
     }
 
     /**
-     * A value as the details panel shows it: capitalised, and ended with a full
+     * A value as the details panel shows it: capitalized, and ended with a full
      * stop unless it already ends in something that closes it (#22).
      * <p>
      * Display only. The stored JSON is always what the tester typed - the

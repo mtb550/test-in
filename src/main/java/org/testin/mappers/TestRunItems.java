@@ -29,7 +29,7 @@ public class TestRunItems {
 
     /**
      * The test case this result belongs to, wired by the run editor after the
-     * run JSON is read - {@code @JsonIgnore}, so it is never deserialised.
+     * run JSON is read - {@code @JsonIgnore}, so it is never deserialized.
      * <p>
      * Null when the test case has been deleted since the run: the editor skips
      * those and never assigns one. They stay out of the list, so the attributes

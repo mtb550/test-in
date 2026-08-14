@@ -123,7 +123,7 @@ public final class TestRunHtmlGenerator {
         html.append("<div class='summary-text'>")
                 .append("A total of <b>").append(total).append("</b> API functional test cases were executed for ")
                 .append("<b>").append(runName).append("</b>. The run completed with a <b>").append(passRate).append("%</b> pass rate. ")
-                .append("The results below summarises the outcome across all executed cases.")
+                .append("The results below summarize the outcome across all executed cases.")
                 .append("</div>");
 
         // Summary cards

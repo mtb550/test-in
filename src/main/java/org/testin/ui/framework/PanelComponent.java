@@ -9,7 +9,7 @@ import javax.swing.*;
  * feature already builds for itself.
  * <p>
  * It exists so a dialog can be declared on the framework without its every
- * panel first becoming a framework component. It adds no behaviour: it does not
+ * panel first becoming a framework component. It adds no behavior: it does not
  * take the initial focus, and it never submits.
  */
 public final class PanelComponent implements IDialogComponent {

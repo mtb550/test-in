@@ -57,7 +57,7 @@ public class GridEditListener implements TableModelListener {
             attr.getImportSetter().execute(p, tc, String.valueOf(model.getValueAt(row, col)));
             final Object after = attr.gridValue(p, tc);
 
-            // Always write the normalised value back to the cell - it renumbers
+            // Always write the normalized value back to the cell - it renumbers
             // steps and drops blank entries even when nothing really changed.
             model.setValueAt(after, row, col);
 

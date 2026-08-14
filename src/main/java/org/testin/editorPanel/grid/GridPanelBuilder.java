@@ -349,8 +349,8 @@ public class GridPanelBuilder {
 
         final JBTable table = new JBTable(model) {
             /**
-             * The grid renderer owns every row colour. JBTable tints the hovered
-             * row after the renderer has run, so the colour is restored here -
+             * The grid renderer owns every row color. JBTable tints the hovered
+             * row after the renderer has run, so the color is restored here -
              * removing the hover listener and swapping the UI were not enough on
              * their own (issue: hover background in grid view).
              */

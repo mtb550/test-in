@@ -290,7 +290,7 @@ public enum TestEditorAttributes {
 
     /**
      * Renders as a plain detail row. The attributes drawn as badges override
-     * this in their own body — the two behaviours sit on the constants that
+     * this in their own body — the two behaviors sit on the constants that
      * have them instead of being chosen by a null at run time.
      */
     public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges,

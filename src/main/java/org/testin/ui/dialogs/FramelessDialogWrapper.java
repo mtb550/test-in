@@ -17,7 +17,7 @@ import java.awt.event.ActionEvent;
  * Shared presentation for project-owned dialogs.
  * <p>
  * The dialog remains a DialogWrapper so callers keep the normal modal,
- * validation, exit-code, and showAndGet behaviour. Only its chrome is
+ * validation, exit-code, and showAndGet behavior. Only its chrome is
  * replaced with the plugin's lightweight, buttonless presentation.
  */
 public abstract class FramelessDialogWrapper extends DialogWrapper {

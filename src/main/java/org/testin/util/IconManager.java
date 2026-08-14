@@ -16,7 +16,7 @@ public class IconManager {
     }
 
     /**
-     * The coloured dot the priority and group rows are marked with, centred in a
+     * The colored dot the priority and group rows are marked with, centered in a
      * standard 16px icon.
      */
     public static @NotNull Icon createIcon(final @NotNull Color color) {

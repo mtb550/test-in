@@ -133,7 +133,7 @@ public enum RunEditorAttributes {
 
     /**
      * Renders as a plain detail row. The attributes drawn as badges override
-     * this in their own body — the two behaviours sit on the constants that
+     * this in their own body — the two behaviors sit on the constants that
      * have them instead of being chosen by a null at run time.
      */
     public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {

@@ -19,7 +19,7 @@ public final class Setting {
 
     /**
      * A stored root as a path. Missing, empty and whitespace-only values all mean
-     * "no root configured" and normalise to the empty path, so callers have one
+     * "no root configured" and normalize to the empty path, so callers have one
      * thing to check rather than three.
      */
     public static @NotNull Path normalize(final @Nullable String rawPath) {

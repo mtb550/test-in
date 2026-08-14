@@ -173,7 +173,7 @@ public final class TestRunPdfGenerator {
             long passRate = summary.passRate();
 
             document.add(new Paragraph(
-                    String.format("A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarise the outcome across all executed cases.", total, passRate))
+                    String.format("A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.", total, passRate))
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(12));
 

@@ -33,7 +33,7 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         XmlSerializerUtil.copyBean(state, this);
 
         // copyBean writes whatever the file held, so a settings file from an older
-        // build - or edited by hand - can put a null over a default. Normalised
+        // build - or edited by hand - can put a null over a default. Normalized
         // here, in the one place it can happen, rather than by every reader:
         // Level.valueOf(logLevel) and every marker write would fail on a null.
         rootTestinPath = orEmpty(rootTestinPath);

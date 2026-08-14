@@ -14,10 +14,10 @@ import java.awt.*;
 /**
  * Testin editors are backed by {@link UnifiedVirtualFile}, a light file on a
  * non-physical file system. The platform has no VCS status for such a file and
- * paints its tab title in the "unknown file" colour, which is why a test set
+ * paints its tab title in the "unknown file" color, which is why a test set
  * tab looked different from the .java tab beside it.
  * <p>
- * The title is rendered in the ordinary label foreground instead. The colour is
+ * The title is rendered in the ordinary label foreground instead. The color is
  * resolved lazily from the theme rather than hardcoded, so it stays readable in
  * light themes as well as dark ones.
  */

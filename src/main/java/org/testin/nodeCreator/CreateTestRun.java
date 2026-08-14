@@ -86,7 +86,7 @@ public class CreateTestRun implements NodeCreator {
      * empty container and take an isRoot flag to exempt the top of the tree,
      * which gave one method two contracts - the root could never be null and a
      * child routinely was. The caller below drops the empties instead, which is
-     * the same behaviour and one rule.
+     * the same behavior and one rule.
      */
     private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder,
                                                                final @NotNull DirectoryDto thisNodeDto) {

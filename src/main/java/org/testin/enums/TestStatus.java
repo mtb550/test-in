@@ -59,7 +59,7 @@ public enum TestStatus {
             " [Pending]",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             // Lazy because it comes from the theme: resolved at class-load time it
-            // would keep the colour of whichever theme happened to be active then.
+            // would keep the color of whichever theme happened to be active then.
             JBColor.lazy(UIUtil::getContextHelpForeground),
             "Pending",
             new MenuEntry(AllIcons.Actions.Restart, KeyStroke.getKeyStroke(KeyEvent.VK_N, 0)),

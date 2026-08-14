@@ -47,8 +47,8 @@ public enum RunStatus {
     /**
      * The card badge, null for IDLE - a case nobody has run carries no badge.
      * <p>
-     * Label and colour are one fact, so they are one field: a status cannot end
-     * up with a label and no colour to draw it in.
+     * Label and color are one fact, so they are one field: a status cannot end
+     * up with a label and no color to draw it in.
      */
     private final @Nullable Badge badge;
 

@@ -122,7 +122,7 @@ public final class TestRunWordGenerator {
                 long passRate = summary.passRate();
 
                 addText(doc, String.format(
-                        "A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarise the outcome across all executed cases.",
+                        "A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.",
                         total, passRate), 11, false, BLACK, null, 12);
 
                 XWPFTable statsTable = doc.createTable(1, 5);
