@@ -17,6 +17,8 @@ import org.testin.services.Services;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
@@ -86,21 +88,33 @@ public final class TreeUtilImpl {
      * that has already gone still has to be cleared from the cache, which is
      * what the synchronous version did by simply returning.
      */
+    /**
+     * Reports whether the file is gone, not merely that the attempt finished.
+     * The callback used to run either way, so a caller could not tell a delete
+     * that failed from one that worked — and the indexer's cache update ran on
+     * both, dropping a node that was still on disk (#66, F2).
+     * <p>
+     * A path the VFS cannot find counts as deleted: there is nothing left to
+     * remove, and the cache should stop describing it.
+     */
     public void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
-                         final @NotNull Runnable onDeleted) {
+                         final @NotNull Consumer<@NotNull Boolean> onDeleted) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
 
             ApplicationManager.getApplication().invokeLater(() -> {
+                final AtomicBoolean deleted = new AtomicBoolean(true);
+
                 WriteAction.run(() -> {
                     try {
                         if (vf != null) vf.delete(requester);
                     } catch (final IOException ex) {
+                        deleted.set(false);
                         Services.getInstance(p, Notifier.class).error(p, "Could not delete file: " + ex.getMessage(), "Error");
                     }
                 });
 
-                onDeleted.run();
+                onDeleted.accept(deleted.get());
             });
         });
     }

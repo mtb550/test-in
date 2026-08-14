@@ -32,6 +32,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 import java.util.stream.Stream;
 
 /**
@@ -342,23 +344,23 @@ public final class ProjectIndexer {
         store.registerTestRun(testRunPath, tr);
     }
 
-    public void removeTestProject(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+    public void removeTestProject(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         removeVf(path, () -> store.removeTestProject(path), onRemoved);
     }
 
-    public void removeTestSet(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+    public void removeTestSet(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         removeVf(path, () -> store.removeTestSet(path), onRemoved);
     }
 
-    public void removeTestRun(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+    public void removeTestRun(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         removeVf(path, () -> store.removeTestRun(path), onRemoved);
     }
 
-    public void removeTestSetPackage(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+    public void removeTestSetPackage(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         removeVf(path, () -> store.removeTestSetPackage(path), onRemoved);
     }
 
-    public void removeTestRunPackage(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+    public void removeTestRunPackage(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         removeVf(path, () -> store.removeTestRunPackage(path), onRemoved);
     }
 
@@ -366,35 +368,48 @@ public final class ProjectIndexer {
      * Removes nothing: the Test Cases and Test Runs containers go with their
      * test project and are never deleted on their own.
      * <p>
-     * The callback still runs. RemoveAction counts completions to know when to
-     * rebuild the tree, so a node that quietly did nothing would leave the
-     * count short and the tree never rebuilt.
+     * The callback still runs, and reports false. RemoveAction counts completions
+     * to know when to rebuild the tree, so a node that quietly did nothing would
+     * leave the count short and the tree never rebuilt — but it must not be
+     * counted as removed either, or the tester is told a node went that is still
+     * in front of them.
      */
-    public void removeFixedContainer(final @NotNull Path path, final @NotNull Runnable onRemoved) {
+    public void removeFixedContainer(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         Logger.info("Not removed: " + path.getFileName() + " belongs to its test project");
-        onRemoved.run();
+        onRemoved.accept(false);
     }
 
     /**
      * Deletes on disk, refreshes, and only then updates the cache — the order
      * CLAUDE.md requires. The refresh is asynchronous now: the synchronous one
      * ran on the EDT, and a full VFS refresh there is a slow operation.
+     * <p>
+     * The cache update runs only when the delete succeeded. It used to run either
+     * way, so a file the VFS refused to delete was dropped from the cache and the
+     * tree stopped showing a node that was still on disk (#66, F2).
      */
     private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate,
-                          final @NotNull Runnable onRemoved) {
+                          final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         Services.getInstance(p, TreeUtilImpl.class).removeVf(p, this, path,
-                () -> VirtualFileManager.getInstance().asyncRefresh(() -> {
-                    cacheUpdate.run();
-                    onRemoved.run();
+                deleted -> VirtualFileManager.getInstance().asyncRefresh(() -> {
+                    if (deleted) cacheUpdate.run();
+                    onRemoved.accept(deleted);
                 }));
     }
 
+    /**
+     * Reports whether the node moved, not merely that the attempt is over. The
+     * callback used to be one Runnable passed as both outcomes, so a caller that
+     * wanted to confirm the move had to read the cache back afterwards to find
+     * out (#66, F2).
+     */
     public void moveNode(final @NotNull Path oldPath,
                          final @NotNull Path newPath,
-                         final @Nullable Runnable onFinished) {
+                         final @Nullable Consumer<@NotNull Boolean> onFinished) {
         final Path targetParent = newPath.getParent();
         if (targetParent == null) {
-            if (onFinished != null) onFinished.run();
+            Logger.warn("Move refused, target has no parent directory: " + newPath);
+            if (onFinished != null) onFinished.accept(false);
             return;
         }
 
@@ -408,24 +423,45 @@ public final class ProjectIndexer {
         }, () -> {
             store.renameNode(oldPath, newPath);
             Logger.info("Moved successfully to: " + newPath);
-            if (onFinished != null) onFinished.run();
-        }, onFinished);
+            if (onFinished != null) onFinished.accept(true);
+        }, () -> {
+            if (onFinished != null) onFinished.accept(false);
+        });
     }
 
-    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath, final @Nullable Runnable onComplete) {
+    /**
+     * Copies each source into the target, and reports how many arrived — not how
+     * many were attempted. Every copy runs its own VFS action and any of them can
+     * fail on its own, so the count is the only honest answer; the callback used
+     * to be a bare Runnable that fired either way, and callers could not tell a
+     * finished copy from a failed one (#66, F2).
+     */
+    public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath,
+                          final @Nullable IntConsumer onComplete) {
         if (sourcePaths.isEmpty()) {
-            if (onComplete != null) onComplete.run();
+            if (onComplete != null) onComplete.accept(0);
             return;
         }
 
         final AtomicInteger pending = new AtomicInteger(sourcePaths.size());
+        final AtomicInteger copied = new AtomicInteger();
+
+        // Both outcomes drain the counter, so the tree is still rebuilt when a
+        // copy fails; only the success path raises the count.
         final Runnable operationFinished = () -> {
             if (pending.decrementAndGet() != 0) return;
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 refreshIndexedProject(targetPath);
-                if (onComplete != null) ApplicationManager.getApplication().invokeLater(onComplete);
+                if (onComplete != null) {
+                    ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
+                }
             });
         };
+        final Runnable operationSucceeded = () -> {
+            copied.incrementAndGet();
+            operationFinished.run();
+        };
+
         for (final Path sourcePath : sourcePaths) {
             Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
                 try {
@@ -434,7 +470,7 @@ public final class ProjectIndexer {
                     Logger.error(ex.getMessage());
                     throw new RuntimeException(ex);
                 }
-            }, operationFinished, operationFinished);
+            }, operationSucceeded, operationFinished);
         }
     }
 
@@ -498,6 +534,12 @@ public final class ProjectIndexer {
         store.refreshDir(path);
     }
 
+    /**
+     * The callback runs only when the rename succeeded. Unlike the copy and move
+     * forms, this needs no success flag: the whole body is one VFS operation, and
+     * {@code executeVfsAction} reports and swallows a failure before the cache
+     * update and the callback are reached.
+     */
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {
         Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, "Rename Failed", vf -> {
             try {
