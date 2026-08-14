@@ -67,6 +67,13 @@ be committed back into storage.
 - Dialogs are built on the declarative framework (`org.testin.ui.framework`):
   a dialog assigns `title`, `components`, `shortcuts` in its constructor and
   implements `submit()`. Never hand-build popup layouts.
+- A method handles its own failures: no `throws` on the signature. Catch inside,
+  log through `Logger`, and notify when a tester action triggered it — a catch
+  that does neither is worse than the `throws` it replaced. Two exceptions, both
+  real contracts: implementing a platform interface that declares it
+  (`NodesTransferable.getTransferData`, AWT `Transferable`) and functional
+  interfaces whose whole point is to let a lambda throw (`GitTaskWork.run`).
+  Both carry a comment saying why. Existing sites are tracked in issue #63.
 
 ## Process
 
