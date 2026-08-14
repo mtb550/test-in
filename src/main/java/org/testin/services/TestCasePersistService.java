@@ -4,6 +4,7 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
@@ -13,12 +14,9 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service(Service.Level.PROJECT)
+@AllArgsConstructor
 public final class TestCasePersistService implements Disposable {
     private final @NotNull Project p;
-
-    public TestCasePersistService(final @NotNull Project p) {
-        this.p = p;
-    }
 
     public void persist(final @Nullable Path path, final @Nullable List<TestCaseDto> tcs) {
         if (path == null || tcs == null || tcs.isEmpty()) return;
@@ -36,3 +34,4 @@ public final class TestCasePersistService implements Disposable {
         // todo, to be implemented
     }
 }
+

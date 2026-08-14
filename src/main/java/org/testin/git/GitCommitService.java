@@ -1,6 +1,7 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
@@ -12,13 +13,10 @@ import java.util.Set;
 /**
  * Local Git repository operations used by the pending-commit workflow.
  */
+@AllArgsConstructor
 public final class GitCommitService {
 
     private final @NotNull Project project;
-
-    public GitCommitService(final @NotNull Project project) {
-        this.project = project;
-    }
 
     public void initialize(final @NotNull Path repositoryPath) {
         GitCommandRunner.execute(project, repositoryPath, "git", "init");
@@ -70,3 +68,4 @@ public final class GitCommitService {
         return result;
     }
 }
+

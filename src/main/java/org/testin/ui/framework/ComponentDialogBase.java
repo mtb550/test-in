@@ -1,6 +1,8 @@
 package org.testin.ui.framework;
 
 import com.intellij.util.IconUtil;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,13 +16,10 @@ import java.util.List;
  * chain; new component types are added as new builders without touching
  * existing dialogs.
  */
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ComponentDialogBase<C extends IDialogComponent> {
 
     private final @NotNull C component;
-
-    private ComponentDialogBase(final @NotNull C component) {
-        this.component = component;
-    }
 
     /**
      * An input field over a selection list — the create-dialog component.
@@ -278,3 +277,4 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
         }
     }
 }
+

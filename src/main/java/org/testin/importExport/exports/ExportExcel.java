@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
@@ -20,12 +21,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+@AllArgsConstructor
 public class ExportExcel {
     private final @NotNull ExportAction exportAction;
-
-    public ExportExcel(final @NotNull ExportAction exportAction) {
-        this.exportAction = exportAction;
-    }
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
@@ -85,3 +83,4 @@ public class ExportExcel {
         );
     }
 }
+

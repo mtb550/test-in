@@ -1,6 +1,7 @@
 package org.testin.importExport.imports;
 
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
@@ -12,12 +13,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+@AllArgsConstructor
 public class ImportCsv {
     private final @NotNull ImportAction importAction;
-
-    public ImportCsv(final @NotNull ImportAction importAction) {
-        this.importAction = importAction;
-    }
 
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
         final Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();

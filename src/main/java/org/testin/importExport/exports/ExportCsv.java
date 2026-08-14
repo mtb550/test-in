@@ -5,6 +5,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
@@ -20,12 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@AllArgsConstructor
 public class ExportCsv {
     private final @NotNull ExportAction exportAction;
-
-    public ExportCsv(final @NotNull ExportAction exportAction) {
-        this.exportAction = exportAction;
-    }
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
@@ -74,3 +72,4 @@ public class ExportCsv {
         return value;
     }
 }
+

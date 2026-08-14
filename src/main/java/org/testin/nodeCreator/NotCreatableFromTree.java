@@ -1,5 +1,6 @@
 package org.testin.nodeCreator;
 
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
@@ -16,13 +17,10 @@ import java.nio.file.Path;
  * by name or by cloning a URL, which {@link NodeCreator#execute} has no
  * argument for.
  */
+@AllArgsConstructor
 public final class NotCreatableFromTree implements NodeCreator {
 
     private final @NotNull String nodeType;
-
-    public NotCreatableFromTree(final @NotNull String nodeType) {
-        this.nodeType = nodeType;
-    }
 
     @Override
     public @Nullable DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir,
@@ -31,3 +29,4 @@ public final class NotCreatableFromTree implements NodeCreator {
         return null;
     }
 }
+

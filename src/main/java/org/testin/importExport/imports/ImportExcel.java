@@ -1,6 +1,7 @@
 package org.testin.importExport.imports;
 
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
@@ -15,12 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+@AllArgsConstructor
 public class ImportExcel {
     private final @NotNull ImportAction importAction;
-
-    public ImportExcel(final @NotNull ImportAction importAction) {
-        this.importAction = importAction;
-    }
 
     public @NotNull Map<String, List<TestCaseDto>> processImport(final @NotNull Project p, final @NotNull File file) {
         final Map<String, List<TestCaseDto>> result = new LinkedHashMap<>();

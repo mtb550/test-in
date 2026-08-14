@@ -1,6 +1,7 @@
 package org.testin.editorPanel.listeners;
 
 import com.intellij.util.ui.JBUI;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.EditorColors;
@@ -11,15 +12,12 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
+@AllArgsConstructor
 public abstract class AbstractListRenderer<U extends IEditor> implements ListCellRenderer<TestCaseDto> {
 
     private static final @NotNull Border SELECTED_BORDER = JBUI.Borders.customLine(EditorColors.SELECTION_BORDER, 1);
     private static final @NotNull Border UNSELECTED_BORDER = JBUI.Borders.empty(1);
     protected final @NotNull U editor;
-
-    public AbstractListRenderer(final @NotNull U editor) {
-        this.editor = editor;
-    }
 
     @Override
     public @NotNull Component getListCellRendererComponent(final JList<? extends TestCaseDto> list, final TestCaseDto tc, final int index, final boolean isSelected, final boolean cellHasFocus) {
@@ -37,3 +35,4 @@ public abstract class AbstractListRenderer<U extends IEditor> implements ListCel
 
     protected abstract @NotNull JComponent bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @Nullable String hover);
 }
+

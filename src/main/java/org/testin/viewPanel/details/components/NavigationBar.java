@@ -6,6 +6,7 @@ import com.intellij.ui.Gray;
 import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+@AllArgsConstructor
 public class NavigationBar extends BaseDetails {
 
     final @NotNull Color DEFAULT_TEXT_COLOR = Gray._120;
@@ -40,10 +42,6 @@ public class NavigationBar extends BaseDetails {
     final int GBC_INSETS_RIGHT = 16;
 
     private final @Nullable ArrayList<String> currentPath;
-
-    public NavigationBar(final @Nullable ArrayList<String> currentPath) {
-        this.currentPath = currentPath;
-    }
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
@@ -123,3 +121,4 @@ public class NavigationBar extends BaseDetails {
         label.setFont(font.deriveFont(attributes));
     }
 }
+

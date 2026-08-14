@@ -4,6 +4,7 @@ import com.intellij.ide.BrowserUtil;
 import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestEditorAttributes;
@@ -19,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+@AllArgsConstructor
 public class ExportHtml {
     private static final @NotNull Map<Character, String> HTML_ESCAPES = Map.of(
             '&', "&amp;",
@@ -28,10 +30,6 @@ public class ExportHtml {
             '\'', "&#39;"
     );
     private final @NotNull ExportAction exportAction;
-
-    public ExportHtml(final @NotNull ExportAction exportAction) {
-        this.exportAction = exportAction;
-    }
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
@@ -155,3 +153,4 @@ public class ExportHtml {
         return sb.toString();
     }
 }
+

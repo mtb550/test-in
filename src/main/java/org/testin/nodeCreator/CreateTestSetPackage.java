@@ -1,6 +1,7 @@
 package org.testin.nodeCreator;
 
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.DirectoryMapper;
@@ -10,12 +11,9 @@ import org.testin.services.Services;
 
 import java.nio.file.Path;
 
+@AllArgsConstructor
 public class CreateTestSetPackage implements NodeCreator {
     private final @NotNull Project p;
-
-    public CreateTestSetPackage(final @NotNull Project p) {
-        this.p = p;
-    }
 
     @Override
     public @NotNull DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
@@ -25,3 +23,4 @@ public class CreateTestSetPackage implements NodeCreator {
         return tsp;
     }
 }
+

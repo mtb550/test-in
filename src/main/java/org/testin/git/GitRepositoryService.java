@@ -10,6 +10,7 @@ import git4idea.GitUtil;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
 import git4idea.repo.GitRepository;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,13 +24,10 @@ import java.util.Set;
  * and selection rules themselves live in {@link GitRefs}, which is testable
  * without an IDE; this class only runs the commands and hands their output over.
  */
+@AllArgsConstructor
 public final class GitRepositoryService {
 
     private final @NotNull Project project;
-
-    public GitRepositoryService(final @NotNull Project project) {
-        this.project = project;
-    }
 
     public boolean isRepository(final @NotNull Path path) {
         return GitUtil.isGitRoot(path);
@@ -146,3 +144,4 @@ public final class GitRepositoryService {
         return repository;
     }
 }
+

@@ -1,6 +1,7 @@
 package org.testin.importExport.shared;
 
 import com.intellij.ui.components.JBCheckBox;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,12 +10,9 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 
+@AllArgsConstructor
 public class CheckboxHeaderRenderer implements TableCellRenderer {
     private final @NotNull JBCheckBox headerCheckbox;
-
-    public CheckboxHeaderRenderer(final @NotNull JBCheckBox headerCheckbox) {
-        this.headerCheckbox = headerCheckbox;
-    }
 
     @Override
     public @NotNull Component getTableCellRendererComponent(final @NotNull JTable table, final @Nullable Object value,
@@ -28,3 +26,4 @@ public class CheckboxHeaderRenderer implements TableCellRenderer {
         return headerCheckbox;
     }
 }
+

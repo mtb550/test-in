@@ -2,6 +2,7 @@ package org.testin.settings;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.services.Services;
@@ -9,13 +10,10 @@ import org.testin.services.Services;
 import java.nio.file.Path;
 
 @Service(Service.Level.PROJECT)
+@AllArgsConstructor
 public final class Setting {
 
     private final @NotNull Project p;
-
-    public Setting(final @NotNull Project p) {
-        this.p = p;
-    }
 
     /**
      * A stored root as a path. Missing, empty and whitespace-only values all mean

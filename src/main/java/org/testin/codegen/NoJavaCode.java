@@ -1,6 +1,7 @@
 package org.testin.codegen;
 
 import com.intellij.openapi.project.Project;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 
@@ -13,16 +14,14 @@ import org.testin.logger.Logger;
  * "generates nothing" is stated by the type instead of every caller having to
  * ask whether there is a generator at all.
  */
+@AllArgsConstructor
 public final class NoJavaCode implements GeneratorAction {
 
     private final @NotNull String nodeType;
-
-    public NoJavaCode(final @NotNull String nodeType) {
-        this.nodeType = nodeType;
-    }
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         Logger.debug("Create " + nodeType + ": generates no Java code");
     }
 }
+

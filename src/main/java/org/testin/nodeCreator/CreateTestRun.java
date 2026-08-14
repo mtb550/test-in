@@ -3,6 +3,7 @@ package org.testin.nodeCreator;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CheckedTreeNode;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestRunConfiguration;
@@ -33,12 +34,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@AllArgsConstructor
 public class CreateTestRun implements NodeCreator {
     private final @NotNull Project p;
-
-    public CreateTestRun(final @NotNull Project p) {
-        this.p = p;
-    }
 
     /**
      * Asynchronous creator: shows the run configuration dialog and completes on OK,
@@ -170,3 +168,4 @@ public class CreateTestRun implements NodeCreator {
     }
 
 }
+
