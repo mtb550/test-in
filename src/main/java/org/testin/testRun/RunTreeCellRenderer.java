@@ -21,8 +21,14 @@ public final class RunTreeCellRenderer {
 
     public static @NotNull CheckboxTree.CheckboxTreeCellRenderer create(final @NotNull Map<@NotNull UUID, @NotNull TestRunItems> resultsMap) {
         return new CheckboxTree.CheckboxTreeCellRenderer() {
+            // Both @NotNull because the platform says so, not because it looks
+            // right: CheckboxTreeCellRendererBase is Kotlin, and its bytecode
+            // calls Intrinsics.checkNotNullParameter on tree and on value. It
+            // already throws on null, so the annotations cannot add a crash -
+            // which is the check that was missing when an unverified @NotNull on
+            // a renderer parameter caused the paint crash fixed in 92f1a1ed.
             @Override
-            public void customizeRenderer(final JTree tree, final Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
+            public void customizeRenderer(final @NotNull JTree tree, final @NotNull Object value, final boolean selected, final boolean expanded, final boolean leaf, final int row, final boolean hasFocus) {
                 if (value instanceof CheckedTreeNode node) {
                     final @Nullable Object userObj = node.getUserObject();
 
