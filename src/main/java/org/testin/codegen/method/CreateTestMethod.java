@@ -22,51 +22,77 @@ import java.util.List;
 
 public class CreateTestMethod implements GeneratorAction {
 
+    /**
+     * The pieces of a fully qualified method name: everything before the method
+     * for the file path, the package segments, the class, and the method.
+     */
+    record Target(@NotNull String path, @NotNull List<String> packageList,
+                  @NotNull String className, @NotNull String methodName) {
+    }
+
+    /**
+     * Splits an FQCN list into the parts the generator needs, or null when there
+     * is no class and method to split into.
+     * <p>
+     * Both entry points read the same four values out of the list, and only the
+     * sync one used to check the length first — so a short FQCN threw
+     * IndexOutOfBoundsException out of the async path. Splitting in one place is
+     * what stops the two drifting apart again.
+     */
+    static @Nullable Target parse(final @NotNull List<String> fqcn) {
+        if (fqcn.size() < 2) return null;
+
+        return new Target(
+                String.join(".", fqcn.subList(0, fqcn.size() - 1)),
+                fqcn.subList(0, fqcn.size() - 2),
+                fqcn.get(fqcn.size() - 2),
+                fqcn.getLast());
+    }
+
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
         final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
-        final String methodName = fqcn.getLast();
-        final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final List<String> packageList = fqcn.subList(0, fqcn.size() - 2);
-        final String className = fqcn.get(fqcn.size() - 2);
+        final Target target = parse(fqcn);
+        if (target == null) {
+            Logger.error("FQCN list is too short to generate a method: " + fqcn);
+            return;
+        }
 
         Logger.info("Creating Test Case for: " + fqcn);
 
         ApplicationManager.getApplication().invokeLater(() ->
                 WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
-                        createMethod(p, path, packageList, className, methodName, tc)
+                        createMethod(p, target, tc)
                 ));
     }
 
     public void executeSync(final @NotNull Project p, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
-        if (fqcn.size() < 2) {
-            Logger.error("FQCN list is too short to generate a method.");
+        final Target target = parse(fqcn);
+        if (target == null) {
+            Logger.error("FQCN list is too short to generate a method: " + fqcn);
             return;
         }
-
-        final String methodName = fqcn.getLast();
-        final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final List<String> packageList = fqcn.subList(0, fqcn.size() - 2);
-        final String className = fqcn.get(fqcn.size() - 2);
 
         Logger.info("Creating Test Case (sync) for: " + fqcn);
 
         try {
             WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
-                    createMethod(p, path, packageList, className, methodName, tc)
+                    createMethod(p, target, tc)
             );
         } catch (final Exception ex) {
-            Logger.error("Failed to inject Java method '" + methodName + "': " + ex.getMessage());
+            Logger.error("Failed to inject Java method '" + target.methodName() + "': " + ex.getMessage());
         }
     }
 
-    private void createMethod(final @NotNull Project p, final @NotNull String path,
-                              final @NotNull List<String> packageList, final @NotNull String className,
-                              final @NotNull String methodName, final @Nullable TestCaseDto tc) {
+    private void createMethod(final @NotNull Project p, final @NotNull Target target, final @Nullable TestCaseDto tc) {
+        final List<String> packageList = target.packageList();
+        final String className = target.className();
+        final String methodName = target.methodName();
+
         try {
-            final PsiClass targetClass = findOrCreateClass(p, path, packageList, className);
+            final PsiClass targetClass = findOrCreateClass(p, target.path(), packageList, className);
             if (targetClass != null) {
                 injectMethod(p, targetClass, methodName, tc);
             } else
