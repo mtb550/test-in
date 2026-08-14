@@ -52,6 +52,14 @@ public abstract class FramelessDialogWrapper extends DialogWrapper {
         return null;
     }
 
+    /**
+     * The frameless header: the dialog's own title, drawn as a label because
+     * there is no window chrome to put it in.
+     */
+    // The label IS the dialog title, so title capitalization is the correct
+    // capitalization for it. The inspection sees a JBLabel and asks for the
+    // sentence case a label would normally take.
+    @SuppressWarnings("DialogTitleCapitalization")
     @Override
     protected @NotNull JComponent createNorthPanel() {
         final JBPanel<?> header = new JBPanel<>(new BorderLayout());
