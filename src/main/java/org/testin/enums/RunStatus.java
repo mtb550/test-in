@@ -11,42 +11,32 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.run.RunTestCaseAction;
 
 import javax.swing.*;
-import java.util.function.BiConsumer;
 
 @Getter
 @AllArgsConstructor
 public enum RunStatus {
     IDLE(
             AllIcons.RunConfigurations.TestState.Run,
-            "Run Test Case",
-            (tc, list) -> {
-            }
+            "Run Test Case"
     ),
 
     PASSED(
             AllIcons.RunConfigurations.TestPassed,
-            "Run Test Case",
-            (tc, list) -> {
-            }
+            "Run Test Case"
     ),
 
     FAILED(
             AllIcons.RunConfigurations.TestFailed,
-            "Run Test Case",
-            (tc, list) -> {
-            }
+            "Run Test Case"
     ),
 
     RUNNING(
             AllIcons.Actions.Suspend,
-            "Test case is Running...",
-            (tc, list) -> {
-            }
+            "Test case is Running..."
     );
 
     private final @NotNull Icon icon;
     private final @NotNull String tooltip;
-    private final @NotNull BiConsumer<TestCaseDto, JBList<TestCaseDto>> action;
 
 
     /**
