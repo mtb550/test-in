@@ -1,309 +1,158 @@
 package org.testin.enums;
 
 import com.intellij.icons.AllIcons;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.statusBar.IStatusBarItem;
 import org.testin.testCase.createDialog.ICreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
+import static org.testin.enums.TestCaseDialogKey.*;
+
+/**
+ * A field of the create test case dialog: the section it builds, the icon and
+ * placeholder it shows, and the key that jumps to it.
+ * <p>
+ * Every constant here is a field. The keys a section advertises are
+ * {@link TestCaseDialogKey}, which is why this enum no longer carries constants
+ * that are null for everything except a name and a keystroke.
+ */
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public enum CreateTestCaseFields implements IStatusBarItem {
-    DESCRIPTION_SHORTCUT(
-            "Description",
-            Shortcuts.CreateTestCaseDescription,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    EXPECTED_RESULT_SHORTCUT(
-            "Expected Result",
-            Shortcuts.CreateTestCaseExpectedResult,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    STEPS_SHORTCUT(
-            "Steps",
-            Shortcuts.CreateTestCaseAddStep,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    PRIORITY_SHORTCUT(
-            "Priority",
-            Shortcuts.CreateTestCasePriority,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    GROUP_SHORTCUT(
-            "Groups",
-            Shortcuts.CreateTestCaseGroup,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    SAVE(
-            "Save",
-            Shortcuts.Enter,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    CANCEL(
-            "Cancel",
-            Shortcuts.Escape,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    // Display only: the platform binds Alt+Enter on the editors itself. Shown
-    // only on the fields that actually spell check.
-    CORRECTIONS(
-            "Corrections",
-            null,
-            Shortcuts.Corrections.getShortcutText(),
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    ADD_STEP(
-            "Add Step",
-            Shortcuts.CreateTestCaseAddStep,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    REMOVE_STEP(
-            "Remove Step",
-            Shortcuts.CreateTestCaseRemoveStep,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    AUTO_COMPLETE(
-            "Auto Complete",
-            null,
-            Shortcuts.AutoComplete.getShortcutText(),
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    SET_PRIORITY(
-            "Set Priority",
-            null,
-            Shortcuts.PriorityHigh.getShortcutText() + " / " + Shortcuts.PriorityMedium.getShortcutText() + " / " + Shortcuts.PriorityLow.getShortcutText(),
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    NAVIGATE_TAB(
-            "Navigate",
-            null,
-            Shortcuts.TabNext.getShortcutText() + " / " + Shortcuts.TabPrevious.getShortcutText(),
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
-
-    NAVIGATE_ARROWS(
-            "Navigate Priority",
-            null,
-            Shortcuts.ArrowUp.getShortcutText() + " / " + Shortcuts.ArrowDown.getShortcutText(),
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
-    ),
 
     DESCRIPTION(
             "Description",
             Shortcuts.CreateTestCaseDescription,
-            null,
             AllIcons.Actions.Edit,
-            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, NAVIGATE_TAB, DESCRIPTION_SHORTCUT, EXPECTED_RESULT_SHORTCUT, STEPS_SHORTCUT, PRIORITY_SHORTCUT, GROUP_SHORTCUT},
-            true,
             TestCaseBaseDialog::getDescriptionSection,
-            "set description"
+            "set description",
+            CORRECTIONS, NAVIGATE_TAB
     ),
 
     EXPECTED_RESULT(
             "Expected Results",
             Shortcuts.CreateTestCaseExpectedResult,
-            null,
             AllIcons.General.InspectionsOK,
-            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, NAVIGATE_TAB},
-            true,
             TestCaseBaseDialog::getExpectedResultSection,
-            "set expected result"
+            "set expected result",
+            CORRECTIONS, NAVIGATE_TAB
     ),
 
     MODULE(
             "Module",
             Shortcuts.CreateTestCaseModule,
-            null,
             AllIcons.General.ContextHelp,
-            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, NAVIGATE_TAB},
-            true,
             TestCaseBaseDialog::getModuleSection,
-            "set module"
+            "set module",
+            CORRECTIONS, NAVIGATE_TAB
     ),
 
     TEST_DATA(
             "Test Data",
             Shortcuts.CreateTestCaseTestData,
-            null,
             AllIcons.Nodes.DataTables,
-            new IStatusBarItem[]{SAVE, CANCEL, NAVIGATE_TAB},
-            true,
             TestCaseBaseDialog::getTestDataSection,
-            "set test data"
+            "set test data",
+            NAVIGATE_TAB
     ),
 
     PRE_CONDITIONS(
             "Pre Conditions",
             Shortcuts.CreateTestCasePreConditions,
-            null,
             AllIcons.Actions.StepOut,
-            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, NAVIGATE_TAB},
-            true,
             TestCaseBaseDialog::getPreConditionsSection,
-            "set pre conditions"
+            "set pre conditions",
+            CORRECTIONS, NAVIGATE_TAB
     ),
 
     STEPS(
             "Steps",
             Shortcuts.CreateTestCaseAddStep,
-            null,
             AllIcons.Actions.ListFiles,
-            new IStatusBarItem[]{SAVE, CANCEL, CORRECTIONS, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB},
-            true,
             TestCaseBaseDialog::getStepsSection,
-            "set step"
+            "set step",
+            CORRECTIONS, ADD_STEP, REMOVE_STEP, AUTO_COMPLETE, NAVIGATE_TAB
     ),
 
     PRIORITY(
             "Priority",
             Shortcuts.CreateTestCasePriority,
-            null,
             AllIcons.Nodes.Favorite,
-            new IStatusBarItem[]{SAVE, CANCEL, SET_PRIORITY, NAVIGATE_ARROWS},
-            true,
             TestCaseBaseDialog::getPrioritySection,
-            null
-    ),
-
-    SELECT_GROUP(
-            "Select / Unselect Group",
-            Shortcuts.SelectGroup,
-            null,
-            null,
-            new IStatusBarItem[]{},
-            false,
-            null,
-            null
+            "",
+            SET_PRIORITY, NAVIGATE_ARROWS
     ),
 
     GROUP(
             "Group",
             Shortcuts.CreateTestCaseGroup,
-            null,
             AllIcons.Nodes.Tag,
-            new IStatusBarItem[]{SAVE, CANCEL, NAVIGATE_TAB, SELECT_GROUP},
-            true,
             TestCaseBaseDialog::getGroupSection,
-            null
+            "",
+            NAVIGATE_TAB, SELECT_GROUP
     );
 
-    private final @NotNull String name;
+    /**
+     * The fields the entry section advertises a jump key for.
+     * <p>
+     * Held here rather than in DESCRIPTION's own declaration because a constant
+     * cannot reference one declared after it — which is the whole reason five
+     * duplicate {@code *_SHORTCUT} constants used to exist.
+     */
+    private static final @NotNull List<CreateTestCaseFields> JUMP_KEYS =
+            List.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRIORITY, GROUP);
 
-    // The *_SHORTCUT constants are status-bar hints only: they name a key and
-    // carry no icon, no placeholder and no dialog section of their own.
-    private final @Nullable Shortcuts shortcut;
-    private final @Nullable String customShortcutText;
-    private final @Nullable Icon icon;
-    private final IStatusBarItem @NotNull [] statusBarItems;
+    private final @NotNull String name;
+    private final @NotNull Shortcuts shortcut;
+    private final @NotNull Icon icon;
+    private final @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
 
     /**
-     * True for the constants the create dialog builds a section for. Those - and
-     * only those - carry an icon and a section extractor; the rest are status-bar
-     * hints for keys the sections bind themselves. Use {@link #requireSectionExtractor()}
-     * rather than trusting a caller to have filtered on this flag first.
+     * Empty for the two sections with no text field of their own to prompt in.
      */
-    private final boolean createMenuItem;
-    private final @Nullable Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
-    private final @Nullable String placeholder;
+    private final @NotNull String placeholder;
 
-    public @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> requireSectionExtractor() {
-        if (sectionExtractor == null) {
-            throw new IllegalStateException(name + " has no dialog section: it is not a create-dialog field");
-        }
-        return sectionExtractor;
+    /**
+     * The keys this section adds to the shared ones.
+     */
+    private final TestCaseDialogKey @NotNull [] ownKeys;
+
+    CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon,
+                         final @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor,
+                         final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
+        this.name = name;
+        this.shortcut = shortcut;
+        this.icon = icon;
+        this.sectionExtractor = sectionExtractor;
+        this.placeholder = placeholder;
+        this.ownKeys = ownKeys;
     }
 
-    // todo, to be removed.
+    /**
+     * What the status bar shows while this section holds the focus: the two keys
+     * every section shares, then its own, and on the entry section the keys that
+     * jump to the other fields.
+     */
+    public IStatusBarItem @NotNull [] getStatusBarItems() {
+        final List<IStatusBarItem> items = new ArrayList<>();
+        items.add(SAVE);
+        items.add(CANCEL);
+        items.addAll(List.of(ownKeys));
+
+        // Description is where the dialog opens, so its bar is also the map.
+        if (this == DESCRIPTION) items.addAll(JUMP_KEYS);
+
+        return items.toArray(IStatusBarItem[]::new);
+    }
+
     @Override
     public @NotNull String getShortcutText() {
-        if (customShortcutText != null)
-            return customShortcutText;
-
-        return shortcut != null ? shortcut.getShortcutText() : "";
+        return shortcut.getShortcutText();
     }
 }

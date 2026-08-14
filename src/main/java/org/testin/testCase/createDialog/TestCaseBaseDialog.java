@@ -64,12 +64,10 @@ public abstract class TestCaseBaseDialog {
         this.statusBarSection = new StatusBarSection();
 
         this.cachedSections = Arrays.stream(CreateTestCaseFields.values())
-                .filter(CreateTestCaseFields::isCreateMenuItem)
-                .map(field -> field.requireSectionExtractor().apply(this))
+                .map(field -> field.getSectionExtractor().apply(this))
                 .toList();
 
         this.statusBarMapping = Arrays.stream(CreateTestCaseFields.values())
-                .filter(CreateTestCaseFields::isCreateMenuItem)
                 .collect(Collectors.toMap(
                         field -> field.getSectionExtractor().apply(this),
                         CreateTestCaseFields::getStatusBarItems

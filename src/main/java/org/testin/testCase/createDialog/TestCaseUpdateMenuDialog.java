@@ -9,7 +9,6 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.updateDialog.UpdateTestCaseDialog;
 import org.testin.ui.dialogs.ShortcutMenuPopup;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -29,9 +28,7 @@ public class TestCaseUpdateMenuDialog {
         final boolean isSingle = items.size() == 1;
         final String title = isSingle ? "Update Test Case" : "Update " + items.size() + " Test Cases";
 
-        final UpdateTestCaseFields[] fields = Arrays.stream(UpdateTestCaseFields.values())
-                .filter(UpdateTestCaseFields::isUpdateMenuItem)
-                .toArray(UpdateTestCaseFields[]::new);
+        final UpdateTestCaseFields[] fields = UpdateTestCaseFields.values();
 
         new ShortcutMenuPopup<>(p, title, fields,
                 UpdateTestCaseFields::getIcon,
@@ -40,7 +37,7 @@ public class TestCaseUpdateMenuDialog {
                 UpdateTestCaseFields::bindShortcut,
                 selectedItem -> {
 
-                    final GeneratorType gt = selectedItem.requireGt();
+                    final GeneratorType gt = selectedItem.getGt();
                     Logger.trace("Menu item selected -> " + selectedItem.getName() + " | changeType = " + gt);
 
                     if (isSingle) {
@@ -50,7 +47,7 @@ public class TestCaseUpdateMenuDialog {
                         }).show();
 
                     } else {
-                        selectedItem.requireBulkAction().execute(p, items, list -> {
+                        selectedItem.getBulkAction().execute(p, items, list -> {
                             Logger.trace("Bulk Edit Save -> changeType = " + gt);
                             updatedItems.accept(list, gt);
                         });

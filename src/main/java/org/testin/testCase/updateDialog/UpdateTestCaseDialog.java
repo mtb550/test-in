@@ -43,7 +43,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
             });
         };
 
-        final ICreateTestCaseSection targetSection = selectedItem.requireSectionExtractor().apply(this);
+        final ICreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
 
         final JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
