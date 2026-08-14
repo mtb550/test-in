@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.Shared;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.TestRunItems;
@@ -26,72 +25,73 @@ public enum RunEditorAttributes {
             "Description",
             true,
             true,
-            (item, p) -> item.getTc().getDescription(),
-            null
+            (item, p) -> item.getTc().getDescription()
     ),
 
     EXPECTED_RESULT(
             "Expected Result",
             true,
             true,
-            (item, p) -> item.getTc().getExpectedResult(),
-            null
+            (item, p) -> item.getTc().getExpectedResult()
     ),
 
     STEPS(
             "Steps",
             true,
             true,
-            (item, p) -> String.join(", ", item.getTc().getSteps()),
-            null
+            (item, p) -> String.join(", ", item.getTc().getSteps())
     ),
 
     PRIORITY(
             "Priority",
             true,
             true,
-            (item, p) -> item.getTc().getPriority().getName(),
-            item -> List.of(Shared.createPriorityBadge(item.getTc()))
-    ),
+            (item, p) -> item.getTc().getPriority().getName()
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            badges.add(Shared.createPriorityBadge(runItem.getTc()));
+        }
+    },
 
     GROUP(
             "Group",
             true,
             true,
-            (item, p) -> item.getTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
-            item -> item.getTc().getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList())
-    ),
+            (item, p) -> item.getTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            runItem.getTc().getGroup().stream().map(Shared::createGroupBadge).forEach(badges::add);
+        }
+    },
 
     ACTUAL_RESULT(
             "Actual Result",
             true,
             true,
-            (item, p) -> item.getActualResult(),
-            null
+            (item, p) -> item.getActualResult()
     ),
 
     BUG_SEVERITY(
             "Bug Severity",
             true,
             true,
-            (item, p) -> item.getBugSeverity().getName(),
-            null
+            (item, p) -> item.getBugSeverity().getName()
     ),
 
     BUG_PRIORITY(
             "Bug Priority",
             true,
             true,
-            (item, p) -> item.getBugPriority().getName(),
-            null
+            (item, p) -> item.getBugPriority().getName()
     ),
 
     RUN_STATUS(
             "Run Status",
             true,
             true,
-            (item, p) -> item.getStatus().getDisplayText(),
-            null
+            (item, p) -> item.getStatus().getDisplayText()
     ),
 
     DURATION(
@@ -101,8 +101,7 @@ public enum RunEditorAttributes {
             (item, p) -> {
                 long s = item.getDuration().getSeconds();
                 return String.format(Locale.ENGLISH, "%02d:%02d", (s % 3600) / 60, (s % 60));
-            },
-            null
+            }
     ),
 
     PATH(
@@ -114,8 +113,7 @@ public enum RunEditorAttributes {
                 if (tc != null)
                     return String.join(" > ", tc.getParent().getPath2());
                 return "";
-            },
-            null
+            }
     ),
 
     FQCN(
@@ -125,8 +123,7 @@ public enum RunEditorAttributes {
             (item, p) -> {
                 final TestCaseDto tc = item.getTc();
                 return String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc));
-            },
-            null
+            }
     );
 
     private final @NotNull String name;
@@ -135,13 +132,12 @@ public enum RunEditorAttributes {
     private final @NotNull ValueExtractor<TestRunItems> runValueExtractor;
 
     /**
-     * Null for every attribute rendered as plain text; set only by those drawn as badges.
+     * Renders as a plain detail row. The attributes drawn as badges override
+     * this in their own body — the two behaviours sit on the constants that
+     * have them instead of being chosen by a null at run time.
      */
-    private final @Nullable DrawItem<TestRunItems> runDrawItem;
-
     public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-        if (runDrawItem != null) badges.addAll(runDrawItem.execute(runItem));
-        else details.put(name, runValueExtractor.execute(runItem, p));
+        details.put(name, runValueExtractor.execute(runItem, p));
     }
 
 }
