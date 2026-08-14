@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
 import org.testin.enums.TestStatus;
@@ -26,8 +27,17 @@ import java.util.UUID;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TestRunItems {
 
+    /**
+     * The test case this result belongs to, wired by the run editor after the
+     * run JSON is read - {@code @JsonIgnore}, so it is never deserialised.
+     * <p>
+     * Null when the test case has been deleted since the run: the editor skips
+     * those and never assigns one. They stay out of the list, so the attributes
+     * that render a row can rely on it; a dialog opened for the raw run item
+     * cannot.
+     */
     @JsonIgnore
-    @NotNull
+    @Nullable
     private TestCaseDto tc;
 
     @NotNull

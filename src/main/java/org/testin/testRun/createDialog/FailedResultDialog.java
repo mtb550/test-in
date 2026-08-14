@@ -68,10 +68,18 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
         title = "Failed Test Case Details";
 
+        // The dialog still opens without the test case: the tester came here to
+        // read and edit the recorded result, which lives on the run item. Only
+        // the two rows describing the case are affected, and the Expected row
+        // is left blank rather than filled with an apology - DialogDetails drops
+        // blank rows, so it simply does not appear.
+        final String description = tc != null ? tc.getDescription() : "No longer in the test set";
+        final String expectedResult = tc != null ? tc.getExpectedResult() : "";
+
         components = List.of(
                 ComponentDialogBase.details()
-                        .row("Description", tc.getDescription())
-                        .row("Expected", tc.getExpectedResult())
+                        .row("Description", description)
+                        .row("Expected", expectedResult)
                         .build(),
                 actualResultField,
                 severityRadios,
@@ -88,7 +96,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
      */
     private static @NotNull BugSeverity severityOf(final @NotNull TestRunItems runItem) {
         final @Nullable BugSeverity stored = runItem.getBugSeverity();
-        return stored == null || stored == BugSeverity.EMPTY ? BugSeverity.ENHANCEMENT : stored;
+        return stored == BugSeverity.EMPTY ? BugSeverity.ENHANCEMENT : stored;
     }
 
     /**
@@ -96,7 +104,7 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
      */
     private static @NotNull BugPriority priorityOf(final @NotNull TestRunItems runItem) {
         final @Nullable BugPriority stored = runItem.getBugPriority();
-        return stored == null || stored == BugPriority.EMPTY ? BugPriority.LOW : stored;
+        return stored == BugPriority.EMPTY ? BugPriority.LOW : stored;
     }
 
     @Override

@@ -23,7 +23,7 @@ import java.util.List;
 public final class ProjectTreeNode extends AbstractTreeNode<Object> {
     private final @NotNull Project project;
 
-    public ProjectTreeNode(final @NotNull Project project, final @Nullable Object value) {
+    public ProjectTreeNode(final @NotNull Project project, final @NotNull Object value) {
         super(project, value);
         this.project = project;
     }

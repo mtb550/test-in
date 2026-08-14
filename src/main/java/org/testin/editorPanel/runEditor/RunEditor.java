@@ -606,8 +606,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            final UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(p, this, list);
-            changeStatus.onExecutionFinished(p, this);
+            final JBList<TestCaseDto> currentList = list;
+            if (currentList == null) return;
+
+            new UpdateTestRunStatusAction(p, this, currentList).onExecutionFinished(p, this);
             return;
         }
 
@@ -648,8 +650,10 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
     @Override
     public void onStartExecutionClicked() {
-        final UpdateTestRunStatusAction changeStatus = new UpdateTestRunStatusAction(p, this, list);
-        changeStatus.applyStatusChange(p, this, TestRunStatus.IN_PROGRESS);
+        final JBList<TestCaseDto> currentList = list;
+        if (currentList == null) return;
+
+        new UpdateTestRunStatusAction(p, this, currentList).applyStatusChange(p, this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(0);
     }
 

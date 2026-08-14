@@ -70,9 +70,11 @@ public class ExportAction extends DumbAwareAction {
                     final ExportDialog dialog = new ExportDialog(p, exportAttributes, sheets, targetDir);
                     if (!dialog.showAndGet()) return;
 
+                    // Both are null until the dialog is accepted, so they are
+                    // read once and checked together.
                     final FileTypes format = dialog.getSelectedFormat();
                     final File destFile = dialog.getSelectedFile();
-                    if (destFile == null) return;
+                    if (format == null || destFile == null) return;
 
                     try {
                         format.exportToFile(p, ExportAction.this, destFile, sheets);

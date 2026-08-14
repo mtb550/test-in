@@ -337,6 +337,9 @@ public class TreeTransferHandler extends TransferHandler {
         final AtomicInteger remaining = new AtomicInteger(from.size());
         for (int i = 0; i < from.size(); i++) {
             Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), () -> {
+                // The move is asynchronous, so this can land after the project
+                // closed; refreshing a disposed tree throws.
+                if (p.isDisposed()) return;
                 if (remaining.decrementAndGet() == 0) refresh.run();
             });
         }

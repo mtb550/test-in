@@ -53,7 +53,7 @@ public class CreateTestRun implements NodeCreator {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
             final Path testCasesPath = testCasesRoot.getPath();
-            final DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesPath, true, testCasesRoot);
+            final DefaultMutableTreeNode fullModelNode = buildDirectoryTree(testCasesPath, testCasesRoot);
 
             final CheckedTreeNode root = convertToCheckedNodes(fullModelNode);
 
@@ -79,31 +79,35 @@ public class CreateTestRun implements NodeCreator {
         return null;
     }
 
-    private @Nullable DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder, final boolean isRoot,
-                                                               final @Nullable DirectoryDto thisNodeDto) {
+    /**
+     * The node for a folder, with its test cases or its child folders under it.
+     * <p>
+     * Always returns a node. It used to return null for an empty test set or an
+     * empty container and take an isRoot flag to exempt the top of the tree,
+     * which gave one method two contracts - the root could never be null and a
+     * child routinely was. The caller below drops the empties instead, which is
+     * the same behaviour and one rule.
+     */
+    private @NotNull DefaultMutableTreeNode buildDirectoryTree(final @NotNull Path folder,
+                                                               final @NotNull DirectoryDto thisNodeDto) {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.awaitIndexing();
 
         final DefaultMutableTreeNode node = new DefaultMutableTreeNode(thisNodeDto);
 
-        if (thisNodeDto == null) return node;
-
-        final boolean isTestSet = thisNodeDto instanceof TestSetDirectoryDto;
-
-        if (isTestSet) {
-            final List<TestCaseDto> testCases = indexer.getTestCasesForTestSet(folder);
-            if (testCases.isEmpty()) return null;
-            for (final TestCaseDto tc : testCases) {
+        if (thisNodeDto instanceof TestSetDirectoryDto) {
+            for (final TestCaseDto tc : indexer.getTestCasesForTestSet(folder)) {
                 node.add(new DefaultMutableTreeNode(tc));
             }
-        } else {
-            final List<DirectoryDto> children = indexer.getChildren(folder);
-            for (final DirectoryDto child : children) {
-                final DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), false, child);
-                if (childNode != null) node.add(childNode);
-            }
-            // Hide empty containers (e.g. a test-set package with no test sets/cases) so they don't clutter the tree.
-            if (node.getChildCount() == 0 && !isRoot) return null;
+            return node;
+        }
+
+        for (final DirectoryDto child : indexer.getChildren(folder)) {
+            final DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), child);
+
+            // An empty test set, or a package holding only empty ones, would
+            // clutter the tree with a branch that cannot be ticked.
+            if (childNode.getChildCount() > 0) node.add(childNode);
         }
 
         return node;
