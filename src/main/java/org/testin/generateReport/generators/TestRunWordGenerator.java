@@ -114,13 +114,12 @@ public final class TestRunWordGenerator {
                 long total = tr.getResults().size();
                 // One traversal counts every status; a new TestStatus constant is
                 // included automatically instead of needing another filter pass.
-                final Map<TestStatus, Long> counts = tr.getResults().stream()
-                        .collect(Collectors.groupingBy(TestRunItems::getStatus, Collectors.counting()));
-                long passed = counts.getOrDefault(TestStatus.PASSED, 0L);
-                long failed = counts.getOrDefault(TestStatus.FAILED, 0L);
-                long blocked = counts.getOrDefault(TestStatus.BLOCKED, 0L);
-                long pending = counts.getOrDefault(TestStatus.PENDING, 0L) + counts.getOrDefault(TestStatus.UNTESTED, 0L);
-                long passRate = total > 0 ? (passed * 100 / total) : 0;
+                final TestRunSummary summary = TestRunSummary.of(tr.getResults());
+                long passed = summary.passed();
+                long failed = summary.failed();
+                long blocked = summary.blocked();
+                long pending = summary.pending();
+                long passRate = summary.passRate();
 
                 addText(doc, String.format(
                         "A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarise the outcome across all executed cases.",

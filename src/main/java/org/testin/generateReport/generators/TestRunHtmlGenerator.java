@@ -41,13 +41,12 @@ public final class TestRunHtmlGenerator {
         final int total = results.size();
         // One traversal counts every status; a new TestStatus constant is
         // included automatically instead of needing another filter pass.
-        final Map<TestStatus, Long> counts = results.stream()
-                .collect(Collectors.groupingBy(TestRunItems::getStatus, Collectors.counting()));
-        final long passed = counts.getOrDefault(TestStatus.PASSED, 0L);
-        final long failed = counts.getOrDefault(TestStatus.FAILED, 0L);
-        final long blocked = counts.getOrDefault(TestStatus.BLOCKED, 0L);
-        final long pending = counts.getOrDefault(TestStatus.PENDING, 0L);
-        final int passRate = total > 0 ? (int) (passed * 100 / total) : 0;
+        final TestRunSummary summary = TestRunSummary.of(results);
+        final long passed = summary.passed();
+        final long failed = summary.failed();
+        final long blocked = summary.blocked();
+        final long pending = summary.pending();
+        final int passRate = summary.passRate();
 
         // Run-level metadata
         final String runName = tr.getChangeLog().replace(".json", "");
