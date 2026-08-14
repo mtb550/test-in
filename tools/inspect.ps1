@@ -64,7 +64,10 @@ function Resolve-Inspector {
 }
 
 function Invoke-Inspector([string] $inspect, [string] $outPath) {
-    $scratch = Join-Path $repo 'build\inspection-ide'
+    # Beside the output and for the same reason: an inspector still running holds
+    # this directory open, and a ./gradlew clean in another terminal then fails
+    # to delete build/ rather than merely losing the report.
+    $scratch = Join-Path $repo '.inspection-ide'
 
     # Started from empty every time. Reusing the caches is tempting - they hold
     # the indexes and make a second run far quicker - but the VFS snapshot in
