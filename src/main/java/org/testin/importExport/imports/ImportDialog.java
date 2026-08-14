@@ -79,8 +79,10 @@ public class ImportDialog extends FramelessDialogWrapper {
         if (!defaultFolder.isBlank()) {
             fileField.setText(defaultFolder);
         } else {
+            // Fired directly, not registered: addBrowseFolderListener above already
+            // owns the button, and registering this one too opened the chooser a
+            // second time as soon as the first closed.
             final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
-            fileField.addActionListener(browseListener);
             ApplicationManager.getApplication().invokeLater(() -> browseListener.actionPerformed(new ActionEvent(fileField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }
     }

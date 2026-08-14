@@ -75,9 +75,11 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
         if (!defaultFolder.isBlank()) {
             folderField.setText(defaultFolder);
         } else {
+            // Fired directly, not registered: addBrowseFolderListener above already
+            // owns the button, and registering this one too opened the chooser a
+            // second time as soon as the first closed.
             final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(
                     folderField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
-            folderField.addActionListener(browseListener);
             ApplicationManager.getApplication().invokeLater(() -> browseListener.actionPerformed(new ActionEvent(folderField.getTextField(), ActionEvent.ACTION_PERFORMED, "browse")));
         }
     }
