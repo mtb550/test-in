@@ -17,16 +17,16 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class FileDocumentListener implements DocumentListener {
     private final @NotNull TextFieldWithBrowseButton fileField;
     private final @NotNull Project p;
-    private final @NotNull Consumer<Map<String, List<TestCaseDto>>> onDataLoaded;
+    private final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded;
     private final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader;
 
     public FileDocumentListener(final @NotNull TextFieldWithBrowseButton fileField, final @NotNull Project p,
-                                final @NotNull Consumer<Map<String, List<TestCaseDto>>> onDataLoaded,
+                                final @NotNull BiConsumer<FileTypes, Map<String, List<TestCaseDto>>> onDataLoaded,
                                 final @NotNull BiFunction<File, FileTypes, Map<String, List<TestCaseDto>>> importLoader) {
         this.fileField = fileField;
         this.p = p;
@@ -84,7 +84,7 @@ public class FileDocumentListener implements DocumentListener {
                         Services.getInstance(p, Notifier.class).warn(p, "No Data", "No test cases found in the selected file.");
                         return;
                     }
-                    onDataLoaded.accept(parsedData);
+                    onDataLoaded.accept(format, parsedData);
                 });
 
             } catch (final Exception ex) {

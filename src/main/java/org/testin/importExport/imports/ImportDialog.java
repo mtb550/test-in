@@ -9,6 +9,9 @@ import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.ui.components.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.FileTypes;
+import java.util.stream.Collectors;
+import com.intellij.util.ui.JBUI;
+import com.intellij.openapi.util.text.StringUtil;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.importExport.shared.CellEditListener;
 import org.testin.importExport.shared.FileDocumentListener;
@@ -43,6 +46,12 @@ public class ImportDialog extends FramelessDialogWrapper {
     // Created here rather than in createCenterPanel: the file listener can call
     // onDataLoaded as soon as the dialog is constructed.
     private final @NotNull JBTabbedPane tableTabbedPane = new JBTabbedPane();
+
+    /**
+     * The chosen format's import hint - which column headers the file needs.
+     * Empty until a file is picked, and hidden while it is.
+     */
+    private final @NotNull JBLabel formatHint = new JBLabel();
     private @NotNull Map<String, List<TestCaseDto>> originalSheetsData = new LinkedHashMap<>();
 
     public ImportDialog(final @NotNull Project p, final @NotNull List<TestEditorAttributes> importAttributes,
@@ -76,7 +85,31 @@ public class ImportDialog extends FramelessDialogWrapper {
         }
     }
 
-    private void onDataLoaded(final @NotNull Map<String, List<TestCaseDto>> parsedData) {
+    /**
+     * The format's hint, with the importable column names filled in. Built from
+     * the attributes the dialog was given, so it can never list a column the
+     * import would ignore.
+     */
+    private void showFormatHint(final @NotNull FileTypes format) {
+        final String message = format.getInfoMessage();
+        if (message.isBlank()) {
+            formatHint.setVisible(false);
+            return;
+        }
+
+        final String columns = importAttributes.stream()
+                .filter(TestEditorAttributes::isImportable)
+                .map(TestEditorAttributes::getName)
+                .collect(Collectors.joining(", "));
+
+        final String escaped = StringUtil.escapeXmlEntities(message.formatted(columns)).replace("\n", "<br>");
+        formatHint.setText("<html>" + escaped + "</html>");
+        formatHint.setVisible(true);
+    }
+
+    private void onDataLoaded(final @NotNull FileTypes format, final @NotNull Map<String, List<TestCaseDto>> parsedData) {
+        showFormatHint(format);
+
         this.originalSheetsData = parsedData;
 
         while (tableTabbedPane.getTabCount() > 0) {
@@ -119,6 +152,15 @@ public class ImportDialog extends FramelessDialogWrapper {
             gbc.weightx = 1.0;
             topPanel.add(setDefaultCheckBox, gbc);
         }
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        formatHint.setForeground(JBUI.CurrentTheme.ContextHelp.FOREGROUND);
+        formatHint.setVisible(false);
+        topPanel.add(formatHint, gbc);
+        gbc.gridwidth = 1;
 
         panel.add(topPanel, BorderLayout.NORTH);
 
