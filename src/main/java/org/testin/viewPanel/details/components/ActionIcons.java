@@ -53,15 +53,8 @@ public class ActionIcons extends BaseDetails {
         actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
         actionsPanel.add(runLabel);
 
-        gbc.gridx = 0;
-        gbc.gridy = currentRow;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.insets = JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT);
-        panel.add(actionsPanel, gbc);
-
-        return currentRow + 1;
+        return addFullWidthRow(panel, gbc, actionsPanel,
+                JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
     }
 
     /**

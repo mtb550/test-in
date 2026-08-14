@@ -33,15 +33,7 @@ public class Badges extends BaseDetails {
             }
         }
 
-        gbc.gridx = 0;
-        gbc.gridy = currentRow;
-        gbc.gridwidth = 2;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.WEST;
-
-        gbc.insets = JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT);
-        panel.add(badgesPanel, gbc);
-
-        return currentRow + 1;
+        return addFullWidthRow(panel, gbc, badgesPanel,
+                JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
     }
 }
