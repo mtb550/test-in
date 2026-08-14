@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
-import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
@@ -18,12 +17,10 @@ import java.awt.event.KeyEvent;
 public class AutomateTestCaseAction extends DumbAwareAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F12, InputEvent.CTRL_DOWN_MASK);
-    private final @NotNull Project p;
     private final JBList<TestCaseDto> list;
 
-    public AutomateTestCaseAction(final @NotNull Project p, final JBList<TestCaseDto> list) {
+    public AutomateTestCaseAction(final JBList<TestCaseDto> list) {
         super("Automate Test Case ", "", AllIcons.Actions.IntentionBulb);
-        this.p = p;
         this.list = list;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }

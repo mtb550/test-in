@@ -24,7 +24,7 @@ import java.awt.*;
 @Service(Service.Level.PROJECT)
 public final class Notifier {
 
-    private final String GROUP_ID = "testin.notifications";
+    private static final @NotNull String GROUP_ID = "testin.notifications";
 
     public void softShow(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
         showBalloon(p, String.format("<html><b>%s</b><br>%s</html>", title, message));

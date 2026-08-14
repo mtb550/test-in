@@ -11,12 +11,10 @@ import org.testin.mappers.dto.TestCaseDto;
 import javax.swing.*;
 
 public class RunListRenderer extends AbstractListRenderer<RunEditor> {
-    private final @NotNull Project p;
     private final @NotNull RunCard card;
 
     public RunListRenderer(final @NotNull Project p, final @NotNull RunEditor editor) {
         super(editor);
-        this.p = p;
         this.card = new RunCard(p);
     }
 

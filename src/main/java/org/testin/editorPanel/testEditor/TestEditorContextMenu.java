@@ -47,7 +47,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
         addSeparator();
 
-        add(new AutomateTestCaseAction(p, list));
+        add(new AutomateTestCaseAction(list));
         add(new RunTestCaseAction(p, list));
         add(new NavigateToCodeAction(p, list));
 
@@ -61,6 +61,6 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu) {
         new EscapeAction(p, list);
         new OpenContextMenuAction(p, list, menu);
-        new CloseTestCaseDetailsAction(p, list);
+        new CloseTestCaseDetailsAction(list);
     }
 }

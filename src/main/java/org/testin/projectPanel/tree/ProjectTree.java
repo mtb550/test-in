@@ -28,8 +28,6 @@ public class ProjectTree implements Disposable {
     private final @NotNull AsyncTreeModel treeModel;
     @Getter
     private final @NotNull SimpleTree mainTree;
-    private final @NotNull TreeTransferHandler transferHandler;
-    private final @NotNull TreeContextMenu treeContextMenu;
     private final @NotNull AtomicBoolean refreshScheduled = new AtomicBoolean();
 
     /**
@@ -62,11 +60,11 @@ public class ProjectTree implements Disposable {
         final Set<DirectoryDto> sharedCutNodes = new HashSet<>();
         mainTree.setCellRenderer(new TreeCellRenderer(sharedCutNodes));
 
-        this.transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh);
+        final TreeTransferHandler transferHandler = new TreeTransferHandler(p, mainTree, sharedCutNodes, this::refresh);
         mainTree.setTransferHandler(transferHandler);
         mainTree.setDragEnabled(true);
 
-        treeContextMenu = new TreeContextMenu(p, pp, mainTree);
+        final TreeContextMenu treeContextMenu = new TreeContextMenu(p, pp, mainTree);
         mainTree.addMouseListener(new TreeMouseListener(p, mainTree, treeContextMenu));
         treeContextMenu.registerShortcuts(mainTree, transferHandler);
     }

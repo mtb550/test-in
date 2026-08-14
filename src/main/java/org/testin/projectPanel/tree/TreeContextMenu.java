@@ -51,8 +51,8 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new RedoNodeAction(p, tree),
                         new RemoveAction(p, tree, pp),
                         new RenameAction(p, pp, tree),
-                        new CopyNodeAction(p, tree),
-                        new CutNodeAction(p, tree),
+                        new CopyNodeAction(tree),
+                        new CutNodeAction(tree),
                         new PasteNodeAction(p, tree))
         ));
 

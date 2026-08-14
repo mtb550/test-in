@@ -41,7 +41,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(new UpdateRunItemAction(p, ui, list));
         addSeparator();
         add(new ViewDetailsAction(p, list, dir.getPath2()));
-        add(new StartExecutionAction(p, ui.getToolBar().getCallbacks()));
+        add(new StartExecutionAction(ui.getToolBar().getCallbacks()));
         addSeparator();
         add(new CopyTestCaseAction(p, list));
         addSeparator();
@@ -56,7 +56,7 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu) {
         new EscapeAction(p, list);
         new OpenContextMenuAction(p, list, menu);
-        new CloseTestCaseDetailsAction(p, list);
+        new CloseTestCaseDetailsAction(list);
         new GenerateReportAction(p, ui, list);
     }
 }
