@@ -57,8 +57,11 @@ public class ViewPanelExecutionSubscriber {
                     }
                 }
 
-                if (!updated && "RUNNING".equals(status) && runningDtoId != null && !uuidToDtoId.containsKey(testName)) {
-                    final TestCaseDto tc = indexer.getTestCaseById(runningDtoId);
+                // Snapshotted: the field is volatile, so re-reading it after the
+                // check could see a different value.
+                final UUID runningId = runningDtoId;
+                if (!updated && "RUNNING".equals(status) && runningId != null && !uuidToDtoId.containsKey(testName)) {
+                    final TestCaseDto tc = indexer.getTestCaseById(runningId);
                     if (tc == null) return;
 
                     Logger.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");

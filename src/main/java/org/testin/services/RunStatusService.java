@@ -123,7 +123,7 @@ public final class RunStatusService {
      */
     public void persistRun(final @NotNull Project p, final @NotNull RunEditor editor) {
         final TestRunDto tr = editor.getTr();
-        if (tr == null || editor.getParent() == null) return;
+        if (tr == null) return;
 
         Services.getInstance(p, ProjectIndexer.class).persistRun(editor.getParent().getPath(), tr);
     }

@@ -64,8 +64,13 @@ public enum RunStatus {
         return IDLE;
     }
 
+    /**
+     * Runs the test case. The list is the component the run action binds its
+     * shortcut to and is null when there is none — the details panel runs a
+     * single case it already holds, with no list behind it.
+     */
     public void executeAction(final @NotNull Project p, final @NotNull TestCaseDto dto,
-                              final @NotNull JBList<TestCaseDto> list) {
+                              final @Nullable JBList<TestCaseDto> list) {
         new RunTestCaseAction(p, list).execute(dto);
     }
 }

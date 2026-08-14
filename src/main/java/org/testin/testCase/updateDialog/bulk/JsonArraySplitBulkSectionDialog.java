@@ -180,7 +180,7 @@ public abstract class JsonArraySplitBulkSectionDialog {
 
             if (focusTc != null && focusItem != null) {
                 for (final ItemMarker sm : itemMarkers) {
-                    if (sm.tcIdx == focusTc && sm.itemIdx == focusItem) {
+                    if (sm.tcIdx == focusTc && sm.itemIdx == focusItem && sm.marker != null) {
                         rightEditor.getCaretModel().moveToOffset(sm.marker.getEndOffset());
                         break;
                     }

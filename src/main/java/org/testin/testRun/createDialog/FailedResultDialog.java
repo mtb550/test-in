@@ -70,8 +70,8 @@ public class FailedResultDialog extends AbstractFrameworkDialog<TextInput> {
 
         components = List.of(
                 ComponentDialogBase.details()
-                        .row("Description", tc != null ? tc.getDescription() : null)
-                        .row("Expected", tc != null ? tc.getExpectedResult() : null)
+                        .row("Description", tc.getDescription())
+                        .row("Expected", tc.getExpectedResult())
                         .build(),
                 actualResultField,
                 severityRadios,

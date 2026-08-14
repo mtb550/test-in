@@ -75,11 +75,16 @@ public class TransferListener extends TransferHandler {
 
             if (items.isEmpty()) return false;
 
+            // Null when the drag did not start on this list: there is nothing
+            // here to reorder, and treating it as an insert would duplicate.
+            final int[] dragged = draggedIndices;
+            if (dragged == null) return false;
+
             final JBList.DropLocation dl = (JBList.DropLocation) support.getDropLocation();
             final int offset = (editor.getCurrentPage() - 1) * editor.getPageSize();
             int insertAtGlobal = offset + dl.getIndex();
 
-            final int[] globalDraggedIndices = Arrays.stream(draggedIndices)
+            final int[] globalDraggedIndices = Arrays.stream(dragged)
                     .map(i -> offset + i)
                     .toArray();
 
