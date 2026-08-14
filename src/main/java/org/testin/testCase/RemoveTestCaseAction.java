@@ -16,6 +16,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.services.Services;
+import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Shortcuts;
 
 import java.util.HashSet;
@@ -47,14 +48,23 @@ public class RemoveTestCaseAction extends DumbAwareAction {
         final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
         if (selectedItems.isEmpty()) return;
 
+        final Runnable delete = () -> ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
+
+        // A pending cut removes its source as the second half of a move the
+        // tester already asked for, so it is not confirmed again.
         final boolean isCutAndSelected = TestEditorContextMenu.isGlobalCutAction() &&
                 selectedItems.stream().allMatch(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()));
 
-        if (!isCutAndSelected && !RemoveTestCaseDialog.confirmDeleteAction(p, selectedItems)) {
+        if (isCutAndSelected) {
+            delete.run();
             return;
         }
 
-        ApplicationManager.getApplication().runWriteAction(() -> performDeletion(selectedItems));
+        final String msg = selectedItems.size() == 1
+                ? "Remove '" + selectedItems.getFirst().getDescription() + "'?"
+                : "Remove these " + selectedItems.size() + " test cases?";
+
+        new ConfirmDialog(p, "Confirm Removing", msg, dir.getPath().toString(), null, "Remove", delete).show();
     }
 
     private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
