@@ -125,6 +125,17 @@ public enum GeneratorType {
             "Update Test Case",
             "Update Automation Test Method Order",
             "order"
+    ),
+
+    /**
+     * The attributes that never reach the Java: ids, paths, the audit fields.
+     * A constant rather than a null on the attribute, so an edit runs its
+     * generator either way instead of asking whether it has one.
+     */
+    NO_CODE_CHANGE(
+            "No Code Change",
+            "This attribute has no generated code",
+            "read-only attribute"
     );
 
     /**

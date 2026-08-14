@@ -88,9 +88,7 @@ public class GridEditListener implements TableModelListener {
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             Services.getInstance(p, ProjectIndexer.class).putTestCase(testSetPath, tc);
-            if (generator != null) {
-                generator.getAction().execute(p, tc);
-            }
+            generator.getAction().execute(p, tc);
         });
     }
 }

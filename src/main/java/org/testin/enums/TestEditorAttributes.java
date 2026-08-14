@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.GeneratorType;
 import org.testin.editorPanel.Shared;
 import org.testin.importExport.imports.ImportSetter;
@@ -34,10 +33,9 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> String.valueOf(tc.getId()),
-            null,
             (p, tc, v) -> {
             },
-            null
+            GeneratorType.NO_CODE_CHANGE
     ),
 
     /// TODO:: added to tool bar details, to be shown but disabled
@@ -50,7 +48,6 @@ public enum TestEditorAttributes {
             true,
             true,
             (tc, p) -> tc.getDescription(),
-            null,
             (p, tc, v) -> tc.setDescription(Services.getInstance(p, Tools.class).sanitizeDescription(v)),
             GeneratorType.UPDATE_TEST_CASE_DESCRIPTION
     ),
@@ -64,7 +61,6 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getExpectedResult(),
-            null,
             (p, tc, v) -> tc.setExpectedResult(v),
             GeneratorType.UPDATE_TEST_CASE_EXPECTED_RESULT
     ),
@@ -78,7 +74,6 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> String.join(", ", tc.getSteps()),
-            null,
             (p, tc, v) -> tc.setSteps(Services.getInstance(p, Tools.class).parseStepsSafe(v)),
             GeneratorType.UPDATE_TEST_CASE_STEPS
     ),
@@ -92,10 +87,15 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getPriority().getName(),
-            tc -> List.of(Shared.createPriorityBadge(tc)),
             (p, tc, v) -> tc.setPriority(Services.getInstance(p, Tools.class).parsePrioritySafe(v)),
             GeneratorType.UPDATE_TEST_CASE_PRIORITY
-    ),
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges,
+                              final @NotNull Map<String, String> details, final @NotNull Project p) {
+            badges.add(Shared.createPriorityBadge(tc));
+        }
+    },
 
     FQCN(
             "FQCN",
@@ -106,10 +106,9 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc)),
-            null,
             (p, tc, v) -> {
             },
-            null
+            GeneratorType.NO_CODE_CHANGE
     ),
 
     REFERENCE(
@@ -121,9 +120,8 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getReference(),
-            null,
             (p, tc, v) -> tc.setReference(v),
-            null
+            GeneratorType.NO_CODE_CHANGE
     ),
 
     TEST_DATA(
@@ -135,7 +133,6 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getTestData(),
-            null,
             (p, tc, v) -> tc.setTestData(v),
             GeneratorType.UPDATE_TEST_CASE_TEST_DATA
     ),
@@ -149,7 +146,6 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getPreConditions(),
-            null,
             (p, tc, v) -> tc.setPreConditions(v),
             GeneratorType.UPDATE_TEST_CASE_PRE_CONDITIONS
     ),
@@ -163,10 +159,15 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getGroup().stream().map(Group::getName).collect(Collectors.joining(", ")),
-            tc -> tc.getGroup().stream().map(Shared::createGroupBadge).collect(Collectors.<JComponent>toList()),
             (p, tc, v) -> tc.setGroup(Services.getInstance(p, Tools.class).parseGroupsSafe(v)),
             GeneratorType.UPDATE_TEST_CASE_GROUP
-    ),
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges,
+                              final @NotNull Map<String, String> details, final @NotNull Project p) {
+            tc.getGroup().stream().map(Shared::createGroupBadge).forEach(badges::add);
+        }
+    },
 
     PATH(
             "Path",
@@ -177,10 +178,9 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
-            null,
             (p, tc, v) -> {
             },
-            null
+            GeneratorType.NO_CODE_CHANGE
     ),
 
     ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
@@ -194,7 +194,6 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getModule(),
-            null,
             (p, tc, v) -> tc.setModule(v),
             GeneratorType.UPDATE_TEST_CASE_MODULE
     ),
@@ -208,9 +207,8 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getStatus().getDisplayText(),
-            null,
             (p, tc, v) -> tc.setStatus(TestCaseStatus.valueOf(v)),
-            null
+            GeneratorType.NO_CODE_CHANGE
     ),
 
     CREATE_BY(
@@ -222,9 +220,8 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getCreatedBy(),
-            null,
             (p, tc, v) -> tc.setCreatedBy(v),
-            null
+            GeneratorType.NO_CODE_CHANGE
     ),
 
     UPDATE_BY(
@@ -236,9 +233,8 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getUpdatedBy(),
-            null,
             (p, tc, v) -> tc.setUpdatedBy(v),
-            null
+            GeneratorType.NO_CODE_CHANGE
     ),
 
     CREATE_AT(
@@ -250,9 +246,8 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
-            null,
             (p, tc, v) -> tc.setCreatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
-            null
+            GeneratorType.NO_CODE_CHANGE
     ),
 
     UPDATE_AT(
@@ -264,9 +259,8 @@ public enum TestEditorAttributes {
             false,
             true,
             (tc, p) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
-            null,
             (p, tc, v) -> tc.setUpdatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
-            null
+            GeneratorType.NO_CODE_CHANGE
     );
 
     private final @NotNull String name;
@@ -278,16 +272,11 @@ public enum TestEditorAttributes {
     private final boolean exportable;
     private final @NotNull ValueExtractor<TestCaseDto> testValueExtractor;
 
-    /**
-     * Null for attributes shown as a plain detail row rather than a badge.
-     */
-    private final @Nullable DrawItem<TestCaseDto> testDrawItem;
     private final @NotNull ImportSetter importSetter;
     /**
-     * Automation code update to run when this attribute changes; null when the
-     * attribute has no effect on the generated Java code.
+     * Automation code update to run when this attribute changes.
      */
-    private final @Nullable GeneratorType generatorType;
+    private final @NotNull GeneratorType generatorType;
 
     /**
      * The value as the grid shows it. Steps get one line each there, so ALT+ENTER
@@ -299,9 +288,14 @@ public enum TestEditorAttributes {
         return this == STEPS ? String.join("\n", tc.getSteps()) : testValueExtractor.execute(tc, p);
     }
 
-    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
-        if (testDrawItem != null) badges.addAll(testDrawItem.execute(tc));
-        else details.put(name, testValueExtractor.execute(tc, p));
+    /**
+     * Renders as a plain detail row. The attributes drawn as badges override
+     * this in their own body — the two behaviours sit on the constants that
+     * have them instead of being chosen by a null at run time.
+     */
+    public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges,
+                          final @NotNull Map<String, String> details, final @NotNull Project p) {
+        details.put(name, testValueExtractor.execute(tc, p));
     }
 
 }
