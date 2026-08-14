@@ -14,6 +14,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
+import org.testin.editorPanel.EditorCenter;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.TestCaseFilter;
@@ -85,13 +86,13 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
      */
     private @Nullable Disposable gridFontSyncDisposable;
     private @NotNull JBPanel<?> mainPanel;
+    private @NotNull EditorCenter center;
     private @Nullable JBList<TestCaseDto> list;
     private @Nullable CollectionListModel<TestCaseDto> model;
     private @Nullable JBTable gridTable;
     private @NotNull RunEditorContextMenu contextMenu;
     private @Nullable JBScrollPane gridScrollPane;
     private @NotNull JBScrollPane listScrollPane;
-    private @Nullable JComponent currentCenter;
     @Getter
     @Setter
     private int currentPage = 1;
@@ -169,6 +170,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
 
         mainPanel = new JBPanel<>(new BorderLayout());
+        center = new EditorCenter(mainPanel);
         mainPanel.add(toolBar, BorderLayout.NORTH);
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         toolBar.installSearchFocusShortcut(mainPanel);
@@ -314,7 +316,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarSwitchedToListView() {
         Logger.debug("[switch] -> LIST view, currentView=" + toolBar.getCurrentView());
-        setCenter(listScrollPane);
+        center.set(listScrollPane);
     }
 
     @Override
@@ -323,7 +325,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         rebuildGrid();
         // rebuildGrid() swallows failures; the grid parts are then still null
         // and the previous center stays visible instead of an NPE.
-        if (gridScrollPane != null) setCenter(gridScrollPane);
+        if (gridScrollPane != null) center.set(gridScrollPane);
         if (gridTable != null) SwingUtilities.invokeLater(gridTable::requestFocusInWindow);
     }
 
@@ -408,7 +410,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
-            if (gridScrollPane != null) setCenter(gridScrollPane);
+            if (gridScrollPane != null) center.set(gridScrollPane);
         }
     }
 
@@ -462,14 +464,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
             if (currentList != null) {
                 gridTable.addMouseListener(new GridContextMenuListener(gridTable, currentList, contextMenu, pageItems));
 
-                final TestCaseDto selectedItem = currentList.getSelectedValue();
-                final int selectedRow = pageItems.indexOf(selectedItem);
-                if (selectedRow >= 0) {
-                    final int column = gridColumnToRestore >= 0 && gridColumnToRestore < gridTable.getColumnCount()
-                            ? gridColumnToRestore : 0;
-                    gridTable.changeSelection(selectedRow, column, false, false);
-                    gridTable.scrollRectToVisible(gridTable.getCellRect(selectedRow, column, true));
-                }
+                GridPanelBuilder.restoreSelection(gridTable, currentList, pageItems, gridColumnToRestore);
             }
             // Cleared regardless of whether the row was found, so a stale column can never
             // be applied to an unrelated rebuild.
@@ -482,17 +477,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         }
     }
 
-    private void setCenter(final @NotNull JComponent component) {
-        Logger.debug("[center] setCenter -> " + component.getClass().getSimpleName()
-                + " (had center=" + (currentCenter != null) + ")");
-        if (currentCenter != null) {
-            mainPanel.remove(currentCenter);
-        }
-        mainPanel.add(component, BorderLayout.CENTER);
-        currentCenter = component;
-        mainPanel.revalidate();
-        mainPanel.repaint();
-    }
+
 
     @Override
     public @NotNull Set<String> getAvailableModules() {

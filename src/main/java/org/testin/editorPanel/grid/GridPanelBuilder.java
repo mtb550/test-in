@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.hover.TableHoverListener;
+import com.intellij.ui.components.JBList;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -191,6 +192,26 @@ public class GridPanelBuilder {
             public void columnSelectionChanged(final javax.swing.event.ListSelectionEvent e) {
             }
         });
+    }
+
+    /**
+     * Puts the grid's selection back on whichever case the list has selected,
+     * in the column the tester was last in.
+     * <p>
+     * Called after every rebuild, by both editors, which each wrote it out. The
+     * column is checked against the rebuilt table rather than trusted: a grid
+     * rebuilt with fewer columns would otherwise be asked to select one it no
+     * longer has.
+     */
+    public static void restoreSelection(final @NotNull JBTable table, final @NotNull JBList<TestCaseDto> list,
+                                        final @NotNull List<TestCaseDto> pageItems, final int columnToRestore) {
+        final int selectedRow = pageItems.indexOf(list.getSelectedValue());
+        if (selectedRow < 0) return;
+
+        final int column = columnToRestore >= 0 && columnToRestore < table.getColumnCount() ? columnToRestore : 0;
+
+        table.changeSelection(selectedRow, column, false, false);
+        table.scrollRectToVisible(table.getCellRect(selectedRow, column, true));
     }
 
     private static void autoSizeColumns(final @NotNull JBTable table) {
