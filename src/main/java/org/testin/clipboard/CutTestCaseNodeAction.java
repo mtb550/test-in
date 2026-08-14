@@ -12,6 +12,7 @@ import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
@@ -56,6 +57,8 @@ public class CutTestCaseNodeAction extends DumbAwareAction {
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
                 list.repaint();
+
+                Services.getInstance(p, Notifier.class).softShow(p, "Test case cut");
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());
