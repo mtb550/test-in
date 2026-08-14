@@ -49,9 +49,9 @@ public class ActionIcons extends BaseDetails {
                 .setShortcut(Shortcuts.NavigateToCode.getShortcutText())
                 .installOn(navLabel);
 
-        final int navTargetWidth = (int) (navIconRaw.getIconWidth() * HOVER_SCALE);
-        final int navTargetHeight = (int) (navIconRaw.getIconHeight() * HOVER_SCALE);
-        navLabel.setPreferredSize(new Dimension(navTargetWidth, navTargetHeight));
+        // From the hovered icon itself: scaling 16px by 1.8 gives 28.8, which the
+        // icon reports as 29 and the estimate truncated to 28, clipping a pixel.
+        navLabel.setPreferredSize(new Dimension(navIconHover.getIconWidth(), navIconHover.getIconHeight()));
         navLabel.setHorizontalAlignment(SwingConstants.CENTER);
         navLabel.setVerticalAlignment(SwingConstants.CENTER);
 
@@ -85,9 +85,7 @@ public class ActionIcons extends BaseDetails {
                 .setShortcut(Shortcuts.RunTestCase.getShortcutText())
                 .installOn(runLabel);
 
-        final int runTargetWidth = (int) (currentRunIconRaw.getIconWidth() * HOVER_SCALE);
-        final int runTargetHeight = (int) (currentRunIconRaw.getIconHeight() * HOVER_SCALE);
-        runLabel.setPreferredSize(new Dimension(runTargetWidth, runTargetHeight));
+        runLabel.setPreferredSize(new Dimension(runIconHover.getIconWidth(), runIconHover.getIconHeight()));
         runLabel.setHorizontalAlignment(SwingConstants.CENTER);
         runLabel.setVerticalAlignment(SwingConstants.CENTER);
 
