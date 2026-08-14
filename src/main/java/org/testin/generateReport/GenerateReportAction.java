@@ -100,14 +100,10 @@ public class GenerateReportAction extends DumbAwareAction {
         if (tr == null) return;
 
         final String suggestedName = tr.getPath().getFileName().toString() + "_Report";
-        final GenerateReportDialog dialog = new GenerateReportDialog(p, suggestedName);
-        if (!dialog.showAndGet()) return;
 
-        // Set together when the dialog accepts; a cancelled dialog never gets here.
-        final FileTypes format = dialog.getSelectedFormat();
-        if (format == null) return;
-
-        processAndSave(p, tr, format, dialog.getSelectedFile());
+        // Effectively final for the callback: tr is assigned in a branch above.
+        final TestRunDirectoryDto runDir = tr;
+        new GenerateReportDialog(p, suggestedName, (format, file) -> processAndSave(p, runDir, format, file)).show();
     }
 
     @Override

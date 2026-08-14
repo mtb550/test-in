@@ -20,7 +20,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class TablePanelBuilder {
 
@@ -135,15 +134,17 @@ public class TablePanelBuilder {
         ));
     }
 
+    /**
+     * One read-through tab per sheet. Callers that keep their models - the ones
+     * that read back what the tester ticked - build their tabs themselves.
+     */
     public @NotNull JBTabbedPane createTabbedPane(final @NotNull Map<String, List<TestCaseDto>> sheetsData,
                                                   final @NotNull List<TestEditorAttributes> attributes,
-                                                  final @NotNull Project p,
-                                                  final @NotNull Consumer<DefaultTableModel> modelCustomizer) {
+                                                  final @NotNull Project p) {
         final JBTabbedPane tabbedPane = new JBTabbedPane();
 
         for (final Map.Entry<String, List<TestCaseDto>> entry : sheetsData.entrySet()) {
             final DefaultTableModel model = createModel(p, attributes, entry.getValue());
-            modelCustomizer.accept(model);
 
             tabbedPane.addTab(entry.getKey(), new JBScrollPane(buildTable(model, p)));
         }

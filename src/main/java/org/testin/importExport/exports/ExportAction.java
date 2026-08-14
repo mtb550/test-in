@@ -14,7 +14,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.FileTypes;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -67,21 +66,17 @@ public class ExportAction extends DumbAwareAction {
                     return;
                 }
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    final ExportDialog dialog = new ExportDialog(p, exportAttributes, sheets, targetDir);
-                    if (!dialog.showAndGet()) return;
-
-                    // Both are null until the dialog is accepted, so they are
-                    // read once and checked together.
-                    final FileTypes format = dialog.getSelectedFormat();
-                    final File destFile = dialog.getSelectedFile();
-                    if (format == null || destFile == null) return;
-
-                    try {
-                        format.exportToFile(p, ExportAction.this, destFile, sheets);
-                    } catch (final Exception ex) {
-                        Logger.error("Export crashed: " + ex.getMessage());
-                        ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).error(p, "Export Failed", ex.getMessage()));
-                    }
+                    // The framework dialog reports through this callback rather
+                    // than a return code, so the destination is never read back
+                    // out of a dialog that was cancelled.
+                    new ExportDialog(p, exportAttributes, sheets, targetDir, (format, destFile) -> {
+                        try {
+                            format.exportToFile(p, ExportAction.this, destFile, sheets);
+                        } catch (final Exception ex) {
+                            Logger.error("Export crashed: " + ex.getMessage());
+                            ApplicationManager.getApplication().invokeLater(() -> Services.getInstance(p, Notifier.class).error(p, "Export Failed", ex.getMessage()));
+                        }
+                    }).show();
                 });
             }
         });
