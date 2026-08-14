@@ -33,7 +33,7 @@ public class RefreshAction extends DumbAwareAction {
         }
 
         Logger.info("Refresh: re-indexing started");
-        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing...");
+        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing..");
 
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
         indexer.resetForReindex();

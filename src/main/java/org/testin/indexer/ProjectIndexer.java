@@ -99,7 +99,7 @@ public final class ProjectIndexer {
             }
 
             indexingLatch = new CountDownLatch(validProjects.size());
-            Logger.info("Indexing " + validProjects.size() + " projects...");
+            Logger.info("Indexing " + validProjects.size() + " projects..");
 
             for (final Path projectPath : validProjects) {
                 final String projectName = projectPath.getFileName().toString();
@@ -110,7 +110,7 @@ public final class ProjectIndexer {
                             public void run(final @NotNull ProgressIndicator indicator) {
                                 indicator.setIndeterminate(false);
                                 indicator.setFraction(0.0);
-                                indicator.setText("Indexing " + projectName + "...");
+                                indicator.setText("Indexing " + projectName + "..");
 
                                 try {
                                     scanCoordinator.scan(projectPath, indicator);

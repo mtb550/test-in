@@ -394,7 +394,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing...");
+        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing..");
         toolBar.getToolbarItem(FilterPopupBtn.class).clearFilters();
         toolBar.getToolbarItem(SearchTxt.class).resetSearchQuery();
 
@@ -405,7 +405,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
         this.unsortedIds.clear();
         this.model.removeAll();
         this.list.setPaintBusy(true);
-        this.list.getEmptyText().setText("Refreshing...");
+        this.list.getEmptyText().setText("Refreshing..");
 
         loadDataAsync();
     }

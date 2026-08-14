@@ -69,7 +69,7 @@ public class BranchSelector {
         if (path == null) {
             showPlaceholder("No project path found");
         } else if (git.isRepository(path)) {
-            showPlaceholder("Loading branches...");
+            showPlaceholder("Loading branches..");
             loadGitBranches(path);
         } else {
             showPlaceholder("Not a Git repository");
@@ -95,7 +95,7 @@ public class BranchSelector {
         final String selectedBranch = getSelectedBranch();
 
         if (selectedBranch == null || selectedBranch.equals("No branches found") ||
-                selectedBranch.equals("Loading branches...") || selectedBranch.equals(currentBranch)) {
+                selectedBranch.equals("Loading branches..") || selectedBranch.equals(currentBranch)) {
             return;
         }
 

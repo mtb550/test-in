@@ -55,7 +55,7 @@ public class CreateTestProjectCloneAction extends DumbAwareAction {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                indicator.setText("Cloning into " + projectName + "...");
+                indicator.setText("Cloning into " + projectName + "..");
 
                 try {
                     final Path parentPath = Services.getInstance(p, Setting.class).getTestinPath();

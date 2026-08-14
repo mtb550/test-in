@@ -184,7 +184,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         final int generation = loadGeneration.incrementAndGet();
         if (list != null) {
             list.setPaintBusy(true);
-            list.getEmptyText().setText("Loading...");
+            list.getEmptyText().setText("Loading..");
         }
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -331,7 +331,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
-        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing...");
+        Services.getInstance(p, Notifier.class).softShow(p, "Refreshing..");
         toolBar.getToolbarItem(FilterPopupBtn.class).clearFilters();
         toolBar.getToolbarItem(SearchTxt.class).resetSearchQuery();
 
@@ -348,7 +348,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
 
         if (this.list != null) {
             this.list.setPaintBusy(true);
-            this.list.getEmptyText().setText("Refreshing...");
+            this.list.getEmptyText().setText("Refreshing..");
         }
 
         loadDataAsync();

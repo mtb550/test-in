@@ -19,7 +19,7 @@ import java.util.Optional;
  * difference between them is not a change at all - it is whatever the filter
  * hid. Acting on that removed live test cases from the master list, and the
  * sequence write that followed persisted the loss. Clearing the model to show
- * "Refreshing..." looked exactly like every case on the page having been
+ * "Refreshing.." looked exactly like every case on the page having been
  * deleted.
  * <p>
  * Nothing needs it to sync: every path that mutates the model - the delete

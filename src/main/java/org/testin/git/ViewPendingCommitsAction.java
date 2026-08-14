@@ -129,7 +129,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
             final @NotNull Collection<TestCaseDiff> selectedChanges) {
         GitBackgroundTask.run(p, "Committing to local Git", false,
                 indicator -> {
-                    indicator.setText("Staging and committing files...");
+                    indicator.setText("Staging and committing files..");
                     commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
@@ -212,7 +212,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                                 final @NotNull String remote, final @NotNull String branch) {
         GitBackgroundTask.run(p, "Pushing to Remote", false,
                 indicator -> {
-                    indicator.setText("Syncing with remote (pull --rebase, then push)...");
+                    indicator.setText("Syncing with remote (pull --rebase, then push)..");
                     commits.pullAndPush(repoPath, remote, branch);
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (pushNotification != null) {
@@ -280,7 +280,7 @@ public class ViewPendingCommitsAction extends DumbAwareAction {
                     indicator -> {
                         commits.configureIdentity(repoPath, name.trim(), email.trim(), setGlobally);
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            Services.getInstance(p, Notifier.class).info(p, "Git Identity Set", "Identity configured successfully. Resuming commit...");
+                            Services.getInstance(p, Notifier.class).info(p, "Git Identity Set", "Identity configured successfully. Resuming commit..");
                             performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges);
                         });
                     },

@@ -58,7 +58,7 @@ final class IndexingScanner {
 
             if (indicator != null) {
                 indicator.setFraction(0.1);
-                indicator.setText(tp.getName() + " - test sets...");
+                indicator.setText(tp.getName() + " - test sets..");
             }
 
             final TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
@@ -68,7 +68,7 @@ final class IndexingScanner {
 
             if (indicator != null) {
                 indicator.setFraction(0.5);
-                indicator.setText(tp.getName() + " - test runs...");
+                indicator.setText(tp.getName() + " - test runs..");
             }
 
             final TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();

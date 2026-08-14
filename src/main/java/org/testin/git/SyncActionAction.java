@@ -65,7 +65,7 @@ public class SyncActionAction extends DumbAwareAction {
                 indicator.setIndeterminate(true);
 
                 try {
-                    indicator.setText("Checking remote configuration...");
+                    indicator.setText("Checking remote configuration..");
                     final String remoteName = git.getRemoteName(repoPath);
                     final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
 
@@ -81,10 +81,10 @@ public class SyncActionAction extends DumbAwareAction {
                         throw new IllegalStateException("Could not determine the repository default branch.");
                     }
 
-                    indicator.setText("Pulling latest changes from " + branch + "...");
+                    indicator.setText("Pulling latest changes from " + branch + "..");
                     sync.pull(repoPath, remoteName, branch);
 
-                    indicator.setText("Refreshing files...");
+                    indicator.setText("Refreshing files..");
                     refreshAfterSync(repoPath);
 
                 } catch (final Exception ex) {
