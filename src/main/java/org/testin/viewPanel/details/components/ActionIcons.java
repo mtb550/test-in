@@ -38,73 +38,16 @@ public class ActionIcons extends BaseDetails {
         final JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
 
-        final JBLabel navLabel = new JBLabel();
-        final Icon navIconBase = IconUtil.scale(navIconRaw, navLabel, BASE_SCALE);
-        final Icon navIconHover = IconUtil.scale(navIconRaw, navLabel, HOVER_SCALE);
-        navLabel.setIcon(navIconBase);
-        navLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        final JBLabel navLabel = hoverIcon(navIconRaw,
+                CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip(),
+                Shortcuts.NavigateToCode.getShortcutText(),
+                () -> new NavigateToCodeAction(p, null).execute(p, dto));
 
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip()))
-                .setShortcut(Shortcuts.NavigateToCode.getShortcutText())
-                .installOn(navLabel);
-
-        // From the hovered icon itself: scaling 16px by 1.8 gives 28.8, which the
-        // icon reports as 29 and the estimate truncated to 28, clipping a pixel.
-        navLabel.setPreferredSize(new Dimension(navIconHover.getIconWidth(), navIconHover.getIconHeight()));
-        navLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        navLabel.setVerticalAlignment(SwingConstants.CENTER);
-
-        navLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(final MouseEvent e) {
-                navLabel.setIcon(navIconHover);
-            }
-
-            @Override
-            public void mouseExited(final MouseEvent e) {
-                navLabel.setIcon(navIconBase);
-            }
-
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                new NavigateToCodeAction(p, null).execute(p, dto);
-            }
-        });
-
-        final JBLabel runLabel = new JBLabel();
         final RunStatus currentStatus = dto.getTempStatus();
-        final Icon currentRunIconRaw = currentStatus.getIcon();
-        final Icon runIconBase = IconUtil.scale(currentRunIconRaw, runLabel, BASE_SCALE);
-        final Icon runIconHover = IconUtil.scale(currentRunIconRaw, runLabel, HOVER_SCALE);
-        runLabel.setIcon(runIconBase);
-        runLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text(currentStatus.getTooltip()))
-                .setShortcut(Shortcuts.RunTestCase.getShortcutText())
-                .installOn(runLabel);
-
-        runLabel.setPreferredSize(new Dimension(runIconHover.getIconWidth(), runIconHover.getIconHeight()));
-        runLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        runLabel.setVerticalAlignment(SwingConstants.CENTER);
-
-        runLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(final MouseEvent e) {
-                runLabel.setIcon(runIconHover);
-            }
-
-            @Override
-            public void mouseExited(final MouseEvent e) {
-                runLabel.setIcon(runIconBase);
-            }
-
-            @Override
-            public void mouseClicked(final MouseEvent e) {
-                currentStatus.executeAction(p, dto, null);
-            }
-        });
+        final JBLabel runLabel = hoverIcon(currentStatus.getIcon(),
+                currentStatus.getTooltip(),
+                Shortcuts.RunTestCase.getShortcutText(),
+                () -> currentStatus.executeAction(p, dto, null));
 
         actionsPanel.add(navLabel);
         actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
@@ -119,5 +62,48 @@ public class ActionIcons extends BaseDetails {
         panel.add(actionsPanel, gbc);
 
         return currentRow + 1;
+    }
+
+    /**
+     * An icon label that grows on hover and acts on click. Sized to the hovered
+     * icon from the start, so growing it does not reflow the row.
+     */
+    private @NotNull JBLabel hoverIcon(final @NotNull Icon raw, final @NotNull String tooltip,
+                                       final @NotNull String shortcut, final @NotNull Runnable onClick) {
+        final JBLabel label = new JBLabel();
+        final Icon base = IconUtil.scale(raw, label, BASE_SCALE);
+        final Icon hover = IconUtil.scale(raw, label, HOVER_SCALE);
+        label.setIcon(base);
+        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text(tooltip))
+                .setShortcut(shortcut)
+                .installOn(label);
+
+        // From the hovered icon itself: scaling 16px by 1.8 gives 28.8, which the
+        // icon reports as 29 and the estimate truncated to 28, clipping a pixel.
+        label.setPreferredSize(new Dimension(hover.getIconWidth(), hover.getIconHeight()));
+        label.setHorizontalAlignment(SwingConstants.CENTER);
+        label.setVerticalAlignment(SwingConstants.CENTER);
+
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(final MouseEvent e) {
+                label.setIcon(hover);
+            }
+
+            @Override
+            public void mouseExited(final MouseEvent e) {
+                label.setIcon(base);
+            }
+
+            @Override
+            public void mouseClicked(final MouseEvent e) {
+                onClick.run();
+            }
+        });
+
+        return label;
     }
 }
