@@ -3,10 +3,10 @@ package org.testin.nodeCreator;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.enums.DirectoryType;
 import org.testin.mappers.dto.dirs.*;
 import org.testin.nodeCreator.dialogs.CreateRunDialog;
@@ -21,15 +21,12 @@ import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
 
-public class CreateTreeNodeAction extends DumbAwareAction {
-
-    private final @NotNull Project p;
+public class CreateTreeNodeAction extends AbstractProjectAction {
     private final @NotNull SimpleTree tree;
     private final @NotNull Tools tools;
 
     public CreateTreeNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Create", "Create new node", AllIcons.General.Add);
-        this.p = p;
+        super(p, "Create", "Create new node", AllIcons.General.Add);
         this.tree = tree;
         this.tools = Services.getInstance(p, Tools.class);
         this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), tree);

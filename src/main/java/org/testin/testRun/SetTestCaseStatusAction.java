@@ -2,10 +2,10 @@ package org.testin.testRun;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.TestStatus;
@@ -23,9 +23,7 @@ import java.util.List;
  * constant carries the label, icon, shortcut and whether details are collected
  * first — one action for all statuses instead of one class per status.
  */
-public class SetTestCaseStatusAction extends DumbAwareAction {
-
-    private final @NotNull Project p;
+public class SetTestCaseStatusAction extends AbstractProjectAction {
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull TestStatus status;
@@ -33,8 +31,7 @@ public class SetTestCaseStatusAction extends DumbAwareAction {
     public SetTestCaseStatusAction(final @NotNull Project p, final @NotNull IEditor editor,
                                    final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status,
                                    final @NotNull TestStatus.MenuEntry entry) {
-        super(status.getLabel(), "Set test case status to " + status.getLabel(), entry.icon());
-        this.p = p;
+        super(p, status.getLabel(), "Set test case status to " + status.getLabel(), entry.icon());
         this.editor = editor;
         this.list = list;
         this.status = status;

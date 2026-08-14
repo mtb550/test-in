@@ -3,9 +3,9 @@ package org.testin.nodeCreator;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.git.GitRefs;
 import org.testin.nodeCreator.dialogs.CreateProjectDialog;
 import org.testin.projectPanel.ProjectPanel;
@@ -16,13 +16,11 @@ import org.testin.testProject.CreateTestProjectNewAction;
 import org.testin.util.OptionalPlugin;
 import org.testin.util.Tools;
 
-public class CreateTestProjectAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class CreateTestProjectAction extends AbstractProjectAction {
     private final @NotNull ProjectPanel pp;
 
     public CreateTestProjectAction(final @NotNull Project p, final @NotNull ProjectPanel pp) {
-        super("New Test Project", "Create or Clone test project", AllIcons.General.Add);
-        this.p = p;
+        super(p, "New Test Project", "Create or Clone test project", AllIcons.General.Add);
         this.pp = pp;
     }
 

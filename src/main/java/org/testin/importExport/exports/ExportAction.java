@@ -7,13 +7,13 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -28,17 +28,15 @@ import javax.swing.tree.TreePath;
 import java.io.InputStream;
 import java.util.*;
 
-public class ExportAction extends DumbAwareAction {
+public class ExportAction extends AbstractProjectAction {
 
     protected final @NotNull List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isExportable)
             .toList();
-    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
     public ExportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
-        this.p = p;
+        super(p, "Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
         this.tree = tree;
     }
 

@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
@@ -12,6 +11,7 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -21,8 +21,7 @@ import org.testin.viewPanel.ViewToolWindowFactory;
 
 import java.awt.datatransfer.StringSelection;
 
-public class EscapeAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class EscapeAction extends AbstractProjectAction {
 
     // Exactly one of tree / list / table is set, by the constructor that was
     // used; the surface this action was registered on is the one that is
@@ -33,8 +32,7 @@ public class EscapeAction extends DumbAwareAction {
     private final @Nullable JBTable table;
 
     public EscapeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
-        super("Escape Action", "", AllIcons.Actions.InlayGear);
-        this.p = p;
+        super(p, "Escape Action", "", AllIcons.Actions.InlayGear);
         this.tree = tree;
         this.transferHandler = transferHandler;
         this.list = null;
@@ -43,8 +41,7 @@ public class EscapeAction extends DumbAwareAction {
     }
 
     public EscapeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super("Escape Action", "", AllIcons.Actions.InlayGear);
-        this.p = p;
+        super(p, "Escape Action", "", AllIcons.Actions.InlayGear);
         this.list = list;
         this.table = null;
         this.tree = null;
@@ -56,8 +53,7 @@ public class EscapeAction extends DumbAwareAction {
      * Grid view: same behavior as the list, except while a cell is being edited.
      */
     public EscapeAction(final @NotNull Project p, final @NotNull JBTable table) {
-        super("Escape Action", "", AllIcons.Actions.InlayGear);
-        this.p = p;
+        super(p, "Escape Action", "", AllIcons.Actions.InlayGear);
         this.table = table;
         this.list = null;
         this.tree = null;

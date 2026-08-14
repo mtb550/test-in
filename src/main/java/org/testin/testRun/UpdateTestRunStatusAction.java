@@ -3,10 +3,10 @@ package org.testin.testRun;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
@@ -25,14 +25,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.UUID;
 
-public class UpdateTestRunStatusAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class UpdateTestRunStatusAction extends AbstractProjectAction {
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
     public UpdateTestRunStatusAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super("Change Test Run Status", "Change the status of the current test run", AllIcons.Nodes.Test);
-        this.p = p;
+        super(p, "Change Test Run Status", "Change the status of the current test run", AllIcons.Nodes.Test);
         this.editor = editor;
         this.list = list;
     }

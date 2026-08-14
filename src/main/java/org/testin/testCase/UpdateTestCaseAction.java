@@ -3,10 +3,10 @@ package org.testin.testCase;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.indexer.ProjectIndexer;
@@ -21,16 +21,13 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UpdateTestCaseAction extends DumbAwareAction {
-
-    private final @NotNull Project p;
+public class UpdateTestCaseAction extends AbstractProjectAction {
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull Path path;
     private final @NotNull IEditor editor;
 
     public UpdateTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull Path path) {
-        super("Update");
-        this.p = p;
+        super(p, "Update");
         this.list = list;
         this.path = path;
         this.editor = editor;

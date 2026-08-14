@@ -7,12 +7,12 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.FileTypes;
@@ -39,23 +39,20 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class GenerateReportAction extends DumbAwareAction {
+public class GenerateReportAction extends AbstractProjectAction {
 
     private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
-    private final @NotNull Project p;
     private final @Nullable SimpleTree tree;
     private final @Nullable IEditor editor;
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
-        this.p = p;
+        super(p, "Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
         this.tree = tree;
         this.editor = null;
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super("Generate Report", "Generate test run report", null);
-        this.p = p;
+        super(p, "Generate Report", "Generate test run report", null);
         this.tree = null;
         this.editor = editor;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);

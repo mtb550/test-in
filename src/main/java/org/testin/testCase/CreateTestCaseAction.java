@@ -4,10 +4,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GeneratorType;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditor;
@@ -24,14 +24,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class CreateTestCaseAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class CreateTestCaseAction extends AbstractProjectAction {
     private final @NotNull IEditor editor;
     private final @NotNull TestSetDirectoryDto dir;
 
     public CreateTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
-        super("Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
-        this.p = p;
+        super(p, "Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
         this.editor = editor;
         this.dir = dir;
         this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), list);

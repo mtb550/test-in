@@ -8,7 +8,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -16,6 +15,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import git4idea.GitUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
@@ -27,17 +27,14 @@ import org.testin.services.Services;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
-public class SyncActionAction extends DumbAwareAction {
-
-    private final @NotNull Project p;
+public class SyncActionAction extends AbstractProjectAction {
     private final @NotNull SimpleTree tree;
     private final @NotNull ProjectPanel pp;
     private final @NotNull GitRepositoryService git;
     private final @NotNull GitSyncService sync;
 
     public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel pp) {
-        super("Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
-        this.p = p;
+        super(p, "Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
         this.tree = tree;
         this.pp = pp;
         this.git = new GitRepositoryService(p);

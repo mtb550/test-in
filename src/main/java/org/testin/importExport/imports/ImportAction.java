@@ -4,11 +4,11 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.method.CreateTestMethod;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.indexer.ProjectIndexer;
@@ -32,17 +32,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class ImportAction extends DumbAwareAction {
+public class ImportAction extends AbstractProjectAction {
 
     protected final @NotNull List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportable)
             .toList();
-    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
     public ImportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Import", "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
-        this.p = p;
+        super(p, "Import", "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
         this.tree = tree;
     }
 

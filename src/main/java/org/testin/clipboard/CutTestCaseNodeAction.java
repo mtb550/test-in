@@ -4,10 +4,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
@@ -23,16 +23,14 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.List;
 
-public class CutTestCaseNodeAction extends DumbAwareAction {
+public class CutTestCaseNodeAction extends AbstractProjectAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
-    private final @NotNull Project p;
     private final IEditor editor;
     private final JBList<TestCaseDto> list;
 
     public CutTestCaseNodeAction(final @NotNull Project p, final IEditor editor, final JBList<TestCaseDto> list) {
-        super("Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
-        this.p = p;
+        super(p, "Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
         this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);

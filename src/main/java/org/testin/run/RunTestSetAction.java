@@ -3,10 +3,10 @@ package org.testin.run;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -18,13 +18,11 @@ import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 
-public class RunTestSetAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class RunTestSetAction extends AbstractProjectAction {
     private final @NotNull SimpleTree tree;
 
     public RunTestSetAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Run Test Set", "Run selected test set", AllIcons.RunConfigurations.TestState.Run);
-        this.p = p;
+        super(p, "Run Test Set", "Run selected test set", AllIcons.RunConfigurations.TestState.Run);
         this.tree = tree;
     }
 

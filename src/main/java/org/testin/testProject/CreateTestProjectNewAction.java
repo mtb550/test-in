@@ -3,9 +3,9 @@ package org.testin.testProject;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GeneratorType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.DirectoryMapper;
@@ -17,14 +17,12 @@ import org.testin.settings.Setting;
 
 import java.nio.file.Path;
 
-public class CreateTestProjectNewAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class CreateTestProjectNewAction extends AbstractProjectAction {
     private final @NotNull ProjectPanel pp;
     private final @NotNull String tpName;
 
     public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull String name) {
-        super("New Test Project", "Create a new test project", AllIcons.General.Add);
-        this.p = p;
+        super(p, "New Test Project", "Create a new test project", AllIcons.General.Add);
         this.pp = pp;
         this.tpName = name;
     }

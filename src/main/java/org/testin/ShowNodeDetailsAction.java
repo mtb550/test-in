@@ -3,23 +3,21 @@ package org.testin;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.tree.TreeValueUtil;
 import org.testin.viewPanel.markerDetails.MarkerDetailsViewDialog;
 
 import javax.swing.tree.TreePath;
 
-public class ShowNodeDetailsAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class ShowNodeDetailsAction extends AbstractProjectAction {
     private final @NotNull SimpleTree tree;
 
     public ShowNodeDetailsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Details", "Show node details", AllIcons.General.IndentDetected);
-        this.p = p;
+        super(p, "Details", "Show node details", AllIcons.General.IndentDetected);
         this.tree = tree;
     }
 

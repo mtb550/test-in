@@ -3,10 +3,10 @@ package org.testin.clipboard;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.projectPanel.tree.TreeUndoService;
 import org.testin.services.Services;
 import org.testin.util.Tools;
@@ -15,14 +15,12 @@ import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-public class UndoNodeAction extends DumbAwareAction {
+public class UndoNodeAction extends AbstractProjectAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK);
-    private final @NotNull Project p;
 
     public UndoNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Undo", "Undo last action", AllIcons.Actions.Undo);
-        this.p = p;
+        super(p, "Undo", "Undo last action", AllIcons.Actions.Undo);
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 

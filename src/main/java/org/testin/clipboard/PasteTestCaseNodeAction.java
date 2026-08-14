@@ -6,10 +6,10 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
@@ -31,15 +31,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-public class PasteTestCaseNodeAction extends DumbAwareAction {
+public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
-    private final @NotNull Project p;
     private final @NotNull IEditor editor;
 
     public PasteTestCaseNodeAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super("Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
-        this.p = p;
+        super(p, "Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
         this.editor = editor;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }

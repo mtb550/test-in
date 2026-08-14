@@ -4,10 +4,10 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.ide.CopyPasteManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.tree.TreeTransferHandler;
@@ -24,15 +24,13 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-public class PasteNodeAction extends DumbAwareAction {
+public class PasteNodeAction extends AbstractProjectAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK);
-    private final @NotNull Project p;
     private final @NotNull SimpleTree tree;
 
     public PasteNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Paste", "Paste items", AllIcons.Actions.MenuPaste);
-        this.p = p;
+        super(p, "Paste", "Paste items", AllIcons.Actions.MenuPaste);
         this.tree = tree;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }

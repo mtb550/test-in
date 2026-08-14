@@ -4,11 +4,11 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GeneratorType;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
@@ -25,18 +25,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class RemoveTestCaseAction extends DumbAwareAction {
+public class RemoveTestCaseAction extends AbstractProjectAction {
     private final @NotNull DirectoryDto dir;
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull CollectionListModel<TestCaseDto> model;
-    private final @NotNull Project p;
 
     public RemoveTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull DirectoryDto dir,
                                 final @NotNull JBList<TestCaseDto> list,
                                 final @NotNull CollectionListModel<TestCaseDto> model) {
-        super("Delete", "Delete test case", AllIcons.Actions.DeleteTag);
-        this.p = p;
+        super(p, "Delete", "Delete test case", AllIcons.Actions.DeleteTag);
         this.editor = editor;
         this.dir = dir;
         this.list = list;

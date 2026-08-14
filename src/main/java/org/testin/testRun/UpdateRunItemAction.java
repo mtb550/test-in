@@ -3,11 +3,11 @@ package org.testin.testRun;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.TestStatus;
@@ -21,15 +21,12 @@ import org.testin.testRun.createDialog.FailedResultDialog;
 import org.testin.util.Shortcuts;
 
 
-public class UpdateRunItemAction extends DumbAwareAction {
-
-    private final @NotNull Project p;
+public class UpdateRunItemAction extends AbstractProjectAction {
     private final @NotNull IEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
     public UpdateRunItemAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
-        super("Failed Test Case Details", "Edit the failure details of the failed test case", AllIcons.Actions.Edit);
-        this.p = p;
+        super(p, "Failed Test Case Details", "Edit the failure details of the failed test case", AllIcons.Actions.Edit);
         this.editor = editor;
         this.list = list;
         this.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), list);

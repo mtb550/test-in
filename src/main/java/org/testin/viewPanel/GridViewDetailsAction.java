@@ -3,10 +3,10 @@ package org.testin.viewPanel;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Shortcuts;
 
@@ -25,17 +25,14 @@ import java.util.List;
  * Enabled only on the sequence ("#") column, which is never editable; on every
  * other cell the action stays disabled so ENTER keeps starting an edit.
  */
-public class GridViewDetailsAction extends DumbAwareAction {
-
-    private final @NotNull Project p;
+public class GridViewDetailsAction extends AbstractProjectAction {
     private final @NotNull JBTable table;
     private final @NotNull List<TestCaseDto> pageItems;
     private final @NotNull ArrayList<String> path;
 
     public GridViewDetailsAction(final @NotNull Project p, final @NotNull JBTable table,
                                  final @NotNull List<TestCaseDto> pageItems, final @NotNull ArrayList<String> path) {
-        super("View Details", "", AllIcons.Actions.PreviewDetails);
-        this.p = p;
+        super(p, "View Details", "", AllIcons.Actions.PreviewDetails);
         this.table = table;
         this.pageItems = pageItems;
         this.path = path;

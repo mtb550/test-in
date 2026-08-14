@@ -3,10 +3,10 @@ package org.testin.open;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.tree.TreeValueUtil;
@@ -16,13 +16,11 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.tree.TreePath;
 
-public class OpenAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class OpenAction extends AbstractProjectAction {
     private final @NotNull SimpleTree tree;
 
     public OpenAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super("Open", "Open selected test sets or runs", AllIcons.Actions.MenuOpen);
-        this.p = p;
+        super(p, "Open", "Open selected test sets or runs", AllIcons.Actions.MenuOpen);
         this.tree = tree;
 
         this.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), tree);

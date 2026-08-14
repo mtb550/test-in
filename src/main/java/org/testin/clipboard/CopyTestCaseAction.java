@@ -3,10 +3,10 @@ package org.testin.clipboard;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -18,13 +18,11 @@ import java.awt.datatransfer.StringSelection;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class CopyTestCaseAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class CopyTestCaseAction extends AbstractProjectAction {
     private final @NotNull JBList<TestCaseDto> list;
 
     public CopyTestCaseAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super("Copy", "Copy test case", AllIcons.Actions.Copy);
-        this.p = p;
+        super(p, "Copy", "Copy test case", AllIcons.Actions.Copy);
         this.list = list;
         registerCustomShortcutSet(Shortcuts.CopyItem.getCustomShortcut(), list);
     }

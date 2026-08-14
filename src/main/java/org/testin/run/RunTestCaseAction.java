@@ -3,10 +3,10 @@ package org.testin.run;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.enums.RunStatus;
 import org.testin.listeners.ITestCaseExecutionListener;
 import org.testin.mappers.dto.TestCaseDto;
@@ -18,13 +18,11 @@ import org.testin.util.Shortcuts;
 
 import java.util.List;
 
-public class RunTestCaseAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class RunTestCaseAction extends AbstractProjectAction {
     private final JBList<TestCaseDto> list;
 
     public RunTestCaseAction(final @NotNull Project p, final JBList<TestCaseDto> list) {
-        super("Run Test", "Run selected test cases", AllIcons.RunConfigurations.TestState.Run);
-        this.p = p;
+        super(p, "Run Test", "Run selected test cases", AllIcons.RunConfigurations.TestState.Run);
         this.list = list;
         this.registerCustomShortcutSet(Shortcuts.RunTestCase.getCustomShortcut(), list);
     }

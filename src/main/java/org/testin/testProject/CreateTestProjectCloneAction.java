@@ -7,12 +7,12 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import git4idea.commands.Git;
 import git4idea.commands.GitCommandResult;
 
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -22,15 +22,13 @@ import org.testin.settings.Setting;
 
 import java.nio.file.Path;
 
-public class CreateTestProjectCloneAction extends DumbAwareAction {
-    private final @NotNull Project p;
+public class CreateTestProjectCloneAction extends AbstractProjectAction {
     private final @NotNull String gitUrl;
     private final @NotNull String projectName;
     private final @NotNull ProjectPanel pp;
 
     public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull ProjectPanel pp) {
-        super("Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
-        this.p = p;
+        super(p, "Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
         this.gitUrl = gitUrl;
         this.projectName = name;
         this.pp = pp;
