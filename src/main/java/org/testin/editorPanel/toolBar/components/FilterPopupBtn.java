@@ -124,7 +124,7 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
         final DefaultActionGroup filterPriorityMenu = new DefaultActionGroup(TestEditorAttributes.PRIORITY.getName(), true);
         Arrays.stream(Priority.values()).forEach(p ->
                 filterPriorityMenu.add(new ToggleFilterAction<>(p.getName(), IconManager.createIcon(p.getColor()),
-                        p, selectedPriority, Priority::onChange, onChanged)));
+                        p, selectedPriority, FilterMembership.plain(), onChanged)));
         filterResetBtn.add(filterPriorityMenu);
 
         // group menu
@@ -134,7 +134,7 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
                 filterGroupMenu.addSeparator();
             }
             filterGroupMenu.add(new ToggleFilterAction<>(g.getName(), null,
-                    g, selectedGroup, Group::onChange, onChanged));
+                    g, selectedGroup, FilterMembership.plain(), onChanged));
         });
         filterResetBtn.add(filterGroupMenu);
 

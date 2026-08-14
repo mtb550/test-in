@@ -5,9 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Set;
 
 /**
- * How toggling a filter value updates the selection set. Enums with their own
- * membership rules pass a method reference (e.g. {@code Priority::onChange});
- * plain values use {@link #plain()}.
+ * How toggling a filter value updates the selection set.
+ * <p>
+ * Every filter uses {@link #plain()} today. The seam is here for a value whose
+ * membership is not one-in-one-out — picking a parent that selects its children,
+ * or a value that excludes another. Priority, Group and BugPriority each carried
+ * their own copy of the plain rule until #61 found all three were identical to
+ * this one.
  */
 @FunctionalInterface
 public interface FilterMembership<T> {

@@ -6,8 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
-import java.util.Set;
-import java.util.function.BiConsumer;
 
 @Getter
 public enum Priority {
@@ -40,7 +38,6 @@ public enum Priority {
     private final @NotNull Color color;
     private final boolean active;
     private final @NotNull Shortcuts shortcut;
-    private final @NotNull BiConsumer<Set<Priority>, Boolean> action;
 
     Priority(final @NotNull String name, final int value, final @NotNull Color color, final boolean active, final @NotNull Shortcuts shortcut) {
         this.name = name;
@@ -48,15 +45,5 @@ public enum Priority {
         this.color = color;
         this.active = active;
         this.shortcut = shortcut;
-
-        this.action = (set, state) -> {
-            if (state) set.add(this);
-            else set.remove(this);
-        };
-
-    }
-
-    public void onChange(final @NotNull Set<Priority> set, final boolean state) {
-        action.accept(set, state);
     }
 }

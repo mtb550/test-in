@@ -6,8 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 import java.awt.*;
-import java.util.Set;
-import java.util.function.BiConsumer;
 
 @Getter
 public enum BugPriority {
@@ -48,7 +46,6 @@ public enum BugPriority {
     private final @NotNull Color color;
     private final boolean active;
     private final @NotNull Shortcuts shortcut;
-    private final @NotNull BiConsumer<Set<BugPriority>, Boolean> action;
 
     BugPriority(final @NotNull String name, final int value, final @NotNull Color color, final boolean active, final @NotNull Shortcuts shortcut) {
         this.name = name;
@@ -56,15 +53,5 @@ public enum BugPriority {
         this.color = color;
         this.active = active;
         this.shortcut = shortcut;
-
-        this.action = (set, state) -> {
-            if (state) set.add(this);
-            else set.remove(this);
-        };
-
-    }
-
-    public void onChange(final @NotNull Set<BugPriority> set, final boolean state) {
-        action.accept(set, state);
     }
 }
