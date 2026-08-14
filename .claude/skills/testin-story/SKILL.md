@@ -10,9 +10,9 @@ Backlog items for Testin live as GitHub issues on `mtb550/test-in`. Never write
 them to a local file — Muteb works across several machines and a local file does
 not travel.
 
-Always pass `--repo mtb550/test-in` explicitly. The git remote still reads
-`TestGit.git`; GitHub redirects, but `gh` inference is unreliable through a
-rename.
+Pass `--repo mtb550/test-in` explicitly. `gh` can infer it from the remote, but
+these commands are run from other directories often enough that being explicit
+is cheaper than being wrong.
 
 ## Before writing
 
