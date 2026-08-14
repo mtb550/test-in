@@ -19,7 +19,7 @@ public final class LoggerService implements Disposable {
 
     private static final long MAX_LOG_SIZE = 5L * 1024 * 1024;
 
-    private final BlockingQueue<String> logQueue = new ArrayBlockingQueue<>(10000);
+    private final BlockingQueue<Object> logQueue = new ArrayBlockingQueue<>(10000);
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
     // The IDE's log directory - beside idea.log, so Help -> Show Log in
@@ -41,10 +41,11 @@ public final class LoggerService implements Disposable {
     }
 
     /**
-     * Not a log line: identity-compared, so a tester writing the same text can
-     * never be mistaken for it.
+     * Not a log line. The queue holds Object so this can be one: a String
+     * sentinel would have to be identity-compared against text a tester could
+     * legitimately write.
      */
-    private static final String SHUTDOWN = new String("");
+    private static final Object SHUTDOWN = new Object();
 
     private void startWriterThread() {
         writerThread = new Thread(this::writeLoop, "Testin-Async-Logger");
@@ -64,14 +65,14 @@ public final class LoggerService implements Disposable {
             try {
                 while (isRunning || !logQueue.isEmpty()) {
 
-                    final String message = logQueue.poll(500, TimeUnit.MILLISECONDS);
-                    if (message == null) {
+                    final Object taken = logQueue.poll(500, TimeUnit.MILLISECONDS);
+                    if (taken == null) {
                         writer.flush();
                         continue;
                     }
 
                     // The wake-up from dispose, not a line to write.
-                    if (message == SHUTDOWN) continue;
+                    if (!(taken instanceof String message)) continue;
 
                     writer.write(message);
                     writer.newLine();
