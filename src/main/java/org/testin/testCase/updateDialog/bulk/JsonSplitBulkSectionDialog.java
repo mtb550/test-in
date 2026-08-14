@@ -5,14 +5,8 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.colors.EditorColors;
-import com.intellij.openapi.editor.colors.EditorColorsScheme;
 import com.intellij.openapi.editor.event.*;
-import com.intellij.openapi.editor.ex.EditorEx;
-import com.intellij.openapi.editor.highlighter.EditorHighlighter;
-import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
 import com.intellij.openapi.editor.markup.*;
-import com.intellij.openapi.fileTypes.FileType;
-import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
@@ -88,12 +82,12 @@ public abstract class JsonSplitBulkSectionDialog {
     }
 
     protected void appendJsonItem(final @NotNull TestCaseDto tc, final int index, final boolean isLast, final @NotNull StringBuilder leftSb, final @NotNull StringBuilder rightSb, final @NotNull List<int[]> rightEditableRanges) {
-        final String escapedValue = escapeJson(getOriginalValue(tc));
+        final String escapedValue = BulkJsonEditor.escapeJson(getOriginalValue(tc));
 
         final StringBuilder prefixSb = new StringBuilder("  {\n    \"id\": \"")
-                .append(escapeJson(tc.getId().toString())).append("\",\n");
+                .append(BulkJsonEditor.escapeJson(tc.getId().toString())).append("\",\n");
         if (showsDescriptionContext()) {
-            prefixSb.append("    \"description\": \"").append(escapeJson(tc.getDescription())).append("\",\n");
+            prefixSb.append("    \"description\": \"").append(BulkJsonEditor.escapeJson(tc.getDescription())).append("\",\n");
         }
         prefixSb.append("    \"").append(getJsonFieldName()).append("\": \"");
 
@@ -130,7 +124,7 @@ public abstract class JsonSplitBulkSectionDialog {
         final Document leftDoc = EditorFactory.getInstance().createDocument(leftSb.toString());
         leftDoc.setReadOnly(true);
         final Editor leftEditor = EditorFactory.getInstance().createViewer(leftDoc, p);
-        setupEditorAppearance(leftEditor, p);
+        BulkJsonEditor.setupEditorAppearance(leftEditor, p);
 
         leftEditor.getContentComponent().setFocusable(false);
         leftEditor.getSettings().setCaretRowShown(false);
@@ -164,7 +158,7 @@ public abstract class JsonSplitBulkSectionDialog {
         });
 
         final Editor rightEditor = EditorFactory.getInstance().createEditor(rightDoc, p);
-        setupEditorAppearance(rightEditor, p);
+        BulkJsonEditor.setupEditorAppearance(rightEditor, p);
 
         final List<RangeHighlighter> leftLineHighlighters = new ArrayList<>();
         Color themeCaretRowColor = rightEditor.getColorsScheme().getColor(EditorColors.CARET_ROW_COLOR);
@@ -206,7 +200,7 @@ public abstract class JsonSplitBulkSectionDialog {
                 }
 
                 if (!isInsideEditable) {
-                    final int nearestOffset = getNearestValidOffset(offset, valueMarkers);
+                    final int nearestOffset = BulkJsonEditor.nearestValidOffset(offset, valueMarkers);
                     caret.moveToOffset(nearestOffset);
                 }
                 updateRowHighlights.run();
@@ -241,7 +235,7 @@ public abstract class JsonSplitBulkSectionDialog {
                         final RangeMarker marker = valueMarkers.get(i);
                         if (marker.isValid()) {
                             final String currentText = rightDoc.getText(new TextRange(marker.getStartOffset(), marker.getEndOffset()));
-                            final String originalText = escapeJson(getOriginalValue(selectedItems.get(i)));
+                            final String originalText = BulkJsonEditor.escapeJson(getOriginalValue(selectedItems.get(i)));
 
                             if (!currentText.equals(originalText)) {
                                 rightMarkupModel.addRangeHighlighter(
@@ -285,7 +279,7 @@ public abstract class JsonSplitBulkSectionDialog {
                         }
                     }
                     if (!isInsideEditable) {
-                        offset = getNearestValidOffset(offset, valueMarkers);
+                        offset = BulkJsonEditor.nearestValidOffset(offset, valueMarkers);
                         final LogicalPosition logPos = rightEditor.offsetToLogicalPosition(offset);
                         visualPos = rightEditor.logicalToVisualPosition(logPos);
                     }
@@ -338,8 +332,8 @@ public abstract class JsonSplitBulkSectionDialog {
                     // The editor shows newlines flattened to spaces (escapeJson); writing an
                     // untouched row back would permanently flatten the stored multi-line value.
                     // null = "unchanged, skip".
-                    final String originalEscaped = escapeJson(getOriginalValue(selectedItems.get(i)));
-                    newValues.add(newText.equals(originalEscaped) ? null : unescapeJson(newText).trim());
+                    final String originalEscaped = BulkJsonEditor.escapeJson(getOriginalValue(selectedItems.get(i)));
+                    newValues.add(newText.equals(originalEscaped) ? null : BulkJsonEditor.unescapeJson(newText).trim());
                 } else {
                     newValues.add(null);
                 }
@@ -379,7 +373,7 @@ public abstract class JsonSplitBulkSectionDialog {
         });
 
         KeyAction.register(() -> {
-            placeCaretOnAllValues(rightEditor, valueMarkers);
+            BulkJsonEditor.placeCaretOnAll(rightEditor, valueMarkers);
             updateRowHighlights.run();
         }, KeyStroke.getKeyStroke(KeyEvent.VK_A, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | KeyEvent.SHIFT_DOWN_MASK), keymapTarget);
 
@@ -411,77 +405,4 @@ public abstract class JsonSplitBulkSectionDialog {
         editor.getCaretModel().moveToOffset(markers.get(target).getEndOffset());
     }
 
-    /**
-     * Ctrl+Shift+A: one caret at the end of every editable value.
-     */
-    private void placeCaretOnAllValues(final @NotNull Editor editor, final @NotNull List<RangeMarker> markers) {
-        final CaretModel caretModel = editor.getCaretModel();
-        caretModel.removeSecondaryCarets();
-
-        boolean isFirst = true;
-        for (final RangeMarker marker : markers) {
-            if (!marker.isValid()) continue;
-
-            final LogicalPosition logPos = editor.offsetToLogicalPosition(marker.getEndOffset());
-            final VisualPosition visPos = editor.logicalToVisualPosition(logPos);
-
-            if (isFirst) {
-                caretModel.moveToVisualPosition(visPos);
-                isFirst = false;
-            } else {
-                caretModel.addCaret(visPos, true);
-            }
-        }
-    }
-
-    private int getNearestValidOffset(final int offset, final @NotNull List<RangeMarker> markers) {
-        int minDistance = Integer.MAX_VALUE;
-        int nearestOffset = offset;
-        for (final RangeMarker m : markers) {
-            // An invalidated marker still answers getStartOffset, with an offset
-            // the document no longer has.
-            if (!m.isValid()) continue;
-
-            if (Math.abs(offset - m.getStartOffset()) < minDistance) {
-                minDistance = Math.abs(offset - m.getStartOffset());
-                nearestOffset = m.getStartOffset();
-            }
-            if (Math.abs(offset - m.getEndOffset()) < minDistance) {
-                minDistance = Math.abs(offset - m.getEndOffset());
-                nearestOffset = m.getEndOffset();
-            }
-        }
-        return nearestOffset;
-    }
-
-    private void setupEditorAppearance(final @NotNull Editor editor, final @NotNull Project p) {
-        final FileType jsonFileType = FileTypeManager.getInstance().getFileTypeByExtension("json");
-        final EditorHighlighter highlighter = EditorHighlighterFactory.getInstance().createEditorHighlighter(p, new com.intellij.testFramework.LightVirtualFile("dummy.json", jsonFileType, ""));
-
-        if (editor instanceof EditorEx) {
-            ((EditorEx) editor).setHighlighter(highlighter);
-        }
-
-        final EditorColorsScheme scheme = editor.getColorsScheme();
-        scheme.setEditorFontSize(15f);
-        scheme.setLineSpacing(1.4f);
-
-        final EditorSettings settings = editor.getSettings();
-        settings.setLineNumbersShown(true);
-        settings.setLineMarkerAreaShown(false);
-        settings.setFoldingOutlineShown(true);
-        settings.setVirtualSpace(false);
-        settings.setUseSoftWraps(false);
-        settings.setAdditionalLinesCount(1);
-    }
-
-    protected @NotNull String escapeJson(final @Nullable String str) {
-        if (str == null) return "";
-        return str.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", " ").replace("\r", "");
-    }
-
-    protected @NotNull String unescapeJson(final @Nullable String str) {
-        if (str == null) return "";
-        return str.replace("\\\"", "\"").replace("\\\\", "\\");
-    }
 }
