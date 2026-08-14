@@ -20,6 +20,5 @@ public interface ExportHandler {
         throw new IllegalStateException("This format cannot be exported to");
     };
 
-    void execute(final @NotNull Project p, final @NotNull ExportAction exportAction, final @NotNull File destFile,
-                 final @NotNull Map<String, List<TestCaseDto>> sheetsData);
+    void execute(final @NotNull Project p, final @NotNull ExportAction exportAction, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData);
 }

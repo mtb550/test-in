@@ -131,24 +131,18 @@ public enum FileTypes {
         return reportHandler != ReportHandler.UNSUPPORTED;
     }
 
-    public void exportToFile(final @NotNull Project p, final @NotNull ExportAction exportAction,
-                             final @NotNull File destFile,
-                             final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
+    public void exportToFile(final @NotNull Project p, final @NotNull ExportAction exportAction, final @NotNull File destFile, final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         // Checked here rather than left to the handler, so the failure names the format.
         if (!isExportable()) throw new IllegalStateException(label + " cannot be exported to");
         exportHandler.execute(p, exportAction, destFile, sheetsData);
     }
 
-    public @NotNull Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p,
-                                                                final @NotNull ImportAction importAction,
-                                                                final @NotNull File importFile) {
+    public @NotNull Map<String, List<TestCaseDto>> importToFile(final @NotNull Project p, final @NotNull ImportAction importAction, final @NotNull File importFile) {
         if (!isImportable()) throw new IllegalStateException(label + " cannot be imported from");
         return importHandler.execute(p, importAction, importFile);
     }
 
-    public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
-                                           final @NotNull TestRunDto tr,
-                                           final @NotNull Map<UUID, TestCaseDto> detailsMap) {
+    public byte @NotNull [] generateReport(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir, final @NotNull TestRunDto tr, final @NotNull Map<UUID, TestCaseDto> detailsMap) {
         if (!isReportable()) throw new IllegalStateException(label + " has no report generator");
         return reportHandler.execute(p, trDir, tr, detailsMap);
     }
