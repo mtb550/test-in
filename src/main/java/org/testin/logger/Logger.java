@@ -38,6 +38,17 @@ public final class Logger {
         log(Level.ERROR, WALKER.getCallerClass().getSimpleName(), message);
     }
 
+    /**
+     * Nothing calls this yet, and it is kept deliberately.
+     * <p>
+     * The settings combo is built from {@code Level.values()}, so FATAL is a log
+     * level a tester can already choose, stored by name and read back with
+     * {@code Level.valueOf}. Deleting the level would make that stored setting
+     * fail to parse on the next start; deleting only this method would leave a
+     * choice in the settings that silences the log, which is what DISABLED is
+     * for.
+     */
+    @SuppressWarnings("unused")
     public static void fatal(final @NotNull String message) {
         log(Level.FATAL, WALKER.getCallerClass().getSimpleName(), message);
     }
