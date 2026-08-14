@@ -86,19 +86,47 @@ public final class TestCaseCacheService implements Disposable {
             reloadScheduled.set(false);
 
             final List<TestCaseDto> testCases = source.get();
+            if (testCases == null) return;
 
-            descriptions.clear();
-            expectedResults.clear();
-            modules.clear();
-            steps.clear();
+            // Built beside the live sets and swapped in, not cleared and refilled.
+            // A dialog reading them while a delete rebuilds would otherwise see
+            // the completion briefly empty.
+            final Set<String> newDescriptions = ConcurrentHashMap.newKeySet();
+            final Set<String> newExpectedResults = ConcurrentHashMap.newKeySet();
+            final Set<String> newModules = ConcurrentHashMap.newKeySet();
+            final Set<String> newSteps = ConcurrentHashMap.newKeySet();
 
-            if (testCases != null) testCases.forEach(this::cache);
+            for (final TestCaseDto tc : testCases) {
+                addTo(newDescriptions, tc.getDescription());
+                addTo(newExpectedResults, tc.getExpectedResult());
+                addTo(newModules, tc.getModule());
+                // Jackson can leave steps null on hand-edited JSON despite the field default.
+                Optional.ofNullable(tc.getSteps()).ifPresent(stepList -> stepList.forEach(s -> addTo(newSteps, s)));
+            }
+
+            replace(descriptions, newDescriptions);
+            replace(expectedResults, newExpectedResults);
+            replace(modules, newModules);
+            replace(steps, newSteps);
         });
     }
 
     private void cacheAsync(final @Nullable List<TestCaseDto> testCases) {
         if (testCases == null || testCases.isEmpty()) return;
         ApplicationManager.getApplication().executeOnPooledThread(() -> testCases.forEach(this::cache));
+    }
+
+    private static void addTo(final @NotNull Set<String> target, final @Nullable String value) {
+        if (value != null && !value.isBlank()) target.add(value.trim());
+    }
+
+    /**
+     * Swaps a rebuilt set into a live one in as few operations as possible:
+     * everything new first, then only what is genuinely gone.
+     */
+    private static void replace(final @NotNull Set<String> live, final @NotNull Set<String> rebuilt) {
+        live.addAll(rebuilt);
+        live.retainAll(rebuilt);
     }
 
     private void cache(final @NotNull TestCaseDto tc) {
