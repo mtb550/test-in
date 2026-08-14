@@ -37,7 +37,7 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
     public PendingCommitsDialog(final @NotNull Project p,
                                 final @NotNull List<TestCaseDiff> differences,
                                 final @NotNull Path repoRoot) {
-        super(p, true);
+        super(p);
         this.p = p;
         this.differences = differences;
         this.repoRoot = repoRoot;

@@ -76,7 +76,7 @@ public class ViewPanel implements Disposable {
         if (tw == null || testCases == null || testCases.isEmpty()) return;
 
         tw.show(() -> {
-            this.selectContent(ViewTab.DETAILS);
+            selectDetailsTab();
             this.updateList(testCases, path);
         });
     }
@@ -97,13 +97,17 @@ public class ViewPanel implements Disposable {
         this.updateList(null, null);
     }
 
-    private void selectContent(final @NotNull ViewTab tab) {
+    /**
+     * Brings the Details tab to the front. Both callers show a test case, and a
+     * test case is shown on Details - no other tab was ever asked for.
+     */
+    private void selectDetailsTab() {
         final ToolWindow tw = ViewToolWindowFactory.getToolWindow(p);
         if (tw == null) return;
 
         final Content[] contents = tw.getContentManager().getContents();
         for (final Content content : contents) {
-            if (tab.getDisplayName().equals(content.getDisplayName())) {
+            if (ViewTab.DETAILS.getDisplayName().equals(content.getDisplayName())) {
                 tw.getContentManager().setSelectedContent(content);
                 break;
             }
@@ -158,7 +162,7 @@ public class ViewPanel implements Disposable {
     }
 
     public void focusDetailsTab() {
-        this.selectContent(ViewTab.DETAILS);
+        selectDetailsTab();
         detailsTab.setFocusable(true);
         detailsTab.requestFocusInWindow();
     }

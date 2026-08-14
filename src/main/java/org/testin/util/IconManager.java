@@ -9,17 +9,17 @@ import java.awt.*;
 
 public class IconManager {
     private static final float SCALE_FACTOR = 1.3f;
-    private static final float DEFAULT_FACTOR = 1.0f;
-
-    public static @NotNull Icon createIcon(final @NotNull Color color) {
-        return createScaledIcon(color, DEFAULT_FACTOR);
-    }
+    private static final int DOT_SIZE = 10;
 
     public static @NotNull Icon zoomStandardIcon(final @NotNull Icon icon, final @NotNull Component contextComponent) {
         return IconUtil.scale(icon, contextComponent, SCALE_FACTOR);
     }
 
-    private static @NotNull Icon createScaledIcon(final @NotNull Color color, final float scale) {
+    /**
+     * The coloured dot the priority and group rows are marked with, centred in a
+     * standard 16px icon.
+     */
+    public static @NotNull Icon createIcon(final @NotNull Color color) {
         return new Icon() {
             @Override
             public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
@@ -28,7 +28,7 @@ public class IconManager {
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2.setColor(color);
 
-                    final int size = JBUI.scale((int) (10 * scale));
+                    final int size = JBUI.scale(DOT_SIZE);
                     final int totalWidth = getIconWidth();
                     final int totalHeight = getIconHeight();
                     final int centeredX = x + (totalWidth - size) / 2;

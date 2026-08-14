@@ -20,7 +20,7 @@ final class GitIdentityDialog extends FramelessDialogWrapper {
     private final @NotNull JBCheckBox globalCheckBox = new JBCheckBox("Set globally");
 
     GitIdentityDialog(final @Nullable Project project) {
-        super(project, true);
+        super(project);
         setTitle("Set Git Identity and Commit");
         initFrameless();
     }

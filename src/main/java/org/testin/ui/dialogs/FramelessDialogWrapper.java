@@ -22,13 +22,12 @@ import java.awt.event.ActionEvent;
  */
 public abstract class FramelessDialogWrapper extends DialogWrapper {
 
-    protected FramelessDialogWrapper(final @Nullable Project project, final boolean canBeParent) {
-        super(project, canBeParent);
-        setUndecorated(true);
-    }
-
-    protected FramelessDialogWrapper(final boolean canBeParent) {
-        super(canBeParent);
+    /**
+     * canBeParent is always true: every dialog here can own a chooser or a
+     * confirmation opened from it.
+     */
+    protected FramelessDialogWrapper(final @Nullable Project project) {
+        super(project, true);
         setUndecorated(true);
     }
 

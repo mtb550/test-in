@@ -21,7 +21,7 @@ public class GroupSelectionDialog extends FramelessDialogWrapper {
     private final @NotNull JBList<Group> list;
 
     public GroupSelectionDialog(final @NotNull Project p, final @Nullable String currentSelection) {
-        super(p, true);
+        super(p);
         setTitle("Select Groups");
 
         // The list holds the groups and renders their names. Only the value
