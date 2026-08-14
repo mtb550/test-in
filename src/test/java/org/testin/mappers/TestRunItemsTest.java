@@ -28,7 +28,7 @@ public class TestRunItemsTest {
     @Test
     public void aFreshItemHasNoTestCaseUntilTheEditorWiresOne() {
         assertNull(TestRunItems.builder().id(UUID.randomUUID()).build().getTc(),
-                "tc is @JsonIgnore - deserialising a run never fills it");
+                "tc is @JsonIgnore - deserializing a run never fills it");
     }
 
     @Test

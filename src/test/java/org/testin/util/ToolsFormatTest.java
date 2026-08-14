@@ -14,7 +14,7 @@ import static org.testng.Assert.assertEquals;
 public class ToolsFormatTest {
 
     @Test
-    public void plainTextIsCapitalisedAndClosed() {
+    public void plainTextIsCapitalizedAndClosed() {
         assertEquals(Tools.format("login with a valid user"), "Login with a valid user.");
     }
 

@@ -190,7 +190,7 @@ final class BulkJsonEditors implements IDialogComponent {
     }
 
     /**
-     * Moves to the neighbouring value. Reads the marker offsets live, because a
+     * Moves to the neighboring value. Reads the marker offsets live, because a
      * position captured when the text was built goes stale as soon as anyone types.
      */
     void navigate(final int direction, final boolean wrap) {
@@ -226,7 +226,7 @@ final class BulkJsonEditors implements IDialogComponent {
     }
 
     // ------------------------------------------------------------------
-    // Behaviour installed once, in the constructor.
+    // Behavior installed once, in the constructor.
     // ------------------------------------------------------------------
 
     /**

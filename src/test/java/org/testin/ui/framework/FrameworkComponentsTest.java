@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
 import static org.testng.Assert.*;
 
 /**
- * Behaviour of the framework components themselves: initial selection, arrow
+ * Behavior of the framework components themselves: initial selection, arrow
  * navigation with clamping, the cleared-selection fallback, the text input's
  * initial value and placeholder, and the message's From/To rows.
  */

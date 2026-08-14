@@ -248,7 +248,7 @@ public final class TestRunWordGenerator {
     }
 
     /**
-     * One coloured count in the result analysis. It carries the spacing the body
+     * One colored count in the result analysis. It carries the spacing the body
      * paragraph below it used to provide.
      */
     private void addColoredCount(final @NotNull XWPFDocument doc, final @NotNull String heading,

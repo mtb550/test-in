@@ -21,7 +21,7 @@ import static org.testng.Assert.fail;
  * enforces it is the platform's bytecode instrumentation, which inserts a
  * runtime check - and enum constants are built in the class initializer, so
  * the check fires while the class is loading. The class then fails to
- * initialise, and every feature that touches it dies with
+ * initialize, and every feature that touches it dies with
  * {@code ExceptionInInitializerError} rather than a diagnosable error.
  * <p>
  * That instrumentation is active here, so this test needs no reflection over
@@ -30,7 +30,7 @@ import static org.testng.Assert.fail;
  * through that gap (#45), each found by opening the feature instead.
  * <p>
  * Failures unrelated to nullability are reported and skipped, so an enum that
- * cannot initialise outside a running IDE does not turn into a false alarm.
+ * cannot initialize outside a running IDE does not turn into a false alarm.
  */
 public class EnumNullContractTest {
 
@@ -55,7 +55,7 @@ public class EnumNullContractTest {
             files.filter(f -> f.toString().endsWith(".java"))
                     .map(EnumNullContractTest::toClassName)
                     .forEach(name -> {
-                        final Class<?> type = loadWithoutInitialising(loader, name);
+                        final Class<?> type = loadWithoutInitializing(loader, name);
                         if (type != null && type.isEnum()) enums.add(type);
                     });
         }
@@ -72,7 +72,7 @@ public class EnumNullContractTest {
      * Loads without running the initializer, so the scan itself never triggers
      * the very failure it is looking for - that is left to the checked call.
      */
-    private static @Nullable Class<?> loadWithoutInitialising(final @NotNull ClassLoader loader,
+    private static @Nullable Class<?> loadWithoutInitializing(final @NotNull ClassLoader loader,
                                                               final @NotNull String name) {
         try {
             return Class.forName(name, false, loader);
@@ -104,7 +104,7 @@ public class EnumNullContractTest {
 
         for (final Class<?> type : enums) {
             try {
-                // Initialises the class, which builds every constant.
+                // Initializes the class, which builds every constant.
                 type.getEnumConstants();
             } catch (final Throwable t) {
                 final Throwable cause = rootCause(t);
@@ -114,7 +114,7 @@ public class EnumNullContractTest {
         }
 
         if (!skipped.isEmpty()) {
-            System.out.println("Enums that could not initialise for reasons unrelated to nullability:");
+            System.out.println("Enums that could not initialize for reasons unrelated to nullability:");
             skipped.forEach(s -> System.out.println("  " + s));
         }
 

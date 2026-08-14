@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 import static org.testng.Assert.*;
 
 /**
- * The settings contract. Two behaviours matter beyond storing values:
+ * The settings contract. Two behaviors matter beyond storing values:
  * <p>
  * Moving the Testin root invalidates the tree, so Apply has to rebuild it -
  * and nothing else may, because a rebuild re-indexes every test project.
