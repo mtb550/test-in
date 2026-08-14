@@ -168,7 +168,10 @@ public final class TestRunHtmlGenerator {
 
             final AtomicInteger seq = new AtomicInteger(1);
             results.stream()
-                    .filter(r -> r.getStatus() == TestStatus.PENDING)
+                    // Must match how the count above is reached: TestRunSummary treats
+                    // pending as PENDING + UNTESTED, because completing a run turns one
+                    // into the other.
+                    .filter(r -> r.getStatus() == TestStatus.PENDING || r.getStatus() == TestStatus.UNTESTED)
                     .forEach(item -> {
                         final TestCaseDto d = detailsMap.get(item.getId());
                         final String desc = d != null ? d.getDescription() : "";
