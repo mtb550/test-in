@@ -62,6 +62,11 @@ public enum OptionalPlugin {
      * True when available; otherwise notifies on every call — for explicit user
      * actions (run, navigate, sync) that must always visibly respond.
      */
+    // Always called as "if (!isAvailableOrWarn(p)) return;", which is what the
+    // inspection objects to. Inverting it to isUnavailable...() would make the
+    // name say the opposite of what the method returns on the happy path, and
+    // every call site reads as a guard. Kept as it is.
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isAvailableOrWarn(final @NotNull Project p) {
         if (isAvailable()) return true;
         warn(p);

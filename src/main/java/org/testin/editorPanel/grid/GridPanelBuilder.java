@@ -388,6 +388,12 @@ public class GridPanelBuilder {
         table.setUI(new BasicTableUI());
         // Swapping the UI is not enough: JBTable also attaches a hover listener in
         // its constructor, which keeps tracking the hovered row and repainting it.
+        //
+        // TableHoverListener is @ApiStatus.Experimental, and this is the only way
+        // to detach the listener the platform attached - the alternative is
+        // reimplementing hover painting to fight it. Accepted deliberately; if the
+        // API goes, this line fails to compile rather than failing quietly.
+        //noinspection UnstableApiUsage
         TableHoverListener.DEFAULT.removeFrom(table);
         table.setFillsViewportHeight(true);
         table.setAutoResizeMode(JBTable.AUTO_RESIZE_OFF);
