@@ -10,7 +10,6 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.text.StringUtil;
-import org.intellij.lang.annotations.MagicConstant;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import lombok.AccessLevel;
@@ -33,7 +32,6 @@ import org.testin.services.Services;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -62,13 +60,16 @@ public final class Tools {
         return KeymapUtil.getKeystrokeText(key);
     }
 
+    /**
+     * Whether the event is this shortcut.
+     * <p>
+     * Built into a KeyStroke and compared, rather than comparing the modifier
+     * masks: KeyStroke normalises what it is given to carry both the old and the
+     * extended bits, while KeyEvent.getModifiersEx reports only the extended
+     * ones. Ctrl+C therefore compared 130 against 128 and never matched.
+     */
     public static boolean matches(final @NotNull KeyEvent e, final @NotNull KeyStroke key) {
-        // KeyStroke holds the same InputEvent mask getModifiersEx returns; saying
-        // so lets the two be compared without the constant being called magic.
-        @MagicConstant(flagsFromClass = InputEvent.class)
-        final int required = key.getModifiers();
-
-        return e.getKeyCode() == key.getKeyCode() && e.getModifiersEx() == required;
+        return key.equals(KeyStroke.getKeyStrokeForEvent(e));
     }
 
     public @NotNull String sanitizePackageName(final @NotNull String s) {
