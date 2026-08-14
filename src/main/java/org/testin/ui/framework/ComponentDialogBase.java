@@ -71,6 +71,16 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
     }
 
     /**
+     * A panel a feature already builds for itself — a table, a tabbed pane.
+     * {@code fillsSpace} gives it the dialog's remaining height, for the one
+     * panel that should grow with the dialog.
+     */
+    public static @NotNull ComponentDialogBase<PanelComponent> panel(final @NotNull JComponent panel,
+                                                                     final boolean fillsSpace) {
+        return new ComponentDialogBase<>(new PanelComponent(panel, fillsSpace));
+    }
+
+    /**
      * Read-only context rows — muted caption + value, display only.
      */
     public static @NotNull DetailsBuilder details() {
