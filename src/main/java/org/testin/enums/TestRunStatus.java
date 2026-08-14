@@ -47,7 +47,7 @@ public enum TestRunStatus {
             "Assigned",
             KeyStroke.getKeyStroke(KeyEvent.VK_1, 0),
             AllIcons.Gutter.ExtAnnotation
-    ), //todo, later, use xml to add tester's name dynamic
+    ), //todo, later, use XML to add tester's name dynamic
 
     CLOSED(
             "Closed",

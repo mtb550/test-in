@@ -58,7 +58,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
         String extractedValue = StringUtil.unquoteString(literal.getText()).trim();
         if (extractedValue.isEmpty()) return;
 
-        // Only mark testin-managed methods: a hand-written testName like "smoke"
+        // Only mark testin-managed methods: a handwritten testName like "smoke"
         // is not a UUID and clicking its marker would throw.
         final UUID testCaseId = parseUuid(extractedValue);
         if (testCaseId == null) return;

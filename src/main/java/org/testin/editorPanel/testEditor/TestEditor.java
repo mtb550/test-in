@@ -417,8 +417,8 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     public void refreshView() {
         // Recomputed here rather than by the callers: the view is a filtered page
-        // of the master list, so anything that changes that list - a delete, a
-        // paste, a reorder - has to show at once. Leaving it to whoever changed
+        // of the master list, so anything that changes that list - deleting,
+        // pasting, reordering - has to show at once. Leaving it to whoever changed
         // the data means the one caller that forgets leaves a deleted test case
         // on screen until the next explicit refresh.
         currentTestCases.clear();
@@ -520,7 +520,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
                 gridTable.changeSelection(selectedRow, column, false, false);
                 gridTable.scrollRectToVisible(gridTable.getCellRect(selectedRow, column, true));
             }
-            // Cleared whether or not the row was found, so a stale column can
+            // Cleared regardless of whether the row was found, so a stale column can
             // never be applied to an unrelated rebuild.
             gridColumnToRestore = -1;
 
@@ -549,7 +549,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
     /**
      * Re-sorts asynchronously, then persists the resulting sequence through
-     * the indexer. The persist must wait for the sort to land - callers use
+     * the indexer. Persisting must wait for the sort to land - callers use
      * this instead of running the two steps sequentially themselves.
      */
     public void resortAndPersistSequence() {

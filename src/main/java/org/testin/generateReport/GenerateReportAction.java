@@ -101,7 +101,7 @@ public class GenerateReportAction extends DumbAwareAction {
 
         final String suggestedName = tr.getPath().getFileName().toString() + "_Report";
 
-        // Effectively final for the callback: tr is assigned in a branch above.
+        // The callback needs an effectively final reference; the run is assigned in a branch above.
         final TestRunDirectoryDto runDir = tr;
         new GenerateReportDialog(p, suggestedName, (format, file) -> processAndSave(p, runDir, format, file)).show();
     }

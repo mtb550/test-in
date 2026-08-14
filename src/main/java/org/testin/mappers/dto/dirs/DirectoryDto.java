@@ -110,7 +110,7 @@ public abstract class DirectoryDto {
 
     /**
      * True when this node may be pasted or dropped into the test-set family;
-     * run nodes say no — they live only under the test runs directory.
+     * run nodes say no — they live only under the test-runs directory.
      */
     public boolean isAllowedInTestSetFamily() {
         return true;
@@ -118,7 +118,7 @@ public abstract class DirectoryDto {
 
     /**
      * True when this node may be pasted or dropped into the run family;
-     * test-set nodes say no — they live only under the test cases directory.
+     * test-set nodes say no — they live only under the test-cases directory.
      */
     public boolean isAllowedInTestRunFamily() {
         return true;

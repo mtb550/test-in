@@ -478,7 +478,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
                     gridTable.scrollRectToVisible(gridTable.getCellRect(selectedRow, column, true));
                 }
             }
-            // Cleared whether or not the row was found, so a stale column can never
+            // Cleared regardless of whether the row was found, so a stale column can never
             // be applied to an unrelated rebuild.
             gridColumnToRestore = -1;
 

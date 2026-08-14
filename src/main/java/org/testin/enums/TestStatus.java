@@ -64,7 +64,7 @@ public enum TestStatus {
             "Pending",
             new MenuEntry(AllIcons.Actions.Restart, KeyStroke.getKeyStroke(KeyEvent.VK_N, 0)),
             // Off the menu: the run owns it. It means "queued to run", and a run
-            // only clears it on completion, so a tester setting it afterwards
+            // only clears it on completion, so a tester setting it afterward
             // leaves a state nothing reconciles.
             false,
             false

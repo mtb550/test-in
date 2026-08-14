@@ -36,7 +36,7 @@ public class FileDocumentListener implements DocumentListener {
 
     /**
      * The format that can read this file name, or null when nothing can. Only
-     * formats with an import handler count; matching e.g. .html would NPE downstream.
+     * formats with an import handler count; matching an .html file would NPE downstream.
      */
     private static @Nullable FileTypes importableFormatOf(final @NotNull String fileName) {
         for (final FileTypes type : FileTypes.values()) {

@@ -51,8 +51,8 @@ public final class SourceForm implements IDialogComponent {
     private final @NotNull FileChooserDescriptor descriptor;
 
     /**
-     * Whether the remember-this-folder checkbox is offered, decided once - the
-     * row and the write used to derive it separately.
+     * Whether the remember-this-folder checkbox is offered, decided once -
+     * drawing the row and writing the setting used to derive it separately.
      */
     private final boolean offersDefaultFolder;
 
@@ -108,7 +108,7 @@ public final class SourceForm implements IDialogComponent {
     /**
      * The chosen file, or null when the field is still empty - in which case it
      * takes the focus and the dialog stays open. Remembers the file's folder
-     * when asked to.
+     * when the checkbox is ticked.
      */
     public @Nullable File resolve() {
         final String filePath = fileField.getText().trim();

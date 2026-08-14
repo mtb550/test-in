@@ -47,9 +47,9 @@ public final class DestinationForm implements IDialogComponent {
     private final @NotNull JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
 
     /**
-     * Whether the remember-this-folder checkbox is offered, decided once. The
-     * row and the write used to derive it separately, so one could show the box
-     * and the other ignore the answer.
+     * Whether the remember-this-folder checkbox is offered, decided once.
+     * Drawing the row and writing the setting used to derive it separately, so
+     * one could show the box and the other ignore the answer.
      */
     private final boolean offersDefaultFolder;
 
