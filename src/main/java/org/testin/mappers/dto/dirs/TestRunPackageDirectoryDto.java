@@ -3,7 +3,6 @@ package org.testin.mappers.dto.dirs;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestRunPackageMarker;
@@ -20,10 +19,6 @@ public class TestRunPackageDirectoryDto extends DirectoryDto {
     @Builder.Default
     private TestRunPackageMarker marker = new TestRunPackageMarker();
 
-    @Override
-    public @NotNull CreateNodeMenu getMenu() {
-        return CreateNodeMenu.TEST_RUN_PACKAGE;
-    }
 
     @Override
     public @NotNull Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
@@ -55,5 +50,10 @@ public class TestRunPackageDirectoryDto extends DirectoryDto {
     @Override
     public @NotNull DirectoryType getType() {
         return DirectoryType.TRP;
+    }
+
+    @Override
+    public boolean canCreateChildren() {
+        return true;
     }
 }

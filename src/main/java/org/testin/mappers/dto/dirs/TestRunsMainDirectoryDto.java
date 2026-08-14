@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestRunsMainDirectoryMarker;
@@ -21,10 +20,6 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
     @Builder.Default
     private TestRunsMainDirectoryMarker marker = new TestRunsMainDirectoryMarker();
 
-    @Override
-    public @NotNull CreateNodeMenu getMenu() {
-        return CreateNodeMenu.TEST_RUNS_MAIN_DIR;
-    }
 
     @Override
     public @Nullable Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
@@ -61,5 +56,10 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
     @Override
     public @NotNull DirectoryType getType() {
         return DirectoryType.TRD;
+    }
+
+    @Override
+    public boolean canCreateChildren() {
+        return true;
     }
 }

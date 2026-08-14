@@ -83,7 +83,7 @@ public class CreateTreeNodeAction extends DumbAwareAction {
             return;
         }
 
-        e.getPresentation().setEnabled(!parentDir.getMenu().getAvailableOptions().isEmpty());
+        e.getPresentation().setEnabled(parentDir.canCreateChildren());
     }
 
     @Override

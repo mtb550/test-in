@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.IMarker;
@@ -51,15 +50,21 @@ public abstract class DirectoryDto {
     @NonNull
     public abstract String getMarkerFileName();
 
-    @NonNull
-    public abstract CreateNodeMenu getMenu();
-
     @Nullable
     public abstract Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer);
 
     // Capability flags replace the instanceof chains that used to branch on
     // node type across the actions (issue #37): a new node type declares what
     // it supports here instead of being hunted for at every call site.
+
+    /**
+     * True when nodes can be created under this one. The test project creates
+     * its children itself, and a test set or run holds test cases rather than
+     * nodes, so only the containers say yes.
+     */
+    public boolean canCreateChildren() {
+        return false;
+    }
 
     /**
      * True when the user may rename this node; the fixed root containers say no.

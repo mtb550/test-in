@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.CreateNodeMenu;
 import org.testin.enums.DirectoryType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.markers.TestSetMarker;
@@ -21,10 +20,6 @@ public class TestSetDirectoryDto extends DirectoryDto {
     @Builder.Default
     private TestSetMarker marker = new TestSetMarker();
 
-    @Override
-    public @NotNull CreateNodeMenu getMenu() {
-        return CreateNodeMenu.TEST_SET;
-    }
 
     @Override
     public @Nullable Object resolveDirectoryObject(final @NotNull Path folder, final @NotNull ProjectIndexer indexer) {
