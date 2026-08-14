@@ -276,7 +276,7 @@ public class TreeTransferHandler extends TransferHandler {
         Services.getInstance(p, Notifier.class).softShow(p, describe(collided) + verb + target.getName() + "'");
     }
 
-    private boolean transfer(final int action, final @NotNull List<DirectoryDto> sources,
+    private void transfer(final int action, final @NotNull List<DirectoryDto> sources,
                              final @NotNull DirectoryDto target) {
         if (action == MOVE) {
             moveNodes(sources, target);
@@ -286,7 +286,6 @@ public class TreeTransferHandler extends TransferHandler {
         }
 
         resetLastAction();
-        return true;
     }
 
     private @Nullable DirectoryDto targetDirectory(final @NotNull TransferSupport support) {

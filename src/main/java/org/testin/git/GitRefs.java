@@ -44,9 +44,6 @@ public final class GitRefs {
     }
 
     /**
-     * The local branch name for a remote branch ({@code origin/main} → {@code main}).
-     */
-    /**
      * True when the text names a repository to clone rather than a project to
      * create.
      * <p>

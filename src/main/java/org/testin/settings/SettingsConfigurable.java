@@ -17,7 +17,7 @@ import org.testin.logger.Logger;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.projectPanel.toolBar.RefreshAction;
 import org.testin.services.Services;
-import org.testin.settings.Dialogs.TestinPathPanel;
+import org.testin.settings.dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 
 import javax.swing.*;

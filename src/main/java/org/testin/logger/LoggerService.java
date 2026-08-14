@@ -121,6 +121,11 @@ public final class LoggerService implements Disposable {
 
         // Wakes the writer immediately. Without it the thread sits out the rest
         // of its 500ms poll before noticing the flag, and every quit pays for it.
+        //
+        // The result is deliberately ignored: offer only fails when the queue is
+        // full, and a full queue means the writer is already draining rather than
+        // waiting on poll - exactly the case where the wake-up is not needed.
+        //noinspection ResultOfMethodCallIgnored
         logQueue.offer(SHUTDOWN);
 
         if (writerThread != null) {
