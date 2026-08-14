@@ -15,7 +15,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import git4idea.GitUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
@@ -27,15 +27,13 @@ import org.testin.services.Services;
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
-public class SyncActionAction extends AbstractProjectAction {
-    private final @NotNull SimpleTree tree;
+public class SyncActionAction extends AbstractProjectTreeAction {
     private final @NotNull ProjectPanel pp;
     private final @NotNull GitRepositoryService git;
     private final @NotNull GitSyncService sync;
 
     public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel pp) {
-        super(p, "Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
-        this.tree = tree;
+        super(p, tree, "Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
         this.pp = pp;
         this.git = new GitRepositoryService(p);
         this.sync = new GitSyncService(p);

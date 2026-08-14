@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.codegen.clazz.RenameJavaClass;
 import org.testin.codegen.pkg.RenameJavaPackage;
 import org.testin.indexer.ProjectIndexer;
@@ -30,16 +30,14 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 
-public class RenameAction extends AbstractProjectAction {
+public class RenameAction extends AbstractProjectTreeAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK);
     private final @NotNull ProjectPanel pp;
-    private final @NotNull SimpleTree tree;
 
     public RenameAction(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull SimpleTree tree) {
-        super(p, "Rename", "Rename selected node", AllIcons.Actions.Edit);
+        super(p, tree, "Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.pp = pp;
-        this.tree = tree;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 

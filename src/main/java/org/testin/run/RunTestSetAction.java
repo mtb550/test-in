@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -18,12 +18,10 @@ import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 
-public class RunTestSetAction extends AbstractProjectAction {
-    private final @NotNull SimpleTree tree;
+public class RunTestSetAction extends AbstractProjectTreeAction {
 
     public RunTestSetAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, "Run Test Set", "Run selected test set", AllIcons.RunConfigurations.TestState.Run);
-        this.tree = tree;
+        super(p, tree, "Run Test Set", "Run selected test set", AllIcons.RunConfigurations.TestState.Run);
     }
 
     @Override

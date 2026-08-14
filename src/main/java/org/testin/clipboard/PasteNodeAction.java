@@ -7,7 +7,7 @@ import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.projectPanel.tree.TreeTransferHandler;
@@ -24,14 +24,12 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-public class PasteNodeAction extends AbstractProjectAction {
+public class PasteNodeAction extends AbstractProjectTreeAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.CTRL_DOWN_MASK);
-    private final @NotNull SimpleTree tree;
 
     public PasteNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, "Paste", "Paste items", AllIcons.Actions.MenuPaste);
-        this.tree = tree;
+        super(p, tree, "Paste", "Paste items", AllIcons.Actions.MenuPaste);
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
     }
 

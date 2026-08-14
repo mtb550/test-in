@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.codegen.method.CreateTestMethod;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.indexer.ProjectIndexer;
@@ -32,16 +32,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class ImportAction extends AbstractProjectAction {
+public class ImportAction extends AbstractProjectTreeAction {
 
     protected final @NotNull List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isImportable)
             .toList();
-    private final @NotNull SimpleTree tree;
 
     public ImportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, "Import", "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
-        this.tree = tree;
+        super(p, tree, "Import", "Import test cases from a file", AllIcons.ToolbarDecorator.Import);
     }
 
     @Override

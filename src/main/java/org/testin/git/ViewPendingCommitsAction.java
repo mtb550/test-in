@@ -11,7 +11,7 @@ import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.projectPanel.tree.TreeValueUtil;
@@ -29,8 +29,7 @@ import java.util.Locale;
  * remote configuration, pull-rebase + push, and conflict handling. Every
  * background step runs through {@link GitBackgroundTask}.
  */
-public class ViewPendingCommitsAction extends AbstractProjectAction {
-    private final @NotNull SimpleTree tree;
+public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private final @NotNull GitRepositoryService git;
     private final @NotNull GitCommitService commits;
     /**
@@ -39,8 +38,7 @@ public class ViewPendingCommitsAction extends AbstractProjectAction {
     private @Nullable Notification pushNotification;
 
     public ViewPendingCommitsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, "View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
-        this.tree = tree;
+        super(p, tree, "View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
         this.git = new GitRepositoryService(p);
         this.commits = new GitCommitService(p);
     }

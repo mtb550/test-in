@@ -13,7 +13,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -28,16 +28,14 @@ import javax.swing.tree.TreePath;
 import java.io.InputStream;
 import java.util.*;
 
-public class ExportAction extends AbstractProjectAction {
+public class ExportAction extends AbstractProjectTreeAction {
 
     protected final @NotNull List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
             .filter(TestEditorAttributes::isExportable)
             .toList();
-    private final @NotNull SimpleTree tree;
 
     public ExportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
-        super(p, "Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
-        this.tree = tree;
+        super(p, tree, "Export", "Export test cases to a file", AllIcons.ToolbarDecorator.Export);
     }
 
     @Override

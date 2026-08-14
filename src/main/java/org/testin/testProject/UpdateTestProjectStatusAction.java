@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.enums.ProjectStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -20,13 +20,11 @@ import org.testin.settings.AppSettingsState;
 
 import javax.swing.tree.TreePath;
 
-public class UpdateTestProjectStatusAction extends AbstractProjectAction {
-    private final @NotNull SimpleTree tree;
+public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
     private final @NotNull ProjectStatus projectStatus;
 
     public UpdateTestProjectStatusAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectStatus projectStatus) {
-        super(p, projectStatus.getButtonName(), projectStatus.getButtonDescription(), AllIcons.Actions.Edit);
-        this.tree = tree;
+        super(p, tree, projectStatus.getButtonName(), projectStatus.getButtonDescription(), AllIcons.Actions.Edit);
         this.projectStatus = projectStatus;
     }
 

@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.actions.AbstractProjectAction;
+import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.dirs.DirectoryDto;
 import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
@@ -24,13 +24,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.testin.util.Shortcuts.DeletePackage;
 
-public class RemoveAction extends AbstractProjectAction {
-    private final @NotNull SimpleTree tree;
+public class RemoveAction extends AbstractProjectTreeAction {
     private final @NotNull ProjectPanel pp;
 
     public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel pp) {
-        super(p, "Remove", "Remove selected nodes", AllIcons.Actions.GC);
-        this.tree = tree;
+        super(p, tree, "Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.pp = pp;
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
