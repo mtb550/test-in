@@ -1,6 +1,12 @@
 package org.testin.editorPanel;
 
+import org.jetbrains.annotations.NotNull;
+import org.testin.mappers.dto.TestCaseDto;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -36,5 +42,49 @@ public class PageWindowTest {
         assertEquals(page.totalPages(), 3);
         assertEquals(page.fromIndex(), 1);
         assertEquals(page.toIndex(), 2);
+    }
+
+    @Test
+    public void findsThePageHoldingATestCase() {
+        final List<TestCaseDto> cases = casesOf(125);
+
+        assertEquals(PageWindow.pageContaining(cases.get(0).getId(), cases, 50), 1);
+        assertEquals(PageWindow.pageContaining(cases.get(49).getId(), cases, 50), 1);
+        assertEquals(PageWindow.pageContaining(cases.get(50).getId(), cases, 50), 2);
+        assertEquals(PageWindow.pageContaining(cases.get(124).getId(), cases, 50), 3);
+    }
+
+    /**
+     * Zero, not one: the callers tell "it is on the first page" from "it is not
+     * here any more" by this, and restoring a selection that has gone would put
+     * the editor on a page the tester did not ask for.
+     */
+    @Test
+    public void answersZeroWhenTheCaseIsNotInTheList() {
+        assertEquals(PageWindow.pageContaining(UUID.randomUUID(), casesOf(10), 50), 0);
+        assertEquals(PageWindow.pageContaining(UUID.randomUUID(), List.of(), 50), 0);
+    }
+
+    @Test
+    public void answersZeroWhenNothingWasRemembered() {
+        assertEquals(PageWindow.pageContaining(null, casesOf(10), 50), 0);
+    }
+
+    @Test
+    public void protectsAgainstInvalidPageSizeWhenSearching() {
+        // A stored page size of 0 would divide by zero rather than return a page.
+        final List<TestCaseDto> cases = casesOf(3);
+
+        assertEquals(PageWindow.pageContaining(cases.get(2).getId(), cases, 0), 3);
+    }
+
+    private static @NotNull List<TestCaseDto> casesOf(final int count) {
+        final List<TestCaseDto> cases = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            final TestCaseDto tc = new TestCaseDto();
+            tc.setId(UUID.randomUUID());
+            cases.add(tc);
+        }
+        return cases;
     }
 }

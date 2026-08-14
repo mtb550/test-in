@@ -29,7 +29,6 @@ import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
 import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.TestToolBar;
 import org.testin.editorPanel.toolBar.components.FilterPopupBtn;
-import org.testin.editorPanel.toolBar.components.SearchTxt;
 import org.testin.editorPanel.toolBar.components.TestDetailsPopupBtn;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
@@ -395,8 +394,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
         Services.getInstance(p, Notifier.class).softShow(p, "Refreshing..");
-        toolBar.getToolbarItem(FilterPopupBtn.class).clearFilters();
-        toolBar.getToolbarItem(SearchTxt.class).resetSearchQuery();
+        toolBar.clearFiltersAndSearch();
 
         rememberSelection();
 
@@ -473,18 +471,12 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
      * Moves to whichever page now holds the remembered test case.
      */
     private void jumpToPageOfPendingSelection() {
-        if (selectionToRestore == null) return;
+        final int page = PageWindow.pageContaining(selectionToRestore, currentTestCases, pageSize);
 
-        // pageSize comes from settings and is guarded everywhere else in this
-        // class; dividing by a stored 0 would throw.
-        final int safePageSize = Math.max(1, pageSize);
-        for (int i = 0; i < currentTestCases.size(); i++) {
-            if (selectionToRestore.equals(currentTestCases.get(i).getId())) {
-                currentPage = (i / safePageSize) + 1;
-                return;
-            }
-        }
-        selectionToRestore = null;
+        // Not on any page any more - the case was deleted or filtered out, so
+        // there is nothing left to restore.
+        if (page == 0) selectionToRestore = null;
+        else currentPage = page;
     }
 
     private @NotNull List<TestCaseDto> getCurrentPageItems() {

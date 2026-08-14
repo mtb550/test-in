@@ -55,6 +55,17 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     }
 
     /**
+     * Drops every filter and the search query, which is what a refresh means for
+     * a toolbar. Both editors reached into the two items and cleared them
+     * themselves, so adding a third narrowing control meant remembering to clear
+     * it in two places.
+     */
+    public void clearFiltersAndSearch() {
+        getToolbarItem(FilterPopupBtn.class).clearFilters();
+        getToolbarItem(SearchTxt.class).resetSearchQuery();
+    }
+
+    /**
      * Registers the search-focus shortcut on the given scope (the editor's
      * main panel), so the toolbar owns the whole search story: the field, its
      * callbacks and its shortcut (#18).
