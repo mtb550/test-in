@@ -27,7 +27,13 @@ public abstract class AbstractProjectAction extends DumbAwareAction {
     /**
      * For an action the platform shows by name alone - a keyboard-only action
      * with no menu entry.
+     * <p>
+     * SameParameterValue reports that {@code title} is always "Update", which is
+     * true and not a reason to inline it: {@code UpdateTestCaseAction} is simply
+     * the only keyboard-only action so far, and hard-coding its name into the
+     * base class would make the next one rename every action that uses it (#66).
      */
+    @SuppressWarnings("SameParameterValue")
     protected AbstractProjectAction(final @NotNull Project p, final @NotNull String title) {
         super(title);
         this.p = p;

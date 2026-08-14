@@ -477,7 +477,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
     private void jumpToPageOfPendingSelection() {
         final int page = PageWindow.pageContaining(selectionToRestore, currentTestCases, pageSize);
 
-        // Not on any page any more - the case was deleted or filtered out, so
+        // Not on any page anymore - the case was deleted or filtered out, so
         // there is nothing left to restore.
         if (page == 0) selectionToRestore = null;
         else currentPage = page;

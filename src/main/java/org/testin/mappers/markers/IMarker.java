@@ -14,6 +14,12 @@ import java.time.temporal.ChronoUnit;
  * with {@code @Accessors(chain = true)} on the marker classes generate these
  * methods, so implementing the interface costs nothing.
  */
+// UnusedReturnValue reports all four setters, and none of them can be void: the
+// marker classes use Lombok @Accessors(chain = true), whose generated setters
+// return the concrete marker type, and a return type is not covariant with void.
+// The chaining is the reason the interface exists, even where the default methods
+// below discard it (#66, C3).
+@SuppressWarnings("UnusedReturnValue")
 public interface IMarker {
 
     @NotNull String getCreatedBy();

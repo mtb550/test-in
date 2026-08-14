@@ -47,6 +47,10 @@ public enum BugPriority {
     private final boolean active;
     private final @NotNull Shortcuts shortcut;
 
+    // Same as Priority: active is always true here and the field is still a real
+    // extension point, read through method references and genuinely false for
+    // Group.UNASSIGNED. All three enums or none (#66, E3).
+    @SuppressWarnings("SameParameterValue")
     BugPriority(final @NotNull String name, final int value, final @NotNull Color color, final boolean active, final @NotNull Shortcuts shortcut) {
         this.name = name;
         this.value = value;
