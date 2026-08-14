@@ -266,9 +266,14 @@ public final class Tools {
 
         generatedFqcn.remove(DirectoryType.TCD.getDisplayedName());
 
+        // Empty and returned empty, because the message says nothing was built:
+        // this used to notify and then fall into get(-1) on the next line, so the
+        // tester read "no class name could be built" and got an
+        // IndexOutOfBoundsException to go with it. Callers skip on empty (#66, F1).
         if (generatedFqcn.isEmpty()) {
             Services.getInstance(p, Notifier.class).softShow(p, "Class Name Unknown",
                     "'" + dir.getName() + "' sits outside a test cases directory, so no automation class name could be built.");
+            return List.of();
         }
 
         final int lastIdx = generatedFqcn.size() - 1;
