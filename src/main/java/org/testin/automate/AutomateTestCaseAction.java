@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Tools;
@@ -27,7 +28,11 @@ public class AutomateTestCaseAction extends DumbAwareAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        TestCaseDto tc = list.getSelectedValue();
+        // update() disables the action on an empty selection, but the shortcut
+        // and the selection can race, and getSelectedValue() is the one thing here
+        // that can hand back null.
+        final @Nullable TestCaseDto tc = list.getSelectedValue();
+        if (tc == null) return;
 
         /// TODO: to be implemented by integrating to pi agent automatic, next release
         Logger.info(tc.getDescription());
