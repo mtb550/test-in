@@ -40,6 +40,12 @@ public final class LoggerService implements Disposable {
         this.currentLogLevel = level;
     }
 
+    /**
+     * Not a log line: identity-compared, so a tester writing the same text can
+     * never be mistaken for it.
+     */
+    private static final String SHUTDOWN = new String("");
+
     private void startWriterThread() {
         writerThread = new Thread(this::writeLoop, "Testin-Async-Logger");
         writerThread.setDaemon(true);
@@ -63,6 +69,9 @@ public final class LoggerService implements Disposable {
                         writer.flush();
                         continue;
                     }
+
+                    // The wake-up from dispose, not a line to write.
+                    if (message == SHUTDOWN) continue;
 
                     writer.write(message);
                     writer.newLine();
@@ -108,6 +117,11 @@ public final class LoggerService implements Disposable {
         // it to bug reports. Only stop accepting, let the writer drain the
         // queue, and give it a bounded moment to flush the tail.
         isRunning = false;
+
+        // Wakes the writer immediately. Without it the thread sits out the rest
+        // of its 500ms poll before noticing the flag, and every quit pays for it.
+        logQueue.offer(SHUTDOWN);
+
         if (writerThread != null) {
             try {
                 writerThread.join(2000);
