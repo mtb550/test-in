@@ -169,6 +169,29 @@ public class FrameworkComponentsTest {
         assertFalse(details.wantsFocus(), "context rows never take the focus");
     }
 
+    /**
+     * A dialog that declares no filler at all - a form and a button - used to
+     * hand the spare space to its last component, which is the button, putting it
+     * in the middle of the dialog instead of at the bottom. It only showed on a
+     * dialog with a preferredSize, so nothing caught it.
+     */
+    @Test
+    public void aButtonRowNeverTakesTheDialogSpace() {
+        final DialogButton button = ComponentDialogBase.button("Generate").getComponent();
+
+        assertFalse(button.fillsSpace(), "a button row does not claim the space");
+        assertFalse(button.canFillSpace(), "and must not be given it when nothing else claims it");
+    }
+
+    @Test
+    public void everythingElseCanTakeTheSpaceWhenNothingClaimsIt() {
+        final TextInput input = ComponentDialogBase.textField().value("name").build().getComponent();
+        final TextArea area = ComponentDialogBase.textArea().value("x").build().getComponent();
+
+        assertTrue(input.canFillSpace(), "a field is a reasonable fallback filler");
+        assertTrue(area.canFillSpace());
+    }
+
     @Test
     public void builtStatusBarEntryRendersTheKeymapText() {
         final StatusBarShortcut entry = StatusBarShortcut.build(org.testin.util.Shortcuts.Enter, "Confirm", () -> {

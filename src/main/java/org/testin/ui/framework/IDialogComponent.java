@@ -49,9 +49,18 @@ public interface IDialogComponent {
      * True for the component that fills the dialog's remaining space (e.g. a
      * selection tree). Components above it keep their preferred height,
      * components below it (e.g. a button row) sit at the bottom. When none
-     * claims the space, the last component fills.
+     * claims the space, the last component that {@link #canFillSpace()} fills.
      */
     default boolean fillsSpace() {
         return false;
+    }
+
+    /**
+     * False for a component that must keep its preferred height even when
+     * nothing else claims the dialog's space - a button row belongs at the
+     * bottom, not stretched down the middle of a dialog with room to spare.
+     */
+    default boolean canFillSpace() {
+        return true;
     }
 }

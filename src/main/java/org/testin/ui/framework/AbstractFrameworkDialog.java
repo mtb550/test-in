@@ -198,10 +198,20 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
     private @NotNull JBPanel<?> buildContentPanel() {
         final List<IDialogComponent> all = builtComponents();
 
-        int fillIndex = all.size() - 1;
+        int fillIndex = -1;
         for (int i = 0; i < all.size(); i++) {
             if (all.get(i).fillsSpace()) fillIndex = i;
         }
+
+        // Nothing asked for the space, so the last component takes it - but not a
+        // component that must keep its height. Handing it to a button row put the
+        // button in the middle of the dialog instead of at the bottom.
+        for (int i = all.size() - 1; i >= 0 && fillIndex < 0; i--) {
+            if (all.get(i).canFillSpace()) fillIndex = i;
+        }
+
+        // Every component refused it; something has to go in the centre.
+        if (fillIndex < 0) fillIndex = all.size() - 1;
 
         final JBPanel<?> stack = new JBPanel<>(new BorderLayout());
         stack.setOpaque(false);
