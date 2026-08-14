@@ -67,7 +67,7 @@ public class ImportDialog extends FramelessDialogWrapper {
         setSize(900, 600);
 
         final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
-        if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
+        if (!defaultFolder.isBlank()) {
             fileField.setText(defaultFolder);
         } else {
             final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(fileField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
@@ -109,7 +109,7 @@ public class ImportDialog extends FramelessDialogWrapper {
         topPanel.add(new JBLabel("Options:"), gbc);
 
         final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
-        if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
+        if (defaultFolder.isBlank()) {
             gbc.gridx = 0;
             gbc.gridy = 2;
             gbc.anchor = GridBagConstraints.WEST;

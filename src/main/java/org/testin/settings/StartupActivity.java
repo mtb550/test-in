@@ -27,22 +27,19 @@ public final class StartupActivity implements ProjectActivity {
     public static void execute(final @NotNull Project p) {
         final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
 
-        if (settings.rootTestinPath == null || settings.rootTestinPath.isEmpty()) {
+        if (settings.rootTestinPath.isEmpty()) {
             Logger.info("First run detected — saving default settings to testinSettings.xml");
         }
 
-        // Defaulted unconditionally: a settings file with no level at all would
-        // otherwise reach Level.valueOf(null) and fail the whole startup.
-        if (settings.logLevel == null || settings.logLevel.isBlank()) {
-            settings.logLevel = Level.INFO.name();
-        }
+        // AppSettingsState.loadState defaults a missing or blank level, so
+        // Level.valueOf always has something to parse.
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
         Logger.info("StartupActivity.execute()");
 
         Path testinPath = null;
 
-        if (settings.rootTestinPath != null && !settings.rootTestinPath.trim().isEmpty()) {
+        if (!settings.rootTestinPath.isBlank()) {
             testinPath = Path.of(settings.rootTestinPath);
         } else {
             ApplicationManager.getApplication().invokeLater(() -> {

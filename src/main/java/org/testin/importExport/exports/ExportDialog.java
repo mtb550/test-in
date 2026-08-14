@@ -85,7 +85,7 @@ public class ExportDialog extends FramelessDialogWrapper {
         setSize(900, 600);
 
         final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
-        if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
+        if (!defaultFolder.isBlank()) {
             folderField.setText(defaultFolder);
         } else {
             final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(folderField, p, descriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT);
@@ -131,7 +131,7 @@ public class ExportDialog extends FramelessDialogWrapper {
         topPanel.add(formatCombo, gbc);
 
         final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
-        if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
+        if (defaultFolder.isBlank()) {
             gbc.gridx = 0;
             gbc.gridy = 3;
             gbc.anchor = GridBagConstraints.WEST;

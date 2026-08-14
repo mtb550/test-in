@@ -68,7 +68,7 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
         setSize(450, 200);
 
         final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
-        if (defaultFolder != null && !defaultFolder.trim().isEmpty()) {
+        if (!defaultFolder.isBlank()) {
             folderField.setText(defaultFolder);
         } else {
             final ComponentWithBrowseButton.BrowseFolderActionListener<JTextField> browseListener = new ComponentWithBrowseButton.BrowseFolderActionListener<>(
@@ -114,7 +114,7 @@ public class GenerateReportDialog extends FramelessDialogWrapper {
         panel.add(formatCombo, gbc);
 
         final String defaultFolder = Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
-        if (defaultFolder == null || defaultFolder.trim().isEmpty()) {
+        if (defaultFolder.isBlank()) {
             gbc.gridx = 0;
             gbc.gridy = 3;
             gbc.anchor = GridBagConstraints.WEST;
