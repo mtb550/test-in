@@ -1,8 +1,8 @@
 package org.testin.model;
 
-import org.testin.enums.BugPriority;
-import org.testin.enums.BugSeverity;
-import org.testin.enums.TestStatus;
+import org.testin.model.BugPriority;
+import org.testin.model.BugSeverity;
+import org.testin.model.TestStatus;
 import org.testng.annotations.Test;
 
 import java.util.UUID;

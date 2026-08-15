@@ -2,7 +2,7 @@ package org.testin.report;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.FileTypes;
+import org.testin.importexport.FileTypes;
 import org.testin.ui.dialogs.DestinationForm;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;

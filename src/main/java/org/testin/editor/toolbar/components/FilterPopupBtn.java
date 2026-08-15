@@ -12,10 +12,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
-import org.testin.enums.Group;
-import org.testin.enums.Priority;
-import org.testin.enums.TestEditorAttributes;
-import org.testin.enums.TestStatus;
+import org.testin.model.Group;
+import org.testin.model.Priority;
+import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestStatus;
 import org.testin.util.IconManager;
 
 import java.util.*;

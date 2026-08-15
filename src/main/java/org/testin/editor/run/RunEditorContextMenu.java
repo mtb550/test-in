@@ -9,7 +9,7 @@ import org.testin.editor.AbstractEditorContextMenu;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.statusbar.NextPageAction;
 import org.testin.editor.statusbar.PrevPageAction;
-import org.testin.enums.TestStatus;
+import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.navigate.NavigateToCodeAction;

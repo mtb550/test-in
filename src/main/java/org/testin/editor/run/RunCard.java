@@ -5,7 +5,7 @@ import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.NonNull;
 import org.testin.editor.BaseCard;
-import org.testin.enums.RunEditorAttributes;
+import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 
 import javax.swing.*;

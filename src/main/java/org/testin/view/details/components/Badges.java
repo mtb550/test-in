@@ -5,7 +5,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.Shared;
-import org.testin.enums.Group;
+import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import java.awt.*;

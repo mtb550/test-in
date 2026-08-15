@@ -4,7 +4,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.DirectoryType;
+import org.testin.model.DirectoryType;
 import org.testin.model.markers.Marker;
 
 import java.nio.file.Path;

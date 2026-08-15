@@ -56,6 +56,6 @@ public class TestRunItemsTest {
 
         // FailedResultDialog renders "No longer in the test set" from exactly this.
         assertNull(item.getTc());
-        assertEquals(item.getStatus(), org.testin.enums.TestStatus.PENDING, "an unrun item defaults to PENDING");
+        assertEquals(item.getStatus(), org.testin.model.TestStatus.PENDING, "an unrun item defaults to PENDING");
     }
 }

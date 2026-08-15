@@ -11,8 +11,8 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.UIAction;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.UIAction;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Shortcuts;
 

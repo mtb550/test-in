@@ -5,8 +5,8 @@ import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.BaseCard;
 import org.testin.editor.RoundedBadge;
-import org.testin.enums.RunStatus;
-import org.testin.enums.TestEditorAttributes;
+import org.testin.model.RunStatus;
+import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.*;

@@ -2,7 +2,7 @@ package org.testin.importexport.shared;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.event.TableModelEvent;

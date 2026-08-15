@@ -6,8 +6,8 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.UIAction;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.UIAction;
 
 import javax.swing.*;
 import java.awt.*;

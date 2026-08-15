@@ -4,11 +4,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.RunStatus;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.listeners.TestCaseExecutionListener;
 import org.testin.logger.Logger;
+import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.runner.TestCaseExecutionListener;
 import org.testin.services.Services;
 
 import java.util.Map;

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
-import org.testin.enums.PackageStatus;
 import org.testin.model.Config;
+import org.testin.model.PackageStatus;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;

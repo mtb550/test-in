@@ -8,8 +8,8 @@ import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.CardHoverAction;
-import org.testin.enums.Group;
+import org.testin.editor.CardHoverAction;
+import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.*;

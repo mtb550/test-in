@@ -3,7 +3,7 @@ package org.testin.editor.listeners;
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.UpdateCallback;
+import org.testin.editor.UpdateCallback;
 
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;

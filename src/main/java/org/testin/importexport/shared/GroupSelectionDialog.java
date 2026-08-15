@@ -7,7 +7,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.Group;
+import org.testin.model.Group;
 import org.testin.ui.dialogs.FramelessDialogWrapper;
 
 import javax.swing.*;

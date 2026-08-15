@@ -10,10 +10,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.VfsBiOperation;
-import org.testin.enums.VfsOperation;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.VfsBiOperation;
+import org.testin.util.VfsOperation;
 
 import java.io.IOException;
 import java.nio.file.Path;

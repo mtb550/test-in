@@ -1,7 +1,7 @@
 package org.testin.report.generators;
 
-import org.testin.enums.TestStatus;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestStatus;
 import org.testng.annotations.Test;
 
 import java.util.List;

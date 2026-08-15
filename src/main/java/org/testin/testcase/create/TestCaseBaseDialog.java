@@ -13,10 +13,10 @@ import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.CreateTestCaseFields;
-import org.testin.enums.UIAction;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.statusbar.StatusBarItem;
+import org.testin.testcase.CreateTestCaseFields;
+import org.testin.testcase.UIAction;
 
 import javax.swing.*;
 import java.awt.*;

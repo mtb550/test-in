@@ -3,7 +3,7 @@ package org.testin.git;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.Group;
+import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.ArrayList;

@@ -11,9 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.EditorColors;
 import org.testin.editor.Shared;
-import org.testin.enums.RunEditorAttributes;
-import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
+import org.testin.model.RunEditorAttributes;
+import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 

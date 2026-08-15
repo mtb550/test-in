@@ -5,7 +5,7 @@ import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
-import org.testin.enums.TestRunStatus;
+import org.testin.model.TestRunStatus;
 
 public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
 

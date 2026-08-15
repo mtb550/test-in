@@ -3,8 +3,8 @@ package org.testin.testcase.update.bulk;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.Group;
 import org.testin.logger.Logger;
+import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.ArrayList;

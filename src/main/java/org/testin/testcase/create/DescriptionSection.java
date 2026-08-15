@@ -10,11 +10,11 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.CreateTestCaseFields;
-import org.testin.enums.UIAction;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
+import org.testin.testcase.CreateTestCaseFields;
+import org.testin.testcase.UIAction;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 

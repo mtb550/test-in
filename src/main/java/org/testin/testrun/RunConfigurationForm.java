@@ -9,7 +9,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.TestRunConfiguration;
+import org.testin.model.TestRunConfiguration;
 import org.testin.ui.framework.DialogComponent;
 
 import javax.swing.*;

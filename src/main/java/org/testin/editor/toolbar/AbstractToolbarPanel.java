@@ -6,8 +6,8 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.testin.editor.ViewMode;
 import org.testin.editor.toolbar.components.*;
-import org.testin.enums.ViewMode;
 
 import javax.swing.*;
 import java.awt.*;

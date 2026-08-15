@@ -8,10 +8,10 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.CreateTestCaseFields;
-import org.testin.enums.Priority;
-import org.testin.enums.UIAction;
+import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.CreateTestCaseFields;
+import org.testin.testcase.UIAction;
 import org.testin.util.IconManager;
 import org.testin.util.Shortcuts;
 

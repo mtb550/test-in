@@ -1,7 +1,7 @@
 package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes;
 
 import java.util.Arrays;
 

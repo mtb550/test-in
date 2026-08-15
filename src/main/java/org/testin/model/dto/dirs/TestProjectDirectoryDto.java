@@ -3,7 +3,7 @@ package org.testin.model.dto.dirs;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.DirectoryType;
+import org.testin.model.DirectoryType;
 import org.testin.model.markers.TestProjectMarker;
 
 

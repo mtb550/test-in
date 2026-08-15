@@ -6,9 +6,9 @@ import com.intellij.ui.SimpleTextAttributes;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.DirectoryType;
-import org.testin.enums.TestRunStatus;
 import org.testin.logger.Logger;
+import org.testin.model.DirectoryType;
+import org.testin.model.TestRunStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 

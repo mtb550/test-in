@@ -1,9 +1,9 @@
 package org.testin.editor;
 
-import org.testin.enums.Group;
-import org.testin.enums.Priority;
-import org.testin.enums.TestStatus;
+import org.testin.model.Group;
+import org.testin.model.Priority;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 

@@ -5,9 +5,9 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.Priority;
-import org.testin.enums.TestEditorAttributes;
 import org.testin.logger.Logger;
+import org.testin.model.Priority;
+import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.*;

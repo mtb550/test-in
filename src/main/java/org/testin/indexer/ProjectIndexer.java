@@ -10,8 +10,8 @@ import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
+import org.testin.model.DirectoryType;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.*;
@@ -41,7 +41,7 @@ import java.util.stream.Stream;
  * operations on virtual files (VFS) or physical files — everything goes
  * through the indexer so its cache objects stay authoritative and every read
  * is a fast in-memory lookup (e.g. {@link #nodeExists}). Exempt packages:
- * {@code git}, {@code importExport}, {@code logger}.
+ * {@code git}, {@code importexport}, {@code logger}.
  * <p>
  * Ordering rule: the cache update (which may persist markers — and marker
  * writes create directories) runs only <b>after</b> the VFS operation

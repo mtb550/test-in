@@ -4,10 +4,10 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.Group;
-import org.testin.enums.Priority;
-import org.testin.enums.TestStatus;
+import org.testin.model.Group;
+import org.testin.model.Priority;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.*;

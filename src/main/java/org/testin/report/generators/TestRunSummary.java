@@ -1,8 +1,8 @@
 package org.testin.report.generators;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.TestStatus;
 import org.testin.model.TestRunItems;
+import org.testin.model.TestStatus;
 
 import java.util.List;
 import java.util.Map;
