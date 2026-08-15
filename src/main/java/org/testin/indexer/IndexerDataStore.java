@@ -16,6 +16,7 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.util.FilesUtil;
+import org.testin.util.Mapper;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -170,6 +171,33 @@ final class IndexerDataStore {
 
     private void writeMarker(final @NotNull Path dirPath, final @NotNull String markerFileName, final @NotNull Object marker) {
         Services.getInstance(p, FilesUtil.class).write(p, dirPath.resolve(markerFileName), marker);
+    }
+
+    /**
+     * The other half of {@link #writeMarker}, so the marker round trip is owned
+     * by one class. It used to live in DirectoryMapper, which meant the indexer
+     * owned the write and a mapper owned the read — the debt #49 records, which
+     * grew from two markers to seven when #68 fixed the five that were written
+     * and never read.
+     * <p>
+     * A missing or unreadable marker falls back to a default instance rather than
+     * failing: the file is a type discriminator as well as a payload, so its
+     * directory is a real node either way, and dropping the node out of the tree
+     * would hide test cases over an unparsable audit stamp.
+     */
+    <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName,
+                              final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
+        try {
+            return Services.getInstance(p, Mapper.class).readValue(dirPath.resolve(markerFileName).toFile(), type);
+
+        } catch (final Exception ex) {
+            Logger.warn("Missing/empty " + kind + " marker '" + name + "', using defaults: " + ex.getMessage());
+            try {
+                return type.getDeclaredConstructor().newInstance();
+            } catch (final Exception fallbackEx) {
+                throw new RuntimeException("Cannot create default " + kind + " marker", fallbackEx);
+            }
+        }
     }
 
     /**

@@ -10,6 +10,7 @@ import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.*;
 import org.testin.model.markers.TestCasesMainDirectoryMarker;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.model.markers.TestRunPackageMarker;
@@ -21,7 +22,6 @@ import org.testin.services.Services;
 import org.testin.util.Mapper;
 import org.testin.util.Tools;
 
-import java.io.File;
 import java.nio.file.Path;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -48,8 +48,7 @@ public final class DirectoryMapper {
         final String fileName = path.getFileName().toString();
         try {
             final Mapper mapper = Services.getInstance(p, Mapper.class);
-            final TestProjectMarker marker = readMarkerSafe(mapper,
-                    path.resolve(DirectoryType.TP.getMarker()).toFile(),
+            final TestProjectMarker marker = Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TP.getMarker(),
                     TestProjectMarker.class, "project", fileName);
 
             final TestProjectDirectoryDto tp = TestProjectDirectoryDto.builder()
@@ -83,8 +82,7 @@ public final class DirectoryMapper {
                 .name(DirectoryType.TCD.getDisplayedName())
                 .parent(tp)
                 .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
-                .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
-                        dir.resolve(DirectoryType.TCD.getMarker()).toFile(),
+                .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(dir, DirectoryType.TCD.getMarker(),
                         TestCasesMainDirectoryMarker.class, "test cases directory", DirectoryType.TCD.getDisplayedName()))
                 .build();
     }
@@ -96,8 +94,7 @@ public final class DirectoryMapper {
                 .name(DirectoryType.TRD.getDisplayedName())
                 .parent(tp)
                 .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
-                .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
-                        dir.resolve(DirectoryType.TRD.getMarker()).toFile(),
+                .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(dir, DirectoryType.TRD.getMarker(),
                         TestRunsMainDirectoryMarker.class, "test runs directory", DirectoryType.TRD.getDisplayedName()))
                 .build();
     }
@@ -111,8 +108,7 @@ public final class DirectoryMapper {
                     .path(path)
                     .parent(parent)
                     .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
-                    .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
-                            path.resolve(DirectoryType.TSP.getMarker()).toFile(),
+                    .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TSP.getMarker(),
                             TestSetPackageMarker.class, "test set package", fileName))
                     .build();
 
@@ -135,8 +131,7 @@ public final class DirectoryMapper {
                     .path(path)
                     .parent(parent)
                     .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
-                    .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
-                            path.resolve(DirectoryType.TRP.getMarker()).toFile(),
+                    .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TRP.getMarker(),
                             TestRunPackageMarker.class, "test run package", fileName))
                     .build();
 
@@ -159,8 +154,7 @@ public final class DirectoryMapper {
                     .path(path)
                     .parent(parent)
                     .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
-                    .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
-                            path.resolve(DirectoryType.TS.getMarker()).toFile(),
+                    .marker(Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TS.getMarker(),
                             TestSetMarker.class, "test set", fileName))
                     .build();
 
@@ -186,8 +180,7 @@ public final class DirectoryMapper {
      */
     public @NotNull TestRunDirectoryDto getTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
         final String fileName = path.getFileName().toString();
-        final TestRunMarker marker = readMarkerSafe(Services.getInstance(p, Mapper.class),
-                path.resolve(DirectoryType.TR.getMarker()).toFile(), TestRunMarker.class, "run", fileName);
+        final TestRunMarker marker = Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TR.getMarker(), TestRunMarker.class, "run", fileName);
         return buildTestRunNode(p, path, parent, marker);
     }
 
@@ -215,16 +208,4 @@ public final class DirectoryMapper {
         }
     }
 
-    private <M> @NotNull M readMarkerSafe(final @NotNull Mapper mapper, final @NotNull File file, final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
-        try {
-            return mapper.readValue(file, type);
-        } catch (final Exception ex) {
-            Logger.warn("Missing/empty " + kind + " marker '" + name + "', using defaults: " + ex.getMessage());
-            try {
-                return type.getDeclaredConstructor().newInstance();
-            } catch (final Exception fallbackEx) {
-                throw new RuntimeException("Cannot create default " + kind + " marker", fallbackEx);
-            }
-        }
-    }
 }

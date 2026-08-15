@@ -515,6 +515,16 @@ public final class ProjectIndexer {
         store.addTestProjectMarker(p, tp);
     }
 
+    /**
+     * Reads a node's marker, falling back to a default instance when the file is
+     * missing or unreadable. The indexer owns both directions of the marker round
+     * trip; nothing outside it opens a marker file (#49).
+     */
+    public <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName,
+                                     final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
+        return store.readMarker(dirPath, markerFileName, type, kind, name);
+    }
+
     public void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
         store.updateRunMarker(p, runPath, marker);
     }
