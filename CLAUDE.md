@@ -15,7 +15,7 @@ is a fast in-memory lookup.
 - UI code (tree, actions, dialogs, editors) holds `DirectoryDto`/`TestCaseDto`
   objects served by the indexer and never touches disk.
 
-**Exempt packages** (may access files directly): `git`, `importExport`, `logger`.
+**Exempt packages** (may access files directly): `git`, `importexport`, `logger`.
 
 In particular: **test runs are saved and read only through the indexer**
 (`putTestRun`, `persistRun`, `persistRunMarker`, `addTestRunDir`,
