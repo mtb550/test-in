@@ -1,5 +1,7 @@
 package org.testin.settings;
 
+import com.intellij.openapi.components.Service;
+import com.intellij.openapi.components.State;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;
@@ -18,6 +20,34 @@ import static org.testng.Assert.*;
  * PersistentStateComponent is restored) replaces them for every later read.
  */
 public class SettingsTest {
+
+    /**
+     * What actually makes a setting the same in every open project: one
+     * application-level service over one file. Not the scope of
+     * {@link Setting}, which is project-level for the convenience of callers
+     * that already hold a project and reads this same shared object.
+     * <p>
+     * Asserted rather than assumed, because the failure is silent. Change this
+     * to {@code Service.Level.PROJECT} and every setting quietly becomes
+     * per-project: nothing fails to compile, no test about values breaks, and
+     * the tester finds out by setting a root in one project and not seeing it
+     * in another (#70).
+     */
+    @Test
+    public void settingsAreOneObjectAndOneFileForTheWholeIde() {
+        final Service service = AppSettingsState.class.getAnnotation(Service.class);
+        assertNotNull(service, "AppSettingsState must be a service");
+        assertEquals(service.value(), new Service.Level[]{Service.Level.APP},
+                "application-level, or every project gets its own settings");
+
+        final State state = AppSettingsState.class.getAnnotation(State.class);
+        assertNotNull(state, "AppSettingsState must declare @State or nothing is persisted");
+        assertEquals(state.storages().length, 1);
+        assertEquals(state.storages()[0].value(), "testinSettings.xml",
+                "renaming the storage file loses every existing tester's settings");
+        assertEquals(state.name(), "testin.settings.AppSettingsState",
+                "renaming the state loses every existing tester's settings");
+    }
 
     private static AppSettingsState state(final String rootPath, final String testerName, final String testerRole) {
         final AppSettingsState settings = new AppSettingsState();
