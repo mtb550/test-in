@@ -6,7 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.project.tree.TreeTransferHandler;
+import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.util.Shortcuts;
 
 public class CopyNodeAction extends DumbAwareAction {

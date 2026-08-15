@@ -10,7 +10,7 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.project.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.runner.TestNGRunnerByClass;
 import org.testin.services.Services;
 import org.testin.util.OptionalPlugin;

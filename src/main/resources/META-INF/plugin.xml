@@ -118,7 +118,7 @@
 
         <!-- Editor Drop Handler -->
         <fileDropHandler
-                implementation="org.testin.project.tree.TreeDropHandler"
+                implementation="org.testin.explorer.tree.TreeDropHandler"
         />
 
         <!-- Services -->
@@ -129,7 +129,7 @@
         <!-- Tool windows -->
         <toolWindow
                 id="testin.tree"
-                factoryClass="org.testin.project.Main"
+                factoryClass="org.testin.explorer.Main"
                 anchor="left"
                 icon="/icons/pluginIcon.svg"
                 secondary="false"

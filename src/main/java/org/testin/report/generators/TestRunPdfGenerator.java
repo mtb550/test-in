@@ -30,7 +30,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.project.ProjectPanel;
+import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
 
 import java.io.ByteArrayOutputStream;

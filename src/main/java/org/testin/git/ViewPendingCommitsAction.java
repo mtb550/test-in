@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.project.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

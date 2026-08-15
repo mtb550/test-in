@@ -13,7 +13,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
-import org.testin.project.Main;
+import org.testin.explorer.Main;
 import org.testin.runner.TestCaseExecutionTracker;
 import org.testin.services.Services;
 import org.testin.util.Tools;

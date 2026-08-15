@@ -19,7 +19,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
-import org.testin.project.ProjectPanel;
+import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
 import org.testin.testrun.RunConfigurationDialog;

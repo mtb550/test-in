@@ -24,7 +24,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.project.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

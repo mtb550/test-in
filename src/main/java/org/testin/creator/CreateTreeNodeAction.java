@@ -12,7 +12,7 @@ import org.testin.model.dto.dirs.*;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.notifications.Notifier;
-import org.testin.project.ProjectPanel;
+import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;

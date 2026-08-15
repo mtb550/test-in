@@ -2,7 +2,7 @@ package org.testin.enums;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.transfer.imports.ImportAction;
+import org.testin.importexport.imports.ImportAction;
 import org.testin.model.dto.TestCaseDto;
 
 import java.io.File;

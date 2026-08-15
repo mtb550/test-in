@@ -26,7 +26,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.project.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 
 import javax.swing.*;

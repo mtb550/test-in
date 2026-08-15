@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.project.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;

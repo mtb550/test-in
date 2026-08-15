@@ -20,8 +20,8 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.project.ProjectPanel;
-import org.testin.project.tree.TreeValueUtil;
+import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 
 import javax.swing.tree.TreePath;

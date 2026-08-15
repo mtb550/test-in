@@ -16,7 +16,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.project.ProjectPanel;
+import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.Setting;
 

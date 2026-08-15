@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.project.tree.TreeTransferHandler;
-import org.testin.project.tree.TreeTransferPayload;
-import org.testin.project.tree.TreeValueUtil;
+import org.testin.explorer.tree.TreeTransferHandler;
+import org.testin.explorer.tree.TreeTransferPayload;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Tools;
 

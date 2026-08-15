@@ -15,7 +15,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.project.tree.TreeTransferHandler;
+import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.util.Shortcuts;
 import org.testin.view.ViewToolWindowFactory;
 

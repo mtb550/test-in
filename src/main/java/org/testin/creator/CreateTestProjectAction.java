@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.git.GitRefs;
 import org.testin.creator.dialogs.CreateProjectDialog;
-import org.testin.project.ProjectPanel;
+import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
 import org.testin.settings.Setting;
 import org.testin.testproject.CreateTestProjectCloneAction;
