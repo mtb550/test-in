@@ -163,7 +163,43 @@ public final class RunStatusService {
         marker.setStatus(status);
         if (statusChangedAt != null) marker.setCreatedAt(statusChangedAt);
 
+        if (status.isTerminal()) closeOutPendingCases(p, runPath);
+
         Services.getInstance(p, ProjectIndexer.class).persistRunMarker(runPath, marker);
+    }
+
+    /**
+     * A finished run has nothing pending: everything not executed by the time it
+     * completes or closes is untested, and the plugin says so rather than leaving
+     * a case queued for a run that will never take it.
+     * <p>
+     * Here rather than in the action that closes the run, because two of them do:
+     * the run editor's own status change and the tree's Set Status menu. Only the
+     * first used to convert, so closing a run from the tree left its pending cases
+     * pending forever, and every report counted them under a heading that said the
+     * run had outstanding work.
+     * <p>
+     * The status is the only thing set. Stamping executedAt and executedBy here —
+     * which the editor's version did — recorded the person who closed the run as
+     * having executed cases nobody ran, and put their name in the report's
+     * Executed By line. When the run closed is on the run's own marker.
+     */
+    private void closeOutPendingCases(final @NotNull Project p, final @NotNull Path runPath) {
+        final TestRunDto tr = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
+        if (tr == null) return;
+
+        int closed = 0;
+        for (final TestRunItems item : tr.getResults()) {
+            if (item.getStatus() == TestStatus.PENDING) {
+                item.setStatus(TestStatus.UNTESTED);
+                closed++;
+            }
+        }
+
+        if (closed == 0) return;
+
+        Services.getInstance(p, ProjectIndexer.class).persistRun(runPath, tr);
+        Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
     }
 
     private void triggerFilterRefresh(final @NotNull TestinEditor editor, final @Nullable JBList<TestCaseDto> list) {

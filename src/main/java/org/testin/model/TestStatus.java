@@ -75,9 +75,12 @@ public enum TestStatus {
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             JBColor.GRAY.brighter(),
             "Untested",
-            // On the menu as "clear my verdict": marking a case Failed and then
-            // finding you tested the wrong build had no way back.
-            new MenuEntry(AllIcons.Actions.Rollback, KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)),
+            // Off the menu, and the plugin sets it: a tester gives one of three
+            // verdicts — passed, failed or blocked — and anything still pending
+            // when the run completes or closes becomes untested by itself. It is
+            // the record of a case the run never reached, not a verdict someone
+            // chose, so there is nothing for a menu entry to apply.
+            null,
             false
     );
 

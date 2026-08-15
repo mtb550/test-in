@@ -11,20 +11,15 @@ import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.logger.Logger;
-import org.testin.model.TestRunItems;
 import org.testin.model.TestRunStatus;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
-import org.testin.setting.AppSettingsState;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
-import java.util.UUID;
 
 public class UpdateTestRunStatusAction extends AbstractProjectAction {
     private final @NotNull TestinEditor editor;
@@ -56,9 +51,6 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
 
         Logger.trace("Test run status changed: " + editor.getParent().getName() + " = " + newStatus.getLabel());
 
-        if (newStatus.isTerminal())
-            resetPendingToUntested(editor);
-
         if (newStatus == TestRunStatus.COMPLETED && oldStatus == TestRunStatus.IN_PROGRESS)
             editor.stopExecution();
 
@@ -87,8 +79,6 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         marker.setStatus(TestRunStatus.COMPLETED);
         marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-        resetPendingToUntested(editor);
-
         persist(editor, marker);
 
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -100,16 +90,6 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         Services.getInstance(p, Notifier.class).softShow(p, TestRunStatus.COMPLETED.getLabel());
     }
 
-    private void resetPendingToUntested(final @NotNull RunEditor editor) {
-        Map<UUID, TestRunItems> resultsMap = editor.getResultsMap();
-        for (TestRunItems item : resultsMap.values()) {
-            if (item.getStatus() == TestStatus.PENDING) {
-                item.setStatus(TestStatus.UNTESTED);
-                item.setExecutedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-                item.setExecutedBy(Services.getInstance(p, AppSettingsState.class).testerName);
-            }
-        }
-    }
 
     /**
      * Both writes go through the single-writer RunStatusService: state is
