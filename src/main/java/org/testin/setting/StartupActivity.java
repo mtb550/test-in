@@ -54,7 +54,7 @@ public final class StartupActivity implements ProjectActivity {
             });
         }
 
-        Services.getInstance(p, Setting.class).setTestinPath(testinPath);
+        Services.getInstance(p, TestinRoot.class).setPath(testinPath);
         Logger.info("testin Path: " + testinPath);
 
         checkTestSourceRootOnce(p);
@@ -97,7 +97,7 @@ public final class StartupActivity implements ProjectActivity {
 
         // The plugin loads in every project. With no root configured the panel has
         // nothing to show, and the setup notification above already covers that case.
-        if (Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty()) return;
+        if (Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty()) return;
 
         final ToolWindowManager manager = ToolWindowManager.getInstance(p);
 

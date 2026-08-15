@@ -21,7 +21,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.setting.Setting;
+import org.testin.setting.TestinRoot;
 import org.testin.testcase.createDialog.TestCaseUpdateMenuDialog;
 import org.testin.util.FontSync;
 import org.testin.util.Shortcuts;
@@ -188,7 +188,7 @@ public class DetailsTab {
         }
 
         if (currentPath != null && !currentPath.isEmpty()) {
-            Path root = Services.getInstance(p, Setting.class).getTestinPath();
+            Path root = Services.getInstance(p, TestinRoot.class).getPath();
             if (root.toString().isEmpty()) {
                 root = Path.of(p.getBasePath() != null ? p.getBasePath() : "");
             }

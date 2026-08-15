@@ -10,7 +10,7 @@ import org.testin.git.GitRefs;
 import org.testin.creator.dialogs.CreateProjectDialog;
 import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.setting.Setting;
+import org.testin.setting.TestinRoot;
 import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.testproject.CreateTestProjectNewAction;
 import org.testin.util.OptionalPlugin;
@@ -52,7 +52,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        if (Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty())
+        if (Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty())
             e.getPresentation().setEnabled(false);
     }
 

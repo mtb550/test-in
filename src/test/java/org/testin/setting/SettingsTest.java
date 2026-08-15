@@ -24,7 +24,7 @@ public class SettingsTest {
     /**
      * What actually makes a setting the same in every open project: one
      * application-level service over one file. Not the scope of
-     * {@link Setting}, which is project-level for the convenience of callers
+     * {@link TestinRoot}, which is project-level for the convenience of callers
      * that already hold a project and reads this same shared object.
      * <p>
      * Asserted rather than assumed, because the failure is silent. Change this
@@ -61,39 +61,39 @@ public class SettingsTest {
 
     @Test
     public void everyEmptyFormOfARootMeansNoRootConfigured() {
-        assertEquals(Setting.normalize(null), Path.of(""));
-        assertEquals(Setting.normalize(""), Path.of(""));
-        assertEquals(Setting.normalize("   "), Path.of(""));
-        assertEquals(Setting.normalize("\t\n "), Path.of(""));
+        assertEquals(TestinRoot.normalize(null), Path.of(""));
+        assertEquals(TestinRoot.normalize(""), Path.of(""));
+        assertEquals(TestinRoot.normalize("   "), Path.of(""));
+        assertEquals(TestinRoot.normalize("\t\n "), Path.of(""));
     }
 
     @Test
     public void aStoredRootIsTrimmedBeforeUse() {
-        assertEquals(Setting.normalize("  C:/testin  "), Path.of("C:/testin"));
-        assertEquals(Setting.normalize("C:/testin"), Path.of("C:/testin"));
+        assertEquals(TestinRoot.normalize("  C:/testin  "), Path.of("C:/testin"));
+        assertEquals(TestinRoot.normalize("C:/testin"), Path.of("C:/testin"));
     }
 
     // -------------------------------------------------- changing the testin folder
 
     @Test
     public void changingTheTestinFolderRequiresTheTreeToReload() {
-        assertTrue(Setting.isRootChanged("C:/testin", "C:/other"));
+        assertTrue(TestinRoot.isRootChanged("C:/testin", "C:/other"));
     }
 
     @Test
     public void configuringARootForTheFirstTimeRequiresTheTreeToReload() {
-        assertTrue(Setting.isRootChanged("", "C:/testin"));
-        assertTrue(Setting.isRootChanged(null, "C:/testin"));
+        assertTrue(TestinRoot.isRootChanged("", "C:/testin"));
+        assertTrue(TestinRoot.isRootChanged(null, "C:/testin"));
     }
 
     @Test
     public void clearingTheRootRequiresTheTreeToReload() {
-        assertTrue(Setting.isRootChanged("C:/testin", ""));
+        assertTrue(TestinRoot.isRootChanged("C:/testin", ""));
     }
 
     @Test
     public void reApplyingTheSameRootLeavesTheTreeAlone() {
-        assertFalse(Setting.isRootChanged("C:/testin", "C:/testin"));
+        assertFalse(TestinRoot.isRootChanged("C:/testin", "C:/testin"));
     }
 
     /**
@@ -102,15 +102,15 @@ public class SettingsTest {
      */
     @Test
     public void whitespaceAroundAnUnchangedRootIsNotAChange() {
-        assertFalse(Setting.isRootChanged("C:/testin", "  C:/testin  "));
-        assertFalse(Setting.isRootChanged("  C:/testin", "C:/testin\t"));
+        assertFalse(TestinRoot.isRootChanged("C:/testin", "  C:/testin  "));
+        assertFalse(TestinRoot.isRootChanged("  C:/testin", "C:/testin\t"));
     }
 
     @Test
     public void theDifferentSpellingsOfNoRootAreNotAChange() {
-        assertFalse(Setting.isRootChanged(null, ""));
-        assertFalse(Setting.isRootChanged("", "   "));
-        assertFalse(Setting.isRootChanged(null, null));
+        assertFalse(TestinRoot.isRootChanged(null, ""));
+        assertFalse(TestinRoot.isRootChanged("", "   "));
+        assertFalse(TestinRoot.isRootChanged(null, null));
     }
 
     // ------------------------------------------------- tester name and role
@@ -124,7 +124,7 @@ public class SettingsTest {
         final AppSettingsState before = state("C:/testin", "Sara", "QA Engineer");
         final AppSettingsState after = state("C:/testin", "Omar", "Test Lead");
 
-        assertFalse(Setting.isRootChanged(before.rootTestinPath, after.rootTestinPath));
+        assertFalse(TestinRoot.isRootChanged(before.rootTestinPath, after.rootTestinPath));
         assertNotEquals(before.testerName, after.testerName);
         assertNotEquals(before.testerRole, after.testerRole);
     }
@@ -196,7 +196,7 @@ public class SettingsTest {
         final AppSettingsState settings = new AppSettingsState();
 
         assertEquals(settings.rootTestinPath, "");
-        assertEquals(Setting.normalize(settings.rootTestinPath), Path.of(""));
+        assertEquals(TestinRoot.normalize(settings.rootTestinPath), Path.of(""));
         assertFalse(settings.openTreeOnStartup, "the panel stays closed until the tester asks for it");
         assertEquals(settings.logLevel, "INFO");
         assertEquals(settings.testerName, "");

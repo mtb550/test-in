@@ -18,7 +18,7 @@ import org.testin.model.dto.dirs.*;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
-import org.testin.setting.Setting;
+import org.testin.setting.TestinRoot;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
@@ -77,7 +77,7 @@ public final class ProjectIndexer {
                 return;
             }
 
-            final Path rootPath = Services.getInstance(p, Setting.class).getTestinPath();
+            final Path rootPath = Services.getInstance(p, TestinRoot.class).getPath();
             if (rootPath.toString().isEmpty()) {
                 indexing.set(false);
                 indexed.set(true);
@@ -249,7 +249,7 @@ public final class ProjectIndexer {
     }
 
     public boolean rootExists() {
-        final Path root = Services.getInstance(p, Setting.class).getTestinPath();
+        final Path root = Services.getInstance(p, TestinRoot.class).getPath();
         return Files.isDirectory(root);
     }
 

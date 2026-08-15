@@ -13,7 +13,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.setting.Setting;
+import org.testin.setting.TestinRoot;
 
 import java.nio.file.Path;
 
@@ -37,7 +37,7 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
      */
     public void execute() {
 
-        final Path tpPath = Services.getInstance(p, Setting.class).getTestinPath().resolve(tpName);
+        final Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
 
         if (Services.getInstance(p, ProjectIndexer.class).projectExists(tpPath)) {
             Services.getInstance(p, Notifier.class).error(p, "Creation Failed", "A test project named '" + tpName + "' already exists.");
@@ -59,7 +59,7 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
     public void update(final @NotNull AnActionEvent e) {
         // Both branches, otherwise the action stays disabled for the whole session
         // once seen without a configured Testin root.
-        e.getPresentation().setEnabled(!Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty());
+        e.getPresentation().setEnabled(!Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty());
     }
 
     @Override

@@ -22,7 +22,7 @@ import java.nio.file.Path;
  */
 @Service(Service.Level.PROJECT)
 @AllArgsConstructor
-public final class Setting {
+public final class TestinRoot {
 
     private final @NotNull Project p;
 
@@ -47,11 +47,11 @@ public final class Setting {
         return !normalize(before).equals(normalize(after));
     }
 
-    public @NotNull Path getTestinPath() {
+    public @NotNull Path getPath() {
         return normalize(Services.getInstance(p, AppSettingsState.class).rootTestinPath);
     }
 
-    public void setTestinPath(final @Nullable Path path) {
+    public void setPath(final @Nullable Path path) {
         final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         settings.rootTestinPath = path != null ? path.toString() : "";
     }

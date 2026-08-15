@@ -18,7 +18,7 @@ import org.testin.explorer.projectSelector.TestProjectSelector;
 import org.testin.explorer.tree.ProjectTree;
 import org.testin.explorer.versionSelector.BranchSelector;
 import org.testin.services.Services;
-import org.testin.setting.Setting;
+import org.testin.setting.TestinRoot;
 import org.testin.setting.SettingsConfigurable;
 import org.testin.util.Bundle;
 
@@ -86,7 +86,7 @@ public final class ProjectPanel implements Disposable {
         emptyText.appendLine("");
         emptyText.appendLine("");
 
-        if (Services.getInstance(p, Setting.class).getTestinPath().toString().isEmpty())
+        if (Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty())
             emptyText.appendLine(
                     AllIcons.General.Settings,
                     "Configure Testin settings",

@@ -90,7 +90,7 @@ public final class SettingsConfigurable implements Configurable {
         // Decided before the fields are overwritten: a moved root is the only change
         // that invalidates the tree, and re-indexing is far too heavy to run for a
         // renamed tester.
-        final boolean rootChanged = Setting.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
+        final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
 
         settings.rootTestinPath = testinPathPanel.getPathText();
         settings.openTreeOnStartup = openTreeOnStartupCheckBox.isSelected();

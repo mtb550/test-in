@@ -18,7 +18,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.setting.Setting;
+import org.testin.setting.TestinRoot;
 
 import java.nio.file.Path;
 
@@ -56,7 +56,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                 indicator.setText("Cloning into " + projectName + "..");
 
                 try {
-                    final Path parentPath = Services.getInstance(p, Setting.class).getTestinPath();
+                    final Path parentPath = Services.getInstance(p, TestinRoot.class).getPath();
                     final GitCommandResult result = Git.getInstance().clone(p, parentPath, gitUrl, projectName);
                     result.throwOnError();
 
@@ -64,7 +64,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                         // The indexer owns disk reads/refresh: scanSingleProject re-scans the cloned
                         // project from disk. No direct VFS refresh here.
                         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                        final Path projectPath = Services.getInstance(p, Setting.class).getTestinPath().resolve(projectName);
+                        final Path projectPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
 
                         indexer.scanSingleProject(projectPath);
                         final TestProjectDirectoryDto clonedProject = indexer.getTestProjectsByPath().get(projectPath.toString());

@@ -13,7 +13,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
-import org.testin.setting.Setting;
+import org.testin.setting.TestinRoot;
 import org.testin.util.EditorUtil;
 import org.testin.util.FontSync;
 
@@ -78,7 +78,7 @@ public class NavigationBar extends BaseDetails {
                     public void mouseClicked(final MouseEvent e) {
                         if (isLast) {
                             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-                            Path testSetPath = Services.getInstance(p, Setting.class).getTestinPath();
+                            Path testSetPath = Services.getInstance(p, TestinRoot.class).getPath();
                             for (final String segment : currentPath) {
                                 testSetPath = testSetPath.resolve(segment);
                             }
