@@ -56,6 +56,26 @@ be committed back into storage.
 
 - The `Project` object is always named `p`: `final @NotNull Project p`.
 - Abstract parent classes are named `Abstract*`; non-abstract parents `Base*`.
+- **Packages are all-lowercase and named by feature, never by kind.** One word
+  where one will do: `editor`, `explorer`, `report`, `creator`, `model`. A
+  sub-package does not repeat its parent — `editor/run`, not `editor/runeditor`.
+  There is no `enums`, `listeners` or `mappers` package: a type lives with the
+  feature that owns it, and shared domain vocabulary lives in `model` beside the
+  DTOs and markers that carry it (#53).
+- **No `I` prefix on interfaces**, and no `Impl` suffix unless an interface of
+  that exact name exists. A class is named for what it does — `VfsExecutor`, not
+  `TreeUtilImpl`; `SaveOnProjectClose`, not `ProjectCloseListenerImpl`. Where the
+  plain noun would collide with a platform type, the plugin prefixes with
+  `Testin`: `TestinEditor` against `com.intellij.openapi.editor.Editor`, as
+  `TestinFileSystem` and `TestinTabColorProvider` already do.
+- **Renaming anything is a three-step check, not a find-and-replace.** Persisted
+  keys read like code — `@State(name = "testin.settings.AppSettingsState")`,
+  `"testin.pageSize"` — and log lines contain ordinary words like `Setting`, so
+  rewrite the qualified form rather than the bare word, then diff every string
+  literal in `src` before and after. On Windows a case-only package rename also
+  needs `--no-build-cache`: Gradle restores the pre-rename casing and javac
+  verifies classpath entries case-sensitively, which surfaces as a
+  package-private class being invisible to a test in its own package.
 - `final` on parameters and locals wherever possible.
 - Nullability: org.jetbrains `@NotNull`/`@Nullable` everywhere; Lombok
   `@NonNull` only on DTO/marker fields (it generates runtime checks there).
