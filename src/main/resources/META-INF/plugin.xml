@@ -169,7 +169,7 @@
     <applicationListeners>
 
         <listener
-                class="org.testin.listeners.ProjectCloseListenerImpl"
+                class="org.testin.listeners.SaveOnProjectClose"
                 topic="com.intellij.openapi.project.ProjectCloseListener"
         />
 

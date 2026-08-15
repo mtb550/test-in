@@ -39,9 +39,9 @@ public class TestProjectSelector {
         selectedTestProject = new ComboBox<>(testProjectList);
 
         selectedTestProject.setFocusable(false);
-        selectedTestProject.setRenderer(new RendererImpl());
+        selectedTestProject.setRenderer(new TestProjectRenderer());
 
-        selectedTestProject.addActionListener(new ListenerImpl(pp));
+        selectedTestProject.addActionListener(new ProjectSelectionListener(pp));
         selectedTestProject.addActionListener(e -> {
             if (isLoading) return;
 

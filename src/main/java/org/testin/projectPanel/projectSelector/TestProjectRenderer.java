@@ -9,7 +9,7 @@ import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
 
 import javax.swing.*;
 
-public class RendererImpl extends ColoredListCellRenderer<TestProjectDirectoryDto> {
+public class TestProjectRenderer extends ColoredListCellRenderer<TestProjectDirectoryDto> {
 
     @Override
     protected void customizeCellRenderer(final @NotNull JList<? extends TestProjectDirectoryDto> list,

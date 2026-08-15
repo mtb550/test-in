@@ -22,7 +22,7 @@ import org.testin.settings.Setting;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
-import org.testin.util.TreeUtilImpl;
+import org.testin.util.VfsExecutor;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -390,7 +390,7 @@ public final class ProjectIndexer {
      */
     private void removeVf(final @NotNull Path path, final @NotNull Runnable cacheUpdate,
                           final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        Services.getInstance(p, TreeUtilImpl.class).removeVf(p, this, path,
+        Services.getInstance(p, VfsExecutor.class).removeVf(p, this, path,
                 deleted -> VirtualFileManager.getInstance().asyncRefresh(() -> {
                     if (deleted) cacheUpdate.run();
                     onRemoved.accept(deleted);
@@ -413,7 +413,7 @@ public final class ProjectIndexer {
             return;
         }
 
-        Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, targetParent, "Move Failed", (sourceVf, targetVf) -> {
+        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, targetParent, "Move Failed", (sourceVf, targetVf) -> {
             try {
                 sourceVf.move(this, targetVf);
             } catch (final IOException ex) {
@@ -463,7 +463,7 @@ public final class ProjectIndexer {
         };
 
         for (final Path sourcePath : sourcePaths) {
-            Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
+            Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(this, targetVf, sourceVf.getName());
                 } catch (final IOException ex) {
@@ -541,7 +541,7 @@ public final class ProjectIndexer {
      * update and the callback are reached.
      */
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {
-        Services.getInstance(p, TreeUtilImpl.class).executeVfsAction(p, oldPath, "Rename Failed", vf -> {
+        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, "Rename Failed", vf -> {
             try {
                 vf.rename(this, newPath.getFileName().toString());
             } catch (final IOException ex) {

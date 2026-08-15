@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.editorPanel.TestinEditor;
+import org.testin.editorPanel.listeners.CardMouseListener;
 import org.testin.editorPanel.listeners.GridListSelectionSynchronizer;
-import org.testin.editorPanel.listeners.MouseListenerImpl;
 import org.testin.editorPanel.listeners.SelectionListener;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.DirectoryDto;
@@ -67,7 +67,7 @@ public final class ListPanelBuilder {
                                            final @NotNull BooleanSupplier gridActiveSupplier) {
         final JBList<TestCaseDto> list = view.list();
 
-        final MouseListenerImpl mouseListener = new MouseListenerImpl(p, editor, list, view.model(), dir, contextMenu);
+        final CardMouseListener mouseListener = new CardMouseListener(p, editor, list, view.model(), dir, contextMenu);
         list.addMouseListener(mouseListener);
         list.addMouseWheelListener(mouseListener);
         list.addMouseMotionListener(mouseListener);

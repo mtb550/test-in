@@ -10,7 +10,7 @@ import org.testin.projectPanel.ProjectPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class ListenerImpl implements ActionListener {
+public class ProjectSelectionListener implements ActionListener {
     private final @NotNull ProjectPanel pp;
 
     /**
@@ -18,7 +18,7 @@ public class ListenerImpl implements ActionListener {
      */
     private @Nullable TestProjectDirectoryDto lastSelected = null;
 
-    public ListenerImpl(final @NotNull ProjectPanel pp) {
+    public ProjectSelectionListener(final @NotNull ProjectPanel pp) {
         this.pp = pp;
     }
 

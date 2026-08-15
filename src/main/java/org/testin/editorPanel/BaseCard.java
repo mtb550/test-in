@@ -21,7 +21,7 @@ import java.util.Map;
 public abstract class BaseCard extends JBPanel<BaseCard> {
     /**
      * Size delta of the card title over the list font. Shared with the mouse hit-testing
-     * in {@code MouseListenerImpl} so hover targets line up with the painted icons.
+     * in {@code CardMouseListener} so hover targets line up with the painted icons.
      */
     public static final float TITLE_FONT_DELTA = 3.0f;
     protected final @NotNull JBLabel descriptionLabel = new JBLabel();

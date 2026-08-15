@@ -7,7 +7,7 @@ import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 
 
-public final class ProjectCloseListenerImpl implements ProjectCloseListener {
+public final class SaveOnProjectClose implements ProjectCloseListener {
 
     @Override
     public void projectClosingBeforeSave(final @NotNull Project p) {

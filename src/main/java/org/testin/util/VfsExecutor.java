@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
-public final class TreeUtilImpl {
+public final class VfsExecutor {
 
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull VfsOperation operation) {
         // The lookup runs off the EDT and the operation on it: refreshAndFindFile
