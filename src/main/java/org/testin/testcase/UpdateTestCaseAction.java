@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.toolBar.Toolbar;
+import org.testin.editor.toolbar.Toolbar;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;

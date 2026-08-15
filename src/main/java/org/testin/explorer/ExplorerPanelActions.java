@@ -4,9 +4,9 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.creator.CreateTestProjectAction;
-import org.testin.explorer.toolBar.CollapseAllAction;
-import org.testin.explorer.toolBar.ExpandAllAction;
-import org.testin.explorer.toolBar.RefreshAction;
+import org.testin.explorer.toolbar.CollapseAllAction;
+import org.testin.explorer.toolbar.ExpandAllAction;
+import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.setting.OpenSettingsAction;
 
 import java.util.List;

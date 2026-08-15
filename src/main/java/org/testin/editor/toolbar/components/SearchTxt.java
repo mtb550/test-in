@@ -1,4 +1,4 @@
-package org.testin.editor.toolBar.components;
+package org.testin.editor.toolbar.components;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.ui.DocumentAdapter;

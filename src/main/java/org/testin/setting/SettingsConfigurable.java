@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
 import org.testin.explorer.ExplorerPanel;
-import org.testin.explorer.toolBar.RefreshAction;
+import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.services.Services;
 import org.testin.setting.dialogs.TestinPathPanel;
 import org.testin.util.Bundle;

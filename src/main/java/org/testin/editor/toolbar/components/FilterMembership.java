@@ -1,4 +1,4 @@
-package org.testin.editor.toolBar.components;
+package org.testin.editor.toolbar.components;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -1,10 +1,10 @@
-package org.testin.editor.toolBar.components;
+package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.runEditor.RunEditor;
-import org.testin.editor.toolBar.Toolbar;
+import org.testin.editor.toolbar.Toolbar;
 import org.testin.enums.TestRunStatus;
 
 public class StartExecutionBtn extends AbstractButton implements ToolbarItem {

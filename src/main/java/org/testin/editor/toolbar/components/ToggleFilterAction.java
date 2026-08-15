@@ -1,4 +1,4 @@
-package org.testin.editor.toolBar.components;
+package org.testin.editor.toolbar.components;
 
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;

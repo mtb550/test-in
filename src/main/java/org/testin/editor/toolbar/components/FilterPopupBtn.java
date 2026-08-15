@@ -1,4 +1,4 @@
-package org.testin.editor.toolBar.components;
+package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.DataManager;
@@ -11,7 +11,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.runEditor.RunEditor;
-import org.testin.editor.toolBar.Toolbar;
+import org.testin.editor.toolbar.Toolbar;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;

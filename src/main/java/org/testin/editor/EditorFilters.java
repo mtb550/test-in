@@ -1,8 +1,8 @@
 package org.testin.editor;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.toolBar.AbstractToolbarPanel;
-import org.testin.editor.toolBar.components.FilterPopupBtn;
+import org.testin.editor.toolbar.AbstractToolbarPanel;
+import org.testin.editor.toolbar.components.FilterPopupBtn;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 

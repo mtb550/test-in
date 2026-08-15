@@ -1,7 +1,7 @@
-package org.testin.editor.toolBar;
+package org.testin.editor.toolbar;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.toolBar.components.*;
+import org.testin.editor.toolbar.components.*;
 
 import java.util.List;
 

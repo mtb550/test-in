@@ -1,4 +1,4 @@
-package org.testin.editor.toolBar.components;
+package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.HelpTooltip;

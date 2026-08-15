@@ -1,4 +1,4 @@
-package org.testin.editor.toolBar;
+package org.testin.editor.toolbar;
 
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.util.Disposer;
@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.toolBar.components.*;
+import org.testin.editor.toolbar.components.*;
 import org.testin.enums.ViewMode;
 
 import javax.swing.*;

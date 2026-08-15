@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.runEditor.RunEditor;
-import org.testin.editor.toolBar.components.StartExecutionBtn;
+import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.enums.TestRunStatus;
 import org.testin.enums.TestStatus;
 import org.testin.logger.Logger;
