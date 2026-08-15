@@ -154,8 +154,10 @@
                 key="testin.display.name"
         />
 
-        <!-- Settings -->
-        <projectConfigurable
+        <!-- Settings: application-level, because the state behind the page always
+             was. One page for the IDE, so two open projects cannot hold two sets
+             of fields over one settings file and overwrite each other (#70). -->
+        <applicationConfigurable
                 instance="org.testin.settings.SettingsConfigurable"
                 id="org.testin.settings.SettingsConfigurable"
                 key="testin.display.name"

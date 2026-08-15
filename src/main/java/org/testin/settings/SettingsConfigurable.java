@@ -3,6 +3,7 @@ package org.testin.settings;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
@@ -32,11 +33,9 @@ public final class SettingsConfigurable implements Configurable {
     private final @NotNull TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
     private final @NotNull JBCheckBox openTreeOnStartupCheckBox = new JBCheckBox("Open the Testin panel when a project opens");
     private final @NotNull ComboBox<String> logLevelComboBox;
-    private final @NotNull Project p;
 
-    public SettingsConfigurable(final @NotNull Project p) {
-        this.p = p;
-        testinPathPanel = new TestinPathPanel(p);
+    public SettingsConfigurable() {
+        testinPathPanel = new TestinPathPanel();
         this.logLevelComboBox = new ComboBox<>(Arrays.stream(Level.values()).map(Level::name).toArray(String[]::new));
     }
 
@@ -47,7 +46,10 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public @NotNull JComponent createComponent() {
-        downloadFolderField.addBrowseFolderListener(p, FileChooserDescriptorFactory.createSingleFolderDescriptor()
+        // Null project, as the source-root field above already does: the chooser
+        // needs one only to seed a starting directory, and an application-level
+        // page has none to give it (#70).
+        downloadFolderField.addBrowseFolderListener(null, FileChooserDescriptorFactory.createSingleFolderDescriptor()
                         .withTitle("Select Default Download Folder")
                         .withDescription("Choose the default folder for imports, exports, and reports"),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
@@ -71,7 +73,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public boolean isModified() {
-        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final AppSettingsState settings = Services.getInstance(AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().equals(settings.rootTestinPath);
         modified |= openTreeOnStartupCheckBox.isSelected() != settings.openTreeOnStartup;
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
@@ -83,7 +85,7 @@ public final class SettingsConfigurable implements Configurable {
 
     @Override
     public void apply() {
-        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
         // Decided before the fields are overwritten: a moved root is the only change
         // that invalidates the tree, and re-indexing is far too heavy to run for a
@@ -100,18 +102,26 @@ public final class SettingsConfigurable implements Configurable {
 
         Logger.setLogLevel(Level.valueOf(settings.logLevel));
 
-        final Setting setting = Services.getInstance(p, Setting.class);
-        setting.setTestinPath(Setting.normalize(settings.rootTestinPath));
+        if (rootChanged) refreshEveryOpenProject();
+    }
 
-        if (rootChanged) {
-            final ProjectPanel pp = Services.getInstance(p, ProjectPanel.class);
-            new RefreshAction(p, pp).execute();
+    /**
+     * Every open project, not the one whose settings happened to be open: the
+     * page is application-level now, and the root it just changed is the root all
+     * of them build their tree from. Leaving the others on the previous root left
+     * them showing a tree for a directory the tester had moved away from (#70).
+     */
+    private void refreshEveryOpenProject() {
+        for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
+            if (open.isDisposed()) continue;
+
+            new RefreshAction(open, Services.getInstance(open, ProjectPanel.class)).execute();
         }
     }
 
     @Override
     public void reset() {
-        final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
+        final AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
         testinPathPanel.setPathText(settings.rootTestinPath);
         openTreeOnStartupCheckBox.setSelected(settings.openTreeOnStartup);

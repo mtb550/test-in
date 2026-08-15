@@ -2,7 +2,7 @@ package org.testin.settings.dialogs;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
-import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.ui.TextComponentAccessor;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.IconLoader;
@@ -10,8 +10,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBTextField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -23,12 +21,10 @@ import java.nio.file.Path;
 
 public final class TestinPathPanel {
 
-    private final @NotNull Project p;
     private final @NotNull TextFieldWithBrowseButton pathField = new TextFieldWithBrowseButton();
     private final @NotNull JButton openFolderBtn = new JButton("Open");
 
-    public TestinPathPanel(final @NotNull Project p) {
-        this.p = p;
+    public TestinPathPanel() {
         setupField();
         setupOpenButton();
         setupValidationListener();
@@ -56,7 +52,11 @@ public final class TestinPathPanel {
                 Desktop.getDesktop().open(new File(pathField.getText()));
 
             } catch (final Exception ex) {
-                Services.getInstance(p, Notifier.class).error(p, "Error", "Could not open folder: " + ex.getMessage());
+                // A dialog rather than a Notifier balloon: the settings page is
+                // application-level and has no project to notify through, and it
+                // is modal anyway, so a balloon behind it would go unread (#70).
+                Messages.showErrorDialog(openFolderBtn,
+                        "Could not open folder: " + ex.getMessage(), "Open Folder Failed");
             }
         });
     }

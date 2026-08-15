@@ -162,15 +162,32 @@ public class SettingsTest {
     }
 
     @Test
-    public void aFreshStateHasNoRootAndOpensTheTree() {
+    public void aFreshStateHasNoRootAndLeavesTheTreeClosed() {
         final AppSettingsState settings = new AppSettingsState();
 
         assertEquals(settings.rootTestinPath, "");
         assertEquals(Setting.normalize(settings.rootTestinPath), Path.of(""));
-        assertTrue(settings.openTreeOnStartup, "the panel opens on startup unless the user turns it off");
+        assertFalse(settings.openTreeOnStartup, "the panel stays closed until the tester asks for it");
         assertEquals(settings.logLevel, "INFO");
         assertEquals(settings.testerName, "");
         assertEquals(settings.testerRole, "");
+    }
+
+    /**
+     * The stored value wins over the new default, which is what makes changing a
+     * default safe for anyone who had already chosen: a settings file saying the
+     * panel should open still opens it.
+     */
+    @Test
+    public void aStoredChoiceSurvivesTheDefaultBeingOff() {
+        final AppSettingsState settings = new AppSettingsState();
+
+        final AppSettingsState stored = new AppSettingsState();
+        stored.openTreeOnStartup = true;
+
+        settings.loadState(stored);
+
+        assertTrue(settings.openTreeOnStartup);
     }
 
     @Test

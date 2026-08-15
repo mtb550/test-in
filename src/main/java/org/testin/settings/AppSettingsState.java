@@ -17,7 +17,10 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     // Readers write these straight into DTO fields and enum lookups that require
     // a value, so a null here would surface as a failure far from its cause.
     public @NotNull String rootTestinPath = "";
-    public boolean openTreeOnStartup = true;
+    // Off by default: the plugin loads in every project, and most of them are not
+    // test projects. A tester who wants the panel opens it once from the settings
+    // page; everyone else is not given a tool window they did not ask for (#70).
+    public boolean openTreeOnStartup = false;
     public @NotNull String logLevel = "INFO";
     public @NotNull String defaultDownloadFolder = "";
     public @NotNull String testerName = "";
