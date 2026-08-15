@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.OptionalPlugin;
 import org.testin.util.Shortcuts;

@@ -3,7 +3,7 @@ package org.testin.git;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.enums.TestCaseStatus;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.util.List;

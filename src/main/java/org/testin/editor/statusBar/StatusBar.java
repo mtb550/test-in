@@ -1,0 +1,157 @@
+package org.testin.editor.statusBar;
+
+import com.intellij.ide.HelpTooltip;
+import com.intellij.openapi.util.text.HtmlChunk;
+import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.ui.components.JBTextField;
+import com.intellij.util.ui.JBUI;
+import com.intellij.util.ui.UIUtil;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.testin.util.FontSync;
+import org.testin.util.Shortcuts;
+
+import javax.swing.*;
+import java.awt.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class StatusBar extends JBPanel<StatusBar> {
+    private final @NotNull JBLabel statusLabel = new JBLabel();
+    private final @NotNull JBLabel syncLabel = new JBLabel();
+
+    private final @NotNull Timer clockTimer;
+
+    @Getter
+    private final @NotNull JButton firstButton = new JButton("<<");
+
+    @Getter
+    private final @NotNull JButton prevButton = new JButton("<");
+
+    private final @NotNull JBLabel currentPageLabel = new JBLabel("1:1");
+
+    @Getter
+    private final @NotNull JBTextField pageSizeField = new JBTextField("50", 3);
+
+    @Getter
+    private final @NotNull JButton nextButton = new JButton(">");
+
+    @Getter
+    private final @NotNull JButton lastButton = new JButton(">>");
+
+    public StatusBar() {
+        super(new BorderLayout());
+
+        clockTimer = new Timer(60000, e -> updateClock());
+        clockTimer.start();
+        updateClock();
+
+        setBorder(JBUI.Borders.compound(
+                JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0),
+                JBUI.Borders.empty(4, 0)
+        ));
+        setBackground(JBUI.CurrentTheme.EditorTabs.background());
+
+        final float smallSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
+        final Font dynamicSmallFont = JBUI.Fonts.smallFont().deriveFont(smallSize);
+
+        statusLabel.setFont(dynamicSmallFont);
+        statusLabel.setForeground(UIUtil.getContextHelpForeground());
+        statusLabel.setBorder(JBUI.Borders.emptyLeft(10));
+
+        syncLabel.setFont(dynamicSmallFont);
+        syncLabel.setForeground(UIUtil.getInactiveTextColor());
+        syncLabel.setBorder(JBUI.Borders.emptyRight(10));
+
+        currentPageLabel.setFont(dynamicSmallFont);
+        pageSizeField.setFont(dynamicSmallFont);
+
+        final JBPanel<?> paginationPanel = new JBPanel<>(new FlowLayout(FlowLayout.CENTER, JBUI.scale(5), 0));
+        paginationPanel.setOpaque(false);
+
+        pageSizeField.setHorizontalAlignment(SwingConstants.CENTER);
+        pageSizeField.setToolTipText("Test cases per page");
+
+        makeCompact(firstButton, dynamicSmallFont);
+        makeCompact(prevButton, dynamicSmallFont);
+        makeCompact(nextButton, dynamicSmallFont);
+        makeCompact(lastButton, dynamicSmallFont);
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("First page"))
+                .installOn(firstButton);
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("Previous page"))
+                .setShortcut(Shortcuts.PreviousTestCase.getShortcutText())
+                .installOn(prevButton);
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("Next page"))
+                .setShortcut(Shortcuts.NextTestCase.getShortcutText())
+                .installOn(nextButton);
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("Last page"))
+                .installOn(lastButton);
+
+        paginationPanel.add(firstButton);
+        paginationPanel.add(prevButton);
+        paginationPanel.add(currentPageLabel);
+        paginationPanel.add(pageSizeField);
+        paginationPanel.add(nextButton);
+        paginationPanel.add(lastButton);
+
+        add(statusLabel, BorderLayout.WEST);
+        add(paginationPanel, BorderLayout.CENTER);
+        add(syncLabel, BorderLayout.EAST);
+    }
+
+    private void updateClock() {
+        final String currentTime = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"));
+        syncLabel.setText("System Time: " + currentTime);
+    }
+
+    private void makeCompact(final @NotNull JButton button, final @NotNull Font font) {
+        button.setMargin(JBUI.insets(0, 4));
+        button.setFont(font);
+        button.setFocusable(false);
+    }
+
+    public void updatePaginationState(final int currentPage, final int totalPages, final int totalCount) {
+        statusLabel.setText(String.format(Locale.ENGLISH, "0 of %d test cases", totalCount));
+        currentPageLabel.setText(currentPage + " of " + Math.max(1, totalPages));
+        syncLabel.setText("Last updated: " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
+
+        firstButton.setEnabled(currentPage > 1);
+        prevButton.setEnabled(currentPage > 1);
+        nextButton.setEnabled(currentPage < totalPages);
+        lastButton.setEnabled(currentPage < totalPages);
+    }
+
+    /**
+     * Stops the clock timer. Must be called when the owning editor is disposed —
+     * a running Swing Timer keeps this component strongly referenced forever.
+     */
+    public void dispose() {
+        clockTimer.stop();
+    }
+
+    public void updateSelectionState(final int @NotNull [] selectedIndices, final int currentPage, final int pageSize, final int totalCount) {
+        final int selectedCount = selectedIndices.length;
+
+        if (selectedCount > 1) {
+            statusLabel.setText(String.format(Locale.ENGLISH, "%d selected of %d test cases", selectedCount, totalCount));
+
+        } else if (selectedCount == 1) {
+            final int globalIndex = ((currentPage - 1) * pageSize) + selectedIndices[0];
+            statusLabel.setText(String.format(Locale.ENGLISH, "%d of %d test cases", globalIndex + 1, totalCount));
+
+        } else {
+            statusLabel.setText(String.format(Locale.ENGLISH, "0 of %d test cases", totalCount));
+        }
+    }
+}

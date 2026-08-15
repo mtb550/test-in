@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.enums.RunStatus;
 import org.testin.listeners.TestCaseExecutionListener;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestNGRunnerByMethod;
 import org.testin.services.Services;

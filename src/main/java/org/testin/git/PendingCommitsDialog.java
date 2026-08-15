@@ -8,7 +8,7 @@ import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.dialogs.FramelessDialogWrapper;

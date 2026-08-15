@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.run.RunTestCaseAction;
 
 import javax.swing.*;

@@ -1,7 +1,7 @@
 package org.testin.git;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 
 @FunctionalInterface
 public interface RevertAction {

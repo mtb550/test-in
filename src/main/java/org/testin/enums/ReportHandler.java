@@ -2,9 +2,9 @@ package org.testin.enums;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.mappers.dto.TestCaseDto;
-import org.testin.mappers.dto.TestRunDto;
-import org.testin.mappers.dto.dirs.TestRunDirectoryDto;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.TestRunDirectoryDto;
 
 import java.util.Map;
 import java.util.UUID;

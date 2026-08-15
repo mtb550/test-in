@@ -3,9 +3,9 @@ package org.testin.enums;
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusBar.StatusBarItem;
-import org.testin.testCase.createDialog.CreateTestCaseSection;
-import org.testin.testCase.createDialog.TestCaseBaseDialog;
+import org.testin.statusbar.StatusBarItem;
+import org.testin.testcase.createDialog.CreateTestCaseSection;
+import org.testin.testcase.createDialog.TestCaseBaseDialog;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;

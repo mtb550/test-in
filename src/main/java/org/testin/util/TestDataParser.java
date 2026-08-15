@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
-import org.testin.mappers.Config;
+import org.testin.model.Config;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

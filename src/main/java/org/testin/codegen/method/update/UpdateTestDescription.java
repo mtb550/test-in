@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiMethod;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

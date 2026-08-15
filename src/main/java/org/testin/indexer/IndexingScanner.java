@@ -8,10 +8,10 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
 import org.testin.enums.ProjectStatus;
 import org.testin.logger.Logger;
-import org.testin.mappers.DirectoryMapper;
-import org.testin.mappers.dto.TestCaseDto;
-import org.testin.mappers.dto.TestRunDto;
-import org.testin.mappers.dto.dirs.*;
+import org.testin.model.DirectoryMapper;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.TestRunDto;
+import org.testin.model.dto.dirs.*;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 

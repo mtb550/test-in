@@ -10,7 +10,7 @@ import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
 import org.testin.codegen.NoJavaCode;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.nodeCreator.*;
+import org.testin.creator.*;
 import org.testin.services.Services;
 
 import javax.swing.*;

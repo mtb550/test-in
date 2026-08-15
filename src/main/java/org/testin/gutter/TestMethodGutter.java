@@ -14,11 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.viewPanel.ViewPanel;
-import org.testin.viewPanel.ViewToolWindowFactory;
+import org.testin.view.ViewPanel;
+import org.testin.view.ViewToolWindowFactory;
 
 import java.util.Collection;
 import java.util.Collections;

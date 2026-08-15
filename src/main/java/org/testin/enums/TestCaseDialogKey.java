@@ -2,7 +2,7 @@ package org.testin.enums;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusBar.StatusBarItem;
+import org.testin.statusbar.StatusBarItem;
 import org.testin.util.Shortcuts;
 
 import java.util.Arrays;

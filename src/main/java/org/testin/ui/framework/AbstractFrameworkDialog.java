@@ -6,8 +6,8 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.ui.components.JBPanel;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusBar.DialogStatusBar;
-import org.testin.statusBar.StatusBarItem;
+import org.testin.statusbar.DialogStatusBar;
+import org.testin.statusbar.StatusBarItem;
 import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;

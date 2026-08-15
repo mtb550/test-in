@@ -8,7 +8,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.notifications.Notifier;
-import org.testin.projectPanel.tree.TreeUndoService;
+import org.testin.project.tree.TreeUndoService;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

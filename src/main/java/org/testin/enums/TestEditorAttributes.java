@@ -5,10 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.editorPanel.Shared;
-import org.testin.importExport.imports.ImportSetter;
-import org.testin.mappers.Config;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.editor.Shared;
+import org.testin.transfer.imports.ImportSetter;
+import org.testin.model.Config;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

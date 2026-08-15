@@ -7,7 +7,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
 import org.testin.logger.Logger;
-import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
+import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

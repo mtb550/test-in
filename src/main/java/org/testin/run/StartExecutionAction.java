@@ -5,8 +5,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.runEditor.RunEditor;
-import org.testin.editorPanel.toolBar.ToolBar;
+import org.testin.editor.runEditor.RunEditor;
+import org.testin.editor.toolBar.ToolBar;
 
 public class StartExecutionAction extends DumbAwareAction {
     private final @NotNull ToolBar callbacks;

@@ -21,12 +21,12 @@ import org.testin.enums.DirectoryType;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.logger.Logger;
-import org.testin.mappers.Config;
-import org.testin.mappers.dto.TestCaseDto;
-import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.dto.dirs.TestProjectDirectoryDto;
+import org.testin.model.Config;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.projectPanel.tree.TreeValueUtil;
+import org.testin.project.tree.TreeValueUtil;
 import org.testin.services.Services;
 
 import javax.swing.*;

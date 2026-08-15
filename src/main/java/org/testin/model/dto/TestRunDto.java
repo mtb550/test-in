@@ -1,0 +1,73 @@
+package org.testin.model.dto;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
+import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.testin.model.Config;
+import org.testin.model.TestRunItems;
+
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Accessors(chain = true)
+@SuperBuilder
+@JsonIgnoreProperties(ignoreUnknown = true)
+@ToString()
+// todo, put uuid for each test run.
+public class TestRunDto {
+
+    @NotNull
+    @Builder.Default
+    private String changeLog = "";
+
+    @NotNull
+    @Builder.Default
+    private String commitId = "";
+
+    @NotNull
+    @Builder.Default
+    private String platform = "";
+
+    @NotNull
+    @Builder.Default
+    private String component = "";
+
+    @NotNull
+    @Builder.Default
+    private String language = "";
+
+    @NotNull
+    @Builder.Default
+    private String browser = "";
+
+    @NotNull
+    @Builder.Default
+    private String deviceType = "";
+
+    @NotNull
+    @Builder.Default
+    private String testType = "";
+
+    @NotNull
+    @Builder.Default
+    private String createdBy = "";
+
+    @NotNull
+    @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+
+    @NotNull
+    @Builder.Default
+    private List<TestRunItems> results = new ArrayList<>();
+
+}

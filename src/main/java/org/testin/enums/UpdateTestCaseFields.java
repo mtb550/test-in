@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.statusBar.StatusBarItem;
-import org.testin.testCase.createDialog.CreateTestCaseSection;
-import org.testin.testCase.createDialog.TestCaseBaseDialog;
-import org.testin.testCase.updateDialog.bulk.*;
+import org.testin.statusbar.StatusBarItem;
+import org.testin.testcase.createDialog.CreateTestCaseSection;
+import org.testin.testcase.createDialog.TestCaseBaseDialog;
+import org.testin.testcase.updateDialog.bulk.*;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;

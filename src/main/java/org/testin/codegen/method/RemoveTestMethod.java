@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.method.update.UpdateTestBase;
 import org.testin.logger.Logger;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 
 public class RemoveTestMethod extends UpdateTestBase implements GenAction {
 

@@ -7,9 +7,9 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.projectPanel.tree.TreeValueUtil;
-import org.testin.viewPanel.markerDetails.MarkerDetailsViewDialog;
+import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.project.tree.TreeValueUtil;
+import org.testin.view.markerDetails.MarkerDetailsViewDialog;
 
 import javax.swing.tree.TreePath;
 

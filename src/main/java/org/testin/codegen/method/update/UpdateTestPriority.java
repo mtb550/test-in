@@ -3,7 +3,7 @@ package org.testin.codegen.method.update;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 
 public class UpdateTestPriority extends UpdateTestBase implements GenAction {
 

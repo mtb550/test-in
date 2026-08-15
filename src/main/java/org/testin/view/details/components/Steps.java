@@ -1,0 +1,52 @@
+package org.testin.view.details.components;
+
+import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBPanel;
+import com.intellij.util.ui.JBFont;
+import com.intellij.util.ui.JBUI;
+import org.jetbrains.annotations.NotNull;
+import org.testin.enums.TestEditorAttributes;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Tools;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.List;
+
+public class Steps extends BaseDetails {
+    private static final int MARGIN_BOTTOM_PER_STEP = 8;
+
+    @Override
+    public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int row) {
+
+        final List<String> steps = dto.getSteps();
+
+        if (steps.isEmpty() || steps.stream().allMatch(String::isBlank))
+            return row;
+
+        final JBPanel<?> stepsContainer = new JBPanel<>();
+        stepsContainer.setLayout(new BoxLayout(stepsContainer, BoxLayout.Y_AXIS));
+        stepsContainer.setOpaque(false);
+
+        for (int i = 0; i < steps.size(); i++) {
+            if (steps.get(i).isBlank()) continue;
+
+            final String stepText = (i + 1) + "- " + Tools.format(steps.get(i));
+            final int marginBottom = (i == steps.size() - 1) ? 0 : MARGIN_BOTTOM_PER_STEP;
+            stepsContainer.add(createStepComponent(stepText, marginBottom));
+        }
+
+        return addRow(panel, gbc, TestEditorAttributes.STEPS.getName2(), stepsContainer, row);
+    }
+
+    private @NotNull JTextArea createStepComponent(final @NotNull String text, final int marginBottom) {
+        final JTextArea stepArea = new JTextArea(text);
+        stepArea.setFont(JBFont.label().deriveFont(Font.PLAIN, getValueFontSize()));
+        stepArea.setLineWrap(true);
+        stepArea.setWrapStyleWord(true);
+        stepArea.setOpaque(false);
+        stepArea.setEditable(false);
+        stepArea.setBorder(JBUI.Borders.emptyBottom(marginBottom));
+        return stepArea;
+    }
+}

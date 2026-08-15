@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.GenAction;
 import org.testin.enums.Group;
 import org.testin.logger.Logger;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

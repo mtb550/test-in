@@ -2,8 +2,8 @@ package org.testin.enums;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.importExport.imports.ImportAction;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.transfer.imports.ImportAction;
+import org.testin.model.dto.TestCaseDto;
 
 import java.io.File;
 import java.util.List;

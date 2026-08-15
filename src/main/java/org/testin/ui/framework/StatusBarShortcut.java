@@ -2,7 +2,7 @@ package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.statusBar.StatusBarItem;
+import org.testin.statusbar.StatusBarItem;
 import org.testin.util.Shortcuts;
 
 /**

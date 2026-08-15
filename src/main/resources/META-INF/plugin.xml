@@ -98,7 +98,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <!-- Tab titles of Testin editors use the normal foreground, not the
              "unknown file" color their non-physical virtual file would get -->
-        <editorTabColorProvider implementation="org.testin.editorPanel.TestinTabColorProvider" order="first"/>
+        <editorTabColorProvider implementation="org.testin.editor.TestinTabColorProvider" order="first"/>
 
         <!-- First run activity -->
         <postStartupActivity
@@ -108,17 +108,17 @@
         <!-- File editors -->
         <virtualFileSystem
                 key="testin"
-                implementationClass="org.testin.editorPanel.TestinFileSystem"
+                implementationClass="org.testin.editor.TestinFileSystem"
                 physical="false"
         />
 
         <fileEditorProvider
-                implementation="org.testin.editorPanel.UnifiedEditorProvider"
+                implementation="org.testin.editor.UnifiedEditorProvider"
         />
 
         <!-- Editor Drop Handler -->
         <fileDropHandler
-                implementation="org.testin.projectPanel.tree.TreeDropHandler"
+                implementation="org.testin.project.tree.TreeDropHandler"
         />
 
         <!-- Services -->
@@ -129,7 +129,7 @@
         <!-- Tool windows -->
         <toolWindow
                 id="testin.tree"
-                factoryClass="org.testin.projectPanel.Main"
+                factoryClass="org.testin.project.Main"
                 anchor="left"
                 icon="/icons/pluginIcon.svg"
                 secondary="false"
@@ -138,7 +138,7 @@
 
         <toolWindow
                 id="testin.view"
-                factoryClass="org.testin.viewPanel.ViewToolWindowFactory"
+                factoryClass="org.testin.view.ViewToolWindowFactory"
                 anchor="right"
                 icon="/icons/pluginIcon.svg"
                 secondary="false"

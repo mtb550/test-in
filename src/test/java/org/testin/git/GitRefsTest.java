@@ -1,6 +1,6 @@
 package org.testin.git;
 
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.dto.TestCaseDto;
 import org.testng.annotations.Test;
 
 import java.nio.file.Path;

@@ -4,10 +4,10 @@ import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.Shared;
+import org.testin.editor.Shared;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.mappers.TestRunItems;
-import org.testin.mappers.dto.TestCaseDto;
+import org.testin.model.TestRunItems;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

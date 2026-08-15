@@ -2,7 +2,7 @@ package org.testin.enums;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.mappers.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.util.function.Consumer;
 
