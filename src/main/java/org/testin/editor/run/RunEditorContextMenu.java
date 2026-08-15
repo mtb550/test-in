@@ -19,7 +19,6 @@ import org.testin.run.RunTestCaseAction;
 import org.testin.run.StartExecutionAction;
 import org.testin.testrun.SetTestCaseStatusAction;
 import org.testin.testrun.UpdateRunItemAction;
-import org.testin.view.CloseTestCaseDetailsAction;
 import org.testin.view.ViewDetailsAction;
 
 public class RunEditorContextMenu extends AbstractEditorContextMenu {
@@ -63,7 +62,6 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu) {
         new EscapeAction(p, list);
         new OpenContextMenuAction(list, menu);
-        new CloseTestCaseDetailsAction(list);
         new GenerateReportAction(p, ui, list);
     }
 }
