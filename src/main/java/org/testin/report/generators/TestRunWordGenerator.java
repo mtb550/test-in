@@ -28,6 +28,7 @@ import org.testin.enums.BugPriority;
 import org.testin.enums.BugSeverity;
 import org.testin.enums.TestRunConfiguration;
 import org.testin.enums.TestStatus;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.logger.Logger;
 import org.testin.model.Config;
 import org.testin.model.TestRunItems;
@@ -35,7 +36,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 
 import java.io.ByteArrayOutputStream;

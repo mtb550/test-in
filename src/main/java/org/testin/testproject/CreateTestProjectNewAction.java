@@ -7,11 +7,11 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GenType;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryMapper;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 

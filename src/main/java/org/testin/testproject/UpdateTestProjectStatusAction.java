@@ -8,13 +8,13 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.enums.ProjectStatus;
+import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ExplorerPanel;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 

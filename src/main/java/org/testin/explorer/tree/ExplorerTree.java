@@ -11,9 +11,9 @@ import com.intellij.util.ui.tree.TreeUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.explorer.ExplorerPanel;
 
 import javax.swing.*;
 import java.util.HashSet;

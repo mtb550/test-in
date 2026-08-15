@@ -7,11 +7,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ExplorerPanel;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 

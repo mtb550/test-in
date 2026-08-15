@@ -3,9 +3,9 @@ package org.testin.explorer.projectSelector;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.explorer.ExplorerPanel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -16,6 +16,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.runEditor.RunEditor;
 import org.testin.enums.FileTypes;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.Config;
@@ -24,7 +25,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 

@@ -4,8 +4,8 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.report.GenerateReportAction;
 import org.testin.explorer.ExplorerPanel;
+import org.testin.report.GenerateReportAction;
 import org.testin.services.Services;
 
 public class GenerateReportBtn extends AbstractButton implements ToolbarItem {

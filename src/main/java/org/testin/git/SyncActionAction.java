@@ -16,12 +16,12 @@ import git4idea.GitUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
+import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ExplorerPanel;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 
 import javax.swing.tree.TreePath;

@@ -20,13 +20,13 @@ import org.jetbrains.jps.model.java.JavaSourceRootType;
 import org.testin.enums.DirectoryType;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.Config;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 
 import javax.swing.*;

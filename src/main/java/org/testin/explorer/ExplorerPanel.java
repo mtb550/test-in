@@ -12,14 +12,14 @@ import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.logger.Logger;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.projectSelector.TestProjectSelector;
 import org.testin.explorer.tree.ExplorerTree;
 import org.testin.explorer.versionSelector.BranchSelector;
+import org.testin.logger.Logger;
 import org.testin.services.Services;
-import org.testin.setting.TestinRoot;
 import org.testin.setting.SettingsConfigurable;
+import org.testin.setting.TestinRoot;
 import org.testin.util.Bundle;
 
 import java.awt.*;
