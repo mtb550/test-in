@@ -26,7 +26,6 @@ import org.testin.model.BugSeverity;
 import org.testin.model.Config;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -160,19 +159,21 @@ public final class TestRunPdfGenerator {
             document.add(sec2);
 
             document.add(new Paragraph(
-                    String.format("A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.", summary.total(), summary.passRate()))
+                    String.format("This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
+                            summary.total(), summary.executed(), summary.passRate()))
                     .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                     .setMarginBottom(12));
 
 
-            Table statsTable = new Table(UnitValue.createPercentArray(new float[]{20, 20, 20, 20, 20}))
+            Table statsTable = new Table(UnitValue.createPercentArray(new float[]{100f / 6, 100f / 6, 100f / 6, 100f / 6, 100f / 6, 100f / 6}))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
             addStatCell(statsTable, String.valueOf(summary.total()), "Total Cases", DARK_NAVY, boldFont);
             addStatCell(statsTable, String.valueOf(summary.passed()), "Passed", GREEN, boldFont);
             addStatCell(statsTable, String.valueOf(summary.failed()), "Failed", RED, boldFont);
-            addStatCell(statsTable, String.valueOf(summary.pending() + summary.blocked()), "Blocked", DARK_YELLOW, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW, boldFont);
+            addStatCell(statsTable, String.valueOf(summary.untested()), "Untested", DARK_GRAY, boldFont);
             addStatCell(statsTable, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE, boldFont);
 
             document.add(statsTable);
@@ -202,37 +203,31 @@ public final class TestRunPdfGenerator {
                             .setMarginBottom(6));
             document.add(failedHeading);
 
-            // Pending
-            Paragraph pendingHeading = new Paragraph()
-                    .add(new Paragraph("Pending (" + (summary.pending() + summary.blocked()) + ")")
+            // Blocked
+            Paragraph blockedHeading = new Paragraph()
+                    .add(new Paragraph("Blocked (" + summary.blocked() + ")")
                             .setFont(boldFont).setFontSize(11).setFontColor(DARK_YELLOW)
                             .setMarginBottom(6));
-            document.add(pendingHeading);
+            document.add(blockedHeading);
 
-            // SECTION 4: FAILED TEST CASES (only if any failures exist)
-            if (summary.failed() > 0) {
+            // Untested
+            Paragraph untestedHeading = new Paragraph()
+                    .add(new Paragraph("Untested (" + summary.untested() + ")")
+                            .setFont(boldFont).setFontSize(11).setFontColor(DARK_GRAY)
+                            .setMarginBottom(6));
+            document.add(untestedHeading);
 
-                buildCaseTable(document, "4", "Failed Test Cases",
-                        "The following %d cases failed and require remediation. Real-user identification validation is the primary defect cluster.",
-                        summary.failed(), tr, detailsMap, boldFont, regularFont, RED, true, true, true,
-                        item -> item.getStatus() == TestStatus.FAILED);
-            }
+            // SECTIONS 4+: one case table per status, empty ones omitted. Numbered
+            // as printed rather than per section, so a run with nothing blocked
+            // does not jump from 5 to 7.
+            int sectionNumber = 4;
+            for (final ReportSection section : ReportSection.values()) {
+                final long count = section.count(summary);
+                if (count == 0) continue;
 
-            // SECTION 5: PASSED TEST CASES (only if any passed exist)
-            if (summary.passed() > 0) {
-                buildCaseTable(document, "5", "Passed Test Cases",
-                        "The following %d cases passed validation and behaved as expected across all verification points.",
-                        summary.passed(), tr, detailsMap, boldFont, regularFont, GREEN, false, false, false,
-                        item -> item.getStatus() == TestStatus.PASSED);
-            }
-
-            // SECTION 6: PENDING TEST CASES (only if any pending exist)
-            long pendingTotal = summary.pending() + summary.blocked();
-            if (pendingTotal > 0) {
-                buildCaseTable(document, "6", "Pending Test Cases",
-                        "The following %d cases were not executed in this cycle, primarily blocked by environment/data dependencies. They are carried forward to the next run.",
-                        pendingTotal, tr, detailsMap, boldFont, regularFont, DARK_YELLOW, false, false, false,
-                        item -> item.getStatus() == TestStatus.PENDING || item.getStatus() == TestStatus.UNTESTED || item.getStatus() == TestStatus.BLOCKED);
+                buildCaseTable(document, String.valueOf(sectionNumber++), section.getTitle(),
+                        section.description(String.valueOf(count)), tr, detailsMap, boldFont, regularFont,
+                        colorOf(section), section.isWithFailureDetail(), section::matches);
             }
 
 
@@ -274,13 +269,27 @@ public final class TestRunPdfGenerator {
     }
 
 
+    /**
+     * The header color of a section's table. Kept here rather than on
+     * {@link ReportSection} because each format has its own color type — iText
+     * wants a DeviceRgb, Word a hex string — and a shared section has no business
+     * knowing about either.
+     */
+    private @NotNull DeviceRgb colorOf(final @NotNull ReportSection section) {
+        return switch (section) {
+            case FAILED -> RED;
+            case PASSED -> GREEN;
+            case BLOCKED -> DARK_YELLOW;
+            case UNTESTED -> DARK_GRAY;
+        };
+    }
+
     private void buildCaseTable(final @NotNull Document document, final @NotNull String sectionNumber,
-                                final @NotNull String sectionTitle, final @NotNull String descriptionFmt,
-                                final long count, final @NotNull TestRunDto tr,
+                                final @NotNull String sectionTitle, final @NotNull String description,
+                                final @NotNull TestRunDto tr,
                                 final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull PdfFont boldFont,
                                 final @NotNull PdfFont regularFont, final @NotNull DeviceRgb headerBg,
-                                final boolean withPriority, final boolean withSeverity,
-                                final boolean withActualResult, final @NotNull Predicate<TestRunItems> filter) {
+                                final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         document.add(new Paragraph(sectionNumber + ". " + sectionTitle)
                 .setFont(boldFont)
                 .setFontSize(13)
@@ -290,14 +299,12 @@ public final class TestRunPdfGenerator {
                 .setMarginBottom(9)
                 .setMarginTop(20));
 
-        document.add(new Paragraph(
-                String.format(descriptionFmt, count))
+        document.add(new Paragraph(description)
                 .setFont(regularFont).setFontSize(11).setFontColor(BLACK)
                 .setMarginBottom(12));
 
-
         // Column widths depend on which extra columns are shown
-        int extraCols = (withPriority ? 1 : 0) + (withSeverity ? 1 : 0);
+        int extraCols = withFailureDetail ? 2 : 0;
         float[] widths = COLUMN_WIDTHS.getOrDefault(extraCols, new float[]{7, 73, 10, 10});
         Table table = new Table(UnitValue.createPercentArray(widths))
                 .useAllAvailableWidth()
@@ -306,8 +313,8 @@ public final class TestRunPdfGenerator {
         // Header row
         addCaseTableHeader(table, "#", headerBg, boldFont);
         addCaseTableHeader(table, "Test Case", headerBg, boldFont);
-        if (withPriority) addCaseTableHeader(table, "Priority", headerBg, boldFont);
-        if (withSeverity) addCaseTableHeader(table, "Severity", headerBg, boldFont);
+        if (withFailureDetail) addCaseTableHeader(table, "Priority", headerBg, boldFont);
+        if (withFailureDetail) addCaseTableHeader(table, "Severity", headerBg, boldFont);
 
         // Data rows — alternating LIGHT_BG / WHITE
         int idx = 1;
@@ -340,7 +347,7 @@ public final class TestRunPdfGenerator {
             testCaseCell.add(new Paragraph(tcName)
                     .setFont(regularFont).setFontSize(9.5f).setFontColor(BLACK)
                     .setMarginBottom(0));
-            if (withActualResult) {
+            if (withFailureDetail) {
                 String actualResult = item.getActualResult();
                 if (actualResult.isEmpty()) actualResult = "—";
                 testCaseCell.add(new Paragraph("Actual result: " + actualResult)
@@ -348,7 +355,7 @@ public final class TestRunPdfGenerator {
             }
             table.addCell(testCaseCell);
 
-            if (withPriority) {
+            if (withFailureDetail) {
                 BugPriority pri = item.getBugPriority();
                 DeviceRgb priColor = PRIORITY_COLOR.getOrDefault(pri, DARK_GRAY);
                 String priText = pri.getName();
@@ -362,7 +369,7 @@ public final class TestRunPdfGenerator {
                                 .setTextAlignment(TextAlignment.CENTER)));
             }
 
-            if (withSeverity) {
+            if (withFailureDetail) {
                 BugSeverity sev = item.getBugSeverity();
                 DeviceRgb sevColor = SEVERITY_COLOR.getOrDefault(sev, DARK_GRAY);
                 String sevText = sev.getName();

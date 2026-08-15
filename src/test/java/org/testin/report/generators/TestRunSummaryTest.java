@@ -29,14 +29,14 @@ public class TestRunSummaryTest {
     }
 
     @Test
-    public void pendingCountsBothWaysOfNotHavingBeenRun() {
+    public void untestedCountsBothWaysOfNotHavingBeenRun() {
         // The regression: a completed run holds UNTESTED, not PENDING.
         final TestRunSummary summary = TestRunSummary.of(List.of(
                 item(TestStatus.UNTESTED),
                 item(TestStatus.UNTESTED),
                 item(TestStatus.PENDING)));
 
-        assertEquals(summary.pending(), 3, "UNTESTED is pending that has outlived the run");
+        assertEquals(summary.untested(), 3, "PENDING is untested that the run has not reached yet");
     }
 
     @Test
@@ -45,9 +45,9 @@ public class TestRunSummaryTest {
                 item(TestStatus.PASSED),
                 item(TestStatus.UNTESTED)));
 
-        assertEquals(summary.pending(), 1);
+        assertEquals(summary.untested(), 1);
         assertEquals(summary.passed(), 1);
-        assertEquals(summary.passRate(), 50);
+        assertEquals(summary.passRate(), 100, "one case ran and it passed; the untested one is not a failure");
     }
 
     @Test
@@ -63,8 +63,9 @@ public class TestRunSummaryTest {
         assertEquals(summary.passed(), 2);
         assertEquals(summary.failed(), 1);
         assertEquals(summary.blocked(), 1);
-        assertEquals(summary.pending(), 1);
-        assertEquals(summary.passRate(), 40);
+        assertEquals(summary.untested(), 1);
+        assertEquals(summary.executed(), 4, "passed, failed and blocked were run; the pending one was not");
+        assertEquals(summary.passRate(), 50, "2 of the 4 that ran");
     }
 
     @Test
@@ -84,6 +85,52 @@ public class TestRunSummaryTest {
                 item(TestStatus.FAILED)));
 
         assertEquals(summary.passRate(), 33);
+    }
+
+    // ------------------------------------------------------- what the rate is of
+
+    /**
+     * The rate measures the cases that were run, not the size of the run. It used
+     * to divide by every case, so building a hundred and running ten reported 10%
+     * even when all ten passed - a number that described how much work was left
+     * rather than how the tests did.
+     */
+    @Test
+    public void untestedCasesDoNotDragThePassRateDown() {
+        final TestRunSummary summary = TestRunSummary.of(List.of(
+                item(TestStatus.PASSED),
+                item(TestStatus.PASSED),
+                item(TestStatus.UNTESTED),
+                item(TestStatus.UNTESTED),
+                item(TestStatus.PENDING)));
+
+        assertEquals(summary.total(), 5);
+        assertEquals(summary.executed(), 2);
+        assertEquals(summary.passRate(), 100);
+    }
+
+    /**
+     * Blocked counts as run: it was attempted and something stopped it, which is
+     * a result the rate should reflect.
+     */
+    @Test
+    public void blockedCountsAgainstThePassRate() {
+        final TestRunSummary summary = TestRunSummary.of(List.of(
+                item(TestStatus.PASSED),
+                item(TestStatus.BLOCKED)));
+
+        assertEquals(summary.executed(), 2);
+        assertEquals(summary.passRate(), 50);
+    }
+
+    @Test
+    public void aRunNobodyStartedHasNoRateRatherThanZeroPercentOfNothing() {
+        final TestRunSummary summary = TestRunSummary.of(List.of(
+                item(TestStatus.PENDING),
+                item(TestStatus.PENDING)));
+
+        assertEquals(summary.executed(), 0);
+        assertEquals(summary.passRate(), 0);
     }
 
     // ------------------------------------------------------------ executed by

@@ -45,7 +45,7 @@ public final class TestRunHtmlGenerator {
         final long passed = summary.passed();
         final long failed = summary.failed();
         final long blocked = summary.blocked();
-        final long pending = summary.pending();
+        final long untested = summary.untested();
         final int passRate = summary.passRate();
 
         // Run-level metadata
@@ -120,9 +120,9 @@ public final class TestRunHtmlGenerator {
         html.append("<div class='section-title-bar'><div class='section-title'>2. Execution Summary</div></div>");
 
         html.append("<div class='summary-text'>")
-                .append("A total of <b>").append(total).append("</b> API functional test cases were executed for ")
-                .append("<b>").append(runName).append("</b>. The run completed with a <b>").append(passRate).append("%</b> pass rate. ")
-                .append("The results below summarize the outcome across all executed cases.")
+                .append("<b>").append(runName).append("</b> holds <b>").append(total).append("</b> test cases, of which <b>")
+                .append(summary.executed()).append("</b> were executed. Of those, <b>").append(passRate).append("%</b> passed. ")
+                .append("The results below summarize the outcome.")
                 .append("</div>");
 
         // Summary cards
@@ -131,26 +131,23 @@ public final class TestRunHtmlGenerator {
         summaryCard(html, String.valueOf(passed), "Passed", GREEN);
         summaryCard(html, String.valueOf(failed), "Failed", RED);
         summaryCard(html, String.valueOf(blocked), "Blocked", ORANGE);
-        summaryCard(html, String.valueOf(pending), "Pending", GOLD);
+        summaryCard(html, String.valueOf(untested), "Untested", GRAY);
         summaryCard(html, passRate + "%", "Pass Rate", DARK_BLUE);
         html.append("</div>");
 
-        // SECTION 3: Failed Test Cases
-        if (failed > 0)
-            appendCaseTable(html, 3, "Failed Test Cases",
-                    "The following <b>" + failed + "</b> cases failed and require remediation.",
-                    results, detailsMap, r -> r.getStatus() == TestStatus.FAILED);
+        // SECTIONS 3+: one case table per status, empty ones omitted, numbered as
+        // printed. Driven by the shared sections, so this report lists the same
+        // cases under the same headings as the PDF and the Word version of the
+        // same run - including the passed table, which HTML used to leave out.
+        int sectionNumber = 3;
+        for (final ReportSection section : ReportSection.values()) {
+            final long count = section.count(summary);
+            if (count == 0) continue;
 
-        // SECTION 4: Pending Test Cases
-        if (pending > 0)
-            appendCaseTable(html, failed > 0 ? 4 : 3, "Pending Test Cases",
-                    "The following <b>" + pending + "</b> cases are pending execution.",
-                    results, detailsMap,
-                    // Must match how the count above is reached: TestRunSummary treats
-                    // pending as PENDING + UNTESTED, because completing a run turns one
-                    // into the other. Filtering on PENDING alone printed the heading and
-                    // the count, then an empty table, on every completed run.
-                    r -> r.getStatus() == TestStatus.PENDING || r.getStatus() == TestStatus.UNTESTED);
+            appendCaseTable(html, sectionNumber++, section.getTitle(),
+                    section.description("<b>" + count + "</b>"),
+                    results, detailsMap, section::matches);
+        }
 
         // FOOTER
         html.append("<div class='footer'>")

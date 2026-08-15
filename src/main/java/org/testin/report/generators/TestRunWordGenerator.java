@@ -31,7 +31,6 @@ import org.testin.model.BugSeverity;
 import org.testin.model.Config;
 import org.testin.model.TestRunConfiguration;
 import org.testin.model.TestRunItems;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
@@ -128,46 +127,38 @@ public final class TestRunWordGenerator {
                 addHeading(doc, "2. Execution Summary", 20, 12);
 
                 addText(doc, String.format(
-                        "A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.",
-                        summary.total(), summary.passRate()), 11, false, BLACK, null, 12);
+                        "This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
+                        summary.total(), summary.executed(), summary.passRate()), 11, false, BLACK, null, 12);
 
-                XWPFTable statsTable = doc.createTable(1, 5);
+                XWPFTable statsTable = doc.createTable(1, 6);
                 statsTable.setWidth("100%");
                 statsTable.setWidthType(TableWidthType.PCT);
                 setTableBorders(statsTable);
-                setTableWidths(statsTable, 20, 20, 20, 20, 20);
+                setTableWidths(statsTable, 17, 17, 17, 17, 16, 16);
 
                 addStatCell(statsTable, 0, String.valueOf(summary.total()), "Total Cases", DARK_NAVY);
                 addStatCell(statsTable, 1, String.valueOf(summary.passed()), "Passed", GREEN);
                 addStatCell(statsTable, 2, String.valueOf(summary.failed()), "Failed", RED);
-                addStatCell(statsTable, 3, String.valueOf(summary.pending() + summary.blocked()), "Blocked", DARK_YELLOW);
-                addStatCell(statsTable, 4, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
+                addStatCell(statsTable, 3, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW);
+                addStatCell(statsTable, 4, String.valueOf(summary.untested()), "Untested", DARK_GRAY);
+                addStatCell(statsTable, 5, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
 
                 addHeading(doc, "3. Result Analysis", 20, 12);
                 addColoredCount(doc, "Passed (" + summary.passed() + ")", GREEN);
                 addColoredCount(doc, "Failed (" + summary.failed() + ")", RED);
-                addColoredCount(doc, "Pending (" + (summary.pending() + summary.blocked()) + ")", DARK_YELLOW);
+                addColoredCount(doc, "Blocked (" + summary.blocked() + ")", DARK_YELLOW);
+                addColoredCount(doc, "Untested (" + summary.untested() + ")", DARK_GRAY);
 
-                if (summary.failed() > 0) {
-                    buildCaseTable(doc, "4", "Failed Test Cases",
-                            "The following %d cases failed and require remediation. Real-user identification validation is the primary defect cluster.",
-                            summary.failed(), tr, detailsMap, RED, true, true, true,
-                            item -> item.getStatus() == TestStatus.FAILED);
-                }
+                // One case table per status, empty ones omitted, numbered as
+                // printed so an absent section leaves no gap in the numbering.
+                int sectionNumber = 4;
+                for (final ReportSection section : ReportSection.values()) {
+                    final long count = section.count(summary);
+                    if (count == 0) continue;
 
-                if (summary.passed() > 0) {
-                    buildCaseTable(doc, "5", "Passed Test Cases",
-                            "The following %d cases passed validation and behaved as expected across all verification points.",
-                            summary.passed(), tr, detailsMap, GREEN, false, false, false,
-                            item -> item.getStatus() == TestStatus.PASSED);
-                }
-
-                long pendingTotal = summary.pending() + summary.blocked();
-                if (pendingTotal > 0) {
-                    buildCaseTable(doc, "6", "Pending Test Cases",
-                            "The following %d cases were not executed in this cycle, primarily blocked by environment/data dependencies. They are carried forward to the next run.",
-                            pendingTotal, tr, detailsMap, DARK_YELLOW, false, false, false,
-                            item -> item.getStatus() == TestStatus.PENDING || item.getStatus() == TestStatus.UNTESTED || item.getStatus() == TestStatus.BLOCKED);
+                    buildCaseTable(doc, String.valueOf(sectionNumber++), section.getTitle(),
+                            section.description(String.valueOf(count)), tr, detailsMap, colorOf(section),
+                            section.isWithFailureDetail(), section::matches);
                 }
 
                 addFooter(doc, ZonedDateTime.now().format(Config.getDateFormatterPattern()));
@@ -277,16 +268,29 @@ public final class TestRunWordGenerator {
         hrun.setColor(headingColor);
     }
 
-    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber,
-                                final @NotNull String sectionTitle, final @NotNull String descriptionFmt,
-                                final long count, final @NotNull TestRunDto tr,
-                                final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg,
-                                final boolean withPriority, final boolean withSeverity,
-                                final boolean withActualResult, final @NotNull Predicate<TestRunItems> filter) {
-        addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
-        addText(doc, String.format(descriptionFmt, count), 11, false, BLACK, null, 12);
+    /**
+     * The header color of a section's table. Per format, because Word wants a hex
+     * string where the PDF wants a DeviceRgb, and a shared section definition has
+     * no business knowing about either.
+     */
+    private @NotNull String colorOf(final @NotNull ReportSection section) {
+        return switch (section) {
+            case FAILED -> RED;
+            case PASSED -> GREEN;
+            case BLOCKED -> DARK_YELLOW;
+            case UNTESTED -> DARK_GRAY;
+        };
+    }
 
-        int cols = 1 + 1 + (withPriority ? 1 : 0) + (withSeverity ? 1 : 0);
+    private void buildCaseTable(final @NotNull XWPFDocument doc, final @NotNull String sectionNumber,
+                                final @NotNull String sectionTitle, final @NotNull String description,
+                                final @NotNull TestRunDto tr,
+                                final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg,
+                                final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
+        addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
+        addText(doc, description, 11, false, BLACK, null, 12);
+
+        int cols = withFailureDetail ? 4 : 2;
         XWPFTable table = doc.createTable(1, cols);
         table.setWidth("100%");
         table.setWidthType(TableWidthType.PCT);
@@ -294,8 +298,8 @@ public final class TestRunWordGenerator {
         XWPFTableRow headerRow = table.getRow(0);
         addCaseHeader(headerRow, 0, "#", headerBg);
         addCaseHeader(headerRow, 1, "Test Case", headerBg);
-        if (withPriority) addCaseHeader(headerRow, 2, "Priority", headerBg);
-        if (withSeverity) addCaseHeader(headerRow, 3, "Severity", headerBg);
+        if (withFailureDetail) addCaseHeader(headerRow, 2, "Priority", headerBg);
+        if (withFailureDetail) addCaseHeader(headerRow, 3, "Severity", headerBg);
 
         int idx = 1;
         boolean alt = true;
@@ -320,7 +324,7 @@ public final class TestRunWordGenerator {
             if (tcName.isEmpty()) tcName = "—";
             setCellText(tcCell, tcName, 9, false, BLACK);
 
-            if (withActualResult) {
+            if (withFailureDetail) {
                 String actualResult = item.getActualResult();
                 if (actualResult.isEmpty()) actualResult = "—";
                 XWPFParagraph ap = tcCell.addParagraph();
@@ -331,7 +335,7 @@ public final class TestRunWordGenerator {
                 arun.setColor(DARK_GRAY);
             }
 
-            if (withPriority) {
+            if (withFailureDetail) {
                 XWPFTableCell priCell = row.getCell(2);
                 shadeCell(priCell, rowBg);
                 setCellPadding(priCell, 4, 6, 4, 6);
@@ -340,7 +344,7 @@ public final class TestRunWordGenerator {
                 setCellText(priCell, pri.getName(), 9, true, priColor);
             }
 
-            if (withSeverity) {
+            if (withFailureDetail) {
                 XWPFTableCell sevCell = row.getCell(3);
                 shadeCell(sevCell, rowBg);
                 setCellPadding(sevCell, 4, 6, 4, 6);

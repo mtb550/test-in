@@ -40,7 +40,22 @@ public final class TestRunExcelGenerator {
             ws.style(2, 0).bold().set();
             ws.value(2, 1, trDir.getMarker().getStatus().name());
 
-            int row = 4;
+            // The same headline the other three formats print, from the same
+            // summary, so a spreadsheet and a PDF of one run cannot disagree.
+            final TestRunSummary summary = TestRunSummary.of(tr.getResults());
+            final String[] headings = {"Passed", "Failed", "Blocked", "Untested", "Executed", "Pass Rate"};
+            final String[] values = {
+                    String.valueOf(summary.passed()), String.valueOf(summary.failed()),
+                    String.valueOf(summary.blocked()), String.valueOf(summary.untested()),
+                    String.valueOf(summary.executed()), summary.passRate() + "%"};
+
+            for (int col = 0; col < headings.length; col++) {
+                ws.value(4, col, headings[col]);
+                ws.style(4, col).bold().set();
+                ws.value(5, col, values[col]);
+            }
+
+            int row = 7;
             ws.value(row, 0, "Test Case ID");
             ws.value(row, 1, "Description");
             ws.value(row, 2, "Status");
