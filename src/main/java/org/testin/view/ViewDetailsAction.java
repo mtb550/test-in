@@ -18,7 +18,7 @@ public class ViewDetailsAction extends AbstractProjectAction {
     private final @NotNull ArrayList<String> path;
 
     public ViewDetailsAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull ArrayList<String> path) {
-        super(p, "View Details", "", AllIcons.Actions.PreviewDetails);
+        super(p, "View Details", "Show the selected test cases in the details panel", AllIcons.Actions.PreviewDetails);
         this.list = list;
         this.path = path;
         this.registerCustomShortcutSet(Shortcuts.Enter.getCustomShortcut(), list);

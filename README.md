@@ -59,9 +59,10 @@ and restart.
 
 <!-- TODO: Marketplace listing URL -->
 
-Then set the Testin root in **Settings → Testin** — the folder in your
+Then set the Testin root in **Settings → Tools → Testin** — the folder in your
 automation repository where test cases will live — and create your first test
-project from the panel.
+project from the panel. Testin's settings are per-IDE, not per-project: the root
+you choose is the one every open project uses.
 
 ## Building from source
 
@@ -71,8 +72,9 @@ project from the panel.
 pwsh tools/inspect.ps1   # run the IntelliJ inspections headlessly
 ```
 
-The sandbox writes to `.sandbox/`; the inspection tooling writes to `build/`.
-Neither is committed.
+The sandbox writes to `.sandbox/`; the inspection tooling writes to
+`.inspection/`, deliberately outside `build/` so `./gradlew clean` does not
+delete the findings list. Neither is committed.
 
 ## Contributing
 

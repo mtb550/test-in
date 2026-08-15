@@ -32,7 +32,7 @@ public class EscapeAction extends AbstractProjectAction {
     private final @Nullable JBTable table;
 
     public EscapeAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull TreeTransferHandler transferHandler) {
-        super(p, "Escape Action", "", AllIcons.Actions.InlayGear);
+        super(p, "Escape Action", "Clear a pending cut or copy in the tree", AllIcons.Actions.InlayGear);
         this.tree = tree;
         this.transferHandler = transferHandler;
         this.list = null;
@@ -41,7 +41,7 @@ public class EscapeAction extends AbstractProjectAction {
     }
 
     public EscapeAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
-        super(p, "Escape Action", "", AllIcons.Actions.InlayGear);
+        super(p, "Escape Action", "Clear a pending cut or copy, close the details panel, then clear the selection", AllIcons.Actions.InlayGear);
         this.list = list;
         this.table = null;
         this.tree = null;
@@ -53,7 +53,7 @@ public class EscapeAction extends AbstractProjectAction {
      * Grid view: same behavior as the list, except while a cell is being edited.
      */
     public EscapeAction(final @NotNull Project p, final @NotNull JBTable table) {
-        super(p, "Escape Action", "", AllIcons.Actions.InlayGear);
+        super(p, "Escape Action", "Cancel the cell being edited, or clear the selection when not editing", AllIcons.Actions.InlayGear);
         this.table = table;
         this.list = null;
         this.tree = null;

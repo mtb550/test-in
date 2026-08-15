@@ -32,7 +32,7 @@ public class GridViewDetailsAction extends AbstractProjectAction {
 
     public GridViewDetailsAction(final @NotNull Project p, final @NotNull JBTable table,
                                  final @NotNull List<TestCaseDto> pageItems, final @NotNull ArrayList<String> path) {
-        super(p, "View Details", "", AllIcons.Actions.PreviewDetails);
+        super(p, "View Details", "Show the selected grid row in the details panel", AllIcons.Actions.PreviewDetails);
         this.table = table;
         this.pageItems = pageItems;
         this.path = path;

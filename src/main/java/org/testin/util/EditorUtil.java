@@ -155,13 +155,15 @@ public final class EditorUtil {
 
                 if ("ts".equals(type)) {
                     final TestSetDirectoryDto ts = indexer.getTestSetByPath(path);
-                    Logger.debug("EditorStateService: lookup testSet by path '" + path + "' -> " + "found");
+                    Logger.debug("EditorStateService: lookup testSet by path '" + path + "' -> "
+                            + (ts != null ? "found" : "not indexed"));
 
                     openIfNotOpen(p, ts);
 
                 } else if ("tr".equals(type)) {
                     final TestRunDirectoryDto tr = indexer.getTestRunDirByPath(path);
-                    Logger.debug("EditorStateService: lookup testRun by path '" + path + "' -> " + "found");
+                    Logger.debug("EditorStateService: lookup testRun by path '" + path + "' -> "
+                            + (tr != null ? "found" : "not indexed"));
                     openIfNotOpen(p, tr);
 
                 } else {
