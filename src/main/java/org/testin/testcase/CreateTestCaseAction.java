@@ -10,14 +10,14 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.testEditor.TestEditor;
+import org.testin.editor.test.TestEditor;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.services.TestCasePersistService;
-import org.testin.testcase.createDialog.CreateTestCaseDialog;
+import org.testin.testcase.create.CreateTestCaseDialog;
 import org.testin.util.Shortcuts;
 
 import java.util.List;

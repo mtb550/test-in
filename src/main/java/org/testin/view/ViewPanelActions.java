@@ -2,8 +2,8 @@ package org.testin.view;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.statusBar.NextTestCaseAction;
-import org.testin.editor.statusBar.PreviousTestCaseAction;
+import org.testin.editor.statusbar.NextTestCaseAction;
+import org.testin.editor.statusbar.PreviousTestCaseAction;
 
 import javax.swing.*;
 import java.util.List;

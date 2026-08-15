@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.runEditor.RunEditor;
+import org.testin.editor.run.RunEditor;
 import org.testin.enums.FileTypes;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;

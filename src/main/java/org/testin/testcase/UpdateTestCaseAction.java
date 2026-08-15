@@ -14,7 +14,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testcase.createDialog.TestCaseUpdateMenuDialog;
+import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Shortcuts;
 
 import java.nio.file.Path;

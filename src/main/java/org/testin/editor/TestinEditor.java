@@ -3,7 +3,7 @@ package org.testin.editor;
 import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editor.statusBar.StatusBar;
+import org.testin.editor.statusbar.StatusBar;
 import org.testin.editor.toolbar.AbstractToolbarPanel;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;

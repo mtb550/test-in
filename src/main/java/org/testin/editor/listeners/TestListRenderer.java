@@ -4,8 +4,8 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.testEditor.TestCard;
-import org.testin.editor.testEditor.TestEditor;
+import org.testin.editor.test.TestCard;
+import org.testin.editor.test.TestEditor;
 import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.*;

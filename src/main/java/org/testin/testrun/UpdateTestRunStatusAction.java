@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.runEditor.RunEditor;
+import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.enums.TestRunStatus;
 import org.testin.enums.TestStatus;

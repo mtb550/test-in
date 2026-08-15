@@ -6,8 +6,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editor.runEditor.RunEditor;
-import org.testin.editor.testEditor.TestEditor;
+import org.testin.editor.run.RunEditor;
+import org.testin.editor.test.TestEditor;
 
 import javax.swing.*;
 import java.util.function.BiFunction;

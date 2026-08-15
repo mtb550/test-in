@@ -22,7 +22,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
-import org.testin.testcase.createDialog.TestCaseUpdateMenuDialog;
+import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.FontSync;
 import org.testin.util.Shortcuts;
 import org.testin.util.Tools;

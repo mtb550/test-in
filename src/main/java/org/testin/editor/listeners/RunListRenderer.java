@@ -3,8 +3,8 @@ package org.testin.editor.listeners;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editor.runEditor.RunCard;
-import org.testin.editor.runEditor.RunEditor;
+import org.testin.editor.run.RunCard;
+import org.testin.editor.run.RunEditor;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 

@@ -8,9 +8,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.statusbar.StatusBarItem;
-import org.testin.testcase.createDialog.CreateTestCaseSection;
-import org.testin.testcase.createDialog.TestCaseBaseDialog;
-import org.testin.testcase.updateDialog.bulk.*;
+import org.testin.testcase.create.CreateTestCaseSection;
+import org.testin.testcase.create.TestCaseBaseDialog;
+import org.testin.testcase.update.bulk.*;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;

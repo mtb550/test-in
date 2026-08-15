@@ -7,13 +7,13 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.runEditor.RunEditor;
+import org.testin.editor.run.RunEditor;
 import org.testin.enums.TestStatus;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
-import org.testin.testrun.createDialog.FailedResultDialog;
+import org.testin.testrun.create.FailedResultDialog;
 import org.testin.util.Tools;
 
 import java.util.List;

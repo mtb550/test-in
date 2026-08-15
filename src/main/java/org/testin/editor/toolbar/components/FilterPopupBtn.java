@@ -10,7 +10,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editor.runEditor.RunEditor;
+import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;

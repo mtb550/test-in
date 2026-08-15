@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.runEditor.RunEditor;
+import org.testin.editor.run.RunEditor;
 import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -18,7 +18,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testrun.createDialog.FailedResultDialog;
+import org.testin.testrun.create.FailedResultDialog;
 import org.testin.util.Shortcuts;
 
 

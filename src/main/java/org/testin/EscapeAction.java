@@ -12,7 +12,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editor.testEditor.TestEditorContextMenu;
+import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
