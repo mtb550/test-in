@@ -11,7 +11,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.IUIAction;
+import org.testin.enums.UIAction;
 import org.testin.enums.UpdateTestCaseFields;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.testCase.createDialog.*;
@@ -30,7 +30,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
     public UpdateTestCaseDialog(final @NotNull Project p, final @NotNull TestCaseDto existingDto, final @NotNull UpdateTestCaseFields selectedItem, final @NotNull Consumer<@NotNull TestCaseDto> onSave) {
         super(p);
 
-        final IUIAction repackPopup = () -> {
+        final UIAction repackPopup = () -> {
             // fillData can run this callback before the popup is created.
             if (popup == null) return;
             popup.pack(false, true);
@@ -43,7 +43,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
             });
         };
 
-        final ICreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
+        final CreateTestCaseSection targetSection = selectedItem.getSectionExtractor().apply(this);
 
         final JBPanel<?> mainPanel = new JBPanel<>(new BorderLayout()) {
             @Override
@@ -66,7 +66,7 @@ public class UpdateTestCaseDialog extends TestCaseBaseDialog {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
-        for (final ICreateTestCaseSection section : getAllSections()) {
+        for (final CreateTestCaseSection section : getAllSections()) {
             final JBPanel<?> slot = new JBPanel<>(new BorderLayout());
             slot.setOpaque(false);
 

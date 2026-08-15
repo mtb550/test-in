@@ -11,7 +11,7 @@ import org.testin.clipboard.CopyTestCaseNodeAction;
 import org.testin.clipboard.CutTestCaseNodeAction;
 import org.testin.clipboard.PasteTestCaseNodeAction;
 import org.testin.editorPanel.AbstractEditorContextMenu;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.statusBar.NextPageAction;
 import org.testin.editorPanel.statusBar.PrevPageAction;
 import org.testin.mappers.dto.TestCaseDto;
@@ -29,7 +29,7 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
     private final @NotNull Project p;
 
-    public TestEditorContextMenu(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
+    public TestEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model) {
         super("Test Editor Context Menu", true);
         this.p = p;
 

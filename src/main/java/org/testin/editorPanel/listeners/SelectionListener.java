@@ -5,7 +5,7 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.viewPanel.ViewToolWindowFactory;
 
@@ -19,7 +19,7 @@ import java.util.Optional;
 public class SelectionListener implements ListSelectionListener {
     private final @NotNull Project p;
     private final @NotNull JBList<TestCaseDto> list;
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
     private final @NotNull ArrayList<String> path;
 
     @Override

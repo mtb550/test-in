@@ -8,9 +8,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
-import org.testin.editorPanel.toolBar.IToolBar;
+import org.testin.editorPanel.toolBar.ToolBar;
 import org.testin.enums.TestRunStatus;
 import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
@@ -32,7 +32,7 @@ import java.util.UUID;
 @Service(Service.Level.PROJECT)
 public final class RunStatusService {
 
-    public void executeNext(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+    public void executeNext(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
         final int executingIndex = editor.getCurrentlyExecutingIndex();
@@ -63,7 +63,7 @@ public final class RunStatusService {
         });
     }
 
-    public void executeManual(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
+    public void executeManual(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
         final TestRunItems item = editor.getResultsMap().get(tc.getId());
@@ -84,7 +84,7 @@ public final class RunStatusService {
         confirmVerdict(p, status, 1);
     }
 
-    public void applyStatus(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
+    public void applyStatus(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
         final List<TestCaseDto> selectedItems = list.getSelectedValuesList();
@@ -166,15 +166,15 @@ public final class RunStatusService {
         Services.getInstance(p, ProjectIndexer.class).persistRunMarker(runPath, marker);
     }
 
-    private void triggerFilterRefresh(final @NotNull IEditor editor, final @Nullable JBList<TestCaseDto> list) {
+    private void triggerFilterRefresh(final @NotNull TestinEditor editor, final @Nullable JBList<TestCaseDto> list) {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (list != null) {
                 list.repaint();
             }
             if (editor instanceof RunEditor runEditor) {
                 runEditor.refreshAfterStatusChange();
-            } else if (editor instanceof IToolBar) {
-                ((IToolBar) editor).onToolBarFilterSelectionChanged();
+            } else if (editor instanceof ToolBar) {
+                ((ToolBar) editor).onToolBarFilterSelectionChanged();
             }
         });
     }

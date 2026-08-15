@@ -8,7 +8,7 @@ import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
-import org.testin.enums.IUIAction;
+import org.testin.enums.UIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
@@ -16,7 +16,7 @@ import org.testin.util.SpellChecker;
 import javax.swing.*;
 import java.awt.*;
 
-public class PreConditionsSection implements ICreateTestCaseSection {
+public class PreConditionsSection implements CreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 4f);
     @Getter
     private final @NotNull EditorTextField preConditionsField;
@@ -58,7 +58,7 @@ public class PreConditionsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCasePreConditions.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -76,7 +76,7 @@ public class PreConditionsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
         preConditionsField.setText(dto.getPreConditions());
     }
 }

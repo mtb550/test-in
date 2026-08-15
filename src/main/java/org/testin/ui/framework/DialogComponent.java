@@ -9,7 +9,7 @@ import javax.swing.*;
  * own layout and internal behavior (navigation, selection sync); the dialog
  * owns the title, the status bar and the shortcut-to-action mapping.
  */
-public interface IDialogComponent {
+public interface DialogComponent {
 
     /**
      * The component's whole panel, placed in the dialog center.

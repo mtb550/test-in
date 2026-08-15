@@ -2,7 +2,7 @@ package org.testin.enums;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusBar.IStatusBarItem;
+import org.testin.statusBar.StatusBarItem;
 import org.testin.util.Shortcuts;
 
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * arguments were null for two thirds of its constants.
  */
 @Getter
-public enum TestCaseDialogKey implements IStatusBarItem {
+public enum TestCaseDialogKey implements StatusBarItem {
 
     SAVE("Save", Shortcuts.Enter),
     CANCEL("Cancel", Shortcuts.Escape),

@@ -3,7 +3,7 @@ package org.testin.editorPanel.toolBar.components;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 
-public class ListViewBtn extends AbstractButton implements IToolbarItem {
+public class ListViewBtn extends AbstractButton implements ToolbarItem {
 
     public ListViewBtn(final @NotNull Runnable onSwitchToList) {
         // https://intellij-icons.jetbrains.design/

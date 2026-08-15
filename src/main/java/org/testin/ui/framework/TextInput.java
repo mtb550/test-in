@@ -18,7 +18,7 @@ import javax.swing.event.DocumentEvent;
  * other single-value input. Same look and empty-submit cue as
  * {@link TextFieldWithSelections}, without the selection list.
  */
-public final class TextInput implements IDialogComponent {
+public final class TextInput implements DialogComponent {
 
     private final @NotNull ExtendableTextField textField;
     private final @Nullable String placeHolderText;

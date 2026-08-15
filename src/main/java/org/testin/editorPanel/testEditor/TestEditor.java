@@ -18,9 +18,9 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
 import org.testin.editorPanel.EditorCenter;
 import org.testin.editorPanel.EditorFilters;
-import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.TestCaseFilter;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
 import org.testin.editorPanel.list.ListPanelBuilder;
@@ -28,8 +28,8 @@ import org.testin.editorPanel.list.ListView;
 import org.testin.editorPanel.listeners.*;
 import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
-import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.TestToolBar;
+import org.testin.editorPanel.toolBar.ToolBar;
 import org.testin.editorPanel.toolBar.components.FilterPopupBtn;
 import org.testin.editorPanel.toolBar.components.TestDetailsPopupBtn;
 import org.testin.enums.TestEditorAttributes;
@@ -56,7 +56,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TestEditor implements Disposable, IToolBar, IEditor {
+public class TestEditor implements Disposable, ToolBar, TestinEditor {
     @Getter
     private final @NotNull Project p;
 
@@ -624,7 +624,7 @@ public class TestEditor implements Disposable, IToolBar, IEditor {
 
         mainPanel.removeAll();
 
-        IEditor.super.dispose();
+        TestinEditor.super.dispose();
 
         Logger.debug("dispose test editor: " + parent.getName() + " - " + parent.getPath());
     }

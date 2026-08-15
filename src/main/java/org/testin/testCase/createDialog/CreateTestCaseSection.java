@@ -6,26 +6,26 @@ import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.enums.IUIAction;
+import org.testin.enums.UIAction;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 import java.awt.*;
 
-public interface ICreateTestCaseSection {
+public interface CreateTestCaseSection {
     @NotNull JBPanel<?> getWrapper();
 
     void showSection(final @NotNull JBPanel<?> contentPanel);
 
     void applyTo(final @NotNull TestCaseDto dto);
 
-    void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction);
+    void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction);
 
     @NotNull JComponent getFocusComponent();
 
     void setEditable(final boolean editable);
 
-    void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction);
+    void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction);
 
     default @NotNull JBPanel<?> createIconPanel(final @NotNull Icon icon) {
         final JBPanel<?> iconPanel = new JBPanel<>(new GridBagLayout());

@@ -11,7 +11,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import java.awt.event.KeyEvent;
 
-public class SearchTxt extends SearchTextField implements Disposable, IToolbarItem {
+public class SearchTxt extends SearchTextField implements Disposable, ToolbarItem {
     private final @NotNull Timer searchDebounceTimer;
     private final @NotNull Runnable onFocusReleased;
 

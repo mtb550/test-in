@@ -20,7 +20,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.JBSplitter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.ui.framework.IDialogComponent;
+import org.testin.ui.framework.DialogComponent;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Shortcuts;
 
@@ -43,7 +43,7 @@ import java.util.function.IntFunction;
  * nothing else - a value per test case or an item of an array per test case
  * look identical from here, which is why one component serves both dialogs.
  */
-final class BulkJsonEditors implements IDialogComponent {
+final class BulkJsonEditors implements DialogComponent {
 
     private final @NotNull Project p;
 
@@ -374,7 +374,7 @@ final class BulkJsonEditors implements IDialogComponent {
     }
 
     // ------------------------------------------------------------------
-    // IDialogComponent.
+    // DialogComponent.
     // ------------------------------------------------------------------
 
     @Override

@@ -19,7 +19,7 @@ import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
 import org.testin.ui.dialogs.FormRows;
-import org.testin.ui.framework.IDialogComponent;
+import org.testin.ui.framework.DialogComponent;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
  * because the hint it renders is built from the importable attributes - that is
  * an import concern, not a dialog one.
  */
-public final class SourceForm implements IDialogComponent {
+public final class SourceForm implements DialogComponent {
 
     private final @NotNull Project p;
     private final @NotNull List<TestEditorAttributes> importAttributes;

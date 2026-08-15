@@ -19,7 +19,7 @@ import java.time.temporal.ChronoUnit;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
-public class TestProjectMarker implements IMarker {
+public class TestProjectMarker implements Marker {
     @Builder.Default
     private ProjectStatus status = ProjectStatus.ACTIVE;
 

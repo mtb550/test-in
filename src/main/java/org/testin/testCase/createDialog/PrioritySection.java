@@ -9,8 +9,8 @@ import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
-import org.testin.enums.IUIAction;
 import org.testin.enums.Priority;
+import org.testin.enums.UIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.IconManager;
 import org.testin.util.Shortcuts;
@@ -20,7 +20,7 @@ import java.awt.*;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class PrioritySection implements ICreateTestCaseSection {
+public class PrioritySection implements CreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
     private final @NotNull ComboBox<Priority> priority;
     private final @NotNull JBPanel<?> wrapper;
@@ -77,7 +77,7 @@ public class PrioritySection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCasePriority.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -95,7 +95,7 @@ public class PrioritySection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
         priority.setSelectedItem(dto.getPriority());
     }
 }

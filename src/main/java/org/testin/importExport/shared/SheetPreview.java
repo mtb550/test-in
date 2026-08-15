@@ -6,7 +6,7 @@ import com.intellij.ui.components.JBTabbedPane;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.TestEditorAttributes;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.ui.framework.IDialogComponent;
+import org.testin.ui.framework.DialogComponent;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -23,7 +23,7 @@ import java.util.Map;
  * be read back is decorative, and the export dialog was exactly that for as
  * long as it built its tabs and dropped them.
  */
-public final class SheetPreview implements IDialogComponent {
+public final class SheetPreview implements DialogComponent {
 
     private final @NotNull Project p;
     private final @NotNull List<TestEditorAttributes> attributes;

@@ -9,13 +9,13 @@ import org.testin.util.Shortcuts;
 public final class DialogStatusBar extends StatusBarBase {
 
     public DialogStatusBar() {
-        this(new IStatusBarItem[]{
+        this(new StatusBarItem[]{
                 new ShortcutItem("Confirm", Shortcuts.Enter.getShortcutText()),
                 new ShortcutItem("Cancel", Shortcuts.Escape.getShortcutText())
         });
     }
 
-    private DialogStatusBar(final IStatusBarItem @NotNull [] items) {
+    private DialogStatusBar(final StatusBarItem @NotNull [] items) {
         super(items);
     }
 }

@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.EscapeAction;
 import org.testin.clipboard.CopyTestCaseAction;
 import org.testin.editorPanel.AbstractEditorContextMenu;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.statusBar.NextPageAction;
 import org.testin.editorPanel.statusBar.PrevPageAction;
 import org.testin.enums.TestStatus;
@@ -25,9 +25,9 @@ import org.testin.viewPanel.ViewDetailsAction;
 public class RunEditorContextMenu extends AbstractEditorContextMenu {
 
     private final @NotNull Project p;
-    private final @NotNull IEditor ui;
+    private final @NotNull TestinEditor ui;
 
-    public RunEditorContextMenu(final @NotNull Project p, final @NotNull IEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
+    public RunEditorContextMenu(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull DirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         super("Run Editor Context Menu", true);
         this.p = p;
         this.ui = ui;

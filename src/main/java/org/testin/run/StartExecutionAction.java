@@ -6,12 +6,12 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.DumbAwareAction;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.runEditor.RunEditor;
-import org.testin.editorPanel.toolBar.IToolBar;
+import org.testin.editorPanel.toolBar.ToolBar;
 
 public class StartExecutionAction extends DumbAwareAction {
-    private final @NotNull IToolBar callbacks;
+    private final @NotNull ToolBar callbacks;
 
-    public StartExecutionAction(final @NotNull IToolBar callbacks) {
+    public StartExecutionAction(final @NotNull ToolBar callbacks) {
         super("Start Run", "Start execution of test cases", AllIcons.Actions.Execute);
         this.callbacks = callbacks;
     }

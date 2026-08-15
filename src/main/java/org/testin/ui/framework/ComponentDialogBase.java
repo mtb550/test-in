@@ -17,7 +17,7 @@ import java.util.List;
  * existing dialogs.
  */
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ComponentDialogBase<C extends IDialogComponent> {
+public final class ComponentDialogBase<C extends DialogComponent> {
 
     private final @NotNull C component;
 
@@ -55,9 +55,9 @@ public final class ComponentDialogBase<C extends IDialogComponent> {
 
     /**
      * Wraps an application-specific component that implements
-     * {@link IDialogComponent} (e.g. a form built by its own class).
+     * {@link DialogComponent} (e.g. a form built by its own class).
      */
-    public static <C extends IDialogComponent> @NotNull ComponentDialogBase<C> of(final @NotNull C component) {
+    public static <C extends DialogComponent> @NotNull ComponentDialogBase<C> of(final @NotNull C component) {
         return new ComponentDialogBase<>(component);
     }
 

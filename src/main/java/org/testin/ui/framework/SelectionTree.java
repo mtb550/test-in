@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  * dialog. Space toggles the focused row; checking a branch checks its
  * children. The dialog reads the selection by visiting the checked nodes.
  */
-public final class SelectionTree implements IDialogComponent {
+public final class SelectionTree implements DialogComponent {
 
     private final @NotNull CheckboxTree tree;
     private final @NotNull CheckedTreeNode root;

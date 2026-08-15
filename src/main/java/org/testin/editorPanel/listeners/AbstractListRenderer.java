@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.EditorColors;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -13,7 +13,7 @@ import javax.swing.border.Border;
 import java.awt.*;
 
 @AllArgsConstructor
-public abstract class AbstractListRenderer<U extends IEditor> implements ListCellRenderer<TestCaseDto> {
+public abstract class AbstractListRenderer<U extends TestinEditor> implements ListCellRenderer<TestCaseDto> {
 
     private static final @NotNull Border SELECTED_BORDER = JBUI.Borders.customLine(EditorColors.SELECTION_BORDER, 1);
     private static final @NotNull Border UNSELECTED_BORDER = JBUI.Borders.empty(1);

@@ -21,15 +21,15 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     protected final @NotNull SearchTxt searchTxt;
 
     @Getter
-    private final @NotNull IToolBar callbacks;
+    private final @NotNull ToolBar callbacks;
 
     @Getter
-    private final @NotNull Map<Class<? extends IToolbarItem>, IToolbarItem> toolbarItems = new HashMap<>();
+    private final @NotNull Map<Class<? extends ToolbarItem>, ToolbarItem> toolbarItems = new HashMap<>();
 
     @Getter
     private @NotNull ViewMode currentView = ViewMode.LIST_VIEW;
 
-    public AbstractToolbarPanel(final @NotNull IToolBar callbacks) {
+    public AbstractToolbarPanel(final @NotNull ToolBar callbacks) {
         super(new GridBagLayout());
         this.callbacks = callbacks;
 
@@ -46,8 +46,8 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
      * state to handle. The {@code @NotNull} contract already made the platform's
      * instrumentation throw here — this only says which class was missing.
      */
-    public <T extends IToolbarItem> @NotNull T getToolbarItem(final @NotNull Class<T> itemClass) {
-        final IToolbarItem item = toolbarItems.get(itemClass);
+    public <T extends ToolbarItem> @NotNull T getToolbarItem(final @NotNull Class<T> itemClass) {
+        final ToolbarItem item = toolbarItems.get(itemClass);
         if (item == null) {
             throw new IllegalStateException(itemClass.getSimpleName() + " is not registered on " + getClass().getSimpleName());
         }
@@ -81,7 +81,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         gbc.fill = GridBagConstraints.NONE;
         gbc.weightx = 0.0;
 
-        for (final IToolbarItem item : getCustomComponents()) {
+        for (final ToolbarItem item : getCustomComponents()) {
             if (item instanceof JComponent component) {
                 toolbarItems.put(item.getClass(), item);
                 add(component, gbc);
@@ -125,7 +125,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
         repaint();
     }
 
-    protected abstract @NotNull List<IToolbarItem> getCustomComponents();
+    protected abstract @NotNull List<ToolbarItem> getCustomComponents();
 
     @Override
     public void dispose() {

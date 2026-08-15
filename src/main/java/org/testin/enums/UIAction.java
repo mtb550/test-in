@@ -1,6 +1,6 @@
 package org.testin.enums;
 
 @FunctionalInterface
-public interface IUIAction {
+public interface UIAction {
     void execute();
 }

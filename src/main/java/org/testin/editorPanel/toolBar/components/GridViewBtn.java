@@ -3,7 +3,7 @@ package org.testin.editorPanel.toolBar.components;
 import com.intellij.icons.AllIcons;
 import org.jetbrains.annotations.NotNull;
 
-public class GridViewBtn extends AbstractButton implements IToolbarItem {
+public class GridViewBtn extends AbstractButton implements ToolbarItem {
 
     public GridViewBtn(final @NotNull Runnable onSwitchToGrid) {
         // https://intellij-icons.jetbrains.design/

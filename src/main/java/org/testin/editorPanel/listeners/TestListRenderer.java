@@ -3,14 +3,14 @@ package org.testin.editorPanel.listeners;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.testEditor.TestCard;
 import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
 
-public class TestListRenderer extends AbstractListRenderer<IEditor> {
+public class TestListRenderer extends AbstractListRenderer<TestinEditor> {
     private final @NotNull TestCard card;
 
     public TestListRenderer(final @NotNull Project p, final @NotNull TestEditor editor) {

@@ -21,7 +21,7 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
 
     private final @NotNull Project p;
     private final @NotNull UnifiedVirtualFile vf;
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
 
     @Override
     public @NotNull JComponent getComponent() {

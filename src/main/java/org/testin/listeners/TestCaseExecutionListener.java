@@ -4,9 +4,9 @@ import com.intellij.util.messages.Topic;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.RunStatus;
 
-public interface ITestCaseExecutionListener {
+public interface TestCaseExecutionListener {
 
-    Topic<ITestCaseExecutionListener> TOPIC = Topic.create("RunTestCaseNotification", ITestCaseExecutionListener.class);
+    Topic<TestCaseExecutionListener> TOPIC = Topic.create("RunTestCaseNotification", TestCaseExecutionListener.class);
 
     void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final String error);
 

@@ -15,7 +15,7 @@ import java.util.Objects;
  * (e.g. bug severity, bug priority). The dialog reads {@link #getSelected()}
  * on submit; a declared initial value keeps the selection always valid.
  */
-public final class RadioSelection<T> implements IDialogComponent {
+public final class RadioSelection<T> implements DialogComponent {
 
     private final @NotNull JBPanel<?> panel;
     private final @NotNull JRadioButton firstButton;

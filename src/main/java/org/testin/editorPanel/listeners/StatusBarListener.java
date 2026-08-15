@@ -1,14 +1,14 @@
 package org.testin.editorPanel.listeners;
 
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 
 import javax.swing.*;
 import java.util.Optional;
 
 public class StatusBarListener {
 
-    public static void attach(final @NotNull IEditor editor) {
+    public static void attach(final @NotNull TestinEditor editor) {
         editor.getStatusBar().getFirstButton().addActionListener(e -> {
             editor.setCurrentPage(1);
             editor.refreshView();

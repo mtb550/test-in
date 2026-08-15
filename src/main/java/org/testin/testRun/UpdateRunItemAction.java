@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
@@ -23,10 +23,10 @@ import org.testin.util.Shortcuts;
 
 
 public class UpdateRunItemAction extends AbstractProjectAction {
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public UpdateRunItemAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public UpdateRunItemAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Failed Test Case Details", "Edit the failure details of the failed test case", AllIcons.Actions.Edit);
         this.editor = editor;
         this.list = list;

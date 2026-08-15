@@ -13,7 +13,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.FileTypes;
 import org.testin.indexer.ProjectIndexer;
@@ -43,7 +43,7 @@ public class GenerateReportAction extends AbstractProjectAction {
 
     private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
     private final @Nullable SimpleTree tree;
-    private final @Nullable IEditor editor;
+    private final @Nullable TestinEditor editor;
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, "Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
@@ -51,7 +51,7 @@ public class GenerateReportAction extends AbstractProjectAction {
         this.editor = null;
     }
 
-    public GenerateReportAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Generate Report", "Generate test run report", null);
         this.tree = null;
         this.editor = editor;

@@ -42,9 +42,9 @@ public class EditorType extends FakeFileType {
 
     @Getter
     @NotNull
-    private final BiFunction<Project, UnifiedVirtualFile, IEditor> factory;
+    private final BiFunction<Project, UnifiedVirtualFile, TestinEditor> factory;
 
-    private EditorType(final @NotNull String name, final @NotNull String description, final @NotNull Icon icon, final @NotNull BiFunction<Project, UnifiedVirtualFile, IEditor> factory) {
+    private EditorType(final @NotNull String name, final @NotNull String description, final @NotNull Icon icon, final @NotNull BiFunction<Project, UnifiedVirtualFile, TestinEditor> factory) {
         this.name = name;
         this.description = description;
         this.icon = icon;

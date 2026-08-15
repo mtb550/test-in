@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Toolbar button that shows a persistent check-box popup of editor detail attributes.
  * The concrete subclasses only supply the enum options and the persistence key.
  */
-public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends AbstractButton implements IToolbarItem {
+public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends AbstractButton implements ToolbarItem {
 
     @Getter
     private final @NotNull Set<E> selectedDetails = new HashSet<>();

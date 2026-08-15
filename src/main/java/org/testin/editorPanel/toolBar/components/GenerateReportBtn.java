@@ -8,7 +8,7 @@ import org.testin.generateReport.GenerateReportAction;
 import org.testin.projectPanel.ProjectPanel;
 import org.testin.services.Services;
 
-public class GenerateReportBtn extends AbstractButton implements IToolbarItem {
+public class GenerateReportBtn extends AbstractButton implements ToolbarItem {
 
     public GenerateReportBtn(final @NotNull Project p) {
         super("Export Results", AllIcons.ToolbarDecorator.Export);

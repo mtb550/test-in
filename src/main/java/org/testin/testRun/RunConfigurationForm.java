@@ -10,7 +10,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.TestRunConfiguration;
-import org.testin.ui.framework.IDialogComponent;
+import org.testin.ui.framework.DialogComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +24,7 @@ import java.util.Map;
  * a separate component.
  */
 @Getter
-public class RunConfigurationForm implements IDialogComponent {
+public class RunConfigurationForm implements DialogComponent {
 
     private final @NotNull JBPanel<?> wrapper;
     private final @NotNull JBTextField changeLog;

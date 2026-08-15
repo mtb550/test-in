@@ -3,7 +3,7 @@ package org.testin.editorPanel.listeners;
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.IUpdateCallback;
+import org.testin.enums.UpdateCallback;
 
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -34,7 +34,7 @@ public class ModelChangeNotifier implements ListDataListener {
     private boolean active = true;
 
     @Setter
-    private @Nullable IUpdateCallback onUpdateCallback;
+    private @Nullable UpdateCallback onUpdateCallback;
 
     public void pause() {
         this.active = false;

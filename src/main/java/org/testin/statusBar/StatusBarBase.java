@@ -41,7 +41,7 @@ public abstract class StatusBarBase {
     private final @NotNull Icon icon = AllIcons.General.Keyboard;
     private final @NotNull Border border = JBUI.Borders.emptyRight(6);
 
-    public StatusBarBase(final IStatusBarItem @NotNull [] items) {
+    public StatusBarBase(final StatusBarItem @NotNull [] items) {
         this.statusBar = new JBPanel<>(new BorderLayout());
         this.statusBar.setBorder(JBUI.Borders.empty(4, 10));
         this.statusBar.setOpaque(true);
@@ -50,7 +50,7 @@ public abstract class StatusBarBase {
         updateItems(items);
     }
 
-    public void updateItems(final IStatusBarItem @NotNull [] items) {
+    public void updateItems(final StatusBarItem @NotNull [] items) {
         this.statusBar.removeAll();
 
         final JBPanel<?> contentPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -59,7 +59,7 @@ public abstract class StatusBarBase {
         contentPanel.add(setStatusBarIcon());
 
         for (int i = 0; i < items.length; i++) {
-            final IStatusBarItem item = items[i];
+            final StatusBarItem item = items[i];
             contentPanel.add(createShortcut(item.getShortcutText()));
             contentPanel.add(createDot());
             contentPanel.add(createLabel(item.getName()));

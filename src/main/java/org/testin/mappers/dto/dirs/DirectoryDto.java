@@ -5,7 +5,7 @@ import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
-import org.testin.mappers.markers.IMarker;
+import org.testin.mappers.markers.Marker;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public abstract class DirectoryDto {
      * persisted truth, the DTO stores none of it.
      */
     @NonNull
-    public abstract IMarker getMarker();
+    public abstract Marker getMarker();
 
     /**
      * File name of this node's marker JSON inside the directory.

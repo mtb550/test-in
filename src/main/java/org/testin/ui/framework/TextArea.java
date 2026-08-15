@@ -28,7 +28,7 @@ import java.util.Base64;
  * newline (the dialog keys stay off this component), Tab moves the focus like
  * everywhere else, and it claims the dialog's remaining space.
  */
-public final class TextArea implements IDialogComponent {
+public final class TextArea implements DialogComponent {
 
     private final @NotNull JBTextArea area;
     private final @NotNull JBScrollPane panel;

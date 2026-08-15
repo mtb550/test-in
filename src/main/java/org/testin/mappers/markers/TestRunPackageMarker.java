@@ -17,7 +17,7 @@ import java.time.temporal.ChronoUnit;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
-public class TestRunPackageMarker implements IMarker {
+public class TestRunPackageMarker implements Marker {
     @NonNull
     @Builder.Default
     private String createdBy = "";

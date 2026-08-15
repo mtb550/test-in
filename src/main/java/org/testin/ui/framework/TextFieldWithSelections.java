@@ -29,7 +29,7 @@ import java.util.List;
  * click on a row submits, and Up/Down move the selection while focus stays in
  * the field. Rendering matches the existing create-node popup exactly.
  */
-public final class TextFieldWithSelections<T> implements IDialogComponent {
+public final class TextFieldWithSelections<T> implements DialogComponent {
 
     private final @NotNull ExtendableTextField textField;
     private final @NotNull JBList<SelectionList<T>> list;

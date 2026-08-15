@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.RunStatus;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.listeners.ITestCaseExecutionListener;
+import org.testin.listeners.TestCaseExecutionListener;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -24,7 +24,7 @@ public class ViewPanelExecutionSubscriber {
     public ViewPanelExecutionSubscriber(final @NotNull Project p, final @NotNull ViewPanel viewPanel) {
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        p.getMessageBus().connect(viewPanel).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
+        p.getMessageBus().connect(viewPanel).subscribe(TestCaseExecutionListener.TOPIC, new TestCaseExecutionListener() {
             @Override
             public void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final String error) {
                 Logger.debug("ViewPanel subscription fired: testName='" + testName + "', status='" + status + "'");

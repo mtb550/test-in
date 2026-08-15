@@ -10,7 +10,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GenType;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.mappers.dto.TestCaseDto;
@@ -28,11 +28,11 @@ import java.util.UUID;
 
 public class RemoveTestCaseAction extends AbstractProjectAction {
     private final @NotNull DirectoryDto dir;
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull CollectionListModel<TestCaseDto> model;
 
-    public RemoveTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull DirectoryDto dir,
+    public RemoveTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull DirectoryDto dir,
                                 final @NotNull JBList<TestCaseDto> list,
                                 final @NotNull CollectionListModel<TestCaseDto> model) {
         super(p, "Delete", "Delete test case", AllIcons.Actions.DeleteTag);

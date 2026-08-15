@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -26,10 +26,10 @@ import java.util.List;
 public class CutTestCaseNodeAction extends AbstractProjectAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_X, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
-    private final IEditor editor;
+    private final TestinEditor editor;
     private final JBList<TestCaseDto> list;
 
-    public CutTestCaseNodeAction(final @NotNull Project p, final IEditor editor, final JBList<TestCaseDto> list) {
+    public CutTestCaseNodeAction(final @NotNull Project p, final TestinEditor editor, final JBList<TestCaseDto> list) {
         super(p, "Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
         this.editor = editor;
         this.list = list;

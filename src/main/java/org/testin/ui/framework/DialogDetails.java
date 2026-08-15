@@ -15,7 +15,7 @@ import java.util.List;
  * (e.g. the test case's description and expected result above an input).
  * Display only: never takes the focus, never submits.
  */
-public final class DialogDetails implements IDialogComponent {
+public final class DialogDetails implements DialogComponent {
 
     private final @NotNull JBPanel<?> panel;
 

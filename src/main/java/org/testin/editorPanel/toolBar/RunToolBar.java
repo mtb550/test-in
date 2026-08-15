@@ -9,14 +9,14 @@ import java.util.List;
 public class RunToolBar extends AbstractToolbarPanel {
     private final @NotNull Project p;
 
-    public RunToolBar(final @NotNull Project p, final @NotNull IToolBar callbacks) {
+    public RunToolBar(final @NotNull Project p, final @NotNull ToolBar callbacks) {
         super(callbacks);
         this.p = p;
         layoutComponents();
     }
 
     @Override
-    public @NotNull List<IToolbarItem> getCustomComponents() {
+    public @NotNull List<ToolbarItem> getCustomComponents() {
         return List.of(
                 new StartExecutionBtn(getCallbacks(), getCallbacks()::onStartExecutionClicked),
                 new GenerateReportBtn(p),

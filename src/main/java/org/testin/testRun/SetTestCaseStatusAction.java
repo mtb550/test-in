@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.enums.TestStatus;
 import org.testin.mappers.TestRunItems;
@@ -24,11 +24,11 @@ import java.util.List;
  * first — one action for all statuses instead of one class per status.
  */
 public class SetTestCaseStatusAction extends AbstractProjectAction {
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull TestStatus status;
 
-    public SetTestCaseStatusAction(final @NotNull Project p, final @NotNull IEditor editor,
+    public SetTestCaseStatusAction(final @NotNull Project p, final @NotNull TestinEditor editor,
                                    final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status,
                                    final @NotNull TestStatus.MenuEntry entry) {
         super(p, status.getLabel(), "Set test case status to " + status.getLabel(), entry.icon());

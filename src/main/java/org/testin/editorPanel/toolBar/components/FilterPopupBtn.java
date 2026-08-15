@@ -11,7 +11,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.runEditor.RunEditor;
-import org.testin.editorPanel.toolBar.IToolBar;
+import org.testin.editorPanel.toolBar.ToolBar;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
@@ -21,7 +21,7 @@ import org.testin.util.IconManager;
 import java.util.*;
 import java.util.function.Supplier;
 
-public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
+public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
     @Getter
     @NotNull
     private final Set<Group> selectedGroup = new HashSet<>();
@@ -48,9 +48,9 @@ public class FilterPopupBtn extends AbstractButton implements IToolbarItem {
     private final Runnable onToolBarFilterReset;
 
     @NotNull
-    private final IToolBar callbacks;
+    private final ToolBar callbacks;
 
-    public FilterPopupBtn(final @NotNull IToolBar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier) {
+    public FilterPopupBtn(final @NotNull ToolBar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier) {
         super("Filter", AllIcons.General.Filter);
         this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;

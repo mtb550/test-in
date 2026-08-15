@@ -20,23 +20,23 @@ import java.time.temporal.ChronoUnit;
 // The chaining is the reason the interface exists, even where the default methods
 // below discard it (#66, C3).
 @SuppressWarnings("UnusedReturnValue")
-public interface IMarker {
+public interface Marker {
 
     @NotNull String getCreatedBy();
 
-    IMarker setCreatedBy(@NotNull String createdBy);
+    Marker setCreatedBy(@NotNull String createdBy);
 
     @NotNull ZonedDateTime getCreatedAt();
 
-    IMarker setCreatedAt(@NotNull ZonedDateTime createdAt);
+    Marker setCreatedAt(@NotNull ZonedDateTime createdAt);
 
     @NotNull String getModifiedBy();
 
-    IMarker setModifiedBy(@NotNull String modifiedBy);
+    Marker setModifiedBy(@NotNull String modifiedBy);
 
     @NotNull ZonedDateTime getModifiedAt();
 
-    IMarker setModifiedAt(@NotNull ZonedDateTime modifiedAt);
+    Marker setModifiedAt(@NotNull ZonedDateTime modifiedAt);
 
     /**
      * Fills the creation audit info; modified mirrors created at birth.

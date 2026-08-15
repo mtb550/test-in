@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editorPanel.AbstractEditorContextMenu;
 import org.testin.editorPanel.BaseCard;
-import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.Shared;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.enums.CardHoverAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -36,9 +36,9 @@ public class MouseListenerImpl extends MouseAdapter {
     private final @NotNull CollectionListModel<TestCaseDto> model;
     private final @NotNull AbstractEditorContextMenu cm;
     private final @NotNull ArrayList<String> path;
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
 
-    public MouseListenerImpl(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull AbstractEditorContextMenu cm) {
+    public MouseListenerImpl(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull CollectionListModel<TestCaseDto> model, final @NotNull DirectoryDto dir, final @NotNull AbstractEditorContextMenu cm) {
         this.p = p;
         this.editor = editor;
         this.list = list;

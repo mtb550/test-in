@@ -3,8 +3,8 @@ package org.testin.enums;
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.testin.statusBar.IStatusBarItem;
-import org.testin.testCase.createDialog.ICreateTestCaseSection;
+import org.testin.statusBar.StatusBarItem;
+import org.testin.testCase.createDialog.CreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
 import org.testin.util.Shortcuts;
 
@@ -24,7 +24,7 @@ import static org.testin.enums.TestCaseDialogKey.*;
  * that are null for everything except a name and a keystroke.
  */
 @Getter
-public enum CreateTestCaseFields implements IStatusBarItem {
+public enum CreateTestCaseFields implements StatusBarItem {
 
     DESCRIPTION(
             "Description",
@@ -111,7 +111,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     private final @NotNull String name;
     private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;
-    private final @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
+    private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 
     /**
      * Empty for the two sections with no text field of their own to prompt in.
@@ -124,7 +124,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
     private final TestCaseDialogKey @NotNull [] ownKeys;
 
     CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon,
-                         final @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor,
+                         final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor,
                          final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
         this.name = name;
         this.shortcut = shortcut;
@@ -139,8 +139,8 @@ public enum CreateTestCaseFields implements IStatusBarItem {
      * every section shares, then its own, and on the entry section the keys that
      * jump to the other fields.
      */
-    public IStatusBarItem @NotNull [] getStatusBarItems() {
-        final List<IStatusBarItem> items = new ArrayList<>();
+    public StatusBarItem @NotNull [] getStatusBarItems() {
+        final List<StatusBarItem> items = new ArrayList<>();
         items.add(SAVE);
         items.add(CANCEL);
         items.addAll(List.of(ownKeys));
@@ -148,7 +148,7 @@ public enum CreateTestCaseFields implements IStatusBarItem {
         // Description is where the dialog opens, so its bar is also the map.
         if (this == DESCRIPTION) items.addAll(JUMP_KEYS);
 
-        return items.toArray(IStatusBarItem[]::new);
+        return items.toArray(StatusBarItem[]::new);
     }
 
     @Override

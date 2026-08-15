@@ -8,7 +8,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.enums.RunStatus;
-import org.testin.listeners.ITestCaseExecutionListener;
+import org.testin.listeners.TestCaseExecutionListener;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.runner.TestNGRunnerByMethod;
@@ -36,7 +36,7 @@ public class RunTestCaseAction extends AbstractProjectAction {
         for (TestCaseDto tc : testCases) {
             if (tc == null || tc.getTempStatus() == RunStatus.RUNNING) continue;
 
-            p.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(tc.getId().toString().toLowerCase(), RunStatus.RUNNING, null);
+            p.getMessageBus().syncPublisher(TestCaseExecutionListener.TOPIC).onStatusChanged(tc.getId().toString().toLowerCase(), RunStatus.RUNNING, null);
 
             Services.getInstance(p, TestNGRunnerByMethod.class).runTestMethod(p, tc);
             started++;

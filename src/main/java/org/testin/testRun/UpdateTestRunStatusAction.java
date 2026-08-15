@@ -7,7 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.runEditor.RunEditor;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
 import org.testin.enums.TestRunStatus;
@@ -27,10 +27,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public class UpdateTestRunStatusAction extends AbstractProjectAction {
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
     private final @NotNull JBList<TestCaseDto> list;
 
-    public UpdateTestRunStatusAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public UpdateTestRunStatusAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Change Test Run Status", "Change the status of the current test run", AllIcons.Nodes.Test);
         this.editor = editor;
         this.list = list;

@@ -24,7 +24,7 @@ public abstract class AbstractEditorContextMenu extends DefaultActionGroup {
 
     @Getter
     @Setter
-    private static @Nullable IEditor globalSourceEditorUI = null;
+    private static @Nullable TestinEditor globalSourceEditorUI = null;
 
     public AbstractEditorContextMenu(final @NotNull String name, final boolean popup) {
         super(name, popup);

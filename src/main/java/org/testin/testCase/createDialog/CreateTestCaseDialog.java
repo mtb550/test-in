@@ -11,7 +11,7 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.IUIAction;
+import org.testin.enums.UIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.Shortcuts;
@@ -29,7 +29,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
 
         final TestCaseDto dto = new TestCaseDto();
 
-        final IUIAction repackPopup = () -> {
+        final UIAction repackPopup = () -> {
             if (popup != null) {
                 popup.pack(false, true);
 
@@ -65,7 +65,7 @@ public class CreateTestCaseDialog extends TestCaseBaseDialog {
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(JBUI.Borders.empty(12));
 
-        for (final ICreateTestCaseSection section : getAllSections()) {
+        for (final CreateTestCaseSection section : getAllSections()) {
             final JBPanel<?> slot = new JBPanel<>(new BorderLayout());
             slot.setOpaque(false);
             contentPanel.add(slot);

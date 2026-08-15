@@ -4,6 +4,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface
-public interface IVfsBiOperation {
+public interface VfsBiOperation {
     void execute(final @NotNull VirtualFile sourceVf, final @NotNull VirtualFile targetVf);
 }

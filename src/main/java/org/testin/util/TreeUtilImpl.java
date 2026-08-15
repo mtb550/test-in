@@ -10,8 +10,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.enums.IVfsBiOperation;
-import org.testin.enums.IVfsOperation;
+import org.testin.enums.VfsBiOperation;
+import org.testin.enums.VfsOperation;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 @Service(Service.Level.PROJECT)
 public final class TreeUtilImpl {
 
-    public void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull IVfsOperation operation) {
+    public void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull VfsOperation operation) {
         // The lookup runs off the EDT and the operation on it: refreshAndFindFile
         // refreshes synchronously and reads the VFS persistence, which the EDT is
         // not allowed to do, while the operation itself mutates the VFS and so
@@ -52,7 +52,7 @@ public final class TreeUtilImpl {
     }
 
     public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
-                                 final @NotNull String errorTitle, final @NotNull IVfsBiOperation operation,
+                                 final @NotNull String errorTitle, final @NotNull VfsBiOperation operation,
                                  final @Nullable Runnable onSuccess, final @Nullable Runnable onFailure) {
         // Both lookups off the EDT, the operation on it - see the single-path form.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {

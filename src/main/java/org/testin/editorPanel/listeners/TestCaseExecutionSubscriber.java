@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.RunStatus;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.listeners.ITestCaseExecutionListener;
+import org.testin.listeners.TestCaseExecutionListener;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -25,7 +25,7 @@ public class TestCaseExecutionSubscriber {
     public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list, final @NotNull Disposable parentDisposable) {
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        p.getMessageBus().connect(parentDisposable).subscribe(ITestCaseExecutionListener.TOPIC, new ITestCaseExecutionListener() {
+        p.getMessageBus().connect(parentDisposable).subscribe(TestCaseExecutionListener.TOPIC, new TestCaseExecutionListener() {
             @Override
             public void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final String error) {
                 // Today's publishers already fire on the EDT, but nothing

@@ -7,8 +7,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editorPanel.IEditor;
-import org.testin.editorPanel.toolBar.IToolBar;
+import org.testin.editorPanel.TestinEditor;
+import org.testin.editorPanel.toolBar.ToolBar;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
 public class UpdateTestCaseAction extends AbstractProjectAction {
     private final @NotNull JBList<TestCaseDto> list;
     private final @NotNull Path path;
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
 
-    public UpdateTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull Path path) {
+    public UpdateTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list, final @NotNull Path path) {
         super(p, "Update");
         this.list = list;
         this.path = path;
@@ -50,8 +50,8 @@ public class UpdateTestCaseAction extends AbstractProjectAction {
 
             Services.getInstance(p, Notifier.class).softShow(p, "Updated");
 
-            if (editor instanceof IToolBar)
-                ((IToolBar) editor).onToolBarFilterSelectionChanged();
+            if (editor instanceof ToolBar)
+                ((ToolBar) editor).onToolBarFilterSelectionChanged();
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 list.repaint();

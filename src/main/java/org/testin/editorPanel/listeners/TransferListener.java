@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -20,10 +20,10 @@ import java.util.List;
 public class TransferListener extends TransferHandler {
     private static final @NotNull DataFlavor FLAVOR = new DataFlavor(List.class, "List of TestCase");
     private final @NotNull Project p;
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
     private int @Nullable [] draggedIndices;
 
-    public TransferListener(final @NotNull Project p, final @NotNull IEditor editor) {
+    public TransferListener(final @NotNull Project p, final @NotNull TestinEditor editor) {
         this.p = p;
         this.editor = editor;
     }

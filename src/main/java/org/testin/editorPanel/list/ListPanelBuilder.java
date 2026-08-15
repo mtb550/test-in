@@ -11,7 +11,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.AbstractEditorContextMenu;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.listeners.GridListSelectionSynchronizer;
 import org.testin.editorPanel.listeners.MouseListenerImpl;
 import org.testin.editorPanel.listeners.SelectionListener;
@@ -59,7 +59,7 @@ public final class ListPanelBuilder {
      * view-panel selection sync, and grid-selection sync.
      */
     public static void wireCommonListeners(final @NotNull Project p,
-                                           final @NotNull IEditor editor,
+                                           final @NotNull TestinEditor editor,
                                            final @NotNull ListView view,
                                            final @NotNull DirectoryDto dir,
                                            final @NotNull AbstractEditorContextMenu contextMenu,

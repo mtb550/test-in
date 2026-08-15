@@ -3,7 +3,7 @@ package org.testin.editorPanel.listeners;
 import com.intellij.ui.table.JBTable;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.mappers.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @AllArgsConstructor
 public class GridSelectionListener implements ListSelectionListener {
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
     private final @NotNull JBTable table;
     private final @NotNull List<TestCaseDto> pageItems;
 

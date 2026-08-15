@@ -2,7 +2,7 @@ package org.testin.ui.framework;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.statusBar.IStatusBarItem;
+import org.testin.statusBar.StatusBarItem;
 import org.testin.util.Shortcuts;
 
 /**
@@ -15,7 +15,7 @@ import org.testin.util.Shortcuts;
 public record StatusBarShortcut(@Nullable Shortcuts shortcut,
                                 @NotNull String displayText,
                                 @NotNull String name,
-                                @Nullable Runnable action) implements IStatusBarItem {
+                                @Nullable Runnable action) implements StatusBarItem {
 
     public static @NotNull StatusBarShortcut build(final @NotNull Shortcuts shortcut, final @NotNull String name, final @NotNull Runnable action) {
         return new StatusBarShortcut(shortcut, shortcut.getShortcutText(), name, action);

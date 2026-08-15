@@ -1,6 +1,6 @@
 package org.testin.enums;
 
 @FunctionalInterface
-public interface IUpdateCallback {
+public interface UpdateCallback {
     void onUpdate();
 }

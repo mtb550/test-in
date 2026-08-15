@@ -12,7 +12,7 @@ import java.awt.*;
  * better than an Enter hint. Clicking it runs the dialog's submit action; the
  * button is the default-styled primary action, right-aligned.
  */
-public final class DialogButton implements IDialogComponent {
+public final class DialogButton implements DialogComponent {
 
     private final @NotNull JButton button;
     private final @NotNull JBPanel<?> panel;

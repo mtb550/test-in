@@ -7,13 +7,13 @@ import java.util.List;
 
 public class TestToolBar extends AbstractToolbarPanel {
 
-    public TestToolBar(final @NotNull IToolBar callbacks) {
+    public TestToolBar(final @NotNull ToolBar callbacks) {
         super(callbacks);
         layoutComponents();
     }
 
     @Override
-    public @NotNull List<IToolbarItem> getCustomComponents() {
+    public @NotNull List<ToolbarItem> getCustomComponents() {
         return List.of(
                 new CreateTestCaseBtn(getCallbacks()::onToolBarCreateTestCaseClicked),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),

@@ -11,7 +11,7 @@ import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.TestRunDto;
 import org.testin.mappers.dto.dirs.*;
-import org.testin.mappers.markers.IMarker;
+import org.testin.mappers.markers.Marker;
 import org.testin.mappers.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
@@ -159,7 +159,7 @@ final class IndexerDataStore {
      * their first write; markers loaded from disk pass through untouched.
      */
     private void stampIfNew(final @NotNull Object marker) {
-        if (marker instanceof IMarker m && m.getCreatedBy().isEmpty()) {
+        if (marker instanceof Marker m && m.getCreatedBy().isEmpty()) {
             m.stampCreated(testerName());
         }
     }

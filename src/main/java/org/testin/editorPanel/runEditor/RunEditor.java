@@ -16,9 +16,9 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
 import org.testin.editorPanel.EditorCenter;
 import org.testin.editorPanel.EditorFilters;
-import org.testin.editorPanel.IEditor;
 import org.testin.editorPanel.PageWindow;
 import org.testin.editorPanel.TestCaseFilter;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.UnifiedVirtualFile;
 import org.testin.editorPanel.grid.GridPanelBuilder;
 import org.testin.editorPanel.list.ListPanelBuilder;
@@ -29,8 +29,8 @@ import org.testin.editorPanel.listeners.RunListRenderer;
 import org.testin.editorPanel.listeners.StatusBarListener;
 import org.testin.editorPanel.statusBar.StatusBar;
 import org.testin.editorPanel.toolBar.AbstractToolbarPanel;
-import org.testin.editorPanel.toolBar.IToolBar;
 import org.testin.editorPanel.toolBar.RunToolBar;
+import org.testin.editorPanel.toolBar.ToolBar;
 import org.testin.editorPanel.toolBar.components.FilterPopupBtn;
 import org.testin.editorPanel.toolBar.components.RunDetailsPopupBtn;
 import org.testin.editorPanel.toolBar.components.StartExecutionBtn;
@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class RunEditor implements Disposable, IToolBar, IEditor {
+public class RunEditor implements Disposable, ToolBar, TestinEditor {
 
     private final @NotNull Project p;
 
@@ -524,7 +524,7 @@ public class RunEditor implements Disposable, IToolBar, IEditor {
         resultsMap.clear();
         if (model != null) model.removeAll();
         mainPanel.removeAll();
-        IEditor.super.dispose();
+        TestinEditor.super.dispose();
 
         Logger.debug("dispose run editor: " + parent.getName() + " - " + parent.getPath());
 

@@ -4,14 +4,14 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editorPanel.runEditor.RunEditor;
-import org.testin.editorPanel.toolBar.IToolBar;
+import org.testin.editorPanel.toolBar.ToolBar;
 import org.testin.enums.TestRunStatus;
 
-public class StartExecutionBtn extends AbstractButton implements IToolbarItem {
+public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
 
-    private final @NotNull IToolBar callbacks;
+    private final @NotNull ToolBar callbacks;
 
-    public StartExecutionBtn(final @NotNull IToolBar callbacks, final @NotNull Runnable onStartExecutionClicked) {
+    public StartExecutionBtn(final @NotNull ToolBar callbacks, final @NotNull Runnable onStartExecutionClicked) {
         super("Start Execution", AllIcons.Actions.Execute);
         this.callbacks = callbacks;
 

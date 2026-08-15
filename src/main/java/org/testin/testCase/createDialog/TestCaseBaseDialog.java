@@ -14,9 +14,9 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateTestCaseFields;
-import org.testin.enums.IUIAction;
+import org.testin.enums.UIAction;
 import org.testin.mappers.dto.TestCaseDto;
-import org.testin.statusBar.IStatusBarItem;
+import org.testin.statusBar.StatusBarItem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,8 +45,8 @@ public abstract class TestCaseBaseDialog {
      * even when the popup is torn down without firing onClosed.
      */
     protected final @NotNull Disposable dialogDisposable;
-    protected final @NotNull Map<ICreateTestCaseSection, IStatusBarItem[]> statusBarMapping;
-    private final @NotNull List<ICreateTestCaseSection> cachedSections;
+    protected final @NotNull Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
+    private final @NotNull List<CreateTestCaseSection> cachedSections;
     private @Nullable PropertyChangeListener focusListener;
 
     public TestCaseBaseDialog(final @NotNull Project p) {
@@ -80,9 +80,9 @@ public abstract class TestCaseBaseDialog {
         focusListener = evt -> {
             final Component focusOwner = (Component) evt.getNewValue();
             if (focusOwner != null && UIUtil.isDescendingFrom(focusOwner, parentPanel)) {
-                for (final ICreateTestCaseSection section : getAllSections()) {
+                for (final CreateTestCaseSection section : getAllSections()) {
                     if (UIUtil.isDescendingFrom(focusOwner, section.getWrapper())) {
-                        final IStatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(DescriptionSection));
+                        final StatusBarItem[] items = statusBarMapping.getOrDefault(section, statusBarMapping.get(DescriptionSection));
                         if (items != null) statusBarSection.updateItems(items);
                         return;
                     }
@@ -106,11 +106,11 @@ public abstract class TestCaseBaseDialog {
         Disposer.dispose(dialogDisposable);
     }
 
-    public @NotNull List<ICreateTestCaseSection> getAllSections() {
+    public @NotNull List<CreateTestCaseSection> getAllSections() {
         return cachedSections;
     }
 
-    public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull IUIAction action) {
+    public void registerShortcut(final @NotNull JComponent component, final @NotNull CustomShortcutSet shortcutSet, final @NotNull UIAction action) {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {

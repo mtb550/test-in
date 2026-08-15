@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
-import org.testin.statusBar.IStatusBarItem;
-import org.testin.testCase.createDialog.ICreateTestCaseSection;
+import org.testin.statusBar.StatusBarItem;
+import org.testin.testCase.createDialog.CreateTestCaseSection;
 import org.testin.testCase.createDialog.TestCaseBaseDialog;
 import org.testin.testCase.updateDialog.bulk.*;
 import org.testin.util.Shortcuts;
@@ -31,7 +31,7 @@ import static org.testin.enums.TestCaseDialogKey.*;
  */
 @Getter
 @AllArgsConstructor
-public enum UpdateTestCaseFields implements IStatusBarItem {
+public enum UpdateTestCaseFields implements StatusBarItem {
 
     DESCRIPTION(
             "Description",
@@ -117,8 +117,8 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
     private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;
     private final @NotNull GenType gt;
-    private final @NotNull IBulkEditorAction bulkAction;
-    private final @NotNull Function<TestCaseBaseDialog, ICreateTestCaseSection> sectionExtractor;
+    private final @NotNull BulkEditorAction bulkAction;
+    private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 
     /**
      * The keys this section adds to the shared ones.
@@ -129,13 +129,13 @@ public enum UpdateTestCaseFields implements IStatusBarItem {
      * What the status bar shows while this section holds the focus: the two keys
      * every section shares, then its own.
      */
-    public IStatusBarItem @NotNull [] getStatusBarItems() {
-        final List<IStatusBarItem> items = new ArrayList<>();
+    public StatusBarItem @NotNull [] getStatusBarItems() {
+        final List<StatusBarItem> items = new ArrayList<>();
         items.add(SAVE);
         items.add(CANCEL);
         items.addAll(List.of(ownKeys));
 
-        return items.toArray(IStatusBarItem[]::new);
+        return items.toArray(StatusBarItem[]::new);
     }
 
     @Override

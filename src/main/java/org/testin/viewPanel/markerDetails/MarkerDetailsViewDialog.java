@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.mappers.Config;
 import org.testin.mappers.dto.dirs.DirectoryDto;
-import org.testin.mappers.markers.IMarker;
+import org.testin.mappers.markers.Marker;
 import org.testin.ui.dialogs.DialogStyle;
 import org.testin.util.FontSync;
 import org.testin.viewPanel.details.components.LabelValueRow;
@@ -42,8 +42,8 @@ public class MarkerDetailsViewDialog {
         int row = 0;
 
         // Creation info comes from the marker - the only place it is stored -
-        // through the IMarker contract; a new marker type needs no new branch.
-        final IMarker marker = dto.getMarker();
+        // through the Marker contract; a new marker type needs no new branch.
+        final Marker marker = dto.getMarker();
 
         row = addRow(panel, gbc, "Name:", dto.getName(), row);
         row = addRow(panel, gbc, "Path:", dto.getPath().toString(), row);

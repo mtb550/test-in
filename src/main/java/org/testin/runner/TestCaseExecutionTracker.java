@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.RunStatus;
-import org.testin.listeners.ITestCaseExecutionListener;
+import org.testin.listeners.TestCaseExecutionListener;
 
 public class TestCaseExecutionTracker {
 
@@ -49,7 +49,7 @@ public class TestCaseExecutionTracker {
     private static void broadcastStatusChange(final @NotNull Project p, final @NotNull String testName, final @NotNull RunStatus status, final String error) {
         ApplicationManager.getApplication().invokeLater(() -> {
             if (!p.isDisposed()) {
-                p.getMessageBus().syncPublisher(ITestCaseExecutionListener.TOPIC).onStatusChanged(testName, status, error);
+                p.getMessageBus().syncPublisher(TestCaseExecutionListener.TOPIC).onStatusChanged(testName, status, error);
             }
         });
     }

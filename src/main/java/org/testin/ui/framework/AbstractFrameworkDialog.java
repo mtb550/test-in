@@ -7,7 +7,7 @@ import com.intellij.ui.components.JBPanel;
 import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 import org.testin.statusBar.DialogStatusBar;
-import org.testin.statusBar.IStatusBarItem;
+import org.testin.statusBar.StatusBarItem;
 import org.testin.ui.dialogs.DialogStyle;
 
 import javax.swing.*;
@@ -24,7 +24,7 @@ import java.util.List;
  * is generated from the same declarations that bind the keys, and the first
  * declared component holds the focus.
  */
-public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
+public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
 
     protected final @NotNull Project p;
 
@@ -54,18 +54,18 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
     protected Dimension preferredSize;
 
     private DialogDto dto;
-    private List<IDialogComponent> built;
+    private List<DialogComponent> built;
     private JBPopup popup;
 
     protected AbstractFrameworkDialog(final @NotNull Project p) {
         this.p = p;
     }
 
-    private static @NotNull JBPanel<?> verticalStack(final @NotNull List<IDialogComponent> dialogComponents) {
+    private static @NotNull JBPanel<?> verticalStack(final @NotNull List<DialogComponent> dialogComponents) {
         final JBPanel<?> stack = new JBPanel<>();
         stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
         stack.setOpaque(false);
-        for (final IDialogComponent dialogComponent : dialogComponents) {
+        for (final DialogComponent dialogComponent : dialogComponents) {
             stack.add(dialogComponent.getPanel());
         }
         return stack;
@@ -165,7 +165,7 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
     /**
      * The declared components, built exactly once — they hold Swing state.
      */
-    private @NotNull List<IDialogComponent> builtComponents() {
+    private @NotNull List<DialogComponent> builtComponents() {
         if (built == null) {
             built = new ArrayList<>();
             for (final ComponentDialogBase<?> holder : dto().components()) {
@@ -178,8 +178,8 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         return built;
     }
 
-    private @NotNull IDialogComponent primaryComponent() {
-        for (final IDialogComponent dialogComponent : builtComponents()) {
+    private @NotNull DialogComponent primaryComponent() {
+        for (final DialogComponent dialogComponent : builtComponents()) {
             if (dialogComponent.wantsFocus()) return dialogComponent;
         }
         return builtComponents().getFirst();
@@ -191,12 +191,12 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
 
     /**
      * Content = declared components stacked top to bottom + the status bar.
-     * The component claiming {@link IDialogComponent#fillsSpace()} takes the
+     * The component claiming {@link DialogComponent#fillsSpace()} takes the
      * remaining space; the ones above sit on top, the ones below (e.g. a
      * button row) at the bottom. When none claims it, the last one fills.
      */
     private @NotNull JBPanel<?> buildContentPanel() {
-        final List<IDialogComponent> all = builtComponents();
+        final List<DialogComponent> all = builtComponents();
 
         int fillIndex = -1;
         for (int i = 0; i < all.size(); i++) {
@@ -224,7 +224,7 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
         }
 
         final DialogStatusBar statusBar = new DialogStatusBar();
-        statusBar.updateItems(dto().shortcuts().toArray(IStatusBarItem[]::new));
+        statusBar.updateItems(dto().shortcuts().toArray(StatusBarItem[]::new));
 
         final JBPanel<?> contentPanel = DialogStyle.styleContent(new JBPanel<>(new BorderLayout()));
         contentPanel.setBorder(BorderFactory.createEmptyBorder());
@@ -265,7 +265,7 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
 
             final String actionKey = "testin.framework.shortcut." + i;
             installKey(contentPanel, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT, key, actionKey, action);
-            for (final IDialogComponent dialogComponent : builtComponents()) {
+            for (final DialogComponent dialogComponent : builtComponents()) {
                 if (!dialogComponent.acceptsDialogKeys()) continue;
                 installKey(dialogComponent.getFocusComponent(), JComponent.WHEN_FOCUSED, key, actionKey, action);
             }
@@ -277,7 +277,7 @@ public abstract class AbstractFrameworkDialog<C extends IDialogComponent> {
      * button) triggers the dialog's submit action.
      */
     private void bindSubmitGesture() {
-        for (final IDialogComponent dialogComponent : builtComponents()) {
+        for (final DialogComponent dialogComponent : builtComponents()) {
             dialogComponent.onSubmitRequest(this::submit);
         }
     }

@@ -8,6 +8,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @FunctionalInterface
-public interface IBulkEditorAction {
+public interface BulkEditorAction {
     void execute(final @NotNull Project p, final @NotNull List<TestCaseDto> items, final @NotNull Consumer<List<TestCaseDto>> updatedItems);
 }

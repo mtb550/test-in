@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.editorPanel.testEditor.TestEditorContextMenu;
 import org.testin.indexer.ProjectIndexer;
@@ -35,9 +35,9 @@ import java.util.UUID;
 public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_V, InputEvent.SHIFT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK);
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
 
-    public PasteTestCaseNodeAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public PasteTestCaseNodeAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Paste Node", "Paste selected test cases from clipboard", AllIcons.Actions.MenuPaste);
         this.editor = editor;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
@@ -53,7 +53,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
             if (destUI == null) return;
 
             boolean isCut = TestEditorContextMenu.isGlobalCutAction();
-            IEditor sourceUI = TestEditorContextMenu.getGlobalSourceEditorUI();
+            TestinEditor sourceUI = TestEditorContextMenu.getGlobalSourceEditorUI();
 
             if (isCut && sourceUI != null) {
 

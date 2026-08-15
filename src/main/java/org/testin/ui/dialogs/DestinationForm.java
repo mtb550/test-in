@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.enums.FileTypes;
 import org.testin.services.Services;
 import org.testin.settings.AppSettingsState;
-import org.testin.ui.framework.IDialogComponent;
+import org.testin.ui.framework.DialogComponent;
 
 import javax.swing.*;
 import java.io.File;
@@ -29,7 +29,7 @@ import java.util.Arrays;
  * which is a component's business; the dialog owns the title, the button and
  * the status bar.
  */
-public final class DestinationForm implements IDialogComponent {
+public final class DestinationForm implements DialogComponent {
 
     /**
      * A resolved destination. Only produced when every field is filled, so the

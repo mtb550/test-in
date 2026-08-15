@@ -9,7 +9,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GenType;
-import org.testin.editorPanel.IEditor;
+import org.testin.editorPanel.TestinEditor;
 import org.testin.editorPanel.testEditor.TestEditor;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.mappers.dto.dirs.TestSetDirectoryDto;
@@ -25,10 +25,10 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CreateTestCaseAction extends AbstractProjectAction {
-    private final @NotNull IEditor editor;
+    private final @NotNull TestinEditor editor;
     private final @NotNull TestSetDirectoryDto dir;
 
-    public CreateTestCaseAction(final @NotNull Project p, final @NotNull IEditor editor, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
+    public CreateTestCaseAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull TestSetDirectoryDto dir, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Create Test Case", "Create new test case", AllIcons.Actions.AddToDictionary);
         this.editor = editor;
         this.dir = dir;

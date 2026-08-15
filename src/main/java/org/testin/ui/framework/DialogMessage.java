@@ -14,7 +14,7 @@ import java.awt.*;
  * {@code \n}; optional muted "From/To" rows show where a transfer goes. The
  * panel itself takes the focus so the dialog's declared keys work immediately.
  */
-public final class DialogMessage implements IDialogComponent {
+public final class DialogMessage implements DialogComponent {
 
     private final @NotNull JBPanel<?> panel;
 

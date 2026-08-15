@@ -8,7 +8,7 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.testin.enums.CreateTestCaseFields;
 import org.testin.enums.Group;
-import org.testin.enums.IUIAction;
+import org.testin.enums.UIAction;
 import org.testin.logger.Logger;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.util.Shortcuts;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GroupSection implements ICreateTestCaseSection {
+public class GroupSection implements CreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 1f);
     private final @NotNull JBPanel<?> group;
     private final @NotNull JBPanel<?> wrapper;
@@ -79,7 +79,7 @@ public class GroupSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseGroup.getCustomShortcut(), () -> {
             showSection(slot);
             repackAction.execute();
@@ -120,7 +120,7 @@ public class GroupSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
         setSelectedGroup(dto.getGroup());
     }
 }

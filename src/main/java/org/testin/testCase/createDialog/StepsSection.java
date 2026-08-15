@@ -16,7 +16,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.enums.CreateTestCaseFields;
-import org.testin.enums.IUIAction;
+import org.testin.enums.UIAction;
 import org.testin.mappers.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
@@ -30,7 +30,7 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StepsSection implements ICreateTestCaseSection {
+public class StepsSection implements CreateTestCaseSection {
     final @NotNull Font fieldFont = JBFont.regular().deriveFont(JBUI.Fonts.label().getSize2D() + 2f);
     private final @NotNull Project p;
     @Getter
@@ -70,7 +70,7 @@ public class StepsSection implements ICreateTestCaseSection {
         }
     }
 
-    public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull IUIAction repackAction) {
+    public void showSection(final @NotNull JBPanel<?> contentPanel, final @NotNull UIAction repackAction) {
         showSection(contentPanel);
         wrapper.setVisible(true);
         addStepField("", repackAction);
@@ -82,7 +82,7 @@ public class StepsSection implements ICreateTestCaseSection {
         });
     }
 
-    public void addStepField(final @Nullable String text, final @NotNull IUIAction repackAction) {
+    public void addStepField(final @Nullable String text, final @NotNull UIAction repackAction) {
         final TextFieldWithAutoCompletionListProvider<String> provider = new TextFieldWithAutoCompletion.StringsCompletionProvider(Services.getInstance(p, TestCaseCacheService.class).getSteps(), CreateTestCaseFields.STEPS.getIcon());
         final EditorTextField stepField = SpellChecker.createCompletionField(p, provider, text != null ? text : "");
 
@@ -141,7 +141,7 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     private void removeStepAction(final @NotNull JBPanel<?> stepRow, final @NotNull EditorTextField stepField,
-                                  final @NotNull IUIAction repackAction) {
+                                  final @NotNull UIAction repackAction) {
         if (stepFields.size() == 1) {
             stepField.setText("");
             stepField.requestFocus();
@@ -173,7 +173,7 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull IUIAction repackAction) {
+    public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
         base.registerShortcut(mainPanel, Shortcuts.CreateTestCaseAddStep.getCustomShortcut(), () ->
                 showSection(slot, repackAction));
     }
@@ -201,7 +201,7 @@ public class StepsSection implements ICreateTestCaseSection {
         }
     }
 
-    public void setStepsData(final @NotNull List<String> steps, final @NotNull IUIAction repack) {
+    public void setStepsData(final @NotNull List<String> steps, final @NotNull UIAction repack) {
         stepsContainer.removeAll();
         stepFields.clear();
         for (final String step : steps) {
@@ -210,7 +210,7 @@ public class StepsSection implements ICreateTestCaseSection {
     }
 
     @Override
-    public void fillData(final @NotNull TestCaseDto dto, final @NotNull IUIAction repackAction) {
+    public void fillData(final @NotNull TestCaseDto dto, final @NotNull UIAction repackAction) {
         setStepsData(dto.getSteps(), repackAction);
     }
 }
