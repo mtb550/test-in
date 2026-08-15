@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.testin.enums.TestSetStatus;
 import org.testin.model.Config;
 
 import java.time.ZonedDateTime;
@@ -18,6 +19,14 @@ import java.time.temporal.ChronoUnit;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
 public class TestSetMarker implements Marker {
+    /**
+     * Deprecated test sets keep their cases and their run history; they stop
+     * being offered when a new run is configured (#68).
+     */
+    @NonNull
+    @Builder.Default
+    private TestSetStatus status = TestSetStatus.ACTIVE;
+
     @NonNull
     @Builder.Default
     private String createdBy = "";
@@ -36,4 +45,9 @@ public class TestSetMarker implements Marker {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime modifiedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @Override
+    public String getStatusLabel() {
+        return status != null ? status.getDescription() : null;
+    }
 }

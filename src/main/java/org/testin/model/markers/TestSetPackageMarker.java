@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.testin.enums.PackageStatus;
 import org.testin.model.Config;
 
 import java.time.ZonedDateTime;
@@ -18,6 +19,14 @@ import java.time.temporal.ChronoUnit;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
 public class TestSetPackageMarker implements Marker {
+    /**
+     * Archived packages keep everything inside them and sort after the active
+     * ones, left collapsed (#68).
+     */
+    @NonNull
+    @Builder.Default
+    private PackageStatus status = PackageStatus.ACTIVE;
+
     @NonNull
     @Builder.Default
     private String createdBy = "";
@@ -36,4 +45,9 @@ public class TestSetPackageMarker implements Marker {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime modifiedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    @Override
+    public String getStatusLabel() {
+        return status != null ? status.getDescription() : null;
+    }
 }

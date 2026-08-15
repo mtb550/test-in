@@ -9,8 +9,13 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.enums.DirectoryType;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.*;
+import org.testin.model.markers.TestCasesMainDirectoryMarker;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.model.markers.TestRunMarker;
+import org.testin.model.markers.TestRunPackageMarker;
+import org.testin.model.markers.TestRunsMainDirectoryMarker;
+import org.testin.model.markers.TestSetMarker;
+import org.testin.model.markers.TestSetPackageMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
@@ -72,20 +77,28 @@ public final class DirectoryMapper {
     }
 
     public @NotNull TestCasesMainDirectoryDto getTestCasesRootNode(final @NotNull Project p, final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
+        final Path dir = path.resolve(DirectoryType.TCD.getDisplayedName());
         return TestCasesMainDirectoryDto.builder()
-                .path(path.resolve(DirectoryType.TCD.getDisplayedName()))
+                .path(dir)
                 .name(DirectoryType.TCD.getDisplayedName())
                 .parent(tp)
                 .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TCD.getDisplayedName()))
+                .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
+                        dir.resolve(DirectoryType.TCD.getMarker()).toFile(),
+                        TestCasesMainDirectoryMarker.class, "test cases directory", DirectoryType.TCD.getDisplayedName()))
                 .build();
     }
 
     public @NotNull TestRunsMainDirectoryDto getTestRunsRootNode(final @NotNull Project p, final @NotNull Path path, final @NotNull TestProjectDirectoryDto tp) {
+        final Path dir = path.resolve(DirectoryType.TRD.getDisplayedName());
         return TestRunsMainDirectoryDto.builder()
-                .path(path.resolve(DirectoryType.TRD.getDisplayedName()))
+                .path(dir)
                 .name(DirectoryType.TRD.getDisplayedName())
                 .parent(tp)
                 .path2(Services.getInstance(p, Tools.class).buildPath2(tp.getPath2(), DirectoryType.TRD.getDisplayedName()))
+                .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
+                        dir.resolve(DirectoryType.TRD.getMarker()).toFile(),
+                        TestRunsMainDirectoryMarker.class, "test runs directory", DirectoryType.TRD.getDisplayedName()))
                 .build();
     }
 
@@ -98,6 +111,9 @@ public final class DirectoryMapper {
                     .path(path)
                     .parent(parent)
                     .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
+                    .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
+                            path.resolve(DirectoryType.TSP.getMarker()).toFile(),
+                            TestSetPackageMarker.class, "test set package", fileName))
                     .build();
 
             Logger.info("retrieve the test set package directory: " + testSetPackageDirectoryDto);
@@ -119,6 +135,9 @@ public final class DirectoryMapper {
                     .path(path)
                     .parent(parent)
                     .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
+                    .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
+                            path.resolve(DirectoryType.TRP.getMarker()).toFile(),
+                            TestRunPackageMarker.class, "test run package", fileName))
                     .build();
 
             Logger.info("retrieve the test run package directory: " + testRunPackageDirectoryDto);
@@ -140,6 +159,9 @@ public final class DirectoryMapper {
                     .path(path)
                     .parent(parent)
                     .path2(Services.getInstance(p, Tools.class).buildPath2(parent.getPath2(), fileName))
+                    .marker(readMarkerSafe(Services.getInstance(p, Mapper.class),
+                            path.resolve(DirectoryType.TS.getMarker()).toFile(),
+                            TestSetMarker.class, "test set", fileName))
                     .build();
 
             Logger.info("retrieve the test set directory: " + testSetDirectoryDto);
