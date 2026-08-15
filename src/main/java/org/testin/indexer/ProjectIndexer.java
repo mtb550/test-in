@@ -525,6 +525,15 @@ public final class ProjectIndexer {
         return store.readMarker(dirPath, markerFileName, type, kind, name);
     }
 
+    /**
+     * The node at a path, whatever kind it is, or null when nothing is indexed
+     * there. Saves a caller that only has a path from having to know which kind
+     * of node to ask for.
+     */
+    public @Nullable DirectoryDto findByPath(final @NotNull Path path) {
+        return store.findByPath(path);
+    }
+
     public void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
         store.updateRunMarker(p, runPath, marker);
     }

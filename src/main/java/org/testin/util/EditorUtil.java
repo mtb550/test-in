@@ -16,7 +16,6 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 
 import java.nio.file.Path;
@@ -115,17 +114,19 @@ public final class EditorUtil {
         }
     }
 
+    /**
+     * A path per open editor, and nothing else. The entry used to carry a "ts"
+     * or "tr" prefix saying which kind of node it was, which the restore then
+     * parsed back to pick a lookup — but the indexer finds a node of any kind by
+     * path, and {@link #open} already decides the editor type from the node's own
+     * class. The prefix said nothing the path did not.
+     */
     private @NotNull List<String> getEntries(final @NotNull FileEditorManager fed) {
-        final VirtualFile[] openFiles = fed.getOpenFiles();
-
         final List<String> entries = new ArrayList<>();
-        for (final VirtualFile vf : openFiles) {
-            if (vf instanceof UnifiedVirtualFile uvf) {
-                final Path dirPath = uvf.getDir().getPath();
-                final String pathStr = dirPath.toAbsolutePath().toString();
-                final String type = uvf.getFileType() == EditorType.TEST_RUN ? "tr" : "ts";
 
-                entries.add(type + "|" + pathStr);
+        for (final VirtualFile vf : fed.getOpenFiles()) {
+            if (vf instanceof UnifiedVirtualFile uvf) {
+                entries.add(uvf.getDir().getPath().toAbsolutePath().toString());
             }
         }
         return entries;
@@ -149,26 +150,10 @@ public final class EditorUtil {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             for (final String entry : entries) {
-                final int sep = entry.indexOf('|');
-                final String type = entry.substring(0, sep);
-                final Path path = Path.of(entry.substring(sep + 1));
+                final DirectoryDto dir = indexer.findByPath(Path.of(entry));
+                Logger.debug("restoring editor for '" + entry + "' -> " + (dir != null ? "found" : "not indexed"));
 
-                if ("ts".equals(type)) {
-                    final TestSetDirectoryDto ts = indexer.getTestSetByPath(path);
-                    Logger.debug("EditorStateService: lookup testSet by path '" + path + "' -> "
-                            + (ts != null ? "found" : "not indexed"));
-
-                    openIfNotOpen(p, ts);
-
-                } else if ("tr".equals(type)) {
-                    final TestRunDirectoryDto tr = indexer.getTestRunDirByPath(path);
-                    Logger.debug("EditorStateService: lookup testRun by path '" + path + "' -> "
-                            + (tr != null ? "found" : "not indexed"));
-                    openIfNotOpen(p, tr);
-
-                } else {
-                    Logger.warn("EditorStateService: unknown directory type '" + type + "', skipping: " + path);
-                }
+                openIfNotOpen(p, dir);
             }
 
             PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);

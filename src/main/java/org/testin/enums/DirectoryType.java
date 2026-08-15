@@ -130,5 +130,4 @@ public enum DirectoryType {
 
     private final @NotNull RemoveHandler removeHandler;
     private final @NotNull SimpleTextAttributes attributes;
-
 }
