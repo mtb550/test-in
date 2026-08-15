@@ -3,6 +3,7 @@ package org.testin.testcase;
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
@@ -55,7 +56,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     TEST_DATA(
             "Test Data",
-            Shortcuts.CreateTestCaseTestData,
+            null,
             AllIcons.Nodes.DataTables,
             TestCaseBaseDialog::getTestDataSection,
             "set test data",
@@ -64,7 +65,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     PRE_CONDITIONS(
             "Pre Conditions",
-            Shortcuts.CreateTestCasePreConditions,
+            null,
             AllIcons.Actions.StepOut,
             TestCaseBaseDialog::getPreConditionsSection,
             "set pre conditions",
@@ -109,7 +110,12 @@ public enum CreateTestCaseFields implements StatusBarItem {
             List.of(DESCRIPTION, EXPECTED_RESULT, STEPS, PRIORITY, GROUP);
 
     private final @NotNull String name;
-    private final @NotNull Shortcuts shortcut;
+    /**
+     * Null for a section with no key of its own. Only the sections in
+     * {@link #JUMP_KEYS} have their key advertised in the status bar, so a
+     * binding outside that list was one nobody could discover.
+     */
+    private final @Nullable Shortcuts shortcut;
     private final @NotNull Icon icon;
     private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 
@@ -123,7 +129,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
      */
     private final TestCaseDialogKey @NotNull [] ownKeys;
 
-    CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon,
+    CreateTestCaseFields(final @NotNull String name, final @Nullable Shortcuts shortcut, final @NotNull Icon icon,
                          final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor,
                          final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
         this.name = name;
@@ -153,6 +159,6 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     @Override
     public @NotNull String getShortcutText() {
-        return shortcut.getShortcutText();
+        return shortcut != null ? shortcut.getShortcutText() : "";
     }
 }

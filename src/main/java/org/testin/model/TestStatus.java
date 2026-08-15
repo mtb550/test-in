@@ -7,6 +7,7 @@ import com.intellij.util.ui.UIUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +31,6 @@ public enum TestStatus {
             JBColor.GREEN,
             "Passed",
             new MenuEntry(AllIcons.Actions.Checked, KeyStroke.getKeyStroke(KeyEvent.VK_P, 0)),
-            true,
             false
     ),
 
@@ -41,7 +41,6 @@ public enum TestStatus {
             JBColor.RED.darker(),
             "Failed",
             new MenuEntry(AllIcons.Actions.Cancel, KeyStroke.getKeyStroke(KeyEvent.VK_F, 0)),
-            true,
             true
     ),
 
@@ -52,7 +51,6 @@ public enum TestStatus {
             JBColor.ORANGE,
             "Blocked",
             new MenuEntry(AllIcons.Actions.Pause, KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)),
-            true,
             false
     ),
 
@@ -64,11 +62,10 @@ public enum TestStatus {
             // would keep the color of whichever theme happened to be active then.
             JBColor.lazy(UIUtil::getContextHelpForeground),
             "Pending",
-            new MenuEntry(AllIcons.Actions.Restart, KeyStroke.getKeyStroke(KeyEvent.VK_N, 0)),
-            // Off the menu: the run owns it. It means "queued to run", and a run
-            // only clears it on completion, so a tester setting it afterward
-            // leaves a state nothing reconciles.
-            false,
+            // No menu entry, so not on the menu: the run owns this status. It
+            // means "queued to run", and a run only clears it on completion, so a
+            // tester setting it afterward leaves a state nothing reconciles.
+            null,
             false
     ),
 
@@ -78,10 +75,9 @@ public enum TestStatus {
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             JBColor.GRAY.brighter(),
             "Untested",
-            new MenuEntry(AllIcons.Actions.Rollback, KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)),
             // On the menu as "clear my verdict": marking a case Failed and then
             // finding you tested the wrong build had no way back.
-            true,
+            new MenuEntry(AllIcons.Actions.Rollback, KeyStroke.getKeyStroke(KeyEvent.VK_U, 0)),
             false
     );
 
@@ -92,17 +88,14 @@ public enum TestStatus {
     private final @NotNull String label;
 
     /**
-     * How this status appears on the status menu. One field rather than two, so
-     * an icon without a shortcut - a status offered with no key to apply it -
-     * cannot be written.
+     * How this status appears on the status menu, or null when the menu does not
+     * offer it. Null is the whole answer: there used to be a separate
+     * addedToMenu flag beside this, which allowed the two states that cannot
+     * mean anything — an entry that is never shown, and a status offered with no
+     * key to apply it. PENDING was the first: off the menu, yet carrying an icon
+     * and a key nothing could reach.
      */
-    private final @NotNull MenuEntry menuEntry;
-
-    /**
-     * Whether the status menu offers it. Separate from the entry above so that
-     * offering a status is one flag rather than inventing a presentation for it.
-     */
-    private final boolean addedToMenu;
+    private final @Nullable MenuEntry menuEntry;
 
     /**
      * True when applying this status first collects details in a dialog (FAILED).

@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.CreateTestCaseFields;
 import org.testin.testcase.UIAction;
-import org.testin.util.Shortcuts;
 import org.testin.util.SpellChecker;
 
 import javax.swing.*;
@@ -59,10 +58,9 @@ public class PreConditionsSection implements CreateTestCaseSection {
 
     @Override
     public void setupShortcut(final @NotNull JComponent mainPanel, final @NotNull JBPanel<?> slot, final @NotNull TestCaseBaseDialog base, final @NotNull UIAction repackAction) {
-        base.registerShortcut(mainPanel, Shortcuts.CreateTestCasePreConditions.getCustomShortcut(), () -> {
-            showSection(slot);
-            repackAction.execute();
-        });
+        // No key for pre-conditions. It had one, but the status bar never advertised it -
+        // the section is not in the dialog's jump map - so it was a binding
+        // nobody could discover and only competed with the keys that are shown.
     }
 
     @Override

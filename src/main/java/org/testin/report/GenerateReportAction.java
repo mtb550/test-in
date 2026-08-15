@@ -26,12 +26,9 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,7 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GenerateReportAction extends AbstractProjectAction {
 
-    private static final @NotNull KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK);
     private final @Nullable SimpleTree tree;
     private final @Nullable TestinEditor editor;
 
@@ -55,7 +51,6 @@ public class GenerateReportAction extends AbstractProjectAction {
         super(p, "Generate Report", "Generate test run report", null);
         this.tree = null;
         this.editor = editor;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
     }
 
     @Override
