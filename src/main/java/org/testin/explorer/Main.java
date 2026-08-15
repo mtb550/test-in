@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
-import org.testin.settings.StartupActivity;
+import org.testin.setting.StartupActivity;
 
 public class Main implements ToolWindowFactory, DumbAware {
 

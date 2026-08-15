@@ -18,8 +18,8 @@ import org.testin.explorer.projectSelector.TestProjectSelector;
 import org.testin.explorer.tree.ProjectTree;
 import org.testin.explorer.versionSelector.BranchSelector;
 import org.testin.services.Services;
-import org.testin.settings.Setting;
-import org.testin.settings.SettingsConfigurable;
+import org.testin.setting.Setting;
+import org.testin.setting.SettingsConfigurable;
 import org.testin.util.Bundle;
 
 import java.awt.*;

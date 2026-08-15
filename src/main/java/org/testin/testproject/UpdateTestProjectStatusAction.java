@@ -16,7 +16,7 @@ import org.testin.notifications.Notifier;
 import org.testin.explorer.ProjectPanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
-import org.testin.settings.AppSettingsState;
+import org.testin.setting.AppSettingsState;
 
 import javax.swing.tree.TreePath;
 

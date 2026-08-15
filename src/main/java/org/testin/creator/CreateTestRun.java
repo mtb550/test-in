@@ -21,7 +21,7 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.settings.AppSettingsState;
+import org.testin.setting.AppSettingsState;
 import org.testin.testrun.RunConfigurationDialog;
 import org.testin.testrun.RunConfigurationForm;
 import org.testin.testrun.RunTreeCellRenderer;

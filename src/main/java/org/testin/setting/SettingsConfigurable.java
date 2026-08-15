@@ -1,4 +1,4 @@
-package org.testin.settings;
+package org.testin.setting;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.options.Configurable;
@@ -18,7 +18,7 @@ import org.testin.logger.Logger;
 import org.testin.explorer.ProjectPanel;
 import org.testin.explorer.toolBar.RefreshAction;
 import org.testin.services.Services;
-import org.testin.settings.dialogs.TestinPathPanel;
+import org.testin.setting.dialogs.TestinPathPanel;
 import org.testin.util.Bundle;
 
 import javax.swing.*;

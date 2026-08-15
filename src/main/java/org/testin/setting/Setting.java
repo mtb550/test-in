@@ -1,4 +1,4 @@
-package org.testin.settings;
+package org.testin.setting;
 
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;

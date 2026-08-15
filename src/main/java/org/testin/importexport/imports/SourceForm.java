@@ -17,7 +17,7 @@ import org.testin.enums.TestEditorAttributes;
 import org.testin.importexport.shared.FileDocumentListener;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.settings.AppSettingsState;
+import org.testin.setting.AppSettingsState;
 import org.testin.ui.dialogs.FormRows;
 import org.testin.ui.framework.DialogComponent;
 

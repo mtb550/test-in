@@ -102,7 +102,7 @@
 
         <!-- First run activity -->
         <postStartupActivity
-                implementation="org.testin.settings.StartupActivity"
+                implementation="org.testin.setting.StartupActivity"
         />
 
         <!-- File editors -->
@@ -123,7 +123,7 @@
 
         <!-- Services -->
         <applicationService
-                serviceImplementation="org.testin.settings.AppSettingsState"
+                serviceImplementation="org.testin.setting.AppSettingsState"
         />
 
         <!-- Tool windows -->
@@ -158,8 +158,8 @@
              was. One page for the IDE, so two open projects cannot hold two sets
              of fields over one settings file and overwrite each other (#70). -->
         <applicationConfigurable
-                instance="org.testin.settings.SettingsConfigurable"
-                id="org.testin.settings.SettingsConfigurable"
+                instance="org.testin.setting.SettingsConfigurable"
+                id="org.testin.setting.SettingsConfigurable"
                 key="testin.display.name"
                 bundle="messages"
                 groupId="tools"

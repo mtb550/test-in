@@ -13,7 +13,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
-import org.testin.settings.Setting;
+import org.testin.setting.Setting;
 import org.testin.util.EditorUtil;
 import org.testin.util.FontSync;
 

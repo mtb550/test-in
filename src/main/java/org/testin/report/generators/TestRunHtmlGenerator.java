@@ -9,7 +9,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
-import org.testin.settings.AppSettingsState;
+import org.testin.setting.AppSettingsState;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;

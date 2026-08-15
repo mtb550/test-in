@@ -18,7 +18,7 @@ import org.testin.model.dto.dirs.*;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
-import org.testin.settings.Setting;
+import org.testin.setting.Setting;
 import org.testin.util.EditorUtil;
 import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;

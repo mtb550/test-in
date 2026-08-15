@@ -7,7 +7,7 @@ import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolBar.CollapseAllAction;
 import org.testin.explorer.toolBar.ExpandAllAction;
 import org.testin.explorer.toolBar.RefreshAction;
-import org.testin.settings.OpenSettingsAction;
+import org.testin.setting.OpenSettingsAction;
 
 import java.util.List;
 

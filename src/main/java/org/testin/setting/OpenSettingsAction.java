@@ -1,4 +1,4 @@
-package org.testin.settings;
+package org.testin.setting;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;

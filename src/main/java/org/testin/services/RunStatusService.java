@@ -21,7 +21,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
-import org.testin.settings.AppSettingsState;
+import org.testin.setting.AppSettingsState;
 
 import java.nio.file.Path;
 import java.time.ZonedDateTime;

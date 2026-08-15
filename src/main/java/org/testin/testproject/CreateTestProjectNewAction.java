@@ -13,7 +13,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.settings.Setting;
+import org.testin.setting.Setting;
 
 import java.nio.file.Path;
 

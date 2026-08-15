@@ -1,4 +1,4 @@
-package org.testin.settings;
+package org.testin.setting;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.options.ShowSettingsUtil;

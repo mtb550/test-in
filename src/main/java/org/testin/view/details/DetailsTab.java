@@ -21,7 +21,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.settings.Setting;
+import org.testin.setting.Setting;
 import org.testin.testcase.createDialog.TestCaseUpdateMenuDialog;
 import org.testin.util.FontSync;
 import org.testin.util.Shortcuts;

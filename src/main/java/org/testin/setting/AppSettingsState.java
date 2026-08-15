@@ -1,4 +1,4 @@
-package org.testin.settings;
+package org.testin.setting;
 
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.Service;

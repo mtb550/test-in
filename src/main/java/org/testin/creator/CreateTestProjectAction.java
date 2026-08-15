@@ -10,7 +10,7 @@ import org.testin.git.GitRefs;
 import org.testin.creator.dialogs.CreateProjectDialog;
 import org.testin.explorer.ProjectPanel;
 import org.testin.services.Services;
-import org.testin.settings.Setting;
+import org.testin.setting.Setting;
 import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.testproject.CreateTestProjectNewAction;
 import org.testin.util.OptionalPlugin;
