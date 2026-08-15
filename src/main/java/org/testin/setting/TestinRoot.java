@@ -12,6 +12,13 @@ import java.nio.file.Path;
 /**
  * The Testin root, as a path.
  * <p>
+ * Separate from {@link AppSettingsState} on purpose, and not merely because it
+ * always has been: that class is the persisted shape — the String and boolean
+ * fields that are in testinSettings.xml — while this one is the logic over one
+ * of them. The asymmetry is the point. A root is stored as a String that may be
+ * missing, empty, blank or untrimmed, and is used as a normalized Path; turning
+ * one into the other is this class, not the file format.
+ * <p>
  * Project-level for the convenience of callers that already hold a project, not
  * because the value is per-project. It reads {@link AppSettingsState}, which is
  * an application-level service over one file, so every open project sees the

@@ -9,6 +9,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Level;
 
+/**
+ * The persisted shape, and only that: the fields that are literally in
+ * testinSettings.xml, all String or boolean.
+ * <p>
+ * Logic over a field belongs on the type that owns it — {@link TestinRoot} turns
+ * rootTestinPath into a normalized Path and answers whether the root moved. It is
+ * kept out of here for a reason beyond tidiness: the XML serializer discovers
+ * public getter/setter pairs as persisted properties, not just public fields, so
+ * a getPath/setPath pair added here would declare a "path" property of a type it
+ * cannot write. Today nothing pairs up — getState has no matching setter — and
+ * that is worth keeping true.
+ */
 @State(name = "testin.settings.AppSettingsState", storages = @Storage("testinSettings.xml"))
 @Service(Service.Level.APP)
 public final class AppSettingsState implements PersistentStateComponent<AppSettingsState> {
