@@ -4,7 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-public interface ToolBar {
+public interface Toolbar {
     /**
      * The query is deliberately not a parameter: both editors rebuild their
      * filtered list through {@code EditorFilters.of(toolBar)}, which reads the

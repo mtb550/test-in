@@ -11,7 +11,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.runEditor.RunEditor;
-import org.testin.editor.toolBar.ToolBar;
+import org.testin.editor.toolBar.Toolbar;
 import org.testin.enums.Group;
 import org.testin.enums.Priority;
 import org.testin.enums.TestEditorAttributes;
@@ -48,9 +48,9 @@ public class FilterPopupBtn extends AbstractButton implements ToolbarItem {
     private final Runnable onToolBarFilterReset;
 
     @NotNull
-    private final ToolBar callbacks;
+    private final Toolbar callbacks;
 
-    public FilterPopupBtn(final @NotNull ToolBar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier) {
+    public FilterPopupBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onToolBarFilterReset, final @NotNull Runnable onToolBarFilterSelectedChanged, final @NotNull Supplier<Set<String>> availableModulesSupplier) {
         super("Filter", AllIcons.General.Filter);
         this.callbacks = callbacks;
         this.onToolBarFilterReset = onToolBarFilterReset;

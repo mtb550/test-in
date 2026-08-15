@@ -1,27 +1,23 @@
 package org.testin.editor.toolBar;
 
-import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.toolBar.components.*;
 
 import java.util.List;
 
-public class RunToolBar extends AbstractToolbarPanel {
-    private final @NotNull Project p;
+public class TestToolbar extends AbstractToolbarPanel {
 
-    public RunToolBar(final @NotNull Project p, final @NotNull ToolBar callbacks) {
+    public TestToolbar(final @NotNull Toolbar callbacks) {
         super(callbacks);
-        this.p = p;
         layoutComponents();
     }
 
     @Override
     public @NotNull List<ToolbarItem> getCustomComponents() {
         return List.of(
-                new StartExecutionBtn(getCallbacks(), getCallbacks()::onStartExecutionClicked),
-                new GenerateReportBtn(p),
+                new CreateTestCaseBtn(getCallbacks()::onToolBarCreateTestCaseClicked),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
-                new RunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
+                new TestDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
                 new FilterPopupBtn(getCallbacks(), getCallbacks()::onToolBarFilterResetButtonClicked, getCallbacks()::onToolBarFilterSelectionChanged, getCallbacks()::getAvailableModules),
                 new ListViewBtn(getCallbacks()::onToolBarSwitchedToListView),
                 new GridViewBtn(getCallbacks()::onToolBarSwitchedToGridView)

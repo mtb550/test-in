@@ -28,8 +28,8 @@ import org.testin.editor.list.ListView;
 import org.testin.editor.listeners.*;
 import org.testin.editor.statusBar.StatusBar;
 import org.testin.editor.toolBar.AbstractToolbarPanel;
-import org.testin.editor.toolBar.TestToolBar;
-import org.testin.editor.toolBar.ToolBar;
+import org.testin.editor.toolBar.TestToolbar;
+import org.testin.editor.toolBar.Toolbar;
 import org.testin.editor.toolBar.components.FilterPopupBtn;
 import org.testin.editor.toolBar.components.TestDetailsPopupBtn;
 import org.testin.enums.TestEditorAttributes;
@@ -56,7 +56,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TestEditor implements Disposable, ToolBar, TestinEditor {
+public class TestEditor implements Disposable, Toolbar, TestinEditor {
     @Getter
     private final @NotNull Project p;
 
@@ -160,7 +160,7 @@ public class TestEditor implements Disposable, ToolBar, TestinEditor {
 
         this.pageSize = PropertiesComponent.getInstance().getInt("testin.pageSize", 50);
 
-        this.toolBar = new TestToolBar(this);
+        this.toolBar = new TestToolbar(this);
         mainPanel.add(toolBar, BorderLayout.NORTH);
         toolBar.installSearchFocusShortcut(mainPanel);
 

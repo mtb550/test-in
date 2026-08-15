@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.runEditor.RunEditor;
-import org.testin.editor.toolBar.ToolBar;
+import org.testin.editor.toolBar.Toolbar;
 import org.testin.enums.TestRunStatus;
 import org.testin.enums.TestStatus;
 import org.testin.indexer.ProjectIndexer;
@@ -173,8 +173,8 @@ public final class RunStatusService {
             }
             if (editor instanceof RunEditor runEditor) {
                 runEditor.refreshAfterStatusChange();
-            } else if (editor instanceof ToolBar) {
-                ((ToolBar) editor).onToolBarFilterSelectionChanged();
+            } else if (editor instanceof Toolbar) {
+                ((Toolbar) editor).onToolBarFilterSelectionChanged();
             }
         });
     }

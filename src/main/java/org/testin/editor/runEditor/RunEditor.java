@@ -29,8 +29,8 @@ import org.testin.editor.listeners.RunListRenderer;
 import org.testin.editor.listeners.StatusBarListener;
 import org.testin.editor.statusBar.StatusBar;
 import org.testin.editor.toolBar.AbstractToolbarPanel;
-import org.testin.editor.toolBar.RunToolBar;
-import org.testin.editor.toolBar.ToolBar;
+import org.testin.editor.toolBar.RunToolbar;
+import org.testin.editor.toolBar.Toolbar;
 import org.testin.editor.toolBar.components.FilterPopupBtn;
 import org.testin.editor.toolBar.components.RunDetailsPopupBtn;
 import org.testin.editor.toolBar.components.StartExecutionBtn;
@@ -57,7 +57,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class RunEditor implements Disposable, ToolBar, TestinEditor {
+public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     private final @NotNull Project p;
 
@@ -151,7 +151,7 @@ public class RunEditor implements Disposable, ToolBar, TestinEditor {
     }
 
     private void buildOpeningPanel() {
-        toolBar = new RunToolBar(p, this);
+        toolBar = new RunToolbar(p, this);
         statusBar = new StatusBar();
         StatusBarListener.attach(this);
 

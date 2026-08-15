@@ -21,7 +21,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     protected final @NotNull SearchTxt searchTxt;
 
     @Getter
-    private final @NotNull ToolBar callbacks;
+    private final @NotNull Toolbar callbacks;
 
     @Getter
     private final @NotNull Map<Class<? extends ToolbarItem>, ToolbarItem> toolbarItems = new HashMap<>();
@@ -29,7 +29,7 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
     @Getter
     private @NotNull ViewMode currentView = ViewMode.LIST_VIEW;
 
-    public AbstractToolbarPanel(final @NotNull ToolBar callbacks) {
+    public AbstractToolbarPanel(final @NotNull Toolbar callbacks) {
         super(new GridBagLayout());
         this.callbacks = callbacks;
 
