@@ -52,6 +52,13 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(new PrevPageAction(ui, list));
     }
 
+    /**
+     * Each of these registers its own shortcut on the list from its constructor,
+     * so the action object is not needed afterwards and is deliberately
+     * discarded. It reads like a mistake and is not one — the alternative is a
+     * factory method per action whose only job is to return something for the
+     * caller to ignore.
+     */
     @Override
     public void registerShortcuts(final @NotNull JBList<TestCaseDto> list, final @NotNull AbstractEditorContextMenu menu) {
         new EscapeAction(p, list);

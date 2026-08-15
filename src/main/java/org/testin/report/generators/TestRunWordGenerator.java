@@ -45,7 +45,6 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public final class TestRunWordGenerator {
 
@@ -96,6 +95,10 @@ public final class TestRunWordGenerator {
 
                 addHeading(doc, "1. Report Overview", 0, 15);
 
+                // One traversal of the results serves the whole report: the
+                // counts below, the pass rate, and who executed it.
+                final TestRunSummary summary = TestRunSummary.of(tr.getResults());
+
                 XWPFTable overviewTable = doc.createTable(1, 2);
                 overviewTable.setWidth("100%");
                 overviewTable.setWidthType(TableWidthType.PCT);
@@ -114,12 +117,7 @@ public final class TestRunWordGenerator {
                 if (!tr.getTestType().isEmpty())
                     addOverviewRow(overviewTable, 4, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
 
-                String executedByAll = tr.getResults().stream()
-                        .map(TestRunItems::getExecutedBy)
-                        .filter(s -> !s.trim().isEmpty())
-                        .distinct()
-                        .collect(Collectors.joining(", "));
-                addOverviewRow(overviewTable, 5, "Executed By", executedByAll);
+                addOverviewRow(overviewTable, 5, "Executed By", summary.executedBy());
 
                 addOverviewRow(overviewTable, 6, "Execution Date", tr.getCreatedAt().format(Config.getDateFormatterPattern()));
                 addOverviewRow(overviewTable, 7, "Run Status", trDir.getMarker().getStatus().name());
@@ -128,9 +126,6 @@ public final class TestRunWordGenerator {
                 setTableBorders(overviewTable);
 
                 addHeading(doc, "2. Execution Summary", 20, 12);
-                // One traversal counts every status; a new TestStatus constant is
-                // included automatically instead of needing another filter pass.
-                final TestRunSummary summary = TestRunSummary.of(tr.getResults());
 
                 addText(doc, String.format(
                         "A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.",

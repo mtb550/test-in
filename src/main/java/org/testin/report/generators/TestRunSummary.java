@@ -17,10 +17,16 @@ import java.util.stream.Collectors;
  * report claimed nothing was outstanding on exactly the runs where something
  * was.
  *
- * @param pending cases that were not executed — PENDING before a run finishes,
- *                UNTESTED after it, which are the same fact at two moments.
+ * @param pending    cases that were not executed — PENDING before a run
+ *                   finishes, UNTESTED after it, which are the same fact at two
+ *                   moments.
+ * @param executedBy everyone who recorded a verdict in this run, comma
+ *                   separated, in the order they first appear. Read from the
+ *                   run's own results, so a report says who ran the tests rather
+ *                   than who printed the report.
  */
-public record TestRunSummary(long total, long passed, long failed, long blocked, long pending, int passRate) {
+public record TestRunSummary(long total, long passed, long failed, long blocked, long pending, int passRate,
+                             @NotNull String executedBy) {
 
     public static @NotNull TestRunSummary of(final @NotNull List<TestRunItems> results) {
         final Map<TestStatus, Long> counts = results.stream()
@@ -35,6 +41,15 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
                 counts.getOrDefault(TestStatus.FAILED, 0L),
                 counts.getOrDefault(TestStatus.BLOCKED, 0L),
                 counts.getOrDefault(TestStatus.PENDING, 0L) + counts.getOrDefault(TestStatus.UNTESTED, 0L),
-                total > 0 ? (int) (passed * 100 / total) : 0);
+                total > 0 ? (int) (passed * 100 / total) : 0,
+                executedBy(results));
+    }
+
+    private static @NotNull String executedBy(final @NotNull List<TestRunItems> results) {
+        return results.stream()
+                .map(TestRunItems::getExecutedBy)
+                .filter(name -> name != null && !name.trim().isEmpty())
+                .distinct()
+                .collect(Collectors.joining(", "));
     }
 }

@@ -38,7 +38,6 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public final class TestRunPdfGenerator {
 
@@ -118,6 +117,10 @@ public final class TestRunPdfGenerator {
             document.add(sec1);
 
 
+            // One traversal of the results serves the whole report: the counts
+            // below, the pass rate, and who executed it.
+            final TestRunSummary summary = TestRunSummary.of(tr.getResults());
+
             Table overviewTable = new Table(UnitValue.createPercentArray(new float[]{30, 70}))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
@@ -136,13 +139,7 @@ public final class TestRunPdfGenerator {
                 addOverviewRow(overviewTable, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType(), boldFont, regularFont);
 
 
-            String executedByAll = tr.getResults().stream()
-                    .map(TestRunItems::getExecutedBy)
-                    .filter(s -> !s.trim().isEmpty())
-                    .distinct()
-                    .collect(Collectors.joining(", "));
-
-            addOverviewRow(overviewTable, "Executed By", executedByAll, boldFont, regularFont);
+            addOverviewRow(overviewTable, "Executed By", summary.executedBy(), boldFont, regularFont);
 
 
             // todo, execution date value to be updated.
@@ -161,9 +158,6 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(9)
                     .setMarginTop(20);
             document.add(sec2);
-            // One traversal counts every status; a new TestStatus constant is
-            // included automatically instead of needing another filter pass.
-            final TestRunSummary summary = TestRunSummary.of(tr.getResults());
 
             document.add(new Paragraph(
                     String.format("A total of %d test cases were executed for this run. The run completed with a %d%% pass rate. The results below summarize the outcome across all executed cases.", summary.total(), summary.passRate()))

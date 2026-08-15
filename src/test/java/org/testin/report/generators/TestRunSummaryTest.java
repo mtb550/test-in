@@ -24,6 +24,10 @@ public class TestRunSummaryTest {
         return TestRunItems.builder().id(UUID.randomUUID()).status(status).build();
     }
 
+    private static TestRunItems ranBy(final String tester) {
+        return TestRunItems.builder().id(UUID.randomUUID()).status(TestStatus.PASSED).executedBy(tester).build();
+    }
+
     @Test
     public void pendingCountsBothWaysOfNotHavingBeenRun() {
         // The regression: a completed run holds UNTESTED, not PENDING.
@@ -80,5 +84,34 @@ public class TestRunSummaryTest {
                 item(TestStatus.FAILED)));
 
         assertEquals(summary.passRate(), 33);
+    }
+
+    // ------------------------------------------------------------ executed by
+
+    /**
+     * Who ran the tests, not who printed the report. The HTML generator used to
+     * put the current tester's name here while PDF and Word read the run — so a
+     * lead exporting someone else's cycle was credited with executing it.
+     */
+    @Test
+    public void executedByNamesEveryoneWhoRecordedAVerdict() {
+        final TestRunSummary summary = TestRunSummary.of(List.of(
+                ranBy("Omar"), ranBy("Sara"), ranBy("Omar")));
+
+        assertEquals(summary.executedBy(), "Omar, Sara", "each tester once, in the order they first appear");
+    }
+
+    @Test
+    public void executedByIgnoresCasesNobodyRan() {
+        final TestRunSummary summary = TestRunSummary.of(List.of(
+                ranBy("Omar"), item(TestStatus.UNTESTED), ranBy("   ")));
+
+        assertEquals(summary.executedBy(), "Omar");
+    }
+
+    @Test
+    public void executedByIsEmptyRatherThanNullOnARunNobodyTouched() {
+        assertEquals(TestRunSummary.of(List.of(item(TestStatus.PENDING))).executedBy(), "");
+        assertEquals(TestRunSummary.of(List.of()).executedBy(), "");
     }
 }

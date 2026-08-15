@@ -38,10 +38,7 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        Logger.debug("[DEBUG] CutTestCaseNode: actionPerformed triggered.");
-
         List<TestCaseDto> selectedTestCases = list.getSelectedValuesList();
-        Logger.info("[DEBUG] CutTestCaseNode: Selected items count = " + selectedTestCases.size());
 
         if (!selectedTestCases.isEmpty()) {
             try {
