@@ -16,7 +16,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 
@@ -25,9 +25,9 @@ import java.nio.file.Path;
 public class CreateTestProjectCloneAction extends AbstractProjectAction {
     private final @NotNull String gitUrl;
     private final @NotNull String projectName;
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
 
-    public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull ProjectPanel pp) {
+    public CreateTestProjectCloneAction(final @NotNull Project p, final @NotNull String gitUrl, final @NotNull String name, final @NotNull ExplorerPanel pp) {
         super(p, "Clone Git Project", "Import an existing test project from Git", AllIcons.Vcs.Clone);
         this.gitUrl = gitUrl;
         this.projectName = name;

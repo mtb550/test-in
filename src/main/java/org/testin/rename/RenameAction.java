@@ -17,7 +17,7 @@ import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeUndoService;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
@@ -34,9 +34,9 @@ import java.nio.file.Path;
 public class RenameAction extends AbstractProjectTreeAction {
 
     private static final KeyStroke SHORTCUT = KeyStroke.getKeyStroke(KeyEvent.VK_F6, InputEvent.SHIFT_DOWN_MASK);
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
 
-    public RenameAction(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull SimpleTree tree) {
+    public RenameAction(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull SimpleTree tree) {
         super(p, tree, "Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.pp = pp;
         this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);

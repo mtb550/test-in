@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.git.GitRepositoryService;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ import java.util.List;
 
 public class BranchSelector {
     private final @NotNull Project p;
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
     private final @NotNull GitRepositoryService git;
     private final @NotNull ComboBox<String> comboBox;
     private final @NotNull DefaultComboBoxModel<String> model;
@@ -37,7 +37,7 @@ public class BranchSelector {
 
     private boolean isUpdating = false;
 
-    public BranchSelector(final @NotNull Project p, final @NotNull ProjectPanel pp,
+    public BranchSelector(final @NotNull Project p, final @NotNull ExplorerPanel pp,
                           final @Nullable TestProjectDirectoryDto testProjectDirectory) {
         this.p = p;
         this.pp = pp;

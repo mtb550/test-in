@@ -11,17 +11,17 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryMapper;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 
 import java.nio.file.Path;
 
 public class CreateTestProjectNewAction extends AbstractProjectAction {
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
     private final @NotNull String tpName;
 
-    public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull ProjectPanel pp, final @NotNull String name) {
+    public CreateTestProjectNewAction(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull String name) {
         super(p, "New Test Project", "Create a new test project", AllIcons.General.Add);
         this.pp = pp;
         this.tpName = name;

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.git.GitRefs;
 import org.testin.creator.dialogs.CreateProjectDialog;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.CreateTestProjectCloneAction;
@@ -17,9 +17,9 @@ import org.testin.util.OptionalPlugin;
 import org.testin.util.Tools;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
 
-    public CreateTestProjectAction(final @NotNull Project p, final @NotNull ProjectPanel pp) {
+    public CreateTestProjectAction(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
         super(p, "New Test Project", "Create or Clone test project", AllIcons.General.Add);
         this.pp = pp;
     }

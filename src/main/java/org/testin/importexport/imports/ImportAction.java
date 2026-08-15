@@ -18,7 +18,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.creator.CreateTestSet;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
@@ -119,7 +119,7 @@ public class ImportAction extends AbstractProjectTreeAction {
             // included, off the EDT.
             Services.getInstance(p, ProjectIndexer.class).refreshDirectory(targetPath);
             ApplicationManager.getApplication().invokeLater(() ->
-                    Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh());
+                    Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh());
 
         });
     }

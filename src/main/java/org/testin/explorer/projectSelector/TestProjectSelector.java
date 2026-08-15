@@ -10,7 +10,7 @@ import org.testin.enums.ProjectStatus;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 
 import javax.swing.*;
@@ -24,7 +24,7 @@ public class TestProjectSelector {
     private static final String SELECTED_PROJECT_KEY = "org.testin.selectedTestProject";
 
     private final @NotNull Project p;
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
     @Getter
     private final @NotNull DefaultComboBoxModel<TestProjectDirectoryDto> testProjectList;
     @Getter
@@ -32,7 +32,7 @@ public class TestProjectSelector {
     @Getter
     private boolean isLoading = false;
 
-    public TestProjectSelector(final @NotNull Project p, final @NotNull ProjectPanel pp) {
+    public TestProjectSelector(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
         this.p = p;
         this.pp = pp;
         testProjectList = new DefaultComboBoxModel<>();

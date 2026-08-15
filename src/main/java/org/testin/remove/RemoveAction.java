@@ -13,7 +13,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
@@ -27,9 +27,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.testin.util.Shortcuts.DeletePackage;
 
 public class RemoveAction extends AbstractProjectTreeAction {
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
 
-    public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel pp) {
+    public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
         super(p, tree, "Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.pp = pp;
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);

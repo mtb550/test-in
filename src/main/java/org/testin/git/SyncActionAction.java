@@ -20,7 +20,7 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 
@@ -28,11 +28,11 @@ import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 
 public class SyncActionAction extends AbstractProjectTreeAction {
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
     private final @NotNull GitRepositoryService git;
     private final @NotNull GitSyncService sync;
 
-    public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ProjectPanel pp) {
+    public SyncActionAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
         super(p, tree, "Sync / Pull Changes", "Pull the latest test cases from the remote repository", AllIcons.Actions.SyncPanels);
         this.pp = pp;
         this.git = new GitRepositoryService(p);

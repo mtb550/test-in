@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.projectSelector.TestProjectSelector;
-import org.testin.explorer.tree.ProjectTree;
+import org.testin.explorer.tree.ExplorerTree;
 import org.testin.explorer.versionSelector.BranchSelector;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
@@ -26,20 +26,20 @@ import java.awt.*;
 
 @Getter
 @Service(Service.Level.PROJECT)
-public final class ProjectPanel implements Disposable {
+public final class ExplorerPanel implements Disposable {
     private final @NotNull Project p;
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
     private final @NotNull TestProjectSelector testProjectSelector;
     private final @NotNull BranchSelector branchSelector;
-    private final @NotNull ProjectTree projectTree;
+    private final @NotNull ExplorerTree projectTree;
 
-    public ProjectPanel(final @NotNull Project p) {
+    public ExplorerPanel(final @NotNull Project p) {
         this.p = p;
-        Logger.info("ProjectPanel.ProjectPanel()");
+        Logger.info("ExplorerPanel.ExplorerPanel()");
 
         testProjectSelector = new TestProjectSelector(p, this);
         branchSelector = new BranchSelector(p, this, testProjectSelector.getSelectedTestProject().getItem());
-        projectTree = new ProjectTree(p, this);
+        projectTree = new ExplorerTree(p, this);
         Disposer.register(this, projectTree);
 
         testProjectSelector.init();
@@ -50,7 +50,7 @@ public final class ProjectPanel implements Disposable {
         panel.getEmptyText().clear();
 
         if (testProjectSelector.getTestProjectList().getSize() > 0) {
-            Logger.info("ProjectPanel.setupMainLayout(): projects found");
+            Logger.info("ExplorerPanel.setupMainLayout(): projects found");
 
             panel.setLayout(new BorderLayout());
             final JBPanel<?> topBar = new JBPanel<>(new BorderLayout());
@@ -63,7 +63,7 @@ public final class ProjectPanel implements Disposable {
             panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         } else {
-            Logger.info("ProjectPanel.setupMainLayout(): no projects found");
+            Logger.info("ExplorerPanel.setupMainLayout(): no projects found");
             showEmptyState();
         }
 

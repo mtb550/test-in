@@ -10,7 +10,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
@@ -44,7 +44,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
                         p, testRunDto.getPath(), selectedStatus,
                         ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-                Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
+                Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
                 // The status names itself, as verdicts do: "Completed", "Closed".
                 // Inside the menu callback, so a dismissed menu says nothing (#62).

@@ -12,7 +12,7 @@ import org.testin.model.dto.dirs.*;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;
@@ -45,7 +45,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
             final Path newDirPath = pDir.getPath().resolve(s);
 
             DirectoryDto dir = dt.getAction().apply(p).execute(s, pDir, newDirPath);
-            Services.getInstance(p, ProjectPanel.class).getProjectTree().refresh();
+            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
             // Asynchronous creators (test runs) return null and run their own
             // follow-up once their dialog completes - including their own

@@ -19,7 +19,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TreeValueUtil {
     public static @Nullable Object valueOf(final @Nullable Object component) {
-        if (component instanceof ProjectTreeNode node) {
+        if (component instanceof ExplorerTreeNode node) {
             return node.getValue();
         }
         if (component instanceof DefaultMutableTreeNode node) {

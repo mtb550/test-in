@@ -19,10 +19,10 @@ import java.util.List;
 /**
  * IntelliJ tree node whose children are resolved by StructureTreeModel in the background.
  */
-public final class ProjectTreeNode extends AbstractTreeNode<Object> {
+public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
     private final @NotNull Project project;
 
-    public ProjectTreeNode(final @NotNull Project project, final @NotNull Object value) {
+    public ExplorerTreeNode(final @NotNull Project project, final @NotNull Object value) {
         super(project, value);
         this.project = project;
     }
@@ -42,7 +42,7 @@ public final class ProjectTreeNode extends AbstractTreeNode<Object> {
         try {
             final ProjectIndexer indexer = Services.getInstance(project, ProjectIndexer.class);
             indexer.awaitIndexing();
-            final List<ProjectTreeNode> children = new ArrayList<>();
+            final List<ExplorerTreeNode> children = new ArrayList<>();
             for (final DirectoryDto child : indexer.getChildren(directory.getPath())) {
                 children.add(child(child));
             }
@@ -54,8 +54,8 @@ public final class ProjectTreeNode extends AbstractTreeNode<Object> {
         }
     }
 
-    private @NotNull ProjectTreeNode child(final @NotNull Object value) {
-        final ProjectTreeNode child = new ProjectTreeNode(project, value);
+    private @NotNull ExplorerTreeNode child(final @NotNull Object value) {
+        final ExplorerTreeNode child = new ExplorerTreeNode(project, value);
         child.setParent(this);
         return child;
     }

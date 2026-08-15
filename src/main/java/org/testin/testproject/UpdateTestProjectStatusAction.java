@@ -13,7 +13,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.markers.TestProjectMarker;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -44,7 +44,7 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
 
             Services.getInstance(p, ProjectIndexer.class).persistTestProjectMarker(p, tp);
 
-            Services.getInstance(p, ProjectPanel.class).getProjectTree().updateNodes();
+            Services.getInstance(p, ExplorerPanel.class).getProjectTree().updateNodes();
 
             Services.getInstance(p, Notifier.class).info(p, "Test project '" + tp.getName() + "' is " + projectStatus.getDescription() + ".");
 

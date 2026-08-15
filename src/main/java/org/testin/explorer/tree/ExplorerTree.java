@@ -13,18 +13,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 
 import javax.swing.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class ProjectTree implements Disposable {
-    private final @NotNull ProjectPanel pp;
+public class ExplorerTree implements Disposable {
+    private final @NotNull ExplorerPanel pp;
     private final @NotNull JBScrollPane scrollPane;
-    private final @NotNull ProjectTreeStructure treeStructure;
-    private final @NotNull StructureTreeModel<ProjectTreeStructure> structureModel;
+    private final @NotNull ExplorerTreeStructure treeStructure;
+    private final @NotNull StructureTreeModel<ExplorerTreeStructure> structureModel;
     private final @NotNull AsyncTreeModel treeModel;
     @Getter
     private final @NotNull SimpleTree mainTree;
@@ -38,12 +38,12 @@ public class ProjectTree implements Disposable {
     private volatile @Nullable String expandedProjectPath;
     private volatile boolean disposed;
 
-    public ProjectTree(final @NotNull Project p, final @NotNull ProjectPanel pp) {
+    public ExplorerTree(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
         this.pp = pp;
 
         final @Nullable TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
                 pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-        this.treeStructure = new ProjectTreeStructure(p, selectedProject);
+        this.treeStructure = new ExplorerTreeStructure(p, selectedProject);
         this.structureModel = new StructureTreeModel<>(treeStructure, this);
         this.treeModel = new AsyncTreeModel(structureModel, this);
         this.mainTree = new SimpleTree(treeModel);

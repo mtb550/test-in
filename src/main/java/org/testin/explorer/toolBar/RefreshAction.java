@@ -10,16 +10,16 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class RefreshAction extends AbstractProjectAction {
-    private final @NotNull ProjectPanel pp;
+    private final @NotNull ExplorerPanel pp;
     private final @NotNull AtomicBoolean refreshGuard = new AtomicBoolean(false);
 
-    public RefreshAction(final @NotNull Project p, final @NotNull ProjectPanel pp) {
+    public RefreshAction(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
         super(p, "Refresh", "Re-index and reload tree", AllIcons.Actions.Refresh);
         this.pp = pp;
     }

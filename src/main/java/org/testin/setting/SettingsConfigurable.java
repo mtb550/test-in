@@ -15,7 +15,7 @@ import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.toolBar.RefreshAction;
 import org.testin.services.Services;
 import org.testin.setting.dialogs.TestinPathPanel;
@@ -115,7 +115,7 @@ public final class SettingsConfigurable implements Configurable {
         for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
             if (open.isDisposed()) continue;
 
-            new RefreshAction(open, Services.getInstance(open, ProjectPanel.class)).execute();
+            new RefreshAction(open, Services.getInstance(open, ExplorerPanel.class)).execute();
         }
     }
 

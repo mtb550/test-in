@@ -19,7 +19,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.testrun.RunConfigurationDialog;
@@ -44,7 +44,7 @@ public class CreateTestRun implements NodeCreator {
      */
     @Override
     public @Nullable DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        final TestProjectDirectoryDto tp = Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
+        final TestProjectDirectoryDto tp = Services.getInstance(p, ExplorerPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
 
         final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
 
@@ -69,7 +69,7 @@ public class CreateTestRun implements NodeCreator {
                     }
 
                     final TestRunDirectoryDto tr = Services.getInstance(p, DirectoryMapper.class).setTestRunNode(p, newDirPath, parentDir);
-                    saveSelectedToJSON(form, selection, newDirPath, Services.getInstance(p, ProjectPanel.class), tr);
+                    saveSelectedToJSON(form, selection, newDirPath, Services.getInstance(p, ExplorerPanel.class), tr);
                 }).show();
             });
         });
@@ -112,7 +112,7 @@ public class CreateTestRun implements NodeCreator {
         return node;
     }
 
-    private void saveSelectedToJSON(final RunConfigurationForm form, final SelectionTree selection, final Path savePath, final ProjectPanel pp, final TestRunDirectoryDto trDir) {
+    private void saveSelectedToJSON(final RunConfigurationForm form, final SelectionTree selection, final Path savePath, final ExplorerPanel pp, final TestRunDirectoryDto trDir) {
         final TestRunDto tr = new TestRunDto()
                 .setCreatedBy(Services.getInstance(p, AppSettingsState.class).testerName)
                 .setChangeLog(form.getChangeLog().getText().trim())

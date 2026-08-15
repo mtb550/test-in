@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.report.GenerateReportAction;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 
 public class GenerateReportBtn extends AbstractButton implements ToolbarItem {
@@ -14,7 +14,7 @@ public class GenerateReportBtn extends AbstractButton implements ToolbarItem {
         super("Export Results", AllIcons.ToolbarDecorator.Export);
 
         addActionListener(e -> {
-            final SimpleTree tree = Services.getInstance(p, ProjectPanel.class).getProjectTree().getMainTree();
+            final SimpleTree tree = Services.getInstance(p, ExplorerPanel.class).getProjectTree().getMainTree();
             final GenerateReportAction action = new GenerateReportAction(p, tree);
 
             if (action.isAvailable()) {

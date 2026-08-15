@@ -30,7 +30,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.explorer.ProjectPanel;
+import org.testin.explorer.ExplorerPanel;
 import org.testin.services.Services;
 
 import java.io.ByteArrayOutputStream;
@@ -82,7 +82,7 @@ public final class TestRunPdfGenerator {
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
             String projectName = "";
-            TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ProjectPanel.class).getTestProjectSelector().getSelectedTestProject().getSelectedItem();
+            TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ExplorerPanel.class).getTestProjectSelector().getSelectedTestProject().getSelectedItem();
 
             if (selectedProject != null) {
                 projectName = selectedProject.getName();
