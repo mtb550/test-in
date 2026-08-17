@@ -15,7 +15,6 @@ import org.testin.model.markers.Marker;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
-import org.testin.util.FilesUtil;
 import org.testin.util.Mapper;
 
 import java.nio.file.Path;

@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.util.FilesUtil;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,4 +1,4 @@
-package org.testin.util;
+package org.testin.indexer;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.application.WriteAction;
@@ -20,11 +20,17 @@ import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+/**
+ * Performs VFS mutations. Package-private, and in this package, so that the
+ * architecture rule is enforced by the compiler rather than by convention: the
+ * indexer is the single owner of test data file access, and nothing outside it
+ * can reach this executor at all.
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
-public final class VfsExecutor {
+final class VfsExecutor {
 
-    public void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull VfsOperation operation) {
+    void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull VfsOperation operation) {
         // The lookup runs off the EDT and the operation on it: refreshAndFindFile
         // refreshes synchronously and reads the VFS persistence, which the EDT is
         // not allowed to do, while the operation itself mutates the VFS and so
@@ -51,9 +57,9 @@ public final class VfsExecutor {
         });
     }
 
-    public void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
-                                 final @NotNull String errorTitle, final @NotNull VfsBiOperation operation,
-                                 final @Nullable Runnable onSuccess, final @Nullable Runnable onFailure) {
+    void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
+                          final @NotNull String errorTitle, final @NotNull VfsBiOperation operation,
+                          final @Nullable Runnable onSuccess, final @Nullable Runnable onFailure) {
         // Both lookups off the EDT, the operation on it - see the single-path form.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @Nullable VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
@@ -97,8 +103,8 @@ public final class VfsExecutor {
      * A path the VFS cannot find counts as deleted: there is nothing left to
      * remove, and the cache should stop describing it.
      */
-    public void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
-                         final @NotNull Consumer<@NotNull Boolean> onDeleted) {
+    void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
+                  final @NotNull Consumer<@NotNull Boolean> onDeleted) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
 
