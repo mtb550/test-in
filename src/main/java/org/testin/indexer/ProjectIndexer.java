@@ -481,7 +481,7 @@ public final class ProjectIndexer {
 
     public void addTestProject(final @NotNull TestProjectDirectoryDto tp) {
         store.addTestProject(tp);
-        store.addTestProjectMarker(p, tp);
+        store.persistMarker(tp);
     }
 
     public void addTestSet(final @NotNull TestSetDirectoryDto ts) {
@@ -509,14 +509,12 @@ public final class ProjectIndexer {
         }
     }
 
-    public void persistTestProjectMarker(final @NotNull Project p, final @NotNull TestProjectDirectoryDto tp) {
-        store.addTestProjectMarker(p, tp);
-    }
-
     /**
      * Writes any node's marker back through the indexer, which owns file access.
-     * The status actions on test sets and packages call this after changing the
-     * marker they were handed.
+     * Every marker write goes through here, whichever node it belongs to: the
+     * write, the cached children invalidation and the VFS refresh are one thing,
+     * and a caller that does only the first leaves a file the IDE - and the Git
+     * paths reading through it - never hear about.
      */
     public void persistMarker(final @NotNull DirectoryDto dto) {
         store.persistMarker(dto);

@@ -330,12 +330,6 @@ final class IndexerDataStore {
         refreshDir(dto.getPath());
     }
 
-    void addTestProjectMarker(final @NotNull Project p, final @NotNull TestProjectDirectoryDto tp) {
-        stampIfNew(tp.getMarker());
-        final Path markerPath = tp.getPath().resolve(DirectoryType.TP.getMarker());
-        Services.getInstance(p, FilesUtil.class).write(p, markerPath, tp.getMarker());
-    }
-
     void updateRunMarker(final @NotNull Project p, final @NotNull Path runPath, final @NotNull TestRunMarker marker) {
         final TestRunDirectoryDto trd = testRunsDirByPath.get(runPath.toString());
         if (trd != null) {

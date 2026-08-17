@@ -14,7 +14,6 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.markers.TestProjectMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -38,22 +37,19 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
         if (tp == null) return;
 
         try {
-            final TestProjectMarker marker = tp.getMarker();
-            marker.setStatus(projectStatus);
-            marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
-            tp.setMarker(marker);
-
-            Services.getInstance(p, ProjectIndexer.class).persistTestProjectMarker(p, tp);
+            tp.getMarker().setStatus(projectStatus);
+            tp.getMarker().touch(Services.getInstance(p, AppSettingsState.class).testerName);
+            Services.getInstance(p, ProjectIndexer.class).persistMarker(tp);
 
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().updateNodes();
 
             // The status names itself: "Active", "Inactive", "Archived" (#62).
-            Services.getInstance(p, Notifier.class).softShow(p, projectStatus.getDescription());
+            Services.getInstance(p, Notifier.class).softShow(p, projectStatus.getLabel());
 
         } catch (final Exception ex) {
-            Logger.error("Unable to update status to " + projectStatus.getDescription());
+            Logger.error("Unable to update status to " + projectStatus.getLabel());
             Logger.error(ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "Unable to update status to " + projectStatus.getDescription());
+            Services.getInstance(p, Notifier.class).error(p, "Unable to update status to " + projectStatus.getLabel());
         }
     }
 
