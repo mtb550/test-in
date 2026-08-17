@@ -10,6 +10,9 @@ import org.testin.model.PackageStatus;
  * thing to both, so one action sets it through this and never asks which
  * package it is holding.
  */
+// UnusedReturnValue reports setStatus for the same reason it reports Marker's
+// setters, and the answer is the same one: see the comment on Marker (#66).
+@SuppressWarnings("UnusedReturnValue")
 public interface PackageMarker extends Marker {
 
     @NotNull PackageStatus getStatus();

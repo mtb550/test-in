@@ -2,7 +2,6 @@ package org.testin.model.markers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -58,12 +57,14 @@ public interface Marker {
     }
 
     /**
-     * Human-readable status of the node, or null when the marker carries none.
+     * Human-readable status of the node; empty when the marker carries none.
+     * Empty rather than null because the details popup drops a blank row
+     * anyway, so no reader has to ask whether this marker has a status.
      * JsonIgnore everywhere: a derived label must never leak into the
      * persisted marker JSON.
      */
     @JsonIgnore
-    default @Nullable String getStatusLabel() {
-        return null;
+    default @NotNull String getStatusLabel() {
+        return "";
     }
 }

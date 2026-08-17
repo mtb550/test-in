@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 import org.testin.model.TestRunStatus;
 
@@ -43,7 +44,7 @@ public class TestRunMarker implements Marker {
 
     @com.fasterxml.jackson.annotation.JsonIgnore
     @Override
-    public String getStatusLabel() {
+    public @NotNull String getStatusLabel() {
         return status.getLabel();
     }
 }

@@ -6,6 +6,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -18,8 +19,11 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
-import javax.swing.tree.TreePath;
-
+/**
+ * Sets a test project's status from the tree context menu - one instance per
+ * {@link ProjectStatus}. Shown only on a test project, and enabled only when it
+ * would change something, the way its test set and package siblings are.
+ */
 public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
     private final @NotNull ProjectStatus projectStatus;
 
@@ -30,10 +34,7 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-
-        final TestProjectDirectoryDto tp = TreeValueUtil.valueOf(path.getLastPathComponent(), TestProjectDirectoryDto.class);
+        final TestProjectDirectoryDto tp = selectedTestProject();
         if (tp == null) return;
 
         try {
@@ -46,7 +47,8 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
 
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().updateNodes();
 
-            Services.getInstance(p, Notifier.class).info(p, "Test project '" + tp.getName() + "' is " + projectStatus.getDescription() + ".");
+            // The status names itself: "Active", "Inactive", "Archived" (#62).
+            Services.getInstance(p, Notifier.class).softShow(p, projectStatus.getDescription());
 
         } catch (final Exception ex) {
             Logger.error("Unable to update status to " + projectStatus.getDescription());
@@ -57,9 +59,14 @@ public class UpdateTestProjectStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-        e.getPresentation().setEnabled(TreeValueUtil.valueOf(path.getLastPathComponent(), TestProjectDirectoryDto.class) != null);
+        final TestProjectDirectoryDto tp = selectedTestProject();
+
+        e.getPresentation().setVisible(tp != null);
+        e.getPresentation().setEnabled(tp != null && tp.getMarker().getStatus() != projectStatus);
+    }
+
+    private @Nullable TestProjectDirectoryDto selectedTestProject() {
+        return TreeValueUtil.singleSelectedDirectory(tree) instanceof TestProjectDirectoryDto tp ? tp : null;
     }
 
     @Override

@@ -20,8 +20,8 @@ import java.util.List;
  * <p>
  * The rows read the {@link Marker} contract, and that contract is the per-node
  * declaration - a marker with a status of its own answers
- * {@link Marker#getStatusLabel()}, one without says null, and the framework's
- * details builder drops a row whose value is blank. So a test set shows its
+ * {@link Marker#getStatusLabel()}, one without answers blank, and the
+ * framework's details builder drops a blank row. So a test set shows its
  * Deprecated or Active, a fixed container shows no Status row at all, and no
  * node type is named here (#68).
  */
