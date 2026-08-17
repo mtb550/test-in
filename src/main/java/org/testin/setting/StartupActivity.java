@@ -5,11 +5,8 @@ import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Key;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.Main;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
@@ -87,37 +84,10 @@ public final class StartupActivity implements ProjectActivity {
                 }));
     }
 
-    /**
-     * Shows the tree panel when the project opens. Deliberately not part of
-     * {@link #execute(Project)}: that method is also called by the tree tool
-     * window factory, so opening the window from there would be circular.
-     */
-    private static void openTreePanel(final @NotNull Project p) {
-        if (!Services.getInstance(p, AppSettingsState.class).openTreeOnStartup) return;
-
-        // The plugin loads in every project. With no root configured the panel has
-        // nothing to show, and the setup notification above already covers that case.
-        if (Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty()) return;
-
-        final ToolWindowManager manager = ToolWindowManager.getInstance(p);
-
-        // Waits for the tool window manager to finish initializing - asking it for a
-        // tool window any earlier returns null.
-        manager.invokeLater(() -> {
-            if (p.isDisposed()) return;
-
-            final ToolWindow tw = Main.getToolWindow(p);
-
-            // show, not activate: the panel appears without taking focus off the editor.
-            if (tw != null && !tw.isVisible()) tw.show(null);
-        });
-    }
-
     @Override
     public @NotNull Object execute(final @NotNull Project p,
                                    final @NotNull Continuation<? super kotlin.Unit> continuation) {
         execute(p);
-        openTreePanel(p);
         return kotlin.Unit.INSTANCE;
     }
 }

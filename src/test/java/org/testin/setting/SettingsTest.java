@@ -175,7 +175,6 @@ public class SettingsTest {
 
         final AppSettingsState stored = new AppSettingsState();
         stored.rootTestinPath = "C:/testin";
-        stored.openTreeOnStartup = false;
         stored.logLevel = "DEBUG";
         stored.testerName = "Omar";
         stored.testerRole = "Test Lead";
@@ -184,7 +183,6 @@ public class SettingsTest {
         settings.loadState(stored);
 
         assertEquals(settings.rootTestinPath, "C:/testin");
-        assertFalse(settings.openTreeOnStartup);
         assertEquals(settings.logLevel, "DEBUG");
         assertEquals(settings.testerName, "Omar");
         assertEquals(settings.testerRole, "Test Lead");
@@ -192,32 +190,14 @@ public class SettingsTest {
     }
 
     @Test
-    public void aFreshStateHasNoRootAndLeavesTheTreeClosed() {
+    public void aFreshStateHasNoRootAndNothingConfigured() {
         final AppSettingsState settings = new AppSettingsState();
 
         assertEquals(settings.rootTestinPath, "");
         assertEquals(TestinRoot.normalize(settings.rootTestinPath), Path.of(""));
-        assertFalse(settings.openTreeOnStartup, "the panel stays closed until the tester asks for it");
         assertEquals(settings.logLevel, "INFO");
         assertEquals(settings.testerName, "");
         assertEquals(settings.testerRole, "");
-    }
-
-    /**
-     * The stored value wins over the new default, which is what makes changing a
-     * default safe for anyone who had already chosen: a settings file saying the
-     * panel should open still opens it.
-     */
-    @Test
-    public void aStoredChoiceSurvivesTheDefaultBeingOff() {
-        final AppSettingsState settings = new AppSettingsState();
-
-        final AppSettingsState stored = new AppSettingsState();
-        stored.openTreeOnStartup = true;
-
-        settings.loadState(stored);
-
-        assertTrue(settings.openTreeOnStartup);
     }
 
     @Test

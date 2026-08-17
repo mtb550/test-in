@@ -31,7 +31,6 @@ public final class SettingsConfigurable implements Configurable {
     private final @NotNull JBTextField testerNameField = new JBTextField();
     private final @NotNull JBTextField testerRoleField = new JBTextField();
     private final @NotNull TextFieldWithBrowseButton downloadFolderField = new TextFieldWithBrowseButton();
-    private final @NotNull JBCheckBox openTreeOnStartupCheckBox = new JBCheckBox("Open the Testin panel when a project opens");
     private final @NotNull ComboBox<String> logLevelComboBox;
 
     public SettingsConfigurable() {
@@ -58,8 +57,6 @@ public final class SettingsConfigurable implements Configurable {
         return FormBuilder.createFormBuilder()
                 .addLabeledComponent(new JBLabel("Testin source root: "), testinPathPanel.getComponent(), 1, false)
                 .addVerticalGap(5)
-                .addComponent(openTreeOnStartupCheckBox)
-                .addVerticalGap(5)
                 .addLabeledComponent("Log level: ", logLevelComboBox)
                 .addVerticalGap(5)
                 .addLabeledComponent(new JBLabel("Tester name: "), testerNameField, 1, false)
@@ -75,7 +72,6 @@ public final class SettingsConfigurable implements Configurable {
     public boolean isModified() {
         final AppSettingsState settings = Services.getInstance(AppSettingsState.class);
         boolean modified = !testinPathPanel.getPathText().equals(settings.rootTestinPath);
-        modified |= openTreeOnStartupCheckBox.isSelected() != settings.openTreeOnStartup;
         modified |= !Objects.equals(logLevelComboBox.getSelectedItem(), settings.logLevel);
         modified |= !testerNameField.getText().equals(settings.testerName);
         modified |= !testerRoleField.getText().equals(settings.testerRole);
@@ -93,7 +89,6 @@ public final class SettingsConfigurable implements Configurable {
         final boolean rootChanged = TestinRoot.isRootChanged(settings.rootTestinPath, testinPathPanel.getPathText());
 
         settings.rootTestinPath = testinPathPanel.getPathText();
-        settings.openTreeOnStartup = openTreeOnStartupCheckBox.isSelected();
         final String selectedLogLevel = (String) logLevelComboBox.getSelectedItem();
         settings.logLevel = selectedLogLevel != null ? selectedLogLevel : Level.INFO.name();
         settings.testerName = testerNameField.getText();
@@ -124,7 +119,6 @@ public final class SettingsConfigurable implements Configurable {
         final AppSettingsState settings = Services.getInstance(AppSettingsState.class);
 
         testinPathPanel.setPathText(settings.rootTestinPath);
-        openTreeOnStartupCheckBox.setSelected(settings.openTreeOnStartup);
         logLevelComboBox.setSelectedItem(settings.logLevel);
         testerNameField.setText(settings.testerName);
         testerRoleField.setText(settings.testerRole);
