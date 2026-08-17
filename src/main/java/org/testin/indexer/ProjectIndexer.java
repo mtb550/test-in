@@ -514,6 +514,15 @@ public final class ProjectIndexer {
     }
 
     /**
+     * Writes any node's marker back through the indexer, which owns file access.
+     * The status actions on test sets and packages call this after changing the
+     * marker they were handed.
+     */
+    public void persistMarker(final @NotNull DirectoryDto dto) {
+        store.persistMarker(dto);
+    }
+
+    /**
      * Reads a node's marker, falling back to a default instance when the file is
      * missing or unreadable. The indexer owns both directions of the marker round
      * trip; nothing outside it opens a marker file (#49).

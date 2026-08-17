@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
+import org.testin.model.PackageStatus;
 import org.testin.model.markers.TestSetPackageMarker;
 
 
@@ -49,5 +50,10 @@ public class TestSetPackageDirectoryDto extends DirectoryDto {
     @Override
     public boolean canCreateChildren() {
         return true;
+    }
+
+    @Override
+    public boolean isRetired() {
+        return marker.getStatus() == PackageStatus.ARCHIVED;
     }
 }

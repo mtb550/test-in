@@ -44,7 +44,11 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
             // where every cycle stands without opening any of them. Every other
             // node takes the icon of what it is.
             setIcon(runStatus != null ? runStatus.getIcon() : type.getIcon());
-            append(dir.getName(), selectedNodes.contains(dir) ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
+            // Gray for a node that is cut, and for one retired from current work -
+            // a deprecated test set or an archived package - so the tree says at
+            // a glance what is live without opening the details of anything.
+            final boolean grayed = selectedNodes.contains(dir) || dir.isRetired();
+            append(dir.getName(), grayed ? SimpleTextAttributes.GRAYED_ATTRIBUTES : type.getAttributes());
             append(" ");
             append(runStatus != null ? runStatus.getLabel() : "", SimpleTextAttributes.GRAY_ATTRIBUTES);
 

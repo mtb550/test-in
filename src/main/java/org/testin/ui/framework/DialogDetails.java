@@ -20,10 +20,10 @@ public final class DialogDetails implements DialogComponent {
     private final @NotNull JBPanel<?> panel;
 
     DialogDetails(final @NotNull List<Row> rows) {
-        panel = new JBPanel<>();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setOpaque(false);
-        panel.setBorder(JBUI.Borders.empty(4, 0));
+        final JBPanel<?> stack = new JBPanel<>();
+        stack.setLayout(new BoxLayout(stack, BoxLayout.Y_AXIS));
+        stack.setOpaque(false);
+        stack.setBorder(JBUI.Borders.empty(4, 0));
 
         for (final Row row : rows) {
             final JBPanel<?> rowPanel = new JBPanel<>(new BorderLayout());
@@ -31,8 +31,15 @@ public final class DialogDetails implements DialogComponent {
             rowPanel.setBorder(JBUI.Borders.emptyTop(8));
             rowPanel.add(Captions.panel(row.caption()), BorderLayout.WEST);
             rowPanel.add(wrappingValue(row.value()), BorderLayout.CENTER);
-            panel.add(rowPanel);
+            stack.add(rowPanel);
         }
+
+        // Anchored to the top: when the rows are all a dialog holds and it is
+        // taller than they are, a bare box layout would spread them down the
+        // dialog. Rows keep their height and the room stays below them.
+        panel = new JBPanel<>(new BorderLayout());
+        panel.setOpaque(false);
+        panel.add(stack, BorderLayout.NORTH);
     }
 
     /**

@@ -102,6 +102,10 @@ public class CreateTestRun implements NodeCreator {
         }
 
         for (final DirectoryDto child : indexer.getChildren(folder)) {
+            // A deprecated test set, or anything under an archived package, is not
+            // offered for a new run: that is what retiring it means (#68).
+            if (child.isRetired()) continue;
+
             final DefaultMutableTreeNode childNode = buildDirectoryTree(child.getPath(), child);
 
             // An empty test set, or a package holding only empty ones, would

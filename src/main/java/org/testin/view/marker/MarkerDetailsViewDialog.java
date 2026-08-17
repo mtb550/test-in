@@ -1,90 +1,57 @@
 package org.testin.view.marker;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
-import com.intellij.openapi.ui.popup.JBPopup;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.Config;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.markers.Marker;
-import org.testin.ui.dialogs.DialogStyle;
-import org.testin.util.FontSync;
-import org.testin.view.details.components.LabelValueRow;
+import org.testin.ui.framework.AbstractFrameworkDialog;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogDetails;
+import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Shortcuts;
 
-import javax.swing.*;
-import java.awt.*;
-import java.time.ZonedDateTime;
-import java.util.Optional;
+import java.util.List;
 
-public class MarkerDetailsViewDialog {
-    final @NotNull Project p;
+/**
+ * The Details popup on a tree node: what the node is, where it lives, and the
+ * audit and status its marker carries.
+ * <p>
+ * The rows read the {@link Marker} contract, and that contract is the per-node
+ * declaration - a marker with a status of its own answers
+ * {@link Marker#getStatusLabel()}, one without says null, and the framework's
+ * details builder drops a row whose value is blank. So a test set shows its
+ * Deprecated or Active, a fixed container shows no Status row at all, and no
+ * node type is named here (#68).
+ */
+public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<DialogDetails> {
 
-    public MarkerDetailsViewDialog(final @NotNull Project p) {
-        this.p = p;
-    }
+    public MarkerDetailsViewDialog(final @NotNull Project p, final @NotNull DirectoryDto dto) {
+        super(p);
 
-    public void show(final @NotNull DirectoryDto dto) {
-        final JBPanel<?> panel = new JBPanel<>(new GridBagLayout());
-        panel.setOpaque(false);
-        DialogStyle.styleContent(panel);
-        panel.setBorder(JBUI.Borders.empty(10));
-
-        final GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-
-        int row = 0;
-
-        // Creation info comes from the marker - the only place it is stored -
-        // through the Marker contract; a new marker type needs no new branch.
         final Marker marker = dto.getMarker();
 
-        row = addRow(panel, gbc, "Name:", dto.getName(), row);
-        row = addRow(panel, gbc, "Path:", dto.getPath().toString(), row);
-        row = addRow(panel, gbc, "Created By:", marker.getCreatedBy(), row);
-        row = addRow(panel, gbc, "Created At:", formatDate(marker.getCreatedAt()), row);
-        row = addRow(panel, gbc, "Modified By:", marker.getModifiedBy(), row);
-        row = addRow(panel, gbc, "Modified At:", formatDate(marker.getModifiedAt()), row);
-        row = addRow(panel, gbc, "Status:", Optional.ofNullable(marker.getStatusLabel()).orElse(""), row);
+        title = "Details";
 
-        final GridBagConstraints spacerGbc = new GridBagConstraints();
-        spacerGbc.gridy = row;
-        spacerGbc.weighty = 1.0;
-        panel.add(Box.createVerticalGlue(), spacerGbc);
+        components = List.of(ComponentDialogBase.details()
+                .row("Name", dto.getName())
+                .row("Path", dto.getPath().toString())
+                .row("Created By", marker.getCreatedBy())
+                .row("Created At", Config.formatOrBlank(marker.getCreatedAt()))
+                .row("Modified By", marker.getModifiedBy())
+                .row("Modified At", Config.formatOrBlank(marker.getModifiedAt()))
+                .row("Status", marker.getStatusLabel())
+                .build());
 
-        final JBScrollPane scrollPane = new JBScrollPane(panel);
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-        scrollPane.setPreferredSize(new Dimension(600, 400));
+        shortcuts = List.of(StatusBarShortcut.build(Shortcuts.Escape, "Close", this::closeCancel));
 
-        final ComponentPopupBuilder builder = JBPopupFactory.getInstance()
-                .createComponentPopupBuilder(scrollPane, null)
-                .setTitle("Details")
-                .setRequestFocus(true)
-                .setCancelOnWindowDeactivation(false)
-                .setCancelOnClickOutside(true)
-                .setMovable(true)
-                .setResizable(true)
-                .setMinSize(new Dimension(400, 300));
-
-        final JBPopup popup = builder.createPopup();
-        popup.showCenteredInCurrentWindow(p);
+        // Sized rather than packed so it stays movable and resizable, as it was.
+        preferredSize = JBUI.size(600, 400);
     }
 
-    private int addRow(final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc,
-                       final @NotNull String labelText, final @Nullable String valueText, final int row) {
-        final float fontSize = FontSync.getBaseFontSize();
-        return LabelValueRow.add(panel, gbc, labelText, valueText, fontSize, fontSize, row);
-    }
-
-    private @NotNull String formatDate(final @Nullable ZonedDateTime dateTime) {
-        if (dateTime == null) return "";
-        return dateTime.format(Config.getDateFormatterPattern());
+    @Override
+    protected void submit() {
+        closeOk();
     }
 }

@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.DirectoryType;
+import org.testin.model.TestSetStatus;
 import org.testin.model.markers.TestSetMarker;
 
 
@@ -50,5 +51,10 @@ public class TestSetDirectoryDto extends DirectoryDto {
     @Override
     public @NotNull DirectoryType getType() {
         return DirectoryType.TS;
+    }
+
+    @Override
+    public boolean isRetired() {
+        return marker.getStatus() == TestSetStatus.DEPRECATED;
     }
 }

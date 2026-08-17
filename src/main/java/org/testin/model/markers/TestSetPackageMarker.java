@@ -18,7 +18,7 @@ import java.time.temporal.ChronoUnit;
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 @ToString()
-public class TestSetPackageMarker implements Marker {
+public class TestSetPackageMarker implements PackageMarker {
     /**
      * Archived packages keep everything inside them and sort after the active
      * ones, left collapsed (#68).

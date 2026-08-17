@@ -40,7 +40,11 @@ final class DirectoryChildrenIndex {
                 if (directory.getParent() == null) continue;
                 rebuilt.computeIfAbsent(directory.getParent().getPath(), ignored -> new ArrayList<>()).add(directory);
             }
-            rebuilt.values().forEach(children -> children.sort(Comparator.comparing(DirectoryDto::getName)));
+            // Retired nodes - archived packages, deprecated test sets - sort after
+            // the live ones, so last quarter's work stops being the first thing in
+            // the tree; by name within each half.
+            rebuilt.values().forEach(children -> children.sort(
+                    Comparator.comparing(DirectoryDto::isRetired).thenComparing(DirectoryDto::getName)));
 
             childrenByParent.clear();
             rebuilt.forEach((parent, children) -> childrenByParent.put(parent, List.copyOf(children)));

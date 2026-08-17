@@ -15,7 +15,9 @@ import org.testin.git.SyncActionAction;
 import org.testin.git.ViewPendingCommitsAction;
 import org.testin.importexport.exports.ExportAction;
 import org.testin.importexport.imports.ImportAction;
+import org.testin.model.PackageStatus;
 import org.testin.model.ProjectStatus;
+import org.testin.model.TestSetStatus;
 import org.testin.open.OpenAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.remove.RemoveAction;
@@ -25,6 +27,7 @@ import org.testin.run.RunTestSetAction;
 import org.testin.services.Services;
 import org.testin.testproject.UpdateTestProjectStatusAction;
 import org.testin.testrun.SetTestRunStatusAction;
+import org.testin.testset.UpdateTestSetStatusAction;
 import org.testin.util.OptionalPlugin;
 import org.testin.util.Tools;
 
@@ -47,6 +50,10 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ACTIVE),
                         new UpdateTestProjectStatusAction(p, tree, ProjectStatus.INACTIVE),
                         new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ARCHIVED),
+                        new UpdateTestSetStatusAction(p, tree, TestSetStatus.ACTIVE),
+                        new UpdateTestSetStatusAction(p, tree, TestSetStatus.DEPRECATED),
+                        new UpdatePackageStatusAction(p, tree, PackageStatus.ACTIVE),
+                        new UpdatePackageStatusAction(p, tree, PackageStatus.ARCHIVED),
                         new UndoNodeAction(p, tree),
                         new RedoNodeAction(p, tree),
                         new RemoveAction(p, tree, pp),

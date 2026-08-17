@@ -65,6 +65,16 @@ public final class ExplorerTreeNode extends AbstractTreeNode<Object> {
         return getValue() instanceof DirectoryDto ? LeafState.ASYNC : LeafState.ALWAYS;
     }
 
+    /**
+     * The platform's expand-all asks every node this before descending into it.
+     * An archived package answers no, so it stays collapsed when the tree opens
+     * a project, while a click still expands it as before.
+     */
+    @Override
+    public boolean isIncludedInExpandAll() {
+        return !(getValue() instanceof DirectoryDto directory && directory.isRetired());
+    }
+
     @Override
     protected void update(final @NotNull PresentationData presentation) {
         final Object value = getValue();

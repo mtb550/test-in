@@ -141,6 +141,19 @@ public abstract class DirectoryDto {
         return isTransferTarget();
     }
 
+    /**
+     * True when the node is out of current work: a deprecated test set, an
+     * archived package. Nothing inside it changes; what changes is how the
+     * plugin treats it - drawn gray, sorted after its siblings, left collapsed
+     * by expand-all, and not offered when a run is configured. Declared here so
+     * the renderer, the children index, the tree node and the run dialog ask
+     * one question instead of each knowing which status enum means "retired"
+     * on which node (#68).
+     */
+    public boolean isRetired() {
+        return false;
+    }
+
     @NotNull
     public abstract DirectoryType getType();
 

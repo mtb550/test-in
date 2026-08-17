@@ -29,7 +29,7 @@ public class ShowNodeDetailsAction extends AbstractProjectTreeAction {
 
         if (!(userObject instanceof DirectoryDto dir)) return;
 
-        new MarkerDetailsViewDialog(p).show(dir);
+        new MarkerDetailsViewDialog(p, dir).show();
     }
 
     @Override
