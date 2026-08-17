@@ -11,7 +11,7 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
     private final @NotNull Toolbar callbacks;
 
     public StartExecutionBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onStartExecutionClicked) {
-        super("Start Execution", AllIcons.Toolwindows.ToolWindowServices);
+        super("Start Execution", AllIcons.Toolwindows.ToolWindowRun);
         this.callbacks = callbacks;
 
         addActionListener(e -> onStartExecutionClicked.run());

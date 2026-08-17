@@ -1,13 +1,19 @@
 package org.testin.editor.toolbar.components;
 
+
+import com.intellij.ide.HelpTooltip;
+import com.intellij.openapi.application.WriteIntentReadAction;
 import com.intellij.openapi.util.IconLoader;
+import com.intellij.openapi.util.text.HtmlChunk;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.util.IconManager;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -81,6 +87,37 @@ public abstract class AbstractButton extends JButton {
                 setHovered(false);
             }
         });
+    }
+
+    /**
+     * A button whose command also has a keystroke. The platform's own tooltip
+     * draws the description and the shortcut together, the way every IDE
+     * toolbar button does, so the key is discoverable without opening the menu
+     * that also carries it.
+     * <p>
+     * The Swing tooltip is deliberately left unset: HelpTooltip replaces it, and
+     * a button carrying both shows the plain one on some paths and the rich one
+     * on others.
+     */
+    public AbstractButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
+        this(null, icon);
+
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text(tooltip))
+                .setShortcut(shortcut.getShortcut())
+                .installOn(this);
+    }
+
+    /**
+     * A Swing click arrives without the lock the action system takes before it
+     * calls an AnAction, so whatever the click opens runs on the EDT with no
+     * read access - the Create Test Case dialog's editor field asserted on
+     * exactly that. Taken here, once, so every toolbar button behaves like the
+     * same command reached through the menu or its shortcut.
+     */
+    @Override
+    protected void fireActionPerformed(final @NotNull ActionEvent event) {
+        WriteIntentReadAction.run(() -> super.fireActionPerformed(event));
     }
 
     private void setHovered(final boolean isHovered) {

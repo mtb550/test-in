@@ -1,20 +1,13 @@
 package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.ide.HelpTooltip;
-import com.intellij.openapi.util.text.HtmlChunk;
 import org.jetbrains.annotations.NotNull;
 import org.testin.util.Shortcuts;
 
 public class CreateTestCaseBtn extends AbstractButton implements ToolbarItem {
 
     public CreateTestCaseBtn(final @NotNull Runnable onToolBarCreateTestCaseClicked) {
-        super(null, AllIcons.General.Add);
-
-        new HelpTooltip()
-                .setDescription(HtmlChunk.text("Create test case"))
-                .setShortcut(Shortcuts.CreateItem.getShortcut())
-                .installOn(this);
+        super("Create test case", AllIcons.General.Add, Shortcuts.CreateItem);
 
         addActionListener(e -> onToolBarCreateTestCaseClicked.run());
     }
