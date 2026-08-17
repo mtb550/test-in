@@ -54,6 +54,20 @@ public class TestStatusMenuTest {
     }
 
     /**
+     * isVerdict answers "did a tester choose this?" out of the same menu entry
+     * this class pins, and something now depends on the two meaning the same
+     * thing: reading an old run drops the execution stamp from every case
+     * without a verdict. Give a tester-settable status no menu entry and that
+     * would start erasing real times, with nothing else failing to say so.
+     */
+    @Test
+    public void aVerdictIsExactlyAStatusTheMenuOffers() {
+        for (final TestStatus status : TestStatus.values()) {
+            assertEquals(status.isVerdict(), status.getMenuEntry() != null, status + " disagrees with the menu");
+        }
+    }
+
+    /**
      * Two statuses sharing a key would make one of them unreachable from the
      * keyboard, and nothing else would notice.
      */

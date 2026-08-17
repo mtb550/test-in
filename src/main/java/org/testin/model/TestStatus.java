@@ -106,6 +106,16 @@ public enum TestStatus {
     private final boolean collectsFailureDetails;
 
     /**
+     * True when a tester chose this status. The three the menu offers are the
+     * three verdicts, and PENDING and UNTESTED are the two the run sets for
+     * itself - which is what the null menu entry already says. Asked by name
+     * here so no caller has to know the two facts coincide.
+     */
+    public boolean isVerdict() {
+        return menuEntry != null;
+    }
+
+    /**
      * The status menu's presentation of a status it offers: the icon of its
      * action and the key that applies it. Only the statuses on the menu have
      * one, which is what makes the null meaningful.

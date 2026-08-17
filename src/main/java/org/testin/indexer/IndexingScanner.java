@@ -223,6 +223,7 @@ final class IndexingScanner {
             if (Files.exists(jsonPath)) {
                 final Mapper mapper = Services.getInstance(p, Mapper.class);
                 final TestRunDto trr = mapper.readValue(jsonPath.toFile(), TestRunDto.class);
+                trr.dropStampsWithoutVerdict();
                 store.getTestRunsByPath().put(path.toString(), trr);
             }
 
