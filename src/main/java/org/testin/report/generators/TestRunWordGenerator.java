@@ -117,9 +117,9 @@ public final class TestRunWordGenerator {
                     addOverviewRow(overviewTable, 4, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
 
                 addOverviewRow(overviewTable, 5, "Executed By", summary.executedBy());
-
-                addOverviewRow(overviewTable, 6, "Execution Date", tr.getCreatedAt().format(Config.getDateFormatterPattern()));
-                addOverviewRow(overviewTable, 7, "Run Status", trDir.getMarker().getStatus().name());
+                addOverviewRow(overviewTable, 6, "Execution Started", Config.formatOrBlank(tr.getExecutionStartedAt()));
+                addOverviewRow(overviewTable, 7, "Execution Ended", Config.formatOrBlank(tr.getExecutionEndedAt()));
+                addOverviewRow(overviewTable, 8, "Run Status", trDir.getMarker().getStatus().name());
 
 
                 setTableBorders(overviewTable);

@@ -139,10 +139,8 @@ public final class TestRunPdfGenerator {
 
 
             addOverviewRow(overviewTable, "Executed By", summary.executedBy(), boldFont, regularFont);
-
-
-            // todo, execution date value to be updated.
-            addOverviewRow(overviewTable, "Execution Date", tr.getCreatedAt().format(Config.getDateFormatterPattern()), boldFont, regularFont);
+            addOverviewRow(overviewTable, "Execution Started", Config.formatOrBlank(tr.getExecutionStartedAt()), boldFont, regularFont);
+            addOverviewRow(overviewTable, "Execution Ended", Config.formatOrBlank(tr.getExecutionEndedAt()), boldFont, regularFont);
             addOverviewRow(overviewTable, "Run Status", trDir.getMarker().getStatus().name(), boldFont, regularFont);
 
             document.add(overviewTable);

@@ -67,10 +67,15 @@ public class TestRunItems {
     @Builder.Default
     private String executedBy = "";
 
+    /**
+     * When the verdict was given; {@link Config#NOT_EXECUTED} until there is one.
+     * It used to default to "now", so every case in a freshly built run already
+     * carried a plausible execution time before anyone had run anything.
+     */
     @NotNull
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime executedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private ZonedDateTime executedAt = Config.NOT_EXECUTED;
 
     @NotNull
     @Builder.Default

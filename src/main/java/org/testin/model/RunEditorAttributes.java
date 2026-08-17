@@ -100,6 +100,20 @@ public enum RunEditorAttributes {
             (item, p) -> Services.getInstance(p, Tools.class).getFormattedDuration(item.getDuration())
     ),
 
+    EXECUTED_BY(
+            "Executed By",
+            true,
+            true,
+            (item, p) -> item.getExecutedBy()
+    ),
+
+    EXECUTED_AT(
+            "Executed At",
+            true,
+            true,
+            (item, p) -> Config.formatOrBlank(item.getExecutedAt())
+    ),
+
     PATH(
             "Path",
             true,

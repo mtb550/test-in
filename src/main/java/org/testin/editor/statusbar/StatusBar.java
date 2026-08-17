@@ -23,6 +23,13 @@ public class StatusBar extends JBPanel<StatusBar> {
     private final @NotNull JBLabel statusLabel = new JBLabel();
     private final @NotNull JBLabel syncLabel = new JBLabel();
 
+    /**
+     * The run's total execution time, ticking while a case is timed. Only the run
+     * editor writes it; in the test case editor it stays blank, which is what a
+     * label with nothing to say looks like.
+     */
+    private final @NotNull JBLabel executionTimeLabel = new JBLabel();
+
     private final @NotNull Timer clockTimer;
 
     @Getter
@@ -66,6 +73,13 @@ public class StatusBar extends JBPanel<StatusBar> {
         syncLabel.setForeground(UIUtil.getInactiveTextColor());
         syncLabel.setBorder(JBUI.Borders.emptyRight(10));
 
+        executionTimeLabel.setFont(dynamicSmallFont);
+        executionTimeLabel.setForeground(UIUtil.getInactiveTextColor());
+        executionTimeLabel.setBorder(JBUI.Borders.emptyRight(10));
+        new HelpTooltip()
+                .setDescription(HtmlChunk.text("Time spent executing this run"))
+                .installOn(executionTimeLabel);
+
         currentPageLabel.setFont(dynamicSmallFont);
         pageSizeField.setFont(dynamicSmallFont);
 
@@ -105,9 +119,22 @@ public class StatusBar extends JBPanel<StatusBar> {
         paginationPanel.add(nextButton);
         paginationPanel.add(lastButton);
 
+        final JBPanel<?> eastPanel = new JBPanel<>(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        eastPanel.setOpaque(false);
+        eastPanel.add(executionTimeLabel);
+        eastPanel.add(syncLabel);
+
         add(statusLabel, BorderLayout.WEST);
         add(paginationPanel, BorderLayout.CENTER);
-        add(syncLabel, BorderLayout.EAST);
+        add(eastPanel, BorderLayout.EAST);
+    }
+
+    /**
+     * Already formatted by the caller: the blank for "nothing measured" is
+     * decided by {@code Tools.getFormattedDuration}, not here.
+     */
+    public void showExecutionTime(final @NotNull String formatted) {
+        executionTimeLabel.setText(formatted);
     }
 
     private void updateClock() {

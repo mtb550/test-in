@@ -66,8 +66,46 @@ public class TestRunDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
+    /**
+     * When the tester first pressed Start Execution; {@link Config#NOT_EXECUTED}
+     * until they do. Not {@code createdAt}: a run built in January and executed
+     * in March is two different facts, and the reports used to print the first
+     * under the heading of the second.
+     */
+    @NotNull
+    @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    private ZonedDateTime executionStartedAt = Config.NOT_EXECUTED;
+
+    /**
+     * When execution last stopped - the run completing, the tester pressing Stop,
+     * or a verdict that ended the flow. {@link Config#NOT_EXECUTED} until then.
+     */
+    @NotNull
+    @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
+    private ZonedDateTime executionEndedAt = Config.NOT_EXECUTED;
+
     @NotNull
     @Builder.Default
     private List<TestRunItems> results = new ArrayList<>();
+
+    /**
+     * Stamps the first Start Execution press and keeps it. A tester who stops
+     * halfway and resumes next week is continuing the same execution, so the run
+     * still started when it started; only a run that has never been started takes
+     * the stamp.
+     */
+    public void markExecutionStarted() {
+        if (Config.isNotExecuted(executionStartedAt))
+            executionStartedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
+
+    /**
+     * Every stop overwrites the previous one: the run ended when it last stopped.
+     */
+    public void markExecutionEnded() {
+        executionEndedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
 
 }

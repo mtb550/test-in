@@ -46,16 +46,19 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.TestCaseSorter;
 import org.testin.testrun.UpdateTestRunStatusAction;
 import org.testin.util.FontSync;
+import org.testin.util.Tools;
 import org.testin.view.GridViewDetailsAction;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseListener;
+import java.time.Duration;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -412,6 +415,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         selectionToRestore = null;
 
         statusBar.updatePaginationState(page.page(), page.totalPages(), total);
+        showExecutionTotal();
 
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
@@ -621,7 +625,23 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         executionTimer.start(runItem, () -> {
             if (list != null) list.repaint();
+            showExecutionTotal();
         });
+    }
+
+    /**
+     * The run's total is the sum of what its cases measured, not a clock of its
+     * own: it counts only while a case is being timed, so a stop freezes it, a
+     * resume continues it, and it is back after a reopen because the case durations
+     * are. A run judged from the context menu has measured nothing and shows blank,
+     * as its cases do.
+     */
+    private void showExecutionTotal() {
+        final Duration total = resultsMap.values().stream()
+                .map(TestRunItems::getDuration)
+                .reduce(Duration.ZERO, Duration::plus);
+
+        statusBar.showExecutionTime(Services.getInstance(p, Tools.class).getFormattedDuration(total));
     }
 
     /**
@@ -665,7 +685,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         toolBar.repaint();
     }
 
+    /**
+     * Ends the execution flow, wherever the end came from - the tester's Stop, the
+     * last verdict, a bulk apply, the run completing. The run's end stamp is written
+     * only when something was executing: this is also reached when a run is set to
+     * Completed by hand, and a run nobody started has no end.
+     * <p>
+     * The caller persists. Every path that reaches this already writes the run
+     * afterwards, so the stamp and the in-flight case's duration land in the file
+     * together.
+     */
     public void stopExecution() {
+        final TestRunDto run = tr;
+        if (isExecuting() && run != null) run.markExecutionEnded();
+
         executionTimer.stop();
         currentlyExecutingIndex = -1;
         refreshExecutionButtons();
@@ -674,8 +707,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void onStartExecutionClicked() {
         final JBList<TestCaseDto> currentList = list;
-        if (currentList == null) return;
+        final TestRunDto run = tr;
+        if (currentList == null || run == null) return;
 
+        // Before the status change, which is what persists the run.
+        run.markExecutionStarted();
         new UpdateTestRunStatusAction(p, this, currentList).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(firstPendingIndex());
         refreshExecutionButtons();
@@ -715,6 +751,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void onStopExecutionClicked() {
         stopExecution();
+        // The other stop paths persist as part of the verdict or status change they
+        // belong to; this one is the tester's alone, so it writes the run itself -
+        // the case duration ticked so far and the end stamp would otherwise live only
+        // until the editor closed.
+        Services.getInstance(p, RunStatusService.class).persistRun(p, this);
         Services.getInstance(p, Notifier.class).softShow(p, "Stopped");
     }
 

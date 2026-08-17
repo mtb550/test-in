@@ -3,6 +3,7 @@ package org.testin.report.generators;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.model.Config;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -11,10 +12,8 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
+import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,7 +53,8 @@ public final class TestRunHtmlGenerator {
         final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         final String testerRole = settings.testerRole;
         final String executedBy = summary.executedBy();
-        final String execDate = trDir.getMarker().getCreatedAt().format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(Locale.US));
+        final String executionStarted = Config.formatOrBlank(tr.getExecutionStartedAt());
+        final String executionEnded = Config.formatOrBlank(tr.getExecutionEndedAt());
         final String runStatus = trDir.getMarker().getStatus().getLabel();
 
         // Project name
@@ -112,7 +112,8 @@ public final class TestRunHtmlGenerator {
         overviewRow(html, "Test Type", "API Functional Testing");
         overviewRow(html, "Platform", platform);
         overviewRow(html, "Executed By", executedBy);
-        overviewRow(html, "Execution Date", execDate);
+        overviewRow(html, "Execution Started", executionStarted);
+        overviewRow(html, "Execution Ended", executionEnded);
         overviewRow(html, "Run Status", runStatus);
         html.append("</table>");
 
@@ -154,7 +155,8 @@ public final class TestRunHtmlGenerator {
                 .append("<p>Prepared by <b>").append(escapedHtml(executedBy)).append("</b> — ")
                 .append(escapedHtml(testerRole))
                 .append("  |  ")
-                .append(execDate.isEmpty() ? "" : execDate)
+                // When the report was generated, as the PDF and Word footers say.
+                .append(ZonedDateTime.now().format(Config.getDateFormatterPattern()))
                 .append("</p>")
                 .append("<p>Generated automatically by <a href='https://plugins.jetbrains.com/plugin/31514-testin' target='_blank'><strong>Testin</strong></a> IntelliJ plugin.</p>")
                 .append("</div>");
