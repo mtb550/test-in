@@ -27,7 +27,7 @@ public enum TestSetStatus {
             "Keep the test set and its history, but stop offering it for new runs"
     );
 
-    private final @NotNull String description;
+    private final @NotNull String label;
     private final @NotNull String buttonName;
     private final @NotNull String buttonDescription;
 }

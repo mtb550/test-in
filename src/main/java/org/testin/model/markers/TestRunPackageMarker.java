@@ -49,6 +49,6 @@ public class TestRunPackageMarker implements PackageMarker {
     @com.fasterxml.jackson.annotation.JsonIgnore
     @Override
     public @NotNull String getStatusLabel() {
-        return status.getDescription();
+        return status.getLabel();
     }
 }

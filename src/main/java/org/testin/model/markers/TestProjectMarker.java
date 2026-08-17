@@ -49,6 +49,6 @@ public class TestProjectMarker implements Marker {
     @com.fasterxml.jackson.annotation.JsonIgnore
     @Override
     public @NotNull String getStatusLabel() {
-        return status.getDescription();
+        return status.getLabel();
     }
 }

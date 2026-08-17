@@ -29,7 +29,7 @@ public enum PackageStatus {
             "Keep the contents, but sort the package last and leave it collapsed"
     );
 
-    private final @NotNull String description;
+    private final @NotNull String label;
     private final @NotNull String buttonName;
     private final @NotNull String buttonDescription;
 }

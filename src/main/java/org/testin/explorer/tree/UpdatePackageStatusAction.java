@@ -47,11 +47,11 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
             // The status names itself: "Archived", "Active" (#62).
-            Services.getInstance(p, Notifier.class).softShow(p, status.getDescription());
+            Services.getInstance(p, Notifier.class).softShow(p, status.getLabel());
 
         } catch (final Exception ex) {
-            Logger.error("Unable to mark package '" + dir.getName() + "' " + status.getDescription() + ": " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "Unable to mark package " + status.getDescription());
+            Logger.error("Unable to mark package '" + dir.getName() + "' " + status.getLabel() + ": " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, "Unable to mark package " + status.getLabel());
         }
     }
 

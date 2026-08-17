@@ -35,7 +35,7 @@ public enum ProjectStatus {
             "Archive test project"
     );
 
-    private final @NotNull String description;
+    private final @NotNull String label;
     private final @NotNull String buttonName;
     private final @NotNull String buttonDescription;
 }

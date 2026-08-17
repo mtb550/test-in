@@ -44,11 +44,11 @@ public class UpdateTestSetStatusAction extends AbstractProjectTreeAction {
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
             // The status names itself: "Deprecated", "Active" (#62).
-            Services.getInstance(p, Notifier.class).softShow(p, status.getDescription());
+            Services.getInstance(p, Notifier.class).softShow(p, status.getLabel());
 
         } catch (final Exception ex) {
-            Logger.error("Unable to mark test set '" + ts.getName() + "' " + status.getDescription() + ": " + ex.getMessage());
-            Services.getInstance(p, Notifier.class).error(p, "Unable to mark test set " + status.getDescription());
+            Logger.error("Unable to mark test set '" + ts.getName() + "' " + status.getLabel() + ": " + ex.getMessage());
+            Services.getInstance(p, Notifier.class).error(p, "Unable to mark test set " + status.getLabel());
         }
     }
 
