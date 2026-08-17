@@ -47,6 +47,9 @@ public enum Shortcuts {
     CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
     DeletePackage(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
 
+    // Run editor: export the run's results (context menu + toolbar button)
+    GenerateReport(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
+
     // Card actions (context menu + hover icons)
     RunTestCase(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0)),
     NavigateToCode(KeyStroke.getKeyStroke(KeyEvent.VK_F5, InputEvent.SHIFT_DOWN_MASK)),

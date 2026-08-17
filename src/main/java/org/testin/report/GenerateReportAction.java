@@ -26,6 +26,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
@@ -41,16 +42,33 @@ public class GenerateReportAction extends AbstractProjectAction {
     private final @Nullable SimpleTree tree;
     private final @Nullable TestinEditor editor;
 
+    /**
+     * The tree entry, which registers the shortcut itself: the context menu
+     * builds this once with the tree it belongs to, so there is nothing for the
+     * tree's own registerShortcuts to add that would not bind the key twice.
+     */
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, "Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
         this.tree = tree;
         this.editor = null;
+        registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), tree);
     }
 
-    public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
+    public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor) {
         super(p, "Generate Report", "Generate test run report", null);
         this.tree = null;
         this.editor = editor;
+    }
+
+    /**
+     * The keyboard route, registered on the list it is reached from - the same
+     * shape as {@link org.testin.EscapeAction}. The two-argument constructor is
+     * the toolbar button, which is clicked rather than typed and so registers
+     * nothing.
+     */
+    public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
+        this(p, editor);
+        registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), list);
     }
 
     @Override
@@ -64,35 +82,32 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     /**
+     * The run this action reports on: the tree's selected node, or the run the
+     * editor is showing. Asked by both {@link #isAvailable()} and
+     * {@link #execute()}, so the two can never disagree about which run is meant.
+     */
+    private @Nullable TestRunDirectoryDto selectedRun() {
+        if (tree != null) return TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
+        return editor instanceof RunEditor re ? re.getParent() : null;
+    }
+
+    /**
      * True when the current selection resolves to a test run.
      */
     public boolean isAvailable() {
-        if (tree != null) {
-            return TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class) != null;
-        }
-        return editor instanceof RunEditor;
+        return selectedRun() != null;
     }
 
     /**
      * Direct entry point for toolbar buttons — no AnActionEvent required.
      */
     public void execute() {
-
-        TestRunDirectoryDto tr = null;
-
-        if (tree != null) {
-            tr = TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
-        } else if (editor instanceof RunEditor re) {
-            tr = re.getParent();
-        }
-
+        final TestRunDirectoryDto tr = selectedRun();
         if (tr == null) return;
 
         final String suggestedName = tr.getPath().getFileName().toString() + "_Report";
 
-        // The callback needs an effectively final reference; the run is assigned in a branch above.
-        final TestRunDirectoryDto runDir = tr;
-        new GenerateReportDialog(p, suggestedName, (format, file) -> processAndSave(p, runDir, format, file)).show();
+        new GenerateReportDialog(p, suggestedName, (format, file) -> processAndSave(p, tr, format, file)).show();
     }
 
     @Override
