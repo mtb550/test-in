@@ -86,16 +86,13 @@ final class VfsExecutor {
     }
 
     /**
-     * Deletes the file, then runs {@code onDeleted} on the EDT.
+     * Deletes the file, then reports on the EDT whether it is gone.
      * <p>
      * The callback exists because the lookup has to leave the EDT, which makes
      * the deletion asynchronous; callers that update the indexer cache afterward
-     * must wait for it. It runs regardless of whether the file was there: a path
-     * that has already gone still has to be cleared from the cache, which is
-     * what the synchronous version did by simply returning.
-     */
-    /**
-     * Reports whether the file is gone, not merely that the attempt finished.
+     * must wait for it.
+     * <p>
+     * It reports whether the file is gone, not merely that the attempt finished.
      * The callback used to run either way, so a caller could not tell a delete
      * that failed from one that worked — and the indexer's cache update ran on
      * both, dropping a node that was still on disk (#66, F2).
