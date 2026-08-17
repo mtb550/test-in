@@ -127,8 +127,20 @@ public final class Tools {
         return ".!?:;/)".indexOf(s.charAt(s.length() - 1)) >= 0;
     }
 
-    public @Nullable String getFormattedDuration(final @Nullable Duration duration) {
-        if (duration == null) return null;
+    /**
+     * A measured duration as HH:MM:SS, and blank when nothing was measured.
+     * <p>
+     * Zero is not a case that took no time - it is a case the timer never ran for,
+     * because the verdict came from the context menu, a bulk apply or the failure
+     * dialog. Printing 00:00 for those claims a measurement nobody took.
+     * <p>
+     * The single place that knows this, so the grid column and the Excel report
+     * both stay unconditional and cannot disagree about what an unmeasured case
+     * looks like.
+     */
+    public @NotNull String getFormattedDuration(final @NotNull Duration duration) {
+        if (duration.isZero()) return "";
+
         return String.format("%02d:%02d:%02d", duration.toHours(), duration.toMinutesPart(), duration.toSecondsPart());
     }
 

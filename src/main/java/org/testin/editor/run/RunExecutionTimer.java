@@ -16,13 +16,22 @@ final class RunExecutionTimer implements Disposable {
     private @Nullable Timer timer;
     private long startedAt;
 
+    /**
+     * Counts on from what the case already carries rather than resetting it.
+     * <p>
+     * A tester who stops halfway and resumes is continuing the same case, so the
+     * time already spent on it is part of its duration. Resetting to zero here
+     * discarded that silently, and the case reported only the last sitting.
+     */
     void start(final @NotNull TestRunItems item, final @NotNull Runnable repaint) {
         stop();
-        item.setDuration(Duration.ZERO);
+
+        final Duration alreadyCounted = item.getDuration();
         startedAt = System.currentTimeMillis();
+
         timer = new Timer(1000, ignored -> {
             final long elapsedSeconds = (System.currentTimeMillis() - startedAt) / 1000;
-            item.setDuration(Duration.ofSeconds(elapsedSeconds));
+            item.setDuration(alreadyCounted.plusSeconds(elapsedSeconds));
             repaint.run();
         });
         timer.start();

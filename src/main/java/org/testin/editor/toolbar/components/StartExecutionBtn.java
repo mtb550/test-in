@@ -1,7 +1,6 @@
 package org.testin.editor.toolbar.components;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.util.IconLoader;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
@@ -12,7 +11,7 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
     private final @NotNull Toolbar callbacks;
 
     public StartExecutionBtn(final @NotNull Toolbar callbacks, final @NotNull Runnable onStartExecutionClicked) {
-        super("Start Execution", AllIcons.Actions.Execute);
+        super("Start Execution", AllIcons.Toolwindows.ToolWindowServices);
         this.callbacks = callbacks;
 
         addActionListener(e -> onStartExecutionClicked.run());
@@ -23,7 +22,6 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
         if (!(callbacks instanceof RunEditor editor)) return;
 
         setEnabled(editor.canStartExecution());
-        setDisabledIcon(IconLoader.getDisabledIcon(AllIcons.Actions.Execute));
         setToolTipText(tooltipFor(editor));
     }
 

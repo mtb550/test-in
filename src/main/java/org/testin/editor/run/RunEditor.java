@@ -35,6 +35,7 @@ import org.testin.editor.toolbar.Toolbar;
 import org.testin.editor.toolbar.components.FilterPopupBtn;
 import org.testin.editor.toolbar.components.RunDetailsPopupBtn;
 import org.testin.editor.toolbar.components.StartExecutionBtn;
+import org.testin.editor.toolbar.components.StopExecutionBtn;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.RunEditorAttributes;
@@ -44,6 +45,7 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
+import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.TestCaseSorter;
@@ -244,7 +246,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                             list.getEmptyText().setText("No test cases found in this run.");
                         }
                     }
-                    toolBar.getToolbarItem(StartExecutionBtn.class).updateEnabledState();
+                    // Also the first paint's answer: Stop starts hidden because a run
+                    // that has just loaded is not executing.
+                    refreshExecutionButtons();
                     refreshView();
                 });
             } catch (final Exception ex) {
@@ -637,17 +641,34 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * Repaints the Start button after the execution state changes - the status
-     * alone does not say whether a run is under way.
+     * The one place that decides which of the two execution buttons is showing.
+     * <p>
+     * Start when idle, Stop while a run is under way, exactly as the list and grid
+     * view buttons swap. It reads {@link #isExecuting()} rather than a flag of its
+     * own: the executing index is already the answer, and a second copy would be a
+     * second thing to keep in step - the one that drifted would leave a Stop button
+     * on a finished run.
+     * <p>
+     * Called after every execution-state change, so nowhere else asks.
      */
-    private void refreshStartButton() {
-        toolBar.getToolbarItem(StartExecutionBtn.class).updateEnabledState();
+    public void refreshExecutionButtons() {
+        final boolean executing = isExecuting();
+
+        final StartExecutionBtn startBtn = toolBar.getToolbarItem(StartExecutionBtn.class);
+        final StopExecutionBtn stopBtn = toolBar.getToolbarItem(StopExecutionBtn.class);
+
+        startBtn.setVisible(!executing);
+        stopBtn.setVisible(executing);
+        startBtn.updateEnabledState();
+
+        toolBar.revalidate();
+        toolBar.repaint();
     }
 
     public void stopExecution() {
         executionTimer.stop();
         currentlyExecutingIndex = -1;
-        refreshStartButton();
+        refreshExecutionButtons();
     }
 
     @Override
@@ -656,8 +677,45 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         if (currentList == null) return;
 
         new UpdateTestRunStatusAction(p, this, currentList).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
-        startTimerForIndex(0);
-        refreshStartButton();
+        startTimerForIndex(firstPendingIndex());
+        refreshExecutionButtons();
+    }
+
+    /**
+     * Where execution starts: the first case the run has not reached yet.
+     * <p>
+     * Starting at zero every time re-ran the cases already given a verdict, so a
+     * tester who stopped halfway, closed the editor and came back was put back at
+     * the top of a run they were in the middle of.
+     * <p>
+     * {@code PENDING} is the right question to ask, and the only one: the run owns
+     * that status and clears it only when the run itself reaches a terminal state,
+     * so it survives a stop and a reopen. A case with a verdict is not pending, and
+     * a case the run never reached is not either once the run has closed.
+     * <p>
+     * With nothing pending it falls back to the top, which is what Start has always
+     * done. Returning the size instead would hand {@link #startTimerForIndex(int)}
+     * its "no cases left" value and complete the run from a single click.
+     */
+    private int firstPendingIndex() {
+        for (int i = 0; i < currentTestCases.size(); i++) {
+            final TestRunItems item = resultsMap.get(currentTestCases.get(i).getId());
+
+            if (item != null && item.getStatus() == TestStatus.PENDING) return i;
+        }
+
+        return 0;
+    }
+
+    /**
+     * The tester's own stop. The confirmation lives here rather than in
+     * {@link #stopExecution()} because that runs on four internal paths - the last
+     * verdict, a bulk apply, the run completing - where nobody pressed anything.
+     */
+    @Override
+    public void onStopExecutionClicked() {
+        stopExecution();
+        Services.getInstance(p, Notifier.class).softShow(p, "Stopped");
     }
 
 

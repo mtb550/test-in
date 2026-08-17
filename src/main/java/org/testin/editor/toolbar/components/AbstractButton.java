@@ -1,5 +1,6 @@
 package org.testin.editor.toolbar.components;
 
+import com.intellij.openapi.util.IconLoader;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -54,7 +55,16 @@ public abstract class AbstractButton extends JButton {
         // the whole toolbar and shifted the buttons under the pointer.
         setIcon(zoomedIcon);
         final Dimension size = getPreferredSize();
-        setIcon(icon);
+        setIcon(restIcon);
+
+        // Swing cannot build this one. BasicLookAndFeel.getDisabledIcon only greys
+        // an ImageIcon and returns null for anything else, and platform icons are
+        // not ImageIcons - so without this a disabled button paints its normal icon
+        // and looks clickable while ignoring every click.
+        //
+        // Derived from this button's own icon, so it cannot drift from what the
+        // button actually shows.
+        setDisabledIcon(IconLoader.getDisabledIcon(restIcon));
 
         setPreferredSize(size);
         setMinimumSize(size);

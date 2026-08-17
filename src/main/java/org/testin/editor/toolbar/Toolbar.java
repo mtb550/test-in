@@ -40,5 +40,8 @@ public interface Toolbar {
     default void onStartExecutionClicked() {
     }
 
+    default void onStopExecutionClicked() {
+    }
+
     @NotNull Set<String> getAvailableModules();
 }

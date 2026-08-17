@@ -13,7 +13,6 @@ import org.testin.util.Tools;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -98,10 +97,7 @@ public enum RunEditorAttributes {
             "Duration",
             true,
             true,
-            (item, p) -> {
-                long s = item.getDuration().getSeconds();
-                return String.format(Locale.ENGLISH, "%02d:%02d", (s % 3600) / 60, (s % 60));
-            }
+            (item, p) -> Services.getInstance(p, Tools.class).getFormattedDuration(item.getDuration())
     ),
 
     PATH(

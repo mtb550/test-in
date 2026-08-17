@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
-import org.testin.editor.toolbar.components.StartExecutionBtn;
 import org.testin.logger.Logger;
 import org.testin.model.TestRunStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -64,7 +63,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
                     editor.getTotalItemsCount()
             );
 
-            updateStartButton(editor);
+            editor.refreshExecutionButtons();
         });
 
         // The status names itself. Start Run routes through here rather than
@@ -84,7 +83,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         ApplicationManager.getApplication().invokeLater(() -> {
             list.repaint();
             editor.getStatusBar().updatePaginationState(editor.getCurrentPage(), editor.getTotalPageCount(), editor.getTotalItemsCount());
-            updateStartButton(editor);
+            editor.refreshExecutionButtons();
         });
 
         Services.getInstance(p, Notifier.class).softShow(p, TestRunStatus.COMPLETED.getLabel());
@@ -99,10 +98,6 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         final RunStatusService statusService = Services.getInstance(p, RunStatusService.class);
         statusService.persistMarker(p, editor.getParent().getPath(), marker.getStatus(), marker.getCreatedAt());
         statusService.persistRun(p, editor);
-    }
-
-    private void updateStartButton(final @NotNull RunEditor editor) {
-        editor.getToolBar().getToolbarItem(StartExecutionBtn.class).updateEnabledState();
     }
 
 }

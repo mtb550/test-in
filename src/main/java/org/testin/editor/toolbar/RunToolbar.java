@@ -19,6 +19,9 @@ public class RunToolbar extends AbstractToolbarPanel {
     public @NotNull List<ToolbarItem> getCustomComponents() {
         return List.of(
                 new StartExecutionBtn(getCallbacks(), getCallbacks()::onStartExecutionClicked),
+                // Laid out beside Start and never removed: RunEditor flips which of the
+                // two is visible, the way the list and grid view buttons already swap.
+                new StopExecutionBtn(getCallbacks()::onStopExecutionClicked),
                 new GenerateReportBtn(p),
                 new RefreshBtn(getCallbacks()::onToolBarRefreshButtonClicked),
                 new RunDetailsPopupBtn(getCallbacks()::onToolBarDetailsSelectionChanged),
