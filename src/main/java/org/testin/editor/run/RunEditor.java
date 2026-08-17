@@ -637,7 +637,17 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         }
 
         executionTimer.start(runItem, () -> {
-            if (list != null) list.repaint();
+            // A model event, not a repaint. The card grows a Duration line the
+            // moment that value stops being blank, which makes the row taller,
+            // and JList re-measures a row only when the model says that row
+            // changed - a repaint draws the taller content into the cached
+            // height and clips it. That is why the duration stayed hidden until
+            // toggling the attribute off and on forced the re-measure.
+            //
+            // Only when the case is on the page being viewed: contentsChanged
+            // fires with index -1 for one that is not, which invalidates the
+            // layout of the whole list once a second for a row nobody can see.
+            if (model != null && model.contains(currentTc)) model.contentsChanged(currentTc);
             showExecutionTotal();
         });
     }
