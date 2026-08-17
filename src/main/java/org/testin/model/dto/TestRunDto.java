@@ -102,9 +102,14 @@ public class TestRunDto {
     }
 
     /**
-     * Every stop overwrites the previous one: the run ended when it last stopped.
+     * Every stop overwrites the previous one: the run ended when it last stopped,
+     * or when it reached a terminal status, from the editor or from the tree.
+     * A run that was never started has no end - this is the one place that
+     * knows so, and every caller stays unconditional.
      */
     public void markExecutionEnded() {
+        if (Config.isNotExecuted(executionStartedAt)) return;
+
         executionEndedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
 

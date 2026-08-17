@@ -55,6 +55,16 @@ public class NotExecutedTimestampTest {
     }
 
     @Test
+    public void aRunThatNeverStartedHasNoEndToStamp() {
+        final TestRunDto run = new TestRunDto();
+
+        // Completed from the tree without ever pressing Start.
+        run.markExecutionEnded();
+
+        assertEquals(Config.formatOrBlank(run.getExecutionEndedAt()), "");
+    }
+
+    @Test
     public void theFirstStartIsKeptAndTheLastEndWins() throws InterruptedException {
         final TestRunDto run = new TestRunDto();
 

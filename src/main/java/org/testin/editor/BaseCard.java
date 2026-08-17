@@ -88,6 +88,12 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 
         details.forEach((attrName, value) -> {
+            // A caption with nothing after it says nothing: "Executed At: " on a
+            // pending case, "Actual Result: " on a passing one. The framework's
+            // details rows drop blank values for the same reason; the card is the
+            // one place that decides it for every attribute.
+            if (value.isBlank()) return;
+
             final JBLabel lbl = attributeLabels.computeIfAbsent(attrName, k -> {
                 final JBLabel newLbl = createDetailLabel();
                 content.add(newLbl);

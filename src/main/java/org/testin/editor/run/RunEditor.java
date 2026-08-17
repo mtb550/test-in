@@ -520,6 +520,19 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void dispose() {
+        // Closing the tab mid-execution is a stop the tester did not press: the
+        // seconds ticked onto the in-flight case and the run's end stamp would
+        // otherwise live only in this editor. Guarded because the project itself
+        // may be closing, and a service asked for during that throws.
+        if (isExecuting()) {
+            try {
+                stopExecution();
+                Services.getInstance(p, RunStatusService.class).persistRun(p, this);
+            } catch (final Exception ex) {
+                Logger.warn("Run not persisted on editor close: " + ex.getMessage());
+            }
+        }
+
         // Releases the message-bus subscriptions (font sync) registered against this editor's lifetime.
         Disposer.dispose(projectDisposable);
 
@@ -687,9 +700,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     /**
      * Ends the execution flow, wherever the end came from - the tester's Stop, the
-     * last verdict, a bulk apply, the run completing. The run's end stamp is written
-     * only when something was executing: this is also reached when a run is set to
-     * Completed by hand, and a run nobody started has no end.
+     * last verdict, a bulk apply, the run completing. The run itself decides
+     * whether it has an end to stamp: a run nobody started has none.
      * <p>
      * The caller persists. Every path that reaches this already writes the run
      * afterwards, so the stamp and the in-flight case's duration land in the file
@@ -697,7 +709,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     public void stopExecution() {
         final TestRunDto run = tr;
-        if (isExecuting() && run != null) run.markExecutionEnded();
+        if (run != null) run.markExecutionEnded();
 
         executionTimer.stop();
         currentlyExecutingIndex = -1;
