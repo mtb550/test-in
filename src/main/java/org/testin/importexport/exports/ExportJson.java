@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -16,6 +17,7 @@ import org.testin.util.Tools;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,9 @@ public class ExportJson {
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try {
+            final @Nullable Path parent = destFile.toPath().getParent();
+            if (parent != null) Files.createDirectories(parent);
+
             Files.write(destFile.toPath(), Services.getInstance(p, Mapper.class).writeValueAsBytes(sheetsData));
         } catch (final IOException ex) {
             Services.getInstance(p, Notifier.class).error(p, "Export failed: " + ex.getMessage());
