@@ -96,7 +96,7 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
      */
     private void persist(final @NotNull RunEditor editor, final @NotNull TestRunMarker marker) {
         final RunStatusService statusService = Services.getInstance(p, RunStatusService.class);
-        statusService.persistMarker(p, editor.getParent().getPath(), marker.getStatus(), marker.getCreatedAt());
+        statusService.persistMarker(p, editor.getParent().getPath(), marker.getStatus());
         statusService.persistRun(p, editor);
     }
 

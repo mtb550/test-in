@@ -16,8 +16,6 @@ import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 
 import javax.swing.tree.TreePath;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 
 public class SetTestRunStatusAction extends AbstractProjectAction {
     final @NotNull SimpleTree tree;
@@ -41,8 +39,7 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
                 // Updates the indexer-owned marker (single source of truth) and
                 // persists it through the sequential run-status writer.
                 Services.getInstance(p, RunStatusService.class).persistMarker(
-                        p, testRunDto.getPath(), selectedStatus,
-                        ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+                        p, testRunDto.getPath(), selectedStatus);
 
                 Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 

@@ -24,7 +24,6 @@ import org.testin.notifications.Notifier;
 import org.testin.setting.AppSettingsState;
 
 import java.nio.file.Path;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -150,9 +149,18 @@ public final class RunStatusService {
      * Single source of truth for the run marker: always updates the
      * indexer-owned directory DTO (callers may hold another instance of the
      * same run), then persists through the indexer.
+     * <p>
+     * A status change is a modification, so it is recorded as one. This used to
+     * take the change time as a parameter and write it over the marker's
+     * createdAt - a leftover from when the reports read that field as the
+     * execution date, which is the bug #27 exists to fix. Setting a run's status
+     * from the tree therefore destroyed the run's creation time, and the editor
+     * path had to pass the marker's own createdAt back in to defend against it.
+     * Neither does anything now: createdAt means what it says, and touch records
+     * who changed the status and when (#27).
      */
     public void persistMarker(final @NotNull Project p, final @NotNull Path runPath,
-                              final @NotNull TestRunStatus status, final @Nullable ZonedDateTime statusChangedAt) {
+                              final @NotNull TestRunStatus status) {
         final TestRunDirectoryDto trd = Services.getInstance(p, ProjectIndexer.class).getTestRunDirByPath(runPath);
         if (trd == null) {
             Logger.warn("persistMarker: run not indexed: " + runPath);
@@ -161,7 +169,7 @@ public final class RunStatusService {
 
         final TestRunMarker marker = trd.getMarker();
         marker.setStatus(status);
-        if (statusChangedAt != null) marker.setCreatedAt(statusChangedAt);
+        marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
 
         if (status.isTerminal()) finishRun(p, runPath);
 
