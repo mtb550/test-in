@@ -104,10 +104,15 @@ public final class SettingsConfigurable implements Configurable {
      * page is application-level now, and the root it just changed is the root all
      * of them build their tree from. Leaving the others on the previous root left
      * them showing a tree for a directory the tester had moved away from (#70).
+     * <p>
+     * Every project that has a panel, that is. A project that never opened the
+     * Testin tool window has nothing on screen to correct, and asking its service
+     * container for one would build the panel and start indexing there - a
+     * refresh of something the tester never opened (#77).
      */
     private void refreshEveryOpenProject() {
         for (final Project open : ProjectManager.getInstance().getOpenProjects()) {
-            if (open.isDisposed()) continue;
+            if (open.isDisposed() || !Services.isCreated(open, ExplorerPanel.class)) continue;
 
             new RefreshAction(open, Services.getInstance(open, ExplorerPanel.class)).execute();
         }

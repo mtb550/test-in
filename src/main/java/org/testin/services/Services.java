@@ -25,4 +25,18 @@ public final class Services {
         return ApplicationManager.getApplication().getService(clazz);
     }
 
+    /**
+     * Whether this project has already built the service. Asking never builds
+     * one - which is the whole point, because {@link #getInstance} does: a
+     * project that never opened the Testin tool window has no explorer panel,
+     * and constructing one just to refresh it starts indexing in a project
+     * nobody asked about (#77).
+     * <p>
+     * The platform answers with a null, and it stays in here so no caller has to
+     * hold a maybe-a-service.
+     */
+    public static boolean isCreated(final @NotNull Project p, final @NotNull Class<?> clazz) {
+        return p.getServiceIfCreated(clazz) != null;
+    }
+
 }
