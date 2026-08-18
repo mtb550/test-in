@@ -106,6 +106,10 @@ final class IndexerDataStore {
         testCaseStore.put(testSetPath, tc);
     }
 
+    void putImportedTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        testCaseStore.putImported(testSetPath, tc);
+    }
+
     void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         testCaseStore.remove(testSetPath, tcId);
     }

@@ -66,10 +66,10 @@ final class TestCaseSequenceStore {
 
     void put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
         // Every save of a test case arrives here - the update dialog, a grid cell,
-        // the details panel, an import, a paste - so the audit is stamped once,
-        // here, instead of at each of them. Reading does not come through: the
-        // indexing scanner fills the maps straight from the JSON, so opening a
-        // project stamps nothing.
+        // the details panel, a paste - so the audit is stamped once, here, instead
+        // of at each of them. Reading does not come through: the indexing scanner
+        // fills the maps straight from the JSON, so opening a project stamps
+        // nothing.
         //
         // Known to the index means the case already exists, whatever its fields
         // say - the one question that separates a create from an update without
@@ -78,6 +78,28 @@ final class TestCaseSequenceStore {
         if (testCasesById.containsKey(testCase.getId())) testCase.touch(tester);
         else testCase.stampCreated(tester);
 
+        store(testSetPath, testCase);
+    }
+
+    /**
+     * The one save that stamps nothing: an import writes the audit the file
+     * brought with it.
+     * <p>
+     * The four audit attributes are mappable in the import wizard, so a
+     * spreadsheet carrying a case's real author and date says who made it - and
+     * the ordinary path would have called this a creation and written the
+     * importer's own name over all four, which is what the preview showing one
+     * thing and the saved file holding another came down to (#66).
+     * <p>
+     * Nothing is filled in when the columns are absent either: an import with no
+     * audit columns produces cases with an empty creator, and empty means "the
+     * file did not say" rather than a name nobody chose.
+     */
+    void putImported(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
+        store(testSetPath, testCase);
+    }
+
+    private void store(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
         final String path = testSetPath.toString();
         testCasesById.put(testCase.getId(), testCase);
         final List<UUID> ids = testSetCaseIds.computeIfAbsent(

@@ -263,6 +263,15 @@ public final class ProjectIndexer {
         store.putTestCase(testSetPath, tc);
     }
 
+    /**
+     * Saves a case exactly as the import produced it, audit included. Every other
+     * save stamps who did it and when; an import is the one case where that
+     * belongs to the file being imported.
+     */
+    public void putImportedTestCase(final @NotNull Path testSetPath, final @NotNull TestCaseDto tc) {
+        store.putImportedTestCase(testSetPath, tc);
+    }
+
     public void removeTestCase(final @NotNull Path testSetPath, final @NotNull UUID tcId) {
         store.removeTestCase(testSetPath, tcId);
 

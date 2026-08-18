@@ -164,8 +164,11 @@ public class ImportAction extends AbstractProjectTreeAction {
             indexer.putTestCase(dirPath, existingTail);
         }
 
+        // The imported cases keep the audit their file carried; the tail is an
+        // existing case whose link changed, so it is an ordinary save and is
+        // recorded as modified by whoever ran the import.
         for (final TestCaseDto tc : testCases) {
-            indexer.putTestCase(dirPath, tc);
+            indexer.putImportedTestCase(dirPath, tc);
         }
     }
 
