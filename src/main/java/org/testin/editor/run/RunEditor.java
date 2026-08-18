@@ -314,7 +314,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     private void updateGridColumns() {
         if (gridTable == null) return;
-        gridPanelBuilder.applyColumnVisibility(gridTable, Arrays.stream(RunEditorAttributes.values()).toList(), RunEditorAttributes::getName, getSelectedDetails());
+        gridPanelBuilder.applyColumnVisibility(gridTable, RunEditorAttributes.class, getSelectedDetails());
     }
 
     @Override
@@ -355,6 +355,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         }
 
         loadDataAsync();
+    }
+
+    @Override
+    public @NotNull String cardTitle(final int globalIndex, final @NotNull TestCaseDto tc) {
+        final Set<RunEditorAttributes> selected = getSelectedDetails();
+
+        return BaseCard.titleText(globalIndex,
+                selected.contains(RunEditorAttributes.ORDER),
+                selected.contains(RunEditorAttributes.DESCRIPTION) ? tc.getDescription() : "");
     }
 
     @Override

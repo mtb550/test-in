@@ -7,33 +7,28 @@ import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
  * Toolbar button that shows a persistent check-box popup of editor detail attributes.
  * The concrete subclasses only supply the enum options and the persistence key.
  */
-public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends AbstractButton implements ToolbarItem {
+public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribute> extends AbstractButton implements ToolbarItem {
 
     @Getter
     private final @NotNull Set<E> selectedDetails = new HashSet<>();
 
     private final @NotNull String propertyKey;
     private final @NotNull List<E> options;
-    private final @NotNull Function<E, String> displayName;
 
     protected AbstractDetailsPopupBtn(final @NotNull String propertyKey,
-                                      final @NotNull List<E> options,
-                                      final @NotNull Function<E, String> displayName,
-                                      final @NotNull Predicate<E> defaultSelected,
-                                      final @NotNull Function<String, E> parser,
+                                      final @NotNull Class<E> attributes,
                                       final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         // A checked box, matching the check-box list this button opens. The
         // previous icon was a framed panel with rules in it, which the New UI
@@ -41,22 +36,27 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends Abstrac
         super("Details", AllIcons.Actions.Selectall);
 
         this.propertyKey = propertyKey;
-        this.options = options;
-        this.displayName = displayName;
+        this.options = List.of(attributes.getEnumConstants());
 
         // Only when nothing is stored yet: the attributes the enum flags on, not
-        // every option. A saved selection is honoured exactly as it was saved.
-        final String defaults = options.stream().filter(defaultSelected).map(Enum::name).collect(Collectors.joining(","));
+        // every option. A saved selection is honored exactly as it was saved.
+        final String defaults = options.stream()
+                .filter(o -> o.getToolBarDefault().isSelectedByDefault())
+                .map(Enum::name)
+                .collect(Collectors.joining(","));
         final String saved = PropertiesComponent.getInstance().getValue(propertyKey, defaults);
 
         for (final String s : saved.split(",")) {
             if (s.isEmpty()) continue;
             try {
-                selectedDetails.add(parser.apply(s));
+                selectedDetails.add(Enum.valueOf(attributes, s));
             } catch (final IllegalArgumentException ex) {
                 Logger.error("Invalid editor attribute '" + s + "' for " + propertyKey + ": " + ex.getMessage());
             }
         }
+
+        // The locked attributes hold the state they declare, whatever was stored.
+        options.forEach(o -> o.getToolBarDefault().enforceLock(o, selectedDetails));
 
         addActionListener(e -> showDetailsPopup(onToolBarDetailsSelectedChanged));
     }
@@ -70,10 +70,20 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends Abstrac
     }
 
     private void showDetailsPopup(final @NotNull Runnable onToolBarDetailsSelectedChanged) {
-        final CheckBoxList<E> detailsList = new CheckBoxList<>();
+        final CheckBoxList<E> detailsList = new CheckBoxList<>() {
+            /**
+             * Grays the locked attributes out, and stops the click and the space
+             * key from toggling them - the platform asks this before both.
+             */
+            @Override
+            protected boolean isEnabled(final int index) {
+                final E item = getItemAt(index);
+                return item == null || item.getToolBarDefault().isSwitchable();
+            }
+        };
         DialogStyle.styleContent(detailsList);
 
-        options.forEach(attr -> detailsList.addItem(attr, displayName.apply(attr), selectedDetails.contains(attr)));
+        options.forEach(attr -> detailsList.addItem(attr, attr.getName(), selectedDetails.contains(attr)));
 
         detailsList.setCheckBoxListListener((index, state) -> {
             final E item = detailsList.getItemAt(index);

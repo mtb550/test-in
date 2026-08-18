@@ -24,7 +24,7 @@ public class TestCard extends BaseCard {
         this.p = p;
     }
 
-    public void updateData(final int index, final @NotNull TestCaseDto tc, final @NotNull Set<?> activeDetails, final boolean isUnsorted) {
+    public void updateData(final int index, final @NotNull TestCaseDto tc, final @NotNull Set<?> activeDetails, final boolean isUnsorted, final @NotNull String title) {
         badges.clear();
         details.clear();
 
@@ -44,7 +44,7 @@ public class TestCard extends BaseCard {
         final RunStatus.Badge badge = runStatus.getBadge();
         if (badge != null) badges.add(Shared.createRunStatusBadge(badge));
 
-        updateUI(index, TestEditorAttributes.DESCRIPTION.getTestValueExtractor().execute(tc, p), badges, details);
+        updateUI(index, title, badges, details);
     }
 
     @Override

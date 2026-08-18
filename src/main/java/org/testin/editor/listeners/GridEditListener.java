@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
@@ -41,16 +42,16 @@ public class GridEditListener implements TableModelListener {
         if (e.getType() != TableModelEvent.UPDATE) return;
         final int row = e.getFirstRow();
         final int col = e.getColumn();
-        if (row < 0 || col <= 0) return;
+        if (row < 0 || col < 0 || GridPanelBuilder.isOrderColumn(col)) return;
         if (!(e.getSource() instanceof DefaultTableModel model)
                 || row >= model.getRowCount()
                 || row >= pageItems.size()
                 || col >= model.getColumnCount()
-                || col - 1 >= TestEditorAttributes.values().length) return;
+                || col >= TestEditorAttributes.values().length) return;
 
         updating = true;
         try {
-            final TestEditorAttributes attr = TestEditorAttributes.values()[col - 1];
+            final TestEditorAttributes attr = TestEditorAttributes.values()[col];
             final TestCaseDto tc = pageItems.get(row);
 
             final Object before = attr.gridValue(p, tc);

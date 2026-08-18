@@ -19,7 +19,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
     }
 
     @Override
-    protected @NotNull JComponent bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @Nullable String hover) {
+    protected @NotNull RunCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @Nullable String hover) {
         TestRunItems runItem = editor.getResultsMap().get(tc.getId());
 
         // The results map can be transiently empty during a refresh while the list still repaints;
@@ -28,7 +28,7 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
             runItem = TestRunItems.builder().id(tc.getId()).tc(tc).build();
         }
 
-        card.updateData(globalIndex, editor.getSelectedDetails(), runItem);
+        card.updateData(globalIndex, editor.getSelectedDetails(), runItem, editor.cardTitle(globalIndex, tc));
         card.setActionsState(isSelected, isRowHovered, hover);
         card.applyListFont(list.getFont());
 

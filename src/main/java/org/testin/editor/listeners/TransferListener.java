@@ -86,7 +86,7 @@ public class TransferListener extends TransferHandler {
             if (dragged == null) return false;
 
             final JBList.DropLocation dl = (JBList.DropLocation) support.getDropLocation();
-            final int offset = (editor.getCurrentPage() - 1) * editor.getPageSize();
+            final int offset = editor.globalIndex(0);
             int insertAtGlobal = offset + dl.getIndex();
 
             final int[] globalDraggedIndices = Arrays.stream(dragged)

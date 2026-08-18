@@ -20,7 +20,7 @@ import java.util.List;
  * Excel / DataGrip-style interaction for the grid tables:
  * <ul>
  *   <li>multi-interval cell selection (drag, Shift, Ctrl)</li>
- *   <li>clicking the sequence ("#") column selects the whole row;
+ *   <li>clicking the order column selects the whole row;
  *       Ctrl toggles rows, Shift extends the row range</li>
  *   <li>Ctrl+C / Ctrl+X / Ctrl+V on cells using tab-separated clipboard text,
  *       compatible with Excel and DataGrip. Paste and cut go through the table

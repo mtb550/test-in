@@ -17,29 +17,51 @@ import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public enum RunEditorAttributes {
+public enum RunEditorAttributes implements ToolBarAttribute {
+
+    /**
+     * The row's position on the page, drawn by the card title and by the grid's
+     * first column. The run item carries no such value - the position is the
+     * view's, not the model's - so the extractor is empty and each view fills
+     * the number in from the index it is already counting.
+     */
+    ORDER(
+            "Order",
+            ToolBarDefault.ON,
+            (item, p) -> ""
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            // Drawn by the card title, ahead of the description: "1. Log in with a valid user".
+        }
+    },
 
     DESCRIPTION(
             "Description",
-            true,
+            ToolBarDefault.ON,
             (item, p) -> item.requireTc().getDescription()
-    ),
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            // The card title is the description; a details row under it would print it twice.
+        }
+    },
 
     EXPECTED_RESULT(
             "Expected Result",
-            true,
+            ToolBarDefault.ON,
             (item, p) -> item.requireTc().getExpectedResult()
     ),
 
     STEPS(
             "Steps",
-            false,
+            ToolBarDefault.OFF,
             (item, p) -> String.join(", ", item.requireTc().getSteps())
     ),
 
     PRIORITY(
             "Priority",
-            true,
+            ToolBarDefault.OFF,
             (item, p) -> item.requireTc().getPriority().getName()
     ) {
         @Override
@@ -50,7 +72,7 @@ public enum RunEditorAttributes {
 
     GROUP(
             "Group",
-            true,
+            ToolBarDefault.OFF,
             (item, p) -> item.requireTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
     ) {
         @Override
@@ -61,13 +83,13 @@ public enum RunEditorAttributes {
 
     ACTUAL_RESULT(
             "Actual Result",
-            true,
+            ToolBarDefault.ON,
             (item, p) -> item.getActualResult()
     ),
 
     BUG_SEVERITY(
             "Bug Severity",
-            true,
+            ToolBarDefault.ON,
             (item, p) -> item.getBugSeverity().getName()
     ) {
         @Override
@@ -78,7 +100,7 @@ public enum RunEditorAttributes {
 
     BUG_PRIORITY(
             "Bug Priority",
-            true,
+            ToolBarDefault.ON,
             (item, p) -> item.getBugPriority().getName()
     ) {
         @Override
@@ -89,31 +111,31 @@ public enum RunEditorAttributes {
 
     RUN_STATUS(
             "Run Status",
-            true,
+            ToolBarDefault.ON,
             (item, p) -> item.getStatus().getDisplayText()
     ),
 
     DURATION(
             "Duration",
-            true,
+            ToolBarDefault.ON,
             (item, p) -> Services.getInstance(p, Tools.class).getFormattedDuration(item.getDuration())
     ),
 
     EXECUTED_BY(
             "Executed By",
-            false,
+            ToolBarDefault.OFF,
             (item, p) -> item.getExecutedBy()
     ),
 
     EXECUTED_AT(
             "Executed At",
-            false,
+            ToolBarDefault.OFF,
             (item, p) -> Config.formatOrBlank(item.getExecutedAt())
     ),
 
     PATH(
             "Path",
-            false,
+            ToolBarDefault.LOCKED_UNCHECKED,
             (item, p) -> {
                 final TestCaseDto tc = Services.getInstance(p, ProjectIndexer.class).getTestCaseById(item.getId());
                 if (tc != null)
@@ -124,7 +146,7 @@ public enum RunEditorAttributes {
 
     FQCN(
             "FQCN",
-            false,
+            ToolBarDefault.LOCKED_UNCHECKED,
             (item, p) -> {
                 final TestCaseDto tc = item.requireTc();
                 return String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc));
@@ -132,7 +154,7 @@ public enum RunEditorAttributes {
     );
 
     private final @NotNull String name;
-    private final boolean defaultToolBarSelected;
+    private final @NotNull ToolBarDefault toolBarDefault;
     private final @NotNull ValueExtractor<TestRunItems> runValueExtractor;
 
     /**

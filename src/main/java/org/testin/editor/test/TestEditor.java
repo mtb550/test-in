@@ -370,7 +370,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
     private void updateGridColumns() {
         if (gridTable == null) return;
-        gridPanelBuilder.applyColumnVisibility(gridTable, Arrays.stream(TestEditorAttributes.values()).toList(), TestEditorAttributes::getName, getSelectedDetails());
+        gridPanelBuilder.applyColumnVisibility(gridTable, TestEditorAttributes.class, getSelectedDetails());
     }
 
     @Override
@@ -404,6 +404,15 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.list.getEmptyText().setText("Refreshing...");
 
         loadDataAsync();
+    }
+
+    @Override
+    public @NotNull String cardTitle(final int globalIndex, final @NotNull TestCaseDto tc) {
+        final Set<TestEditorAttributes> selected = getSelectedDetails();
+
+        return BaseCard.titleText(globalIndex,
+                selected.contains(TestEditorAttributes.ORDER),
+                selected.contains(TestEditorAttributes.DESCRIPTION) ? tc.getDescription() : "");
     }
 
     @Override

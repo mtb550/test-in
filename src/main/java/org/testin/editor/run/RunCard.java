@@ -3,7 +3,6 @@ package org.testin.editor.run;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.NonNull;
 import org.testin.editor.BaseCard;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestRunItems;
@@ -24,11 +23,11 @@ public class RunCard extends BaseCard {
     }
 
     @Override
-    public void applyListFont(final @NonNull Font listFont) {
+    public void applyListFont(final @NotNull Font listFont) {
         super.applyListFont(listFont);
     }
 
-    public void updateData(final @NotNull Integer index, final @NotNull Set<?> activeDetails, final @NotNull TestRunItems runItem) {
+    public void updateData(final @NotNull Integer index, final @NotNull Set<?> activeDetails, final @NotNull TestRunItems runItem, final @NotNull String title) {
         badges.clear();
         details.clear();
 
@@ -36,7 +35,7 @@ public class RunCard extends BaseCard {
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(runItem, badges, details, p));
 
-        updateUI(index, RunEditorAttributes.DESCRIPTION.getRunValueExtractor().execute(runItem, p), badges, details);
+        updateUI(index, title, badges, details);
 
         final JBLabel statusLabel = attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName());
 

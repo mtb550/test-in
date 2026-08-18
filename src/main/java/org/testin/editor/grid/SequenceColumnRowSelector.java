@@ -8,7 +8,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Excel-style row selection via the sequence ("#") column: plain click selects
+ * Excel-style row selection via the order column: plain click selects
  * the whole row, Ctrl toggles rows, Shift extends the row range. Must be
  * registered ahead of the table UI's mouse handler and consumes the press so
  * default cell selection cannot override the row selection.
@@ -28,7 +28,7 @@ final class SequenceColumnRowSelector extends MouseAdapter {
         final int viewRow = table.rowAtPoint(e.getPoint());
         final int viewCol = table.columnAtPoint(e.getPoint());
         if (viewRow < 0 || viewCol < 0) return;
-        if (table.convertColumnIndexToModel(viewCol) != 0) return; // only the "#" column
+        if (!GridPanelBuilder.isOrderColumn(table, viewCol)) return;
 
         final ListSelectionModel rows = table.getSelectionModel();
 

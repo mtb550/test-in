@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.Shortcuts;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * an IDE action rather than a Swing key binding, because the IDE dispatcher
  * handles registered shortcuts before a component's own ActionMap.
  * <p>
- * Enabled only on the sequence ("#") column, which is never editable; on every
+ * Enabled only on the order column, which is never editable; on every
  * other cell the action stays disabled so ENTER keeps starting an edit.
  */
 public class GridViewDetailsAction extends AbstractProjectAction {
@@ -54,7 +55,7 @@ public class GridViewDetailsAction extends AbstractProjectAction {
     }
 
     /**
-     * Double-click on the sequence column opens the details view too, so the
+     * Double-click on the order column opens the details view too, so the
      * grid offers the same two gestures as the list.
      */
     public void installDoubleClick() {
@@ -63,8 +64,7 @@ public class GridViewDetailsAction extends AbstractProjectAction {
             public void mouseClicked(final MouseEvent e) {
                 if (e.getClickCount() != 2 || !SwingUtilities.isLeftMouseButton(e)) return;
 
-                final int column = table.columnAtPoint(e.getPoint());
-                if (column < 0 || table.convertColumnIndexToModel(column) != 0) return;
+                if (!GridPanelBuilder.isOrderColumn(table, table.columnAtPoint(e.getPoint()))) return;
 
                 showDetails(table.rowAtPoint(e.getPoint()));
                 e.consume();
@@ -74,10 +74,9 @@ public class GridViewDetailsAction extends AbstractProjectAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final int column = table.getSelectedColumn();
-        final boolean onSequenceColumn = column >= 0 && table.convertColumnIndexToModel(column) == 0;
+        final boolean onOrderColumn = GridPanelBuilder.isOrderColumn(table, table.getSelectedColumn());
 
-        e.getPresentation().setEnabled(!table.isEditing() && onSequenceColumn && table.getSelectedRow() >= 0);
+        e.getPresentation().setEnabled(!table.isEditing() && onOrderColumn && table.getSelectedRow() >= 0);
     }
 
     @Override

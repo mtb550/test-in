@@ -23,7 +23,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 public class CardMouseListener extends MouseAdapter {
@@ -152,19 +151,19 @@ public class CardMouseListener extends MouseAdapter {
 
         final float baseSize = list.getFont().getSize2D();
 
-        // Must match the painted title font, otherwise the hover hit targets drift
-        // away from the drawn icons as the title grows.
+        // Must match the painted title font: it sets both the height of the band
+        // that counts as the title line and the width the title measures to.
         final Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
         final FontMetrics fm = list.getFontMetrics(titleFont);
 
         final int dynamicYBound = fm.getHeight() + JBUI.scale(20);
 
         if (yInCell <= dynamicYBound) {
-            final TestCaseDto tc = list.getModel().getElementAt(index);
-            final int globalIndex = ((editor.getCurrentPage() - 1) * editor.getPageSize()) + index;
-            final String titleText = String.format(Locale.ENGLISH, "%d. %s", globalIndex + 1, tc.getDescription());
-
-            final int titleWidth = fm.stringWidth(titleText);
+            // Asked of the editor, which owns what the title reads, and measured
+            // with the font the card draws it in. Rebuilding the string here is
+            // what used to drift once either half could be switched off.
+            final int globalIndex = editor.globalIndex(index);
+            final int titleWidth = fm.stringWidth(editor.cardTitle(globalIndex, list.getModel().getElementAt(index)));
 
             final int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
             final int navStartX = startX - JBUI.scale(6);
@@ -177,4 +176,5 @@ public class CardMouseListener extends MouseAdapter {
 
         return null;
     }
+
 }

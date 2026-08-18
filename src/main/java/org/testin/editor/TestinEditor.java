@@ -29,6 +29,19 @@ public interface TestinEditor extends Disposable {
 
     int getPageSize();
 
+    /**
+     * The row's position in the whole list rather than on the page it is drawn
+     * on. The number the card shows, and what every lookup by index outside the
+     * page needs.
+     * <p>
+     * Default rather than repeated: the renderer, the hover hit-test and the
+     * transfer handler all convert the same way, and a card that numbered rows
+     * differently from the handler acting on them would be a quiet mismatch.
+     */
+    default int globalIndex(final int rowIndex) {
+        return ((getCurrentPage() - 1) * getPageSize()) + rowIndex;
+    }
+
     void setPageSize(final int size);
 
     int getTotalPageCount();
@@ -46,6 +59,18 @@ public interface TestinEditor extends Disposable {
     @Nullable JComponent getPreferredFocusedComponent();
 
     @NotNull Set<?> getSelectedDetails();
+
+    /**
+     * The title line of the card at this row, as it is drawn: the order number
+     * and the description, each present only while its attribute is ticked in
+     * the Details popup.
+     * <p>
+     * Lives here because the two editors hold different attribute enums and only
+     * they can read their own selection. The renderer asks for it to draw, and
+     * the mouse listener asks for it to place the hover icons, so both are
+     * looking at one answer.
+     */
+    @NotNull String cardTitle(final int globalIndex, final @NotNull TestCaseDto tc);
 
     @NotNull List<TestCaseDto> getAllTestCases();
 

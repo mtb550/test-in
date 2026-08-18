@@ -16,17 +16,57 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-// TODO: add order, then add it toolbar details (select by the order number) & add it to edit menu.
-// TODO: add all to edit menu: auto ref, business ref..etc
-// TODO: also, map all to view panel dynamically.
 @Getter
 @AllArgsConstructor
-public enum TestEditorAttributes {
+public enum TestEditorAttributes implements ToolBarAttribute {
+
+    /**
+     * The row's position on the page, drawn by the card title and by the grid's
+     * first column. The test case carries no such value - the position is the
+     * view's, not the model's - so the extractor is empty and each view fills
+     * the number in from the index it is already counting.
+     */
+    ORDER(
+            "Order",
+            "Order:",
+            ToolBarDefault.ON,
+            false,
+            false,
+            false,
+            (tc, p) -> "",
+            (p, tc, v) -> {
+            },
+            GenType.NO_CODE_CHANGE
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges,
+                              final @NotNull Map<String, String> details, final @NotNull Project p) {
+            // Drawn by the card title, ahead of the description: "1. Log in with a valid user".
+        }
+    },
+
+    DESCRIPTION(
+            "Description",
+            "Description:",
+            ToolBarDefault.LOCKED_CHECKED,
+            true,
+            true,
+            true,
+            (tc, p) -> tc.getDescription(),
+            (p, tc, v) -> tc.setDescription(Services.getInstance(p, Tools.class).sanitizeDescription(v)),
+            GenType.UPDATE_TEST_CASE_DESCRIPTION
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestCaseDto tc, final @NotNull List<JComponent> badges,
+                              final @NotNull Map<String, String> details, final @NotNull Project p) {
+            // The card title is the description; a details row under it would print it twice.
+        }
+    },
 
     ID(
             "ID",
             "ID:",
-            false,
+            ToolBarDefault.LOCKED_UNCHECKED,
             false,
             false,
             true,
@@ -36,23 +76,10 @@ public enum TestEditorAttributes {
             GenType.NO_CODE_CHANGE
     ),
 
-    /// TODO:: added to tool bar details, to be shown but disabled
-    DESCRIPTION(
-            "Description",
-            "Description:",
-            false,
-            true,
-            true,
-            true,
-            (tc, p) -> tc.getDescription(),
-            (p, tc, v) -> tc.setDescription(Services.getInstance(p, Tools.class).sanitizeDescription(v)),
-            GenType.UPDATE_TEST_CASE_DESCRIPTION
-    ),
-
     EXPECTED_RESULT(
             "Expected Result",
             "Expected Result:",
-            true,
+            ToolBarDefault.ON,
             true,
             false,
             true,
@@ -64,7 +91,7 @@ public enum TestEditorAttributes {
     STEPS(
             "Steps",
             "Steps:",
-            true,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -76,7 +103,7 @@ public enum TestEditorAttributes {
     PRIORITY(
             "Priority",
             "Priority:",
-            true,
+            ToolBarDefault.ON,
             true,
             false,
             true,
@@ -94,7 +121,7 @@ public enum TestEditorAttributes {
     FQCN(
             "FQCN",
             "FQCN:",
-            false,
+            ToolBarDefault.LOCKED_UNCHECKED,
             false,
             false,
             true,
@@ -107,7 +134,7 @@ public enum TestEditorAttributes {
     REFERENCE(
             "Reference",
             "Reference:",
-            false,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -119,7 +146,7 @@ public enum TestEditorAttributes {
     TEST_DATA(
             "Test Data",
             "Test Data:",
-            false,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -131,7 +158,7 @@ public enum TestEditorAttributes {
     PRE_CONDITIONS(
             "Pre Conditions",
             "Pre Conditions:",
-            false,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -143,7 +170,7 @@ public enum TestEditorAttributes {
     GROUP(
             "Group",
             "Group:",
-            true,
+            ToolBarDefault.ON,
             true,
             false,
             true,
@@ -161,7 +188,7 @@ public enum TestEditorAttributes {
     PATH(
             "Path",
             "Path:",
-            false,
+            ToolBarDefault.LOCKED_UNCHECKED,
             false,
             false,
             true,
@@ -171,12 +198,10 @@ public enum TestEditorAttributes {
             GenType.NO_CODE_CHANGE
     ),
 
-    ///  TODO:: ORDER to be added to show or hide sequence numbers in editors
-
     MODULE(
             "Module",
             "Module:",
-            false,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -188,7 +213,7 @@ public enum TestEditorAttributes {
     STATUS(
             "Status",
             "Status:",
-            false,
+            ToolBarDefault.OFF,
             false,
             false,
             true,
@@ -200,7 +225,7 @@ public enum TestEditorAttributes {
     CREATE_BY(
             "Created By",
             "Created By:",
-            false,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -212,7 +237,7 @@ public enum TestEditorAttributes {
     UPDATE_BY(
             "Updated By",
             "Updated By:",
-            false,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -224,7 +249,7 @@ public enum TestEditorAttributes {
     CREATE_AT(
             "Created At",
             "Created At:",
-            false,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -236,7 +261,7 @@ public enum TestEditorAttributes {
     UPDATE_AT(
             "Updated At",
             "Updated At:",
-            false,
+            ToolBarDefault.OFF,
             true,
             false,
             true,
@@ -247,7 +272,7 @@ public enum TestEditorAttributes {
 
     private final @NotNull String name;
     private final @NotNull String name2;
-    private final boolean defaultToolBarSelected;
+    private final @NotNull ToolBarDefault toolBarDefault;
     private final boolean importable;
     private final boolean copyable;
     private final boolean exportable;
