@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Builds the test-case review model from what Git reports as changed. The
@@ -40,18 +41,42 @@ public final class GitDiffProcessor {
             final @NotNull Project project,
             final @NotNull Path repositoryRoot) {
         final Path root = repositoryRoot.toAbsolutePath().normalize();
-        final Mapper mapper = Services.getInstance(project, Mapper.class);
         final GitRepositoryService repositories = new GitRepositoryService(project);
+
+        return toDiffs(repositories.status(root), root,
+                Services.getInstance(project, Mapper.class),
+                path -> repositories.showAtHead(root, path));
+    }
+
+    /**
+     * The review, built from what Git said and what is on disk.
+     * <p>
+     * Separated from {@link #getPendingChanges} so the whole mapping can be
+     * exercised against plain status lines and real files, without an IDE or a
+     * repository: which lines are ours, which side of each change is read from
+     * where, and which changes are not worth showing.
+     *
+     * @param committedContent the file's content as committed, or null when
+     *                         there is none - a new file, or no commits yet
+     */
+    static @NotNull List<TestCaseDiff> toDiffs(
+            final @NotNull List<String> statusLines,
+            final @NotNull Path repositoryRoot,
+            final @NotNull Mapper mapper,
+            final @NotNull Function<String, String> committedContent) {
+        final Path root = repositoryRoot.toAbsolutePath().normalize();
         final List<TestCaseDiff> result = new ArrayList<>();
 
-        for (final GitRefs.StatusEntry entry : GitRefs.parseStatus(repositories.status(root))) {
+        for (final GitRefs.StatusEntry entry : GitRefs.parseStatus(statusLines)) {
+            // Markers change too, and they travel with the commit - but there is
+            // nothing in a marker for a tester to review.
             if (!entry.path().endsWith(".json")) continue;
 
             final Path relativePath = Path.of(entry.path());
             try {
                 final TestCaseDiff diff = TestCaseDiffFactory.fromJson(
                         entry.type(),
-                        committedContent(repositories, root, entry),
+                        entry.type() == DiffType.ADDED ? null : committedContent.apply(entry.path()),
                         workingContent(root, relativePath, entry),
                         relativePath,
                         mapper);
@@ -62,16 +87,6 @@ public final class GitDiffProcessor {
             }
         }
         return result;
-    }
-
-    /**
-     * Null for an addition, which by definition has no committed version.
-     */
-    private static @Nullable String committedContent(
-            final @NotNull GitRepositoryService repositories,
-            final @NotNull Path root,
-            final @NotNull GitRefs.StatusEntry entry) {
-        return entry.type() == DiffType.ADDED ? null : repositories.showAtHead(root, entry.path());
     }
 
     /**

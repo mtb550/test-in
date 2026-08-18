@@ -1,0 +1,381 @@
+package org.testin.git;
+
+import org.testin.model.Priority;
+import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Mapper;
+import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+
+/**
+ * The whole workflow against a real repository: write test cases, review what
+ * changed, commit, push, and have a colleague clone what arrived.
+ * <p>
+ * Nothing is stubbed. Git is the Git on this machine, the repository is a real
+ * one in a temporary directory, and the remote is a real bare repository - so a
+ * push is a push. What is exercised is the plugin's own logic driving it: the
+ * review comes from {@link GitDiffProcessor} reading real {@code git status}
+ * output, and what gets staged is what {@link GitRefs} and
+ * {@link GitCommitService} decide it should be.
+ * <p>
+ * The parsing tests elsewhere prove the rules are right about text we typed.
+ * This proves they are right about text Git produced, which is the difference
+ * between a test passing and the feature working - the review was empty for
+ * every user of this plugin while its unit tests were green.
+ */
+public class GitWorkflowTest {
+
+    private Path remote;
+    private Path work;
+
+    // ------------------------------------------------------------------ setup
+
+    private static Mapper mapper() {
+        try {
+            final Constructor<Mapper> constructor = Mapper.class.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
+        } catch (final ReflectiveOperationException ex) {
+            throw new IllegalStateException("Could not build a Mapper for the test", ex);
+        }
+    }
+
+    /**
+     * Runs Git and returns its output, or null when it failed - which is how the
+     * plugin treats a failure too: no answer rather than an exception.
+     */
+    private static String git(final Path directory, final String... arguments) {
+        final List<String> command = new ArrayList<>();
+        command.add("git");
+        command.addAll(List.of(arguments));
+
+        try {
+            final Process process = new ProcessBuilder(command)
+                    .directory(directory.toFile())
+                    .redirectErrorStream(true)
+                    .start();
+
+            final String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            return process.waitFor() == 0 ? output : null;
+
+        } catch (final IOException | InterruptedException ex) {
+            return null;
+        }
+    }
+
+    private static String mustGit(final Path directory, final String... arguments) {
+        final String output = git(directory, arguments);
+        assertNotNull(output, "git " + String.join(" ", arguments) + " failed in " + directory);
+        return output;
+    }
+
+    @BeforeMethod
+    public void createRepositories() throws IOException {
+        if (git(Path.of("."), "--version") == null) {
+            throw new SkipException("Git is not on the PATH, so the workflow cannot be exercised");
+        }
+
+        final Path base = Files.createTempDirectory("testin-workflow");
+        remote = base.resolve("remote.git");
+        work = base.resolve("work");
+        Files.createDirectories(remote);
+        Files.createDirectories(work);
+
+        mustGit(remote, "init", "--bare", "--initial-branch=main");
+        mustGit(work, "init", "--initial-branch=main");
+
+        // Local, so the test never depends on - or touches - the developer's own
+        // Git identity.
+        mustGit(work, "config", "user.name", "Testin Test");
+        mustGit(work, "config", "user.email", "testin@example.invalid");
+        mustGit(work, "remote", "add", "origin", remote.toUri().toString());
+    }
+
+    @AfterMethod
+    public void removeRepositories() throws IOException {
+        if (remote == null) return;
+        final Path base = remote.getParent();
+        if (base == null || !Files.exists(base)) return;
+
+        try (Stream<Path> paths = Files.walk(base)) {
+            paths.sorted(Comparator.reverseOrder()).forEach(path -> {
+                path.toFile().setWritable(true);
+                path.toFile().delete();
+            });
+        }
+    }
+
+    // ------------------------------------------------------- the test project
+
+    private TestCaseDto testCase(final String description) {
+        return TestCaseDto.builder()
+                .description(description)
+                .expectedResult("the account dashboard opens")
+                .steps(new ArrayList<>(List.of("open the app", "sign in")))
+                .priority(Priority.HIGH)
+                .module("authentication")
+                .build();
+    }
+
+    private void write(final Path root, final String relativePath, final Object content) throws IOException {
+        final Path file = root.resolve(relativePath);
+        Files.createDirectories(file.getParent() == null ? root : file.getParent());
+        Files.writeString(file, content instanceof String text ? text : mapper().writeValueAsString(content),
+                StandardCharsets.UTF_8);
+    }
+
+    /**
+     * A test project as the plugin lays one out: a marker per directory, and the
+     * test cases linked head to tail the way the editor orders them.
+     */
+    private List<TestCaseDto> writeTestProject() throws IOException {
+        write(work, ".tp", "{\"status\":\"ACTIVE\"}");
+        write(work, "Test Cases/.tcd", "{}");
+        write(work, "Test Runs/.trd", "{}");
+        write(work, "Test Cases/login flow/.ts", "{}");
+
+        final List<TestCaseDto> cases = List.of(
+                testCase("a registered user signs in"),
+                testCase("a wrong password is refused"));
+
+        cases.getFirst().setIsHead(true).setNext(cases.get(1).getId());
+
+        for (final TestCaseDto testCase : cases) {
+            write(work, "Test Cases/login flow/" + testCase.getId() + ".json", testCase);
+        }
+        return cases;
+    }
+
+    // --------------------------------------------------------- the plugin bits
+
+    /**
+     * The review, built the way the plugin builds it: from what Git says changed
+     * and what Git has committed.
+     */
+    private List<TestCaseDiff> review() {
+        final List<String> status = mustGit(work, "status", "--porcelain", "-uall")
+                .lines().filter(line -> !line.isBlank()).toList();
+
+        return GitDiffProcessor.toDiffs(status, work, mapper(),
+                path -> git(work, "show", "HEAD:" + path));
+    }
+
+    /**
+     * Everything the plugin would stage for the given review: the selected test
+     * cases, and the markers that make their directories mean anything.
+     */
+    private Set<String> stagedFor(final List<TestCaseDiff> review) {
+        final Set<String> paths = new LinkedHashSet<>(GitRefs.repoRelativePaths(review));
+        paths.addAll(GitCommitService.markersAlongside(work, paths));
+        return paths;
+    }
+
+    private void commit(final Set<String> paths, final String message) {
+        final List<String> add = new ArrayList<>(List.of("add", "--"));
+        add.addAll(paths);
+        mustGit(work, add.toArray(String[]::new));
+
+        final List<String> commit = new ArrayList<>(List.of("commit", "--only", "-m", message, "--"));
+        commit.addAll(paths);
+        mustGit(work, commit.toArray(String[]::new));
+    }
+
+    private Path cloneAsColleague() throws IOException {
+        final Path colleague = remote.getParent().resolve("colleague");
+        mustGit(remote.getParent(), "clone", remote.toUri().toString(), colleague.toString());
+        return colleague;
+    }
+
+    // ------------------------------------------------------------------ tests
+
+    /**
+     * The first commit of a new test project, which is the case that could not be
+     * made at all: everything is untracked, and untracked was invisible.
+     */
+    @Test
+    public void aNewTestProjectIsReviewedCommittedAndPushed() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+
+        final List<TestCaseDiff> pending = review();
+        assertEquals(pending.size(), 2, "both new test cases are in the review");
+        assertTrue(pending.stream().allMatch(diff -> diff.type() == DiffType.ADDED));
+
+        commit(stagedFor(pending), "the first commit");
+        assertNotNull(git(work, "push", "-u", "origin", "main"), "the push to an empty remote succeeded");
+
+        final Path colleague = cloneAsColleague();
+        for (final TestCaseDto testCase : cases) {
+            assertTrue(Files.exists(colleague.resolve("Test Cases/login flow/" + testCase.getId() + ".json")),
+                    "the colleague received " + testCase.getDescription());
+        }
+    }
+
+    /**
+     * The fault that would have made every clone useless: a directory is only a
+     * test set because a marker sits in it, and the review never lists markers.
+     */
+    @Test
+    public void whatTheColleagueClonesIsAUsableTestProject() throws IOException {
+        writeTestProject();
+
+        commit(stagedFor(review()), "the first commit");
+        mustGit(work, "push", "-u", "origin", "main");
+
+        final Path colleague = cloneAsColleague();
+
+        assertTrue(Files.exists(colleague.resolve(".tp")), "the test project marker travelled");
+        assertTrue(Files.exists(colleague.resolve("Test Cases/.tcd")), "the test cases container marker travelled");
+        assertTrue(Files.exists(colleague.resolve("Test Cases/login flow/.ts")),
+                "the test set marker travelled - without it the cases are in a directory nothing recognises");
+    }
+
+    /**
+     * A run directory is not part of a test case commit, so it must not be
+     * dragged in: the markers that travel are the ones above the cases selected.
+     */
+    @Test
+    public void onlyTheMarkersAboveTheSelectedCasesTravel() throws IOException {
+        writeTestProject();
+
+        final Set<String> staged = stagedFor(review());
+
+        assertTrue(staged.contains(".tp"));
+        assertTrue(staged.contains("Test Cases/.tcd"));
+        assertTrue(staged.contains("Test Cases/login flow/.ts"));
+        assertFalse(staged.contains("Test Runs/.trd"),
+                "no test case sits under Test Runs, so its marker is not part of this commit");
+    }
+
+    /**
+     * Editing a case and asking again: the review reads the committed side out of
+     * Git and reports only the field that moved.
+     */
+    @Test
+    public void editingACaseShowsExactlyWhatChanged() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+
+        assertEquals(review(), List.of(), "nothing is pending straight after a commit");
+
+        final TestCaseDto edited = cases.getFirst().setModule("payments");
+        write(work, "Test Cases/login flow/" + edited.getId() + ".json", edited);
+
+        final List<TestCaseDiff> pending = review();
+
+        assertEquals(pending.size(), 1);
+        assertEquals(pending.getFirst().type(), DiffType.MODIFIED);
+        assertEquals(pending.getFirst().fieldChanges().size(), 1, "one field moved, so one row");
+        assertEquals(pending.getFirst().fieldChanges().getFirst().changeType(), ChangeType.CHANGE_MODULE);
+        assertEquals(pending.getFirst().fieldChanges().getFirst().oldValue(), "authentication");
+        assertEquals(pending.getFirst().fieldChanges().getFirst().newValue(), "payments");
+    }
+
+    @Test
+    public void addingACaseToACommittedTestSetIsReviewedAsAnAddition() throws IOException {
+        writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+
+        final TestCaseDto extra = testCase("a locked account cannot sign in");
+        write(work, "Test Cases/login flow/" + extra.getId() + ".json", extra);
+
+        final List<TestCaseDiff> pending = review();
+
+        assertEquals(pending.size(), 1);
+        assertEquals(pending.getFirst().type(), DiffType.ADDED);
+        assertEquals(pending.getFirst().subject().getDescription(), "a locked account cannot sign in");
+    }
+
+    @Test
+    public void deletingACaseIsReviewedFromWhatWasCommitted() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+
+        Files.delete(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"));
+
+        final List<TestCaseDiff> pending = review();
+
+        assertEquals(pending.size(), 1);
+        assertEquals(pending.getFirst().type(), DiffType.DELETED);
+        assertEquals(pending.getFirst().subject().getDescription(), "a registered user signs in");
+    }
+
+    /**
+     * The colleague half of the round trip: they change a case and push, and the
+     * change arrives here on a pull.
+     */
+    @Test
+    public void aColleaguesChangeArrivesOnAPull() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+        mustGit(work, "push", "-u", "origin", "main");
+
+        final Path colleague = cloneAsColleague();
+        mustGit(colleague, "config", "user.name", "Colleague");
+        mustGit(colleague, "config", "user.email", "colleague@example.invalid");
+
+        final Path theirCopy = colleague.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json");
+        final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+        Files.writeString(theirCopy, mapper().writeValueAsString(theirs.setExpectedResult("the dashboard opens within two seconds")),
+                StandardCharsets.UTF_8);
+
+        mustGit(colleague, "commit", "-am", "tightened the expected result");
+        mustGit(colleague, "push", "origin", "main");
+
+        mustGit(work, "pull", "--rebase", "--autostash", "origin", "main");
+
+        final TestCaseDto pulled = mapper().readValue(
+                Files.readString(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"),
+                        StandardCharsets.UTF_8), TestCaseDto.class);
+
+        assertEquals(pulled.getExpectedResult(), "the dashboard opens within two seconds");
+        assertEquals(review(), List.of(), "a clean pull leaves nothing pending");
+    }
+
+    /**
+     * A repository with no commits reports no HEAD branch, which was read as a
+     * branch literally called "(unknown)" and broke every first push.
+     */
+    @Test
+    public void anEmptyRemoteNamesNoHeadBranch() {
+        final String remoteInfo = mustGit(work, "remote", "show", "origin");
+
+        assertTrue(remoteInfo.contains("HEAD branch:"), "git reports a HEAD branch line: " + remoteInfo);
+        assertEquals(GitRefs.parseHeadBranch(remoteInfo), null,
+                "an empty remote names no branch, so the push falls back to the local one");
+    }
+
+    /**
+     * The status output the review is built from, straight from Git rather than
+     * typed into a test - quoting, untracked marks and all.
+     */
+    @Test
+    public void gitReportsNewTestCasesAsUntrackedWithQuotedPaths() throws IOException {
+        writeTestProject();
+
+        final String status = mustGit(work, "status", "--porcelain", "-uall");
+
+        assertTrue(status.contains("?? \"Test Cases/login flow/"),
+                "a path with a space comes back quoted: " + status);
+        assertEquals(GitRefs.parseStatus(status.lines().toList()).stream()
+                .filter(entry -> entry.path().endsWith(".json")).count(), 2);
+    }
+}

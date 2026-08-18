@@ -74,6 +74,15 @@ public final class Mapper {
         }
     }
 
+    /**
+     * Raises rather than answering with nothing.
+     * <p>
+     * This used to return an empty array when serialization failed, and the
+     * empty array was then written over the file: a failure was logged and
+     * committed to disk as a zero-byte marker or test case, destroying what was
+     * there. Both callers in the indexer already catch a failure here and refuse
+     * to write - they simply never got one.
+     */
     public byte @NotNull [] writeValueAsBytes(final @NotNull Object value) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(value);
@@ -81,17 +90,22 @@ public final class Mapper {
         } catch (final Exception ex) {
             Logger.error("Failed to serialize object to bytes: " + value.getClass().getSimpleName());
             Logger.error("Exception: " + ex.getMessage());
-            return new byte[0];
+            throw new IllegalStateException("Could not serialize " + value.getClass().getSimpleName(), ex);
         }
     }
 
+    /**
+     * Raises rather than answering with an empty string - see
+     * {@link #writeValueAsBytes}. An empty string put on the clipboard is a
+     * silent copy of nothing.
+     */
     public @NotNull String writeValueAsString(final @NotNull Object value) {
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);
 
         } catch (final Exception ex) {
             Logger.error("Failed to serialize object to string: " + value.getClass().getSimpleName());
-            return "";
+            throw new IllegalStateException("Could not serialize " + value.getClass().getSimpleName(), ex);
         }
     }
 

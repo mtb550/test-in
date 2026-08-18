@@ -67,7 +67,7 @@ public final class GitCommitService {
      * marker a directory carries is what says whether it is a test set, a package
      * or a container, and only one of them is there.
      */
-    private @NotNull Set<String> markersAlongside(final @NotNull Path repositoryPath, final @NotNull Set<String> testCasePaths) {
+    static @NotNull Set<String> markersAlongside(final @NotNull Path repositoryPath, final @NotNull Set<String> testCasePaths) {
         final Set<String> markers = new LinkedHashSet<>();
 
         for (final String directory : GitRefs.ancestorDirectories(testCasePaths)) {
