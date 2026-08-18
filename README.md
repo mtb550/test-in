@@ -1,18 +1,20 @@
 # Testin
 
+[![JetBrains Marketplace](https://img.shields.io/jetbrains/plugin/v/31514-testin?label=marketplace)](https://plugins.jetbrains.com/plugin/31514-testin)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/31514-testin)](https://plugins.jetbrains.com/plugin/31514-testin)
+[![Rating](https://img.shields.io/jetbrains/plugin/r/rating/31514-testin)](https://plugins.jetbrains.com/plugin/31514-testin)
+
 Test case management inside the IDE, next to the automation it drives.
 
-Testin adds a tool window where you organise test projects, test sets and test
+Testin adds a tool window where you organize test projects, test sets and test
 runs, write test cases, execute them, and generate reports — without leaving
 IntelliJ IDEA and without a second tool to keep in sync. Test cases are stored
 as JSON on disk in your automation repository, so they are reviewed, branched
 and merged like the code they test.
 
-<!-- TODO: screenshot of the project panel with a test editor open, saved under docs/ -->
-
 ## What it does
 
-- **Organise** — test projects hold test sets and test runs, in a tree beside
+- **Organize** — test projects hold test sets and test runs, in a tree beside
   your code. Create, rename, move, copy and delete nodes with the keyboard.
 - **Write** — a test case has a description, expected result, module,
   pre-conditions, steps, test data, priority and groups. The editor offers list
@@ -57,7 +59,7 @@ without them and disables the features that need them rather than failing.
 From the IDE: **Settings → Plugins → Marketplace**, search for *Testin*, install
 and restart.
 
-<!-- TODO: Marketplace listing URL -->
+Or install it from the listing: **[Testin on the JetBrains Marketplace](https://plugins.jetbrains.com/plugin/31514-testin)**.
 
 Then set the Testin root in **Settings → Tools → Testin** — the folder in your
 automation repository where test cases will live — and create your first test
@@ -75,6 +77,15 @@ pwsh tools/inspect.ps1   # run the IntelliJ inspections headlessly
 The sandbox writes to `.sandbox/`; the inspection tooling writes to
 `.inspection/`, deliberately outside `build/` so `./gradlew clean` does not
 delete the findings list. Neither is committed.
+
+## License and privacy
+
+Testin is released under the terms in [LICENSE.md](LICENSE.md).
+
+It runs entirely on your machine: test cases, steps and JSON files stay on your
+disk or in your own version control, and the plugin embeds no telemetry, no
+analytics, and never uploads your source, test data or credentials anywhere. The
+full statement is in [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 
 ## Contributing
 
