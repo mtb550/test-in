@@ -125,10 +125,16 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
             final @NotNull Collection<TestCaseDiff> selectedChanges) {
         GitBackgroundTask.run(p, "Committing to local Git", false,
                 indicator -> {
-                    indicator.setText("Staging and committing files..");
+                    indicator.setText("Staging and committing files");
                     commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
+                        // The one action link that deliberately does not expire on
+                        // click. Every other offer is spent the moment it is taken;
+                        // this one is spent when the push succeeds, which is why it
+                        // is held and expired below instead. A push that fails
+                        // leaves the offer standing, so the tester can try again
+                        // without committing a second time.
                         final NotificationAction pushAction = NotificationAction.createSimple(
                                 "Push to Remote",
                                 () -> pushToRemote(p, repoPath)
@@ -136,8 +142,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
                         pushNotification = Services.getInstance(p, Notifier.class).infoWithActions(
                                 p,
-                                "Commit successful",
-                                "Changes committed locally. Would you like to push to the remote repository now?",
+                                "Committed",
+                                "Push these changes to the remote?",
                                 pushAction
                         );
                     });
@@ -155,8 +161,14 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         GitBackgroundTask.run(p, "Initializing git repository", false,
                 indicator -> {
                     commits.initialize(repoPath);
-                    ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).softShow(p, "Git initialized"));
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        Services.getInstance(p, Notifier.class).softShow(p, "Git initialized");
+
+                        // The tester asked to see pending commits. Initializing was
+                        // what stood in the way, not what they wanted, so the review
+                        // they invoked opens rather than making them ask twice.
+                        scanForChanges(p, repoPath);
+                    });
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage()));
     }
@@ -208,7 +220,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                                 final @NotNull String remote, final @NotNull String branch) {
         GitBackgroundTask.run(p, "Pushing to Remote", false,
                 indicator -> {
-                    indicator.setText("Syncing with remote (pull --rebase, then push)..");
+                    indicator.setText("Syncing with remote: pull --rebase, then push");
                     commits.pullAndPush(repoPath, remote, branch);
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (pushNotification != null) {
@@ -228,12 +240,13 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote,
                                      final @NotNull String branch) {
-        Services.getInstance(p, Notifier.class).warnWithActions(
+        final Notifier notifier = Services.getInstance(p, Notifier.class);
+        notifier.warnWithActions(
                 p,
                 "Git Conflicts",
                 "Pull stopped because conflicts must be resolved in the IDE before continuing.",
-                NotificationAction.createSimple("Continue rebase", () -> finishRebase(repoPath, remote, branch, false)),
-                NotificationAction.createSimple("Abort rebase", () -> finishRebase(repoPath, remote, branch, true)));
+                notifier.action("Continue rebase", () -> finishRebase(repoPath, remote, branch, false)),
+                notifier.action("Abort rebase", () -> finishRebase(repoPath, remote, branch, true)));
     }
 
     private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote,

@@ -97,11 +97,12 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     }
 
     private void showConflictActions(final @NotNull Path repoPath) {
-        final NotificationAction continueAction = NotificationAction.createSimple(
+        final Notifier notifier = Services.getInstance(p, Notifier.class);
+        final NotificationAction continueAction = notifier.action(
                 "Continue rebase", () -> finishRebase(repoPath, false));
-        final NotificationAction abortAction = NotificationAction.createSimple(
+        final NotificationAction abortAction = notifier.action(
                 "Abort rebase", () -> finishRebase(repoPath, true));
-        Services.getInstance(p, Notifier.class).warnWithActions(
+        notifier.warnWithActions(
                 p,
                 "Git Conflicts",
                 "Pull stopped because conflicts must be resolved in the IDE before continuing.",

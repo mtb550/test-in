@@ -86,8 +86,24 @@ public final class Notifier {
         notify(p, title, message, NotificationType.ERROR);
     }
 
+    /**
+     * A link on a notification, and the notification goes away when it is
+     * clicked.
+     * <p>
+     * Every one of these is a one-shot offer - initialize the repository,
+     * continue the rebase, open the settings - so the notification that made the
+     * offer has nothing left to say once it is taken. Built here rather than at
+     * the call sites because {@code NotificationAction.createSimple} does not
+     * expire and nothing fails when it does not: the notification simply stays,
+     * with its link still live. On the conflict notification that meant Abort
+     * could be clicked, and then Continue, on a rebase that no longer existed.
+     */
+    public @NotNull NotificationAction action(final @NotNull String name, final @NotNull Runnable action) {
+        return NotificationAction.createSimpleExpiring(name, action);
+    }
+
     public void warnWithAction(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull String actionName, final @NotNull Runnable action) {
-        warnWithActions(p, title, message, NotificationAction.createSimple(actionName, action));
+        warnWithActions(p, title, message, action(actionName, action));
     }
 
     public void warnWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
