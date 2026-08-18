@@ -17,8 +17,6 @@ import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 
 public class UpdateTestRunStatusAction extends AbstractProjectAction {
     private final @NotNull TestinEditor editor;
@@ -46,7 +44,6 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         TestRunStatus oldStatus = marker.getStatus();
 
         marker.setStatus(newStatus);
-        marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         Logger.trace("Test run status changed: " + editor.getParent().getName() + " = " + newStatus.getLabel());
 
@@ -76,7 +73,6 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
 
         TestRunMarker marker = editor.getParent().getMarker();
         marker.setStatus(TestRunStatus.COMPLETED);
-        marker.setCreatedAt(ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         persist(editor, marker);
 
