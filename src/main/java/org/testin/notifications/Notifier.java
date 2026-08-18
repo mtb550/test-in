@@ -35,6 +35,18 @@ public final class Notifier {
     }
 
     /**
+     * The tester typed a name that is already taken.
+     * <p>
+     * One sentence for one situation, whichever action they reached it through -
+     * creating a test project, creating any node in the tree, or renaming one.
+     * It fades rather than going in the log: it is feedback on what they just
+     * typed, not a failure worth keeping beside real ones (#62).
+     */
+    public void softShowExists(final @NotNull Project p, final @NotNull String name) {
+        softShow(p, name + " Already Exists");
+    }
+
+    /**
      * Confirms an operation that ran over a selection: "Node copied" for one,
      * "Nodes copied 3" for several. Here rather than at the call sites so that
      * every bulk action pluralizes and counts the same way (#62).

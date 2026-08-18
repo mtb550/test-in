@@ -10,6 +10,7 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.explorer.ExplorerPanel;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.*;
 import org.testin.notifications.Notifier;
@@ -43,6 +44,17 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
 
             if (s.isEmpty()) return;
             final Path newDirPath = pDir.getPath().resolve(s);
+
+            // Every node created from the tree passes through here - test set,
+            // test set package, test run, test run package - so the name is
+            // checked once for all four. None of the creators checked: a test set
+            // created with a name already in use did not fail, it adopted the
+            // existing directory and every test case in it, and rewrote its
+            // marker. The tester saw "Node created" and got somebody else's set.
+            if (Services.getInstance(p, ProjectIndexer.class).nodeExists(newDirPath)) {
+                Services.getInstance(p, Notifier.class).softShowExists(p, s);
+                return;
+            }
 
             DirectoryDto dir = dt.getAction().apply(p).execute(s, pDir, newDirPath);
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();

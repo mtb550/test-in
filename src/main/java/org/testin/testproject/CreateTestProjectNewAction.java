@@ -39,11 +39,8 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
 
         final Path tpPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(tpName);
 
-        // The same situation rename already reports this way: the tester typed a
-        // name that is taken, which is feedback on what they typed rather than a
-        // failure to record in the log (#62).
         if (Services.getInstance(p, ProjectIndexer.class).projectExists(tpPath)) {
-            Services.getInstance(p, Notifier.class).softShow(p, tpName + " Already Exists");
+            Services.getInstance(p, Notifier.class).softShowExists(p, tpName);
             return;
         }
 

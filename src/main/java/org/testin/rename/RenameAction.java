@@ -70,12 +70,8 @@ public class RenameAction extends AbstractProjectTreeAction {
         // A sibling with the new name would make the VFS rename fail with
         // "already exists" - reject it with a message instead. Existence comes
         // from the indexer cache - file access is the indexer's alone.
-        //
-        // Worded exactly as creating a test project words it: one situation, one
-        // sentence, whichever action the tester reached it through. The parent is
-        // not named because they are looking at it.
         if (Services.getInstance(p, ProjectIndexer.class).nodeExists(parent.resolve(newName))) {
-            Services.getInstance(p, Notifier.class).softShow(p, newName + " Already Exists");
+            Services.getInstance(p, Notifier.class).softShowExists(p, newName);
             return;
         }
 
