@@ -21,11 +21,6 @@ public enum GenType {
             "Create Automation Test Project"
     ),
 
-    REMOVE_TEST_PROJECT(
-            "Remove Test Project",
-            "Remove Automation Test Project"
-    ),
-
     RENAME_TEST_PROJECT(
             "Rename Test Project",
             "Rename Automation Test Project"

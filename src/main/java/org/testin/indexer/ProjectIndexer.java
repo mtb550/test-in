@@ -342,10 +342,6 @@ public final class ProjectIndexer {
         store.registerTestRun(testRunPath, tr);
     }
 
-    public void removeTestProject(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        removeVf(path, () -> store.removeTestProject(path), onRemoved);
-    }
-
     public void removeTestSet(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         removeVf(path, () -> store.removeTestSet(path), onRemoved);
     }
@@ -363,8 +359,9 @@ public final class ProjectIndexer {
     }
 
     /**
-     * Removes nothing: the Test Cases and Test Runs containers go with their
-     * test project and are never deleted on their own.
+     * Removes nothing, for the node types the tree never deletes: the Test Cases
+     * and Test Runs containers, which go with their test project, and the test
+     * project itself, which is deactivated rather than deleted.
      * <p>
      * The callback still runs, and reports false. RemoveAction counts completions
      * to know when to rebuild the tree, so a node that quietly did nothing would
@@ -372,8 +369,8 @@ public final class ProjectIndexer {
      * counted as removed either, or the tester is told a node went that is still
      * in front of them.
      */
-    public void removeFixedContainer(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
-        Logger.info("Not removed: " + path.getFileName() + " belongs to its test project");
+    public void refuseRemove(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
+        Logger.info("Not removed: " + path.getFileName() + " is not removable from the tree");
         onRemoved.accept(false);
     }
 

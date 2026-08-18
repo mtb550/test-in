@@ -213,21 +213,6 @@ final class IndexerDataStore {
                 LocalFileSystem.getInstance().refreshNioFiles(List.of(dirPath), true, true, null));
     }
 
-    void removeTestProject(final @NotNull Path path) {
-        final String pathStr = path.toString();
-        testProjectsByPath.remove(pathStr);
-        testCasesMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
-        testRunsMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
-
-        removeTestSetPackagesUnder(path);
-        removeTestRunPackagesUnder(path);
-        removeTestSetsUnder(path);
-        removeTestRunsUnder(path);
-        childrenIndex.invalidate();
-
-        Logger.info("Removed test project at: " + pathStr);
-    }
-
     private void removeTestSetPackagesUnder(final @NotNull Path path) {
         testSetPackagesByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
     }

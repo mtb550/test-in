@@ -26,10 +26,7 @@ public enum DirectoryType {
             ".tp",
             p -> new NotCreatableFromTree("Test Project"),
             (p, dir) -> GenType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
-            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath(), removed -> {
-                if (removed) GenType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
-                onRemoved.accept(removed);
-            }),
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved),
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
 
@@ -40,7 +37,7 @@ public enum DirectoryType {
             ".tcd",
             p -> new NotCreatableFromTree("Test Cases directory"),
             new NoJavaCode("Test Cases directory"),
-            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeFixedContainer(dir.getPath(), onRemoved),
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved),
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
 
@@ -51,7 +48,7 @@ public enum DirectoryType {
             ".trd",
             p -> new NotCreatableFromTree("Test Runs directory"),
             new NoJavaCode("Test Runs directory"),
-            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeFixedContainer(dir.getPath(), onRemoved),
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved),
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
 
