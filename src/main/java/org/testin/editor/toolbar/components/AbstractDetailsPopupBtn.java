@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +32,7 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends Abstrac
     protected AbstractDetailsPopupBtn(final @NotNull String propertyKey,
                                       final @NotNull List<E> options,
                                       final @NotNull Function<E, String> displayName,
+                                      final @NotNull Predicate<E> defaultSelected,
                                       final @NotNull Function<String, E> parser,
                                       final @NotNull Runnable onToolBarDetailsSelectedChanged) {
         // A checked box, matching the check-box list this button opens. The
@@ -42,7 +44,9 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E>> extends Abstrac
         this.options = options;
         this.displayName = displayName;
 
-        final String defaults = options.stream().map(Enum::name).collect(Collectors.joining(","));
+        // Only when nothing is stored yet: the attributes the enum flags on, not
+        // every option. A saved selection is honoured exactly as it was saved.
+        final String defaults = options.stream().filter(defaultSelected).map(Enum::name).collect(Collectors.joining(","));
         final String saved = PropertiesComponent.getInstance().getValue(propertyKey, defaults);
 
         for (final String s : saved.split(",")) {

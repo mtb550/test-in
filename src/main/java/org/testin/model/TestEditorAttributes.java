@@ -26,7 +26,6 @@ public enum TestEditorAttributes {
     ID(
             "ID",
             "ID:",
-            true,
             false,
             false,
             false,
@@ -41,8 +40,7 @@ public enum TestEditorAttributes {
     DESCRIPTION(
             "Description",
             "Description:",
-            true,
-            true,
+            false,
             true,
             true,
             true,
@@ -54,7 +52,6 @@ public enum TestEditorAttributes {
     EXPECTED_RESULT(
             "Expected Result",
             "Expected Result:",
-            true,
             true,
             true,
             false,
@@ -69,7 +66,6 @@ public enum TestEditorAttributes {
             "Steps:",
             true,
             true,
-            true,
             false,
             true,
             (tc, p) -> String.join(", ", tc.getSteps()),
@@ -80,7 +76,6 @@ public enum TestEditorAttributes {
     PRIORITY(
             "Priority",
             "Priority:",
-            true,
             true,
             true,
             false,
@@ -99,8 +94,7 @@ public enum TestEditorAttributes {
     FQCN(
             "FQCN",
             "FQCN:",
-            true,
-            true,
+            false,
             false,
             false,
             true,
@@ -113,7 +107,6 @@ public enum TestEditorAttributes {
     REFERENCE(
             "Reference",
             "Reference:",
-            true,
             false,
             true,
             false,
@@ -126,7 +119,6 @@ public enum TestEditorAttributes {
     TEST_DATA(
             "Test Data",
             "Test Data:",
-            true,
             false,
             true,
             false,
@@ -139,7 +131,6 @@ public enum TestEditorAttributes {
     PRE_CONDITIONS(
             "Pre Conditions",
             "Pre Conditions:",
-            true,
             false,
             true,
             false,
@@ -152,7 +143,6 @@ public enum TestEditorAttributes {
     GROUP(
             "Group",
             "Group:",
-            true,
             true,
             true,
             false,
@@ -171,7 +161,6 @@ public enum TestEditorAttributes {
     PATH(
             "Path",
             "Path:",
-            true,
             false,
             false,
             false,
@@ -187,7 +176,6 @@ public enum TestEditorAttributes {
     MODULE(
             "Module",
             "Module:",
-            true,
             false,
             true,
             false,
@@ -200,7 +188,6 @@ public enum TestEditorAttributes {
     STATUS(
             "Status",
             "Status:",
-            true,
             false,
             false,
             false,
@@ -213,7 +200,6 @@ public enum TestEditorAttributes {
     CREATE_BY(
             "Created By",
             "Created By:",
-            true,
             false,
             true,
             false,
@@ -226,7 +212,6 @@ public enum TestEditorAttributes {
     UPDATE_BY(
             "Updated By",
             "Updated By:",
-            true,
             false,
             true,
             false,
@@ -239,7 +224,6 @@ public enum TestEditorAttributes {
     CREATE_AT(
             "Created At",
             "Created At:",
-            true,
             false,
             true,
             false,
@@ -252,7 +236,6 @@ public enum TestEditorAttributes {
     UPDATE_AT(
             "Updated At",
             "Updated At:",
-            true,
             false,
             true,
             false,
@@ -264,7 +247,6 @@ public enum TestEditorAttributes {
 
     private final @NotNull String name;
     private final @NotNull String name2;
-    private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
     private final boolean importable;
     private final boolean copyable;

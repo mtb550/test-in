@@ -22,27 +22,23 @@ public enum RunEditorAttributes {
     DESCRIPTION(
             "Description",
             true,
-            true,
             (item, p) -> item.requireTc().getDescription()
     ),
 
     EXPECTED_RESULT(
             "Expected Result",
             true,
-            true,
             (item, p) -> item.requireTc().getExpectedResult()
     ),
 
     STEPS(
             "Steps",
-            true,
-            true,
+            false,
             (item, p) -> String.join(", ", item.requireTc().getSteps())
     ),
 
     PRIORITY(
             "Priority",
-            true,
             true,
             (item, p) -> item.requireTc().getPriority().getName()
     ) {
@@ -55,7 +51,6 @@ public enum RunEditorAttributes {
     GROUP(
             "Group",
             true,
-            true,
             (item, p) -> item.requireTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
     ) {
         @Override
@@ -67,13 +62,11 @@ public enum RunEditorAttributes {
     ACTUAL_RESULT(
             "Actual Result",
             true,
-            true,
             (item, p) -> item.getActualResult()
     ),
 
     BUG_SEVERITY(
             "Bug Severity",
-            true,
             true,
             (item, p) -> item.getBugSeverity().getName()
     ) {
@@ -86,7 +79,6 @@ public enum RunEditorAttributes {
     BUG_PRIORITY(
             "Bug Priority",
             true,
-            true,
             (item, p) -> item.getBugPriority().getName()
     ) {
         @Override
@@ -98,35 +90,30 @@ public enum RunEditorAttributes {
     RUN_STATUS(
             "Run Status",
             true,
-            true,
             (item, p) -> item.getStatus().getDisplayText()
     ),
 
     DURATION(
             "Duration",
             true,
-            true,
             (item, p) -> Services.getInstance(p, Tools.class).getFormattedDuration(item.getDuration())
     ),
 
     EXECUTED_BY(
             "Executed By",
-            true,
-            true,
+            false,
             (item, p) -> item.getExecutedBy()
     ),
 
     EXECUTED_AT(
             "Executed At",
-            true,
-            true,
+            false,
             (item, p) -> Config.formatOrBlank(item.getExecutedAt())
     ),
 
     PATH(
             "Path",
-            true,
-            true,
+            false,
             (item, p) -> {
                 final TestCaseDto tc = Services.getInstance(p, ProjectIndexer.class).getTestCaseById(item.getId());
                 if (tc != null)
@@ -137,8 +124,7 @@ public enum RunEditorAttributes {
 
     FQCN(
             "FQCN",
-            true,
-            true,
+            false,
             (item, p) -> {
                 final TestCaseDto tc = item.requireTc();
                 return String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc));
@@ -146,7 +132,6 @@ public enum RunEditorAttributes {
     );
 
     private final @NotNull String name;
-    private final boolean standardToolBarOption;
     private final boolean defaultToolBarSelected;
     private final @NotNull ValueExtractor<TestRunItems> runValueExtractor;
 
