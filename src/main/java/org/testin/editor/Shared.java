@@ -10,7 +10,6 @@ import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editor.CardHoverAction;
 import org.testin.model.Group;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -19,9 +18,10 @@ import org.testin.util.FontSync;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseWheelEvent;
+import java.util.List;
+
 // Explicit, because java.awt.* above also offers a List and it takes no type
 // parameter - the resulting error names the wrong thing and cascades.
-import java.util.List;
 
 public class Shared {
 
@@ -41,7 +41,9 @@ public class Shared {
 
     private static final int BADGE_RADIUS = 20;
 
-    /** Room around the text, inside the pill. */
+    /**
+     * Room around the text, inside the pill.
+     */
     private static final int BADGE_PAD_V = 2;
     private static final int BADGE_PAD_H = 10;
 
@@ -117,53 +119,6 @@ public class Shared {
         return 0.2126 * bg.getRed() + 0.7152 * bg.getGreen() + 0.0722 * bg.getBlue() > 140;
     }
 
-    /**
-     * The pill: a rounded label that draws its own background and picks its own
-     * text colour. Private, because a badge is asked for by name above and never
-     * assembled by a caller - that is what keeps the look in one place.
-     */
-    private static final class Badge extends JBLabel {
-
-        private Badge(final @NotNull String text, final @NotNull Color bg) {
-            super(text);
-            setOpaque(false);
-            setBackground(bg);
-
-            final float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
-            setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
-
-            setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H));
-        }
-
-        /**
-         * Derived rather than set, because the badge is the only thing that knows
-         * what it is drawn on. White was hard-coded, which is fine on the deep
-         * reds and greys the cards started with and unreadable the moment a value
-         * takes a light colour - a yellow severity pill with white text says
-         * nothing. Computed per call rather than in the constructor because a
-         * JBColor resolves to a different value in the dark theme, and the answer
-         * has to follow it.
-         */
-        @Override
-        public Color getForeground() {
-            final Color bg = getBackground();
-            if (bg == null) return super.getForeground();
-
-            return isLight(bg) ? TEXT_ON_LIGHT : JBColor.WHITE;
-        }
-
-        @Override
-        protected void paintComponent(final Graphics g) {
-            final Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(getBackground());
-            g2.fillRoundRect(0, 0, getWidth(), getHeight(), BADGE_RADIUS, BADGE_RADIUS);
-            g2.dispose();
-
-            super.paintComponent(g);
-        }
-    }
-
     public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int x, final int y, final @Nullable String hoveredAction, final boolean isRunning) {
         final int startX = JBUI.scale(16) + x + JBUI.scale(10);
 
@@ -215,6 +170,53 @@ public class Shared {
             scaledIcon.paintIcon(c, g, x - offsetX, y - offsetY);
         } else {
             baseIcon.paintIcon(c, g, x, y);
+        }
+    }
+
+    /**
+     * The pill: a rounded label that draws its own background and picks its own
+     * text colour. Private, because a badge is asked for by name above and never
+     * assembled by a caller - that is what keeps the look in one place.
+     */
+    private static final class Badge extends JBLabel {
+
+        private Badge(final @NotNull String text, final @NotNull Color bg) {
+            super(text);
+            setOpaque(false);
+            setBackground(bg);
+
+            final float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
+            setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
+
+            setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H));
+        }
+
+        /**
+         * Derived rather than set, because the badge is the only thing that knows
+         * what it is drawn on. White was hard-coded, which is fine on the deep
+         * reds and greys the cards started with and unreadable the moment a value
+         * takes a light colour - a yellow severity pill with white text says
+         * nothing. Computed per call rather than in the constructor because a
+         * JBColor resolves to a different value in the dark theme, and the answer
+         * has to follow it.
+         */
+        @Override
+        public Color getForeground() {
+            final Color bg = getBackground();
+            if (bg == null) return super.getForeground();
+
+            return isLight(bg) ? TEXT_ON_LIGHT : JBColor.WHITE;
+        }
+
+        @Override
+        protected void paintComponent(final Graphics g) {
+            final Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), BADGE_RADIUS, BADGE_RADIUS);
+            g2.dispose();
+
+            super.paintComponent(g);
         }
     }
 

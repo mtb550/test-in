@@ -1,13 +1,11 @@
 package org.testin.model;
 
-import org.testin.model.BugPriority;
-import org.testin.model.BugSeverity;
-import org.testin.model.TestStatus;
 import org.testng.annotations.Test;
 
 import java.util.UUID;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 
 /**
  * Recording a verdict on a run item.
@@ -104,6 +102,6 @@ public class TestRunVerdictTest {
         assertEquals(item.getBugSeverity(), BugSeverity.MAJOR);
         assertEquals(item.getBugPriority(), BugPriority.HIGH);
         assertEquals(item.getActualResult(), "NPE on the login button");
-        assertEquals(item.getStacktrace().isEmpty(), false);
+        assertFalse(item.getStacktrace().isEmpty());
     }
 }

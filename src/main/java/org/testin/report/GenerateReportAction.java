@@ -28,7 +28,6 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Shortcuts;
 
-import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.file.Files;

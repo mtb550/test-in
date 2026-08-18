@@ -19,8 +19,6 @@ public class TestRunPackageDirectoryDto extends DirectoryDto {
     private TestRunPackageMarker marker = new TestRunPackageMarker();
 
 
-
-
     @Override
     public @NotNull String getMarkerFileName() {
         return DirectoryType.TRP.getMarker();

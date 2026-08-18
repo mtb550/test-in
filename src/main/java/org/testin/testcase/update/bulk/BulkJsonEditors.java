@@ -6,12 +6,12 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.editor.*;
 import com.intellij.openapi.editor.actionSystem.EditorActionManager;
 import com.intellij.openapi.editor.colors.EditorColors;
 import com.intellij.openapi.editor.event.*;
 import com.intellij.openapi.editor.markup.*;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Disposer;
 import com.intellij.openapi.util.TextRange;
@@ -101,6 +101,21 @@ final class BulkJsonEditors implements DialogComponent {
         installDiffHighlighting();
         installScrollSync();
         installMultiCaretClick();
+    }
+
+    private static void register(final @NotNull Runnable body, final @NotNull KeyStroke keyStroke,
+                                 final @NotNull JComponent target) {
+        new DumbAwareAction() {
+            @Override
+            public void actionPerformed(final @NotNull AnActionEvent e) {
+                body.run();
+            }
+
+            @Override
+            public @NotNull ActionUpdateThread getActionUpdateThread() {
+                return ActionUpdateThread.EDT;
+            }
+        }.registerCustomShortcutSet(new CustomShortcutSet(keyStroke), target);
     }
 
     /**
@@ -215,6 +230,10 @@ final class BulkJsonEditors implements DialogComponent {
         refreshRowHighlights();
     }
 
+    // ------------------------------------------------------------------
+    // Behavior installed once, in the constructor.
+    // ------------------------------------------------------------------
+
     /**
      * Releases both editors. The platform does not reclaim them with the popup,
      * so the dialog calls this when it closes.
@@ -224,10 +243,6 @@ final class BulkJsonEditors implements DialogComponent {
         if (!leftEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(leftEditor);
         if (!rightEditor.isDisposed()) EditorFactory.getInstance().releaseEditor(rightEditor);
     }
-
-    // ------------------------------------------------------------------
-    // Behavior installed once, in the constructor.
-    // ------------------------------------------------------------------
 
     /**
      * A caret that lands on the JSON around a value is pulled to the nearest
@@ -369,13 +384,13 @@ final class BulkJsonEditors implements DialogComponent {
         return -1;
     }
 
-    private @NotNull List<RangeMarker> liveMarkers() {
-        return markers.stream().filter(RangeMarker::isValid).toList();
-    }
-
     // ------------------------------------------------------------------
     // DialogComponent.
     // ------------------------------------------------------------------
+
+    private @NotNull List<RangeMarker> liveMarkers() {
+        return markers.stream().filter(RangeMarker::isValid).toList();
+    }
 
     @Override
     public @NotNull JComponent getPanel() {
@@ -430,21 +445,6 @@ final class BulkJsonEditors implements DialogComponent {
                 register(action, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK), target);
             }
         }
-    }
-
-    private static void register(final @NotNull Runnable body, final @NotNull KeyStroke keyStroke,
-                                 final @NotNull JComponent target) {
-        new DumbAwareAction() {
-            @Override
-            public void actionPerformed(final @NotNull AnActionEvent e) {
-                body.run();
-            }
-
-            @Override
-            public @NotNull ActionUpdateThread getActionUpdateThread() {
-                return ActionUpdateThread.EDT;
-            }
-        }.registerCustomShortcutSet(new CustomShortcutSet(keyStroke), target);
     }
 
     /**

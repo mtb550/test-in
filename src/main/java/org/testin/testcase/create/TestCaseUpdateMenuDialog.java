@@ -1,8 +1,8 @@
 package org.testin.testcase.create;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import com.intellij.openapi.application.ApplicationManager;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
 import org.testin.logger.Logger;

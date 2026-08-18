@@ -278,7 +278,7 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private void transfer(final int action, final @NotNull List<DirectoryDto> sources,
-                             final @NotNull DirectoryDto target) {
+                          final @NotNull DirectoryDto target) {
         if (action == MOVE) {
             moveNodes(sources, target);
         } else {

@@ -13,6 +13,16 @@ import static org.testng.Assert.assertTrue;
 
 public class PageWindowTest {
 
+    private static @NotNull List<TestCaseDto> casesOf(final int count) {
+        final List<TestCaseDto> cases = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            final TestCaseDto tc = new TestCaseDto();
+            tc.setId(UUID.randomUUID());
+            cases.add(tc);
+        }
+        return cases;
+    }
+
     @Test
     public void calculatesMiddlePageBounds() {
         final PageWindow page = PageWindow.of(125, 2, 50);
@@ -76,15 +86,5 @@ public class PageWindowTest {
         final List<TestCaseDto> cases = casesOf(3);
 
         assertEquals(PageWindow.pageContaining(cases.get(2).getId(), cases, 0), 3);
-    }
-
-    private static @NotNull List<TestCaseDto> casesOf(final int count) {
-        final List<TestCaseDto> cases = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            final TestCaseDto tc = new TestCaseDto();
-            tc.setId(UUID.randomUUID());
-            cases.add(tc);
-        }
-        return cases;
     }
 }

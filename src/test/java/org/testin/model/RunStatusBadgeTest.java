@@ -2,9 +2,7 @@ package org.testin.model;
 
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.*;
 
 /**
  * A run status either draws a badge or it does not (#48).
@@ -30,7 +28,7 @@ public class RunStatusBadgeTest {
             final RunStatus.Badge badge = status.getBadge();
             assertNotNull(badge, status + " should draw a badge");
             assertNotNull(badge.color(), status + " has a label, so it has a color to draw it in");
-            assertEquals(badge.label().isBlank(), false, status + " has a visible label");
+            assertFalse(badge.label().isBlank(), status + " has a visible label");
         }
     }
 
@@ -45,7 +43,7 @@ public class RunStatusBadgeTest {
     public void everyStatusHasAnIconAndTooltip() {
         for (final RunStatus status : RunStatus.values()) {
             assertNotNull(status.getIcon(), status + " needs an icon for the gutter");
-            assertEquals(status.getTooltip().isBlank(), false, status + " needs a tooltip");
+            assertFalse(status.getTooltip().isBlank(), status + " needs a tooltip");
         }
     }
 }

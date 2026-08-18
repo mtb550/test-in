@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     public GroupBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                   final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
+                                  final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
 

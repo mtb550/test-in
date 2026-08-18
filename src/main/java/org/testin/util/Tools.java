@@ -72,6 +72,30 @@ public final class Tools {
         return key.equals(KeyStroke.getKeyStrokeForEvent(e));
     }
 
+    /**
+     * A value as the details panel shows it: capitalized, and ended with a full
+     * stop unless it already ends in something that closes it (#22).
+     * <p>
+     * Display only. The stored JSON is always what the tester typed - the
+     * editable surfaces load the raw value, never this.
+     */
+    @NotNull
+    public static String format(final @Nullable String text) {
+        if (StringUtil.isEmptyOrSpaces(text)) return "";
+
+        final String s = text.trim();
+        return StringUtil.capitalize(s) + (endsClosed(s) ? "" : ".");
+    }
+
+    /**
+     * True when a full stop would be wrong: the text already ends in
+     * punctuation, or in a character that means it is not a sentence - a URL or
+     * a path ending in '/', a parenthesized note, a code snippet.
+     */
+    private static boolean endsClosed(final @NotNull String s) {
+        return ".!?:;/)".indexOf(s.charAt(s.length() - 1)) >= 0;
+    }
+
     public @NotNull String sanitizePackageName(final @NotNull String s) {
         return nameSanitizer.packageName(s);
     }
@@ -101,30 +125,6 @@ public final class Tools {
         }
 
         return null;
-    }
-
-    /**
-     * A value as the details panel shows it: capitalized, and ended with a full
-     * stop unless it already ends in something that closes it (#22).
-     * <p>
-     * Display only. The stored JSON is always what the tester typed - the
-     * editable surfaces load the raw value, never this.
-     */
-    @NotNull
-    public static String format(final @Nullable String text) {
-        if (StringUtil.isEmptyOrSpaces(text)) return "";
-
-        final String s = text.trim();
-        return StringUtil.capitalize(s) + (endsClosed(s) ? "" : ".");
-    }
-
-    /**
-     * True when a full stop would be wrong: the text already ends in
-     * punctuation, or in a character that means it is not a sentence - a URL or
-     * a path ending in '/', a parenthesized note, a code snippet.
-     */
-    private static boolean endsClosed(final @NotNull String s) {
-        return ".!?:;/)".indexOf(s.charAt(s.length() - 1)) >= 0;
     }
 
     /**

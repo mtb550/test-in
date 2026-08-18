@@ -8,9 +8,6 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.model.BugPriority;
-import org.testin.model.BugSeverity;
-import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 
 import java.time.Duration;

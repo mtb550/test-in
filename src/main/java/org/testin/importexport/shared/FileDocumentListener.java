@@ -16,8 +16,8 @@ import javax.swing.event.DocumentListener;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 public class FileDocumentListener implements DocumentListener {
     private final @NotNull TextFieldWithBrowseButton fileField;

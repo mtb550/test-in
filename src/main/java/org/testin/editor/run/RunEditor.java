@@ -14,13 +14,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.EscapeAction;
-import org.testin.editor.EditorCenter;
-import org.testin.editor.EditorFilters;
-import org.testin.editor.PageWindow;
-import org.testin.editor.TestCaseFilter;
-import org.testin.editor.TestinEditor;
-import org.testin.editor.UnifiedVirtualFile;
-import org.testin.editor.ViewMode;
+import org.testin.editor.*;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.list.ListPanelBuilder;
 import org.testin.editor.list.ListView;
@@ -486,7 +480,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }
     }
-
 
 
     @Override

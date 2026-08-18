@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenType;
 import org.testin.editor.Shared;
 import org.testin.importexport.imports.ImportSetter;
-import org.testin.model.Config;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;

@@ -20,11 +20,7 @@ import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Shortcuts;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class RemoveTestCaseAction extends AbstractProjectAction {
     private final @NotNull DirectoryDto dir;

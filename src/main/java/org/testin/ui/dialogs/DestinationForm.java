@@ -31,21 +31,12 @@ import java.util.Arrays;
  */
 public final class DestinationForm implements DialogComponent {
 
-    /**
-     * A resolved destination. Only produced when every field is filled, so the
-     * caller never has to re-check them.
-     */
-    public record Destination(@NotNull File file, @NotNull FileTypes format) {
-    }
-
     private final @NotNull Project p;
     private final @NotNull FormRows rows;
-
     private final @NotNull TextFieldWithBrowseButton folderField = new TextFieldWithBrowseButton();
     private final @NotNull JBTextField fileNameField = new JBTextField(30);
     private final @NotNull ComboBox<FileTypes> formatCombo;
     private final @NotNull JBCheckBox setDefaultCheckBox = new JBCheckBox("Set as default folder");
-
     /**
      * Whether the remember-this-folder checkbox is offered, decided once.
      * Drawing the row and writing the setting used to derive it separately, so
@@ -79,6 +70,28 @@ public final class DestinationForm implements DialogComponent {
         folderField.setText(defaultFolder());
 
         rows = buildRows();
+    }
+
+    /**
+     * The name with the chosen format's extension on it.
+     * <p>
+     * Only a tail that is itself a known extension is replaced. Cutting at the
+     * last dot regardless turned "Sprint 1.2 Report" into "Sprint 1.pdf" - the
+     * file was written, under a name the tester did not choose.
+     */
+    // Package-private rather than private so the naming rule can be tested
+    // without a Project and a Swing form behind it.
+    static @NotNull String withExtension(final @NotNull String fileName, final @NotNull String extension) {
+        if (fileName.endsWith(extension)) return fileName;
+
+        final int dot = fileName.lastIndexOf('.');
+        if (dot < 0) return fileName + extension;
+
+        final String tail = fileName.substring(dot);
+        final boolean tailIsAnExtension = Arrays.stream(FileTypes.values())
+                .anyMatch(type -> type.getExtension().equalsIgnoreCase(tail));
+
+        return tailIsAnExtension ? fileName.substring(0, dot) + extension : fileName + extension;
     }
 
     private @NotNull FormRows buildRows() {
@@ -123,28 +136,6 @@ public final class DestinationForm implements DialogComponent {
         return new Destination(new File(folder, withExtension(fileName, format.getExtension())), format);
     }
 
-    /**
-     * The name with the chosen format's extension on it.
-     * <p>
-     * Only a tail that is itself a known extension is replaced. Cutting at the
-     * last dot regardless turned "Sprint 1.2 Report" into "Sprint 1.pdf" - the
-     * file was written, under a name the tester did not choose.
-     */
-    // Package-private rather than private so the naming rule can be tested
-    // without a Project and a Swing form behind it.
-    static @NotNull String withExtension(final @NotNull String fileName, final @NotNull String extension) {
-        if (fileName.endsWith(extension)) return fileName;
-
-        final int dot = fileName.lastIndexOf('.');
-        if (dot < 0) return fileName + extension;
-
-        final String tail = fileName.substring(dot);
-        final boolean tailIsAnExtension = Arrays.stream(FileTypes.values())
-                .anyMatch(type -> type.getExtension().equalsIgnoreCase(tail));
-
-        return tailIsAnExtension ? fileName.substring(0, dot) + extension : fileName + extension;
-    }
-
     private @NotNull String defaultFolder() {
         return Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder;
     }
@@ -162,5 +153,12 @@ public final class DestinationForm implements DialogComponent {
     @Override
     public void onSubmitRequest(final @NotNull Runnable submit) {
         // The dialog confirms by its Export button, not by Enter in a field.
+    }
+
+    /**
+     * A resolved destination. Only produced when every field is filled, so the
+     * caller never has to re-check them.
+     */
+    public record Destination(@NotNull File file, @NotNull FileTypes format) {
     }
 }

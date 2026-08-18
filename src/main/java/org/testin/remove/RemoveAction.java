@@ -20,9 +20,9 @@ import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.EditorUtil;
 
 import javax.swing.tree.TreePath;
-import java.util.function.Consumer;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static org.testin.util.Shortcuts.DeletePackage;
 

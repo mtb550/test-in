@@ -244,7 +244,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     if (abort) {
                         if (!git.abortRebase(repoPath)) throw new IllegalStateException("Could not abort the rebase.");
                     } else {
-                        if (!git.continueRebase(repoPath)) throw new IllegalStateException("Could not continue the rebase.");
+                        if (!git.continueRebase(repoPath))
+                            throw new IllegalStateException("Could not continue the rebase.");
                         commits.push(repoPath, remote, branch);
                     }
                     ApplicationManager.getApplication().invokeLater(() ->

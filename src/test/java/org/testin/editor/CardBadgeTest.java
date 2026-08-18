@@ -4,16 +4,14 @@ import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testng.annotations.Test;
 
-import javax.swing.JComponent;
-import java.awt.Color;
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * The two rules a badge cannot be allowed to break silently (#79).

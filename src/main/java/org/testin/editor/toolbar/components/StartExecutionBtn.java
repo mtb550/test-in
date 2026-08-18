@@ -17,14 +17,6 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
         addActionListener(e -> onStartExecutionClicked.run());
     }
 
-
-    public void updateEnabledState() {
-        if (!(callbacks instanceof RunEditor editor)) return;
-
-        setEnabled(editor.canStartExecution());
-        setToolTipText(tooltipFor(editor));
-    }
-
     private static @NotNull String tooltipFor(final @NotNull RunEditor editor) {
         if (editor.isExecuting()) return "Execution in progress";
 
@@ -32,5 +24,12 @@ public class StartExecutionBtn extends AbstractButton implements ToolbarItem {
         return status.isTerminal()
                 ? "Execution disabled — run status is " + status.getLabel()
                 : "Start Execution";
+    }
+
+    public void updateEnabledState() {
+        if (!(callbacks instanceof RunEditor editor)) return;
+
+        setEnabled(editor.canStartExecution());
+        setToolTipText(tooltipFor(editor));
     }
 }

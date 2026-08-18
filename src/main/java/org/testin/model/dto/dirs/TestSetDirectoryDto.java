@@ -19,8 +19,6 @@ public class TestSetDirectoryDto extends DirectoryDto {
     private TestSetMarker marker = new TestSetMarker();
 
 
-
-
     @Override
     public boolean isTestCaseContainer() {
         return true;

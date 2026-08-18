@@ -34,6 +34,14 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
     public @NotNull String testerName = "";
     public @NotNull String testerRole = "";
 
+    private static @NotNull String orEmpty(final @Nullable String value) {
+        return value != null ? value : "";
+    }
+
+    private static @NotNull String orDefault(final @Nullable String value, final @NotNull String fallback) {
+        return value != null && !value.isBlank() ? value : fallback;
+    }
+
     @Override
     public @NotNull AppSettingsState getState() {
         return this;
@@ -52,13 +60,5 @@ public final class AppSettingsState implements PersistentStateComponent<AppSetti
         defaultDownloadFolder = orEmpty(defaultDownloadFolder);
         testerName = orEmpty(testerName);
         testerRole = orEmpty(testerRole);
-    }
-
-    private static @NotNull String orEmpty(final @Nullable String value) {
-        return value != null ? value : "";
-    }
-
-    private static @NotNull String orDefault(final @Nullable String value, final @NotNull String fallback) {
-        return value != null && !value.isBlank() ? value : fallback;
     }
 }

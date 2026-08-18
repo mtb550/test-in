@@ -4,12 +4,11 @@ import com.intellij.openapi.actionSystem.CustomShortcutSet;
 import com.intellij.openapi.actionSystem.Shortcut;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.intellij.lang.annotations.MagicConstant;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
-import org.intellij.lang.annotations.MagicConstant;
-
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 

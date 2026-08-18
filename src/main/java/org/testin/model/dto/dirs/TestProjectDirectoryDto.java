@@ -31,8 +31,6 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     private TestProjectMarker marker = new TestProjectMarker();
 
 
-
-
     @Override
     public @NotNull String getMarkerFileName() {
         return DirectoryType.TP.getMarker();

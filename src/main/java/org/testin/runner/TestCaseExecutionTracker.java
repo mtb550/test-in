@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunStatus;
-import org.testin.runner.TestCaseExecutionListener;
 
 public class TestCaseExecutionTracker {
 

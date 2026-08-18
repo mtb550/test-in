@@ -19,18 +19,20 @@ import java.util.concurrent.TimeUnit;
 public final class LoggerService implements Disposable {
 
     private static final long MAX_LOG_SIZE = 5L * 1024 * 1024;
-
+    /**
+     * Not a log line. The queue holds Object so this can be one: a String
+     * sentinel would have to be identity-compared against text a tester could
+     * legitimately write.
+     */
+    private static final Object SHUTDOWN = new Object();
     private final BlockingQueue<Object> logQueue = new ArrayBlockingQueue<>(10000);
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-
     // The IDE's log directory - beside idea.log, so Help -> Show Log in
     // Explorer finds it and Collect Logs and Diagnostic Data bundles it.
     // Resolved once; the location never depends on any open project.
     private final Path logFile = Path.of(PathManager.getLogPath(), "testin.log");
-
     private volatile boolean isRunning = true;
     private volatile Level currentLogLevel = Level.DISABLED;
-
     private Thread writerThread;
 
     public LoggerService() {
@@ -40,13 +42,6 @@ public final class LoggerService implements Disposable {
     public void setLogLevel(final @NotNull Level level) {
         this.currentLogLevel = level;
     }
-
-    /**
-     * Not a log line. The queue holds Object so this can be one: a String
-     * sentinel would have to be identity-compared against text a tester could
-     * legitimately write.
-     */
-    private static final Object SHUTDOWN = new Object();
 
     private void startWriterThread() {
         writerThread = new Thread(this::writeLoop, "Testin-Async-Logger");

@@ -2,14 +2,11 @@ package org.testin.model;
 
 import org.testng.annotations.Test;
 
-import javax.swing.KeyStroke;
-
+import javax.swing.*;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.*;
 
 /**
  * Which statuses a tester may choose, and which the plugin sets for itself.

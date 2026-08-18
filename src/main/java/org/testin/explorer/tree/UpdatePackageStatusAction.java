@@ -33,6 +33,10 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
         this.status = status;
     }
 
+    private static @Nullable PackageMarker markerOf(final @Nullable DirectoryDto dir) {
+        return dir != null && dir.getMarker() instanceof PackageMarker marker ? marker : null;
+    }
+
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
         final DirectoryDto dir = TreeValueUtil.singleSelectedDirectory(tree);
@@ -61,10 +65,6 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
 
         e.getPresentation().setVisible(marker != null);
         e.getPresentation().setEnabled(marker != null && marker.getStatus() != status);
-    }
-
-    private static @Nullable PackageMarker markerOf(final @Nullable DirectoryDto dir) {
-        return dir != null && dir.getMarker() instanceof PackageMarker marker ? marker : null;
     }
 
     @Override

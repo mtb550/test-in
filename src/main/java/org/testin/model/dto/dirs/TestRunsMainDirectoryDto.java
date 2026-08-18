@@ -18,8 +18,6 @@ public class TestRunsMainDirectoryDto extends DirectoryDto {
     private TestRunsMainDirectoryMarker marker = new TestRunsMainDirectoryMarker();
 
 
-
-
     @Override
     public boolean isRenamable() {
         return false;

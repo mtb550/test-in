@@ -21,6 +21,14 @@ import static org.testng.Assert.*;
  */
 public class SettingsTest {
 
+    private static AppSettingsState state(final String rootPath, final String testerName, final String testerRole) {
+        final AppSettingsState settings = new AppSettingsState();
+        settings.rootTestinPath = rootPath;
+        settings.testerName = testerName;
+        settings.testerRole = testerRole;
+        return settings;
+    }
+
     /**
      * What actually makes a setting the same in every open project: one
      * application-level service over one file. Not the scope of
@@ -47,14 +55,6 @@ public class SettingsTest {
                 "renaming the storage file loses every existing tester's settings");
         assertEquals(state.name(), "testin.settings.AppSettingsState",
                 "renaming the state loses every existing tester's settings");
-    }
-
-    private static AppSettingsState state(final String rootPath, final String testerName, final String testerRole) {
-        final AppSettingsState settings = new AppSettingsState();
-        settings.rootTestinPath = rootPath;
-        settings.testerName = testerName;
-        settings.testerRole = testerRole;
-        return settings;
     }
 
     // ---------------------------------------------------------------- root path

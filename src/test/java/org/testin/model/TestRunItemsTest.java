@@ -5,11 +5,7 @@ import org.testng.annotations.Test;
 
 import java.util.UUID;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.expectThrows;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * The two contracts {@code tc} serves (#48).

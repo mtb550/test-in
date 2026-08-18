@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.util.FontSync;
-import org.testin.view.ViewTab;
 import org.testin.view.bugs.OpenBugsTab;
 import org.testin.view.details.DetailsTab;
 import org.testin.view.history.HistoryTab;

@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public class ModuleBulkSectionDialog extends JsonSplitBulkSectionDialog {
 
     public ModuleBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                    final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
+                                   final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
 

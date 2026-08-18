@@ -5,8 +5,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
-import org.testin.actions.AbstractProjectAction;
 import org.jetbrains.annotations.NotNull;
+import org.testin.actions.AbstractProjectAction;
 
 public class OpenSettingsAction extends AbstractProjectAction {
 

@@ -52,9 +52,6 @@ public enum RunStatus {
      */
     private final @Nullable Badge badge;
 
-    public record Badge(@NotNull String label, @NotNull JBColor color) {}
-
-
     /**
      * Runs the test case. The list is the component the run action binds its
      * shortcut to and is null when there is none — the details panel runs a
@@ -63,5 +60,8 @@ public enum RunStatus {
     public void executeAction(final @NotNull Project p, final @NotNull TestCaseDto dto,
                               final @Nullable JBList<TestCaseDto> list) {
         new RunTestCaseAction(p, list).execute(dto);
+    }
+
+    public record Badge(@NotNull String label, @NotNull JBColor color) {
     }
 }

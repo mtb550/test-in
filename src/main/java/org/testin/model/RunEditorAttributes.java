@@ -6,7 +6,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.Shared;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;

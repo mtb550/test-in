@@ -19,7 +19,6 @@ public class TestRunDirectoryDto extends DirectoryDto {
     private TestRunMarker marker = new TestRunMarker();
 
 
-
     @Override
     public boolean isOpenableInEditor() {
         return true;

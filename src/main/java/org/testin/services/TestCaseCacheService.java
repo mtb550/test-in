@@ -25,6 +25,19 @@ public final class TestCaseCacheService implements Disposable {
     private final @NotNull Set<String> steps = ConcurrentHashMap.newKeySet();
     private final @NotNull AtomicBoolean reloadScheduled = new AtomicBoolean();
 
+    private static void addTo(final @NotNull Set<String> target, final @Nullable String value) {
+        if (value != null && !value.isBlank()) target.add(value.trim());
+    }
+
+    /**
+     * Swaps a rebuilt set into a live one in as few operations as possible:
+     * everything new first, then only what is genuinely gone.
+     */
+    private static void replace(final @NotNull Set<String> live, final @NotNull Set<String> rebuilt) {
+        live.addAll(rebuilt);
+        live.retainAll(rebuilt);
+    }
+
     public @NotNull Set<String> getDescription() {
         return Collections.unmodifiableSet(descriptions);
     }
@@ -114,19 +127,6 @@ public final class TestCaseCacheService implements Disposable {
     private void cacheAsync(final @Nullable List<TestCaseDto> testCases) {
         if (testCases == null || testCases.isEmpty()) return;
         ApplicationManager.getApplication().executeOnPooledThread(() -> testCases.forEach(this::cache));
-    }
-
-    private static void addTo(final @NotNull Set<String> target, final @Nullable String value) {
-        if (value != null && !value.isBlank()) target.add(value.trim());
-    }
-
-    /**
-     * Swaps a rebuilt set into a live one in as few operations as possible:
-     * everything new first, then only what is genuinely gone.
-     */
-    private static void replace(final @NotNull Set<String> live, final @NotNull Set<String> rebuilt) {
-        live.addAll(rebuilt);
-        live.retainAll(rebuilt);
     }
 
     private void cache(final @NotNull TestCaseDto tc) {

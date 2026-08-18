@@ -23,14 +23,6 @@ import java.util.List;
 public class CreateTestMethod implements GenAction {
 
     /**
-     * The pieces of a fully qualified method name: everything before the method
-     * for the file path, the package segments, the class, and the method.
-     */
-    record Target(@NotNull String path, @NotNull List<String> packageList,
-                  @NotNull String className, @NotNull String methodName) {
-    }
-
-    /**
      * Splits an FQCN list into the parts the generator needs, or null when there
      * is no class and method to split into.
      * <p>
@@ -238,5 +230,13 @@ public class CreateTestMethod implements GenAction {
         } catch (final Exception ex) {
             Logger.error("injectMethod failed for '" + methodName + "': " + ex.getMessage());
         }
+    }
+
+    /**
+     * The pieces of a fully qualified method name: everything before the method
+     * for the file path, the package segments, the class, and the method.
+     */
+    record Target(@NotNull String path, @NotNull List<String> packageList,
+                  @NotNull String className, @NotNull String methodName) {
     }
 }
