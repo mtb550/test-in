@@ -57,6 +57,10 @@ public class RunTestSetAction extends AbstractProjectTreeAction {
                 Logger.info("fqcn: " + fqcn);
                 Services.getInstance(p, TestNGRunnerByClass.class).runTestClass(p, fqcn);
 
+                // The same word Run Test Case uses, for the same reason: the run
+                // starts elsewhere and the tree gives no sign it was heard (#62).
+                Services.getInstance(p, Notifier.class).softShow(p, "Running");
+
             } else
                 Services.getInstance(p, Notifier.class).error(p, "Run Failed", "Could not parse class name from file path: " + ts.getPath().toFile().getName());
 

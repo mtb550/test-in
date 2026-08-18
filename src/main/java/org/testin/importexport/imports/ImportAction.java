@@ -88,7 +88,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                 if (generateCode) generateTestMethods(p, flatList, ts.getName());
 
                 Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts);
-                Services.getInstance(p, Notifier.class).info(p, "Import Complete", "Successfully imported " + flatList.size() + " test cases.");
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "imported", flatList.size());
 
             } else {
                 int totalImported = 0;
@@ -110,7 +110,9 @@ public class ImportAction extends AbstractProjectTreeAction {
 
                     totalImported += sheetCases.size();
                 }
-                Services.getInstance(p, Notifier.class).info(p, "Import Complete", "Successfully imported " + totalImported + " test cases into separate Test Sets.");
+                // Same wording as the single-test-set branch above: the tester
+                // chose which shape to import into, so the count is the news (#62).
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "imported", totalImported);
             }
 
             // Asynchronous refresh: a synchronous recursive VFS refresh inside a

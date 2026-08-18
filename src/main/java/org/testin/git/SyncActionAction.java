@@ -135,7 +135,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     }
                     refreshRepository(repoPath);
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).info(p, "Git Conflict Resolution", "Rebase aborted."));
+                            Services.getInstance(p, Notifier.class).info(p, "Rebase aborted", "The pull was rolled back"));
                     return;
                 }
 
@@ -151,7 +151,10 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     private void refreshAfterSync(final @NotNull Path repoPath) {
         refreshRepository(repoPath);
         ApplicationManager.getApplication().invokeLater(() -> {
-            Services.getInstance(p, Notifier.class).info(p, "Sync Successful", "Your project is now up to date with the remote repository.");
+            // A real notification, not a soft balloon: a sync runs in the
+            // background and can finish while the tester is in another window,
+            // so it has to survive in the log rather than fade (#62).
+            Services.getInstance(p, Notifier.class).info(p, "Synced", "Up to date with the remote");
             pp.getProjectTree().refresh();
         });
     }

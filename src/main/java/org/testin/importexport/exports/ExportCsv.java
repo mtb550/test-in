@@ -51,7 +51,7 @@ public class ExportCsv {
         }
 
         ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(p, Notifier.class).infoWithActions(p, "Export Complete", "Exported to: " + destFile.getName(),
+                Services.getInstance(p, Notifier.class).infoWithActions(p, "Exported", destFile.getName(),
                         NotificationAction.createSimple("Open file", () -> {
                             final VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
                             Services.getInstance(p, Tools.class).openWithAssociatedProgram(p, vf);

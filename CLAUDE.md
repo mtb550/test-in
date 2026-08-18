@@ -109,6 +109,15 @@ be committed back into storage.
   not happened. Put the call after the work, inside whatever `try` could fail.
   Actions that only move the view — paging, escape, opening a details panel —
   stay silent, or the tester learns to ignore all of them (#62).
+  <p>
+  **Which kind: can it finish while the tester is not looking?** `softShow` is a
+  balloon on the status bar that fades and leaves no trace; `info` is a real IDE
+  notification that stays in the Notifications log. Work that happens under the
+  tester's hand takes the balloon — that is almost everything. Work that runs in
+  the background and completes on its own time takes `info`, so a sync or a push
+  that lands while they are reading a bug report is still there afterwards. Those
+  keep a short title and one line of detail — `Synced` / "Up to date with the
+  remote" — never a sentence and never an exclamation mark.
 - **American English**, in comments and in text a tester reads. The platform API
   this is written against is American (`Color`, `EditorColors`, `normalize`), so
   British spellings put two dialects in one sentence — a comment about "the caret

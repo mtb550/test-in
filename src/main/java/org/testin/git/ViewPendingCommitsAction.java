@@ -89,7 +89,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private void reviewChanges(final @NotNull Project p, final @NotNull Path path,
                                final @NotNull List<TestCaseDiff> changes) {
         if (changes.isEmpty()) {
-            Services.getInstance(p, Notifier.class).info(p, "No Changes", "Your test cases are up to date in this project.");
+            Services.getInstance(p, Notifier.class).softShow(p, "No changes");
             return;
         }
 
@@ -156,7 +156,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 indicator -> {
                     commits.initialize(repoPath);
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).info(p, "Git Initialized", "Successfully initialized Git in:\n" + repoPath.getFileName()));
+                            Services.getInstance(p, Notifier.class).softShow(p, "Git initialized"));
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage()));
     }
@@ -215,7 +215,9 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                             pushNotification.expire();
                             pushNotification = null;
                         }
-                        Services.getInstance(p, Notifier.class).info(p, "Push Successful", "Test cases were successfully pushed to the remote repository!");
+                        // In the log for the same reason the sync is: the push
+                        // finishes on its own time, not under the tester's hand.
+                        Services.getInstance(p, Notifier.class).info(p, "Pushed", "Test cases are on the remote");
                     });
                 },
                 ex -> {
@@ -249,7 +251,9 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                         commits.push(repoPath, remote, branch);
                     }
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).info(p, "Git Conflict Resolution", abort ? "Rebase aborted." : "Rebase continued and changes were pushed."));
+                            Services.getInstance(p, Notifier.class).info(p,
+                                    abort ? "Rebase aborted" : "Rebase continued",
+                                    abort ? "Nothing was pushed" : "Changes pushed to the remote"));
                 },
                 ex -> {
                     if (git.hasConflicts(repoPath)) showConflictActions(repoPath, remote, branch);
@@ -280,7 +284,9 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     indicator -> {
                         commits.configureIdentity(repoPath, name.trim(), email.trim(), setGlobally);
                         ApplicationManager.getApplication().invokeLater(() -> {
-                            Services.getInstance(p, Notifier.class).info(p, "Git Identity Set", "Identity configured successfully. Resuming commit..");
+                            // The tester is watching: they just filled the dialog
+                            // in and the commit resumes on the next line.
+                            Services.getInstance(p, Notifier.class).softShow(p, "Identity set");
                             performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges);
                         });
                     },

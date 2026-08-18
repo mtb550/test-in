@@ -44,7 +44,7 @@ public class ExportHtml {
 
         ApplicationManager.getApplication().invokeLater(() ->
                 Services.getInstance(p, Notifier.class)
-                        .infoWithActions(p, "Export Complete", "Exported to: " + destFile.getName(), NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
+                        .infoWithActions(p, "Exported", destFile.getName(), NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
     }
 
     private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project p,
