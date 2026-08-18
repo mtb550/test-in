@@ -212,11 +212,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 final List<TestCaseDto> loadedItems = new ArrayList<>();
                 if (run != null) {
                     for (final TestRunItems item : run.getResults()) {
-                        final TestCaseDto testCase = indexer.getTestCaseById(item.getId());
-                        if (testCase == null) {
-                            Logger.warn("Test run references missing test case id=" + item.getId());
-                            continue;
-                        }
+                        final TestCaseDto indexed = indexer.getTestCaseById(item.getId());
+
+                        // A case deleted since the run leaves its result behind, and
+                        // the result is what the run is a record of. The row stays,
+                        // as an orphan that says so.
+                        if (indexed == null) Logger.warn("Test run references a deleted test case id=" + item.getId());
+
+                        final TestCaseDto testCase = indexed != null ? indexed : TestCaseDto.deleted(item.getId());
+
                         loadedItems.add(testCase);
                         final TestRunItems runItem = resultsMap.get(item.getId());
                         if (runItem != null) runItem.setTc(testCase);

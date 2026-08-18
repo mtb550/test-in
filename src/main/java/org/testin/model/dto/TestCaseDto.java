@@ -112,6 +112,26 @@ public final class TestCaseDto {
     private volatile String tempError = "";
 
     /**
+     * The stand-in for a case a run refers to and the index no longer has.
+     * <p>
+     * A run records what was executed, and deleting a test case afterwards does
+     * not un-execute it. The row therefore stays, carrying the verdict, actual
+     * result and timings the run wrote against it, and says plainly that the
+     * case itself is gone - the run used to drop the row with only a log line,
+     * so a run built with twelve cases quietly showed eleven while its file
+     * still held twelve.
+     * <p>
+     * The id is kept because it is the only identity left: two deleted cases in
+     * one run are otherwise the same row twice.
+     */
+    public static @NotNull TestCaseDto deleted(final @NotNull UUID id) {
+        return TestCaseDto.builder()
+                .id(id)
+                .description("Deleted test case (" + id + ")")
+                .build();
+    }
+
+    /**
      * Fills the creation audit, and leaves the modification pair empty: a case
      * that has just been made has not been changed by anyone yet. Called once, by
      * the write path, the first time this case is saved.

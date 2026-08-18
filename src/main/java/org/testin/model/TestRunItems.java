@@ -28,10 +28,11 @@ public class TestRunItems {
      * The test case this result belongs to, wired by the run editor after the
      * run JSON is read - {@code @JsonIgnore}, so it is never deserialized.
      * <p>
-     * Null when the test case has been deleted since the run: the editor skips
-     * those and never assigns one. They stay out of the list, so the attributes
-     * that render a row can rely on it; a dialog opened for the raw run item
-     * cannot.
+     * Every row the editor loads gets one, including a result whose test case
+     * has been deleted since the run: that row is wired to
+     * {@link TestCaseDto#deleted}, so the attributes that render a row can rely
+     * on it. Null only before the editor has wired it - a dialog opened for a
+     * raw run item read straight from the file.
      */
     @JsonIgnore
     @Nullable
