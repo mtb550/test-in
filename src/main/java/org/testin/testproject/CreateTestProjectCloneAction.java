@@ -53,7 +53,7 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
-                indicator.setText("Cloning into " + projectName + "..");
+                indicator.setText("Cloning into " + projectName + "...");
 
                 try {
                     final Path parentPath = Services.getInstance(p, TestinRoot.class).getPath();

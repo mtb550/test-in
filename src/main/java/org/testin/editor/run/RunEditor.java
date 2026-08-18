@@ -187,7 +187,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final int generation = loadGeneration.incrementAndGet();
         if (list != null) {
             list.setPaintBusy(true);
-            list.getEmptyText().setText("Loading..");
+            list.getEmptyText().setText("Loading...");
         }
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
@@ -351,7 +351,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         if (this.list != null) {
             this.list.setPaintBusy(true);
-            this.list.getEmptyText().setText("Refreshing..");
+            this.list.getEmptyText().setText("Refreshing...");
         }
 
         loadDataAsync();

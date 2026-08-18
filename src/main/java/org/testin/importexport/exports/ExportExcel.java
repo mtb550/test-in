@@ -1,19 +1,12 @@
 package org.testin.importexport.exports;
 
-import com.intellij.notification.NotificationAction;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -73,14 +66,7 @@ public class ExportExcel {
             throw new RuntimeException(ex);
         }
 
-        ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(p, Notifier.class).infoWithActions(p,
-                        "Exported", destFile.getName(),
-                        NotificationAction.createSimple("Open file", () -> {
-                            final VirtualFile vf = LocalFileSystem.getInstance().findFileByPath(destFile.getAbsolutePath());
-                            Services.getInstance(p, Tools.class).openWithAssociatedProgram(p, vf);
-                        }))
-        );
+        ExportNotice.show(p, destFile);
     }
 }
 

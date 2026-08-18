@@ -37,7 +37,7 @@ public enum RunStatus {
 
     RUNNING(
             AllIcons.Actions.Suspend,
-            "Test case is Running..",
+            "Test case is Running...",
             new Badge("Running", new JBColor(new Color(255, 200, 100), new Color(200, 150, 50)))
     );
 

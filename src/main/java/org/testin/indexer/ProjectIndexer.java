@@ -110,7 +110,7 @@ public final class ProjectIndexer {
                             public void run(final @NotNull ProgressIndicator indicator) {
                                 indicator.setIndeterminate(false);
                                 indicator.setFraction(0.0);
-                                indicator.setText("Indexing " + projectName + "..");
+                                indicator.setText("Indexing " + projectName + "...");
 
                                 try {
                                     scanCoordinator.scan(projectPath, indicator);

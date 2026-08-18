@@ -39,7 +39,7 @@ public final class ListPanelBuilder {
         list.setBackground(UIUtil.getPanelBackground());
         list.setOpaque(true);
         list.setPaintBusy(true);
-        list.getEmptyText().setText("Loading..");
+        list.getEmptyText().setText("Loading...");
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.setExpandableItemsEnabled(false);
 

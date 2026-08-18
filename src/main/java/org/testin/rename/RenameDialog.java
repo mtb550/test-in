@@ -29,7 +29,7 @@ final class RenameDialog extends AbstractFrameworkDialog<TextInput> {
         components = List.of(
                 ComponentDialogBase.textField()
                         .icon(AllIcons.Actions.Edit)
-                        .placeholder("set new name..")
+                        .placeholder("set new name...")
                         .value(currentName)
                         .build());
 

@@ -401,7 +401,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.unsortedIds.clear();
         this.model.removeAll();
         this.list.setPaintBusy(true);
-        this.list.getEmptyText().setText("Refreshing..");
+        this.list.getEmptyText().setText("Refreshing...");
 
         loadDataAsync();
     }

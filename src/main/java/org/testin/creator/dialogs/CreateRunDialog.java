@@ -30,7 +30,7 @@ public final class CreateRunDialog extends AbstractFrameworkDialog<TextFieldWith
         components = List.of(
                 ComponentDialogBase.<DirectoryType>textFieldWithSelections()
                         .icon(DirectoryType.TR.getIcon())
-                        .placeholder("set name..")
+                        .placeholder("set name...")
                         .selection(DirectoryType.TR.getIcon(), "Test Run", "Records execution results", DirectoryType.TR)
                         .selection(DirectoryType.TRP.getIcon(), "Test Run Package", "Groups test runs", DirectoryType.TRP)
                         .build());

@@ -1,8 +1,5 @@
 package org.testin.importexport.exports;
 
-import com.intellij.ide.BrowserUtil;
-import com.intellij.notification.NotificationAction;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -10,8 +7,6 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.notifications.Notifier;
-import org.testin.services.Services;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -42,9 +37,7 @@ public class ExportHtml {
             throw new RuntimeException(ex);
         }
 
-        ApplicationManager.getApplication().invokeLater(() ->
-                Services.getInstance(p, Notifier.class)
-                        .infoWithActions(p, "Exported", destFile.getName(), NotificationAction.createSimple("Open file", () -> BrowserUtil.browse(destFile.toURI().toString()))));
+        ExportNotice.showInBrowser(p, destFile);
     }
 
     private void writeHtmlDocument(final @NotNull BufferedWriter writer, final @NotNull Project p,

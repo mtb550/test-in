@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * One field, no choice to make: what was typed says which it is. A repository
  * URL is clonable and a project name is not, so asking the tester to also pick
  * from a list was asking them to repeat themselves — and to be wrong. The
- * placeholder already promised this ("set name or paste url..") long before the
+ * placeholder already promised this ("set name or paste url...") long before the
  * dialog behaved that way.
  */
 public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput> {
@@ -34,7 +34,7 @@ public final class CreateProjectDialog extends AbstractFrameworkDialog<TextInput
         components = List.of(
                 ComponentDialogBase.textField()
                         .icon(DirectoryType.TP.getIcon())
-                        .placeholder("set name or paste url..")
+                        .placeholder("set name or paste url...")
                         .build());
 
         shortcuts = List.of(

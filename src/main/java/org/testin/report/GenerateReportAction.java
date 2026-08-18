@@ -144,7 +144,8 @@ public class GenerateReportAction extends AbstractProjectAction {
 
                 Files.write(reportFile.toPath(), fileBytes);
 
-                final NotificationAction openAction = NotificationAction.createSimple("Open report", () -> {
+                final Notifier notifier = Services.getInstance(p, Notifier.class);
+                final NotificationAction openAction = notifier.action("Open report", () -> {
 
                     try {
                         java.awt.Desktop.getDesktop().open(reportFile);
