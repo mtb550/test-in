@@ -7,11 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -38,13 +34,6 @@ public final class GitRefs {
      */
     private static final @NotNull Set<String> UNMERGED =
             Set.of("DD", "AU", "UD", "UA", "DU", "AA", "UU");
-
-    /**
-     * One line of {@code git status --porcelain}: what happened to a file, and
-     * which file, with the path already unquoted and slashed for comparison.
-     */
-    public record StatusEntry(@NotNull DiffType type, @NotNull String path) {
-    }
 
     /**
      * Reads {@code git status --porcelain -uall} into what changed.
@@ -215,10 +204,6 @@ public final class GitRefs {
     }
 
     /**
-     * The forward-slashed repository-relative paths behind the selected
-     * changes, deduplicated in selection order.
-     */
-    /**
      * Every directory the given repository-relative files sit under, itself
      * repository-relative, with the repository root as the empty string.
      * <p>
@@ -238,10 +223,22 @@ public final class GitRefs {
         return directories;
     }
 
+    /**
+     * The forward-slashed repository-relative paths behind the selected
+     * changes, deduplicated in selection order.
+     */
+
     public static @NotNull Set<String> repoRelativePaths(final @NotNull Collection<TestCaseDiff> changes) {
         return changes.stream()
                 .map(TestCaseDiff::relativeFilePath)
                 .map(path -> path.toString().replace('\\', '/'))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    /**
+     * One line of {@code git status --porcelain}: what happened to a file, and
+     * which file, with the path already unquoted and slashed for comparison.
+     */
+    public record StatusEntry(@NotNull DiffType type, @NotNull String path) {
     }
 }

@@ -12,17 +12,10 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.expectThrows;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * The step between "Git says these files changed" and "here is the review".
@@ -39,8 +32,8 @@ import static org.testng.Assert.assertTrue;
  */
 public class GitDiffProcessorTest {
 
-    private Path root;
     private final Map<String, String> committed = new HashMap<>();
+    private Path root;
 
     private static Mapper mapper() {
         try {

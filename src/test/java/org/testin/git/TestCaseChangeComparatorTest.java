@@ -14,6 +14,27 @@ import static org.testng.Assert.assertTrue;
 
 public class TestCaseChangeComparatorTest {
 
+    private static TestCaseDto base() {
+        return TestCaseDto.builder()
+                .description("a login case")
+                .expectedResult("the balance is shown")
+                .steps(new ArrayList<>(List.of("open the app", "log in")))
+                .priority(Priority.LOW)
+                .status(TestCaseStatus.PENDING)
+                .reference("REF-1")
+                .module("payments")
+                .testData("account=1")
+                .preConditions("authenticated")
+                .group(new ArrayList<>(List.of(Group.SMOKE)))
+                .build();
+    }
+
+    private static FieldChange onlyChange(final TestCaseDto after) {
+        final List<FieldChange> changes = TestCaseChangeComparator.compare(base(), after);
+        assertEquals(changes.size(), 1, "expected exactly one changed field, got " + changes);
+        return changes.getFirst();
+    }
+
     @Test
     public void comparesAllEditableFields() {
         final TestCaseDto oldState = TestCaseDto.builder().build();
@@ -107,26 +128,5 @@ public class TestCaseChangeComparatorTest {
         final TestCaseDto edited = base().setDescription("something else").setDescription("a login case");
 
         assertEquals(TestCaseChangeComparator.compare(base(), edited), List.of());
-    }
-
-    private static TestCaseDto base() {
-        return TestCaseDto.builder()
-                .description("a login case")
-                .expectedResult("the balance is shown")
-                .steps(new ArrayList<>(List.of("open the app", "log in")))
-                .priority(Priority.LOW)
-                .status(TestCaseStatus.PENDING)
-                .reference("REF-1")
-                .module("payments")
-                .testData("account=1")
-                .preConditions("authenticated")
-                .group(new ArrayList<>(List.of(Group.SMOKE)))
-                .build();
-    }
-
-    private static FieldChange onlyChange(final TestCaseDto after) {
-        final List<FieldChange> changes = TestCaseChangeComparator.compare(base(), after);
-        assertEquals(changes.size(), 1, "expected exactly one changed field, got " + changes);
-        return changes.getFirst();
     }
 }

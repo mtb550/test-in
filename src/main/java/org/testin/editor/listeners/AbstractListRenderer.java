@@ -4,14 +4,13 @@ import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.editor.EditorColors;
 import org.testin.editor.BaseCard;
+import org.testin.editor.EditorColors;
 import org.testin.editor.TestinEditor;
 import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.*;
 import javax.swing.border.Border;
-import java.awt.*;
 
 @AllArgsConstructor
 public abstract class AbstractListRenderer<U extends TestinEditor> implements ListCellRenderer<TestCaseDto> {

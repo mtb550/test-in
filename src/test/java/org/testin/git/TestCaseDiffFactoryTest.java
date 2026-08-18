@@ -12,10 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
-import static org.testng.Assert.assertThrows;
+import static org.testng.Assert.*;
 
 /**
  * Everything the pending-commits review shows comes from this class, and it had

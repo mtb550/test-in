@@ -33,6 +33,27 @@ public final class GitCommitService {
         this.repositories = new GitRepositoryService(project);
     }
 
+    /**
+     * The marker files present in the repository root and in every directory the
+     * selected test cases sit under. Checked on disk rather than assumed: which
+     * marker a directory carries is what says whether it is a test set, a package
+     * or a container, and only one of them is there.
+     */
+    static @NotNull Set<String> markersAlongside(final @NotNull Path repositoryPath, final @NotNull Set<String> testCasePaths) {
+        final Set<String> markers = new LinkedHashSet<>();
+
+        for (final String directory : GitRefs.ancestorDirectories(testCasePaths)) {
+            for (final DirectoryType type : DirectoryType.values()) {
+                final String marker = type.getMarker();
+                if (marker.isBlank()) continue;
+
+                final String relative = directory.isEmpty() ? marker : directory + "/" + marker;
+                if (Files.exists(repositoryPath.resolve(relative))) markers.add(relative);
+            }
+        }
+        return markers;
+    }
+
     public void initialize(final @NotNull Path repositoryPath) {
         GitCommandRunner.execute(project, repositoryPath, "git", "init");
     }
@@ -59,27 +80,6 @@ public final class GitCommitService {
 
         GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "add", "--"));
         GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "commit", "--only", "-m", message, "--"));
-    }
-
-    /**
-     * The marker files present in the repository root and in every directory the
-     * selected test cases sit under. Checked on disk rather than assumed: which
-     * marker a directory carries is what says whether it is a test set, a package
-     * or a container, and only one of them is there.
-     */
-    static @NotNull Set<String> markersAlongside(final @NotNull Path repositoryPath, final @NotNull Set<String> testCasePaths) {
-        final Set<String> markers = new LinkedHashSet<>();
-
-        for (final String directory : GitRefs.ancestorDirectories(testCasePaths)) {
-            for (final DirectoryType type : DirectoryType.values()) {
-                final String marker = type.getMarker();
-                if (marker.isBlank()) continue;
-
-                final String relative = directory.isEmpty() ? marker : directory + "/" + marker;
-                if (Files.exists(repositoryPath.resolve(relative))) markers.add(relative);
-            }
-        }
-        return markers;
     }
 
     public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {
@@ -134,8 +134,6 @@ public final class GitCommitService {
             return false;
         }
     }
-
-
 
     public void push(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         GitCommandRunner.executeRemote(project, repositoryPath, repositories.getRemoteUrl(repositoryPath, remote),

@@ -7,21 +7,13 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.ui.framework.AbstractFrameworkDialog;
-import org.testin.ui.framework.ComponentDialogBase;
-import org.testin.ui.framework.DialogButton;
-import org.testin.ui.framework.SelectionTable;
-import org.testin.ui.framework.StatusBarShortcut;
-import org.testin.ui.framework.TextInput;
+import org.testin.ui.framework.*;
 import org.testin.util.Shortcuts;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 import java.util.function.BiConsumer;
 
 /**

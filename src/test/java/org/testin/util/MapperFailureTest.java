@@ -5,10 +5,7 @@ import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.expectThrows;
+import static org.testng.Assert.*;
 
 /**
  * What the serializer does when it cannot serialize.
@@ -33,13 +30,6 @@ public class MapperFailureTest {
         } catch (final ReflectiveOperationException ex) {
             throw new IllegalStateException("Could not build a Mapper for the test", ex);
         }
-    }
-
-    /**
-     * Jackson cannot serialize a type with no properties and no annotations, so
-     * this is a genuine failure rather than a mocked one.
-     */
-    private static final class NotSerializable {
     }
 
     @Test
@@ -81,5 +71,12 @@ public class MapperFailureTest {
 
         assertEquals(readBack.getDescription(), original.getDescription());
         assertEquals(readBack.getId(), original.getId());
+    }
+
+    /**
+     * Jackson cannot serialize a type with no properties and no annotations, so
+     * this is a genuine failure rather than a mocked one.
+     */
+    private static final class NotSerializable {
     }
 }

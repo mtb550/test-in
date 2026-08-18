@@ -13,18 +13,10 @@ import java.lang.reflect.Constructor;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * The whole workflow against a real repository: write test cases, review what
@@ -359,8 +351,7 @@ public class GitWorkflowTest {
         final String remoteInfo = mustGit(work, "remote", "show", "origin");
 
         assertTrue(remoteInfo.contains("HEAD branch:"), "git reports a HEAD branch line: " + remoteInfo);
-        assertEquals(GitRefs.parseHeadBranch(remoteInfo), null,
-                "an empty remote names no branch, so the push falls back to the local one");
+        assertNull(GitRefs.parseHeadBranch(remoteInfo), "an empty remote names no branch, so the push falls back to the local one");
     }
 
     /**

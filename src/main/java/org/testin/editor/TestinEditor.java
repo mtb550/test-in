@@ -29,6 +29,8 @@ public interface TestinEditor extends Disposable {
 
     int getPageSize();
 
+    void setPageSize(final int size);
+
     /**
      * The row's position in the whole list rather than on the page it is drawn
      * on. The number the card shows, and what every lookup by index outside the
@@ -41,8 +43,6 @@ public interface TestinEditor extends Disposable {
     default int globalIndex(final int rowIndex) {
         return ((getCurrentPage() - 1) * getPageSize()) + rowIndex;
     }
-
-    void setPageSize(final int size);
 
     int getTotalPageCount();
 

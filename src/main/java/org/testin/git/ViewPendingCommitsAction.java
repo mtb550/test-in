@@ -30,6 +30,7 @@ import java.util.Locale;
 public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private final @NotNull GitRepositoryService git;
     private final @NotNull GitCommitService commits;
+
     /**
      * Live only between a successful commit and the push that expires it.
      */
