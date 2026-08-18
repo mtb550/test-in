@@ -17,6 +17,7 @@ import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 import org.testin.util.Mapper;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -190,16 +191,31 @@ final class IndexerDataStore {
      */
     <M> @NotNull M readMarker(final @NotNull Path dirPath, final @NotNull String markerFileName,
                               final @NotNull Class<M> type, final @NotNull String kind, final @NotNull String name) {
+        final Path markerFile = dirPath.resolve(markerFileName);
+
+        // Asked before reading, because a marker that is not there yet is the
+        // ordinary case: a node is created, its directory appears, and the marker
+        // follows. Handing an absent file to the mapper made it log an ERROR on
+        // the way out - one per node created, 135 in a single sandbox session -
+        // and those were the first thing a search for ERROR found. Now an ERROR
+        // from the mapper means what it says: a file that is there and will not
+        // parse (#66).
+        if (!Files.exists(markerFile)) return defaultMarker(type, kind);
+
         try {
-            return Services.getInstance(p, Mapper.class).readValue(dirPath.resolve(markerFileName).toFile(), type);
+            return Services.getInstance(p, Mapper.class).readValue(markerFile.toFile(), type);
 
         } catch (final Exception ex) {
-            Logger.warn("Missing/empty " + kind + " marker '" + name + "', using defaults: " + ex.getMessage());
-            try {
-                return type.getDeclaredConstructor().newInstance();
-            } catch (final Exception fallbackEx) {
-                throw new RuntimeException("Cannot create default " + kind + " marker", fallbackEx);
-            }
+            Logger.warn("Unreadable " + kind + " marker '" + name + "', using defaults: " + ex.getMessage());
+            return defaultMarker(type, kind);
+        }
+    }
+
+    private <M> @NotNull M defaultMarker(final @NotNull Class<M> type, final @NotNull String kind) {
+        try {
+            return type.getDeclaredConstructor().newInstance();
+        } catch (final Exception ex) {
+            throw new RuntimeException("Cannot create default " + kind + " marker", ex);
         }
     }
 
