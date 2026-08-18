@@ -4,17 +4,17 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.BaseCard;
+import org.testin.editor.Shared;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestRunItems;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 public class RunCard extends BaseCard {
     private final @NotNull Project p;
-    private final @NotNull List<JComponent> badges = new ArrayList<>();
+    private final @NotNull List<Shared.Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
 
     public RunCard(final @NotNull Project p) {

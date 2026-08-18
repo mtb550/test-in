@@ -4,7 +4,6 @@ import org.testin.model.BugPriority;
 import org.testin.model.BugSeverity;
 import org.testng.annotations.Test;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,9 +21,9 @@ import static org.testng.Assert.*;
  * never failed has no severity and no bug priority, so it must draw no pill
  * rather than an empty one.
  * <p>
- * Neither test builds a badge: constructing one needs the platform's fonts. They
- * pin the two decisions instead - which text colour a background earns, and
- * whether a value draws at all.
+ * Neither test draws a pill: painting one needs the platform's fonts. They pin
+ * the two decisions instead - which text colour a background earns, and whether
+ * a value becomes a badge at all.
  */
 public class CardBadgeTest {
 
@@ -56,7 +55,7 @@ public class CardBadgeTest {
 
     @Test
     public void aCaseThatNeverFailedDrawsNoPill() {
-        final List<JComponent> badges = new ArrayList<>();
+        final List<Shared.Badge> badges = new ArrayList<>();
 
         Shared.addBadge(badges, "Bug Severity", BugSeverity.EMPTY.getName(), BugSeverity.EMPTY.getColor());
         Shared.addBadge(badges, "Bug Priority", BugPriority.EMPTY.getName(), BugPriority.EMPTY.getColor());

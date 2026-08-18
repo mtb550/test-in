@@ -4,6 +4,7 @@ import com.intellij.icons.AllIcons;
 import com.intellij.ui.Gray;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBLabel;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.IconUtil;
 import com.intellij.util.ui.JBUI;
@@ -29,10 +30,11 @@ public class Shared {
     //
     // One place for badges, look and content together: the constants below are
     // the whole design, the factories say what each badge shows and which colour
-    // it takes, and Badge at the bottom paints it. Every badge anywhere in the
-    // plugin comes from here - the run card, the test card and the view panel's
-    // details - so a change to the look lands on all three at once and none of
-    // them can drift. Nothing outside this file builds one.
+    // it takes, Badge is that answer as data, and BadgePill at the bottom paints
+    // it. Every badge anywhere in the plugin comes from here - the run card, the
+    // test card and the view panel's details - so a change to the look lands on
+    // all three at once and none of them can drift. Nothing outside this file
+    // builds one.
     //
     // Captioned or bare: a badge is captioned when another badge could be
     // mistaken for it - the test case's priority and the bug's priority declare
@@ -62,14 +64,14 @@ public class Shared {
      */
     private static final @NotNull JBColor UNSORTED_COLOR = new JBColor(new Color(255, 100, 100), new Color(130, 50, 50));
 
-    public static @NotNull JBLabel createPriorityBadge(final @NotNull TestCaseDto tc) {
+    public static @NotNull Badge createPriorityBadge(final @NotNull TestCaseDto tc) {
         return captioned("Priority", tc.getPriority().getName(), tc.getPriority().getColor());
     }
 
     /**
      * The test case is not under a test set, so it is not in a run yet.
      */
-    public static @NotNull JBLabel createUnsortedBadge() {
+    public static @NotNull Badge createUnsortedBadge() {
         return new Badge("Unsorted", UNSORTED_COLOR);
     }
 
@@ -77,8 +79,8 @@ public class Shared {
      * The live state of a case while a run is executing - the label and colour
      * are the status's own.
      */
-    public static @NotNull JBLabel createRunStatusBadge(final @NotNull RunStatus.Badge badge) {
-        return new Badge(badge.label(), badge.color());
+    public static @NotNull Badge createRunStatusBadge(final @NotNull RunStatus.Badge runStatus) {
+        return new Badge(runStatus.label(), runStatus.color());
     }
 
     /**
@@ -93,7 +95,7 @@ public class Shared {
      * priority, and an empty pill is worse than no pill. One place decides it,
      * so every caller stays unconditional.
      */
-    public static void addBadge(final @NotNull List<JComponent> badges, final @NotNull String caption,
+    public static void addBadge(final @NotNull List<Badge> badges, final @NotNull String caption,
                                 final @NotNull String value, final @NotNull Color color) {
         if (value.isBlank()) return;
 
@@ -105,8 +107,34 @@ public class Shared {
         return new Badge(caption + ": " + value, color);
     }
 
-    public static @NotNull JBLabel createGroupBadge(final @NotNull Group group) {
+    public static @NotNull Badge createGroupBadge(final @NotNull Group group) {
         return new Badge(group.getName(), JBColor.darkGray);
+    }
+
+    /**
+     * Draws this row of badges in the panel, reusing the pills already in it.
+     * <p>
+     * The card that owns the panel is one component bound again for every row on
+     * the page: the list has no fixed cell height, so a sort, a filter or a page
+     * change re-measures all fifty of them before anything is drawn. Throwing the
+     * pills away and building new ones each time was several Swing components per
+     * row, for a row that usually shows the same two badges as the one before it.
+     * <p>
+     * A pill past the end of the list is hidden rather than removed - the layout
+     * skips an invisible component, and keeping it is what makes the next row
+     * free.
+     */
+    public static void showBadges(final @NotNull JBPanel<?> panel, final @NotNull List<Badge> badges) {
+        while (panel.getComponentCount() < badges.size()) {
+            panel.add(new BadgePill());
+        }
+
+        for (int i = 0; i < panel.getComponentCount(); i++) {
+            final BadgePill pill = (BadgePill) panel.getComponent(i);
+
+            if (i < badges.size()) pill.show(badges.get(i));
+            else pill.setVisible(false);
+        }
     }
 
     /**
@@ -218,21 +246,39 @@ public class Shared {
     }
 
     /**
+     * What a badge shows: a word, and the colour it is drawn in. Data rather
+     * than a component, so an attribute deciding what a row says never builds
+     * one - it describes it, the way it already hands its detail row over as
+     * text, and the panel that draws them owns the components.
+     */
+    public record Badge(@NotNull String text, @NotNull Color color) {
+    }
+
+    /**
      * The pill: a rounded label that draws its own background and picks its own
      * text colour. Private, because a badge is asked for by name above and never
      * assembled by a caller - that is what keeps the look in one place.
      */
-    private static final class Badge extends JBLabel {
+    private static final class BadgePill extends JBLabel {
 
-        private Badge(final @NotNull String text, final @NotNull Color bg) {
-            super(text);
+        private BadgePill() {
             setOpaque(false);
-            setBackground(bg);
+            setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H));
+        }
+
+        /**
+         * Shows this badge. The font is derived here rather than in the
+         * constructor because a pill outlives the row it was first built for,
+         * and the base size follows the tester's zoom.
+         */
+        private void show(final @NotNull Badge badge) {
+            setText(badge.text());
+            setBackground(badge.color());
 
             final float badgeSize = Math.max(8.0f, FontSync.getBaseFontSize() - 2.0f);
             setFont(UIUtil.getLabelFont(UIUtil.FontSize.SMALL).deriveFont(Font.BOLD, badgeSize));
 
-            setBorder(JBUI.Borders.empty(BADGE_PAD_V, BADGE_PAD_H));
+            setVisible(true);
         }
 
         /**

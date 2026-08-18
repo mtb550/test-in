@@ -8,14 +8,13 @@ import org.testin.model.RunStatus;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
 public class TestCard extends BaseCard {
     private final @NotNull Project p;
-    private final @NotNull List<JComponent> badges = new ArrayList<>();
+    private final @NotNull List<Shared.Badge> badges = new ArrayList<>();
     private final @NotNull Map<String, String> details = new LinkedHashMap<>();
     private boolean isPendingCut = false;
 

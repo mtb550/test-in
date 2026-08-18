@@ -97,15 +97,14 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
      * because only it knows which attributes are ticked - so neither card decides
      * anything about it here.
      */
-    protected void updateUI(final int index, final @NotNull String title, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details) {
+    protected void updateUI(final int index, final @NotNull String title, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details) {
         descriptionLabel.setText(title);
 
         final Color currentRowColor = index % 2 == 0 ? new JBColor(Gray._245, Gray._60) : new JBColor(Gray._230, Gray._45);
         setBackground(currentRowColor);
         setBorder(JBUI.Borders.customLine(JBColor.border(), 1, 0, 1, 0));
 
-        badgePanel.removeAll();
-        badges.forEach(badgePanel::add);
+        Shared.showBadges(badgePanel, badges);
 
         attributeLabels.values().forEach(lbl -> lbl.setVisible(false));
 

@@ -10,7 +10,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.util.Tools;
 
-import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> ""
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // Drawn by the card title, ahead of the description: "1. Log in with a valid user".
         }
     },
@@ -42,7 +41,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.requireTc().getDescription()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             // The card title is the description; a details row under it would print it twice.
         }
     },
@@ -65,7 +64,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.requireTc().getPriority().getName()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             badges.add(Shared.createPriorityBadge(runItem.requireTc()));
         }
     },
@@ -76,7 +75,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.requireTc().getGroup().stream().map(Group::getName).collect(Collectors.joining(", "))
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             runItem.requireTc().getGroup().stream().map(Shared::createGroupBadge).forEach(badges::add);
         }
     },
@@ -93,7 +92,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.getBugSeverity().getName()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             Shared.addBadge(badges, getName(), runItem.getBugSeverity().getName(), runItem.getBugSeverity().getColor());
         }
     },
@@ -104,7 +103,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             (item, p) -> item.getBugPriority().getName()
     ) {
         @Override
-        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
             Shared.addBadge(badges, getName(), runItem.getBugPriority().getName(), runItem.getBugPriority().getColor());
         }
     },
@@ -162,7 +161,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
      * this in their own body — the two behaviors sit on the constants that
      * have them instead of being chosen by a null at run time.
      */
-    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+    public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<Shared.Badge> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
         details.put(name, runValueExtractor.execute(runItem, p));
     }
 

@@ -9,6 +9,8 @@ import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Badges extends BaseDetails {
 
@@ -23,15 +25,16 @@ public class Badges extends BaseDetails {
         final JBPanel<?> badgesPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, JBUI.scale(FLOW_GAP), 0));
         badgesPanel.setOpaque(false);
 
-        badgesPanel.add(Shared.createPriorityBadge(dto));
+        final List<Shared.Badge> badges = new ArrayList<>();
+        badges.add(Shared.createPriorityBadge(dto));
 
-        if (!dto.getGroup().isEmpty()) {
-            for (final Group group : dto.getGroup()) {
-                if (group != null) {
-                    badgesPanel.add(Shared.createGroupBadge(group));
-                }
+        for (final Group group : dto.getGroup()) {
+            if (group != null) {
+                badges.add(Shared.createGroupBadge(group));
             }
         }
+
+        Shared.showBadges(badgesPanel, badges);
 
         return addFullWidthRow(panel, gbc, badgesPanel,
                 JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
