@@ -38,9 +38,25 @@
         <li><b>Your data stays yours:</b> Zero telemetry, zero data collection. Everything lives in local files you control.</li>
         <li><b>IDE Support:</b> Installs on IntelliJ IDEA, PyCharm, GoLand, WebStorm, and other IntelliJ-based IDEs (build 261+). Test management works everywhere; code generation, TestNG execution, and Git features switch on automatically when the Java, TestNG, and Git plugins are present.</li>
     </ul>
+
+    <b>&#128101; Team</b>
+    <ul>
+        <li><b>Muteb AlMughyiri</b> &mdash; author and maintainer</li>
+        <li><b>Mohammed AlZamil</b> &mdash; testing and feature requests</li>
+    </ul>
 ]]></description>
 
     <change-notes><![CDATA[
+    <b>2.8-beta</b>
+    <ul>
+        <li><b>Git on a repository of its own:</b> test cases no longer have to live inside the automation project. The pending review reads Git directly, so a newly written test case shows up straight away, the markers that make a test set a test set travel with the commit, and a first push to an empty repository succeeds.</li>
+        <li><b>A real review dialog:</b> pending changes open in a table with a commit message field and a Commit button, a status bar showing the keys, and right-click to revert a single changed field.</li>
+        <li><b>Execution timing:</b> a run records when it started and ended, per-case durations survive stopping and resuming, and all three report formats show a real execution date instead of the day the run was created.</li>
+        <li><b>Bug severity and priority as badges</b> on the run card, each captioned so it cannot be mistaken for the test case's own priority, and readable in both light and dark themes.</li>
+        <li><b>Clearer confirmations:</b> every action says what it did in a few words. Work that finishes on its own time, like a sync or a push, stays in the notification log instead of fading away unseen.</li>
+        <li>Tested by <b>Mohammed AlZamil</b>.</li>
+    </ul>
+    <br/>
     <b>2.7</b>
     <ul>
         <li><b>Multi-IDE Support:</b> Java, TestNG, and Git are now optional dependencies — Testin installs and runs on PyCharm, GoLand, WebStorm, and other IntelliJ-based IDEs. Features that need a missing plugin degrade gracefully with a clear notification instead of failing.</li>

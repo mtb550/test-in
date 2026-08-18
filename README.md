@@ -9,8 +9,9 @@ Test case management inside the IDE, next to the automation it drives.
 Testin adds a tool window where you organize test projects, test sets and test
 runs, write test cases, execute them, and generate reports — without leaving
 IntelliJ IDEA and without a second tool to keep in sync. Test cases are stored
-as JSON on disk in your automation repository, so they are reviewed, branched
-and merged like the code they test.
+as JSON on disk in a Git repository of their own, so they are reviewed, branched
+and merged like the code they test — without mixing into the automation project
+they exercise.
 
 ## What it does
 
@@ -61,10 +62,12 @@ and restart.
 
 Or install it from the listing: **[Testin on the JetBrains Marketplace](https://plugins.jetbrains.com/plugin/31514-testin)**.
 
-Then set the Testin root in **Settings → Tools → Testin** — the folder in your
-automation repository where test cases will live — and create your first test
-project from the panel. Testin's settings are per-IDE, not per-project: the root
-you choose is the one every open project uses.
+Then set the Testin root in **Settings → Tools → Testin** — the folder where
+your test cases will live — and create your first test project from the panel.
+Each test project under that root is its own Git repository, kept separate from
+the automation project it tests, so test data and code have their own histories.
+Testin's settings are per-IDE, not per-project: the root you choose is the one
+every open project uses.
 
 ## Building from source
 

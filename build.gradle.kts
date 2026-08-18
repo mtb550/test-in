@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.testin"
-version = "2.7.1"
+version = "2.8.0-beta"
 
 repositories {
     mavenCentral()
