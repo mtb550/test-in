@@ -347,6 +347,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
+
+        // Before anything is cleared: the timer holds the item it is counting,
+        // and everything it is counted into is about to be thrown away.
+        haltExecution();
+
         toolBar.clearFiltersAndSearch();
 
         rememberSelection();
@@ -734,6 +739,21 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final TestRunDto run = tr;
         if (run != null) run.markExecutionEnded();
 
+        haltExecution();
+    }
+
+    /**
+     * Stops the execution flow without saying the run ended.
+     * <p>
+     * Refresh needs exactly this. It throws the loaded run and its results away
+     * and reads them again, and the timer used to survive that: it kept ticking
+     * an item that was no longer in the map, so that case's duration went
+     * nowhere, and the reloaded run still showed the Stop button for an
+     * execution nothing was driving. What it must not do is stamp the run's end
+     * - refreshing is not finishing, and a run refreshed halfway would report an
+     * end time the tester never asked for.
+     */
+    private void haltExecution() {
         executionTimer.stop();
         currentlyExecutingIndex = -1;
         refreshExecutionButtons();
