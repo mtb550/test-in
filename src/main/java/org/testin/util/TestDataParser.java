@@ -44,13 +44,36 @@ final class TestDataParser {
         }
     }
 
+    /**
+     * Reads a timestamp back out of text, in either shape it is ever written in.
+     * <p>
+     * The plugin's own is first, because it is the one a tester is looking at:
+     * every grid cell, every card and every exported sheet shows
+     * "Wednesday 19-08-2026 At 01:12:58 [Asia/Riyadh]", and only the Excel shape
+     * was parsed - so exporting a sheet and importing it back read every date as
+     * a failure and answered "now". The import preview showed today's date and
+     * time for a case created months ago, whatever the file said.
+     * <p>
+     * A blank cell, or text that is neither shape, is the empty timestamp rather
+     * than now: the file did not say when, and inventing a moment is what this
+     * was doing wrong in the first place.
+     */
     @NotNull ZonedDateTime date(final @Nullable String value) {
-        if (value == null || value.isBlank()) return now();
+        if (value == null || value.isBlank()) return Config.NOT_EXECUTED;
+
+        final String text = value.trim();
         try {
-            return LocalDateTime.parse(value, Config.EXCEL_DATE_FORMATTER)
+            return ZonedDateTime.parse(text, Config.getDateFormatterPattern());
+        } catch (final Exception ignored) {
+            // Not the plugin's own format; try the plain one a spreadsheet from
+            // another tool carries.
+        }
+
+        try {
+            return LocalDateTime.parse(text, Config.EXCEL_DATE_FORMATTER)
                     .atZone(ZoneId.systemDefault());
         } catch (final Exception ignored) {
-            return now();
+            return Config.NOT_EXECUTED;
         }
     }
 
