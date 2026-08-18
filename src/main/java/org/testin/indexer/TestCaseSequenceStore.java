@@ -66,11 +66,17 @@ final class TestCaseSequenceStore {
 
     void put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
         // Every save of a test case arrives here - the update dialog, a grid cell,
-        // the details panel, an import, a paste - so the audit pair is stamped
-        // once, here, instead of at each of them. Reading does not come through:
-        // the indexing scanner fills the maps straight from the JSON, so opening
-        // a project stamps nothing.
-        testCase.stampSavedBy(Services.getInstance(project, AppSettingsState.class).testerName);
+        // the details panel, an import, a paste - so the audit is stamped once,
+        // here, instead of at each of them. Reading does not come through: the
+        // indexing scanner fills the maps straight from the JSON, so opening a
+        // project stamps nothing.
+        //
+        // Known to the index means the case already exists, whatever its fields
+        // say - the one question that separates a create from an update without
+        // trusting a value a tester could have typed.
+        final String tester = Services.getInstance(project, AppSettingsState.class).testerName;
+        if (testCasesById.containsKey(testCase.getId())) testCase.touch(tester);
+        else testCase.stampCreated(tester);
 
         final String path = testSetPath.toString();
         testCasesById.put(testCase.getId(), testCase);

@@ -33,6 +33,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             false,
             false,
             false,
+            false,
             (tc, p) -> "",
             (p, tc, v) -> {
             },
@@ -49,6 +50,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Description",
             "Description:",
             ToolBarDefault.LOCKED_CHECKED,
+            true,
             true,
             true,
             true,
@@ -69,6 +71,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             ToolBarDefault.LOCKED_UNCHECKED,
             false,
             false,
+            false,
             true,
             (tc, p) -> String.valueOf(tc.getId()),
             (p, tc, v) -> {
@@ -80,6 +83,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Expected Result",
             "Expected Result:",
             ToolBarDefault.ON,
+            true,
             true,
             false,
             true,
@@ -93,6 +97,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Steps:",
             ToolBarDefault.OFF,
             true,
+            true,
             false,
             true,
             (tc, p) -> String.join(", ", tc.getSteps()),
@@ -104,6 +109,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Priority",
             "Priority:",
             ToolBarDefault.ON,
+            true,
             true,
             false,
             true,
@@ -124,6 +130,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             ToolBarDefault.LOCKED_UNCHECKED,
             false,
             false,
+            false,
             true,
             (tc, p) -> String.join(" > ", Services.getInstance(p, Tools.class).buildFqcnMethod(tc)),
             (p, tc, v) -> {
@@ -135,6 +142,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Reference",
             "Reference:",
             ToolBarDefault.OFF,
+            true,
             true,
             false,
             true,
@@ -148,6 +156,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Test Data:",
             ToolBarDefault.OFF,
             true,
+            true,
             false,
             true,
             (tc, p) -> tc.getTestData(),
@@ -160,6 +169,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Pre Conditions:",
             ToolBarDefault.OFF,
             true,
+            true,
             false,
             true,
             (tc, p) -> tc.getPreConditions(),
@@ -171,6 +181,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Group",
             "Group:",
             ToolBarDefault.ON,
+            true,
             true,
             false,
             true,
@@ -191,6 +202,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             ToolBarDefault.LOCKED_UNCHECKED,
             false,
             false,
+            false,
             true,
             (tc, p) -> String.join(" > ", tc.getParent().getPath2()),
             (p, tc, v) -> {
@@ -203,6 +215,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Module:",
             ToolBarDefault.OFF,
             true,
+            true,
             false,
             true,
             (tc, p) -> tc.getModule(),
@@ -214,6 +227,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Status",
             "Status:",
             ToolBarDefault.OFF,
+            true,
             false,
             false,
             true,
@@ -226,6 +240,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Created By",
             "Created By:",
             ToolBarDefault.OFF,
+            false,
             true,
             false,
             true,
@@ -238,6 +253,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Updated By",
             "Updated By:",
             ToolBarDefault.OFF,
+            false,
             true,
             false,
             true,
@@ -250,10 +266,11 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Created At",
             "Created At:",
             ToolBarDefault.OFF,
+            false,
             true,
             false,
             true,
-            (tc, p) -> tc.getCreatedAt().format(Config.getDateFormatterPattern()),
+            (tc, p) -> Config.formatOrBlank(tc.getCreatedAt()),
             (p, tc, v) -> tc.setCreatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
             GenType.NO_CODE_CHANGE
     ),
@@ -262,10 +279,11 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             "Updated At",
             "Updated At:",
             ToolBarDefault.OFF,
+            false,
             true,
             false,
             true,
-            (tc, p) -> tc.getUpdatedAt().format(Config.getDateFormatterPattern()),
+            (tc, p) -> Config.formatOrBlank(tc.getUpdatedAt()),
             (p, tc, v) -> tc.setUpdatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
             GenType.NO_CODE_CHANGE
     );
@@ -273,6 +291,15 @@ public enum TestEditorAttributes implements ToolBarAttribute {
     private final @NotNull String name;
     private final @NotNull String name2;
     private final @NotNull ToolBarDefault toolBarDefault;
+
+    /**
+     * Whether a tester may type this into a grid cell. False for what the tester
+     * does not own - the row number, the identity a test case is filed under, and
+     * the audit pairs, which the save path fills in. The grid asks the attribute
+     * rather than the column number, so a column that cannot be written never
+     * opens an editor to begin with.
+     */
+    private final boolean editable;
     private final boolean importable;
     private final boolean copyable;
     private final boolean exportable;

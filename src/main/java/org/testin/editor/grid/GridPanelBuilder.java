@@ -14,8 +14,8 @@ import org.testin.editor.Shared;
 import org.testin.logger.Logger;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestEditorAttributes;
-import org.testin.model.ToolBarAttribute;
 import org.testin.model.TestRunItems;
+import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
 
 import javax.swing.*;
@@ -33,6 +33,7 @@ import java.awt.event.MouseWheelEvent;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.IntPredicate;
 
 public class GridPanelBuilder {
 
@@ -49,6 +50,13 @@ public class GridPanelBuilder {
     private static final @NotNull Color ODD_ROW_COLOR = new JBColor(Gray._230, Gray._45);
     private static final @NotNull Border FIRST_CELL_SELECTION_BORDER = new SelectionCellBorder(true);
     private static final @NotNull Border CELL_SELECTION_BORDER = new SelectionCellBorder(false);
+    /**
+     * The model column ORDER occupies in both grids. A column carries its
+     * attribute's ordinal as its model index, and ORDER is declared first in
+     * both attribute enums - {@code AttributeOrderTest} pins that, because
+     * nothing else would fail if a constant were declared above it.
+     */
+    private static final int ORDER_COLUMN = 0;
 
     static @NotNull Color rowColor(final int row) {
         return row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR;
@@ -280,6 +288,25 @@ public class GridPanelBuilder {
         table.getActionMap().put("startEditing", startEditing);
     }
 
+    /**
+     * Whether a model column is the order column: the row number, the one column
+     * that is never edited, and the target of the two gestures that are not edits
+     * - clicking it selects the whole row, ENTER and double-click open details.
+     */
+    public static boolean isOrderColumn(final int modelColumn) {
+        return modelColumn == ORDER_COLUMN;
+    }
+
+    /**
+     * The same question asked of a view column, which is what a mouse position or
+     * a selection gives. False for every column while Order is unticked, because
+     * nothing on screen maps to its model index then - so the gestures that need
+     * it go quiet together rather than one of them acting on another column.
+     */
+    public static boolean isOrderColumn(final @NotNull JTable table, final int viewColumn) {
+        return viewColumn >= 0 && isOrderColumn(table.convertColumnIndexToModel(viewColumn));
+    }
+
     public @NotNull JBTable buildRunTable(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases, final @NotNull Set<RunEditorAttributes> attributes, final @NotNull Map<UUID, TestRunItems> resultsMap, final int firstItemIndex) {
         Logger.debug("[GridPanelBuilder] buildRunTable: testCases=" + testCases.size() + ", attributes=" + attributes);
         final List<RunEditorAttributes> ordered = Arrays.stream(RunEditorAttributes.values()).toList();
@@ -313,7 +340,8 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final JBTable table = buildTable(columns, rows, false);
+        // Nothing in a run grid is editable yet; #74 is where that changes.
+        final JBTable table = buildTable(columns, rows, column -> false, "run");
         applyColumnVisibility(table, RunEditorAttributes.class, attributes);
         return table;
     }
@@ -344,7 +372,7 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final JBTable table = buildTable(columns, rows, true);
+        final JBTable table = buildTable(columns, rows, column -> TestEditorAttributes.values()[column].isEditable(), "test");
         applyColumnVisibility(table, TestEditorAttributes.class, attributes);
         return table;
     }
@@ -372,11 +400,11 @@ public class GridPanelBuilder {
         return column;
     }
 
-    private @NotNull JBTable buildTable(final String @NotNull [] columns, final @NotNull List<String[]> rows, final boolean editable) {
+    private @NotNull JBTable buildTable(final String @NotNull [] columns, final @NotNull List<String[]> rows, final @NotNull IntPredicate columnEditable, final @NotNull String kind) {
         final DefaultTableModel model = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(final int row, final int column) {
-                return editable && !isOrderColumn(column);
+                return columnEditable.test(column);
             }
         };
 
@@ -398,7 +426,7 @@ public class GridPanelBuilder {
                 return component;
             }
         };
-        table.putClientProperty(GRID_KIND_KEY, editable ? "test" : "run");
+        table.putClientProperty(GRID_KIND_KEY, kind);
         // The IntelliJ table UI paints a rollover background over table rows.
         // The grid renderer owns all row colors, so use the standard table UI here.
         table.setUI(new BasicTableUI());
@@ -428,38 +456,11 @@ public class GridPanelBuilder {
         addColumnResizeListener(table);
         addWheelScrollListener(table);
         installAutoRowHeight(table, model);
-        if (editable) {
-            table.setDefaultEditor(Object.class, new GridCellEditor());
-        }
+        // Installed either way: a cell the model refuses to edit never reaches an
+        // editor, so there is no second place deciding what is editable.
+        table.setDefaultEditor(Object.class, new GridCellEditor());
 
         return table;
-    }
-
-    /**
-     * The model column ORDER occupies in both grids. A column carries its
-     * attribute's ordinal as its model index, and ORDER is declared first in
-     * both attribute enums - {@code AttributeOrderTest} pins that, because
-     * nothing else would fail if a constant were declared above it.
-     */
-    private static final int ORDER_COLUMN = 0;
-
-    /**
-     * Whether a model column is the order column: the row number, the one column
-     * that is never edited, and the target of the two gestures that are not edits
-     * - clicking it selects the whole row, ENTER and double-click open details.
-     */
-    public static boolean isOrderColumn(final int modelColumn) {
-        return modelColumn == ORDER_COLUMN;
-    }
-
-    /**
-     * The same question asked of a view column, which is what a mouse position or
-     * a selection gives. False for every column while Order is unticked, because
-     * nothing on screen maps to its model index then - so the gestures that need
-     * it go quiet together rather than one of them acting on another column.
-     */
-    public static boolean isOrderColumn(final @NotNull JTable table, final int viewColumn) {
-        return viewColumn >= 0 && isOrderColumn(table.convertColumnIndexToModel(viewColumn));
     }
 
     private String @NotNull [] buildColumns(final @NotNull List<? extends ToolBarAttribute> attributes) {

@@ -119,8 +119,8 @@ public class DetailsTab {
                 new AttributeRow(TestEditorAttributes.MODULE, (p, dto) -> Tools.format(dto.getModule())),
                 new AttributeRow(TestEditorAttributes.CREATE_BY, (p, dto) -> dto.getCreatedBy()),
                 new AttributeRow(TestEditorAttributes.UPDATE_BY, (p, dto) -> dto.getUpdatedBy()),
-                new AttributeRow(TestEditorAttributes.CREATE_AT, (p, dto) -> dto.getCreatedAt().format(Config.getDateFormatterPattern())),
-                new AttributeRow(TestEditorAttributes.UPDATE_AT, (p, dto) -> dto.getUpdatedAt().format(Config.getDateFormatterPattern()))
+                new AttributeRow(TestEditorAttributes.CREATE_AT, (p, dto) -> Config.formatOrBlank(dto.getCreatedAt())),
+                new AttributeRow(TestEditorAttributes.UPDATE_AT, (p, dto) -> Config.formatOrBlank(dto.getUpdatedAt()))
         );
     }
 

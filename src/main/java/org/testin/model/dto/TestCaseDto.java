@@ -79,10 +79,15 @@ public final class TestCaseDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
     private volatile ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
+    /**
+     * The empty timestamp until the case is edited for the first time: a case
+     * nobody has changed has no modification date, and every reader gets a blank
+     * from {@link Config#formatOrBlank} rather than asking whether it is set.
+     */
     @NonNull
     @Builder.Default
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private volatile ZonedDateTime updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private volatile ZonedDateTime updatedAt = Config.NOT_EXECUTED;
 
     @NonNull
     @Builder.Default
@@ -107,18 +112,23 @@ public final class TestCaseDto {
     private volatile String tempError = "";
 
     /**
-     * Records who is saving this test case, and when, in the two audit pairs the
-     * editor shows. Called by the one write path, so no caller has to remember.
-     * <p>
-     * The creator is filled once: the first save names whoever made the case, and
-     * every save after it leaves that name alone. {@code createdAt} is not
-     * touched at all - a new case is already stamped with the moment it was built,
-     * and one that exists carries the date it was really created, which
-     * re-stamping would overwrite with today.
+     * Fills the creation audit, and leaves the modification pair empty: a case
+     * that has just been made has not been changed by anyone yet. Called once, by
+     * the write path, the first time this case is saved.
      */
-    public void stampSavedBy(final @NotNull String tester) {
-        if (createdBy.isEmpty()) createdBy = tester;
+    public void stampCreated(final @NotNull String tester) {
+        createdBy = tester;
+        createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
 
+        updatedBy = "";
+        updatedAt = Config.NOT_EXECUTED;
+    }
+
+    /**
+     * Records a change by the given tester, now. The creation pair is never
+     * touched again after {@link #stampCreated}.
+     */
+    public void touch(final @NotNull String tester) {
         updatedBy = tester;
         updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
     }
