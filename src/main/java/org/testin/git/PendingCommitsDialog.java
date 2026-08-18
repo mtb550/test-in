@@ -119,8 +119,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         final TestCaseDto state = diff.type() == DiffType.DELETED ? diff.oldState() : diff.newState();
         if (state != null) return state.getDescription();
 
-        final String fallback = diff.type() == DiffType.DELETED ? change.oldValue() : change.newValue();
-        return fallback == null ? "" : fallback;
+        return diff.type() == DiffType.DELETED ? change.oldValue() : change.newValue();
     }
 
     /**

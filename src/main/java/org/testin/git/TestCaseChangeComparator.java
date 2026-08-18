@@ -40,8 +40,8 @@ final class TestCaseChangeComparator {
     private static void addIfChanged(
             final @NotNull List<FieldChange> changes,
             final @NotNull String field,
-            final String oldValue,
-            final String newValue,
+            final @NotNull String oldValue,
+            final @NotNull String newValue,
             final @NotNull ChangeType type) {
         if (!Objects.equals(oldValue, newValue)) {
             changes.add(new FieldChange(field, oldValue, newValue, type));
