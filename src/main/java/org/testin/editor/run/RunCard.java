@@ -22,11 +22,6 @@ public class RunCard extends BaseCard {
         this.p = p;
     }
 
-    @Override
-    public void applyListFont(final @NotNull Font listFont) {
-        super.applyListFont(listFont);
-    }
-
     public void updateData(final @NotNull Integer index, final @NotNull Set<?> activeDetails, final @NotNull TestRunItems runItem, final @NotNull String title) {
         badges.clear();
         details.clear();

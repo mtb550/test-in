@@ -119,17 +119,35 @@ public class Shared {
         return 0.2126 * bg.getRed() + 0.7152 * bg.getGreen() + 0.0722 * bg.getBlue() > 140;
     }
 
-    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int x, final int y, final @Nullable String hoveredAction, final boolean isRunning) {
-        final int startX = JBUI.scale(16) + x + JBUI.scale(10);
+    /**
+     * Where the two action icons sit on a card whose title is this wide, in the
+     * card's own coordinates.
+     * <p>
+     * One owner, because two callers need the same answer: the card paints from
+     * it and the mouse listener asks it what the pointer is over. They used to
+     * work it out separately and had drifted - the painter stepping to the second
+     * icon by its width, the hit-test by a rounded literal - so the clickable
+     * band no longer covered the icon it belonged to.
+     */
+    public static @NotNull ActionIcons descriptionActionIcons(final int titleWidth) {
+        final Icon icon = AllIcons.Nodes.Class;
+        final int x = JBUI.scale(16) + titleWidth + JBUI.scale(10);
+        final int y = JBUI.scale(12);
 
-        final Icon navIcon = AllIcons.Nodes.Class;
-        final boolean isNavHovered = CardHoverAction.NAVIGATE_TO_TEST_METHOD.name().equals(hoveredAction);
-        drawHoverableIcon(c, g, navIcon, startX, y, isNavHovered);
+        return new ActionIcons(
+                new Rectangle(x, y, icon.getIconWidth(), icon.getIconHeight()),
+                new Rectangle(x + icon.getIconWidth() + JBUI.scale(8), y, icon.getIconWidth(), icon.getIconHeight()));
+    }
 
-        final int runStartX = startX + navIcon.getIconWidth() + JBUI.scale(8);
-        final Icon runIcon = isRunning ? AllIcons.Actions.Suspend : AllIcons.RunConfigurations.TestState.Run;
-        final boolean isRunHovered = CardHoverAction.RUN_TEST_CASE.name().equals(hoveredAction);
-        drawHoverableIcon(c, g, runIcon, runStartX, y, isRunHovered);
+    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @Nullable String hoveredAction, final boolean isRunning) {
+        final ActionIcons icons = descriptionActionIcons(titleWidth);
+
+        drawHoverableIcon(c, g, AllIcons.Nodes.Class, icons.navigate().x, icons.navigate().y,
+                CardHoverAction.NAVIGATE_TO_TEST_METHOD.name().equals(hoveredAction));
+
+        drawHoverableIcon(c, g, isRunning ? AllIcons.Actions.Suspend : AllIcons.RunConfigurations.TestState.Run,
+                icons.run().x, icons.run().y,
+                CardHoverAction.RUN_TEST_CASE.name().equals(hoveredAction));
     }
 
     /**
@@ -170,6 +188,32 @@ public class Shared {
             scaledIcon.paintIcon(c, g, x - offsetX, y - offsetY);
         } else {
             baseIcon.paintIcon(c, g, x, y);
+        }
+    }
+
+    /**
+     * The two icons drawn after a card's title, and the question the mouse asks
+     * of them.
+     */
+    public record ActionIcons(@NotNull Rectangle navigate, @NotNull Rectangle run) {
+
+        /**
+         * Which action the pointer is over, or none. The bands are grown a little
+         * past the icons: a 16-pixel target is hard to hold, and being generous
+         * here is safe while nothing else on the title line is clickable.
+         */
+        public @Nullable CardHoverAction at(final int x, final int y) {
+            if (grown(navigate).contains(x, y)) return CardHoverAction.NAVIGATE_TO_TEST_METHOD;
+            if (grown(run).contains(x, y)) return CardHoverAction.RUN_TEST_CASE;
+
+            return null;
+        }
+
+        private @NotNull Rectangle grown(final @NotNull Rectangle icon) {
+            final int padding = JBUI.scale(4);
+
+            return new Rectangle(icon.x - padding, icon.y - padding,
+                    icon.width + padding * 2, icon.height + padding * 2);
         }
     }
 

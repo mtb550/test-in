@@ -5,7 +5,6 @@ import com.intellij.openapi.actionSystem.ActionPlaces;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.CollectionListModel;
 import com.intellij.ui.components.JBList;
-import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.editor.*;
@@ -149,32 +148,18 @@ public class CardMouseListener extends MouseAdapter {
     private @Nullable CardHoverAction getActionAtPoint(final int index, final int xInCell, final int yInCell) {
         if (index == -1) return null;
 
+        // Must match the font the card paints the title in, or the width is
+        // measured against the wrong glyphs and every target shifts.
         final float baseSize = list.getFont().getSize2D();
-
-        // Must match the painted title font: it sets both the height of the band
-        // that counts as the title line and the width the title measures to.
         final Font titleFont = list.getFont().deriveFont(Font.BOLD, baseSize + BaseCard.TITLE_FONT_DELTA);
-        final FontMetrics fm = list.getFontMetrics(titleFont);
 
-        final int dynamicYBound = fm.getHeight() + JBUI.scale(20);
+        // The title is asked of the editor, which owns what it reads, and where
+        // the icons sit is asked of Shared, which paints them. Neither is worked
+        // out here: both used to be, and both drifted.
+        final String title = editor.cardTitle(editor.globalIndex(index), list.getModel().getElementAt(index));
+        final int titleWidth = list.getFontMetrics(titleFont).stringWidth(title);
 
-        if (yInCell <= dynamicYBound) {
-            // Asked of the editor, which owns what the title reads, and measured
-            // with the font the card draws it in. Rebuilding the string here is
-            // what used to drift once either half could be switched off.
-            final int globalIndex = editor.globalIndex(index);
-            final int titleWidth = fm.stringWidth(editor.cardTitle(globalIndex, list.getModel().getElementAt(index)));
-
-            final int startX = JBUI.scale(16) + titleWidth + JBUI.scale(10);
-            final int navStartX = startX - JBUI.scale(6);
-            final int runStartX = startX + JBUI.scale(22);
-            final int runEndX = runStartX + JBUI.scale(28);
-
-            if (xInCell >= navStartX && xInCell <= runStartX) return CardHoverAction.NAVIGATE_TO_TEST_METHOD;
-            if (xInCell > runStartX && xInCell <= runEndX) return CardHoverAction.RUN_TEST_CASE;
-        }
-
-        return null;
+        return Shared.descriptionActionIcons(titleWidth).at(xInCell, yInCell);
     }
 
 }

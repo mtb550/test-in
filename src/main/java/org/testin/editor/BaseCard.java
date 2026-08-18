@@ -60,21 +60,6 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    public void applyListFont(final @NotNull Font listFont) {
-        final float baseSize = listFont.getSize2D();
-
-        descriptionLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + TITLE_FONT_DELTA));
-
-        for (final JBLabel lbl : attributeLabels.values()) {
-            lbl.setFont(listFont.deriveFont(baseSize));
-        }
-
-        final float badgeSize = Math.max(8.0f, baseSize - 2.0f);
-        for (final Component c : badgePanel.getComponents()) {
-            c.setFont(listFont.deriveFont(Font.BOLD, badgeSize));
-        }
-    }
-
     /**
      * The title line: the Order and Description attributes drawn together, as in
      * "1. Log in with a valid user". Either half can be switched off in the
@@ -90,6 +75,21 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
         final String order = showOrder ? String.format(Locale.ENGLISH, "%d.", index + 1) : "";
 
         return order.isEmpty() || description.isEmpty() ? order + description : order + " " + description;
+    }
+
+    public void applyListFont(final @NotNull Font listFont) {
+        final float baseSize = listFont.getSize2D();
+
+        descriptionLabel.setFont(listFont.deriveFont(Font.BOLD, baseSize + TITLE_FONT_DELTA));
+
+        for (final JBLabel lbl : attributeLabels.values()) {
+            lbl.setFont(listFont.deriveFont(baseSize));
+        }
+
+        final float badgeSize = Math.max(8.0f, baseSize - 2.0f);
+        for (final Component c : badgePanel.getComponents()) {
+            c.setFont(listFont.deriveFont(Font.BOLD, badgeSize));
+        }
     }
 
     /**
@@ -152,7 +152,7 @@ public abstract class BaseCard extends JBPanel<BaseCard> {
     protected void paintChildren(final Graphics g) {
         super.paintChildren(g);
         if (isRowHovered) {
-            Shared.drawDescriptionActionIcons(this, g, titleWidth(), JBUI.scale(12), hoveredAction, isRunning);
+            Shared.drawDescriptionActionIcons(this, g, titleWidth(), hoveredAction, isRunning);
         }
     }
 
