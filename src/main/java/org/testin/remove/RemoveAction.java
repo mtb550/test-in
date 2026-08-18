@@ -11,11 +11,13 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.Tools;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.EditorUtil;
 
@@ -25,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static org.testin.util.Shortcuts.DeletePackage;
+import static org.testin.util.Shortcuts.RemoveNode;
 
 public class RemoveAction extends AbstractProjectTreeAction {
     private final @NotNull ExplorerPanel pp;
@@ -32,7 +35,9 @@ public class RemoveAction extends AbstractProjectTreeAction {
     public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
         super(p, tree, "Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.pp = pp;
-        this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
+        // Two keys, one action, every node the same: Delete, and Ctrl+Delete for
+        // a hand already on the modifier.
+        this.registerCustomShortcutSet(Tools.customShortcut(DeletePackage.getKey(), RemoveNode.getKey()), tree);
     }
 
     private boolean isRemovable(final @Nullable Object dir) {
@@ -54,13 +59,21 @@ public class RemoveAction extends AbstractProjectTreeAction {
         List<DirectoryDto> nodesToRemove = getRemovableNodes(paths);
         if (nodesToRemove.isEmpty()) return;
 
-        final String msg = nodesToRemove.size() == 1
+        // What it holds goes in the message, under the question: the From row
+        // below carries the path, and a second captioned row would read as a
+        // destination. A test project takes every test set, case and run inside
+        // it, and removal is not recorded by the undo service.
+        final String holds = nodesToRemove.size() == 1
+                ? Services.getInstance(p, ProjectIndexer.class).contentsUnder(nodesToRemove.getFirst().getPath()).describe()
+                : "";
+
+        final String msg = (nodesToRemove.size() == 1
                 ? "Remove '" + nodesToRemove.getFirst().getName() + "'?"
-                : "Remove these " + nodesToRemove.size() + " items?";
+                : "Remove these " + nodesToRemove.size() + " items?")
+                + (holds.isEmpty() ? "" : System.lineSeparator() + holds);
 
         // Single node: its path shows exactly what is being deleted.
         final String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : null;
-
         new ConfirmDialog(p, "Confirm Removing", msg, from, null, "Remove", () -> removeNodes(nodesToRemove)).show();
     }
 

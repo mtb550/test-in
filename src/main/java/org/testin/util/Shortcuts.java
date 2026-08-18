@@ -46,6 +46,14 @@ public enum Shortcuts {
     CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
     DeletePackage(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
 
+    /**
+     * Remove's second key, for a hand already on the modifier - Ctrl+Delete, and
+     * Cmd+Delete on macOS. The same action as {@link #DeletePackage} on the same
+     * nodes; neither key is the "safe" one, because what makes a removal safe is
+     * the confirmation, which says how much goes with the node.
+     */
+    RemoveNode(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, menuMask())),
+
     // Run editor: export the run's results (context menu + toolbar button)
     GenerateReport(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
 

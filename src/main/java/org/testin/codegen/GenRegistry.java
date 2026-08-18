@@ -35,6 +35,7 @@ final class GenRegistry {
         ACTIONS.put(GenType.CREATE_TEST_PROJECT, new CreateJavaPackage());
         ACTIONS.put(GenType.RENAME_TEST_PROJECT, new RenameJavaPackage());
         ACTIONS.put(GenType.CREATE_TEST_SET_PACKAGE, new CreateJavaPackage());
+        ACTIONS.put(GenType.REMOVE_TEST_PROJECT, new RemoveJavaPackage());
         ACTIONS.put(GenType.REMOVE_TEST_SET_PACKAGE, new RemoveJavaPackage());
         ACTIONS.put(GenType.RENAME_TEST_SET_PACKAGE, new RenameJavaPackage());
         ACTIONS.put(GenType.CREATE_TEST_SET, new CreateJavaClass());

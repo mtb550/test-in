@@ -26,7 +26,10 @@ public enum DirectoryType {
             ".tp",
             p -> new NotCreatableFromTree("Test Project"),
             (p, dir) -> GenType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
-            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved),
+            (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath(), removed -> {
+                if (removed) GenType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
+                onRemoved.accept(removed);
+            }),
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
 

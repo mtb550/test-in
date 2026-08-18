@@ -50,11 +50,6 @@ public class TestProjectDirectoryDto extends DirectoryDto {
     }
 
     @Override
-    public boolean isRemovable() {
-        return false;
-    }
-
-    @Override
     public boolean isTransferTarget() {
         return false;
     }

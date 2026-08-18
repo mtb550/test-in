@@ -37,7 +37,6 @@ public class TreeTransferRestrictionsTest {
     @Test
     public void fixedNodesCannotBeMovedRenamedOrRemoved() {
         final DirectoryDto[] fixed = {
-                new TestProjectDirectoryDto(),
                 new TestCasesMainDirectoryDto(),
                 new TestRunsMainDirectoryDto()
         };
@@ -47,6 +46,25 @@ public class TreeTransferRestrictionsTest {
             assertFalse(node.isRemovable(), node.getClass().getSimpleName() + " must not be removable");
             assertFalse(node.isRenamable(), node.getClass().getSimpleName() + " must not be renamable");
         }
+    }
+
+    /**
+     * A test project is fixed in the tree in every way but one: it cannot be
+     * moved and cannot be renamed - its name is the directory every path under
+     * it is built from - and it can be removed.
+     * <p>
+     * Removing it was switched off with the rest of the restrictions in
+     * 5f6e0a87 and turned back on deliberately: the tester who made a project
+     * is the one who deletes it, behind a confirmation that counts the test
+     * sets, cases and runs going with it.
+     */
+    @Test
+    public void aTestProjectIsRemovableButNeverMovedOrRenamed() {
+        final DirectoryDto testProject = new TestProjectDirectoryDto();
+
+        assertTrue(testProject.isRemovable(), "a test project is removed by the tester who made it");
+        assertFalse(testProject.isTransferable(), "a test project is not cut, copied or dragged");
+        assertFalse(testProject.isRenamable(), "every path under it is built from its name");
     }
 
     @Test

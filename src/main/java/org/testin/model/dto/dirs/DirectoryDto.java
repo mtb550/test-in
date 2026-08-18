@@ -93,8 +93,10 @@ public abstract class DirectoryDto {
     }
 
     /**
-     * True when the user may remove this node; the test project and the fixed
-     * root containers say no.
+     * True when the user may remove this node; the fixed root containers say no.
+     * A test project may be removed, behind a confirmation that says how much
+     * goes with it - it is the largest delete in the plugin and the undo service
+     * deliberately does not record removals.
      */
     public boolean isRemovable() {
         return true;

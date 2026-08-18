@@ -233,6 +233,25 @@ final class IndexerDataStore {
                 LocalFileSystem.getInstance().refreshNioFiles(List.of(dirPath), true, true, null));
     }
 
+    /**
+     * Drops a whole test project out of the cache: the project itself, its two
+     * main directories, and every package, set and run beneath it.
+     */
+    void removeTestProject(final @NotNull Path path) {
+        final String pathStr = path.toString();
+        testProjectsByPath.remove(pathStr);
+        testCasesMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
+        testRunsMainDirsByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
+
+        removeTestSetPackagesUnder(path);
+        removeTestRunPackagesUnder(path);
+        removeTestSetsUnder(path);
+        removeTestRunsUnder(path);
+        childrenIndex.invalidate();
+
+        Logger.info("Removed test project at: " + pathStr);
+    }
+
     private void removeTestSetPackagesUnder(final @NotNull Path path) {
         testSetPackagesByPath.entrySet().removeIf(entry -> entry.getValue().getPath().startsWith(path));
     }
