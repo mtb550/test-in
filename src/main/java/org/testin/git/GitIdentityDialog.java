@@ -1,53 +1,92 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBTextField;
-import com.intellij.util.ui.FormBuilder;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.testin.ui.dialogs.FramelessDialogWrapper;
+import org.testin.ui.framework.AbstractFrameworkDialog;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.RadioSelection;
+import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.ui.framework.TextInput;
+import org.testin.util.Shortcuts;
 
-import javax.swing.*;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Collects the Git identity required for a first commit.
+ * <p>
+ * On the framework, like every other dialog: the constructor declares the
+ * title, the components and the keys, and the status bar shows the keys it
+ * declared. It used to be hand-built on the frameless wrapper, which bound
+ * Enter and Escape into the root pane and told the tester about neither (#66).
+ * <p>
+ * The scope is two radios rather than a "set globally" checkbox. The question
+ * has two named halves - this repository, or every repository on the machine -
+ * and a radio pair says both out loud where a checkbox only names one and
+ * leaves the other to be inferred from it being off.
  */
-final class GitIdentityDialog extends FramelessDialogWrapper {
+final class GitIdentityDialog extends AbstractFrameworkDialog<TextInput> {
 
-    private final @NotNull JBTextField nameField = new JBTextField();
-    private final @NotNull JBTextField emailField = new JBTextField();
-    private final @NotNull JBCheckBox globalCheckBox = new JBCheckBox("Set globally");
+    private final @NotNull TextInput nameField;
+    private final @NotNull TextInput emailField;
+    private final @NotNull RadioSelection<Boolean> scope;
+    private final @NotNull Consumer<@NotNull Identity> onSet;
 
-    GitIdentityDialog(final @Nullable Project project) {
-        super(project);
-        setTitle("Set Git Identity and Commit");
-        initFrameless();
+    GitIdentityDialog(final @NotNull Project p, final @NotNull Consumer<@NotNull Identity> onSet) {
+        super(p);
+        this.onSet = onSet;
+
+        title = "Set Git Identity and Commit";
+
+        final ComponentDialogBase<TextInput> name = ComponentDialogBase.textField()
+                .placeholder("your name...")
+                .build();
+        final ComponentDialogBase<TextInput> email = ComponentDialogBase.textField()
+                .placeholder("your email address...")
+                .build();
+        final ComponentDialogBase<RadioSelection<Boolean>> where = ComponentDialogBase.<Boolean>radios("Apply to")
+                .option("This repository", false)
+                .option("Every repository on this machine", true)
+                .select(false)
+                .build();
+
+        components = List.of(
+                ComponentDialogBase.message("Git records who made a commit, and has no name or email to record yet.", null, null),
+                name,
+                email,
+                where);
+
+        shortcuts = List.of(
+                StatusBarShortcut.build(Shortcuts.Enter, "Confirm", this::submit),
+                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+
+        nameField = name.getComponent();
+        emailField = email.getComponent();
+        scope = where.getComponent();
     }
 
     @Override
-    protected @NotNull JComponent createCenterPanel() {
-        return FormBuilder.createFormBuilder()
-                .addLabeledComponent("Name:", nameField)
-                .addLabeledComponent("Email:", emailField)
-                .addComponent(globalCheckBox)
-                .getPanel();
+    protected void submit() {
+        final String name = nameField.getText().trim();
+        if (name.isEmpty()) {
+            nameField.showEmptyWarning();
+            return;
+        }
+
+        final String email = emailField.getText().trim();
+        if (email.isEmpty()) {
+            emailField.showEmptyWarning();
+            return;
+        }
+
+        onSet.accept(new Identity(name, email, scope.getSelected()));
+        closeOk();
     }
 
-    @Override
-    public @NotNull JComponent getPreferredFocusedComponent() {
-        return nameField;
-    }
-
-    @NotNull String getUserName() {
-        return nameField.getText();
-    }
-
-    @NotNull String getUserEmail() {
-        return emailField.getText();
-    }
-
-    boolean isSetGlobalConfig() {
-        return globalCheckBox.isSelected();
+    /**
+     * What the tester filled in: the two values Git needs, and whether they
+     * belong to this repository or to the machine.
+     */
+    record Identity(@NotNull String name, @NotNull String email, boolean global) {
     }
 }

@@ -252,31 +252,22 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
             final @NotNull Path repoPath,
             final @NotNull String pendingCommitMessage,
             final @NotNull Collection<TestCaseDiff> selectedChanges) {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            final GitIdentityDialog dialog = new GitIdentityDialog(p);
-            if (!dialog.showAndGet()) return;
-
-            final String name = dialog.getUserName();
-            final String email = dialog.getUserEmail();
-            final boolean setGlobally = dialog.isSetGlobalConfig();
-
-            if (name.trim().isEmpty() || email.trim().isEmpty()) {
-                Services.getInstance(p, Notifier.class).warn(p, "Missing Info", "Name and email are required to configure Git.");
-                return;
-            }
-
-            GitBackgroundTask.run(p, "Configuring git identity", false,
-                    indicator -> {
-                        commits.configureIdentity(repoPath, name.trim(), email.trim(), setGlobally);
-                        ApplicationManager.getApplication().invokeLater(() -> {
-                            // The tester is watching: they just filled the dialog
-                            // in and the commit resumes on the next line.
-                            Services.getInstance(p, Notifier.class).softShow(p, "Identity set");
-                            performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges);
-                        });
-                    },
-                    ex -> Services.getInstance(p, Notifier.class).error(p, "Config Failed", "Failed to set Git identity:\n" + ex.getMessage()));
-        });
+        // The dialog validates what it collected - a blank name or email never
+        // leaves it - so this is the workflow resuming, not a second check.
+        ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->
+                GitBackgroundTask.run(p, "Configuring git identity", false,
+                        indicator -> {
+                            commits.configureIdentity(repoPath, identity.name(), identity.email(), identity.global());
+                            ApplicationManager.getApplication().invokeLater(() -> {
+                                // The tester is watching: they just filled the dialog
+                                // in and the commit resumes on the next line.
+                                Services.getInstance(p, Notifier.class).softShow(p, "Identity set");
+                                performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges);
+                            });
+                        },
+                        ex -> Services.getInstance(p, Notifier.class).error(p, "Config Failed",
+                                "Failed to set Git identity:" + System.lineSeparator() + ex.getMessage()))
+        ).show());
     }
 
     private boolean isIdentityError(final @Nullable String message) {

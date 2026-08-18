@@ -88,6 +88,18 @@ public final class SelectionTable implements DialogComponent {
         if (table.getRowCount() > 0) table.addRowSelectionInterval(0, table.getRowCount() - 1);
     }
 
+    /**
+     * Selects exactly these rows, for a dialog that opens on an answer the
+     * tester gave before - the groups a test case already carries. Called after
+     * the rows are added, for the same reason {@link #selectAll()} is.
+     */
+    public void selectRows(final @NotNull List<Integer> rows) {
+        table.clearSelection();
+        for (final int row : rows) {
+            if (row >= 0 && row < table.getRowCount()) table.addRowSelectionInterval(row, row);
+        }
+    }
+
     public @NotNull List<Integer> getSelectedRows() {
         final List<Integer> rows = new ArrayList<>();
         for (final int row : table.getSelectedRows()) rows.add(row);

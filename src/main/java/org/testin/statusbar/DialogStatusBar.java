@@ -1,21 +1,17 @@
 package org.testin.statusbar;
 
-import org.jetbrains.annotations.NotNull;
-import org.testin.util.Shortcuts;
-
 /**
- * Status bar used by the shared action dialogs.
+ * Status bar used by the framework's dialogs.
+ * <p>
+ * It opens empty. It used to be built with Confirm and Cancel hard-coded, from
+ * the days when every dialog had exactly those two keys - and the framework
+ * overwrote them with the dialog's own declaration before it was ever painted.
+ * A default nothing can see is not a default; the keys come from the dialog
+ * that declared them (#66).
  */
 public final class DialogStatusBar extends StatusBarBase {
 
     public DialogStatusBar() {
-        this(new StatusBarItem[]{
-                new ShortcutItem("Confirm", Shortcuts.Enter.getShortcutText()),
-                new ShortcutItem("Cancel", Shortcuts.Escape.getShortcutText())
-        });
-    }
-
-    private DialogStatusBar(final StatusBarItem @NotNull [] items) {
-        super(items);
+        super(new StatusBarItem[0]);
     }
 }
