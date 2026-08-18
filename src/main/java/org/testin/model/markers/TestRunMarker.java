@@ -1,48 +1,23 @@
 package org.testin.model.markers;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Config;
 import org.testin.model.TestRunStatus;
-
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Setter
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
 @Accessors(chain = true)
-@Builder
-@JsonIgnoreProperties(ignoreUnknown = true)
-@ToString()
-public class TestRunMarker implements Marker {
+@ToString(callSuper = true)
+public class TestRunMarker extends AbstractMarker {
     @NonNull
-    @Builder.Default
     private TestRunStatus status = TestRunStatus.CREATED;
 
-    @NonNull
-    @Builder.Default
-    private String createdBy = "";
-
-    @NonNull
-    @Builder.Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime createdAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
-    @NonNull
-    @Builder.Default
-    private String modifiedBy = "";
-
-    @NonNull
-    @Builder.Default
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime modifiedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-
-    @com.fasterxml.jackson.annotation.JsonIgnore
+    @JsonIgnore
     @Override
     public @NotNull String getStatusLabel() {
         return status.getLabel();
