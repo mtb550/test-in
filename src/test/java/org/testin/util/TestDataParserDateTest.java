@@ -40,6 +40,20 @@ public class TestDataParserDateTest {
                 "a sheet from another tool carries this one");
     }
 
+    /**
+     * The weekday is decoration - the plugin derives it from the date - so a cell
+     * whose weekday was edited, or copied from the row above, still reads. Refusing
+     * it emptied the Updated At column of a sheet whose dates were perfectly good.
+     */
+    @Test
+    public void readsADateWhoseWeekdayIsWrong() {
+        final ZonedDateTime read = parser.date("Sunday 05-08-2026 At 02:13:07 [Asia/Riyadh]");
+
+        assertEquals(read.getDayOfMonth(), 5);
+        assertEquals(read.getMonthValue(), 8);
+        assertEquals(read.getYear(), 2026);
+    }
+
     @Test
     public void aBlankCellIsNoTimeAtAll() {
         assertTrue(Config.isNotExecuted(parser.date("")), "the file did not say when");

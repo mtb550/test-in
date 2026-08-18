@@ -9,6 +9,7 @@ import org.testin.model.Priority;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -58,12 +59,24 @@ final class TestDataParser {
      * than now: the file did not say when, and inventing a moment is what this
      * was doing wrong in the first place.
      */
+    /**
+     * The plugin's timestamp without its leading weekday, which is stripped
+     * rather than matched - see {@link #date}.
+     */
+    private static final @NotNull DateTimeFormatter WITHOUT_WEEKDAY =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
+
     @NotNull ZonedDateTime date(final @Nullable String value) {
         if (value == null || value.isBlank()) return Config.NOT_EXECUTED;
 
         final String text = value.trim();
         try {
-            return ZonedDateTime.parse(text, Config.getDateFormatterPattern());
+            // The weekday is dropped before parsing, not matched. It is decoration
+            // - derived from the date every time the plugin writes one - and
+            // java.time refuses the whole string when the two disagree, which is
+            // what an edited cell looks like: "Sunday 05-08-2026" for a date that
+            // is a Wednesday. The numbers are the fact, so they are what is read.
+            return ZonedDateTime.parse(text.replaceFirst("^\\p{L}+\\s+", ""), WITHOUT_WEEKDAY);
         } catch (final Exception ignored) {
             // Not the plugin's own format; try the plain one a spreadsheet from
             // another tool carries.
