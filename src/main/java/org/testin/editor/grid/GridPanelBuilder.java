@@ -250,7 +250,13 @@ public class GridPanelBuilder {
                     table, col.getHeaderValue(), false, false, 0, i);
             maxWidth = headerComp.getPreferredSize().width;
 
-            for (int r = 0; r < table.getRowCount(); r++) {
+            // The width is capped below, so once a row has pushed it past the cap
+            // no later row can change the answer. A Description column reaches
+            // that on its first long row, and measuring the rest of the page is
+            // pure cost - this runs again on every attribute ticked.
+            final int capBeforePadding = MAX_COL_WIDTH - (2 * CELL_PADDING + 20);
+
+            for (int r = 0; r < table.getRowCount() && maxWidth < capBeforePadding; r++) {
                 final Object value = table.getValueAt(r, i);
                 if (value != null) {
                     maxWidth = Math.max(maxWidth, fm.stringWidth(value.toString()));

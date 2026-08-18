@@ -10,9 +10,11 @@ import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;
 
+import javax.swing.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +28,11 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
 
     private final @NotNull String propertyKey;
     private final @NotNull List<E> options;
+
+    /**
+     * Whether a view refresh is already queued for the current burst of ticks.
+     */
+    private final @NotNull AtomicBoolean refreshQueued = new AtomicBoolean();
 
     protected AbstractDetailsPopupBtn(final @NotNull String propertyKey,
                                       final @NotNull Class<E> attributes,
@@ -94,7 +101,16 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
 
             saveProps();
 
-            onToolBarDetailsSelectedChanged.run();
+            // The refresh re-measures every card on the page, or every column
+            // against every row - work the checkbox should not be waiting on. It
+            // runs on the next pass instead, so the tick lands immediately, and
+            // one refresh covers a burst of them rather than one refresh each.
+            if (refreshQueued.compareAndSet(false, true)) {
+                SwingUtilities.invokeLater(() -> {
+                    refreshQueued.set(false);
+                    onToolBarDetailsSelectedChanged.run();
+                });
+            }
         });
 
         JBPopupFactory.getInstance()

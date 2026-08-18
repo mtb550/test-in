@@ -303,13 +303,20 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void onToolBarDetailsSelectionChanged() {
         Logger.debug("[details] selectedDetails changed -> " + getSelectedDetails());
-        if (list != null && model != null) {
-            model.allContentsChanged();
-        }
+
+        // Only what is on screen. Re-measuring the cards costs a full pass over
+        // the page, and doing it while the grid is showing buys nothing - the
+        // list is re-measured when it comes back instead.
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[details] grid active -> toggling column visibility");
             updateGridColumns();
+        } else {
+            refreshCards();
         }
+    }
+
+    private void refreshCards() {
+        if (list != null && model != null) model.allContentsChanged();
     }
 
     private void updateGridColumns() {
@@ -321,6 +328,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     public void onToolBarSwitchedToListView() {
         Logger.debug("[switch] -> LIST view, currentView=" + toolBar.getCurrentView());
         center.set(listScrollPane);
+
+        // Attributes ticked while the grid was showing did not touch the cards;
+        // they are re-measured here, once, rather than on every tick.
+        refreshCards();
     }
 
     @Override
