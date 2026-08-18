@@ -1,10 +1,9 @@
 package org.testin.editor.test;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.JBColor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.BaseCard;
-import org.testin.editor.RoundedBadge;
+import org.testin.editor.Shared;
 import org.testin.model.RunStatus;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
@@ -36,14 +35,14 @@ public class TestCard extends BaseCard {
                 .forEach(attr -> attr.applyToUI(tc, badges, details, p));
 
         if (isUnsorted) {
-            badges.add(new RoundedBadge("Unsorted", new JBColor(new Color(255, 100, 100), new Color(130, 50, 50))));
+            badges.add(Shared.createUnsortedBadge());
         }
 
         final RunStatus runStatus = tc.getTempStatus();
         this.isRunning = runStatus == RunStatus.RUNNING;
 
         final RunStatus.Badge badge = runStatus.getBadge();
-        if (badge != null) badges.add(new RoundedBadge(badge.label(), badge.color()));
+        if (badge != null) badges.add(Shared.createRunStatusBadge(badge));
 
         updateUI(index, TestEditorAttributes.DESCRIPTION.getTestValueExtractor().execute(tc, p), badges, details);
     }

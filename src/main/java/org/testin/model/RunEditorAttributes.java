@@ -77,14 +77,24 @@ public enum RunEditorAttributes {
             true,
             true,
             (item, p) -> item.getBugSeverity().getName()
-    ),
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            Shared.addBadge(badges, getName(), runItem.getBugSeverity().getName(), runItem.getBugSeverity().getColor());
+        }
+    },
 
     BUG_PRIORITY(
             "Bug Priority",
             true,
             true,
             (item, p) -> item.getBugPriority().getName()
-    ),
+    ) {
+        @Override
+        public void applyToUI(final @NotNull TestRunItems runItem, final @NotNull List<JComponent> badges, final @NotNull Map<String, String> details, final @NotNull Project p) {
+            Shared.addBadge(badges, getName(), runItem.getBugPriority().getName(), runItem.getBugPriority().getColor());
+        }
+    },
 
     RUN_STATUS(
             "Run Status",
