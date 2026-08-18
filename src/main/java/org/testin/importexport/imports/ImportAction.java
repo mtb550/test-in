@@ -47,14 +47,14 @@ public class ImportAction extends AbstractProjectTreeAction {
         final TreePath path = tree.getSelectionPath();
 
         if (path == null) {
-            Services.getInstance(p, Notifier.class).error(p, "Import Error", "Please select a directory in the Project Panel tree.");
+            Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Import Into", "Select a directory in the Project Panel tree.");
             return;
         }
 
         final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
 
         if (!(userObject instanceof DirectoryDto dirDto) || !dirDto.isTestCaseContainer()) {
-            Services.getInstance(p, Notifier.class).error(p, "Import Error", "Please select a valid Test Set, Test Set Package, or Test Cases Directory.");
+            Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Import Into", "Select a Test Set, a Test Set Package, or the Test Cases directory.");
             return;
         }
 

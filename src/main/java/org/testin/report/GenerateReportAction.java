@@ -123,7 +123,7 @@ public class GenerateReportAction extends AbstractProjectAction {
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 final TestRunDto runData = indexer.getTestRunByPath(dirPath);
                 if (runData == null) {
-                    Services.getInstance(p, Notifier.class).error(p, "Report Error",
+                    Services.getInstance(p, Notifier.class).softShow(p, "Report Empty",
                             "No test run data found at: " + dirPath);
                     return;
                 }

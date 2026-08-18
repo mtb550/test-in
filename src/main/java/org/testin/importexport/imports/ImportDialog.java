@@ -66,13 +66,13 @@ public final class ImportDialog extends AbstractFrameworkDialog<SourceForm> {
         if (component().resolve() == null) return;
 
         if (preview.isEmpty()) {
-            Services.getInstance(p, Notifier.class).error(p, "Import Error", "No data loaded from the selected file.");
+            Services.getInstance(p, Notifier.class).softShow(p, "Import Empty", "No data loaded from the selected file.");
             return;
         }
 
         final Map<String, List<TestCaseDto>> selected = preview.selected();
         if (selected.isEmpty()) {
-            Services.getInstance(p, Notifier.class).error(p, "Import Error", "Please select at least one test case to import.");
+            Services.getInstance(p, Notifier.class).softShow(p, "Import Empty", "Select at least one test case to import.");
             return;
         }
 

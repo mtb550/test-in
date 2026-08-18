@@ -81,7 +81,7 @@ public class FileDocumentListener implements DocumentListener {
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (parsedData == null || parsedData.isEmpty()) {
-                        Services.getInstance(p, Notifier.class).warn(p, "No Data", "No test cases found in the selected file.");
+                        Services.getInstance(p, Notifier.class).softShow(p, "No Data", "No test cases found in the selected file.");
                         return;
                     }
                     onDataLoaded.accept(format, parsedData);
