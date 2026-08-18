@@ -154,6 +154,27 @@ public class TestCaseDiffFactoryTest {
     }
 
     /**
+     * Every diff can name the test case it is about, whichever side of the
+     * change survives it. The review shows that description on every row, so a
+     * diff that could not answer would be a row with no case on it.
+     */
+    @Test
+    public void everyKindOfChangeCanNameItsTestCase() {
+        final TestCaseDto added = testCase("added");
+        final TestCaseDto before = testCase("before");
+        final TestCaseDto after = testCase("after").setId(before.getId());
+
+        assertEquals(TestCaseDiffFactory.fromJson(DiffType.ADDED, null, json(added), PATH, mapper())
+                .subject().getDescription(), "added");
+
+        assertEquals(TestCaseDiffFactory.fromJson(DiffType.DELETED, json(before), null, PATH, mapper())
+                .subject().getDescription(), "before", "a deletion is about the case that was there");
+
+        assertEquals(TestCaseDiffFactory.fromJson(DiffType.MODIFIED, json(before), json(after), PATH, mapper())
+                .subject().getDescription(), "after", "a modification is about the case as it is now");
+    }
+
+    /**
      * The round trip the review depends on: what a test case is written as on
      * disk has to come back as the same test case, or every diff is noise.
      */

@@ -103,23 +103,12 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             for (final FieldChange change : diff.fieldChanges()) {
                 changes.addRow(
                         change.changeType().getLabel(),
-                        describe(diff, change),
+                        diff.subject().getDescription(),
                         change.oldValue(),
                         change.newValue());
                 rowDifferences.add(diff);
             }
         }
-    }
-
-    /**
-     * The test case's description, taken from whichever side of the change still
-     * has one — a deleted case only exists on the old side.
-     */
-    private @NotNull String describe(final @NotNull TestCaseDiff diff, final @NotNull FieldChange change) {
-        final TestCaseDto state = diff.type() == DiffType.DELETED ? diff.oldState() : diff.newState();
-        if (state != null) return state.getDescription();
-
-        return diff.type() == DiffType.DELETED ? change.oldValue() : change.newValue();
     }
 
     /**
