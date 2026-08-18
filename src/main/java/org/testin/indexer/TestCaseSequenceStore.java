@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
+import org.testin.setting.AppSettingsState;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -64,6 +65,13 @@ final class TestCaseSequenceStore {
     }
 
     void put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
+        // Every save of a test case arrives here - the update dialog, a grid cell,
+        // the details panel, an import, a paste - so the audit pair is stamped
+        // once, here, instead of at each of them. Reading does not come through:
+        // the indexing scanner fills the maps straight from the JSON, so opening
+        // a project stamps nothing.
+        testCase.stampSavedBy(Services.getInstance(project, AppSettingsState.class).testerName);
+
         final String path = testSetPath.toString();
         testCasesById.put(testCase.getId(), testCase);
         final List<UUID> ids = testSetCaseIds.computeIfAbsent(

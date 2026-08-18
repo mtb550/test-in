@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.*;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 
@@ -104,4 +105,21 @@ public final class TestCaseDto {
     @NonNull
     @Builder.Default
     private volatile String tempError = "";
+
+    /**
+     * Records who is saving this test case, and when, in the two audit pairs the
+     * editor shows. Called by the one write path, so no caller has to remember.
+     * <p>
+     * The creator is filled once: the first save names whoever made the case, and
+     * every save after it leaves that name alone. {@code createdAt} is not
+     * touched at all - a new case is already stamped with the moment it was built,
+     * and one that exists carries the date it was really created, which
+     * re-stamping would overwrite with today.
+     */
+    public void stampSavedBy(final @NotNull String tester) {
+        if (createdBy.isEmpty()) createdBy = tester;
+
+        updatedBy = tester;
+        updatedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    }
 }
