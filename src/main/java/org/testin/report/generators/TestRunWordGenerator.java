@@ -257,7 +257,7 @@ public final class TestRunWordGenerator {
             case FAILED -> RED;
             case PASSED -> GREEN;
             case BLOCKED -> DARK_YELLOW;
-            case UNTESTED -> DARK_GRAY;
+            case UNTESTED, REMOVED -> DARK_GRAY;
         };
     }
 

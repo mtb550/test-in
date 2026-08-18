@@ -15,6 +15,7 @@ import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.services.RunStatusService;
 import org.testin.model.dto.TestRunDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -43,6 +44,12 @@ public class UpdateRunItemAction extends AbstractProjectAction {
 
         final @Nullable TestRunItems runItem = runEditor.getResultsMap().get(selected.getId());
         if (runItem == null) return;
+
+        // The test case is gone: what the run recorded against it stands as it is.
+        if (runItem.isRemoved()) {
+            Services.getInstance(p, RunStatusService.class).refuseRemoved(p);
+            return;
+        }
 
         Logger.trace("update test run item for: " + selected.getDescription());
 

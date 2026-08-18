@@ -216,8 +216,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
                         // A case deleted since the run leaves its result behind, and
                         // the result is what the run is a record of. The row stays,
-                        // as an orphan that says so.
-                        if (indexed == null) Logger.warn("Test run references a deleted test case id=" + item.getId());
+                        // says so, and takes the one status a tester cannot give.
+                        //
+                        // In memory only. The file heals the next time the run is
+                        // written, the way the missing-stamp repair already does -
+                        // opening a run rewrites nothing.
+                        if (indexed == null) {
+                            Logger.warn("Test run references a deleted test case id=" + item.getId());
+                            item.setStatus(TestStatus.REMOVED);
+                        }
 
                         final TestCaseDto testCase = indexed != null ? indexed : TestCaseDto.deleted(item.getId());
 
@@ -651,9 +658,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final TestCaseDto currentTc = currentTestCases.get(globalIndex);
         final TestRunItems runItem = resultsMap.get(currentTc.getId());
 
-        if (runItem == null) {
-            // No run data for this case; skip it. Status changes themselves go
-            // through RunStatusService, which owns advance + persist.
+        if (runItem == null || runItem.isRemoved()) {
+            // No run data for this case, or no test case left to run: either way
+            // the execution moves on. Status changes themselves go through
+            // RunStatusService, which owns advance + persist.
             startTimerForIndex(globalIndex + 1);
             return;
         }

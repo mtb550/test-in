@@ -129,7 +129,10 @@ public class TestRunDto {
      */
     public void dropStampsWithoutVerdict() {
         for (final TestRunItems item : results) {
-            if (!item.getStatus().isVerdict()) {
+            // REMOVED is not a verdict either, and its stamp still stands: the
+            // case was executed before it was deleted, so the time is real
+            // rather than the old default this repair exists to clear.
+            if (!item.getStatus().isVerdict() && !item.isRemoved()) {
                 item.setExecutedAt(Config.NOT_EXECUTED);
             }
         }

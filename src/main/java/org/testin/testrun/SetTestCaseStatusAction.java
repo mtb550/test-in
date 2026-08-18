@@ -47,7 +47,7 @@ public class SetTestCaseStatusAction extends AbstractProjectAction {
         // Single selection of a run item: collect failure details first, apply after the dialog closes.
         if (status.isCollectsFailureDetails() && editor instanceof RunEditor runEditor && selectedItems.size() == 1) {
             final TestRunItems runItem = runEditor.getResultsMap().get(selectedItems.getFirst().getId());
-            if (runItem != null) {
+            if (runItem != null && !runItem.isRemoved()) {
                 new FailedResultDialog(p, runItem, this::applyStatus).show();
                 return;
             }

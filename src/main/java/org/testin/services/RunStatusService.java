@@ -83,6 +83,16 @@ public final class RunStatusService {
         confirmVerdict(p, status, 1);
     }
 
+    /**
+     * Says why nothing happened, once, wherever a removed row was asked to take
+     * something new - a verdict, a failure detail, an actual result. One
+     * sentence for one situation, so the three surfaces that can ask do not each
+     * word it differently.
+     */
+    public void refuseRemoved(final @NotNull Project p) {
+        Services.getInstance(p, Notifier.class).softShow(p, "The test case was removed - the run keeps what it recorded");
+    }
+
     public void applyStatus(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull JBList<TestCaseDto> list, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
@@ -91,6 +101,12 @@ public final class RunStatusService {
 
         if (selectedItems.size() == 1) {
             final TestCaseDto tc = selectedItems.getFirst();
+            final TestRunItems only = editor.getResultsMap().get(tc.getId());
+            if (only != null && only.isRemoved()) {
+                refuseRemoved(p);
+                return;
+            }
+
             final int globalIndex = editor.getCurrentTestCases().indexOf(tc);
             if (globalIndex == editor.getCurrentlyExecutingIndex()) {
                 executeNext(p, ui, list, status);
@@ -102,6 +118,8 @@ public final class RunStatusService {
 
             for (final TestCaseDto tc : selectedItems) {
                 final TestRunItems item = editor.getResultsMap().get(tc.getId());
+                if (item != null && item.isRemoved()) continue;
+
                 if (item != null) {
                     item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
                     recorded++;

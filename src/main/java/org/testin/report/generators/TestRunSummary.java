@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
  *                   run's own results, so a report says who ran the tests rather
  *                   than who printed the report.
  */
-public record TestRunSummary(long total, long passed, long failed, long blocked, long untested, int passRate,
-                             @NotNull String executedBy) {
+public record TestRunSummary(long total, long passed, long failed, long blocked, long untested, long removed,
+                             int passRate, @NotNull String executedBy) {
 
     public static @NotNull TestRunSummary of(final @NotNull List<TestRunItems> results) {
         final Map<TestStatus, Long> counts = results.stream()
@@ -45,6 +45,10 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
                 failed,
                 blocked,
                 counts.getOrDefault(TestStatus.PENDING, 0L) + counts.getOrDefault(TestStatus.UNTESTED, 0L),
+                // Counted, because the total counts them: a run keeps the row for
+                // a case deleted under it, so a report whose tables ignored it
+                // would print a total its own sections do not add up to.
+                counts.getOrDefault(TestStatus.REMOVED, 0L),
                 executed > 0 ? (int) (passed * 100 / executed) : 0,
                 whoExecuted(results));
     }

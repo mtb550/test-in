@@ -41,6 +41,19 @@ public class TestRunItems {
     @NotNull
     private UUID id;
 
+    /**
+     * True when the test case behind this result has been deleted since the run.
+     * <p>
+     * The row is drawn from what the run recorded and takes nothing new: a
+     * verdict means "we ran it and this is what happened", and a case that is
+     * gone cannot be run again. Asked by name so the verdict path, the details
+     * editor and the execution walker all ask the same question.
+     */
+    @JsonIgnore
+    public boolean isRemoved() {
+        return status == TestStatus.REMOVED;
+    }
+
     @NotNull
     @Builder.Default
     private TestStatus status = TestStatus.PENDING;

@@ -69,6 +69,21 @@ public enum TestStatus {
             false
     ),
 
+    REMOVED(
+            "9E9E9E",
+            " [Removed]",
+            SimpleTextAttributes.GRAYED_ITALIC_ATTRIBUTES,
+            JBColor.GRAY,
+            "Removed",
+            // Off the menu, and the run sets it for itself: the test case this
+            // result belongs to has been deleted, so there is nothing left to
+            // execute and nothing left to judge. The row stays because the run
+            // executed it once, and what it recorded is history rather than a
+            // verdict anyone can still give (#66).
+            null,
+            false
+    ),
+
     UNTESTED(
             "808080",
             " [Untested]",

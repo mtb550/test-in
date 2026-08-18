@@ -47,7 +47,17 @@ enum ReportSection {
      */
     UNTESTED("Untested Test Cases",
             "The following %s cases were not executed in this cycle and carry forward to the next run.",
-            TestRunSummary::untested, false, TestStatus.PENDING, TestStatus.UNTESTED);
+            TestRunSummary::untested, false, TestStatus.PENDING, TestStatus.UNTESTED),
+
+    /**
+     * The test case was deleted after this run recorded it. The run keeps the
+     * row - it executed that case once, and deleting it later does not undo
+     * that - so the report says so rather than dropping a row and leaving its
+     * own total unexplained.
+     */
+    REMOVED("Removed Test Cases",
+            "The following %s cases were removed from the test suite after this run recorded them.",
+            TestRunSummary::removed, false, TestStatus.REMOVED);
 
     private final @NotNull String title;
     private final @NotNull String descriptionFmt;
