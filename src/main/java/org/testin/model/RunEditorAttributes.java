@@ -129,7 +129,7 @@ public enum RunEditorAttributes implements ToolBarAttribute {
     EXECUTED_AT(
             "Executed At",
             ToolBarDefault.OFF,
-            (item, p) -> Config.formatOrBlank(item.getExecutedAt())
+            (item, p) -> Tools.formatDate(item.getExecutedAt())
     ),
 
     PATH(

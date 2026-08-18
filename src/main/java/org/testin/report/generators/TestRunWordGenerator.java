@@ -22,6 +22,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
+import org.testin.util.Tools;
 
 public final class TestRunWordGenerator {
 
@@ -95,8 +96,8 @@ public final class TestRunWordGenerator {
                     addOverviewRow(overviewTable, 4, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
 
                 addOverviewRow(overviewTable, 5, "Executed By", summary.executedBy());
-                addOverviewRow(overviewTable, 6, "Execution Started", Config.formatOrBlank(tr.getExecutionStartedAt()));
-                addOverviewRow(overviewTable, 7, "Execution Ended", Config.formatOrBlank(tr.getExecutionEndedAt()));
+                addOverviewRow(overviewTable, 6, "Execution Started", Tools.formatDate(tr.getExecutionStartedAt()));
+                addOverviewRow(overviewTable, 7, "Execution Ended", Tools.formatDate(tr.getExecutionEndedAt()));
                 addOverviewRow(overviewTable, 8, "Run Status", trDir.getMarker().getStatus().name());
 
 
@@ -139,7 +140,7 @@ public final class TestRunWordGenerator {
                             section.isWithFailureDetail(), section::matches);
                 }
 
-                addFooter(doc, ZonedDateTime.now().format(Config.getDateFormatterPattern()));
+                addFooter(doc, Tools.formatDate(ZonedDateTime.now()));
 
                 applyPageMargins(doc);
 

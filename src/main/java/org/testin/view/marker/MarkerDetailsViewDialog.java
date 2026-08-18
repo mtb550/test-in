@@ -13,6 +13,7 @@ import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
+import org.testin.util.Tools;
 
 /**
  * The Details popup on a tree node: what the node is, where it lives, and the
@@ -38,9 +39,9 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 .row("Name", dto.getName())
                 .row("Path", dto.getPath().toString())
                 .row("Created By", marker.getCreatedBy())
-                .row("Created At", Config.formatOrBlank(marker.getCreatedAt()))
+                .row("Created At", Tools.formatDate(marker.getCreatedAt()))
                 .row("Modified By", marker.getModifiedBy())
-                .row("Modified At", Config.formatOrBlank(marker.getModifiedAt()))
+                .row("Modified At", Tools.formatDate(marker.getModifiedAt()))
                 .row("Status", marker.getStatusLabel())
                 .build());
 

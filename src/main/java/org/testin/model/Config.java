@@ -35,15 +35,6 @@ public class Config {
     private static volatile @Nullable VirtualFile testSourceRoot;
 
     /**
-     * The one place that knows what an unset timestamp looks like. Every reader -
-     * grid column, list card, the three document reports - calls this and never
-     * asks whether the value is set.
-     */
-    public static @NotNull String formatOrBlank(final @NotNull ZonedDateTime at) {
-        return isNotExecuted(at) ? "" : at.format(dateFormatterPattern);
-    }
-
-    /**
      * Compared as instants, not with {@code ZonedDateTime.equals}: the mapper moves
      * every timestamp it reads into the system zone, so the epoch comes back from a
      * run file as 03:00 in Asia/Riyadh and equals() would call that a different moment.

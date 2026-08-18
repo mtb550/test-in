@@ -26,7 +26,7 @@ public class TestDataParserDateTest {
 
     @Test
     public void readsBackWhatThePluginDisplays() {
-        final String displayed = Config.formatOrBlank(when);
+        final String displayed = Tools.formatDate(when);
 
         assertEquals(parser.date(displayed).toInstant(), when.toInstant(),
                 "the export writes this shape, so the import has to read it");

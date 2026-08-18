@@ -269,7 +269,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             true,
             false,
             true,
-            (tc, p) -> Config.formatOrBlank(tc.getCreatedAt()),
+            (tc, p) -> Tools.formatDate(tc.getCreatedAt()),
             (p, tc, v) -> tc.setCreatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
             GenType.NO_CODE_CHANGE
     ),
@@ -282,7 +282,7 @@ public enum TestEditorAttributes implements ToolBarAttribute {
             true,
             false,
             true,
-            (tc, p) -> Config.formatOrBlank(tc.getUpdatedAt()),
+            (tc, p) -> Tools.formatDate(tc.getUpdatedAt()),
             (p, tc, v) -> tc.setUpdatedAt(Services.getInstance(p, Tools.class).parseDateSafe(v)),
             GenType.NO_CODE_CHANGE
     );

@@ -1,6 +1,7 @@
 package org.testin.model;
 
 import org.testin.model.dto.TestRunDto;
+import org.testin.util.Tools;
 import org.testng.annotations.Test;
 
 import java.time.ZoneId;
@@ -22,7 +23,7 @@ public class NotExecutedTimestampTest {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
         assertTrue(Config.isNotExecuted(item.getExecutedAt()));
-        assertEquals(Config.formatOrBlank(item.getExecutedAt()), "");
+        assertEquals(Tools.formatDate(item.getExecutedAt()), "");
     }
 
     @Test
@@ -32,7 +33,7 @@ public class NotExecutedTimestampTest {
         item.recordVerdict(TestStatus.PASSED, "tester");
 
         assertFalse(Config.isNotExecuted(item.getExecutedAt()));
-        assertFalse(Config.formatOrBlank(item.getExecutedAt()).isEmpty());
+        assertFalse(Tools.formatDate(item.getExecutedAt()).isEmpty());
     }
 
     @Test
@@ -42,15 +43,15 @@ public class NotExecutedTimestampTest {
         final ZonedDateTime readBack = Config.NOT_EXECUTED.withZoneSameInstant(ZoneId.of("Asia/Riyadh"));
 
         assertTrue(Config.isNotExecuted(readBack));
-        assertEquals(Config.formatOrBlank(readBack), "");
+        assertEquals(Tools.formatDate(readBack), "");
     }
 
     @Test
     public void aFreshRunHasNeitherStartedNorEnded() {
         final TestRunDto run = new TestRunDto();
 
-        assertEquals(Config.formatOrBlank(run.getExecutionStartedAt()), "");
-        assertEquals(Config.formatOrBlank(run.getExecutionEndedAt()), "");
+        assertEquals(Tools.formatDate(run.getExecutionStartedAt()), "");
+        assertEquals(Tools.formatDate(run.getExecutionEndedAt()), "");
     }
 
     @Test
@@ -60,7 +61,7 @@ public class NotExecutedTimestampTest {
         // Completed from the tree without ever pressing Start.
         run.markExecutionEnded();
 
-        assertEquals(Config.formatOrBlank(run.getExecutionEndedAt()), "");
+        assertEquals(Tools.formatDate(run.getExecutionEndedAt()), "");
     }
 
     @Test
@@ -103,8 +104,8 @@ public class NotExecutedTimestampTest {
 
         run.dropStampsWithoutVerdict();
 
-        assertEquals(Config.formatOrBlank(pending.getExecutedAt()), "", "queued, never executed");
-        assertEquals(Config.formatOrBlank(untested.getExecutedAt()), "", "the run ended without reaching it");
+        assertEquals(Tools.formatDate(pending.getExecutedAt()), "", "queued, never executed");
+        assertEquals(Tools.formatDate(untested.getExecutedAt()), "", "the run ended without reaching it");
         assertEquals(passed.getExecutedAt(), asIfCreated, "a verdict's own time is not a default");
     }
 }

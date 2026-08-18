@@ -7,11 +7,11 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.util.Tools;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -119,7 +119,7 @@ public class ExportHtml {
             writer.write("<p><em>Total test cases exported: " + totalExported + "</em></p>");
             writer.newLine();
 
-            final String exportDate = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss zzz"));
+            final String exportDate = Tools.formatDate(ZonedDateTime.now());
             writer.write("<p><em>Exported on: " + htmlEscape(exportDate) + "</em></p>");
             writer.newLine();
 

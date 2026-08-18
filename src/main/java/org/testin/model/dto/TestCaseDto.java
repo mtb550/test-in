@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.testin.util.Tools;
 
 @Setter
 @Getter
@@ -82,7 +83,7 @@ public final class TestCaseDto {
     /**
      * The empty timestamp until the case is edited for the first time: a case
      * nobody has changed has no modification date, and every reader gets a blank
-     * from {@link Config#formatOrBlank} rather than asking whether it is set.
+     * from {@link org.testin.util.Tools#formatDate} rather than asking whether it is set.
      */
     @NonNull
     @Builder.Default

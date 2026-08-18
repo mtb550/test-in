@@ -88,6 +88,21 @@ public final class Tools {
     }
 
     /**
+     * A timestamp as everything shows it: the card, the grid, the details popup,
+     * an exported sheet, a report footer - and blank when there is no moment to
+     * show, which {@link Config#NOT_EXECUTED} is how the model says.
+     * <p>
+     * One owner, because the format is a contract rather than a style: what the
+     * plugin writes into a sheet is what its own import has to read back, and
+     * the two drifted apart once already - the exporter wrote this shape while
+     * the parser knew only "2026-08-19 01:12:58", so every re-imported date
+     * failed and became "now" (#66).
+     */
+    public static @NotNull String formatDate(final @NotNull ZonedDateTime at) {
+        return Config.isNotExecuted(at) ? "" : at.format(Config.getDateFormatterPattern());
+    }
+
+    /**
      * True when a full stop would be wrong: the text already ends in
      * punctuation, or in a character that means it is not a sentence - a URL or
      * a path ending in '/', a parenthesized note, a code snippet.

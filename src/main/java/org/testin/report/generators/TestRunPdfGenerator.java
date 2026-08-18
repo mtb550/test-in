@@ -33,6 +33,7 @@ import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
+import org.testin.util.Tools;
 
 public final class TestRunPdfGenerator {
 
@@ -135,8 +136,8 @@ public final class TestRunPdfGenerator {
 
 
             addOverviewRow(overviewTable, "Executed By", summary.executedBy(), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Execution Started", Config.formatOrBlank(tr.getExecutionStartedAt()), boldFont, regularFont);
-            addOverviewRow(overviewTable, "Execution Ended", Config.formatOrBlank(tr.getExecutionEndedAt()), boldFont, regularFont);
+            addOverviewRow(overviewTable, "Execution Started", Tools.formatDate(tr.getExecutionStartedAt()), boldFont, regularFont);
+            addOverviewRow(overviewTable, "Execution Ended", Tools.formatDate(tr.getExecutionEndedAt()), boldFont, regularFont);
             addOverviewRow(overviewTable, "Run Status", trDir.getMarker().getStatus().name(), boldFont, regularFont);
 
             document.add(overviewTable);
@@ -245,7 +246,7 @@ public final class TestRunPdfGenerator {
             footerCanvas.add(new Paragraph()
                     .setFont(regularFont).setFontSize(8).setFontColor(DARK_GRAY)
                     .setTextAlignment(TextAlignment.CENTER)
-                    .add(new Text(ZonedDateTime.now().format(Config.getDateFormatterPattern())))
+                    .add(new Text(Tools.formatDate(ZonedDateTime.now())))
                     .add(new Text("  |  Generated automatically by "))
                     .add(new Link("Testin", PdfAction.createURI("https://plugins.jetbrains.com/plugin/31514-testin"))
                             .setFontColor(LINK_BLUE))

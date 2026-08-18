@@ -19,7 +19,6 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.importexport.FileTypes;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
-import org.testin.model.Config;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -27,6 +26,7 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Shortcuts;
+import org.testin.util.Tools;
 
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
@@ -137,7 +137,7 @@ public class GenerateReportAction extends AbstractProjectAction {
                     reportFile = outputFile;
                 } else {
                     final String cleanName = runData.getChangeLog().replace(".json", "");
-                    final String rawTimestamp = java.time.ZonedDateTime.now().format(Config.getDateFormatterPattern());
+                    final String rawTimestamp = Tools.formatDate(java.time.ZonedDateTime.now());
                     final String safeTimestamp = rawTimestamp.replace(":", "-").replace("/", "-");
                     reportFile = dirPath.resolve(cleanName + "_Report_" + safeTimestamp + format.getExtension()).toFile();
                 }
