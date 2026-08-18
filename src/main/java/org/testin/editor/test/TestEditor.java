@@ -179,8 +179,16 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         loadDataAsync();
     }
 
+    /**
+     * True from the moment a load starts until its data is on screen. The empty
+     * message asks it, so a list that is empty because it is still loading keeps
+     * the loading message instead of being told there is nothing to show.
+     */
+    private volatile boolean loading;
+
     private void loadDataAsync() {
         final int generation = modelGeneration.incrementAndGet();
+        loading = true;
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             indexer.awaitIndexing();
@@ -194,7 +202,9 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
                     currentTestCases.clear();
                     unsortedIds.clear();
                     list.setPaintBusy(false);
-                    list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
+                    loading = false;
+                    // The message comes from refreshView, which is the one place
+                    // that knows what the page ended up holding.
                     refreshView();
                 });
                 return;
@@ -220,9 +230,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
                 jumpToPageOfPendingSelection();
 
                 list.setPaintBusy(false);
-                if (allTestCases.isEmpty()) {
-                    list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
-                }
+                loading = false;
 
                 refreshView();
             });
@@ -465,12 +473,40 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         }
         selectionToRestore = null;
 
+        showEmptyStateIfNothingToDraw(totalItems);
+
         statusBar.updatePaginationState(page.page(), page.totalPages(), totalItems);
 
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
             if (gridScrollPane != null) center.set(gridScrollPane);
+        }
+    }
+
+    /**
+     * What an empty list says, decided here because this is where the page is
+     * decided.
+     * <p>
+     * It used to be set only by the two places that load data, so a list emptied
+     * any other way kept whatever message was last written - remove the last
+     * test case after a refresh and the editor sat on "Refreshing..." forever,
+     * for a refresh that had finished minutes ago.
+     * <p>
+     * Two empties, two answers: nothing in the test set at all, which is an
+     * invitation to add one, and nothing matching the search, which is not - the
+     * cases are there and the filter is hiding them.
+     * <p>
+     * Silent while loading. The load paths own that message, and overwriting it
+     * here would flash "No test cases found" over data that is still on its way.
+     */
+    private void showEmptyStateIfNothingToDraw(final int totalItems) {
+        if (totalItems > 0 || loading) return;
+
+        if (allTestCases.isEmpty()) {
+            list.getEmptyText().setText("No test cases found").appendLine("Press Ctrl+M to add");
+        } else {
+            list.getEmptyText().setText("No test cases match the search");
         }
     }
 
