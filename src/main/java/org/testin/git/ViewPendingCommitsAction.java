@@ -1,8 +1,6 @@
 package org.testin.git;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationAction;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
@@ -35,8 +33,6 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     /**
      * Live only between a successful commit and the push that expires it.
      */
-    private @Nullable Notification pushNotification;
-
     public ViewPendingCommitsAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, tree, "View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
         this.git = new GitRepositoryService(p);
@@ -93,29 +89,10 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
             return;
         }
 
-        final PendingCommitsDialog dialog = new PendingCommitsDialog(p, changes, path);
-        if (!dialog.showAndGet()) return;
-
-        final List<TestCaseDiff> selectedChanges = dialog.getSelectedDifferences();
-        if (selectedChanges.isEmpty()) {
-            Services.getInstance(p, Notifier.class).warn(p, "Commit Aborted", "Select at least one change to commit.");
-            return;
-        }
-
-        final String commitMessage = Messages.showInputDialog(
-                p,
-                "Enter a message for this commit:",
-                "Commit Test Cases",
-                Messages.getQuestionIcon(),
-                "Updated test cases",
-                null
-        );
-
-        if (commitMessage != null && !commitMessage.trim().isEmpty()) {
-            performCommitWorkflow(p, path, commitMessage.trim(), selectedChanges);
-        } else if (commitMessage != null) {
-            Services.getInstance(p, Notifier.class).warn(p, "Commit Aborted", "A commit message is required.");
-        }
+        // The dialog owns the whole review now - which changes, the message and
+        // the Commit button - so there is nothing left to ask afterwards.
+        new PendingCommitsDialog(p, changes, path,
+                (selected, message) -> performCommitWorkflow(p, path, message, selected)).show();
     }
 
     private void performCommitWorkflow(
@@ -129,22 +106,12 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        // The one action link that deliberately does not expire on
-                        // click. Every other offer is spent the moment it is taken;
-                        // this one is spent when the push succeeds, which is why it
-                        // is held and expired below instead. A push that fails
-                        // leaves the offer standing, so the tester can try again
-                        // without committing a second time.
-                        final NotificationAction pushAction = NotificationAction.createSimple(
-                                "Push to Remote",
-                                () -> pushToRemote(p, repoPath)
-                        );
-
-                        pushNotification = Services.getInstance(p, Notifier.class).infoWithActions(
+                        final Notifier notifier = Services.getInstance(p, Notifier.class);
+                        notifier.infoWithActions(
                                 p,
                                 "Committed",
                                 "Push these changes to the remote?",
-                                pushAction
+                                notifier.action("Push to Remote", () -> pushToRemote(p, repoPath))
                         );
                     });
                 },
@@ -222,19 +189,23 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 indicator -> {
                     indicator.setText("Syncing with remote: pull --rebase, then push");
                     commits.pullAndPush(repoPath, remote, branch);
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        if (pushNotification != null) {
-                            pushNotification.expire();
-                            pushNotification = null;
-                        }
-                        // In the log for the same reason the sync is: the push
-                        // finishes on its own time, not under the tester's hand.
-                        Services.getInstance(p, Notifier.class).info(p, "Pushed", "Test cases are on the remote");
-                    });
+                    // In the log for the same reason the sync is: the push
+                    // finishes on its own time, not under the tester's hand.
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            Services.getInstance(p, Notifier.class).info(p, "Pushed", "Test cases are on the remote"));
                 },
                 ex -> {
-                    if (git.hasConflicts(repoPath)) showConflictActions(repoPath, remote, branch);
-                    else Services.getInstance(p, Notifier.class).error(p, "Push Failed", ex.getMessage());
+                    if (git.hasConflicts(repoPath)) {
+                        showConflictActions(repoPath, remote, branch);
+                        return;
+                    }
+
+                    // The commit already happened, so there is nothing pending to
+                    // review and no second route back to a push. The retry travels
+                    // with the failure that needs it.
+                    final Notifier notifier = Services.getInstance(p, Notifier.class);
+                    notifier.errorWithActions(p, "Push Failed", ex.getMessage(),
+                            notifier.action("Try Again", () -> pushToRemote(p, repoPath)));
                 });
     }
 

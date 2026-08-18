@@ -114,6 +114,16 @@ public final class Notifier {
         return notify(p, title, message, NotificationType.INFORMATION, actions);
     }
 
+    /**
+     * A failure the tester can do something about, with the something attached.
+     * <p>
+     * An error with no way forward is just news; this is for the ones where the
+     * answer is "try that again" - a push that could not reach the remote, say.
+     */
+    public void errorWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
+        notify(p, title, message, NotificationType.ERROR, actions);
+    }
+
     private Notification notify(final @NotNull Project p, final String title, final @NotNull String message,
                                 final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
         final Notification notification = title == null

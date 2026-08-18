@@ -91,6 +91,20 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     }
 
     /**
+     * A read-only table the tester selects rows in — "here is what changed,
+     * pick the ones you mean". One {@code .column(...)} call per column:
+     * <pre>
+     * ComponentDialogBase.table()
+     *         .column("Change Type", 120)
+     *         .column("Description", 240)
+     *         .build()
+     * </pre>
+     */
+    public static @NotNull TableBuilder table() {
+        return new TableBuilder();
+    }
+
+    /**
      * Framework default: every declared icon renders desaturated, so the
      * color accents of tree icons (e.g. badge dots) never distract inside
      * a dialog. Dialogs pass their icons plain.
@@ -101,6 +115,28 @@ public final class ComponentDialogBase<C extends DialogComponent> {
 
     public @NotNull C getComponent() {
         return component;
+    }
+
+    /**
+     * Fluent builder for {@link SelectionTable}.
+     */
+    public static final class TableBuilder {
+
+        private final @NotNull List<String> columns = new ArrayList<>();
+        private final @NotNull List<Integer> widths = new ArrayList<>();
+
+        /**
+         * One column: its heading, and the width it prefers before scaling.
+         */
+        public @NotNull TableBuilder column(final @NotNull String heading, final int width) {
+            columns.add(heading);
+            widths.add(width);
+            return this;
+        }
+
+        public @NotNull ComponentDialogBase<SelectionTable> build() {
+            return new ComponentDialogBase<>(new SelectionTable(List.copyOf(columns), List.copyOf(widths)));
+        }
     }
 
     /**

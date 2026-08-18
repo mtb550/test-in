@@ -37,6 +37,19 @@ public class BranchSelector {
 
     private boolean isUpdating = false;
 
+    /**
+     * True while the box holds an explanation rather than branches - loading,
+     * no project, not a repository, nothing found.
+     * <p>
+     * A field rather than a comparison against the text on screen. That is what
+     * it used to be, and it guarded only two of the four messages: selecting
+     * "Not a Git repository" was read as a request to check out a branch by that
+     * name. The strings are also shown to the tester, so rewording one silently
+     * broke the guard - which is exactly what nearly happened when the ellipsis
+     * in "Loading branches..." was corrected in two places at once.
+     */
+    private boolean showingPlaceholder = false;
+
     public BranchSelector(final @NotNull Project p, final @NotNull ExplorerPanel pp,
                           final @Nullable TestProjectDirectoryDto testProjectDirectory) {
         this.p = p;
@@ -69,7 +82,7 @@ public class BranchSelector {
         if (path == null) {
             showPlaceholder("No project path found");
         } else if (git.isRepository(path)) {
-            showPlaceholder("Loading branches..");
+            showPlaceholder("Loading branches...");
             loadGitBranches(path);
         } else {
             showPlaceholder("Not a Git repository");
@@ -84,6 +97,7 @@ public class BranchSelector {
         isUpdating = true;
         try {
             model.addElement(text);
+            showingPlaceholder = true;
         } finally {
             isUpdating = false;
         }
@@ -99,8 +113,7 @@ public class BranchSelector {
 
         final String selectedBranch = getSelectedBranch();
 
-        if (selectedBranch == null || selectedBranch.equals("No branches found") ||
-                selectedBranch.equals("Loading branches..") || selectedBranch.equals(currentBranch)) {
+        if (selectedBranch == null || showingPlaceholder || selectedBranch.equals(currentBranch)) {
             return;
         }
 
@@ -180,6 +193,7 @@ public class BranchSelector {
                             model.removeAllElements();
 
                             if (!branches.isEmpty()) {
+                                showingPlaceholder = false;
                                 for (final String branch : branches) {
                                     model.addElement(branch);
                                 }
@@ -195,6 +209,7 @@ public class BranchSelector {
                                 comboBox.setEnabled(true);
                             } else {
                                 model.addElement("No branches found");
+                                showingPlaceholder = true;
                                 comboBox.setEnabled(false);
                             }
                         } finally {

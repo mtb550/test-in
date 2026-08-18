@@ -1,90 +1,74 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vcs.VcsException;
-import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
-import git4idea.GitLocalBranch;
-import git4idea.GitRemoteBranch;
 import git4idea.GitUtil;
-import git4idea.commands.Git;
-import git4idea.commands.GitCommandResult;
-import git4idea.repo.GitRepository;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.function.Function;
 
 /**
- * Repository lookup and branch operations backed by IntelliJ Git4Idea. The naming
- * and selection rules themselves live in {@link GitRefs}, which is testable
- * without an IDE; this class only runs the commands and hands their output over.
+ * Repository and branch operations, run as Git commands. The naming and parsing
+ * rules live in {@link GitRefs}, which is testable without an IDE or a
+ * repository; this class only runs the commands and hands their output over.
+ * <p>
+ * It used to ask the IDE for a {@code GitRepository} instead, and that could not
+ * work here: the IDE only knows repositories registered as VCS roots in the open
+ * project, and a Testin root is deliberately a separate repository from the
+ * automation project. Every lookup came back null, so the branch was unknown, the
+ * branch list was empty, and a push failed with "Could not determine the
+ * repository default branch" on a repository whose branch Git could name
+ * immediately.
  */
 @AllArgsConstructor
 public final class GitRepositoryService {
 
     private final @NotNull Project project;
 
+    /**
+     * A filesystem question, not an IDE one - so this stays as it was.
+     */
     public boolean isRepository(final @NotNull Path path) {
         return GitUtil.isGitRoot(path);
     }
 
-    public @Nullable GitRepository findRepository(final @NotNull Path path) {
-        final VirtualFile root = LocalFileSystem.getInstance().findFileByNioFile(path);
-        if (root == null || !isRepository(path)) return null;
-        try {
-            return GitUtil.getRepositoryForRoot(project, root);
-        } catch (final VcsException ignored) {
-            return null;
-        }
-    }
-
+    /**
+     * The checked-out branch, or null when Git cannot name one - an empty
+     * repository before its first commit, or a detached HEAD.
+     */
     public @Nullable String getCurrentBranch(final @NotNull Path path) {
-        final GitRepository repository = findRepository(path);
-        final GitLocalBranch branch = repository == null ? null : repository.getCurrentBranch();
-        return branch == null ? null : branch.getName();
+        final String branch = run(path, "git", "branch", "--show-current");
+        return branch == null || branch.isBlank() ? null : branch.trim();
     }
 
+    /**
+     * The branch a push should go to: what the remote calls its HEAD, falling
+     * back to the branch checked out here.
+     */
     public @Nullable String getDefaultBranch(final @NotNull Path path) {
         final String currentBranch = getCurrentBranch(path);
         final String remoteName = getRemoteName(path);
         if (remoteName == null) return currentBranch;
-        try {
-            final String remoteInfo = GitCommandRunner.execute(project, path, "git", "remote", "show", remoteName);
-            final String headBranch = GitRefs.parseHeadBranch(remoteInfo);
-            return headBranch != null ? headBranch : currentBranch;
-        } catch (final RuntimeException ignored) {
-            return currentBranch;
-        }
+
+        final String remoteInfo = runRemote(path, getRemoteUrl(path, remoteName), "git", "remote", "show", remoteName);
+        final String headBranch = remoteInfo == null ? null : GitRefs.parseHeadBranch(remoteInfo);
+        return headBranch != null ? headBranch : currentBranch;
     }
 
     public void fetchRemoteBranches(final @NotNull Path path) {
-        if (getRemoteName(path) == null) return;
-        GitCommandRunner.execute(project, path, "git", "fetch", "--all", "--prune");
-        final GitRepository repository = findRepository(path);
-        if (repository != null) GitUtil.updateRepositories(List.of(repository));
+        final String remoteName = getRemoteName(path);
+        if (remoteName == null) return;
+
+        runRemote(path, getRemoteUrl(path, remoteName), "git", "fetch", "--all", "--prune");
     }
 
     public @NotNull List<String> getAvailableBranches(final @NotNull Path path) {
-        final GitRepository repository = findRepository(path);
-        if (repository == null) return List.of();
-
-        final Set<String> branches = new LinkedHashSet<>();
-        repository.getBranches().getLocalBranches().stream()
-                .map(GitLocalBranch::getName)
-                .forEach(branches::add);
-        repository.getBranches().getRemoteBranches().stream()
-                .map(GitRemoteBranch::getName)
-                .filter(name -> !name.endsWith("/HEAD"))
-                .forEach(branches::add);
-
-        return branches.stream().sorted().toList();
+        final String output = run(path, "git", "branch", "-a");
+        return output == null ? List.of() : GitRefs.parseBranches(output.lines().toList());
     }
 
     /**
@@ -93,23 +77,13 @@ public final class GitRepositoryService {
      * configured", which is what an unreadable config amounts to.
      */
     public @NotNull String getRemoteUrl(final @NotNull Path path, final @NotNull String remoteName) {
-        final VirtualFile root = LocalFileSystem.getInstance().findFileByNioFile(path);
-        if (root == null) return "";
-        try {
-            final String remote = git4idea.config.GitConfigUtil.getValue(project, root, "remote." + remoteName + ".url");
-            return remote == null ? "" : remote.trim();
-        } catch (final VcsException ex) {
-            Logger.error("Could not read remote." + remoteName + ".url: " + ex.getMessage());
-            return "";
-        }
+        final String url = run(path, "git", "remote", "get-url", remoteName);
+        return url == null ? "" : url.trim();
     }
 
     public @Nullable String getRemoteName(final @NotNull Path path) {
-        try {
-            return GitRefs.chooseRemote(GitCommandRunner.execute(project, path, "git", "remote").lines().toList());
-        } catch (final RuntimeException ignored) {
-            return null;
-        }
+        final String output = run(path, "git", "remote");
+        return output == null ? null : GitRefs.chooseRemote(output.lines().toList());
     }
 
     /**
@@ -120,40 +94,59 @@ public final class GitRepositoryService {
      * is the caller's to write.
      */
     public @Nullable String checkout(final @NotNull Path path, final @NotNull String branch) {
-        final GitRepository repository = findRepository(path);
-        if (repository == null) {
-            Logger.error("Checkout failed, no Git repository at: " + path);
-            return null;
+        final String localName = GitRefs.localNameOf(branch);
+        final boolean remoteBranch = !localName.equals(branch);
+
+        // A remote branch checked out by its remote name detaches HEAD. Tracking
+        // it under its local name is what the tester meant by picking it.
+        if (remoteBranch && !getAvailableBranches(path).contains(localName)) {
+            return run(path, "git", "checkout", "-b", localName, "--track", branch) == null ? null : localName;
         }
 
-        try {
-            final boolean remoteBranch = repository.getBranches().getRemoteBranches().stream()
-                    .map(GitRemoteBranch::getName)
-                    .anyMatch(branch::equals);
-            if (remoteBranch) {
-                final String localBranch = GitRefs.localNameOf(branch);
-                if (repository.getBranches().findLocalBranch(localBranch) == null) {
-                    GitCommandRunner.execute(project, path, "git", "checkout", "-b", localBranch, "--track", branch);
-                    return localBranch;
-                }
-            }
-
-            final GitCommandResult result = Git.getInstance().checkout(repository, branch, null, false, false);
-            result.throwOnError();
-            return branch;
-
-        } catch (final VcsException | RuntimeException ex) {
-            Logger.error("Checkout of '" + branch + "' failed: " + ex.getMessage());
-            return null;
-        }
+        final String target = remoteBranch ? localName : branch;
+        return run(path, "git", "checkout", target) == null ? null : target;
     }
 
+    /**
+     * What Git itself reports as changed, one porcelain line per file.
+     * <p>
+     * {@code -uall} rather than the default: without it Git collapses an
+     * untracked directory into a single entry, so a new test set arrives as
+     * "Test Cases/login/" and not one line per test case in it.
+     */
+    public @NotNull List<String> status(final @NotNull Path path) {
+        final String output = run(path, "git", "status", "--porcelain", "-uall");
+        return output == null ? List.of() : output.lines().filter(line -> !line.isBlank()).toList();
+    }
+
+    /**
+     * A file's content as committed, or null when there is no committed version
+     * to read - the file is new, or the repository has no commits at all, which
+     * is every repository on the day it is initialized.
+     */
+    public @Nullable String showAtHead(final @NotNull Path path, final @NotNull String relativePath) {
+        return run(path, "git", "show", "HEAD:" + relativePath);
+    }
+
+    /**
+     * True while a pull has stopped on a conflict: either a rebase is halfway
+     * through, or Git reports a path both sides touched.
+     */
     public boolean hasConflicts(final @NotNull Path path) {
-        final GitRepository repository = findRepository(path);
-        if (repository == null) return false;
-        if (repository.isRebaseInProgress()) return true;
-        final GitCommandResult result = Git.getInstance().getUnmergedFiles(repository);
-        return result.success() && !result.getOutput().isEmpty();
+        if (isRebaseInProgress(path)) return true;
+
+        final String output = run(path, "git", "status", "--porcelain");
+        return output != null && GitRefs.hasUnmergedPaths(output.lines().toList());
+    }
+
+    /**
+     * Git leaves one of these directories behind for the duration of a rebase -
+     * which is how Git itself knows, and the only way to ask without a
+     * repository object.
+     */
+    private boolean isRebaseInProgress(final @NotNull Path path) {
+        final Path gitDir = path.resolve(".git");
+        return Files.isDirectory(gitDir.resolve("rebase-merge")) || Files.isDirectory(gitDir.resolve("rebase-apply"));
     }
 
     /**
@@ -162,31 +155,46 @@ public final class GitRepositoryService {
      * plain failure, and only this method's caller knows that.
      */
     public boolean abortRebase(final @NotNull Path path) {
-        return rebase(path, "abort", repository -> Git.getInstance().rebaseAbort(repository));
+        return run(path, "git", "rebase", "--abort") != null;
     }
 
     /**
      * False when the rebase did not continue — see {@link #abortRebase}.
      */
     public boolean continueRebase(final @NotNull Path path) {
-        return rebase(path, "continue", repository -> Git.getInstance().rebaseContinue(repository));
+        return run(path, "git", "rebase", "--continue") != null;
     }
 
-    private boolean rebase(final @NotNull Path path, final @NotNull String operation,
-                           final @NotNull Function<GitRepository, GitCommandResult> command) {
-        final GitRepository repository = findRepository(path);
-        if (repository == null) {
-            Logger.error("Rebase " + operation + " failed, no Git repository at: " + path);
-            return false;
-        }
+    /**
+     * Runs a local command and answers null when it failed, rather than raising.
+     * <p>
+     * Every caller here treats a failure as "no answer" - there is no branch, no
+     * remote, the rebase did not continue - and each of them already returns
+     * null or false for it. The reason goes to the log, where a git message
+     * belongs; the sentence the tester reads is written by whoever called.
+     */
+    private @Nullable String run(final @NotNull Path path, final @NotNull String... command) {
+        return execute(path, "", command);
+    }
 
+    /**
+     * The same, for a command that reaches the remote: the URL is what makes
+     * git4idea set up authentication for it, so a fetch or a push can ask for
+     * credentials. See {@code GitCommandRunner.executeRemote}.
+     */
+    private @Nullable String runRemote(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
+        return execute(path, remoteUrl, command);
+    }
+
+    /**
+     * The one body both entry points share: a blank URL is a local command.
+     */
+    private @Nullable String execute(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
         try {
-            command.apply(repository).throwOnError();
-            return true;
-        } catch (final VcsException | RuntimeException ex) {
-            Logger.error("Rebase " + operation + " failed: " + ex.getMessage());
-            return false;
+            return GitCommandRunner.executeRemote(project, path, remoteUrl, command);
+        } catch (final RuntimeException ex) {
+            Logger.debug("git " + String.join(" ", command) + " failed in " + path + ": " + ex.getMessage());
+            return null;
         }
     }
 }
-

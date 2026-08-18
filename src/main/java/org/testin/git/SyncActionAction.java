@@ -60,7 +60,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                 indicator.setIndeterminate(true);
 
                 try {
-                    indicator.setText("Checking remote configuration..");
+                    indicator.setText("Checking remote configuration...");
                     final String remoteName = git.getRemoteName(repoPath);
                     final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
 
@@ -76,16 +76,22 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                         throw new IllegalStateException("Could not determine the repository default branch.");
                     }
 
-                    indicator.setText("Pulling latest changes from " + branch + "..");
+                    indicator.setText("Pulling latest changes from " + branch + "...");
                     sync.pull(repoPath, remoteName, branch);
 
-                    indicator.setText("Refreshing files..");
+                    indicator.setText("Refreshing files...");
                     refreshAfterSync(repoPath);
 
                 } catch (final Exception ex) {
                     Logger.error(ex.getMessage());
+
+                    // Asked here, still on the background thread: answering it
+                    // runs git status, and a git command on the EDT trips the
+                    // platform's own assertion.
+                    final boolean conflicts = git.hasConflicts(repoPath);
+
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        if (sync.hasConflicts(repoPath)) {
+                        if (conflicts) {
                             showConflictActions(repoPath);
                         } else {
                             Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not pull changes:\n" + ex.getMessage());
@@ -116,8 +122,12 @@ public class SyncActionAction extends AbstractProjectTreeAction {
      * the first place, so it is raised again with its two buttons.
      */
     private void reportRebaseFailure(final @NotNull Path repoPath, final @NotNull String message) {
+        // Called from a background task's body and from its error handler, both
+        // off the EDT - which is where the git question has to be asked.
+        final boolean conflicts = git.hasConflicts(repoPath);
+
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (sync.hasConflicts(repoPath)) showConflictActions(repoPath);
+            if (conflicts) showConflictActions(repoPath);
             else Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", message);
         });
     }
@@ -130,7 +140,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                 // choice it cannot make - conflicts that remain are re-offered
                 // rather than reported as a plain failure (#63).
                 if (abort) {
-                    if (!sync.abortRebase(repoPath)) {
+                    if (!git.abortRebase(repoPath)) {
                         reportRebaseFailure(repoPath, "Could not abort the rebase.");
                         return;
                     }
@@ -140,7 +150,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     return;
                 }
 
-                if (!sync.continueRebase(repoPath)) {
+                if (!git.continueRebase(repoPath)) {
                     reportRebaseFailure(repoPath, "Could not continue the rebase.");
                     return;
                 }

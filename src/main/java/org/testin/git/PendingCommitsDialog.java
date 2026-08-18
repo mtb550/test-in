@@ -1,149 +1,151 @@
 package org.testin.git;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.JBPopupMenu;
-import com.intellij.ui.components.JBPanel;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.table.JBTable;
+import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.ui.dialogs.FramelessDialogWrapper;
+import org.testin.ui.framework.AbstractFrameworkDialog;
+import org.testin.ui.framework.ComponentDialogBase;
+import org.testin.ui.framework.DialogButton;
+import org.testin.ui.framework.SelectionTable;
+import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.ui.framework.TextInput;
+import org.testin.util.Shortcuts;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.Dimension;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.BiConsumer;
 
-public class PendingCommitsDialog extends FramelessDialogWrapper {
+/**
+ * Review what changed and commit it: the changed fields as rows, a message, and
+ * a Commit button.
+ * <p>
+ * On {@code ui.framework} rather than hand-built (#69), which is what gives it a
+ * status bar — the keys it binds are now the keys it shows, instead of binding
+ * Enter and Escape and advertising neither (#66).
+ * <p>
+ * The message used to be a second platform prompt raised after this dialog
+ * closed, so the tester confirmed a selection and only then found out a message
+ * was wanted, with the changes no longer in front of them. It is a field here,
+ * beside the button that uses it.
+ */
+public final class PendingCommitsDialog extends AbstractFrameworkDialog<SelectionTable> {
 
-    private final @NotNull Project p;
-    private final @NotNull List<TestCaseDiff> differences;
-    private final @NotNull Path repoRoot;
+    private static final int COLUMN_CHANGE_TYPE = 0;
+
     private final @NotNull List<TestCaseDiff> rowDifferences = new ArrayList<>();
-
-    /**
-     * Built by {@link #createCenterPanel()}; null until the dialog has been laid out.
-     */
-    private @Nullable JBTable table;
+    private final @NotNull Path repoRoot;
+    private final @NotNull SelectionTable changes;
+    private final @NotNull TextInput message;
+    private final @NotNull DialogButton commit;
+    private final @NotNull BiConsumer<List<TestCaseDiff>, String> onCommit;
 
     public PendingCommitsDialog(final @NotNull Project p,
                                 final @NotNull List<TestCaseDiff> differences,
-                                final @NotNull Path repoRoot) {
+                                final @NotNull Path repoRoot,
+                                final @NotNull BiConsumer<List<TestCaseDiff>, String> onCommit) {
         super(p);
-        this.p = p;
-        this.differences = differences;
         this.repoRoot = repoRoot;
-        setTitle("Pending Test Case Changes");
-        initFrameless();
+        this.onCommit = onCommit;
+
+        title = "Pending Test Case Changes";
+
+        final ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
+                .column("Change Type", 140)
+                .column("Test Case", 260)
+                .column("Before", 200)
+                .column("After", 200)
+                .build();
+        // Deliberately empty. Pre-filling it produced five commits called
+        // "Updated test cases" in one afternoon of testing - a default that gets
+        // accepted rather than read, and a history that tells a reviewer nothing.
+        final ComponentDialogBase<TextInput> messageField = ComponentDialogBase.textField()
+                .placeholder("what changed, in a line...")
+                .build();
+        final ComponentDialogBase<DialogButton> commitButton = ComponentDialogBase.button("Commit");
+
+        components = List.of(table, messageField, commitButton);
+        changes = table.getComponent();
+        message = messageField.getComponent();
+        commit = commitButton.getComponent();
+
+        shortcuts = List.of(
+                StatusBarShortcut.hint("Right click", "Revert a change"),
+                StatusBarShortcut.build(Shortcuts.Escape, "Cancel", this::closeCancel));
+
+        preferredSize = new Dimension(JBUI.scale(1000), JBUI.scale(500));
+
+        fillRows(differences);
+        changes.selectAll();
+        changes.onRowAction("Revert this change", row -> revertRow(p, row));
+
+        // Nothing selected is nothing to commit, and the tester can deselect
+        // every row - so the button follows the selection rather than letting
+        // them press it and be told afterwards.
+        changes.onSelectionChanged(() -> commit.setEnabled(!changes.getSelectedRows().isEmpty()));
+        commit.setEnabled(!changes.getSelectedRows().isEmpty());
     }
 
-    @Override
-    protected @NotNull JComponent createCenterPanel() {
-        final JBPanel<?> panel = new JBPanel<>(new BorderLayout());
-
-        final String[] columns = {"Test Case ID", "Change Type", "Test Case Description", "Old Value", "New Value"};
-        final DefaultTableModel model = new DefaultTableModel(columns, 0) {
-            @Override
-            public boolean isCellEditable(final int row, final int column) {
-                return false;
-            }
-        };
-
+    /**
+     * One row per changed field, not per test case: a case with three edited
+     * fields is three rows, so each can be reverted on its own.
+     */
+    private void fillRows(final @NotNull List<TestCaseDiff> differences) {
         for (final TestCaseDiff diff : differences) {
-            for (final FieldChange fc : diff.fieldChanges()) {
-                final String description = getDescriptionForRow(diff, fc);
-                model.addRow(new Object[]{
-                        diff.testCaseId(),
-                        fc.changeType().getLabel(),
-                        description,
-                        fc.oldValue(),
-                        fc.newValue()
-                });
+            for (final FieldChange change : diff.fieldChanges()) {
+                changes.addRow(
+                        change.changeType().getLabel(),
+                        describe(diff, change),
+                        change.oldValue(),
+                        change.newValue());
                 rowDifferences.add(diff);
             }
         }
-
-        final JBTable builtTable = new JBTable(model);
-        table = builtTable;
-        builtTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        if (builtTable.getRowCount() > 0) builtTable.addRowSelectionInterval(0, builtTable.getRowCount() - 1);
-        builtTable.setFillsViewportHeight(true);
-        builtTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-        builtTable.getColumnModel().getColumn(1).setPreferredWidth(120);
-        builtTable.getColumnModel().getColumn(2).setPreferredWidth(200);
-        builtTable.getColumnModel().getColumn(3).setPreferredWidth(200);
-        builtTable.getColumnModel().getColumn(4).setPreferredWidth(200);
-
-        // --- Context Menu for Rejecting Changes ---
-        final JBPopupMenu popupMenu = new JBPopupMenu();
-        final JMenuItem rejectItem = new JMenuItem("Reject Specific Change");
-        rejectItem.addActionListener(e -> rejectSelectedChange(model));
-        popupMenu.add(rejectItem);
-
-        builtTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(final @NotNull MouseEvent e) {
-                if (e.isPopupTrigger() || SwingUtilities.isRightMouseButton(e)) {
-                    final int r = builtTable.rowAtPoint(e.getPoint());
-                    if (r >= 0 && r < builtTable.getRowCount()) {
-                        builtTable.setRowSelectionInterval(r, r);
-                    } else {
-                        builtTable.clearSelection();
-                    }
-                    if (builtTable.getSelectedRow() >= 0) {
-                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
-            }
-        });
-
-        panel.add(new JBScrollPane(builtTable), BorderLayout.CENTER);
-        panel.setPreferredSize(new Dimension(900, 400));
-
-        return panel;
     }
 
-    public @NotNull List<TestCaseDiff> getSelectedDifferences() {
-        if (table == null || table.getSelectedRowCount() == 0) return List.of();
+    /**
+     * The test case's description, taken from whichever side of the change still
+     * has one — a deleted case only exists on the old side.
+     */
+    private @NotNull String describe(final @NotNull TestCaseDiff diff, final @NotNull FieldChange change) {
+        final TestCaseDto state = diff.type() == DiffType.DELETED ? diff.oldState() : diff.newState();
+        if (state != null) return state.getDescription();
+
+        final String fallback = diff.type() == DiffType.DELETED ? change.oldValue() : change.newValue();
+        return fallback == null ? "" : fallback;
+    }
+
+    /**
+     * The changes the tester left selected, one entry per test case however many
+     * of its rows are selected.
+     */
+    private @NotNull List<TestCaseDiff> selectedDifferences() {
         final Set<TestCaseDiff> selected = new LinkedHashSet<>();
-        for (final int row : table.getSelectedRows()) {
-            if (row >= 0 && row < rowDifferences.size()) selected.add(rowDifferences.get(row));
+        for (final int row : changes.getSelectedRows()) {
+            if (row < rowDifferences.size()) selected.add(rowDifferences.get(row));
         }
         return List.copyOf(selected);
     }
 
-    private @Nullable String getDescriptionForRow(final @NotNull TestCaseDiff diff, final @NotNull FieldChange fc) {
-        if (diff.type() == DiffType.DELETED) {
-            final TestCaseDto oldState = diff.oldState();
-            return oldState != null ? oldState.getDescription() : fc.oldValue();
-        }
+    /**
+     * Puts one field back to what was committed, and takes its row away.
+     * <p>
+     * The row's own change-type label says which field it reverts: one test case
+     * can contribute several rows, so the field cannot be read off the diff.
+     */
+    private void revertRow(final @NotNull Project p, final int row) {
+        if (row >= rowDifferences.size()) return;
 
-        final TestCaseDto newState = diff.newState();
-        return newState != null ? newState.getDescription() : fc.newValue();
-    }
-
-    private void rejectSelectedChange(final @NotNull DefaultTableModel model) {
-        final JBTable selectionSource = table;
-        if (selectionSource == null) return;
-
-        final int selectedRow = selectionSource.getSelectedRow();
-        if (selectedRow < 0 || selectedRow >= rowDifferences.size()) return;
-
-        // rowDifferences maps rows to diffs exactly; searching by test case id would
-        // pick the wrong diff when one test case contributes several change rows.
-        final TestCaseDiff diff = rowDifferences.get(selectedRow);
-
-        // The row's change-type label says which field this row reverts; a diff can
-        // contribute several rows, so it cannot be read off the diff itself.
-        final String changeTypeLabel = (String) model.getValueAt(selectedRow, 1);
+        final TestCaseDiff diff = rowDifferences.get(row);
+        final ChangeType changeType = ChangeType.fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE));
 
         try {
             final Path testSetPath = repoRoot.resolve(diff.relativeFilePath()).getParent();
@@ -152,34 +154,51 @@ public class PendingCommitsDialog extends FramelessDialogWrapper {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final UUID testCaseId = UUID.fromString(diff.testCaseId());
 
-            if (diff.type() == DiffType.ADDED) {
-                indexer.removeTestCase(testSetPath, testCaseId);
-                removeRow(selectedRow, model);
-            } else if (diff.type() == DiffType.MODIFIED) {
-                final TestCaseDto currentDto = indexer.getTestCaseById(testCaseId);
-                final TestCaseDto oldDto = diff.oldState();
-                if (currentDto == null || oldDto == null) return;
+            switch (diff.type()) {
+                case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
+                case DELETED -> {
+                    final TestCaseDto oldState = diff.oldState();
+                    if (oldState == null) return;
+                    indexer.putTestCase(testSetPath, oldState);
+                }
+                case MODIFIED -> {
+                    final TestCaseDto current = indexer.getTestCaseById(testCaseId);
+                    final TestCaseDto oldState = diff.oldState();
+                    final RevertAction revert = changeType == null ? null : changeType.getRevertAction();
+                    if (current == null || oldState == null || revert == null) return;
 
-                final ChangeType changeType = ChangeType.fromLabel(changeTypeLabel);
-                final RevertAction revertAction = changeType == null ? null : changeType.getRevertAction();
-                if (revertAction != null) revertAction.apply(currentDto, oldDto);
-
-                indexer.putTestCase(testSetPath, currentDto);
-                removeRow(selectedRow, model);
-            } else if (diff.type() == DiffType.DELETED) {
-                final TestCaseDto oldDto = diff.oldState();
-                if (oldDto == null) return;
-
-                indexer.putTestCase(testSetPath, oldDto);
-                removeRow(selectedRow, model);
+                    revert.apply(current, oldState);
+                    indexer.putTestCase(testSetPath, current);
+                }
             }
+
+            removeRow(row);
+            Services.getInstance(p, Notifier.class).softShow(p, "Reverted");
+
         } catch (final Exception ex) {
             Services.getInstance(p, Notifier.class).error(p, "Revert Failed", "Could not revert change: " + ex.getMessage());
         }
     }
 
-    private void removeRow(final int row, final @NotNull DefaultTableModel model) {
-        model.removeRow(row);
-        if (row >= 0 && row < rowDifferences.size()) rowDifferences.remove(row);
+    private void removeRow(final int row) {
+        changes.removeRow(row);
+        rowDifferences.remove(row);
+        commit.setEnabled(!changes.getSelectedRows().isEmpty());
+    }
+
+    @Override
+    protected void submit() {
+        final List<TestCaseDiff> selected = selectedDifferences();
+        if (selected.isEmpty()) return;
+
+        // Said here, next to the empty field, rather than as a balloon after the
+        // dialog closed and took the changes off the screen with it.
+        if (message.getText().isBlank()) {
+            message.showEmptyWarning();
+            return;
+        }
+
+        onCommit.accept(selected, message.getText().trim());
+        closeOk();
     }
 }
