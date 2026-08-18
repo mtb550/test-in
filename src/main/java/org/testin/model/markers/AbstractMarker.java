@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 import org.testin.model.Config;
 
 import java.time.ZonedDateTime;
@@ -50,5 +51,30 @@ public abstract class AbstractMarker implements Marker {
     @JsonAlias("updatedAt")
     @NonNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = Config.DATE_FORMAT_PATTERN, locale = "en_US")
-    private ZonedDateTime modifiedAt = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+    private ZonedDateTime modifiedAt = Config.NOT_EXECUTED;
+
+    /**
+     * Who last modified the node - its creator, until somebody else does.
+     * <p>
+     * Markers written before these two fields existed carry only the creation
+     * pair, and a node that was never modified was last touched when it was
+     * made. The default used to be {@code now()}, so those nodes reported
+     * themselves as modified at the moment they were read, and the Details popup
+     * printed today's date for a directory nobody had touched in months.
+     * <p>
+     * Answered here rather than at each reader, so the popup, the reports and
+     * whatever asks next stay unconditional - and what is written back is the
+     * same answer, not the invented one.
+     */
+    public @NotNull String getModifiedBy() {
+        return modifiedBy.isBlank() ? createdBy : modifiedBy;
+    }
+
+    /**
+     * When the node was last modified, which is when it was created until it is.
+     * See {@link #getModifiedBy()} for why the pair answers this way.
+     */
+    public @NotNull ZonedDateTime getModifiedAt() {
+        return Config.isNotExecuted(modifiedAt) ? createdAt : modifiedAt;
+    }
 }

@@ -78,6 +78,22 @@ public class MarkerJsonTest {
     }
 
     /**
+     * A marker file written before the modified pair existed has only the
+     * creation pair, and says so: the node was last touched when it was made.
+     * The default used to be now(), so those nodes reported themselves as
+     * modified at the moment they were read.
+     */
+    @Test
+    public void aMarkerNeverModifiedReportsItsCreation() throws Exception {
+        final String onlyCreated = "{\"createdBy\":\"mtb\",\"createdAt\":\"" + onDisk + "\"}";
+
+        final TestCasesMainDirectoryMarker marker = mapper.readValue(onlyCreated, TestCasesMainDirectoryMarker.class);
+
+        assertEquals(marker.getModifiedBy(), "mtb", "nobody has modified it, so it stands as its creator made it");
+        assertEquals(marker.getModifiedAt().toInstant(), when.toInstant(), "and at the time they made it");
+    }
+
+    /**
      * The date format is the one every marker file on disk is written in, so it
      * has to survive both directions - a change to the pattern would make every
      * existing marker unreadable rather than merely differently formatted.
