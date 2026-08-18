@@ -109,7 +109,12 @@ public class DetailsTab {
                 new Steps(),
                 new AttributeRow(TestEditorAttributes.PRE_CONDITIONS, (p, dto) -> Tools.format(dto.getPreConditions())),
                 new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> Tools.format(dto.getTestData())),
-                new Fqcn(),
+                // No FQCN row. The fully qualified class and method name is how
+                // the plugin finds the generated code to navigate to and run -
+                // it is machinery, not something a tester reads while executing.
+                // It stays available as a toolbar attribute for anyone who wants
+                // it on the card or in the grid; it is only off the always-on
+                // panel.
                 new AttributeRow(TestEditorAttributes.REFERENCE, (p, dto) -> Tools.format(dto.getReference())),
                 new AttributeRow(TestEditorAttributes.MODULE, (p, dto) -> Tools.format(dto.getModule())),
                 new AttributeRow(TestEditorAttributes.CREATE_BY, (p, dto) -> dto.getCreatedBy()),
