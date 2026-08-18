@@ -8,7 +8,7 @@ IntelliJ IDEA and without a second tool to keep in sync. Test cases are stored
 as JSON on disk in your automation repository, so they are reviewed, branched
 and merged like the code they test.
 
-<!-- TODO: screenshot of the project panel with a test editor open, saved under docs/ -->
+<!-- screenshot: see docs/test-editor.png (planned) -->
 
 ## What it does
 
@@ -23,8 +23,8 @@ and merged like the code they test.
 - **Execute** — run a case, a set, or a whole test run from the gutter, the tree
   or the editor. Results are recorded per case with status, duration and
   failure details.
-- **Report** — export a run to PDF, Word, Excel or HTML, and import or export
-  test cases as XLSX, CSV or JSON.
+- **Report** — export a run to PDF, Word, Excel or HTML.
+- **Import / Export** — import and export test cases as XLS, XLSX, CSV or JSON.
 - **Version** — commit and sync test case changes from inside the panel, with a
   diff of what changed in each case.
 
@@ -57,7 +57,7 @@ without them and disables the features that need them rather than failing.
 From the IDE: **Settings → Plugins → Marketplace**, search for *Testin*, install
 and restart.
 
-<!-- TODO: Marketplace listing URL -->
+<!-- Marketplace: https://plugins.jetbrains.com/plugin/XXXXX -->
 
 Then set the Testin root in **Settings → Tools → Testin** — the folder in your
 automation repository where test cases will live — and create your first test
