@@ -29,9 +29,7 @@ public class Badges extends BaseDetails {
         badges.add(Shared.createPriorityBadge(dto));
 
         for (final Group group : dto.getGroup()) {
-            if (group != null) {
-                badges.add(Shared.createGroupBadge(group));
-            }
+            badges.add(Shared.createGroupBadge(group));
         }
 
         Shared.showBadges(badgesPanel, badges);
