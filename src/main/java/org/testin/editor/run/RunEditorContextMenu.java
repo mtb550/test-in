@@ -20,6 +20,7 @@ import org.testin.run.StartExecutionAction;
 import org.testin.testrun.SetTestCaseStatusAction;
 import org.testin.testrun.UpdateRunItemAction;
 import org.testin.view.ViewDetailsAction;
+import org.testin.util.OptionalPlugin;
 
 public class RunEditorContextMenu extends AbstractEditorContextMenu {
 
@@ -44,9 +45,14 @@ public class RunEditorContextMenu extends AbstractEditorContextMenu {
         add(new StartExecutionAction(ui.getToolBar().getCallbacks()));
         addSeparator();
         add(new CopyTestCaseAction(p, list));
-        addSeparator();
-        add(new RunTestCaseAction(p, list));
-        add(new NavigateToCodeAction(p, list));
+        // See TestEditorContextMenu: an action the IDE cannot perform is not
+        // offered rather than offered and refused (#66).
+        if (OptionalPlugin.JAVA.isAvailable() || OptionalPlugin.TESTNG.isAvailable()) {
+            addSeparator();
+            if (OptionalPlugin.TESTNG.isAvailable()) add(new RunTestCaseAction(p, list));
+            if (OptionalPlugin.JAVA.isAvailable()) add(new NavigateToCodeAction(p, list));
+        }
+
         addSeparator();
         add(new NextPageAction(ui, list));
         add(new PrevPageAction(ui, list));

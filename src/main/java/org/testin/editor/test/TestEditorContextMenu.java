@@ -23,6 +23,7 @@ import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.RemoveTestCaseAction;
 import org.testin.testcase.UpdateTestCaseAction;
 import org.testin.view.ViewDetailsAction;
+import org.testin.util.OptionalPlugin;
 
 public class TestEditorContextMenu extends AbstractEditorContextMenu {
 
@@ -44,11 +45,16 @@ public class TestEditorContextMenu extends AbstractEditorContextMenu {
         add(new PasteTestCaseNodeAction(p, ui, list));
         add(new RemoveTestCaseAction(p, ui, dir, list, model));
 
-        addSeparator();
+        // Absent, not present and broken: in an IDE without the Java or TestNG
+        // plugin these three cannot do anything, and a tester should not find
+        // them on the menu to be told so by a balloon (#66).
+        if (OptionalPlugin.JAVA.isAvailable() || OptionalPlugin.TESTNG.isAvailable()) {
+            addSeparator();
 
-        add(new AutomateTestCaseAction(p, list));
-        add(new RunTestCaseAction(p, list));
-        add(new NavigateToCodeAction(p, list));
+            if (OptionalPlugin.JAVA.isAvailable()) add(new AutomateTestCaseAction(p, list));
+            if (OptionalPlugin.TESTNG.isAvailable()) add(new RunTestCaseAction(p, list));
+            if (OptionalPlugin.JAVA.isAvailable()) add(new NavigateToCodeAction(p, list));
+        }
 
         addSeparator();
 

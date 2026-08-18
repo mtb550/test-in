@@ -63,9 +63,10 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new PasteNodeAction(p, tree))
         ));
 
-        addSeparator();
-
-        add(new RunTestSetAction(p, tree));
+        if (OptionalPlugin.TESTNG.isAvailable()) {
+            addSeparator();
+            add(new RunTestSetAction(p, tree));
+        }
 
         addSeparator();
 

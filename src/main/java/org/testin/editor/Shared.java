@@ -170,12 +170,16 @@ public class Shared {
     public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @Nullable String hoveredAction, final boolean isRunning) {
         final ActionIcons icons = descriptionActionIcons(titleWidth);
 
-        drawHoverableIcon(c, g, AllIcons.Nodes.Class, icons.navigate().x, icons.navigate().y,
-                CardHoverAction.NAVIGATE_TO_TEST_METHOD.name().equals(hoveredAction));
+        if (CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered()) {
+            drawHoverableIcon(c, g, AllIcons.Nodes.Class, icons.navigate().x, icons.navigate().y,
+                    CardHoverAction.NAVIGATE_TO_TEST_METHOD.name().equals(hoveredAction));
+        }
 
-        drawHoverableIcon(c, g, isRunning ? AllIcons.Actions.Suspend : AllIcons.RunConfigurations.TestState.Run,
-                icons.run().x, icons.run().y,
-                CardHoverAction.RUN_TEST_CASE.name().equals(hoveredAction));
+        if (CardHoverAction.RUN_TEST_CASE.isOffered()) {
+            drawHoverableIcon(c, g, isRunning ? AllIcons.Actions.Suspend : AllIcons.RunConfigurations.TestState.Run,
+                    icons.run().x, icons.run().y,
+                    CardHoverAction.RUN_TEST_CASE.name().equals(hoveredAction));
+        }
     }
 
     /**
@@ -231,8 +235,13 @@ public class Shared {
          * here is safe while nothing else on the title line is clickable.
          */
         public @Nullable CardHoverAction at(final int x, final int y) {
-            if (grown(navigate).contains(x, y)) return CardHoverAction.NAVIGATE_TO_TEST_METHOD;
-            if (grown(run).contains(x, y)) return CardHoverAction.RUN_TEST_CASE;
+            // An action this IDE does not offer is not drawn, so nothing is over
+            // it either - the band belongs to the icon, and there is no icon.
+            if (CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered() && grown(navigate).contains(x, y))
+                return CardHoverAction.NAVIGATE_TO_TEST_METHOD;
+
+            if (CardHoverAction.RUN_TEST_CASE.isOffered() && grown(run).contains(x, y))
+                return CardHoverAction.RUN_TEST_CASE;
 
             return null;
         }

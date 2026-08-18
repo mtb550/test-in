@@ -35,23 +35,33 @@ public class ActionIcons extends BaseDetails {
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
+        // Neither icon is drawn in an IDE that cannot act on it, and a row with
+        // no icons in it is no row at all.
+        final boolean navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered();
+        final boolean run = CardHoverAction.RUN_TEST_CASE.isOffered();
+        if (!navigate && !run) return currentRow;
+
         final JBPanel<?> actionsPanel = new JBPanel<>(new FlowLayout(FlowLayout.LEFT, 0, 0));
         actionsPanel.setOpaque(false);
 
-        final JBLabel navLabel = hoverIcon(navIconRaw,
-                CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip(),
-                Shortcuts.NavigateToCode.getShortcutText(),
-                () -> new NavigateToCodeAction(p, null).execute(p, dto));
+        if (navigate) {
+            actionsPanel.add(hoverIcon(navIconRaw,
+                    CardHoverAction.NAVIGATE_TO_TEST_METHOD.getTooltip(),
+                    Shortcuts.NavigateToCode.getShortcutText(),
+                    () -> new NavigateToCodeAction(p, null).execute(p, dto)));
+        }
 
-        final RunStatus currentStatus = dto.getTempStatus();
-        final JBLabel runLabel = hoverIcon(currentStatus.getIcon(),
-                currentStatus.getTooltip(),
-                Shortcuts.RunTestCase.getShortcutText(),
-                () -> currentStatus.executeAction(p, dto, null));
+        if (navigate && run) {
+            actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
+        }
 
-        actionsPanel.add(navLabel);
-        actionsPanel.add(Box.createHorizontalStrut(JBUI.scale(STRUT_WIDTH)));
-        actionsPanel.add(runLabel);
+        if (run) {
+            final RunStatus currentStatus = dto.getTempStatus();
+            actionsPanel.add(hoverIcon(currentStatus.getIcon(),
+                    currentStatus.getTooltip(),
+                    Shortcuts.RunTestCase.getShortcutText(),
+                    () -> currentStatus.executeAction(p, dto, null)));
+        }
 
         return addFullWidthRow(panel, gbc, actionsPanel,
                 JBUI.insets(INSETS_TOP, INSETS_LEFT, INSETS_BOTTOM, INSETS_RIGHT), currentRow);
