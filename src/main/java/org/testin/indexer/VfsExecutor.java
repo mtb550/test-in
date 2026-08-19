@@ -98,7 +98,7 @@ final class VfsExecutor {
      * must wait for it.
      * <p>
      * It reports whether the file is gone, not merely that the attempt finished.
-     * The callback used to run either way, so a caller could not tell a delete
+     * The callback used to run either way, so a caller could not tell a deletion
      * that failed from one that worked — and the indexer's cache update ran on
      * both, dropping a node that was still on disk (#66, F2).
      * <p>

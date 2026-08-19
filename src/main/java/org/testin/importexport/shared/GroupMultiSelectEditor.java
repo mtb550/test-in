@@ -20,7 +20,7 @@ public class GroupMultiSelectEditor extends AbstractCellEditor implements TableC
 
         // The dialog is a popup, not a modal: it answers through the callback
         // rather than on the line that showed it, and the cell stops editing
-        // whichever way it closed - picked or cancelled.
+        // whichever way it closed - picked or canceled.
         button.addActionListener(e -> {
             final GroupSelectionDialog dialog = new GroupSelectionDialog(p, currentValue, picked -> currentValue = picked);
             dialog.show();

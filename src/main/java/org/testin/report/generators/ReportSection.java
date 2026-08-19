@@ -43,8 +43,10 @@ enum ReportSection {
     /**
      * Both ways of not having been run. A case is PENDING while its run is open
      * and UNTESTED once the run finishes without reaching it, which is one fact
-     * at two moments — so one table, or a completed run would print a heading
-     * and a count above an empty table.
+     * at two moments.
+     * <p>
+     * So one table. Two would mean a completed run printing a heading and a
+     * count above an empty one.
      */
     UNTESTED("Untested Test Cases",
             "The following %s cases were not executed in this cycle and carry forward to the next run.",

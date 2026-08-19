@@ -27,7 +27,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      * <pre>
      * ComponentDialogBase.&lt;DirectoryType&gt;textFieldWithSelections()
      *         .icon(...)
-     *         .placeholder("set name..")
+     *         .placeholder("set name...")
      *         .selection(icon, "Test Set", "Holds test cases", DirectoryType.TS)
      *         .build()
      * </pre>

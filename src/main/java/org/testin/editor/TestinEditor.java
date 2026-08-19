@@ -65,7 +65,7 @@ public interface TestinEditor extends Disposable {
      * and the description, each present only while its attribute is ticked in
      * the Details popup.
      * <p>
-     * Lives here because the two editors hold different attribute enums and only
+     * Lives here because the two editors hold different attribute enums, and only
      * they can read their own selection. The renderer asks for it to draw, and
      * the mouse listener asks for it to place the hover icons, so both are
      * looking at one answer.

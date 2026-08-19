@@ -425,11 +425,12 @@ public final class ProjectIndexer {
      * Removes nothing, for the two containers the tree never deletes: Test Cases
      * and Test Runs go with their test project and never on their own.
      * <p>
-     * The callback still runs, and reports false. RemoveAction counts completions
-     * to know when to rebuild the tree, so a node that quietly did nothing would
-     * leave the count short and the tree never rebuilt — but it must not be
-     * counted as removed either, or the tester is told a node went that is still
-     * in front of them.
+     * The callback still runs, and reports false. RemoveAction counts
+     * completions to know when to rebuild the tree, so a node that quietly did
+     * nothing would leave the count short and the tree never rebuilt.
+     * <p>
+     * It must not be counted as removed either, or the tester is told a node
+     * went that is still in front of them.
      */
     public void refuseRemove(final @NotNull Path path, final @NotNull Consumer<@NotNull Boolean> onRemoved) {
         Logger.info("Not removed: " + path.getFileName() + " is not removable from the tree");
@@ -441,7 +442,7 @@ public final class ProjectIndexer {
      * CLAUDE.md requires. The refresh is asynchronous now: the synchronous one
      * ran on the EDT, and a full VFS refresh there is a slow operation.
      * <p>
-     * The cache update runs only when the delete succeeded. It used to run either
+     * The cache update runs only when the deletion succeeded. It used to run either
      * way, so a file the VFS refused to delete was dropped from the cache and the
      * tree stopped showing a node that was still on disk (#66, F2).
      */
@@ -457,7 +458,7 @@ public final class ProjectIndexer {
     /**
      * Reports whether the node moved, not merely that the attempt is over. The
      * callback used to be one Runnable passed as both outcomes, so a caller that
-     * wanted to confirm the move had to read the cache back afterwards to find
+     * wanted to confirm the move had to read the cache back afterward to find
      * out (#66, F2).
      */
     public void moveNode(final @NotNull Path oldPath,
@@ -570,10 +571,10 @@ public final class ProjectIndexer {
 
     /**
      * Writes any node's marker back through the indexer, which owns file access.
-     * Every marker write goes through here, whichever node it belongs to: the
-     * write, the cached children invalidation and the VFS refresh are one thing,
-     * and a caller that does only the first leaves a file the IDE - and the Git
-     * paths reading through it - never hear about.
+     * Every marker write goes through here, whichever node it belongs to.
+     * Writing the file, invalidating the cached children and refreshing the VFS
+     * are one act: a caller that does only the first leaves a file the IDE never
+     * hears about, and the Git paths read through the IDE.
      */
     public void persistMarker(final @NotNull DirectoryDto dto) {
         store.persistMarker(dto);

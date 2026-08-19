@@ -38,7 +38,7 @@ final class FilesUtil {
     }
 
     private void writeBytes(final @NotNull Project p, final @NotNull Path path, final byte @NotNull [] jsonBytes) {
-        // The last line of defence for test data: writing nothing over a file
+        // The last line of defense for test data: writing nothing over a file
         // empties it, and an empty marker takes its node's audit info with it.
         // Six markers in a real data root were left at zero bytes this way.
         // Nothing legitimate written here is empty - the smallest marker is a

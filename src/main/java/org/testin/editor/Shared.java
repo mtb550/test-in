@@ -29,7 +29,7 @@ public class Shared {
     // ---------------------------------------------------------------- badges
     //
     // One place for badges, look and content together: the constants below are
-    // the whole design, the factories say what each badge shows and which colour
+    // the whole design, the factories say what each badge shows and which color
     // it takes, Badge is that answer as data, and BadgePill at the bottom paints
     // it. Every badge anywhere in the plugin comes from here - the run card, the
     // test card and the view panel's details - so a change to the look lands on
@@ -38,7 +38,7 @@ public class Shared {
     //
     // Captioned or bare: a badge is captioned when another badge could be
     // mistaken for it - the test case's priority and the bug's priority declare
-    // the same three colours, and severity sits beside both. A badge whose word
+    // the same three colors, and severity sits beside both. A badge whose word
     // is its own explanation stays bare.
 
     private static final int BADGE_RADIUS = 20;
@@ -58,8 +58,8 @@ public class Shared {
     private static final @NotNull Color TEXT_ON_LIGHT = Gray._30;
 
     /**
-     * The only colour a badge names here. Every other one comes from the enum of
-     * the value being shown, which is where a colour belongs; this one describes
+     * The only color a badge names here. Every other one comes from the enum of
+     * the value being shown, which is where a color belongs; this one describes
      * a position in the tree rather than a value, so it has no enum to live in.
      */
     private static final @NotNull JBColor UNSORTED_COLOR = new JBColor(new Color(255, 100, 100), new Color(130, 50, 50));
@@ -76,7 +76,7 @@ public class Shared {
     }
 
     /**
-     * The live state of a case while a run is executing - the label and colour
+     * The live state of a case while a run is executing - the label and color
      * are the status's own.
      */
     public static @NotNull Badge createRunStatusBadge(final @NotNull RunStatus.Badge runStatus) {
@@ -87,7 +87,7 @@ public class Shared {
      * Adds a captioned pill, and adds nothing when there is no value to show.
      * <p>
      * The caption is what makes the row readable: the test case's priority and
-     * the bug's priority declare the same three colours, so an uncaptioned
+     * the bug's priority declare the same three colors, so an uncaptioned
      * "Low" beside another "Low" says two different things in the same pill.
      * <p>
      * The blank rule lives here for the same reason {@code BaseCard} owns it for
@@ -255,7 +255,7 @@ public class Shared {
     }
 
     /**
-     * What a badge shows: a word, and the colour it is drawn in. Data rather
+     * What a badge shows: a word, and the color it is drawn in. Data rather
      * than a component, so an attribute deciding what a row says never builds
      * one - it describes it, the way it already hands its detail row over as
      * text, and the panel that draws them owns the components.
@@ -265,7 +265,7 @@ public class Shared {
 
     /**
      * The pill: a rounded label that draws its own background and picks its own
-     * text colour. Private, because a badge is asked for by name above and never
+     * text color. Private, because a badge is asked for by name above and never
      * assembled by a caller - that is what keeps the look in one place.
      */
     private static final class BadgePill extends JBLabel {
@@ -294,7 +294,7 @@ public class Shared {
          * Derived rather than set, because the badge is the only thing that knows
          * what it is drawn on. White was hard-coded, which is fine on the deep
          * reds and greys the cards started with and unreadable the moment a value
-         * takes a light colour - a yellow severity pill with white text says
+         * takes a light color - a yellow severity pill with white text says
          * nothing. Computed per call rather than in the constructor because a
          * JBColor resolves to a different value in the dark theme, and the answer
          * has to follow it.

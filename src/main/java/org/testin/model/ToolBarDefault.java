@@ -24,7 +24,7 @@ public enum ToolBarDefault {
 
     /**
      * Checked on a profile that has never stored a selection, and free to be
-     * unticked afterwards.
+     * unticked afterward.
      */
     ON(true, true),
 

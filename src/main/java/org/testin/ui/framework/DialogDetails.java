@@ -34,7 +34,7 @@ public final class DialogDetails implements DialogComponent {
             stack.add(rowPanel);
         }
 
-        // Anchored to the top: when the rows are all a dialog holds and it is
+        // Anchored to the top: when the rows are all a dialog holds, and it is
         // taller than they are, a bare box layout would spread them down the
         // dialog. Rows keep their height and the room stays below them.
         panel = new JBPanel<>(new BorderLayout());

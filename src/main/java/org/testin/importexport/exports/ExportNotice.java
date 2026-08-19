@@ -17,10 +17,11 @@ import java.io.File;
 /**
  * Says an export finished, and offers to open what it produced.
  * <p>
- * One place for all four formats. It was four copies of the same eight lines -
- * three of them identical to the character - so the wording, the action label
- * and the decision to raise this on the EDT could each drift in one format
- * without anyone noticing in the others.
+ * One place for all four formats. It was four copies of the same eight lines,
+ * three of them identical to the character.
+ * <p>
+ * So the wording, the action label and the decision to raise this on the EDT
+ * could each drift in one format without anyone noticing in the others.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class ExportNotice {

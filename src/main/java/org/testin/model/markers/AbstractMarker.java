@@ -20,9 +20,10 @@ import java.time.temporal.ChronoUnit;
  * status it adds - two of them add nothing and are now empty.
  * <p>
  * Serialization lives here too. {@code ignoreUnknown} is what lets a marker
- * file written by an older build - or by a sibling marker that has a status
- * this one does not - still be read, and the date format is the one every
- * marker file on disk is already written in.
+ * file written by an older build still be read - or one written by a sibling
+ * marker that has a status this one does not.
+ * <p>
+ * The date format is the one every marker file on disk is already written in.
  * <p>
  * The {@code updatedBy}/{@code updatedAt} aliases are the pre-rename keys.
  * Only the test project marker declared them, because it was the only marker

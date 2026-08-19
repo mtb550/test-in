@@ -116,10 +116,12 @@ public final class EditorUtil {
 
     /**
      * A path per open editor, and nothing else. The entry used to carry a "ts"
-     * or "tr" prefix saying which kind of node it was, which the restore then
-     * parsed back to pick a lookup — but the indexer finds a node of any kind by
-     * path, and {@link #open} already decides the editor type from the node's own
-     * class. The prefix said nothing the path did not.
+     * or "tr" prefix saying which kind of node it was, which the restore parsed
+     * back to pick a lookup.
+     * <p>
+     * The indexer finds a node of any kind by path, and {@link #open} already
+     * decides the editor type from the node's own class. The prefix said nothing
+     * the path did not.
      */
     private @NotNull List<String> getEntries(final @NotNull FileEditorManager fed) {
         final List<String> entries = new ArrayList<>();

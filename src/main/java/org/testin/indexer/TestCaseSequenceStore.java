@@ -72,7 +72,7 @@ final class TestCaseSequenceStore {
         // nothing.
         //
         // Known to the index means the case already exists, whatever its fields
-        // say - the one question that separates a create from an update without
+        // say - the one question that separates a creation from an update without
         // trusting a value a tester could have typed.
         final String tester = Services.getInstance(project, AppSettingsState.class).testerName;
         if (testCasesById.containsKey(testCase.getId())) testCase.touch(tester);
@@ -86,9 +86,10 @@ final class TestCaseSequenceStore {
      * brought with it.
      * <p>
      * The four audit attributes are mappable in the import wizard, so a
-     * spreadsheet carrying a case's real author and date says who made it - and
-     * the ordinary path would have called this a creation and written the
-     * importer's own name over all four, which is what the preview showing one
+     * spreadsheet carrying a case's real author and date says who made it.
+     * <p>
+     * The ordinary path would have called this a creation and written the
+     * importer's own name over all four. That is what the preview showing one
      * thing and the saved file holding another came down to (#66).
      * <p>
      * Nothing is filled in when the columns are absent either: an import with no

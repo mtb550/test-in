@@ -667,11 +667,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         }
 
         executionTimer.start(runItem, () -> {
-            // A model event, not a repaint. The card grows a Duration line the
-            // moment that value stops being blank, which makes the row taller,
-            // and JList re-measures a row only when the model says that row
-            // changed - a repaint draws the taller content into the cached
-            // height and clips it. That is why the duration stayed hidden until
+            // A model event, not a repaint. The card grows a Duration line
+            // the moment that value stops being blank, which makes the row
+            // taller. JList re-measures a row only when the model says that row
+            // changed: a repaint draws the taller content into the cached height
+            // and clips it. That is why the duration stayed hidden until
             // toggling the attribute off and on forced the re-measure.
             //
             // Only when the case is on the page being viewed: contentsChanged
@@ -685,8 +685,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     /**
      * The run's total is the sum of what its cases measured, not a clock of its
      * own: it counts only while a case is being timed, so a stop freezes it, a
-     * resume continues it, and it is back after a reopen because the case durations
-     * are. A run judged from the context menu has measured nothing and shows blank,
+     * resuming continues it, and it is back after a reopen because the case
+     * durations are. A run judged from the context menu has measured nothing and shows blank,
      * as its cases do.
      */
     private void showExecutionTotal() {
@@ -744,7 +744,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * whether it has an end to stamp: a run nobody started has none.
      * <p>
      * The caller persists. Every path that reaches this already writes the run
-     * afterwards, so the stamp and the in-flight case's duration land in the file
+     * afterward, so the stamp and the in-flight case's duration land in the file
      * together.
      */
     public void stopExecution() {

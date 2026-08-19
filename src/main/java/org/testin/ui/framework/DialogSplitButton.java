@@ -14,10 +14,10 @@ import java.util.List;
  * A primary action with alternatives behind an arrow — the IDE's own commit
  * control, which is what a tester already knows: the common answer is on the
  * button and the others are one click away, rather than in a menu somewhere
- * else or a second dialog afterwards.
+ * else or a second dialog afterward.
  * <p>
  * Every action submits the dialog. Which one was pressed is a question the
- * dialog asks afterwards through {@link #getChosen()}, so there is one submit
+ * dialog asks afterward through {@link #getChosen()}, so there is one submit
  * path with one validation in it, and the choice only decides what happens with
  * what the dialog collected.
  * <p>

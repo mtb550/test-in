@@ -110,11 +110,17 @@ public abstract class AbstractButton extends JButton {
 
     /**
      * A Swing click arrives without the lock the action system takes before it
-     * calls an AnAction, so whatever the click opens runs on the EDT with no
-     * read access - the Create Test Case dialog's editor field asserted on
-     * exactly that. Taken here, once, so every toolbar button behaves like the
-     * same command reached through the menu or its shortcut.
+     * calls an AnAction. So whatever the click opens runs on the EDT with no
+     * read access, and the Create Test Case dialog's editor field asserted on
+     * exactly that.
+     * <p>
+     * Taken here, once, so every toolbar button behaves like the same command
+     * reached through the menu or its shortcut.
      */
+    // The platform marks WriteIntentReadAction experimental, and it is what the
+    // action system itself takes before dispatching - so the alternative is not
+    // a stable API, it is doing without the lock and asserting on the EDT.
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     protected void fireActionPerformed(final @NotNull ActionEvent event) {
         WriteIntentReadAction.run(() -> super.fireActionPerformed(event));
