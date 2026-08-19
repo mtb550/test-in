@@ -59,6 +59,13 @@ public final class ExplorerPanel implements Disposable {
      */
     private @NotNull Map<String, ProjectStatus> underRoot = Map.of();
 
+    /**
+     * How many projects the welcome screen offers as lines before it hands the
+     * choice to the picker instead. A status text does not scroll, so a long
+     * list would run off the panel.
+     */
+    private static final int INLINE_CHOICES = 6;
+
     public ExplorerPanel(final @NotNull Project p) {
         this.p = p;
         Logger.info("ExplorerPanel.ExplorerPanel()");
@@ -108,7 +115,18 @@ public final class ExplorerPanel implements Disposable {
         // directory walk that reads a marker per project, and the threading rule
         // in CLAUDE.md keeps disk work off the thread that paints (#66).
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            final PanelState state = state();
+            final Map<String, ProjectStatus> listing = Services.getInstance(p, ProjectIndexer.class).testProjects();
+
+            // Binding changes what indexing covers, so the answer is re-indexed
+            // rather than redrawn - the same route every other binder takes.
+            if (bindTheOnlyProject(listing)) {
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (!p.isDisposed()) reindex();
+                });
+                return;
+            }
+
+            final PanelState state = state(listing);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (p.isDisposed()) return;
@@ -138,8 +156,58 @@ public final class ExplorerPanel implements Disposable {
         panel.repaint();
     }
 
+    /**
+     * Binds to a project the tester clicked in the welcome screen, off the EDT
+     * because it writes {@code testin.yml}, and redraws either way - a write
+     * that failed has said so, and the screen must not sit there looking as
+     * though the click did nothing.
+     */
+    private void bindTo(final @NotNull String name) {
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final boolean bound = Services.getInstance(p, BoundTestProject.class).bind(name);
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (p.isDisposed()) return;
+
+                // Re-indexed rather than redrawn: indexing is scoped to the
+                // bound project, so the cache built before the binding is not
+                // the one the tree needs.
+                if (bound) reindex();
+                else refresh();
+            });
+        });
+    }
+
     private @Nullable TestProjectDirectoryDto bound() {
         return Services.getInstance(p, BoundTestProject.class).get();
+    }
+
+    /**
+     * Binds a repository that names no test project to the only one there is,
+     * and says whether it did.
+     * <p>
+     * A picker with one row is a question with one answer, and a fresh clone of
+     * an automation repository beside a Testin root that holds a single project
+     * is the common first run. It writes the binding and the tree opens, rather
+     * than asking a tester who has nothing to choose between.
+     * <p>
+     * Only when the repository names nothing at all. A name that resolves to
+     * nothing - a renamed folder, an archived project - is a different state
+     * with a different sentence, and silently rebinding it would hide the thing
+     * the tester needs to know (#8).
+     * <p>
+     * On the pooled thread that gathers, because it writes {@code testin.yml};
+     * the listing it decides from is the one that pass already read.
+     */
+    private boolean bindTheOnlyProject(final @NotNull Map<String, ProjectStatus> projects) {
+        final BoundTestProject bound = Services.getInstance(p, BoundTestProject.class);
+        if (bound.isNamed() || projects.size() != 1) return false;
+
+        final String only = projects.keySet().iterator().next();
+        if (!bound.bind(only)) return false;
+
+        Logger.info("Bound to the only test project under the root: " + only);
+        return true;
     }
 
     /**
@@ -147,11 +215,11 @@ public final class ExplorerPanel implements Disposable {
      * {@link PanelState}. The root and the project listing are disk reads, so
      * they are asked for once per draw rather than once per branch.
      */
-    private @NotNull PanelState state() {
-        // Read once and used three times over. It is a directory walk that reads
-        // a marker per project, and drawing the panel must not do that more than
-        // it has to.
-        underRoot = Services.getInstance(p, ProjectIndexer.class).testProjects();
+    private @NotNull PanelState state(final @NotNull Map<String, ProjectStatus> listing) {
+        // Handed in rather than read here: the caller has already walked the root
+        // to decide whether there was one project to bind to, and that walk reads
+        // a marker per project.
+        underRoot = listing;
 
         return PanelState.of(
                 !Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty(),
@@ -229,6 +297,18 @@ public final class ExplorerPanel implements Disposable {
                 if (!problem.isEmpty()) {
                     emptyText.appendLine(problem, SimpleTextAttributes.ERROR_ATTRIBUTES, null);
                     emptyText.appendLine("");
+                }
+
+                // Few enough to read at a glance: one line each, one click to
+                // bind. The dialog is for the root that holds more than a
+                // screenful, where a list in a status text stops being a list.
+                if (underRoot.size() <= INLINE_CHOICES) {
+                    underRoot.forEach((name, status) -> emptyText.appendLine(
+                            AllIcons.Actions.ModuleDirectory,
+                            name + "  " + status.getLabel(),
+                            SimpleTextAttributes.LINK_ATTRIBUTES,
+                            e -> bindTo(name)));
+                    return;
                 }
 
                 emptyText.appendLine(
