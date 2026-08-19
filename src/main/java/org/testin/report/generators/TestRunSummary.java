@@ -56,7 +56,7 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
     private static @NotNull String whoExecuted(final @NotNull List<TestRunItems> results) {
         return results.stream()
                 .map(TestRunItems::getExecutedBy)
-                .filter(name -> name != null && !name.trim().isEmpty())
+                .filter(name -> !name.trim().isEmpty())
                 .distinct()
                 .collect(Collectors.joining(", "));
     }

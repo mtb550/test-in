@@ -17,10 +17,6 @@ import org.testin.setting.StartupActivity;
 
 public class Main implements ToolWindowFactory, DumbAware {
 
-    public static @Nullable ToolWindow getToolWindow(final @NotNull Project p) {
-        return ToolWindowManager.getInstance(p).getToolWindow("testin.tree");
-    }
-
     @Override
     public void createToolWindowContent(final @NotNull Project p, final @NotNull ToolWindow tw) {
         Logger.info("ToolWindowFactory.createToolWindowContent()");

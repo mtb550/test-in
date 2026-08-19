@@ -46,6 +46,13 @@ final class TestDataParser {
     }
 
     /**
+     * The plugin's timestamp without its leading weekday, which is stripped
+     * rather than matched - see {@link #date}.
+     */
+    private static final @NotNull DateTimeFormatter WITHOUT_WEEKDAY =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
+
+    /**
      * Reads a timestamp back out of text, in either shape it is ever written in.
      * <p>
      * The plugin's own is first, because it is the one a tester is looking at:
@@ -59,13 +66,6 @@ final class TestDataParser {
      * than now: the file did not say when, and inventing a moment is what this
      * was doing wrong in the first place.
      */
-    /**
-     * The plugin's timestamp without its leading weekday, which is stripped
-     * rather than matched - see {@link #date}.
-     */
-    private static final @NotNull DateTimeFormatter WITHOUT_WEEKDAY =
-            DateTimeFormatter.ofPattern("dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
-
     @NotNull ZonedDateTime date(final @Nullable String value) {
         if (value == null || value.isBlank()) return Config.NOT_EXECUTED;
 
@@ -106,7 +106,4 @@ final class TestDataParser {
                 .collect(Collectors.toList());
     }
 
-    private @NotNull ZonedDateTime now() {
-        return ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
-    }
 }

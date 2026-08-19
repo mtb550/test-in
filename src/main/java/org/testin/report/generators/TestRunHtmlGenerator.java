@@ -25,7 +25,6 @@ public final class TestRunHtmlGenerator {
     final String GREEN = "#2e7d32";
     final String RED = "#c0392b";
     final String ORANGE = "#e46c0a";
-    final String GOLD = "#b8860b";
     final String GRAY = "#595959";
     final String LIGHT_BG = "#f2f5fa";
     final String BORDER_COLOR = "#d0d7e5";

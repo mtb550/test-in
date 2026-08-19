@@ -30,7 +30,12 @@ import java.util.function.Consumer;
 @Service(Service.Level.PROJECT)
 final class VfsExecutor {
 
-    void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull String errorTitle, final @NotNull VfsOperation operation) {
+    // Renaming is the only single-path VFS operation, so the title it reports a
+    // failure under is not a parameter: one caller, one word, and a second
+    // operation would bring its own method rather than a second string.
+    void executeVfsAction(final @NotNull Project p, final @NotNull Path path, final @NotNull VfsOperation operation) {
+        final String errorTitle = "Rename Failed";
+
         // The lookup runs off the EDT and the operation on it: refreshAndFindFile
         // refreshes synchronously and reads the VFS persistence, which the EDT is
         // not allowed to do, while the operation itself mutates the VFS and so

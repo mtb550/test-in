@@ -1,5 +1,6 @@
 package org.testin.report.generators;
 
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
@@ -62,6 +63,11 @@ enum ReportSection {
     private final @NotNull String title;
     private final @NotNull String descriptionFmt;
     private final @NotNull ToLongFunction<TestRunSummary> count;
+    /**
+     * True for the tables that carry priority, severity and the actual result:
+     * the columns only say anything about a case that failed.
+     */
+    @Getter
     private final boolean withFailureDetail;
     private final @NotNull Set<TestStatus> statuses;
 
@@ -85,14 +91,6 @@ enum ReportSection {
      */
     public long count(final @NotNull TestRunSummary summary) {
         return count.applyAsLong(summary);
-    }
-
-    /**
-     * True for the tables that carry priority, severity and the actual result:
-     * the columns only say anything about a case that failed.
-     */
-    public boolean isWithFailureDetail() {
-        return withFailureDetail;
     }
 
     /**

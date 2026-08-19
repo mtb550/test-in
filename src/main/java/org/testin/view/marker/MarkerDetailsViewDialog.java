@@ -3,7 +3,6 @@ package org.testin.view.marker;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.Config;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.markers.Marker;
 import org.testin.ui.framework.AbstractFrameworkDialog;

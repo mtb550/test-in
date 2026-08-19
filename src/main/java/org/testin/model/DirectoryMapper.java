@@ -40,7 +40,6 @@ public final class DirectoryMapper {
     public @NotNull TestProjectDirectoryDto getTestProjectNode(final @NotNull Project p, final @NotNull Path path) {
         final String fileName = path.getFileName().toString();
         try {
-            final Mapper mapper = Services.getInstance(p, Mapper.class);
             final TestProjectMarker marker = Services.getInstance(p, ProjectIndexer.class).readMarker(path, DirectoryType.TP.getMarker(),
                     TestProjectMarker.class, "project", fileName);
 

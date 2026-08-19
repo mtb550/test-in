@@ -624,7 +624,7 @@ public final class ProjectIndexer {
      * update and the callback are reached.
      */
     public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {
-        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, "Rename Failed", vf -> {
+        Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, vf -> {
             try {
                 vf.rename(this, newPath.getFileName().toString());
             } catch (final IOException ex) {

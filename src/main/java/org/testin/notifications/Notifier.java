@@ -78,10 +78,6 @@ public final class Notifier {
         });
     }
 
-    public void info(final @NotNull Project p, final @NotNull String message) {
-        notify(p, null, message, NotificationType.INFORMATION);
-    }
-
     public void error(final @NotNull Project p, final @NotNull String message) {
         notify(p, null, message, NotificationType.ERROR);
     }
@@ -122,8 +118,8 @@ public final class Notifier {
         notify(p, title, message, NotificationType.WARNING, actions);
     }
 
-    public Notification infoWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
-        return notify(p, title, message, NotificationType.INFORMATION, actions);
+    public void infoWithActions(final @NotNull Project p, final @NotNull String title, final @NotNull String message, final @NotNull NotificationAction... actions) {
+        notify(p, title, message, NotificationType.INFORMATION, actions);
     }
 
     /**

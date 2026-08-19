@@ -14,7 +14,6 @@ import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.model.Config;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
