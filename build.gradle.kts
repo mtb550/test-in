@@ -107,8 +107,8 @@ intellijPlatform {
         // default from the Marketplace page rather than uploaded again - a
         // version string can only be published once, whatever channel it
         // goes to.
-        //channels.set(listOf("alpha"))
-        channels.set(listOf("default"))
+        channels.set(listOf("alpha"))
+        //channels.set(listOf("default"))
     }
 
     sandboxContainer.set(layout.projectDirectory.dir(".sandbox"))
