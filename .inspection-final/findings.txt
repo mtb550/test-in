@@ -1,0 +1,8 @@
+src/main/java/org/testin/editor/test/TestEditor.java:333 - [unused] Method is not reachable from the entry points.
+src/main/java/org/testin/editor/test/TestEditor.java:680 - [unused] Method is not reachable from the entry points.
+src/main/java/org/testin/explorer/version/BranchSelector.java:111 - [unused] Parameter e is not used
+src/main/java/org/testin/model/markers/TestRunsMainDirectoryMarker.java:8 - [GrazieInspection] An apostrophe may be missing.
+src/main/java/org/testin/model/ProjectStatus.java:26 - [unused] Enum constant is never used.
+src/main/java/org/testin/remove/RemoveAction.java:82 - [ExtractMethodRecommender] It's possible to extract method returning 'onRemoved' from a long surrounding method
+src/main/java/org/testin/view/ViewTab.java:15 - [unused] Enum constant is never used.
+src/main/java/org/testin/view/ViewTab.java:16 - [unused] Enum constant is never used.

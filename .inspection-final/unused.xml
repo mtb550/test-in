@@ -1,0 +1,97 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/test/TestEditor.java</file>
+  <line>333</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor.test</package>
+  <entry_point TYPE="method" FQNAME="org.testin.editor.test.TestEditor javax.swing.JComponent getComponent()" />
+  <language>JAVA</language>
+  <offset>31</offset>
+  <length>12</length>
+  <highlighted_element>getComponent</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Method is not reachable from the entry points.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/test/TestEditor.java</file>
+  <line>680</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor.test</package>
+  <entry_point TYPE="method" FQNAME="org.testin.editor.test.TestEditor java.util.List&lt;org.testin.model.dto.TestCaseDto&gt; getSelectedTestCases()" />
+  <language>JAVA</language>
+  <offset>38</offset>
+  <length>20</length>
+  <highlighted_element>getSelectedTestCases</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Method is not reachable from the entry points.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/explorer/version/BranchSelector.java</file>
+  <line>111</line>
+  <module>Testin.main</module>
+  <package>org.testin.explorer.version</package>
+  <entry_point TYPE="method" FQNAME="org.testin.explorer.version.BranchSelector void onSelection(java.awt.event.ActionEvent e)" />
+  <problem_class id="unused" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Unused declaration</problem_class>
+  <hints>
+    <hint value="e" />
+  </hints>
+  <description>Parameter &lt;code&gt;e&lt;/code&gt; is not used</description>
+  <highlighted_element>e</highlighted_element>
+  <language>JAVA</language>
+  <offset>56</offset>
+  <length>1</length>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/model/ProjectStatus.java</file>
+  <line>26</line>
+  <module>Testin.main</module>
+  <package>org.testin.model</package>
+  <entry_point TYPE="field" FQNAME="org.testin.model.ProjectStatus REMOVED" />
+  <language>JAVA</language>
+  <offset>4</offset>
+  <length>7</length>
+  <highlighted_element>REMOVED</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Enum constant is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/view/ViewTab.java</file>
+  <line>15</line>
+  <module>Testin.main</module>
+  <package>org.testin.view</package>
+  <entry_point TYPE="field" FQNAME="org.testin.view.ViewTab HISTORY" />
+  <language>JAVA</language>
+  <offset>4</offset>
+  <length>7</length>
+  <highlighted_element>HISTORY</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Enum constant is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/view/ViewTab.java</file>
+  <line>16</line>
+  <module>Testin.main</module>
+  <package>org.testin.view</package>
+  <entry_point TYPE="field" FQNAME="org.testin.view.ViewTab OPEN_BUGS" />
+  <language>JAVA</language>
+  <offset>4</offset>
+  <length>9</length>
+  <highlighted_element>OPEN_BUGS</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Enum constant is never used.</description>
+</problem></problems>
