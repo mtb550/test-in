@@ -10,6 +10,7 @@ poi = "5.5.1"
 lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jackson" }
 testng = { module = "org.testng:testng", version.ref = "testng" }
 iText-kernel = { module = "com.itextpdf:kernel", version.ref = "iText" }
 iText-layout = { module = "com.itextpdf:layout", version.ref = "iText" }

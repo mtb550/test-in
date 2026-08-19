@@ -7,6 +7,8 @@ import com.intellij.openapi.startup.ProjectActivity;
 import com.intellij.openapi.util.Key;
 import kotlin.coroutines.Continuation;
 import org.jetbrains.annotations.NotNull;
+import org.testin.config.TestinConfigService;
+import org.testin.config.TestinProjectConfig;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Level;
 import org.testin.logger.Logger;
@@ -55,6 +57,14 @@ public final class StartupActivity implements ProjectActivity {
         Logger.info("testin Path: " + testinPath);
 
         checkTestSourceRootOnce(p);
+
+        // Before the first index, never after it: the config names the test
+        // project this repository exercises, and an index that started without it
+        // would have to be thrown away and run again (#6).
+        final TestinProjectConfig config = Services.getInstance(p, TestinConfigService.class).get();
+        Logger.info(config.isBound()
+                ? "Bound to test project '" + config.testinProject() + "'"
+                : "No test project bound to " + p.getName());
 
         if (testinPath != null) {
             Services.getInstance(p, ProjectIndexer.class).indexWithProgress();

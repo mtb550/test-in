@@ -15,13 +15,18 @@ is a fast in-memory lookup.
 - UI code (tree, actions, dialogs, editors) holds `DirectoryDto`/`TestCaseDto`
   objects served by the indexer and never touches disk.
 
-**Exempt packages** (may access files directly): `codegen`, `git`, `importexport`,
-`report`, `setting`, `logger`.
+**Exempt packages** (may access files directly): `codegen`, `config`, `git`,
+`importexport`, `report`, `setting`, `logger`.
 
 What they have in common: none of them read or write **test data**. They handle
-generated source, the Git working tree, files outside the tree, generated report
-output, the IDE settings path, and the log. The rule exists to keep the indexer's
-cache authoritative over test data, and none of these touch it.
+generated source, the automation repository's own `testin.yml`, the Git working
+tree, files outside the tree, generated report output, the IDE settings path, and
+the log. The rule exists to keep the indexer's cache authoritative over test data,
+and none of these touch it.
+
+`config` reads a file that lives in the automation repository, not under the
+Testin root, and it runs before the indexer exists — it is what tells the indexer
+which project to index.
 
 `util` is deliberately not on the list. `FilesUtil` and `VfsExecutor` are the file
 layer the indexer itself calls, not callers of it — whether that counts as inside

@@ -50,6 +50,10 @@ dependencies {
 
     implementation(libs.jackson.databind)
     implementation(libs.jackson.datatype.jsr310)
+    // YAML for testin.yml, the file that binds an automation repository to the
+    // test project it exercises (#6). SnakeYAML comes with it and the platform
+    // ships its own copy, so the verifier run is what proves they do not clash.
+    implementation(libs.jackson.dataformat.yaml)
     testImplementation(libs.testng)
     implementation(libs.iText.kernel)
     implementation(libs.iText.layout)
