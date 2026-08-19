@@ -6,12 +6,10 @@ import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
-import org.testin.explorer.ExplorerPanel;
 import org.testin.logger.Logger;
 import org.testin.model.*;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 
@@ -23,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import org.testin.util.Tools;
+import org.testin.testproject.BoundTestProject;
 
 public final class TestRunWordGenerator {
 
@@ -56,12 +55,7 @@ public final class TestRunWordGenerator {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (XWPFDocument doc = new XWPFDocument()) {
 
-                String projectName = "";
-                TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ExplorerPanel.class)
-                        .getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-                if (selectedProject != null) {
-                    projectName = selectedProject.getName();
-                }
+                final String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
                 addText(doc, "TEST SUMMARY REPORT", 18, true, DARK_NAVY, null, 2);
 

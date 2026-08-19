@@ -110,7 +110,7 @@ public class RenameAction extends AbstractProjectTreeAction {
             pp.getProjectTree().refresh();
 
             if (dir instanceof TestProjectDirectoryDto) {
-                pp.getTestProjectSelector().loadTestProjectList();
+                pp.refresh();
             }
 
             Logger.info("Success! Renamed to: " + newName);

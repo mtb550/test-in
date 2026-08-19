@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.explorer.ExplorerPanel;
+import org.testin.logger.Logger;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryMapper;
 import org.testin.model.TestRunConfiguration;
@@ -21,6 +22,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 import org.testin.setting.AppSettingsState;
 import org.testin.testrun.RunConfigurationDialog;
 import org.testin.testrun.RunConfigurationForm;
@@ -44,7 +46,14 @@ public class CreateTestRun implements NodeCreator {
      */
     @Override
     public @Nullable DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
-        final TestProjectDirectoryDto tp = Services.getInstance(p, ExplorerPanel.class).getTestProjectSelector().getSelectedTestProject().getItem();
+        // The tree this was started from only exists when a project is bound, so
+        // nobody can click their way into the miss. It is checked because a run
+        // written against no project would be a directory nothing owns.
+        final @Nullable TestProjectDirectoryDto tp = Services.getInstance(p, BoundTestProject.class).get();
+        if (tp == null) {
+            Logger.warn("Create test run: no test project is bound to " + p.getName());
+            return null;
+        }
 
         final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
 

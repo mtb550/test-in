@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.config.TestinConfigService;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -172,23 +173,45 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private void configureRemoteAndPush(final @NotNull Project p, final @NotNull Path repoPath,
                                         final @NotNull String remoteName, final @NotNull String branch,
                                         final @NotNull String commitId) {
-        final String remoteUrl = Messages.showInputDialog(
+        final TestinConfigService config = Services.getInstance(p, TestinConfigService.class);
+
+        // The repository already says where its test project lives, so a clone of
+        // it should not have to be told again. Asking is the fallback, not the
+        // first move (#8).
+        final String known = config.get().testinRepoUrl();
+        final String remoteUrl = known.isEmpty() ? askForRemoteUrl(p) : known;
+
+        if (remoteUrl.isEmpty()) {
+            Services.getInstance(p, Notifier.class).warn(p, "Push Aborted", "A remote URL is required to push.");
+            return;
+        }
+
+        // Written back so the next machine that opens this repository inherits it.
+        // Only what the tester typed: a URL that came out of the file is already
+        // in it.
+        if (known.isEmpty()) config.rememberRepoUrl(remoteUrl);
+
+        GitBackgroundTask.run(p, "Configuring remote", false,
+                indicator -> {
+                    commits.configureRemote(repoPath, remoteName, remoteUrl);
+                    ApplicationManager.getApplication().invokeLater(() -> executeGitPush(p, repoPath, remoteName, branch, commitId));
+                },
+                ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
+    }
+
+    /**
+     * The remote URL as the tester types it, or empty when they close the prompt.
+     * Empty rather than null, so the caller that decides what to do about a
+     * missing URL does it in one place whichever way it came up missing.
+     */
+    private static @NotNull String askForRemoteUrl(final @NotNull Project p) {
+        final String typed = Messages.showInputDialog(
                 p,
                 "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
                 "Configure Remote",
                 Messages.getQuestionIcon());
 
-        if (remoteUrl == null || remoteUrl.trim().isEmpty()) {
-            Services.getInstance(p, Notifier.class).warn(p, "Push Aborted", "A remote URL is required to push.");
-            return;
-        }
-
-        GitBackgroundTask.run(p, "Configuring remote", false,
-                indicator -> {
-                    commits.configureRemote(repoPath, remoteName, remoteUrl.trim());
-                    ApplicationManager.getApplication().invokeLater(() -> executeGitPush(p, repoPath, remoteName, branch, commitId));
-                },
-                ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
+        return typed == null ? "" : typed.trim();
     }
 
     private void executeGitPush(final @NotNull Project p, final @NotNull Path repoPath,

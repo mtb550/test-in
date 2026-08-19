@@ -146,12 +146,7 @@ public class BranchSelector {
 
                 currentBranch = checkedOut;
 
-                ApplicationManager.getApplication().invokeLater(() -> {
-                    final TestProjectDirectoryDto currentProject = pp.getTestProjectSelector().getSelectedTestProject().getItem();
-                    if (currentProject != null) {
-                        pp.getProjectTree().refresh();
-                    }
-                });
+                ApplicationManager.getApplication().invokeLater(() -> pp.getProjectTree().refresh());
             }
         });
     }

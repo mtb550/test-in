@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.indexer.ProjectIndexer;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
@@ -67,11 +66,12 @@ public class CreateTestProjectCloneAction extends AbstractProjectAction {
                         final Path projectPath = Services.getInstance(p, TestinRoot.class).getPath().resolve(projectName);
 
                         indexer.scanSingleProject(projectPath);
-                        final TestProjectDirectoryDto clonedProject = indexer.getTestProjectsByPath().get(projectPath.toString());
-                        if (clonedProject != null)
-                            pp.getTestProjectSelector().addTestProject(clonedProject);
 
-                        pp.getProjectTree().updateNodes();
+                        // Bound to what was just cloned, for the same reason a new
+                        // project is: this repository asked for it (#8).
+                        Services.getInstance(p, BoundTestProject.class).bind(projectName);
+
+                        pp.refresh();
                         Services.getInstance(p, Notifier.class).softShow(p, "Project cloned");
                     });
 

@@ -19,12 +19,10 @@ import com.itextpdf.layout.properties.TextAlignment;
 import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
-import org.testin.explorer.ExplorerPanel;
 import org.testin.logger.Logger;
 import org.testin.model.*;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 
@@ -34,6 +32,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
 import org.testin.util.Tools;
+import org.testin.testproject.BoundTestProject;
 
 public final class TestRunPdfGenerator {
 
@@ -76,12 +75,7 @@ public final class TestRunPdfGenerator {
             PdfFont regularFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
             PdfFont italicFont = PdfFontFactory.createFont(StandardFonts.HELVETICA_OBLIQUE);
 
-            String projectName = "";
-            TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto) Services.getInstance(p, ExplorerPanel.class).getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-
-            if (selectedProject != null) {
-                projectName = selectedProject.getName();
-            }
+            final String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
             // TITLE
             document.add(new Paragraph("TEST SUMMARY REPORT")

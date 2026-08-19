@@ -43,7 +43,7 @@ public class RefreshAction extends AbstractProjectAction {
             Logger.info("Refresh: re-indexing complete, rebuilding tree");
 
             ApplicationManager.getApplication().invokeLater(() -> {
-                pp.getTestProjectSelector().loadTestProjectList();
+                pp.refresh();
 
                 refreshGuard.set(false);
                 Logger.info("Refresh: tree rebuilt");

@@ -11,7 +11,9 @@ import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
+import org.testin.model.DirectoryMapper;
 import org.testin.model.DirectoryType;
+import org.testin.model.ProjectStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.*;
@@ -19,6 +21,7 @@ import org.testin.model.markers.TestRunMarker;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.setting.TestinRoot;
+import org.testin.testproject.BoundTestProject;
 import org.testin.util.EditorUtil;
 import org.testin.util.Mapper;
 
@@ -75,21 +78,15 @@ public final class ProjectIndexer {
                 return;
             }
 
-            final Path rootPath = Services.getInstance(p, TestinRoot.class).getPath();
-            if (rootPath.toString().isEmpty()) {
+            final Path absoluteRoot = absoluteRoot();
+            if (absoluteRoot.toString().isEmpty()) {
                 indexing.set(false);
                 indexed.set(true);
                 indexingLatch.countDown();
                 return;
             }
 
-            final Path absoluteRoot = rootPath.isAbsolute()
-                    ? rootPath
-                    : (p.getBasePath() != null
-                    ? Path.of(p.getBasePath(), rootPath.toString())
-                    : rootPath);
-
-            final List<Path> validProjects = collectValidProjects(absoluteRoot);
+            final List<Path> validProjects = boundOnly(collectValidProjects(absoluteRoot));
             if (validProjects.isEmpty()) {
                 indexing.set(false);
                 indexed.set(true);
@@ -185,6 +182,74 @@ public final class ProjectIndexer {
         indexing.set(false);
         indexingLatch = new CountDownLatch(1);
         Logger.info("Indexer reset for re-indexing");
+    }
+
+    /**
+     * The Testin root as an absolute path, or the empty path when none is set.
+     * A relative root is resolved against the open project, which is how it has
+     * always been read - here rather than at each caller so that indexing and
+     * the project listing can never disagree about where the root is.
+     */
+    private @NotNull Path absoluteRoot() {
+        final Path rootPath = Services.getInstance(p, TestinRoot.class).getPath();
+        if (rootPath.toString().isEmpty() || rootPath.isAbsolute()) return rootPath;
+
+        return p.getBasePath() != null ? Path.of(p.getBasePath(), rootPath.toString()) : rootPath;
+    }
+
+    /**
+     * Just the project this repository is bound to, when it is bound to one.
+     * <p>
+     * The reason the change is worth making: a tester with eleven test projects
+     * under the root indexed all eleven on every open, and used one of them. An
+     * unbound repository still indexes everything, because the picker that binds
+     * it is the only screen that has a use for the others.
+     */
+    private @NotNull List<Path> boundOnly(final @NotNull List<Path> projects) {
+        final String bound = Services.getInstance(p, BoundTestProject.class).name();
+        if (bound.isEmpty()) return projects;
+
+        final List<Path> scoped = projects.stream()
+                .filter(path -> bound.equals(path.getFileName().toString()))
+                .toList();
+
+        if (scoped.isEmpty()) {
+            Logger.warn("testin.yml names '" + bound + "', which is not a test project under the root");
+            return scoped;
+        }
+
+        Logger.info("Indexing only the bound project '" + bound + "'");
+        return scoped;
+    }
+
+    /**
+     * Every test project folder under the root with the status its marker gives,
+     * archived ones included. The listing behind the picker that binds a
+     * repository, and behind the sentence that says why a bound project is not
+     * showing - both of which have to know about a project the index skipped.
+     * <p>
+     * A directory read rather than a cache read, deliberately: it answers about
+     * projects that were never indexed, which is exactly what the cache cannot do.
+     */
+    public @NotNull Map<String, ProjectStatus> testProjects() {
+        final Map<String, ProjectStatus> byName = new LinkedHashMap<>();
+        final Path root = absoluteRoot();
+        if (root.toString().isEmpty()) return byName;
+
+        for (final Path path : collectValidProjects(root)) {
+            final String name = path.getFileName().toString();
+            try {
+                byName.put(name, Services.getInstance(p, DirectoryMapper.class)
+                        .getTestProjectNode(p, path).getMarker().getStatus());
+
+            } catch (final Exception ex) {
+                // One project that will not be read must not cost the tester the
+                // list of the others - the listing is what they choose from.
+                Logger.warn("Could not read test project '" + name + "': " + ex.getMessage());
+            }
+        }
+
+        return byName;
     }
 
     private @NotNull List<Path> collectValidProjects(final @NotNull Path rootPath) {
@@ -286,11 +351,6 @@ public final class ProjectIndexer {
 
     public @NotNull Map<String, TestProjectDirectoryDto> getTestProjectsByPath() {
         return store.getTestProjectsByPath();
-    }
-
-    public boolean rootExists() {
-        final Path root = Services.getInstance(p, TestinRoot.class).getPath();
-        return Files.isDirectory(root);
     }
 
     public boolean projectExists(final @NotNull Path projectPath) {
@@ -616,6 +676,14 @@ public final class ProjectIndexer {
      */
     public void refreshDirectory(final @NotNull Path path) {
         store.refreshDir(path);
+    }
+
+    /**
+     * VFS refresh of one file the plugin wrote outside the VFS, so it appears in
+     * the Project view without waiting for the IDE to notice it by itself.
+     */
+    public void refreshFile(final @NotNull Path file) {
+        store.refreshFile(file);
     }
 
     /**

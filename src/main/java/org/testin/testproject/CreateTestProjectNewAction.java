@@ -47,8 +47,13 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
         final TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).setTestProjectNode(p, tpPath);
 
         Services.getInstance(p, ProjectIndexer.class).addTestProject(tp);
-        pp.getTestProjectSelector().addTestProject(tp);
-        pp.getProjectTree().updateNodes();
+
+        // A repository asks for exactly one test project, so the one it just made
+        // is the one it is about. Writing it here is what makes the next clone of
+        // this repository open on it without being asked (#8).
+        Services.getInstance(p, BoundTestProject.class).bind(tp.getName());
+
+        pp.refresh();
         Services.getInstance(p, Notifier.class).softShow(p, "Project created");
 
         GenType.CREATE_TEST_PROJECT.getAction().execute(p, tp);

@@ -3,7 +3,9 @@ package org.testin.config;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.services.Services;
 
 import java.nio.file.Path;
 
@@ -81,6 +83,11 @@ public final class TestinConfigService {
         }
 
         if (!TestinConfigWriter.write(file, key, value)) return false;
+
+        // The file was written with java.nio, so until the VFS is told, the
+        // Project view shows a repository that does not have a testin.yml - and
+        // the tester's next move is to commit the file they cannot see.
+        Services.getInstance(p, ProjectIndexer.class).refreshFile(file);
 
         reload();
         return true;

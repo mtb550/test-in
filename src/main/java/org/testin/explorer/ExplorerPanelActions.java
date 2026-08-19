@@ -8,6 +8,7 @@ import org.testin.explorer.toolbar.CollapseAllAction;
 import org.testin.explorer.toolbar.ExpandAllAction;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.setting.OpenSettingsAction;
+import org.testin.testproject.SelectTestProjectAction;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class ExplorerPanelActions {
                 new ExpandAllAction(pp),
                 new CollapseAllAction(pp),
                 new RefreshAction(p, pp),
+                new SelectTestProjectAction(p, pp),
                 new CreateTestProjectAction(p, pp)
         );
     }

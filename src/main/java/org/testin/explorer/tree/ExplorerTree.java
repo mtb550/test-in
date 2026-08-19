@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
 
 import javax.swing.*;
 import java.util.HashSet;
@@ -21,6 +23,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ExplorerTree implements Disposable {
+    private final @NotNull Project p;
     private final @NotNull ExplorerPanel pp;
     private final @NotNull JBScrollPane scrollPane;
     private final @NotNull ExplorerTreeStructure treeStructure;
@@ -39,11 +42,10 @@ public class ExplorerTree implements Disposable {
     private volatile boolean disposed;
 
     public ExplorerTree(final @NotNull Project p, final @NotNull ExplorerPanel pp) {
+        this.p = p;
         this.pp = pp;
 
-        final @Nullable TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
-                pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-        this.treeStructure = new ExplorerTreeStructure(p, selectedProject);
+        this.treeStructure = new ExplorerTreeStructure(p, bound());
         this.structureModel = new StructureTreeModel<>(treeStructure, this);
         this.treeModel = new AsyncTreeModel(structureModel, this);
         this.mainTree = new SimpleTree(treeModel);
@@ -78,11 +80,10 @@ public class ExplorerTree implements Disposable {
         ApplicationManager.getApplication().invokeLater(() -> {
             try {
                 if (disposed) return;
-                final @Nullable TestProjectDirectoryDto selectedProject = (TestProjectDirectoryDto)
-                        pp.getTestProjectSelector().getSelectedTestProject().getSelectedItem();
-                treeStructure.setSelectedProject(selectedProject);
+                final @Nullable TestProjectDirectoryDto boundProject = bound();
+                treeStructure.setSelectedProject(boundProject);
 
-                final @Nullable String projectPath = selectedProject != null ? selectedProject.getPath().toString() : null;
+                final @Nullable String projectPath = boundProject != null ? boundProject.getPath().toString() : null;
                 final boolean projectChanged = projectPath != null && !projectPath.equals(expandedProjectPath);
                 expandedProjectPath = projectPath;
 
@@ -102,7 +103,16 @@ public class ExplorerTree implements Disposable {
     }
 
     public void updateNodes() {
-        pp.getTestProjectSelector().loadTestProjectList();
+        pp.refresh();
+    }
+
+    /**
+     * The test project this repository is bound to, asked for fresh each time.
+     * The tree used to read it out of a combo box; it now reads it from the one
+     * service that answers the question (#8).
+     */
+    private @Nullable TestProjectDirectoryDto bound() {
+        return Services.getInstance(p, BoundTestProject.class).get();
     }
 
     public @NotNull JComponent getComponent() {
