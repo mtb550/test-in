@@ -167,10 +167,12 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     private void refreshAfterSync(final @NotNull Path repoPath) {
         refreshRepository(repoPath);
         ApplicationManager.getApplication().invokeLater(() -> {
-            // A real notification, not a soft balloon: a sync runs in the
-            // background and can finish while the tester is in another window,
-            // so it has to survive in the log rather than fade (#62).
-            Services.getInstance(p, Notifier.class).info(p, "Synced", "Up to date with the remote");
+            // A balloon, not a log entry. A sync is pressed and watched: it
+            // finishes in seconds with the tree rebuilding underneath it, and
+            // what it leaves behind is the tree itself rather than a line in the
+            // Notifications log. The failures still go there, which is what the
+            // log is worth keeping for.
+            Services.getInstance(p, Notifier.class).softShow(p, "Synced", "Up to date with the remote");
             pp.getProjectTree().refresh();
         });
     }
