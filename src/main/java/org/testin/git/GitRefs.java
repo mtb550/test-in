@@ -45,8 +45,11 @@ public final class GitRefs {
      *       until something stages it - so it is an addition, not nothing.</li>
      *   <li>A path containing a space comes back wrapped in double quotes with
      *       C-style escapes, and every test set named with a space produces one.</li>
-     *   <li>A rename is reported as {@code old -> new}, and the new path is the
-     *       one the review is about.</li>
+     *   <li>A rename is reported as {@code old -> new} and is <b>two</b> changes,
+     *       not one: the file is there under the new name and gone from the old.
+     *       Listing only the new path commits half the move, and whoever pulls it
+     *       gets both copies. A copy - {@code C} - is the one arrow that leaves
+     *       its source where it was, so only {@code R} produces the deletion.</li>
      * </ul>
      */
     public static @NotNull List<StatusEntry> parseStatus(final @NotNull List<String> porcelainLines) {
@@ -63,7 +66,13 @@ public final class GitRefs {
             final String path = unquote(renameArrow < 0 ? rawPath : rawPath.substring(renameArrow + 4));
             if (path.isEmpty()) continue;
 
-            entries.add(new StatusEntry(typeOf(code), path.replace('\\', '/')));
+            // The deletion first, so the move reads in the order it happened.
+            if (renameArrow >= 0 && code.indexOf('R') >= 0) {
+                final String from = unquote(rawPath.substring(0, renameArrow));
+                if (!from.isEmpty()) entries.add(new StatusEntry(DiffType.DELETED, slashed(from)));
+            }
+
+            entries.add(new StatusEntry(typeOf(code), slashed(path)));
         }
         return entries;
     }
@@ -101,9 +110,24 @@ public final class GitRefs {
                 .anyMatch(UNMERGED::contains);
     }
 
+    /**
+     * A path as the rest of the plugin compares them: forward slashes, whatever
+     * the platform wrote. Git speaks slashes on every platform, and a path read
+     * back from a marker on Windows does not.
+     */
+    private static @NotNull String slashed(final @NotNull String path) {
+        return path.replace('\\', '/');
+    }
+
     private static @NotNull DiffType typeOf(final @NotNull String code) {
         if (code.equals("??") || code.indexOf('A') >= 0) return DiffType.ADDED;
         if (code.indexOf('D') >= 0) return DiffType.DELETED;
+
+        // After the deletion check, so a rename whose new file was then deleted
+        // stays a deletion. Nothing existed under the new name to modify, which
+        // is what makes it an addition rather than a change.
+        if (code.indexOf('R') >= 0) return DiffType.ADDED;
+
         return DiffType.MODIFIED;
     }
 

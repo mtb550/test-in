@@ -182,9 +182,15 @@ public class GitWorkflowTest {
     }
 
     private void commit(final Set<String> paths, final String message) {
-        final List<String> add = new ArrayList<>(List.of("add", "--"));
-        add.addAll(paths);
-        mustGit(work, add.toArray(String[]::new));
+        // Through the plugin's own rule, not a copy of it: which paths git add
+        // may be given is the thing being tested when a rename is involved.
+        final Set<String> stageable = GitCommitService.stageable(work, paths);
+
+        if (!stageable.isEmpty()) {
+            final List<String> add = new ArrayList<>(List.of("add", "--"));
+            add.addAll(stageable);
+            mustGit(work, add.toArray(String[]::new));
+        }
 
         final List<String> commit = new ArrayList<>(List.of("commit", "--only", "-m", message, "--"));
         commit.addAll(paths);
@@ -319,6 +325,39 @@ public class GitWorkflowTest {
         assertEquals(pending.size(), 1);
         assertEquals(pending.getFirst().type(), DiffType.DELETED);
         assertEquals(pending.getFirst().testCase().getDescription(), "a registered user signs in");
+    }
+
+    /**
+     * A rename the tester staged somewhere else - the IDE's own commit window,
+     * or the command line - and then brought to this review.
+     * <p>
+     * Two things had to be true and neither was. The review has to list both
+     * sides, or the commit carries the new file and leaves the old one behind,
+     * and whoever pulls it has the test case twice. And the old path must be
+     * kept out of {@code git add}, which refuses a path that is in neither the
+     * working tree nor the index - one of those fails the command outright, so
+     * the commit never happens.
+     */
+    @Test
+    public void aRenameStagedElsewhereCommitsBothSides() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+
+        final String file = cases.getFirst().getId() + ".json";
+        mustGit(work, "mv", "Test Cases/login flow/" + file, "Test Cases/" + file);
+
+        final List<PendingChange> pending = review();
+        assertEquals(pending.stream().filter(change -> change.type() == DiffType.DELETED).count(), 1);
+        assertEquals(pending.stream().filter(change -> change.type() == DiffType.ADDED).count(), 1);
+
+        commit(stagedFor(pending), "the case moved out of the test set");
+
+        final List<String> committed = mustGit(work, "ls-tree", "-r", "--name-only", "HEAD")
+                .lines().filter(line -> line.endsWith(file)).toList();
+
+        assertEquals(committed.size(), 1);
+        assertEquals(committed.getFirst(), "Test Cases/" + file);
+        assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
     }
 
     /**

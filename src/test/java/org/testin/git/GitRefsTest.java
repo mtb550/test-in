@@ -153,15 +153,47 @@ public class GitRefsTest {
     }
 
     /**
-     * A rename is reported as old to new, and the review is about where the file
-     * is now - taking the left-hand side would diff a path that no longer exists.
+     * A rename is two changes and both belong in the commit. Listing only the
+     * new path leaves the old file behind for whoever pulls it, which is the
+     * whole defect: they get the test case twice, under both names.
      */
     @Test
-    public void aRenameIsReportedAtItsNewPath() {
-        final GitRefs.StatusEntry entry = GitRefs.parseStatus(
-                List.of("R  \"Test Cases/old/a.json\" -> \"Test Cases/new/a.json\"")).getFirst();
+    public void aRenameIsBothTheDeletionAndTheAddition() {
+        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(
+                List.of("R  \"Test Cases/old/a.json\" -> \"Test Cases/new/a.json\""));
 
-        assertEquals(entry.path(), "Test Cases/new/a.json");
+        assertEquals(entries.size(), 2);
+
+        assertEquals(entries.getFirst().type(), DiffType.DELETED);
+        assertEquals(entries.getFirst().path(), "Test Cases/old/a.json");
+
+        assertEquals(entries.get(1).type(), DiffType.ADDED);
+        assertEquals(entries.get(1).path(), "Test Cases/new/a.json");
+    }
+
+    /**
+     * A copy leaves its source exactly where it was, so the arrow means
+     * something else entirely: one row, and no deletion.
+     */
+    @Test
+    public void aCopyIsOnlyTheNewFile() {
+        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("C  a.json -> b.json"));
+
+        assertEquals(entries.size(), 1);
+        assertEquals(entries.getFirst().path(), "b.json");
+    }
+
+    /**
+     * A rename whose new file was then deleted is a deletion of both sides -
+     * nothing arrives under the new name, so nothing is added.
+     */
+    @Test
+    public void aRenameThenDeletedIsTwoDeletions() {
+        final List<GitRefs.StatusEntry> entries = GitRefs.parseStatus(List.of("RD a.json -> b.json"));
+
+        assertEquals(entries.size(), 2);
+        assertEquals(entries.getFirst().type(), DiffType.DELETED);
+        assertEquals(entries.get(1).type(), DiffType.DELETED);
     }
 
     /**
