@@ -132,14 +132,13 @@ public final class Notifier {
         notify(p, title, message, NotificationType.ERROR, actions);
     }
 
-    private Notification notify(final @NotNull Project p, final String title, final @NotNull String message,
-                                final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
+    private void notify(final @NotNull Project p, final String title, final @NotNull String message,
+                        final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
         final Notification notification = title == null
                 ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(message, type)
                 : NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(title, message, type);
 
         for (final NotificationAction action : actions) notification.addAction(action);
         notification.notify(p);
-        return notification;
     }
 }

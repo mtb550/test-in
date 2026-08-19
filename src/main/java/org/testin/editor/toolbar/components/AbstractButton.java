@@ -63,7 +63,7 @@ public abstract class AbstractButton extends JButton {
         final Dimension size = getPreferredSize();
         setIcon(restIcon);
 
-        // Swing cannot build this one. BasicLookAndFeel.getDisabledIcon only greys
+        // Swing cannot build this one. BasicLookAndFeel.getDisabledIcon only grays
         // an ImageIcon and returns null for anything else, and platform icons are
         // not ImageIcons - so without this a disabled button paints its normal icon
         // and looks clickable while ignoring every click.

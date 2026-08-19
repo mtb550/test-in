@@ -21,7 +21,7 @@ import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.util.List;
 
-// Explicit, because java.awt.* above also offers a List and it takes no type
+// Explicit, because java.awt.* above also offers a List, and it takes no type
 // parameter - the resulting error names the wrong thing and cascades.
 
 public class Shared {
@@ -293,7 +293,7 @@ public class Shared {
         /**
          * Derived rather than set, because the badge is the only thing that knows
          * what it is drawn on. White was hard-coded, which is fine on the deep
-         * reds and greys the cards started with and unreadable the moment a value
+         * reds and grays the cards started with and unreadable the moment a value
          * takes a light color - a yellow severity pill with white text says
          * nothing. Computed per call rather than in the constructor because a
          * JBColor resolves to a different value in the dark theme, and the answer

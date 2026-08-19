@@ -247,7 +247,7 @@ public final class ProjectIndexer {
      * runs anywhere beneath it.
      * <p>
      * For the question a confirmation has to answer before a tester agrees to a
-     * delete - "and what goes with it?". Counted rather than guessed, because
+     * removal - "and what goes with it?". Counted rather than guessed, because
      * the number is the whole point: removing a test project with two sets is a
      * different act from removing one with two hundred.
      */

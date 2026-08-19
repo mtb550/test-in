@@ -55,9 +55,9 @@ public class RemoveAction extends AbstractProjectTreeAction {
         List<DirectoryDto> nodesToRemove = getRemovableNodes(paths);
         if (nodesToRemove.isEmpty()) return;
 
-        // What it holds goes in the message, under the question: the From row
-        // below carries the path, and a second captioned row would read as a
-        // destination. A test project takes every test set, case and run inside
+        // What it holds goes in the message, under the question. The row below
+        // carries the path, captioned "From", and a second captioned row would
+        // read as a destination. A test project takes every test set, case and run inside
         // it, and removal is not recorded by the undo service.
         final String holds = nodesToRemove.size() == 1
                 ? Services.getInstance(p, ProjectIndexer.class).contentsUnder(nodesToRemove.getFirst().getPath()).describe()

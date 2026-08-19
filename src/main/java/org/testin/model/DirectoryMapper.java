@@ -12,7 +12,6 @@ import org.testin.model.dto.dirs.*;
 import org.testin.model.markers.*;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Mapper;
 import org.testin.util.Tools;
 
 import java.nio.file.Path;
