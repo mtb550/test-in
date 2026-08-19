@@ -17,6 +17,7 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -31,7 +32,7 @@ import java.util.*;
 public class ExportAction extends AbstractProjectTreeAction {
 
     protected final @NotNull List<TestEditorAttributes> exportAttributes = Arrays.stream(TestEditorAttributes.values())
-            .filter(TestEditorAttributes::isExportable)
+            .filter(a -> a.can(Can.EXPORT))
             .toList();
 
     public ExportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {

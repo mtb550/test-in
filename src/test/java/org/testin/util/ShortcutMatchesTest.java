@@ -15,7 +15,7 @@ import static org.testng.Assert.assertTrue;
  * The rule compares a KeyEvent against a KeyStroke, and the two report their
  * modifiers differently — which is what the inspection was pointing at.
  */
-public class ToolsMatchesTest {
+public class ShortcutMatchesTest {
 
     private static KeyEvent event(final int keyCode, final int modifiersEx) {
         return new KeyEvent(new JPanel(), KeyEvent.KEY_PRESSED, 0L, modifiersEx, keyCode, KeyEvent.CHAR_UNDEFINED);
@@ -23,25 +23,25 @@ public class ToolsMatchesTest {
 
     @Test
     public void aShortcutWithNoModifierMatches() {
-        assertTrue(Tools.matches(event(KeyEvent.VK_ENTER, 0),
+        assertTrue(Shortcuts.matches(event(KeyEvent.VK_ENTER, 0),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)));
     }
 
     @Test
     public void aShortcutWithAModifierMatches() {
-        assertTrue(Tools.matches(event(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK),
+        assertTrue(Shortcuts.matches(event(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK),
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
     }
 
     @Test
     public void aDifferentModifierDoesNotMatch() {
-        assertFalse(Tools.matches(event(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK),
+        assertFalse(Shortcuts.matches(event(KeyEvent.VK_C, InputEvent.SHIFT_DOWN_MASK),
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
     }
 
     @Test
     public void aBareKeyDoesNotMatchTheSameKeyWithAModifier() {
-        assertFalse(Tools.matches(event(KeyEvent.VK_C, 0),
+        assertFalse(Shortcuts.matches(event(KeyEvent.VK_C, 0),
                 KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)));
     }
 }

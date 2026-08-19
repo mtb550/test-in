@@ -1,5 +1,6 @@
 package org.testin.ui.framework;
 
+import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
 
 import java.util.List;

@@ -12,7 +12,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
@@ -26,7 +26,7 @@ public class AutomateTestCaseAction extends AbstractProjectAction {
     public AutomateTestCaseAction(final @NotNull Project p, final @NotNull JBList<TestCaseDto> list) {
         super(p, "Automate Test Case", "Generate automation code for the selected test case", AllIcons.Actions.IntentionBulb);
         this.list = list;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
     }
 
     @Override

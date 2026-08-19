@@ -4,11 +4,11 @@ import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,7 +19,7 @@ public class RemoveJavaClass implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
 
-        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnClass(p, dir);
+        final List<String> fqcn = Fqcn.ofClass(p, dir);
         if (fqcn.isEmpty()) return;
 
         final String packagePath = String.join("/", fqcn.subList(0, fqcn.size() - 1));
@@ -28,7 +28,7 @@ public class RemoveJavaClass implements GenAction {
 
         WriteAction.run(() -> {
             try {
-                final VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
+                final VirtualFile testSourceRoot = JavaSourceRoot.find(p);
                 if (testSourceRoot == null) return;
 
                 final VirtualFile pkgDir = testSourceRoot.findFileByRelativePath(packagePath);

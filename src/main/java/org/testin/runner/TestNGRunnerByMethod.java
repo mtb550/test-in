@@ -18,10 +18,9 @@ import com.theoryinpractice.testng.model.TestType;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import java.util.ArrayList;
 
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 public final class TestNGRunnerByMethod {
 
     public void runTestMethod(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        ArrayList<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+        ArrayList<String> fqcn = Fqcn.ofMethod(tc);
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {

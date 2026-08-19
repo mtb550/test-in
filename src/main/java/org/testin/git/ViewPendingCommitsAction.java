@@ -15,7 +15,6 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
@@ -82,7 +81,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final Path path = Services.getInstance(p, Tools.class).getProjectPath(tree);
+        final Path path = TreeValueUtil.projectPath(tree);
         if (path == null) return;
 
         if (!git.isRepository(path)) {

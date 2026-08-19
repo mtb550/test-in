@@ -9,8 +9,8 @@ import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogDetails;
 import org.testin.ui.framework.StatusBarShortcut;
+import org.testin.util.Display;
 import org.testin.util.Shortcuts;
-import org.testin.util.Tools;
 
 import java.util.List;
 
@@ -38,9 +38,9 @@ public final class MarkerDetailsViewDialog extends AbstractFrameworkDialog<Dialo
                 .row("Name", dto.getName())
                 .row("Path", dto.getPath().toString())
                 .row("Created By", marker.getCreatedBy())
-                .row("Created At", Tools.formatDate(marker.getCreatedAt()))
+                .row("Created At", Display.formatDate(marker.getCreatedAt()))
                 .row("Modified By", marker.getModifiedBy())
-                .row("Modified At", Tools.formatDate(marker.getModifiedAt()))
+                .row("Modified At", Display.formatDate(marker.getModifiedAt()))
                 .row("Status", marker.getStatusLabel())
                 .build());
 

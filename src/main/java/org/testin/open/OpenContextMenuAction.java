@@ -5,7 +5,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,7 +23,7 @@ public class OpenContextMenuAction extends DumbAwareAction {
         this.tree = tree;
         this.cm = cm;
         this.list = null;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
     public OpenContextMenuAction(final JBList<?> list, final DefaultActionGroup cm) {
@@ -31,7 +31,7 @@ public class OpenContextMenuAction extends DumbAwareAction {
         this.list = list;
         this.cm = cm;
         this.tree = null;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
     }
 
     @Override

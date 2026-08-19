@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -84,7 +84,7 @@ public enum TestRunStatus {
 
     public @NotNull String getShortcutText() {
         return Optional.ofNullable(shortcut)
-                .map(Tools::shortcutText)
+                .map(Shortcuts::shortcutText)
                 .orElse("");
     }
 
@@ -95,7 +95,7 @@ public enum TestRunStatus {
                 public void actionPerformed(final @NotNull AnActionEvent e) {
                     onAction.run();
                 }
-            }.registerCustomShortcutSet(Tools.customShortcut(shortcut), component);
+            }.registerCustomShortcutSet(Shortcuts.customShortcut(shortcut), component);
         }
     }
 }

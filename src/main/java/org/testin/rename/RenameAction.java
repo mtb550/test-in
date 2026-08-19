@@ -23,7 +23,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.OptionalPlugin;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import javax.swing.tree.TreePath;
@@ -39,7 +39,7 @@ public class RenameAction extends AbstractProjectTreeAction {
     public RenameAction(final @NotNull Project p, final @NotNull ExplorerPanel pp, final @NotNull SimpleTree tree) {
         super(p, tree, "Rename", "Rename selected node", AllIcons.Actions.Edit);
         this.pp = pp;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
     @Override

@@ -5,11 +5,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,11 +19,11 @@ public class CreateJavaPackage implements GenAction {
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof DirectoryDto dir)) return;
-        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnPackage(dir);
+        final List<String> fqcn = Fqcn.ofPackage(dir);
 
         WriteAction.run(() -> {
             try {
-                final VirtualFile testSourceRoot = Services.getInstance(p, Tools.class).getTestSourceRootOrWarn(p);
+                final VirtualFile testSourceRoot = JavaSourceRoot.findOrWarn(p);
                 if (testSourceRoot == null) {
                     return;
                 }

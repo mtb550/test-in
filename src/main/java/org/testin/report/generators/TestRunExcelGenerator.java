@@ -9,9 +9,8 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
-import org.testin.services.Services;
 import org.testin.util.Bundle;
-import org.testin.util.Tools;
+import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +19,12 @@ import java.util.UUID;
 
 public final class TestRunExcelGenerator {
 
+    /**
+     * The project is not read here and is part of the signature anyway: all four
+     * generators are called through one functional interface in {@code FileTypes},
+     * and the three that render a document do need it (#61).
+     */
+    @SuppressWarnings("unused")
     public byte @NotNull [] generate(final @NotNull Project p, final @NotNull TestRunDirectoryDto trDir,
                                      final @NotNull TestRunDto tr,
                                      final @NotNull Map<UUID, TestCaseDto> detailsMap) {
@@ -92,7 +97,7 @@ public final class TestRunExcelGenerator {
                 ws.value(row, 5, result.getBugPriority().getName());
                 ws.style(row, 5).bold().set();
 
-                final String formattedDuration = Services.getInstance(p, Tools.class).getFormattedDuration(result.getDuration());
+                final String formattedDuration = Display.formatDuration(result.getDuration());
                 ws.value(row, 6, formattedDuration);
 
                 ws.value(row, 7, expectedResult);

@@ -3,6 +3,7 @@ package org.testin.explorer.tree;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
+import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
@@ -24,13 +25,12 @@ import org.testin.remove.RemoveAction;
 import org.testin.rename.RenameAction;
 import org.testin.report.GenerateReportAction;
 import org.testin.run.RunTestSetAction;
-import org.testin.services.Services;
 import org.testin.testproject.UpdateTestProjectStatusAction;
 import org.testin.testrun.SetTestRunStatusAction;
 import org.testin.testset.UpdateTestSetStatusAction;
 import org.testin.util.OptionalPlugin;
-import org.testin.util.Tools;
 
+import javax.swing.*;
 import java.util.List;
 
 public class TreeContextMenu extends DefaultActionGroup {
@@ -45,8 +45,7 @@ public class TreeContextMenu extends DefaultActionGroup {
 
         addSeparator();
 
-        add(Services.getInstance(p, Tools.class).createSubGroup("Actions", AllIcons.Actions.Edit,
-                List.of(
+        add(actionsSubMenu(List.of(
                         new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ACTIVE),
                         new UpdateTestProjectStatusAction(p, tree, ProjectStatus.INACTIVE),
                         new UpdateTestProjectStatusAction(p, tree, ProjectStatus.ARCHIVED),
@@ -99,6 +98,19 @@ public class TreeContextMenu extends DefaultActionGroup {
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
         return ActionUpdateThread.EDT;
+    }
+
+
+    /**
+     * The "Actions" submenu - everything that changes a node rather than opening
+     * one. Two lines of platform setup that only this menu needs; they used to
+     * live in a shared utility class where this was the one caller.
+     */
+    private static @NotNull DefaultActionGroup actionsSubMenu(final @NotNull List<? extends DumbAwareAction> actions) {
+        final DefaultActionGroup group = new DefaultActionGroup("Actions", true);
+        group.getTemplatePresentation().setIcon(AllIcons.Actions.Edit);
+        actions.forEach(group::add);
+        return group;
     }
 
 }

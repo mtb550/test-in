@@ -7,7 +7,7 @@ import com.intellij.openapi.project.DumbAwareAction;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.explorer.tree.TreeTransferHandler;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;
@@ -21,7 +21,7 @@ public class CutNodeAction extends DumbAwareAction {
     public CutNodeAction(final @NotNull SimpleTree tree) {
         super("Cut", "Cut selected items", AllIcons.Actions.MenuCut);
         this.tree = tree;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
     @Override

@@ -15,7 +15,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.StringSelection;
@@ -33,7 +33,7 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
         super(p, "Cut Node", "Cut selected test case(s) to clipboard", AllIcons.Actions.MenuCut);
         this.editor = editor;
         this.list = list;
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), list);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), list);
     }
 
     @Override

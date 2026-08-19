@@ -6,11 +6,11 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
+import org.testin.util.NameSanitizer;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public class RenameJavaClass implements GenAction {
     }
 
     public void execute(final @NotNull Project p, final @NotNull TestSetDirectoryDto dir, final @NotNull String newName) {
-        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnClass(p, dir);
+        final List<String> fqcn = Fqcn.ofClass(p, dir);
         if (fqcn.isEmpty()) return;
         final String path = String.join(".", fqcn);
 
@@ -34,7 +34,7 @@ public class RenameJavaClass implements GenAction {
                 return;
             }
 
-            final String newClassName = Services.getInstance(p, Tools.class).sanitizeClassName(newName);
+            final String newClassName = NameSanitizer.className(newName);
             // Receiver is the non-null side: PsiClass#getName is null for anonymous classes.
             if (!newClassName.equals(targetClass.getName())) {
                 targetClass.setName(newClassName);

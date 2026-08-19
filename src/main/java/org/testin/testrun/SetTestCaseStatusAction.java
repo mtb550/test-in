@@ -14,7 +14,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class SetTestCaseStatusAction extends AbstractProjectAction {
         this.list = list;
         this.status = status;
 
-        this.registerCustomShortcutSet(Tools.customShortcut(entry.shortcut()), list);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(entry.shortcut()), list);
     }
 
     @Override

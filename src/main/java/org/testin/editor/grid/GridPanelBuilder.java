@@ -14,6 +14,7 @@ import org.testin.editor.Shared;
 import org.testin.logger.Logger;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.TestRunItems;
 import org.testin.model.ToolBarAttribute;
 import org.testin.model.dto.TestCaseDto;
@@ -378,7 +379,7 @@ public class GridPanelBuilder {
             rows.add(row);
         }
 
-        final JBTable table = buildTable(columns, rows, column -> TestEditorAttributes.values()[column].isEditable(), "test");
+        final JBTable table = buildTable(columns, rows, column -> TestEditorAttributes.values()[column].can(Can.EDIT), "test");
         applyColumnVisibility(table, TestEditorAttributes.class, attributes);
         return table;
     }

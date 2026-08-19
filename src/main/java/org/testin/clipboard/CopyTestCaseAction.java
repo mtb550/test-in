@@ -8,6 +8,7 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -33,7 +34,7 @@ public class CopyTestCaseAction extends AbstractProjectAction {
         if (tc == null) return;
 
         final String text = Arrays.stream(TestEditorAttributes.values())
-                .filter(TestEditorAttributes::isCopyable)
+                .filter(a -> a.can(Can.COPY))
                 .map(attr -> attr.getName2() + " " + attr.getTestValueExtractor().execute(tc, p))
                 .collect(Collectors.joining("\n"));
 

@@ -9,6 +9,7 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
+import org.testin.codegen.Fqcn;
 import org.testin.codegen.method.CreateTestMethod;
 import org.testin.creator.CreateTestSet;
 import org.testin.explorer.ExplorerPanel;
@@ -16,14 +17,15 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
+import org.testin.util.NameSanitizer;
 import org.testin.util.OptionalPlugin;
-import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
@@ -35,7 +37,7 @@ import java.util.Map;
 public class ImportAction extends AbstractProjectTreeAction {
 
     protected final @NotNull List<TestEditorAttributes> importAttributes = Arrays.stream(TestEditorAttributes.values())
-            .filter(TestEditorAttributes::isImportable)
+            .filter(a -> a.can(Can.IMPORT))
             .toList();
 
     public ImportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
@@ -95,7 +97,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                 for (final Map.Entry<String, List<TestCaseDto>> entry : selectedCasesBySheet.entrySet()) {
                     final List<TestCaseDto> sheetCases = entry.getValue();
 
-                    final String cName = Services.getInstance(p, Tools.class).removeSpecialChars(entry.getKey());
+                    final String cName = NameSanitizer.removeSpecialChars(entry.getKey());
                     final Path newDirPath = targetPath.resolve(cName);
                     final DirectoryDto dir = new CreateTestSet(p).execute(cName, selectedDirDto, newDirPath);
 
@@ -136,7 +138,7 @@ public class ImportAction extends AbstractProjectTreeAction {
 
         final CreateTestMethod syncInjector = new CreateTestMethod();
         for (final TestCaseDto tc : testCases) {
-            final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+            final List<String> fqcn = Fqcn.ofMethod(tc);
             syncInjector.executeSync(p, tc, fqcn);
         }
     }

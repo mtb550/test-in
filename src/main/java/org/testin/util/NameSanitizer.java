@@ -1,5 +1,7 @@
 package org.testin.util;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,11 +10,12 @@ import java.util.regex.Pattern;
 /**
  * Naming rules used when generating Java packages, classes, and methods.
  */
-final class NameSanitizer {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class NameSanitizer {
 
     private static final @NotNull Pattern INVALID_NAME = Pattern.compile("[^a-zA-Z0-9 _]");
 
-    @NotNull String packageName(final @NotNull String value) {
+    public static @NotNull String packageName(final @NotNull String value) {
         final String cleanName = INVALID_NAME.matcher(value.replace("-test-cases", ""))
                 .replaceAll("").trim();
         final StringBuilder result = new StringBuilder();
@@ -31,7 +34,7 @@ final class NameSanitizer {
         return result.toString();
     }
 
-    @NotNull String className(final @NotNull String value) {
+    public static @NotNull String className(final @NotNull String value) {
         if (value.trim().isEmpty()) return "DefaultTest";
         final String cleanName = INVALID_NAME.matcher(value).replaceAll("").trim();
         final StringBuilder result = new StringBuilder();
@@ -45,13 +48,13 @@ final class NameSanitizer {
         return result.append("Test").toString();
     }
 
-    @NotNull String description(final @Nullable String rawDescription) {
+    public static @NotNull String description(final @Nullable String rawDescription) {
         if (rawDescription == null || rawDescription.isBlank()) return "EMPTY_DESCRIPTION";
         final String cleaned = INVALID_NAME.matcher(rawDescription).replaceAll("").trim();
         return cleaned.isEmpty() ? "EMPTY_DESCRIPTION" : cleaned;
     }
 
-    @NotNull String methodName(final @Nullable String description) {
+    public static @NotNull String methodName(final @Nullable String description) {
         if (description == null || description.isEmpty()) return "testMethod";
         final StringBuilder result = new StringBuilder();
         for (final String word : description.split("[^a-zA-Z0-9]+")) {
@@ -66,7 +69,7 @@ final class NameSanitizer {
         return result.toString();
     }
 
-    @NotNull String removeSpecialChars(final @NotNull String value) {
+    public static @NotNull String removeSpecialChars(final @NotNull String value) {
         if (value.isEmpty()) return "";
         return value.chars()
                 .mapToObj(c -> isSpecial((char) c) ? "_" : String.valueOf((char) c))
@@ -74,7 +77,7 @@ final class NameSanitizer {
                 .toString();
     }
 
-    @NotNull String projectNameFromUrl(final @NotNull String gitUrl) {
+    public static @NotNull String projectNameFromUrl(final @NotNull String gitUrl) {
         String name = gitUrl;
         if (name.endsWith("/")) name = name.substring(0, name.length() - 1);
         if (name.endsWith(".git")) name = name.substring(0, name.length() - 4);
@@ -84,7 +87,7 @@ final class NameSanitizer {
                 : "ImportedTestProject";
     }
 
-    private boolean isSpecial(final char value) {
+    private static boolean isSpecial(final char value) {
         return "!\"#$%&'()*+,./:;<=>?@[\\]^_`{|}~".indexOf(value) >= 0;
     }
 }

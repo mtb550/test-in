@@ -7,10 +7,9 @@ import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -110,7 +109,7 @@ public class UpdateTestBase {
     // its @Test method by testName, then apply the specific update inside a write command action.
     protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
                                final @NotNull Consumer<PsiMethod> updater) {
-        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+        final List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return;
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
 

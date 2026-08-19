@@ -1,7 +1,9 @@
 package org.testin.util;
 
 import com.intellij.openapi.actionSystem.CustomShortcutSet;
+import com.intellij.openapi.actionSystem.KeyboardShortcut;
 import com.intellij.openapi.actionSystem.Shortcut;
+import com.intellij.openapi.keymap.KeymapUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.intellij.lang.annotations.MagicConstant;
@@ -13,9 +15,14 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 /**
- * Keystrokes shared by more than one class. Single-use keystrokes live as
- * constants in their owning action/enum class; the helper methods are in
- * {@link Tools}.
+ * Every keystroke question the plugin asks, and the keys more than one class
+ * binds.
+ * <p>
+ * The constants are the shared keys - a single-use keystroke stays a constant in
+ * the action or enum that owns it. The four static helpers answer the same
+ * questions for those: what shortcut set is this, what does it read as, does
+ * this event match. One owner either way, so a shared key and a single-use key
+ * cannot start behaving differently.
  */
 @Getter
 @AllArgsConstructor
@@ -106,18 +113,46 @@ public enum Shortcuts {
     }
 
     public @NotNull CustomShortcutSet getCustomShortcut() {
-        return Tools.customShortcut(key);
+        return customShortcut(key);
     }
 
     public @NotNull Shortcut getShortcut() {
-        return Tools.keyboardShortcut(key);
+        return keyboardShortcut(key);
     }
 
     public @NotNull String getShortcutText() {
-        return Tools.shortcutText(key);
+        return shortcutText(key);
     }
 
     public boolean matches(final @NotNull KeyEvent e) {
-        return Tools.matches(e, key);
+        return matches(e, key);
+    }
+
+    // The same four questions for a keystroke that is not one of the shared keys
+    // above - a single-use one a class declares for itself. One owner either way,
+    // so a key bound here and a key bound there behave the same.
+
+    public static @NotNull CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
+        return new CustomShortcutSet(key);
+    }
+
+    public static @NotNull Shortcut keyboardShortcut(final @NotNull KeyStroke key) {
+        return new KeyboardShortcut(key, null);
+    }
+
+    public static @NotNull String shortcutText(final @NotNull KeyStroke key) {
+        return KeymapUtil.getKeystrokeText(key);
+    }
+
+    /**
+     * Whether the event is this shortcut.
+     * <p>
+     * Built into a KeyStroke and compared, rather than comparing the modifier
+     * masks: KeyStroke normalizes what it is given to carry both the old and the
+     * extended bits, while KeyEvent.getModifiersEx reports only the extended
+     * ones. Ctrl+C therefore compared 130 against 128 and never matched.
+     */
+    public static boolean matches(final @NotNull KeyEvent e, final @NotNull KeyStroke key) {
+        return key.equals(KeyStroke.getKeyStrokeForEvent(e));
     }
 }

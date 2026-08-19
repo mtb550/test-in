@@ -22,9 +22,9 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testcase.create.TestCaseUpdateMenuDialog;
+import org.testin.util.Display;
 import org.testin.util.FontSync;
 import org.testin.util.Shortcuts;
-import org.testin.util.Tools;
 import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 import org.testin.view.details.components.*;
@@ -104,22 +104,22 @@ public class DetailsTab {
                 new Title(),
                 new ActionIcons(),
                 new Badges(),
-                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT, (p, dto) -> Tools.format(dto.getExpectedResult())),
+                new AttributeRow(TestEditorAttributes.EXPECTED_RESULT, (p, dto) -> Display.format(dto.getExpectedResult())),
                 new Steps(),
-                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS, (p, dto) -> Tools.format(dto.getPreConditions())),
-                new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> Tools.format(dto.getTestData())),
+                new AttributeRow(TestEditorAttributes.PRE_CONDITIONS, (p, dto) -> Display.format(dto.getPreConditions())),
+                new AttributeRow(TestEditorAttributes.TEST_DATA, (p, dto) -> Display.format(dto.getTestData())),
                 // No FQCN row. The fully qualified class and method name is how
                 // the plugin finds the generated code to navigate to and run -
                 // it is machinery, not something a tester reads while executing.
                 // It stays available as a toolbar attribute for anyone who wants
                 // it on the card or in the grid; it is only off the always-on
                 // panel.
-                new AttributeRow(TestEditorAttributes.REFERENCE, (p, dto) -> Tools.format(dto.getReference())),
-                new AttributeRow(TestEditorAttributes.MODULE, (p, dto) -> Tools.format(dto.getModule())),
+                new AttributeRow(TestEditorAttributes.REFERENCE, (p, dto) -> Display.format(dto.getReference())),
+                new AttributeRow(TestEditorAttributes.MODULE, (p, dto) -> Display.format(dto.getModule())),
                 new AttributeRow(TestEditorAttributes.CREATE_BY, (p, dto) -> dto.getCreatedBy()),
                 new AttributeRow(TestEditorAttributes.UPDATE_BY, (p, dto) -> dto.getUpdatedBy()),
-                new AttributeRow(TestEditorAttributes.CREATE_AT, (p, dto) -> Tools.formatDate(dto.getCreatedAt())),
-                new AttributeRow(TestEditorAttributes.UPDATE_AT, (p, dto) -> Tools.formatDate(dto.getUpdatedAt()))
+                new AttributeRow(TestEditorAttributes.CREATE_AT, (p, dto) -> Display.formatDate(dto.getCreatedAt())),
+                new AttributeRow(TestEditorAttributes.UPDATE_AT, (p, dto) -> Display.formatDate(dto.getUpdatedAt()))
         );
     }
 

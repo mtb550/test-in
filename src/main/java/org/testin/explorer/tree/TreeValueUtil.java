@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.dirs.DirectoryDto;
+import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,24 @@ public final class TreeValueUtil {
 
     public static @Nullable DirectoryDto selectedDirectory(final @Nullable TreePath path) {
         return path == null ? null : directoryOf(path.getLastPathComponent());
+    }
+
+    /**
+     * Whatever directory the tree has selected, or null when it has none. Unlike
+     * {@link #singleSelectedDirectory} this does not care how many are selected -
+     * the creators use it to find the parent to create under.
+     */
+    public static @Nullable DirectoryDto selectedDirectory(final @NotNull SimpleTree tree) {
+        return selectedDirectory(tree.getSelectionPath());
+    }
+
+    /**
+     * The test project the tree is rooted at, or null when it is not rooted at
+     * one - which is every state the panel draws instead of a tree.
+     */
+    public static @Nullable Path projectPath(final @NotNull SimpleTree tree) {
+        final DirectoryDto root = directoryOf(tree.getModel().getRoot());
+        return root instanceof TestProjectDirectoryDto project ? project.getPath() : null;
     }
 
     /**

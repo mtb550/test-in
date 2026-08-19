@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.importexport.FileTypes;
 import org.testin.importexport.shared.FileDocumentListener;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -141,7 +142,7 @@ public final class SourceForm implements DialogComponent {
         }
 
         final String columns = importAttributes.stream()
-                .filter(TestEditorAttributes::isImportable)
+                .filter(a -> a.can(Can.IMPORT))
                 .map(TestEditorAttributes::getName)
                 .collect(Collectors.joining(", "));
 

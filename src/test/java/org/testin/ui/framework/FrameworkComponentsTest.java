@@ -1,6 +1,7 @@
 package org.testin.ui.framework;
 
 import com.intellij.ui.components.fields.ExtendableTextField;
+import org.testin.util.Shortcuts;
 import org.testng.annotations.Test;
 
 import javax.swing.*;

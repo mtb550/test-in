@@ -14,7 +14,7 @@ import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.ui.framework.ConfirmDialog;
-import org.testin.util.Tools;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.datatransfer.Transferable;
@@ -30,7 +30,7 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
 
     public PasteNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, tree, "Paste", "Paste items", AllIcons.Actions.MenuPaste);
-        this.registerCustomShortcutSet(Tools.customShortcut(SHORTCUT), tree);
+        this.registerCustomShortcutSet(Shortcuts.customShortcut(SHORTCUT), tree);
     }
 
     @Override

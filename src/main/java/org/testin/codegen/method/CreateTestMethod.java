@@ -10,12 +10,12 @@ import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
+import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.services.Services;
-import org.testin.util.Tools;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,7 +45,7 @@ public class CreateTestMethod implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        final List<String> fqcn = Services.getInstance(p, Tools.class).buildFqcnMethod(tc);
+        final List<String> fqcn = Fqcn.ofMethod(tc);
         final Target target = parse(fqcn);
         if (target == null) {
             Logger.error("FQCN list is too short to generate a method: " + fqcn);
@@ -105,7 +105,7 @@ public class CreateTestMethod implements GenAction {
         if (targetClass != null) return targetClass;
 
         try {
-            final VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRootOrWarn(p);
+            final VirtualFile sourceRoot = JavaSourceRoot.findOrWarn(p);
             if (sourceRoot != null) {
                 // Package segments are camelCase (see NameSanitizer.packageName); lowercasing
                 // the directory here would disagree with the emitted package declaration
@@ -137,7 +137,7 @@ public class CreateTestMethod implements GenAction {
                                        final @NotNull String className, final @NotNull String methodName,
                                        final @Nullable TestCaseDto tc) {
         try {
-            final VirtualFile sourceRoot = Services.getInstance(p, Tools.class).getTestSourceRoot(p);
+            final VirtualFile sourceRoot = JavaSourceRoot.find(p);
             if (sourceRoot == null) {
                 Logger.error("retryInjectPhysically: sourceRoot is null, cannot inject method '" + methodName + "'");
                 return;

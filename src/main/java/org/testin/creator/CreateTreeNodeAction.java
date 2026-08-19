@@ -10,6 +10,7 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.creator.dialogs.CreateRunDialog;
 import org.testin.creator.dialogs.CreateTestDialog;
 import org.testin.explorer.ExplorerPanel;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryType;
 import org.testin.model.dto.dirs.*;
@@ -17,25 +18,22 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;
-import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
 
 public class CreateTreeNodeAction extends AbstractProjectTreeAction {
-    private final @NotNull Tools tools;
 
     public CreateTreeNodeAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, tree, "Create", "Create new node", AllIcons.General.Add);
-        this.tools = Services.getInstance(p, Tools.class);
         this.registerCustomShortcutSet(Shortcuts.CreateItem.getCustomShortcut(), tree);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final DirectoryDto pDir = tools.getCurrentSelectedDirectory(tree);
+        final DirectoryDto pDir = TreeValueUtil.selectedDirectory(tree);
         final TreePath path = tree.getSelectionPath();
 
         if (path == null || pDir == null) return;
@@ -87,7 +85,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
 
-        DirectoryDto parentDir = tools.getCurrentSelectedDirectory(tree);
+        DirectoryDto parentDir = TreeValueUtil.selectedDirectory(tree);
 
         if (parentDir == null || parentDir instanceof TestProjectDirectoryDto) {
             e.getPresentation().setEnabled(false);

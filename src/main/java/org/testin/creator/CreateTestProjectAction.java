@@ -13,8 +13,8 @@ import org.testin.services.Services;
 import org.testin.setting.TestinRoot;
 import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.testproject.CreateTestProjectNewAction;
+import org.testin.util.NameSanitizer;
 import org.testin.util.OptionalPlugin;
-import org.testin.util.Tools;
 
 public class CreateTestProjectAction extends AbstractProjectAction {
     private final @NotNull ExplorerPanel pp;
@@ -44,7 +44,7 @@ public class CreateTestProjectAction extends AbstractProjectAction {
 
             if (!OptionalPlugin.GIT.isAvailableOrWarn(p)) return;
 
-            final String projectName = Services.getInstance(p, Tools.class).extractProjectNameFromUrl(name);
+            final String projectName = NameSanitizer.projectNameFromUrl(name);
             new CreateTestProjectCloneAction(p, name, projectName, pp).execute();
 
         }).show();

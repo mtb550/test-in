@@ -26,7 +26,7 @@ public class Config {
     @Getter
     private static final @NotNull DateTimeFormatter dateFormatterPattern = DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN, Locale.US);
     /**
-     * Java test source root, detected once at plugin startup (see Tools.getTestSourceRoot).
+     * Java test source root, detected once at plugin startup by JavaSourceRoot.
      * Cached here so code generation does not re-scan the project modules on every call;
      * re-detected only if the cached root becomes invalid (e.g. the folder was removed).
      */

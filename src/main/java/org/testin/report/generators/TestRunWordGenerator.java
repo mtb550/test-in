@@ -16,7 +16,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.testproject.BoundTestProject;
-import org.testin.util.Tools;
+import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -93,8 +93,8 @@ public final class TestRunWordGenerator {
                     addOverviewRow(overviewTable, 4, TestRunConfiguration.TEST_TYPE.getDisplayName(), tr.getTestType());
 
                 addOverviewRow(overviewTable, 5, "Executed By", summary.executedBy());
-                addOverviewRow(overviewTable, 6, "Execution Started", Tools.formatDate(tr.getExecutionStartedAt()));
-                addOverviewRow(overviewTable, 7, "Execution Ended", Tools.formatDate(tr.getExecutionEndedAt()));
+                addOverviewRow(overviewTable, 6, "Execution Started", Display.formatDate(tr.getExecutionStartedAt()));
+                addOverviewRow(overviewTable, 7, "Execution Ended", Display.formatDate(tr.getExecutionEndedAt()));
                 addOverviewRow(overviewTable, 8, "Run Status", trDir.getMarker().getStatus().name());
 
 
@@ -137,7 +137,7 @@ public final class TestRunWordGenerator {
                             section.isWithFailureDetail(), section::matches);
                 }
 
-                addFooter(doc, Tools.formatDate(ZonedDateTime.now()));
+                addFooter(doc, Display.formatDate(ZonedDateTime.now()));
 
                 applyPageMargins(doc);
 

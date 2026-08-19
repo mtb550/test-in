@@ -9,6 +9,7 @@ import org.testin.model.markers.Marker;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,6 +34,23 @@ public abstract class DirectoryDto {
      */
     @ToString.Exclude
     private @Nullable DirectoryDto parent;
+
+    /**
+     * A child's {@code path2}, from its parent's and its own name.
+     * <p>
+     * On the type that owns {@code path2}, so a node built from the tree and one
+     * read from disk describe where they sit in the same way. The parent list is
+     * absent for a test project, which has nothing above it.
+     */
+    public static @NotNull ArrayList<String> pathOf(final @Nullable List<String> parentPath,
+                                                    final @NotNull String name) {
+        final ArrayList<String> path = new ArrayList<>();
+
+        if (parentPath != null) path.addAll(parentPath);
+        path.add(name);
+
+        return path;
+    }
 
     /**
      * The node's marker; each subtype's Lombok-generated getter returns its

@@ -7,6 +7,7 @@ import org.testin.codegen.GenType;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 
@@ -55,7 +56,7 @@ public class GridEditListener implements TableModelListener {
             // The table model refuses these columns already; asked again of the
             // same attribute because a programmatic setValueAt never goes through
             // the model's answer.
-            if (!attr.isEditable()) return;
+            if (!attr.can(Can.EDIT)) return;
 
             final TestCaseDto tc = pageItems.get(row);
 

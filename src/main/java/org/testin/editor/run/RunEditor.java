@@ -45,8 +45,8 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.TestCaseSorter;
 import org.testin.testrun.UpdateTestRunStatusAction;
+import org.testin.util.Display;
 import org.testin.util.FontSync;
-import org.testin.util.Tools;
 import org.testin.view.GridViewDetailsAction;
 
 import javax.swing.*;
@@ -694,7 +694,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                 .map(TestRunItems::getDuration)
                 .reduce(Duration.ZERO, Duration::plus);
 
-        statusBar.showExecutionTime(Services.getInstance(p, Tools.class).getFormattedDuration(total));
+        statusBar.showExecutionTime(Display.formatDuration(total));
     }
 
     /**

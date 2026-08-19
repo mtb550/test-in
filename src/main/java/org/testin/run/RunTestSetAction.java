@@ -7,6 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
+import org.testin.codegen.Fqcn;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -14,7 +15,6 @@ import org.testin.notifications.Notifier;
 import org.testin.runner.TestNGRunnerByClass;
 import org.testin.services.Services;
 import org.testin.util.OptionalPlugin;
-import org.testin.util.Tools;
 
 import javax.swing.tree.TreePath;
 
@@ -50,7 +50,7 @@ public class RunTestSetAction extends AbstractProjectTreeAction {
             // Build the FQCN the same way the code generator does: strip the
             // "Test Cases" display node and sanitize each segment. The raw path2
             // join produced a class name findClass could never resolve.
-            String fqcn = String.join(".", Services.getInstance(p, Tools.class).buildFqcnClass(p, ts));
+            String fqcn = String.join(".", Fqcn.ofClass(p, ts));
             Logger.info(this.getClass() + "fqcn path: " + fqcn);
 
             if (!fqcn.trim().isEmpty()) {

@@ -21,14 +21,13 @@ import static org.testng.Assert.assertTrue;
  */
 public class TestDataParserDateTest {
 
-    private final TestDataParser parser = new TestDataParser();
     private final ZonedDateTime when = ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS).minusMonths(7);
 
     @Test
     public void readsBackWhatThePluginDisplays() {
-        final String displayed = Tools.formatDate(when);
+        final String displayed = Display.formatDate(when);
 
-        assertEquals(parser.date(displayed).toInstant(), when.toInstant(),
+        assertEquals(TestDataParser.date(displayed).toInstant(), when.toInstant(),
                 "the export writes this shape, so the import has to read it");
     }
 
@@ -36,7 +35,7 @@ public class TestDataParserDateTest {
     public void readsThePlainSpreadsheetShape() {
         final String plain = when.format(Config.EXCEL_DATE_FORMATTER);
 
-        assertEquals(parser.date(plain).toLocalDateTime(), when.toLocalDateTime(),
+        assertEquals(TestDataParser.date(plain).toLocalDateTime(), when.toLocalDateTime(),
                 "a sheet from another tool carries this one");
     }
 
@@ -47,7 +46,7 @@ public class TestDataParserDateTest {
      */
     @Test
     public void readsADateWhoseWeekdayIsWrong() {
-        final ZonedDateTime read = parser.date("Sunday 05-08-2026 At 02:13:07 [Asia/Riyadh]");
+        final ZonedDateTime read = TestDataParser.date("Sunday 05-08-2026 At 02:13:07 [Asia/Riyadh]");
 
         assertEquals(read.getDayOfMonth(), 5);
         assertEquals(read.getMonthValue(), 8);
@@ -56,14 +55,14 @@ public class TestDataParserDateTest {
 
     @Test
     public void aBlankCellIsNoTimeAtAll() {
-        assertTrue(Config.isNotExecuted(parser.date("")), "the file did not say when");
-        assertTrue(Config.isNotExecuted(parser.date("   ")), "nor here");
-        assertTrue(Config.isNotExecuted(parser.date(null)), "nor when the column is absent");
+        assertTrue(Config.isNotExecuted(TestDataParser.date("")), "the file did not say when");
+        assertTrue(Config.isNotExecuted(TestDataParser.date("   ")), "nor here");
+        assertTrue(Config.isNotExecuted(TestDataParser.date(null)), "nor when the column is absent");
     }
 
     @Test
     public void textThatIsNeitherShapeIsNoTimeEither() {
-        assertTrue(Config.isNotExecuted(parser.date("last Tuesday")),
+        assertTrue(Config.isNotExecuted(TestDataParser.date("last Tuesday")),
                 "inventing 'now' for it is what put today's date on every imported case");
     }
 }

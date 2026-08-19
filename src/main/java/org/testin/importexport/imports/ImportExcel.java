@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.*;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
+import org.testin.model.TestEditorAttributes.Can;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -88,7 +89,7 @@ public class ImportExcel {
                 currentTestCase.setIsHead(null);
 
                 for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
-                    if (attr.isImportable()) {
+                    if (attr.can(Can.IMPORT)) {
                         final Integer colIndex = headerIndexMap.get(attr.getName().toLowerCase());
                         final String rawValue = colIndex == null
                                 ? ""

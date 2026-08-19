@@ -9,7 +9,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
-import org.testin.util.Tools;
+import org.testin.util.Display;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -51,8 +51,8 @@ public final class TestRunHtmlGenerator {
         final AppSettingsState settings = Services.getInstance(p, AppSettingsState.class);
         final String testerRole = settings.testerRole;
         final String executedBy = summary.executedBy();
-        final String executionStarted = Tools.formatDate(tr.getExecutionStartedAt());
-        final String executionEnded = Tools.formatDate(tr.getExecutionEndedAt());
+        final String executionStarted = Display.formatDate(tr.getExecutionStartedAt());
+        final String executionEnded = Display.formatDate(tr.getExecutionEndedAt());
         final String runStatus = trDir.getMarker().getStatus().getLabel();
 
         // Project name
@@ -154,7 +154,7 @@ public final class TestRunHtmlGenerator {
                 .append(escapedHtml(testerRole))
                 .append("  |  ")
                 // When the report was generated, as the PDF and Word footers say.
-                .append(Tools.formatDate(ZonedDateTime.now()))
+                .append(Display.formatDate(ZonedDateTime.now()))
                 .append("</p>")
                 .append("<p>Generated automatically by <a href='https://plugins.jetbrains.com/plugin/31514-testin' target='_blank'><strong>Testin</strong></a> IntelliJ plugin.</p>")
                 .append("</div>");
