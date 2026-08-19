@@ -19,7 +19,6 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Shortcuts;
-import org.testin.util.Tools;
 
 import java.util.*;
 
@@ -37,10 +36,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
         this.dir = dir;
         this.list = list;
         this.model = model;
-        // The same pair the tree's Remove answers to, so the key means "remove"
-        // wherever the tester is standing.
-        this.registerCustomShortcutSet(
-                Tools.customShortcut(Shortcuts.DeletePackage.getKey(), Shortcuts.RemoveNode.getKey()), list);
+        this.registerCustomShortcutSet(Shortcuts.DeletePackage.getCustomShortcut(), list);
     }
 
     @Override

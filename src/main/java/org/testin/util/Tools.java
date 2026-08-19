@@ -39,7 +39,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service(Service.Level.PROJECT)
@@ -49,13 +48,8 @@ public final class Tools {
     private final @NotNull NameSanitizer nameSanitizer = new NameSanitizer();
     private final @NotNull TestDataParser testDataParser = new TestDataParser();
 
-    /**
-     * One shortcut set for one or more keys - the platform takes Shortcut
-     * objects rather than raw keystrokes when there is more than one, which is
-     * how an action answers to two keys at once.
-     */
-    public static @NotNull CustomShortcutSet customShortcut(final @NotNull KeyStroke... keys) {
-        return new CustomShortcutSet(Arrays.stream(keys).map(Tools::keyboardShortcut).toArray(Shortcut[]::new));
+    public static @NotNull CustomShortcutSet customShortcut(final @NotNull KeyStroke key) {
+        return new CustomShortcutSet(key);
     }
 
     public static @NotNull Shortcut keyboardShortcut(final @NotNull KeyStroke key) {

@@ -17,7 +17,6 @@ import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Tools;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.EditorUtil;
 
@@ -27,7 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static org.testin.util.Shortcuts.DeletePackage;
-import static org.testin.util.Shortcuts.RemoveNode;
 
 public class RemoveAction extends AbstractProjectTreeAction {
     private final @NotNull ExplorerPanel pp;
@@ -35,9 +33,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
     public RemoveAction(final @NotNull Project p, final @NotNull SimpleTree tree, final @NotNull ExplorerPanel pp) {
         super(p, tree, "Remove", "Remove selected nodes", AllIcons.Actions.GC);
         this.pp = pp;
-        // Two keys, one action, every node the same: Delete, and Ctrl+Delete for
-        // a hand already on the modifier.
-        this.registerCustomShortcutSet(Tools.customShortcut(DeletePackage.getKey(), RemoveNode.getKey()), tree);
+        this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
 
     private boolean isRemovable(final @Nullable Object dir) {
