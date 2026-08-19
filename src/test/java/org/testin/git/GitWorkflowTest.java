@@ -163,7 +163,7 @@ public class GitWorkflowTest {
      * The review, built the way the plugin builds it: from what Git says changed
      * and what Git has committed.
      */
-    private List<TestCaseDiff> review() {
+    private List<PendingChange> review() {
         final List<String> status = mustGit(work, "status", "--porcelain", "-uall")
                 .lines().filter(line -> !line.isBlank()).toList();
 
@@ -175,7 +175,7 @@ public class GitWorkflowTest {
      * Everything the plugin would stage for the given review: the selected test
      * cases, and the markers that make their directories mean anything.
      */
-    private Set<String> stagedFor(final List<TestCaseDiff> review) {
+    private Set<String> stagedFor(final List<PendingChange> review) {
         final Set<String> paths = new LinkedHashSet<>(GitRefs.repoRelativePaths(review));
         paths.addAll(GitCommitService.markersAlongside(work, paths));
         return paths;
@@ -207,8 +207,11 @@ public class GitWorkflowTest {
     public void aNewTestProjectIsReviewedCommittedAndPushed() throws IOException {
         final List<TestCaseDto> cases = writeTestProject();
 
-        final List<TestCaseDiff> pending = review();
-        assertEquals(pending.size(), 2, "both new test cases are in the review");
+        final List<PendingChange> pending = review();
+        assertEquals(pending.stream().filter(change -> change.subject() == ChangeSubject.TEST_CASE).count(), 2,
+                "both new test cases are in the review");
+        assertTrue(pending.stream().anyMatch(change -> change.subject() == ChangeSubject.MARKER),
+                "and so are the markers that make their directories nodes");
         assertTrue(pending.stream().allMatch(diff -> diff.type() == DiffType.ADDED));
 
         commit(stagedFor(pending), "the first commit");
@@ -242,13 +245,21 @@ public class GitWorkflowTest {
 
     /**
      * A run directory is not part of a test case commit, so it must not be
-     * dragged in: the markers that travel are the ones above the cases selected.
+     * dragged in: the markers that travel with a selection are the ones above
+     * the cases in it.
+     * <p>
+     * Markers are rows of their own now, so a tester can commit one deliberately
+     * - archiving a project is a marker edit and nothing else. This is about the
+     * ones nobody selected: the review is filtered to the test cases, and what
+     * comes along is only what those cases need to mean anything.
      */
     @Test
     public void onlyTheMarkersAboveTheSelectedCasesTravel() throws IOException {
         writeTestProject();
 
-        final Set<String> staged = stagedFor(review());
+        final Set<String> staged = stagedFor(review().stream()
+                .filter(change -> change.subject() == ChangeSubject.TEST_CASE)
+                .toList());
 
         assertTrue(staged.contains(".tp"));
         assertTrue(staged.contains("Test Cases/.tcd"));
@@ -271,7 +282,7 @@ public class GitWorkflowTest {
         final TestCaseDto edited = cases.getFirst().setModule("payments");
         write(work, "Test Cases/login flow/" + edited.getId() + ".json", edited);
 
-        final List<TestCaseDiff> pending = review();
+        final List<PendingChange> pending = review();
 
         assertEquals(pending.size(), 1);
         assertEquals(pending.getFirst().type(), DiffType.MODIFIED);
@@ -289,11 +300,11 @@ public class GitWorkflowTest {
         final TestCaseDto extra = testCase("a locked account cannot sign in");
         write(work, "Test Cases/login flow/" + extra.getId() + ".json", extra);
 
-        final List<TestCaseDiff> pending = review();
+        final List<PendingChange> pending = review();
 
         assertEquals(pending.size(), 1);
         assertEquals(pending.getFirst().type(), DiffType.ADDED);
-        assertEquals(pending.getFirst().subject().getDescription(), "a locked account cannot sign in");
+        assertEquals(pending.getFirst().testCase().getDescription(), "a locked account cannot sign in");
     }
 
     @Test
@@ -303,11 +314,11 @@ public class GitWorkflowTest {
 
         Files.delete(work.resolve("Test Cases/login flow/" + cases.getFirst().getId() + ".json"));
 
-        final List<TestCaseDiff> pending = review();
+        final List<PendingChange> pending = review();
 
         assertEquals(pending.size(), 1);
         assertEquals(pending.getFirst().type(), DiffType.DELETED);
-        assertEquals(pending.getFirst().subject().getDescription(), "a registered user signs in");
+        assertEquals(pending.getFirst().testCase().getDescription(), "a registered user signs in");
     }
 
     /**

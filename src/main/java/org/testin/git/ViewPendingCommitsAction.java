@@ -77,50 +77,56 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private void scanForChanges(final @NotNull Project p, final @NotNull Path path) {
         GitBackgroundTask.run(p, "Scanning for changes", true,
                 indicator -> {
-                    final List<TestCaseDiff> changes = GitDiffProcessor.getPendingChanges(p, path);
+                    final List<PendingChange> changes = GitDiffProcessor.getPendingChanges(p, path);
                     ApplicationManager.getApplication().invokeLater(() -> reviewChanges(p, path, changes));
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
     }
 
     private void reviewChanges(final @NotNull Project p, final @NotNull Path path,
-                               final @NotNull List<TestCaseDiff> changes) {
+                               final @NotNull List<PendingChange> changes) {
         if (changes.isEmpty()) {
             Services.getInstance(p, Notifier.class).softShow(p, "No changes");
             return;
         }
 
-        // The dialog owns the whole review now - which changes, the message and
-        // the Commit button - so there is nothing left to ask afterwards.
+        // The dialog owns the whole review - which changes, the message, and
+        // whether it goes to the remote - so there is nothing left to ask
+        // afterwards.
         new PendingCommitsDialog(p, changes, path,
-                (selected, message) -> performCommitWorkflow(p, path, message, selected)).show();
+                request -> performCommitWorkflow(p, path, request.message(), request.changes(), request.push())).show();
     }
 
     private void performCommitWorkflow(
             final @NotNull Project p,
             final @NotNull Path repoPath,
             final @NotNull String commitMessage,
-            final @NotNull Collection<TestCaseDiff> selectedChanges) {
-        GitBackgroundTask.run(p, "Committing to local Git", false,
+            final @NotNull Collection<PendingChange> selectedChanges,
+            final boolean push) {
+        GitBackgroundTask.run(p, push ? "Committing and pushing" : "Committing to local Git", false,
                 indicator -> {
                     indicator.setText("Staging and committing files");
                     commits.stageAndCommit(repoPath, commitMessage, selectedChanges);
 
+                    // Read here, while the commit just made is still HEAD: the
+                    // tester is told which commit their changes went into, and a
+                    // push that follows reports the same one.
+                    final String commitId = commits.headCommitId(repoPath);
+
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        final Notifier notifier = Services.getInstance(p, Notifier.class);
-                        notifier.infoWithActions(
-                                p,
-                                "Committed",
-                                "Push these changes to the remote?",
-                                notifier.action("Push to Remote", () -> pushToRemote(p, repoPath))
-                        );
+                        if (push) {
+                            pushToRemote(p, repoPath, commitId);
+                            return;
+                        }
+
+                        Services.getInstance(p, Notifier.class).softShow(p, "Committed", commitId);
                     });
                 },
                 ex -> {
                     if (isIdentityError(ex.getMessage())) {
-                        promptAndSetGitIdentity(p, repoPath, commitMessage, selectedChanges);
+                        promptAndSetGitIdentity(p, repoPath, commitMessage, selectedChanges, push);
                     } else {
-                        Services.getInstance(p, Notifier.class).error(p, "Commit Failed", "Failed to commit changes:\n" + ex.getMessage());
+                        Services.getInstance(p, Notifier.class).error(p, "Commit Failed", "Failed to commit changes:" + System.lineSeparator() + ex.getMessage());
                     }
                 });
     }
@@ -141,7 +147,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage()));
     }
 
-    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath) {
+    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String commitId) {
         GitBackgroundTask.run(p, "Checking Git remote", false,
                 indicator -> {
                     final String remoteName = git.getRemoteName(repoPath);
@@ -154,9 +160,9 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                         // A null remote name always yields an empty URL above; naming it here
                         // keeps the "already configured" branch provably non-null.
                         if (remoteName == null || remoteUrl.isEmpty()) {
-                            configureRemoteAndPush(p, repoPath, remoteName == null ? "origin" : remoteName, branch);
+                            configureRemoteAndPush(p, repoPath, remoteName == null ? "origin" : remoteName, branch, commitId);
                         } else {
-                            executeGitPush(p, repoPath, remoteName, branch);
+                            executeGitPush(p, repoPath, remoteName, branch, commitId);
                         }
                     });
                 },
@@ -164,7 +170,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     }
 
     private void configureRemoteAndPush(final @NotNull Project p, final @NotNull Path repoPath,
-                                        final @NotNull String remoteName, final @NotNull String branch) {
+                                        final @NotNull String remoteName, final @NotNull String branch,
+                                        final @NotNull String commitId) {
         final String remoteUrl = Messages.showInputDialog(
                 p,
                 "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
@@ -179,21 +186,25 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         GitBackgroundTask.run(p, "Configuring remote", false,
                 indicator -> {
                     commits.configureRemote(repoPath, remoteName, remoteUrl.trim());
-                    ApplicationManager.getApplication().invokeLater(() -> executeGitPush(p, repoPath, remoteName, branch));
+                    ApplicationManager.getApplication().invokeLater(() -> executeGitPush(p, repoPath, remoteName, branch, commitId));
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
     }
 
     private void executeGitPush(final @NotNull Project p, final @NotNull Path repoPath,
-                                final @NotNull String remote, final @NotNull String branch) {
+                                final @NotNull String remote, final @NotNull String branch,
+                                final @NotNull String commitId) {
         GitBackgroundTask.run(p, "Pushing to Remote", false,
                 indicator -> {
                     indicator.setText("Syncing with remote: pull --rebase, then push");
                     commits.pullAndPush(repoPath, remote, branch);
                     // In the log for the same reason the sync is: the push
-                    // finishes on its own time, not under the tester's hand.
+                    // finishes on its own time, not under the tester's hand -
+                    // and it names the commit, so the tester can find it on the
+                    // remote without going back to look it up.
                     ApplicationManager.getApplication().invokeLater(() ->
-                            Services.getInstance(p, Notifier.class).info(p, "Pushed", "Test cases are on the remote"));
+                            Services.getInstance(p, Notifier.class).info(p, "Pushed",
+                                    "Commit " + commitId + " is on " + remote + "/" + branch));
                 },
                 ex -> {
                     if (git.hasConflicts(repoPath)) {
@@ -206,7 +217,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     // with the failure that needs it.
                     final Notifier notifier = Services.getInstance(p, Notifier.class);
                     notifier.errorWithActions(p, "Push Failed", ex.getMessage(),
-                            notifier.action("Try Again", () -> pushToRemote(p, repoPath)));
+                            notifier.action("Try Again", () -> pushToRemote(p, repoPath, commitId)));
                 });
     }
 
@@ -251,7 +262,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
             final @NotNull Project p,
             final @NotNull Path repoPath,
             final @NotNull String pendingCommitMessage,
-            final @NotNull Collection<TestCaseDiff> selectedChanges) {
+            final @NotNull Collection<PendingChange> selectedChanges,
+            final boolean push) {
         // The dialog validates what it collected - a blank name or email never
         // leaves it - so this is the workflow resuming, not a second check.
         ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->
@@ -262,7 +274,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                                 // The tester is watching: they just filled the dialog
                                 // in and the commit resumes on the next line.
                                 Services.getInstance(p, Notifier.class).softShow(p, "Identity set");
-                                performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges);
+                                performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges, push);
                             });
                         },
                         ex -> Services.getInstance(p, Notifier.class).error(p, "Config Failed",

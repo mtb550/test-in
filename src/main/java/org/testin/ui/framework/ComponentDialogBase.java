@@ -65,6 +65,15 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      * A confirm button row — clicking it submits the dialog. For working
      * dialogs where a visible OK button reads better than an Enter hint.
      */
+    /**
+     * A button with alternatives behind an arrow: the first label is the
+     * default, the rest sit under it. For a dialog whose one action has a
+     * second, less common form - commit, or commit and push.
+     */
+    public static @NotNull ComponentDialogBase<DialogSplitButton> splitButton(final @NotNull String... labels) {
+        return new ComponentDialogBase<>(new DialogSplitButton(List.of(labels)));
+    }
+
     public static @NotNull ComponentDialogBase<DialogButton> button(final @NotNull String text) {
         return new ComponentDialogBase<>(new DialogButton(text));
     }

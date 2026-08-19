@@ -72,7 +72,7 @@ public final class GitCommitService {
     public void stageAndCommit(
             final @NotNull Path repositoryPath,
             final @NotNull String message,
-            final @NotNull Collection<TestCaseDiff> selectedChanges) {
+            final @NotNull Collection<PendingChange> selectedChanges) {
         final Set<String> paths = GitRefs.repoRelativePaths(selectedChanges);
         if (paths.isEmpty()) throw new IllegalArgumentException("No Git changes were selected");
 
@@ -80,6 +80,17 @@ public final class GitCommitService {
 
         GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "add", "--"));
         GitCommandRunner.execute(project, repositoryPath, withPaths(paths, "git", "commit", "--only", "-m", message, "--"));
+    }
+
+    /**
+     * The short id of the commit at HEAD - what a tester quotes when they say
+     * which commit their work went into, and what the push reports afterwards.
+     * <p>
+     * Blank when the repository has no commit yet, which is a real state: a
+     * repository initialized a moment ago and nothing committed into it.
+     */
+    public @NotNull String headCommitId(final @NotNull Path repositoryPath) {
+        return GitCommandRunner.execute(project, repositoryPath, "git", "rev-parse", "--short", "HEAD").trim();
     }
 
     public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {

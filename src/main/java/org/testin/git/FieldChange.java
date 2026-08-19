@@ -3,7 +3,7 @@ package org.testin.git;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A single changed field inside a {@link TestCaseDiff}.
+ * A single changed field inside a {@link PendingChange}.
  * <p>
  * Both values are always there. A field the tester never filled in is {@code ""}
  * on that side, not null - every compared field on {@link org.testin.model.dto.TestCaseDto}

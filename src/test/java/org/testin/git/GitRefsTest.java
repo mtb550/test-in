@@ -16,8 +16,9 @@ import static org.testng.Assert.*;
  */
 public class GitRefsTest {
 
-    private static TestCaseDiff diff(final Path relativePath) {
-        return new TestCaseDiff(UUID.randomUUID().toString(), relativePath, DiffType.MODIFIED,
+    private static PendingChange diff(final Path relativePath) {
+        return new PendingChange(ChangeSubject.TEST_CASE, "a case", "a test set", UUID.randomUUID().toString(),
+                relativePath, DiffType.MODIFIED,
                 TestCaseDto.builder().build(), TestCaseDto.builder().build(), List.of());
     }
 

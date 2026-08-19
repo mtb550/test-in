@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +21,7 @@ import static org.testng.Assert.*;
  * contents as plain strings - so the whole review model can be built and
  * asserted here, without a repository or a change list.
  */
-public class TestCaseDiffFactoryTest {
+public class PendingChangeFactoryTest {
 
     private static final Path PATH = Path.of("Test Cases", "login", "case.json");
 
@@ -58,7 +59,7 @@ public class TestCaseDiffFactoryTest {
     public void anAddedFileIsOneCreateChangeCarryingTheDescription() {
         final TestCaseDto added = testCase("a brand new case");
 
-        final TestCaseDiff diff = TestCaseDiffFactory.fromJson(
+        final PendingChange diff = PendingChangeFactory.fromFile(
                 DiffType.ADDED, null, json(added), PATH, mapper());
 
         assertNotNull(diff);
@@ -79,7 +80,7 @@ public class TestCaseDiffFactoryTest {
     public void aDeletedFileIsOneRemoveChangeCarryingTheDescription() {
         final TestCaseDto removed = testCase("a case that is going away");
 
-        final TestCaseDiff diff = TestCaseDiffFactory.fromJson(
+        final PendingChange diff = PendingChangeFactory.fromFile(
                 DiffType.DELETED, json(removed), null, PATH, mapper());
 
         assertNotNull(diff);
@@ -102,7 +103,7 @@ public class TestCaseDiffFactoryTest {
                 .setModule("billing")
                 .setPriority(Priority.HIGH);
 
-        final TestCaseDiff diff = TestCaseDiffFactory.fromJson(
+        final PendingChange diff = PendingChangeFactory.fromFile(
                 DiffType.MODIFIED, json(before), json(after), PATH, mapper());
 
         assertNotNull(diff);
@@ -116,16 +117,89 @@ public class TestCaseDiffFactoryTest {
     }
 
     /**
-     * Git reports a file as modified for reasons the tester has no interest in -
-     * a reformat, a field they cannot edit. The review offers nothing rather
-     * than a row with no content, which is why the factory can answer null.
+     * Git reports a file as modified for reasons no compared field shows - a
+     * reorder, an audit stamp, a reformat. It is still a change, and the commit
+     * stages only what the review lists, so dropping it would leave a modified
+     * file that nothing in the plugin could ever commit. It gets one row saying
+     * as much (#66).
      */
     @Test
-    public void aModifiedFileWithNothingReviewableIsNotOfferedAtAll() {
+    public void aModifiedFileWithNoComparedFieldStillGetsARow() {
         final TestCaseDto unchanged = testCase("identical on both sides");
 
-        assertNull(TestCaseDiffFactory.fromJson(
-                DiffType.MODIFIED, json(unchanged), json(unchanged), PATH, mapper()));
+        final PendingChange change = PendingChangeFactory.fromFile(
+                DiffType.MODIFIED, json(unchanged), json(unchanged), PATH, mapper());
+
+        assertNotNull(change, "a file git calls modified is a change to commit");
+        assertEquals(change.fieldChanges().size(), 1);
+        assertEquals(change.fieldChanges().getFirst().changeType(), ChangeType.CHANGE_FILE);
+    }
+
+    /**
+     * A test run is not a test case, and reading it as one is what put a
+     * nameless row in the review - and, for a run that was edited rather than
+     * created, no row at all (#66).
+     */
+    @Test
+    public void aTestRunIsItsOwnKindOfChange() {
+        final String runJson = """
+                {"changeLog":"cycle 4","results":[{"id":"%s","status":"PASSED"},{"id":"%s","status":"FAILED"}]}
+                """.formatted(UUID.randomUUID(), UUID.randomUUID());
+
+        final PendingChange added = PendingChangeFactory.fromFile(
+                DiffType.ADDED, null, runJson, Path.of("Test Runs", "cycle 4", "cycle 4.json"), mapper());
+
+        assertNotNull(added);
+        assertEquals(added.subject(), ChangeSubject.TEST_RUN);
+        assertEquals(added.name(), "cycle 4", "the run's own name, not a blank test case description");
+        assertEquals(added.testSet(), "", "a run belongs to no test set");
+        assertFalse(added.isRevertible(), "a verdict is a record of work, not an edit to undo");
+        assertEquals(added.fieldChanges().getFirst().changeType(), ChangeType.CREATE_TEST_RUN);
+        assertTrue(added.fieldChanges().getFirst().newValue().contains("2 cases"), "the row says what the run holds");
+    }
+
+    /**
+     * The case that used to vanish: a run already committed, then executed
+     * further. No test-case field differs because none applies, and the review
+     * showed nothing - so the results could never be committed from it.
+     */
+    @Test
+    public void anEditedTestRunIsStillOfferedForCommit() {
+        final String before = """
+                {"results":[{"id":"%s","status":"PENDING"}]}""".formatted(UUID.randomUUID());
+        final String after = """
+                {"results":[{"id":"%s","status":"PASSED"}]}""".formatted(UUID.randomUUID());
+
+        final PendingChange change = PendingChangeFactory.fromFile(
+                DiffType.MODIFIED, before, after, Path.of("Test Runs", "cycle 4", "cycle 4.json"), mapper());
+
+        assertNotNull(change, "an edited run is a change the tester has to be able to commit");
+        assertEquals(change.subject(), ChangeSubject.TEST_RUN);
+        assertFalse(change.fieldChanges().isEmpty());
+    }
+
+    /**
+     * A marker carries no test data, and it is still a change: archiving a
+     * project is a marker edit and nothing else, so a review that hid markers
+     * left the tester unable to commit it.
+     */
+    @Test
+    public void aMarkerChangeIsListedWithItsStatus() {
+        final PendingChange change = PendingChangeFactory.fromFile(
+                DiffType.MODIFIED,
+                "{\"status\":\"ACTIVE\",\"createdBy\":\"mtb\"}",
+                "{\"status\":\"ARCHIVED\",\"createdBy\":\"mtb\"}",
+                Path.of("Test Cases", "login", ".ts"), mapper());
+
+        assertNotNull(change);
+        assertEquals(change.subject(), ChangeSubject.MARKER);
+        assertEquals(change.name(), "login", "a marker is named by the node it belongs to");
+        assertFalse(change.isRevertible());
+
+        final FieldChange status = change.fieldChanges().getFirst();
+        assertEquals(status.changeType(), ChangeType.CHANGE_MARKER);
+        assertEquals(status.oldValue(), "ACTIVE");
+        assertEquals(status.newValue(), "ARCHIVED");
     }
 
     /**
@@ -137,16 +211,16 @@ public class TestCaseDiffFactoryTest {
     public void aMissingRevisionFailsByName() {
         final TestCaseDto present = testCase("only one side survived");
 
-        assertThrows(IllegalStateException.class, () -> TestCaseDiffFactory.fromJson(
+        assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
                 DiffType.MODIFIED, null, json(present), PATH, mapper()));
 
-        assertThrows(IllegalStateException.class, () -> TestCaseDiffFactory.fromJson(
+        assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
                 DiffType.MODIFIED, json(present), null, PATH, mapper()));
 
-        assertThrows(IllegalStateException.class, () -> TestCaseDiffFactory.fromJson(
+        assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
                 DiffType.ADDED, json(present), null, PATH, mapper()));
 
-        assertThrows(IllegalStateException.class, () -> TestCaseDiffFactory.fromJson(
+        assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
                 DiffType.DELETED, null, json(present), PATH, mapper()));
     }
 
@@ -161,14 +235,14 @@ public class TestCaseDiffFactoryTest {
         final TestCaseDto before = testCase("before");
         final TestCaseDto after = testCase("after").setId(before.getId());
 
-        assertEquals(TestCaseDiffFactory.fromJson(DiffType.ADDED, null, json(added), PATH, mapper())
-                .subject().getDescription(), "added");
+        assertEquals(PendingChangeFactory.fromFile(DiffType.ADDED, null, json(added), PATH, mapper())
+                .testCase().getDescription(), "added");
 
-        assertEquals(TestCaseDiffFactory.fromJson(DiffType.DELETED, json(before), null, PATH, mapper())
-                .subject().getDescription(), "before", "a deletion is about the case that was there");
+        assertEquals(PendingChangeFactory.fromFile(DiffType.DELETED, json(before), null, PATH, mapper())
+                .testCase().getDescription(), "before", "a deletion is about the case that was there");
 
-        assertEquals(TestCaseDiffFactory.fromJson(DiffType.MODIFIED, json(before), json(after), PATH, mapper())
-                .subject().getDescription(), "after", "a modification is about the case as it is now");
+        assertEquals(PendingChangeFactory.fromFile(DiffType.MODIFIED, json(before), json(after), PATH, mapper())
+                .testCase().getDescription(), "after", "a modification is about the case as it is now");
     }
 
     /**
@@ -179,7 +253,7 @@ public class TestCaseDiffFactoryTest {
     public void aTestCaseSurvivesBeingWrittenAndReadBack() {
         final TestCaseDto original = testCase("survives the round trip");
 
-        final TestCaseDiff diff = TestCaseDiffFactory.fromJson(
+        final PendingChange diff = PendingChangeFactory.fromFile(
                 DiffType.ADDED, null, json(original), PATH, mapper());
 
         assertNotNull(diff);

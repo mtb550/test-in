@@ -228,9 +228,9 @@ public final class GitRefs {
      * changes, deduplicated in selection order.
      */
 
-    public static @NotNull Set<String> repoRelativePaths(final @NotNull Collection<TestCaseDiff> changes) {
+    public static @NotNull Set<String> repoRelativePaths(final @NotNull Collection<PendingChange> changes) {
         return changes.stream()
-                .map(TestCaseDiff::relativeFilePath)
+                .map(PendingChange::relativeFilePath)
                 .map(path -> path.toString().replace('\\', '/'))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }

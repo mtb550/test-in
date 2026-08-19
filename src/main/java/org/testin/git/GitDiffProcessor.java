@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 /**
  * Builds the test-case review model from what Git reports as changed. The
- * IDE-free diff construction lives in {@link TestCaseDiffFactory} and the
+ * IDE-free diff construction lives in {@link PendingChangeFactory} and the
  * porcelain parsing in {@link GitRefs}; this class only asks Git and reads the
  * two sides of each change.
  * <p>
@@ -37,7 +37,7 @@ import java.util.function.Function;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class GitDiffProcessor {
 
-    public static @NotNull List<TestCaseDiff> getPendingChanges(
+    public static @NotNull List<PendingChange> getPendingChanges(
             final @NotNull Project project,
             final @NotNull Path repositoryRoot) {
         final Path root = repositoryRoot.toAbsolutePath().normalize();
@@ -59,22 +59,28 @@ public final class GitDiffProcessor {
      * @param committedContent the file's content as committed, or null when
      *                         there is none - a new file, or no commits yet
      */
-    static @NotNull List<TestCaseDiff> toDiffs(
+    static @NotNull List<PendingChange> toDiffs(
             final @NotNull List<String> statusLines,
             final @NotNull Path repositoryRoot,
             final @NotNull Mapper mapper,
             final @NotNull Function<String, String> committedContent) {
         final Path root = repositoryRoot.toAbsolutePath().normalize();
-        final List<TestCaseDiff> result = new ArrayList<>();
+        final List<PendingChange> result = new ArrayList<>();
 
         for (final GitRefs.StatusEntry entry : GitRefs.parseStatus(statusLines)) {
-            // Markers change too, and they travel with the commit - but there is
-            // nothing in a marker for a tester to review.
-            if (!entry.path().endsWith(".json")) continue;
-
             final Path relativePath = Path.of(entry.path());
+
+            // An untracked file that is no longer there is not a pending change:
+            // Git listed it a moment ago and something removed it since. Listing
+            // it would offer the tester a row that cannot be staged, because
+            // there is no file for "git add" to find.
+            if (entry.type() == DiffType.ADDED && !Files.exists(root.resolve(relativePath))) {
+                Logger.warn("Skipping " + relativePath + ": Git listed it as new, and it is gone");
+                continue;
+            }
+
             try {
-                final TestCaseDiff diff = TestCaseDiffFactory.fromJson(
+                final PendingChange diff = PendingChangeFactory.fromFile(
                         entry.type(),
                         entry.type() == DiffType.ADDED ? null : committedContent.apply(entry.path()),
                         workingContent(root, relativePath, entry),
@@ -83,7 +89,14 @@ public final class GitDiffProcessor {
                 if (diff != null) result.add(diff);
 
             } catch (final RuntimeException ex) {
-                throw new IllegalStateException("Failed to read Git change " + relativePath, ex);
+                // One unreadable file does not take the review down with it. Git
+                // said this path changed, so it is a change the tester has to be
+                // able to commit - it is listed with what little can be said
+                // about it, and the reason goes to the log. Throwing here meant a
+                // file deleted between the status and the read, or a hand-edited
+                // one, emptied the whole review (#66).
+                Logger.warn("Listing " + relativePath + " without detail: " + ex.getMessage());
+                result.add(PendingChangeFactory.unreadable(entry.type(), relativePath));
             }
         }
         return result;
@@ -107,7 +120,11 @@ public final class GitDiffProcessor {
         try {
             return Files.readString(file, StandardCharsets.UTF_8);
         } catch (final IOException ex) {
-            Logger.error("Could not read changed test case " + file + ": " + ex.getMessage());
+            // Not fatal to the review: the change is still listed, with whatever
+            // can be said about it, and the caller decides what to show. A file
+            // the plugin cannot read is a file the tester still has to be able
+            // to commit.
+            Logger.warn("Could not read changed file " + file + ": " + ex.getMessage());
             throw new IllegalStateException("Could not read " + relativePath, ex);
         }
     }

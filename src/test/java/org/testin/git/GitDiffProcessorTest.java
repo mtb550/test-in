@@ -78,7 +78,7 @@ public class GitDiffProcessorTest {
         Files.writeString(file, mapper().writeValueAsString(testCase), StandardCharsets.UTF_8);
     }
 
-    private List<TestCaseDiff> review(final String... statusLines) {
+    private List<PendingChange> review(final String... statusLines) {
         return GitDiffProcessor.toDiffs(List.of(statusLines), root, mapper(), committed::get);
     }
 
@@ -90,11 +90,11 @@ public class GitDiffProcessorTest {
     public void aNewlyWrittenTestCaseIsInTheReview() throws IOException {
         onDisk("Test Cases/login/case.json", testCase("a brand new case"));
 
-        final List<TestCaseDiff> review = review("?? \"Test Cases/login/case.json\"");
+        final List<PendingChange> review = review("?? \"Test Cases/login/case.json\"");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().type(), DiffType.ADDED);
-        assertEquals(review.getFirst().subject().getDescription(), "a brand new case");
+        assertEquals(review.getFirst().testCase().getDescription(), "a brand new case");
         assertEquals(review.getFirst().fieldChanges().getFirst().changeType(), ChangeType.CREATE_TEST_CASE);
     }
 
@@ -106,7 +106,7 @@ public class GitDiffProcessorTest {
         committed.put("Test Cases/login/case.json", mapper().writeValueAsString(before));
         onDisk("Test Cases/login/case.json", after);
 
-        final List<TestCaseDiff> review = review(" M \"Test Cases/login/case.json\"");
+        final List<PendingChange> review = review(" M \"Test Cases/login/case.json\"");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().type(), DiffType.MODIFIED);
@@ -123,43 +123,50 @@ public class GitDiffProcessorTest {
         final TestCaseDto removed = testCase("a case that is going away");
         committed.put("Test Cases/login/case.json", mapper().writeValueAsString(removed));
 
-        final List<TestCaseDiff> review = review(" D \"Test Cases/login/case.json\"");
+        final List<PendingChange> review = review(" D \"Test Cases/login/case.json\"");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().type(), DiffType.DELETED);
-        assertEquals(review.getFirst().subject().getDescription(), "a case that is going away");
+        assertEquals(review.getFirst().testCase().getDescription(), "a case that is going away");
     }
 
     /**
-     * Markers change on every status edit and travel with the commit, but there
-     * is nothing in one for a tester to read - so they must not become rows.
+     * Markers travel with a test case commit, and they are also changes in their
+     * own right: archiving a project edits nothing but a marker, and a review
+     * that hid them left the tester unable to commit it (#66).
      */
     @Test
-    public void markersAreNotReviewableRows() throws IOException {
-        onDisk("Test Cases/login/case.json", testCase("the only reviewable thing here"));
+    public void markersAreListedAsMarkerChanges() throws IOException {
+        onDisk("Test Cases/login/case.json", testCase("the test case among them"));
         Files.writeString(root.resolve("Test Cases/login/.ts"), "{}", StandardCharsets.UTF_8);
         Files.writeString(root.resolve(".tp"), "{}", StandardCharsets.UTF_8);
 
-        final List<TestCaseDiff> review = review(
+        final List<PendingChange> review = review(
                 "?? .tp",
                 "?? \"Test Cases/login/.ts\"",
                 "?? \"Test Cases/login/case.json\"");
 
-        assertEquals(review.size(), 1, "only the test case is reviewable");
+        assertEquals(review.size(), 3, "every changed file is a row - what is not listed cannot be committed");
+        assertEquals(review.stream().filter(change -> change.subject() == ChangeSubject.MARKER).count(), 2);
+        assertEquals(review.stream().filter(change -> change.subject() == ChangeSubject.TEST_CASE).count(), 1);
     }
 
     /**
-     * Git reports a file as modified for reasons a tester has no interest in.
-     * A row with nothing in it is worse than no row.
+     * Git reports a file as modified for reasons no compared field shows - a
+     * reorder, an audit stamp. It is still a change, and the commit stages only
+     * what the review lists, so it gets a row rather than disappearing (#66).
      */
     @Test
-    public void aFileGitCallsModifiedButIsNotShowsNoRow() throws IOException {
+    public void aFileGitCallsModifiedIsAlwaysARow() throws IOException {
         final TestCaseDto unchanged = testCase("identical on both sides");
 
         committed.put("Test Cases/login/case.json", mapper().writeValueAsString(unchanged));
         onDisk("Test Cases/login/case.json", unchanged);
 
-        assertEquals(review(" M \"Test Cases/login/case.json\""), List.of());
+        final List<PendingChange> review = review(" M \"Test Cases/login/case.json\"");
+
+        assertEquals(review.size(), 1);
+        assertEquals(review.getFirst().fieldChanges().getFirst().changeType(), ChangeType.CHANGE_FILE);
     }
 
     /**
@@ -171,15 +178,17 @@ public class GitDiffProcessorTest {
         for (int index = 1; index <= 3; index++) {
             onDisk("Test Cases/login flow/case-" + index + ".json", testCase("case " + index));
         }
+        Files.writeString(root.resolve("Test Cases/login flow/.ts"), "{}", StandardCharsets.UTF_8);
 
-        final List<TestCaseDiff> review = review(
+        final List<PendingChange> review = review(
                 "?? \"Test Cases/login flow/.ts\"",
                 "?? \"Test Cases/login flow/case-1.json\"",
                 "?? \"Test Cases/login flow/case-2.json\"",
                 "?? \"Test Cases/login flow/case-3.json\"");
 
-        assertEquals(review.size(), 3);
+        assertEquals(review.size(), 4, "three cases and the marker that makes the directory a test set");
         assertTrue(review.stream().allMatch(diff -> diff.type() == DiffType.ADDED));
+        assertEquals(review.stream().filter(diff -> diff.subject() == ChangeSubject.TEST_CASE).count(), 3);
     }
 
     /**
@@ -191,24 +200,29 @@ public class GitDiffProcessorTest {
     public void aQuotedPathStillFindsItsFile() throws IOException {
         onDisk("Test Cases/login flow/a case.json", testCase("quoted all the way down"));
 
-        final List<TestCaseDiff> review = review("?? \"Test Cases/login flow/a case.json\"");
+        final List<PendingChange> review = review("?? \"Test Cases/login flow/a case.json\"");
 
         assertEquals(review.size(), 1);
         assertEquals(review.getFirst().relativeFilePath(), Path.of("Test Cases/login flow/a case.json"));
-        assertEquals(review.getFirst().subject().getDescription(), "quoted all the way down");
+        assertEquals(review.getFirst().testCase().getDescription(), "quoted all the way down");
     }
 
     /**
-     * Git named a file that is not there. Reading the review must fail saying
-     * which one, not carry on and show a diff against nothing.
+     * Git named a new file that is no longer there - it listed the status a
+     * moment before something removed the file. There is nothing to commit and
+     * nothing to show, and one such file must not take the rest of the review
+     * with it: the tester still has to be able to commit everything else (#66).
      */
     @Test
-    public void aChangedFileThatIsMissingFailsByName() {
-        final IllegalStateException failure = expectThrows(IllegalStateException.class,
-                () -> review("?? \"Test Cases/login/gone.json\""));
+    public void anUntrackedFileThatVanishedIsSkippedAndTheRestSurvives() throws IOException {
+        onDisk("Test Cases/login/case.json", testCase("still here"));
 
-        assertNotNull(failure.getMessage());
-        assertTrue(failure.getMessage().contains("gone.json"), "the message names the file: " + failure.getMessage());
+        final List<PendingChange> review = review(
+                "?? \"Test Cases/login/gone.json\"",
+                "?? \"Test Cases/login/case.json\"");
+
+        assertEquals(review.size(), 1, "the file that vanished is not a change; the one that is there still is");
+        assertEquals(review.getFirst().testCase().getDescription(), "still here");
     }
 
     @Test

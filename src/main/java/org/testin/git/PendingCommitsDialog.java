@@ -14,7 +14,7 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * Review what changed and commit it: the changed fields as rows, a message, and
@@ -33,28 +33,36 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
     private static final int COLUMN_CHANGE_TYPE = 0;
 
-    private final @NotNull List<TestCaseDiff> rowDifferences = new ArrayList<>();
+    /**
+     * The button's two answers. Push is first, so it is the default and what
+     * Enter does.
+     */
+    private static final @NotNull String PUSH = "Commit & Push";
+    private static final @NotNull String COMMIT = "Commit";
+
+    private final @NotNull List<PendingChange> rowDifferences = new ArrayList<>();
     private final @NotNull Path repoRoot;
     private final @NotNull SelectionTable changes;
     private final @NotNull TextInput message;
-    private final @NotNull DialogButton commit;
-    private final @NotNull BiConsumer<List<TestCaseDiff>, String> onCommit;
+    private final @NotNull DialogSplitButton commit;
+    private final @NotNull Consumer<Request> onCommit;
 
     public PendingCommitsDialog(final @NotNull Project p,
-                                final @NotNull List<TestCaseDiff> differences,
+                                final @NotNull List<PendingChange> differences,
                                 final @NotNull Path repoRoot,
-                                final @NotNull BiConsumer<List<TestCaseDiff>, String> onCommit) {
+                                final @NotNull Consumer<Request> onCommit) {
         super(p);
         this.repoRoot = repoRoot;
         this.onCommit = onCommit;
 
-        title = "Pending Test Case Changes";
+        title = "Pending Changes";
 
         final ComponentDialogBase<SelectionTable> table = ComponentDialogBase.table()
-                .column("Change Type", 140)
-                .column("Test Case", 260)
-                .column("Before", 200)
-                .column("After", 200)
+                .column("Change Type", 150)
+                .column("Test Set", 150)
+                .column("Name", 240)
+                .column("Before", 180)
+                .column("After", 180)
                 .build();
         // Deliberately empty. Pre-filling it produced five commits called
         // "Updated test cases" in one afternoon of testing - a default that gets
@@ -62,7 +70,12 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         final ComponentDialogBase<TextInput> messageField = ComponentDialogBase.textField()
                 .placeholder("what changed, in a line...")
                 .build();
-        final ComponentDialogBase<DialogButton> commitButton = ComponentDialogBase.button("Commit");
+        // Push first, because a commit nobody pushed helps no colleague - the
+        // review used to end in a commit and then offer the push in a
+        // notification, which is a second decision taken away from the changes
+        // it is about. Commit alone stays, one click under it.
+        final ComponentDialogBase<DialogSplitButton> commitButton =
+                ComponentDialogBase.splitButton(PUSH, COMMIT);
 
         components = List.of(table, messageField, commitButton);
         changes = table.getComponent();
@@ -87,15 +100,23 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     }
 
     /**
-     * One row per changed field, not per test case: a case with three edited
-     * fields is three rows, so each can be reverted on its own.
+     * One row per changed field, not per changed file: a case with three edited
+     * fields is three rows, so each can be reverted on its own. A run and a
+     * marker contribute rows the same way - what changed inside them, one line
+     * each - though neither offers a revert.
+     * <p>
+     * The name column is whatever the row is about: a test case's description, a
+     * run's name, the node a marker belongs to. The test set beside it is filled
+     * for a test case and blank for the rest, because a run belongs to no test
+     * set and saying otherwise would be a guess.
      */
-    private void fillRows(final @NotNull List<TestCaseDiff> differences) {
-        for (final TestCaseDiff diff : differences) {
+    private void fillRows(final @NotNull List<PendingChange> differences) {
+        for (final PendingChange diff : differences) {
             for (final FieldChange change : diff.fieldChanges()) {
                 changes.addRow(
                         change.changeType().getLabel(),
-                        diff.subject().getDescription(),
+                        diff.testSet(),
+                        diff.name(),
                         change.oldValue(),
                         change.newValue());
                 rowDifferences.add(diff);
@@ -107,8 +128,8 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      * The changes the tester left selected, one entry per test case however many
      * of its rows are selected.
      */
-    private @NotNull List<TestCaseDiff> selectedDifferences() {
-        final Set<TestCaseDiff> selected = new LinkedHashSet<>();
+    private @NotNull List<PendingChange> selectedDifferences() {
+        final Set<PendingChange> selected = new LinkedHashSet<>();
         for (final int row : changes.getSelectedRows()) {
             if (row < rowDifferences.size()) selected.add(rowDifferences.get(row));
         }
@@ -124,7 +145,17 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     private void revertRow(final @NotNull Project p, final int row) {
         if (row >= rowDifferences.size()) return;
 
-        final TestCaseDiff diff = rowDifferences.get(row);
+        final PendingChange diff = rowDifferences.get(row);
+
+        // A run's verdicts and a node's marker are records of work rather than
+        // edits: putting one back would say a case was never run, or that a
+        // project was never archived. Only a test case reverts.
+        if (!diff.isRevertible()) {
+            Services.getInstance(p, Notifier.class)
+                    .softShow(p, "Only a test case change can be reverted");
+            return;
+        }
+
         final ChangeType changeType = ChangeType.fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE));
 
         try {
@@ -168,7 +199,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
     @Override
     protected void submit() {
-        final List<TestCaseDiff> selected = selectedDifferences();
+        final List<PendingChange> selected = selectedDifferences();
         if (selected.isEmpty()) return;
 
         // Said here, next to the empty field, rather than as a balloon after the
@@ -178,7 +209,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             return;
         }
 
-        onCommit.accept(selected, message.getText().trim());
+        onCommit.accept(new Request(selected, message.getText().trim(), PUSH.equals(commit.getChosen())));
         closeOk();
+    }
+
+    /**
+     * What the tester asked for: these changes, under this message, and whether
+     * it goes to the remote as well as into the local history.
+     */
+    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push) {
     }
 }

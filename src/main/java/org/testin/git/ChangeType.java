@@ -64,6 +64,56 @@ public enum ChangeType {
     CHANGE_PRECONDITIONS(
             "Change Preconditions",
             (current, old) -> current.setPreConditions(old.getPreConditions())
+    ),
+
+    // Everything below is about a file that is not a test case. None of them
+    // reverts: a run's results and a node's marker are written by the plugin as
+    // work happens, and putting one back is undoing the work rather than undoing
+    // an edit. They are listed so they can be seen and committed (#66).
+
+    CREATE_TEST_RUN(
+            "Create Test Run",
+            null
+    ),
+
+    CHANGE_TEST_RUN(
+            "Change Test Run",
+            null
+    ),
+
+    REMOVE_TEST_RUN(
+            "Remove Test Run",
+            null
+    ),
+
+    CREATE_MARKER(
+            "Create Marker",
+            null
+    ),
+
+    CHANGE_MARKER(
+            "Change Marker",
+            null
+    ),
+
+    REMOVE_MARKER(
+            "Remove Marker",
+            null
+    ),
+
+    CREATE_FILE(
+            "Create File",
+            null
+    ),
+
+    CHANGE_FILE(
+            "Change File",
+            null
+    ),
+
+    REMOVE_FILE(
+            "Remove File",
+            null
     );
 
     private final @NotNull String label;
