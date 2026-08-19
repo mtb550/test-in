@@ -28,10 +28,12 @@ final class PendingChangeFactory {
     private static final @NotNull String JSON = ".json";
 
     /**
-     * The change for one file, or {@code null} when a modification turns out to
-     * change nothing worth showing.
+     * The change for one file. Always one: a file Git reports as changed is a
+     * file the tester has to be able to commit, and the review is the only place
+     * that can offer it - answering null here used to drop a run, a reorder or
+     * an audit stamp out of the commit entirely (#66).
      */
-    static @Nullable PendingChange fromFile(
+    static @NotNull PendingChange fromFile(
             final @NotNull DiffType type,
             final @Nullable String beforeJson,
             final @Nullable String afterJson,
@@ -156,7 +158,7 @@ final class PendingChangeFactory {
     }
 
     /**
-     * A marker change, described by the one thing in it a tester recognises:
+     * A marker change, described by the one thing in it a tester recognizes:
      * its status. Everything else it holds is the audit the plugin fills in.
      */
     private static @NotNull PendingChange marker(

@@ -92,7 +92,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
         // The dialog owns the whole review - which changes, the message, and
         // whether it goes to the remote - so there is nothing left to ask
-        // afterwards.
+        // afterward.
         new PendingCommitsDialog(p, changes, path,
                 request -> performCommitWorkflow(p, path, request.message(), request.changes(), request.push())).show();
     }

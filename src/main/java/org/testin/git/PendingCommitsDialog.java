@@ -92,9 +92,9 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         changes.selectAll();
         changes.onRowAction("Revert this change", row -> revertRow(p, row));
 
-        // Nothing selected is nothing to commit, and the tester can deselect
-        // every row - so the button follows the selection rather than letting
-        // them press it and be told afterwards.
+        // With nothing selected there is nothing to commit, and the tester can
+        // deselect every row - so the button follows the selection rather than
+        // letting them press it and be told afterward.
         changes.onSelectionChanged(() -> commit.setEnabled(!changes.getSelectedRows().isEmpty()));
         commit.setEnabled(!changes.getSelectedRows().isEmpty());
     }

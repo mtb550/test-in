@@ -80,13 +80,12 @@ public final class GitDiffProcessor {
             }
 
             try {
-                final PendingChange diff = PendingChangeFactory.fromFile(
+                result.add(PendingChangeFactory.fromFile(
                         entry.type(),
                         entry.type() == DiffType.ADDED ? null : committedContent.apply(entry.path()),
                         workingContent(root, relativePath, entry),
                         relativePath,
-                        mapper);
-                if (diff != null) result.add(diff);
+                        mapper));
 
             } catch (final RuntimeException ex) {
                 // One unreadable file does not take the review down with it. Git

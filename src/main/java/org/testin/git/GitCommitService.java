@@ -59,15 +59,17 @@ public final class GitCommitService {
     }
 
     /**
-     * Commits the selected test cases, and the marker files that make them mean
+     * Commits what the tester selected, and the marker files that make it mean
      * anything.
      * <p>
      * A directory is a test set because a {@code .ts} sits in it - the indexer
      * decides what every node is by looking for its marker. Committing only the
      * test case JSON therefore pushes files into directories that the colleague
      * who pulls them cannot see as test sets at all, so the cases never appear in
-     * their tree. The markers are not shown in the review because there is
-     * nothing in them for a tester to review; they simply have to travel.
+     * their tree. The review lists markers in their own right now, so one can be
+     * committed deliberately - archiving a project is a marker edit and nothing
+     * else - and the ones above a selected case travel whether they were picked
+     * or not, because without them the case lands somewhere nothing recognizes.
      */
     public void stageAndCommit(
             final @NotNull Path repositoryPath,
@@ -84,7 +86,7 @@ public final class GitCommitService {
 
     /**
      * The short id of the commit at HEAD - what a tester quotes when they say
-     * which commit their work went into, and what the push reports afterwards.
+     * which commit their work went into, and what the push reports afterward.
      * <p>
      * Blank rather than a failure when Git cannot answer: a repository with no
      * commit in it yet has no HEAD, and the commit that just succeeded must not
