@@ -49,8 +49,13 @@ public class SyncActionAction extends AbstractProjectTreeAction {
             return;
         }
 
+        // Soft, and not an error: nothing failed. The tester pressed Sync on a
+        // test project that was never put under Git, and the sentence says which
+        // project and where the repository comes from - the review is what
+        // offers to create one.
         if (!git.isRepository(repoPath)) {
-            Services.getInstance(p, Notifier.class).warn(p, "Sync Error", "This project is not a Git repository. Initialize it first.");
+            Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Sync",
+                    "'" + repoPath.getFileName() + "' is not under Git yet. Open Pending Commits to create the repository.");
             return;
         }
 
