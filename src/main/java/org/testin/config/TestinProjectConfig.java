@@ -82,6 +82,17 @@ public record TestinProjectConfig(int version,
         return new TestinProjectConfig(version, strip(testinProject), strip(testinRepoUrl), strip(defaultBranch));
     }
 
+    private static @NotNull String strip(final @Nullable String value) {
+        return value == null ? "" : value.strip();
+    }
+
+    private static @NotNull String validRepoUrl(final @NotNull String value) {
+        if (value.isEmpty() || REPO_URL.matcher(value).matches()) return value;
+
+        Logger.warn("testinRepoUrl is not a clone URL and was ignored: " + value);
+        return "";
+    }
+
     /**
      * Whether the repository has said which test project it is about. The one
      * question every caller asks, so it is answered here instead of by comparing
@@ -97,16 +108,5 @@ public record TestinProjectConfig(int version,
      */
     public boolean hasRepoUrl() {
         return !testinRepoUrl.isEmpty();
-    }
-
-    private static @NotNull String strip(final @Nullable String value) {
-        return value == null ? "" : value.strip();
-    }
-
-    private static @NotNull String validRepoUrl(final @NotNull String value) {
-        if (value.isEmpty() || REPO_URL.matcher(value).matches()) return value;
-
-        Logger.warn("testinRepoUrl is not a clone URL and was ignored: " + value);
-        return "";
     }
 }

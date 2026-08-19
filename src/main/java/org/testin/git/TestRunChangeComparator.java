@@ -8,11 +8,7 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestRunDto;
 import org.testin.util.Tools;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Compares two revisions of a test run, the way {@link TestCaseChangeComparator}

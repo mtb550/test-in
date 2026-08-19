@@ -38,13 +38,17 @@ import java.util.Map;
 public final class ExplorerPanel implements Disposable {
     private final @NotNull Project p;
 
-    /** The component the tool window shows. */
+    /**
+     * The component the tool window shows.
+     */
     @Getter
     private final @NotNull JBPanelWithEmptyText panel = new JBPanelWithEmptyText(new BorderLayout());
 
     private final @NotNull BranchSelector branchSelector;
 
-    /** Asked for by every action that changes a node and has to redraw it. */
+    /**
+     * Asked for by every action that changes a node and has to redraw it.
+     */
     @Getter
     private final @NotNull ExplorerTree projectTree;
 

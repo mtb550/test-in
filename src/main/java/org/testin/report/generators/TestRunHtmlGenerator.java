@@ -9,6 +9,7 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
+import org.testin.util.Tools;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -16,7 +17,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
-import org.testin.util.Tools;
 
 public final class TestRunHtmlGenerator {
 

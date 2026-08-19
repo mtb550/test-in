@@ -10,8 +10,8 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.config.TestinConfigService;
+import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -39,6 +39,30 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         super(p, tree, "View Pending Commits", "Review and push changed test cases", AllIcons.Actions.Commit);
         this.git = new GitRepositoryService(p);
         this.commits = new GitCommitService(p);
+    }
+
+    /**
+     * The remote URL as the tester types it, or empty when they close the prompt.
+     * Empty rather than null, so the caller that decides what to do about a
+     * missing URL does it in one place whichever way it came up missing.
+     */
+    private static @NotNull String askForRemoteUrl(final @NotNull Project p) {
+        final String typed = Messages.showInputDialog(
+                p,
+                "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
+                "Configure Remote",
+                Messages.getQuestionIcon());
+
+        return typed == null ? "" : typed.trim();
+    }
+
+    /**
+     * How a commit is named to the tester. The id when Git could give one - it is
+     * what they search for on the remote - and a plain phrase when it could not,
+     * so a successful push is never reported as "Commit  is on origin/main".
+     */
+    private static @NotNull String commitLabel(final @NotNull String commitId) {
+        return commitId.isBlank() ? "The commit" : "Commit " + commitId;
     }
 
     @Override
@@ -199,21 +223,6 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to add remote: " + ex.getMessage()));
     }
 
-    /**
-     * The remote URL as the tester types it, or empty when they close the prompt.
-     * Empty rather than null, so the caller that decides what to do about a
-     * missing URL does it in one place whichever way it came up missing.
-     */
-    private static @NotNull String askForRemoteUrl(final @NotNull Project p) {
-        final String typed = Messages.showInputDialog(
-                p,
-                "No remote repository is configured for this project.\n\nPlease enter your Git Remote URL (e.g., https://github.com/user/repo.git):",
-                "Configure Remote",
-                Messages.getQuestionIcon());
-
-        return typed == null ? "" : typed.trim();
-    }
-
     private void executeGitPush(final @NotNull Project p, final @NotNull Path repoPath,
                                 final @NotNull String remote, final @NotNull String branch,
                                 final @NotNull String commitId) {
@@ -263,7 +272,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     // to the task's error handler - which is where the conflict
                     // recovery below lives. The git reason is already logged (#63).
                     if (abort) {
-                        if (git.couldNotAbortRebase(repoPath)) throw new IllegalStateException("Could not abort the rebase.");
+                        if (git.couldNotAbortRebase(repoPath))
+                            throw new IllegalStateException("Could not abort the rebase.");
                     } else {
                         if (git.couldNotContinueRebase(repoPath))
                             throw new IllegalStateException("Could not continue the rebase.");
@@ -303,15 +313,6 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                         ex -> Services.getInstance(p, Notifier.class).error(p, "Config Failed",
                                 "Failed to set Git identity:" + System.lineSeparator() + ex.getMessage()))
         ).show());
-    }
-
-    /**
-     * How a commit is named to the tester. The id when Git could give one - it is
-     * what they search for on the remote - and a plain phrase when it could not,
-     * so a successful push is never reported as "Commit  is on origin/main".
-     */
-    private static @NotNull String commitLabel(final @NotNull String commitId) {
-        return commitId.isBlank() ? "The commit" : "Commit " + commitId;
     }
 
     private boolean isIdentityError(final @Nullable String message) {

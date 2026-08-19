@@ -120,6 +120,12 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     @Getter
     @Setter
     private int hoveredIndex = -1;
+    /**
+     * True from the moment a load starts until its data is on screen. The empty
+     * message asks it, so a list that is empty because it is still loading keeps
+     * the loading message instead of being told there is nothing to show.
+     */
+    private volatile boolean loading;
 
     public TestEditor(final @NotNull Project p, final @NotNull UnifiedVirtualFile vf) {
         this.p = p;
@@ -178,13 +184,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         loadDataAsync();
     }
-
-    /**
-     * True from the moment a load starts until its data is on screen. The empty
-     * message asks it, so a list that is empty because it is still loading keeps
-     * the loading message instead of being told there is nothing to show.
-     */
-    private volatile boolean loading;
 
     private void loadDataAsync() {
         final int generation = modelGeneration.incrementAndGet();

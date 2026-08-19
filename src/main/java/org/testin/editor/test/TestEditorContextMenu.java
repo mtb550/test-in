@@ -22,8 +22,8 @@ import org.testin.run.RunTestCaseAction;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.RemoveTestCaseAction;
 import org.testin.testcase.UpdateTestCaseAction;
-import org.testin.view.ViewDetailsAction;
 import org.testin.util.OptionalPlugin;
+import org.testin.view.ViewDetailsAction;
 
 public class TestEditorContextMenu extends AbstractEditorContextMenu {
 

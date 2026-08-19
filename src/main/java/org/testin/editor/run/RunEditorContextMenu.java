@@ -19,8 +19,8 @@ import org.testin.run.RunTestCaseAction;
 import org.testin.run.StartExecutionAction;
 import org.testin.testrun.SetTestCaseStatusAction;
 import org.testin.testrun.UpdateRunItemAction;
-import org.testin.view.ViewDetailsAction;
 import org.testin.util.OptionalPlugin;
+import org.testin.view.ViewDetailsAction;
 
 public class RunEditorContextMenu extends AbstractEditorContextMenu {
 

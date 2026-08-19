@@ -13,7 +13,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum PanelState {
 
-    /** No Testin root is configured, so there is nowhere to look. */
+    /**
+     * No Testin root is configured, so there is nowhere to look.
+     */
     NO_ROOT,
 
     /**
@@ -22,7 +24,9 @@ public enum PanelState {
      */
     CLONE_BOUND,
 
-    /** A root with no test projects under it at all. */
+    /**
+     * A root with no test projects under it at all.
+     */
     NO_PROJECTS,
 
     /**
@@ -31,7 +35,9 @@ public enum PanelState {
      */
     CHOOSE,
 
-    /** A bound project that resolved. The tree. */
+    /**
+     * A bound project that resolved. The tree.
+     */
     TREE;
 
     /**

@@ -20,19 +20,22 @@ import com.itextpdf.layout.properties.UnitValue;
 import com.itextpdf.layout.properties.VerticalAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
-import org.testin.model.*;
+import org.testin.model.BugPriority;
+import org.testin.model.BugSeverity;
+import org.testin.model.TestRunConfiguration;
+import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.services.Services;
+import org.testin.testproject.BoundTestProject;
+import org.testin.util.Tools;
 
 import java.io.ByteArrayOutputStream;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
-import org.testin.util.Tools;
-import org.testin.testproject.BoundTestProject;
 
 public final class TestRunPdfGenerator {
 

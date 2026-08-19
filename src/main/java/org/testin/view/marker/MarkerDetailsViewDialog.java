@@ -10,9 +10,9 @@ import org.testin.ui.framework.ComponentDialogBase;
 import org.testin.ui.framework.DialogDetails;
 import org.testin.ui.framework.StatusBarShortcut;
 import org.testin.util.Shortcuts;
+import org.testin.util.Tools;
 
 import java.util.List;
-import org.testin.util.Tools;
 
 /**
  * The Details popup on a tree node: what the node is, where it lives, and the

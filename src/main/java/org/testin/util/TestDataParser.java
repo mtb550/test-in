@@ -22,6 +22,12 @@ final class TestDataParser {
     private static final @NotNull Pattern MULTI_STEP_LINE = Pattern.compile(".*\\s\\d+[-.].*");
     private static final @NotNull Pattern STEP_SEPARATOR = Pattern.compile("(\\s)(?=\\d+[-.])");
     private static final @NotNull Pattern STEP_PREFIX = Pattern.compile("^\\d+[-.]\\s*");
+    /**
+     * The plugin's timestamp without its leading weekday, which is stripped
+     * rather than matched - see {@link #date}.
+     */
+    private static final @NotNull DateTimeFormatter WITHOUT_WEEKDAY =
+            DateTimeFormatter.ofPattern("dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
 
     @NotNull List<String> steps(final @Nullable String rawSteps) {
         if (rawSteps == null || rawSteps.isBlank()) return new ArrayList<>();
@@ -43,13 +49,6 @@ final class TestDataParser {
             return Priority.LOW;
         }
     }
-
-    /**
-     * The plugin's timestamp without its leading weekday, which is stripped
-     * rather than matched - see {@link #date}.
-     */
-    private static final @NotNull DateTimeFormatter WITHOUT_WEEKDAY =
-            DateTimeFormatter.ofPattern("dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
 
     /**
      * Reads a timestamp back out of text, in either shape it is ever written in.
