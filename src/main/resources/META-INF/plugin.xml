@@ -9,51 +9,72 @@
     <id>org.testin</id>
     <resource-bundle>messages</resource-bundle>
     <description><![CDATA[
-    <b>Testin</b> — test case management built into your IDE. Write, organize, execute, and report on your test cases next to your code. No server, no account, no external tool — everything is stored as local files.<br/><br/>
+    <b>Testin</b> brings test case management into the IDE. Design test cases, run them, and report on the results in the same window as the code they cover.
+    <br/><br/>
+    Everything is stored as plain files in a folder you choose &mdash; readable, diffable, and versioned with Git if you want them to be. There is no server to run, no account to create, and no data leaves the machine.
+    <br/><br/>
 
-    <b>✨ Manage</b>
+    <b>Design</b>
     <ul>
-        <li><b>📂 Test Project Tree:</b> Organize test projects, test sets, and test runs in a sidebar tree. Create, rename, copy, cut, paste, and drag &amp; drop — just like files.</li>
-        <li><b>✍️ Test Case Editor:</b> Each test case holds steps, expected result, priority, group, module, pre-conditions, and test data. Find anything fast with search, filters, and pagination.</li>
-        <li><b>🧮 Excel-Style Grid:</b> Edit test cases in a spreadsheet view — select rows or cell ranges, copy/cut/paste to and from Excel, rows auto-fit their content, and your column widths are remembered.</li>
-        <li><b>📝 Bulk Editing:</b> Change descriptions, steps, expected results, groups, and more across many test cases in one dialog.</li>
-        <li><b>📊 Details Panel:</b> See the full test case — attributes, metadata, and change history — in a panel on the right.</li>
+        <li><b>Test project tree.</b> Test projects, test sets, packages and runs in a sidebar tree, with create, rename, copy, cut, paste, drag and drop, and undo &mdash; the operations a file tree already taught your hands.</li>
+        <li><b>Test case editor.</b> Description, steps, expected result, priority, groups, module, preconditions, reference and test data. Search, filter and paging keep a large suite navigable, and every attribute can be switched off the view when it is not the one you are working on.</li>
+        <li><b>Spreadsheet grid.</b> The same cases as a table: multi-cell selection, copy and paste with Excel in both directions, rows that size themselves to their content, and column widths that survive a refresh.</li>
+        <li><b>Bulk editing.</b> Descriptions, steps, expected results, groups and more, changed across a whole selection in one dialog.</li>
+        <li><b>Details panel.</b> The full test case beside the list, including who created it and when.</li>
     </ul>
 
-    <b>🏃 Execute</b>
+    <b>Execute</b>
     <ul>
-        <li><b>Test Runs:</b> Pick test cases into a run and record results — Passed, Failed, Blocked, Untested, Pending — with execution notes and automatic duration timers.</li>
-        <li><b>Automation (with the Java &amp; TestNG plugins):</b> Generate test packages, classes, and methods from your test cases; run them by class or method; jump between a test case and its code with one click or a gutter icon.</li>
+        <li><b>Test runs.</b> Choose cases into a cycle and record what happened: Passed, Failed or Blocked, with an actual result, bug severity and bug priority on a failure, and per-case durations timed for you. Cases a run never reached are marked Untested when it closes, and a case deleted after it was executed keeps the result it earned, marked Removed.</li>
+        <li><b>Automation</b> <i>(with the Java and TestNG plugins)</i><b>.</b> Generate packages, classes and methods from your test cases, run them by class or by method, and move between a case and its code from a gutter icon or a click on the card.</li>
     </ul>
 
-    <b>📤 Share</b>
+    <b>Share</b>
     <ul>
-        <li><b>Reports:</b> One-click execution reports as HTML, PDF, Word, or Excel.</li>
-        <li><b>Import &amp; Export:</b> Bring test cases in from Excel, CSV, or JSON — and export them back out, including HTML.</li>
-        <li><b>Git (with the Git plugin):</b> Review and commit test case changes, push and pull directly from the tree, clone a shared test project, and see which commit each run belongs to.</li>
+        <li><b>Reports.</b> Execution reports as HTML, PDF, Word or Excel, with the pass rate, a table per status, and the run's real execution times.</li>
+        <li><b>Import and export.</b> Excel, CSV and JSON in and out, plus HTML on the way out. Mapped column by column, with a preview before anything is written.</li>
+        <li><b>Git</b> <i>(with the Git plugin)</i><b>.</b> A review dialog listing every pending change &mdash; test cases field by field, test runs, and the markers that make a folder a test set &mdash; then commit and push from the same place. Clone a shared test project, sync with a rebase, revert a single changed field, and switch branches from the panel.</li>
     </ul>
 
-    <b>📋 Compatibility &amp; Privacy</b>
+    <b>Compatibility</b>
     <ul>
-        <li><b>Your data stays yours:</b> Zero telemetry, zero data collection. Everything lives in local files you control.</li>
-        <li><b>IDE Support:</b> Installs on IntelliJ IDEA, PyCharm, GoLand, WebStorm, and other IntelliJ-based IDEs (build 261+). Test management works everywhere; code generation, TestNG execution, and Git features switch on automatically when the Java, TestNG, and Git plugins are present.</li>
+        <li>IntelliJ IDEA, PyCharm, GoLand, WebStorm and other IntelliJ-based IDEs, build 261 and later.</li>
+        <li>Test management works in all of them. Java code generation, TestNG execution and the Git features appear when those plugins are installed, and are absent rather than broken when they are not.</li>
     </ul>
 
-    <b>&#128101; Team</b>
+    <b>Privacy</b>
+    <ul>
+        <li>No telemetry, no accounts, no analytics. The only network traffic is to the Git remote you configure yourself.</li>
+    </ul>
+
+    <b>Team</b>
     <ul>
         <li><b>Muteb AlMughyiri</b> &mdash; author and maintainer</li>
         <li><b>Mohammed AlZamil</b> &mdash; testing and feature requests</li>
     </ul>
+
+    <b>Support</b>
+    <ul>
+        <li>Issues and feature requests: <a href="https://github.com/mtb550/test-in/issues">github.com/mtb550/test-in/issues</a></li>
+    </ul>
 ]]></description>
 
     <change-notes><![CDATA[
-    <b>2.8-beta</b>
+    <b>2.8.0-alpha</b>
     <ul>
+        <li><b>Every change is reviewable, and the review commits and pushes:</b> the pending-changes dialog now understands test runs and markers as well as test cases, so an executed run no longer shows as a nameless row and a run edited after its first commit no longer disappears from the list entirely. A Test Set column says where each change lives, and the button is <b>Commit &amp; Push</b> with Commit alone behind it &mdash; the push is chosen with the changes still on screen, and the notification names the commit it sent.</li>
+        <li><b>Removed:</b> a run keeps the row for a test case deleted under it, marked Removed, carrying the verdict and timings it recorded. The row takes no new verdict &mdash; a case that is gone cannot be run &mdash; execution steps over it, and the reports count it in a table of its own.</li>
+        <li><b>Removing a test project works again</b> from the tree, behind a confirmation that says how much goes with it: "Holds 3 test sets, 42 test cases and 5 test runs".</li>
+        <li><b>Dates read the way they are written:</b> exporting a sheet and importing it back kept every date, instead of turning each one into today. An imported case now keeps the author and dates its file carried rather than being stamped with whoever ran the import.</li>
+        <li><b>Audit that tells the truth:</b> all seven node markers share one audit block, every one of them reads a file written before the fields were renamed, and a node nobody has modified reports when it was made instead of the moment it was read.</li>
+        <li><b>Lighter lists:</b> a card reuses its badges instead of rebuilding them for every row, so sorting, filtering and paging a full page of test cases costs a fraction of what it did.</li>
+        <li><b>Quieter, clearer messages:</b> import, export, report and sync outcomes appear as status-bar balloons instead of entries in the notification log, which is left for the failures worth finding again. Syncing a project that is not under Git says so plainly and points at where a repository is created.</li>
+        <li><b>Absent, not broken:</b> in IDEs without the Java or TestNG plugin, Run Test Case, Automate Test Case and Navigate To Code are no longer offered at all rather than appearing and refusing.</li>
+        <li>The Git identity and group-selection dialogs moved onto the shared dialog framework, so every key they bind is shown; an empty list says why it is empty; and a marker that has not been written yet is no longer logged as an error.</li>
         <li><b>Git on a repository of its own:</b> test cases no longer have to live inside the automation project. The pending review reads Git directly, so a newly written test case shows up straight away, the markers that make a test set a test set travel with the commit, and a first push to an empty repository succeeds.</li>
-        <li><b>A real review dialog:</b> pending changes open in a table with a commit message field and a Commit button, a status bar showing the keys, and right-click to revert a single changed field.</li>
+        <li><b>A real review dialog:</b> pending changes open in a table with a commit message field, a status bar showing the keys, and right-click to revert a single changed field.</li>
         <li><b>Execution timing:</b> a run records when it started and ended, per-case durations survive stopping and resuming, and all three report formats show a real execution date instead of the day the run was created.</li>
         <li><b>Bug severity and priority as badges</b> on the run card, each captioned so it cannot be mistaken for the test case's own priority, and readable in both light and dark themes.</li>
-        <li><b>Clearer confirmations:</b> every action says what it did in a few words. Work that finishes on its own time, like a sync or a push, stays in the notification log instead of fading away unseen.</li>
         <li>Tested by <b>Mohammed AlZamil</b>.</li>
     </ul>
     <br/>

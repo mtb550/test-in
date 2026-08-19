@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "org.testin"
-version = "2.8.0-beta"
+version = "2.8.0-alpha"
 
 repositories {
     mavenCentral()
@@ -102,10 +102,13 @@ intellijPlatform {
 
     publishing {
         token.set(System.getenv("JETBRAINS_TOKEN"))
-        // Alpha channel while validating multi-IDE support (issues #38/#41);
-        // switch back to "default" for the stable release.
-        channels.set(listOf("alpha"))
-        //channels.set(listOf("default"))
+        // Two channels only: alpha while a release is being used, and default
+        // for production. A release goes out to alpha and is promoted to
+        // default from the Marketplace page rather than uploaded again - a
+        // version string can only be published once, whatever channel it
+        // goes to.
+        //channels.set(listOf("alpha"))
+        channels.set(listOf("default"))
     }
 
     sandboxContainer.set(layout.projectDirectory.dir(".sandbox"))
