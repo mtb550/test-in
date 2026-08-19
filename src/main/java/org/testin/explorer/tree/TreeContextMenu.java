@@ -30,7 +30,6 @@ import org.testin.testrun.SetTestRunStatusAction;
 import org.testin.testset.UpdateTestSetStatusAction;
 import org.testin.util.OptionalPlugin;
 
-import javax.swing.*;
 import java.util.List;
 
 public class TreeContextMenu extends DefaultActionGroup {

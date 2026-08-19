@@ -9,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.*;
-import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.markers.*;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
