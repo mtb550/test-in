@@ -22,7 +22,7 @@ import java.util.Optional;
  * "Refreshing..." looked exactly like every case on the page having been
  * deleted.
  * <p>
- * Nothing needs it to sync: every path that mutates the model - the delete
+ * Nothing needs it to sync: every path that mutates the model - the deletion
  * action, cut and paste, drag and drop, the page reload - maintains the master
  * list itself.
  * <p>

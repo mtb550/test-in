@@ -102,7 +102,7 @@ public final class TestCaseCacheService implements Disposable {
             if (testCases == null) return;
 
             // Built beside the live sets and swapped in, not cleared and refilled.
-            // A dialog reading them while a delete rebuilds would otherwise see
+            // A dialog reading them while a deletion rebuilds would otherwise see
             // the completion briefly empty.
             final Set<String> newDescriptions = ConcurrentHashMap.newKeySet();
             final Set<String> newExpectedResults = ConcurrentHashMap.newKeySet();
