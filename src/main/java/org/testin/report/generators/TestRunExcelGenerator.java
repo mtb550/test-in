@@ -14,6 +14,8 @@ import org.testin.util.Display;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -48,16 +50,25 @@ public final class TestRunExcelGenerator {
             // The same headline the other three formats print, from the same
             // summary, so a spreadsheet and a PDF of one run cannot disagree.
             final TestRunSummary summary = TestRunSummary.of(tr.getResults());
-            final String[] headings = {"Passed", "Failed", "Blocked", "Untested", "Executed", "Pass Rate"};
-            final String[] values = {
+            final List<String> headings = new ArrayList<>(
+                    List.of("Passed", "Failed", "Blocked", "Untested", "Executed", "Pass Rate"));
+            final List<String> values = new ArrayList<>(List.of(
                     String.valueOf(summary.passed()), String.valueOf(summary.failed()),
                     String.valueOf(summary.blocked()), String.valueOf(summary.untested()),
-                    String.valueOf(summary.executed()), summary.passRate() + "%"};
+                    String.valueOf(summary.executed()), summary.passRate() + "%"));
 
-            for (int col = 0; col < headings.length; col++) {
-                ws.value(4, col, headings[col]);
+            // Beside Untested, so the spreadsheet headline names what its own
+            // rows below already carry - a removed case is in the sheet either
+            // way, and a headline that skips it explains nothing.
+            if (summary.hasRemoved()) {
+                headings.add(4, "Removed");
+                values.add(4, String.valueOf(summary.removed()));
+            }
+
+            for (int col = 0; col < headings.size(); col++) {
+                ws.value(4, col, headings.get(col));
                 ws.style(4, col).bold().set();
-                ws.value(5, col, values[col]);
+                ws.value(5, col, values.get(col));
             }
 
             int row = 7;

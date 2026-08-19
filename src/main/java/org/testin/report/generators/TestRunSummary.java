@@ -62,6 +62,20 @@ public record TestRunSummary(long total, long passed, long failed, long blocked,
     }
 
     /**
+     * Whether this run holds cases that were deleted from the suite after it
+     * recorded them.
+     * <p>
+     * The headline is six figures on almost every run, and a seventh reading
+     * "Removed 0" would appear on all of them to explain something that happened
+     * on none. So every format asks this instead - and asks it here, because a
+     * format that answered it for itself is how the three of them drifted apart
+     * the first time.
+     */
+    public boolean hasRemoved() {
+        return removed > 0;
+    }
+
+    /**
      * The cases someone gave a verdict on: passed, failed or blocked. A blocked
      * case counts as run — it was attempted and something stopped it, which is a
      * result — while an untested one was never reached at all.

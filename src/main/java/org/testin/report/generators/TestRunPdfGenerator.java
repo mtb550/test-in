@@ -34,6 +34,7 @@ import org.testin.util.Display;
 import java.io.ByteArrayOutputStream;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -157,7 +158,13 @@ public final class TestRunPdfGenerator {
                     .setMarginBottom(12));
 
 
-            Table statsTable = new Table(UnitValue.createPercentArray(new float[]{100f / 6, 100f / 6, 100f / 6, 100f / 6, 100f / 6, 100f / 6}))
+            // Six tiles, or seven when the run has removed cases: the total
+            // counts them, so without a tile of their own the figures below the
+            // total do not add up to it.
+            final float[] tileWidths = new float[summary.hasRemoved() ? 7 : 6];
+            Arrays.fill(tileWidths, 100f / tileWidths.length);
+
+            Table statsTable = new Table(UnitValue.createPercentArray(tileWidths))
                     .useAllAvailableWidth()
                     .setBorder(Border.NO_BORDER);
 
@@ -166,6 +173,9 @@ public final class TestRunPdfGenerator {
             addStatCell(statsTable, String.valueOf(summary.failed()), "Failed", RED, boldFont);
             addStatCell(statsTable, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW, boldFont);
             addStatCell(statsTable, String.valueOf(summary.untested()), "Untested", DARK_GRAY, boldFont);
+            if (summary.hasRemoved()) {
+                addStatCell(statsTable, String.valueOf(summary.removed()), "Removed", DARK_GRAY, boldFont);
+            }
             addStatCell(statsTable, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE, boldFont);
 
             document.add(statsTable);
@@ -208,6 +218,14 @@ public final class TestRunPdfGenerator {
                             .setFont(boldFont).setFontSize(11).setFontColor(DARK_GRAY)
                             .setMarginBottom(6));
             document.add(untestedHeading);
+
+            // Removed
+            if (summary.hasRemoved()) {
+                document.add(new Paragraph()
+                        .add(new Paragraph("Removed (" + summary.removed() + ")")
+                                .setFont(boldFont).setFontSize(11).setFontColor(DARK_GRAY)
+                                .setMarginBottom(6)));
+            }
 
             // SECTIONS 4+: one case table per status, empty ones omitted. Numbered
             // as printed rather than per section, so a run with nothing blocked

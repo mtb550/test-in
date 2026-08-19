@@ -131,6 +131,7 @@ public final class TestRunHtmlGenerator {
         summaryCard(html, String.valueOf(failed), "Failed", RED);
         summaryCard(html, String.valueOf(blocked), "Blocked", ORANGE);
         summaryCard(html, String.valueOf(untested), "Untested", GRAY);
+        if (summary.hasRemoved()) summaryCard(html, String.valueOf(summary.removed()), "Removed", GRAY);
         summaryCard(html, passRate + "%", "Pass Rate", DARK_BLUE);
         html.append("</div>");
 

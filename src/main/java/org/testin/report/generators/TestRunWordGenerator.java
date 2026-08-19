@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -106,24 +107,36 @@ public final class TestRunWordGenerator {
                         "This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
                         summary.total(), summary.executed(), summary.passRate()), 11, false, BLACK, null, 12);
 
-                XWPFTable statsTable = doc.createTable(1, 6);
+                // Seven tiles when the run has removed cases, six otherwise:
+                // the total counts them, so without a tile of their own the
+                // figures below the total do not add up to it.
+                final int tiles = summary.hasRemoved() ? 7 : 6;
+
+                XWPFTable statsTable = doc.createTable(1, tiles);
                 statsTable.setWidth("100%");
                 statsTable.setWidthType(TableWidthType.PCT);
                 setTableBorders(statsTable);
-                setTableWidths(statsTable, 17, 17, 17, 17, 16, 16);
+                setTableWidths(statsTable, evenWidths(tiles));
 
-                addStatCell(statsTable, 0, String.valueOf(summary.total()), "Total Cases", DARK_NAVY);
-                addStatCell(statsTable, 1, String.valueOf(summary.passed()), "Passed", GREEN);
-                addStatCell(statsTable, 2, String.valueOf(summary.failed()), "Failed", RED);
-                addStatCell(statsTable, 3, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW);
-                addStatCell(statsTable, 4, String.valueOf(summary.untested()), "Untested", DARK_GRAY);
-                addStatCell(statsTable, 5, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
+                int tile = 0;
+                addStatCell(statsTable, tile++, String.valueOf(summary.total()), "Total Cases", DARK_NAVY);
+                addStatCell(statsTable, tile++, String.valueOf(summary.passed()), "Passed", GREEN);
+                addStatCell(statsTable, tile++, String.valueOf(summary.failed()), "Failed", RED);
+                addStatCell(statsTable, tile++, String.valueOf(summary.blocked()), "Blocked", DARK_YELLOW);
+                addStatCell(statsTable, tile++, String.valueOf(summary.untested()), "Untested", DARK_GRAY);
+                if (summary.hasRemoved()) {
+                    addStatCell(statsTable, tile++, String.valueOf(summary.removed()), "Removed", DARK_GRAY);
+                }
+                addStatCell(statsTable, tile, summary.passRate() + "%", "Pass Rate", MEDIUM_BLUE);
 
                 addHeading(doc, "3. Result Analysis", 20, 12);
                 addColoredCount(doc, "Passed (" + summary.passed() + ")", GREEN);
                 addColoredCount(doc, "Failed (" + summary.failed() + ")", RED);
                 addColoredCount(doc, "Blocked (" + summary.blocked() + ")", DARK_YELLOW);
                 addColoredCount(doc, "Untested (" + summary.untested() + ")", DARK_GRAY);
+                if (summary.hasRemoved()) {
+                    addColoredCount(doc, "Removed (" + summary.removed() + ")", DARK_GRAY);
+                }
 
                 // One case table per status, empty ones omitted, numbered as
                 // printed so an absent section leaves no gap in the numbering.
@@ -417,6 +430,20 @@ public final class TestRunWordGenerator {
                 right.setVal(STBorder.Enum.forString("single"));
             }
         }
+    }
+
+    /**
+     * Percentages that fill the row exactly, whatever the tile count. The
+     * leftmost columns carry the remainder, which is what the hand-written
+     * widths did when there were always six of them.
+     */
+    private @NotNull int[] evenWidths(final int columns) {
+        final int[] widths = new int[columns];
+        Arrays.fill(widths, 100 / columns);
+
+        for (int i = 0; i < 100 % columns; i++) widths[i]++;
+
+        return widths;
     }
 
     private void setTableWidths(final @NotNull XWPFTable table, final int... percents) {
