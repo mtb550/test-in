@@ -10,11 +10,12 @@ import java.util.List;
 /**
  * One reviewable change in the repository, whatever kind of file it is about.
  * <p>
- * It was {@code TestCaseDiff} and knew only test cases, which is why a test run
- * appeared as a nameless case and an edited one appeared not at all (#66). The
- * subject says what the change is about, and the name and test set are carried
- * on the change itself rather than dug out of a test case that may not exist -
- * a run has a name and no test set, a marker names the node it belongs to.
+ * It was {@code TestCaseDiff} and knew only test cases. That is why a test run
+ * appeared as a nameless case, and an edited one appeared not at all (#66).
+ * <p>
+ * The subject says what the change is about. The name and the test set are
+ * carried here rather than dug out of a test case that may not exist: a run has
+ * a name and no test set, and a marker names the node it belongs to.
  * <p>
  * Exactly one side is absent for a pure add or delete: {@code oldState} is null
  * for {@link DiffType#ADDED}, {@code newState} is null for
@@ -30,10 +31,12 @@ public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name
      * <p>
      * A deletion is about the case that was there; everything else is about the
      * case that is there now. The factory always populates that side for a test
-     * case - an addition reads the new revision, a deletion the old one, a
-     * modification both - so the question has an answer for every test-case
-     * change, and asking it here keeps the two nullable fields from spreading a
-     * null check across everything that renders a row.
+     * case: an addition reads the new revision, a deletion the old one, a
+     * modification both.
+     * <p>
+     * So the question has an answer for every test-case change. Asking it here
+     * keeps the two nullable fields from spreading a null check across
+     * everything that renders a row.
      *
      * @throws IllegalStateException if asked of a change that is not about a
      *                               test case, or of one built without the side

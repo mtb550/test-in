@@ -18,10 +18,10 @@ import java.util.Objects;
  * Compares two revisions of a test run, the way {@link TestCaseChangeComparator}
  * does for a test case.
  * <p>
- * A run's rows are its results, and a tester reviewing a commit wants to know
- * what happened to them rather than which of forty fields moved - so the
- * verdicts are summarized into one line and the configuration fields that
- * describe the cycle are compared individually.
+ * A run's rows are its results. A tester reviewing a commit wants to know what
+ * happened to them, not which of forty fields moved. So the verdicts become one
+ * summarized line, and the configuration fields that describe the cycle are
+ * compared one by one.
  * <p>
  * Nothing here reverts. A verdict is a record of work, not an edit: putting it
  * back would say a case was never run.

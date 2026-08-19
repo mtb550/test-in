@@ -150,19 +150,23 @@ public final class GitRepositoryService {
     }
 
     /**
-     * False when the abort did not happen. The caller decides what to say: a
-     * rebase that still has conflicts is re-offered rather than reported as a
-     * plain failure, and only this method's caller knows that.
+     * True when the abort did not happen. Asked in the negative because that is
+     * the only way it was ever asked - both callers wrote {@code if (!abort...)}
+     * - and a question read one way at every call site should be named that way.
+     * <p>
+     * The caller decides what to say: a rebase that still has conflicts is
+     * re-offered rather than reported as a plain failure, and only the caller
+     * knows that.
      */
-    public boolean abortRebase(final @NotNull Path path) {
-        return run(path, "git", "rebase", "--abort") != null;
+    public boolean couldNotAbortRebase(final @NotNull Path path) {
+        return run(path, "git", "rebase", "--abort") == null;
     }
 
     /**
-     * False when the rebase did not continue — see {@link #abortRebase}.
+     * True when the rebase did not continue — see {@link #couldNotAbortRebase}.
      */
-    public boolean continueRebase(final @NotNull Path path) {
-        return run(path, "git", "rebase", "--continue") != null;
+    public boolean couldNotContinueRebase(final @NotNull Path path) {
+        return run(path, "git", "rebase", "--continue") == null;
     }
 
     /**
@@ -179,8 +183,8 @@ public final class GitRepositoryService {
 
     /**
      * The same, for a command that reaches the remote: the URL is what makes
-     * git4idea set up authentication for it, so a fetch or a push can ask for
-     * credentials. See {@code GitCommandRunner.executeRemote}.
+     * {@code git4idea} set up authentication for it, so a fetch or a push can
+     * ask for credentials. See {@code GitCommandRunner.executeRemote}.
      */
     private @Nullable String runRemote(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
         return execute(path, remoteUrl, command);

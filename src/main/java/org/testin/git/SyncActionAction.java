@@ -140,7 +140,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                 // choice it cannot make - conflicts that remain are re-offered
                 // rather than reported as a plain failure (#63).
                 if (abort) {
-                    if (!git.abortRebase(repoPath)) {
+                    if (git.couldNotAbortRebase(repoPath)) {
                         reportRebaseFailure(repoPath, "Could not abort the rebase.");
                         return;
                     }
@@ -150,7 +150,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     return;
                 }
 
-                if (!git.continueRebase(repoPath)) {
+                if (git.couldNotContinueRebase(repoPath)) {
                     reportRebaseFailure(repoPath, "Could not continue the rebase.");
                     return;
                 }

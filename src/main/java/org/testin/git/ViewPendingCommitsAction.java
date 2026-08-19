@@ -240,9 +240,9 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     // to the task's error handler - which is where the conflict
                     // recovery below lives. The git reason is already logged (#63).
                     if (abort) {
-                        if (!git.abortRebase(repoPath)) throw new IllegalStateException("Could not abort the rebase.");
+                        if (git.couldNotAbortRebase(repoPath)) throw new IllegalStateException("Could not abort the rebase.");
                     } else {
-                        if (!git.continueRebase(repoPath))
+                        if (git.couldNotContinueRebase(repoPath))
                             throw new IllegalStateException("Could not continue the rebase.");
                         commits.push(repoPath, remote, branch);
                     }

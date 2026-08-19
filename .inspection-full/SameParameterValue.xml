@@ -1,0 +1,17 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/VfsExecutor.java</file>
+  <line>33</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.VfsExecutor void executeVfsAction(com.intellij.openapi.project.Project p, java.nio.file.Path path, java.lang.String errorTitle, org.testin.util.VfsOperation operation)" />
+  <problem_class id="SameParameterValue" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Method parameter always has the same value</problem_class>
+  <hints>
+    <hint value="errorTitle &quot;Rename Failed&quot;" />
+  </hints>
+  <description>Value of parameter &lt;code&gt;errorTitle&lt;/code&gt; is always '&quot;Rename Failed&quot;'</description>
+  <highlighted_element>errorTitle</highlighted_element>
+  <language>JAVA</language>
+  <offset>100</offset>
+  <length>10</length>
+</problem></problems>

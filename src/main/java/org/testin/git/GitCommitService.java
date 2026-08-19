@@ -21,7 +21,7 @@ public final class GitCommitService {
     private final @NotNull Project project;
 
     /**
-     * For the remote's URL, which the network commands need so git4idea can
+     * For the remote's URL, which the network commands need so {@code git4idea} can
      * authenticate them. Read through the service that owns that question rather
      * than asked again here - two answers to "what is the remote's URL" is one
      * more than there should be.
@@ -66,10 +66,12 @@ public final class GitCommitService {
      * decides what every node is by looking for its marker. Committing only the
      * test case JSON therefore pushes files into directories that the colleague
      * who pulls them cannot see as test sets at all, so the cases never appear in
-     * their tree. The review lists markers in their own right now, so one can be
-     * committed deliberately - archiving a project is a marker edit and nothing
-     * else - and the ones above a selected case travel whether they were picked
-     * or not, because without them the case lands somewhere nothing recognizes.
+     * their tree.
+     * <p>
+     * The review lists markers in their own right now, so one can be committed
+     * deliberately: archiving a project is a marker edit and nothing else. The
+     * ones above a selected case travel whether they were picked or not, because
+     * without them the case lands somewhere nothing recognizes.
      */
     public void stageAndCommit(
             final @NotNull Path repositoryPath,
@@ -140,9 +142,10 @@ public final class GitCommitService {
 
     /**
      * False when the remote has no such branch, and equally when the remote could
-     * not be reached - an unreachable remote fails the push a moment later with a
-     * message that says so, which is better than failing here with one about a
-     * missing branch.
+     * not be reached.
+     * <p>
+     * An unreachable remote fails the push a moment later, with a message that
+     * says so. That is better than failing here with one about a missing branch.
      */
     private boolean remoteHasBranch(final @NotNull Path repositoryPath, final @NotNull String remote, final @NotNull String branch) {
         try {

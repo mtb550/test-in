@@ -19,7 +19,7 @@ import java.util.function.Consumer;
  * Deciding whether a failed push stopped on a conflict means running
  * {@code git status}, and running a git command on the EDT trips the platform's
  * own assertion - "Should not wait for built-in server on EDT" - from inside
- * git4idea's HTTP authentication setup. A stack trace in the log instead of the
+ * {@code git4idea}'s HTTP authentication setup. A stack trace in the log instead of the
  * abort-or-continue offer the tester needed.
  */
 public final class GitBackgroundTask extends Task.Backgroundable {

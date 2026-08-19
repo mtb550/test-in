@@ -31,7 +31,7 @@ final class GitCommandRunner {
      * for.
      * <p>
      * That is what makes {@code GitLineHandler.isRemote()} true, and it is the
-     * only reason git4idea sets up its credential helper for the process. Without
+     * only reason {@code git4idea} sets up its credential helper for the process. Without
      * it a push over HTTPS gets no authentication support at all: no prompt, no
      * stored credentials, just a failure that reads as a broken plugin. The URL
      * is also how the IDE finds the credentials it already has for that host, so

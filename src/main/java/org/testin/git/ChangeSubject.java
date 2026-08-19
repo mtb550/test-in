@@ -30,11 +30,12 @@ public enum ChangeSubject {
     ),
 
     /**
-     * The dotfile that makes a directory a node. It carries no test data, so
-     * there is little to review - but it is what a colleague pulling the commit
-     * needs in order to see the directory as a test set at all, and a change to
-     * one (archiving a project, deprecating a test set) is a change worth
-     * committing on its own.
+     * The dotfile that makes a directory a node.
+     * <p>
+     * It carries no test data, so there is little in one to read. It is still
+     * what a colleague pulling the commit needs to see the directory as a test
+     * set at all. And a change to one - archiving a project, deprecating a test
+     * set - is worth committing on its own.
      */
     MARKER(
             "Marker"

@@ -1,0 +1,90 @@
+src/main/java/org/testin/editor/listeners/ModelChangeNotifier.java:22 - [GrazieInspection] Two consecutive dots
+src/main/java/org/testin/editor/run/RunEditor.java:674 - [GrazieStyle] Long sentences (44 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/editor/run/RunEditor.java:688 - [GrazieInspection] This French-borrowed phrase usually has diacritics
+src/main/java/org/testin/editor/run/RunEditor.java:747 - [GrazieInspection] In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.
+src/main/java/org/testin/editor/run/RunEditorContextMenu.java:63 - [GrazieInspection] In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.
+src/main/java/org/testin/editor/Shared.java:24 - [GrazieInspection] Use a comma before 'and' if it connects two independent clauses (unless they are closely connected and short).
+src/main/java/org/testin/editor/Shared.java:32 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/Shared.java:41 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/Shared.java:61 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/Shared.java:62 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/Shared.java:79 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/Shared.java:90 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/Shared.java:258 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/Shared.java:268 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/Shared.java:296 - [GrazieStyle] American English uses 'gray'
+src/main/java/org/testin/editor/Shared.java:297 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/editor/test/TestEditor.java:333 - [unused] Method is not reachable from the entry points.
+src/main/java/org/testin/editor/test/TestEditor.java:680 - [unused] Method is not reachable from the entry points.
+src/main/java/org/testin/editor/test/TestEditorContextMenu.java:67 - [GrazieInspection] In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.
+src/main/java/org/testin/editor/TestinEditor.java:68 - [GrazieInspection] Use a comma before 'and' if it connects two independent clauses (unless they are closely connected and short).
+src/main/java/org/testin/editor/toolbar/components/AbstractButton.java:66 - [GrazieStyle] American English uses 'gray'
+src/main/java/org/testin/editor/toolbar/components/AbstractButton.java:115 - [GrazieStyle] Long sentences (40 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/editor/toolbar/components/AbstractButton.java:120 - [UnstableApiUsage] 'com.intellij.openapi.application.WriteIntentReadAction' is marked unstable with @ApiStatus.Experimental
+src/main/java/org/testin/editor/toolbar/components/AbstractButton.java:120 - [UnstableApiUsage] 'run(java.lang.@org.jetbrains.annotations.NotNull Runnable)' is marked unstable with @ApiStatus.Experimental
+src/main/java/org/testin/explorer/Main.java:20 - [unused] Method is never used.
+src/main/java/org/testin/explorer/version/BranchSelector.java:111 - [unused] Parameter e is not used
+src/main/java/org/testin/git/ChangeSubject.java:37 - [GrazieStyle] Long sentences (53 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/git/GitBackgroundTask.java:22 - [GrazieInspection] Possible typo detected.
+src/main/java/org/testin/git/GitCommandRunner.java:34 - [GrazieInspection] Possible typo detected.
+src/main/java/org/testin/git/GitCommitService.java:24 - [GrazieInspection] Possible typo detected.
+src/main/java/org/testin/git/GitCommitService.java:72 - [GrazieStyle] Long sentences (48 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/git/GitCommitService.java:145 - [GrazieStyle] Long sentences (44 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/git/GitDiffProcessor.java:30 - [GrazieStyle] Long sentences (44 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/git/GitRepositoryService.java:157 - [BooleanMethodIsAlwaysInverted] Calls to boolean method 'abortRebase()' are always inverted
+src/main/java/org/testin/git/GitRepositoryService.java:164 - [BooleanMethodIsAlwaysInverted] Calls to boolean method 'continueRebase()' are always inverted
+src/main/java/org/testin/git/GitRepositoryService.java:182 - [GrazieInspection] Possible typo detected.
+src/main/java/org/testin/git/PendingChange.java:17 - [GrazieStyle] Long sentences (49 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/git/PendingChange.java:36 - [GrazieStyle] Long sentences (54 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/git/TestRunChangeComparator.java:24 - [GrazieStyle] Long sentences (45 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/importexport/exports/ExportNotice.java:23 - [GrazieStyle] Long sentences (43 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/importexport/shared/GroupMultiSelectEditor.java:23 - [GrazieStyle] American English does not double '-l-' in suffixes
+src/main/java/org/testin/indexer/FilesUtil.java:41 - [GrazieStyle] American English uses 'defense'
+src/main/java/org/testin/indexer/ProjectIndexer.java:249 - [GrazieInspection] The verb 'delete' does not usually follow articles like 'a'. Check that 'delete' is spelled correctly; using 'delete' as a noun may be non-standard.
+src/main/java/org/testin/indexer/ProjectIndexer.java:250 - [GrazieInspection] The verb 'delete' does not usually follow articles like 'a'. Check that 'delete' is spelled correctly; using 'delete' as a noun may be non-standard.
+src/main/java/org/testin/indexer/ProjectIndexer.java:432 - [GrazieStyle] Long sentences (51 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/indexer/ProjectIndexer.java:444 - [GrazieInspection] The verb 'delete' does not usually follow articles like 'the'. Check that 'delete' is spelled correctly; using 'delete' as a noun may be non-standard.
+src/main/java/org/testin/indexer/ProjectIndexer.java:460 - [GrazieInspection] In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.
+src/main/java/org/testin/indexer/ProjectIndexer.java:573 - [GrazieInspection] The verb 'write' does not usually follow articles like 'the'. Check that 'write' is spelled correctly; using 'write' as a noun may be non-standard.
+src/main/java/org/testin/indexer/ProjectIndexer.java:574 - [GrazieInspection] The verb 'write' does not usually follow articles like 'the'. Check that 'write' is spelled correctly; using 'write' as a noun may be non-standard.
+src/main/java/org/testin/indexer/TestCaseSequenceStore.java:75 - [GrazieInspection] The word 'create' is a verb. Did you mean the noun 'creation'?
+src/main/java/org/testin/indexer/TestCaseSequenceStore.java:92 - [GrazieStyle] Long sentences (60 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/indexer/VfsExecutor.java:33 - [SameParameterValue] Value of parameter errorTitle is always '"Rename Failed"'
+src/main/java/org/testin/indexer/VfsExecutor.java:96 - [GrazieInspection] The verb 'delete' does not usually follow articles like 'a'. Check that 'delete' is spelled correctly; using 'delete' as a noun may be non-standard.
+src/main/java/org/testin/model/BugSeverity.java:13 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/model/BugSeverity.java:15 - [GrazieStyle] American English uses 'gray'
+src/main/java/org/testin/model/BugSeverity.java:18 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/model/BugSeverity.java:25 - [GrazieStyle] British roots ending with '-our' usually have '-or' in American English
+src/main/java/org/testin/model/DirectoryMapper.java:43 - [unused] Variable mapper is never used
+src/main/java/org/testin/model/dto/TestCaseDto.java:17 - [UNUSED_IMPORT] Unused import import org.testin.util.Tools;
+src/main/java/org/testin/model/dto/TestCaseDto.java:118 - [GrazieInspection] In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.
+src/main/java/org/testin/model/dto/TestCaseDto.java:123 - [GrazieStyle] Long sentences (53 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/model/markers/AbstractMarker.java:25 - [GrazieStyle] Long sentences (43 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/model/markers/TestRunsMainDirectoryMarker.java:8 - [GrazieInspection] An apostrophe may be missing.
+src/main/java/org/testin/model/ProjectStatus.java:26 - [unused] Enum constant is never used.
+src/main/java/org/testin/model/ToolBarDefault.java:27 - [GrazieInspection] In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.
+src/main/java/org/testin/notifications/Notifier.java:81 - [unused] Method is never used.
+src/main/java/org/testin/notifications/Notifier.java:125 - [UnusedReturnValue] Return value of the method is never used
+src/main/java/org/testin/remove/RemoveAction.java:58 - [GrazieInspection] Did you mean 'form'?
+src/main/java/org/testin/remove/RemoveAction.java:82 - [ExtractMethodRecommender] It's possible to extract method returning 'onRemoved' from a long surrounding method
+src/main/java/org/testin/report/generators/ReportSection.java:46 - [GrazieStyle] Long sentences (43 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/report/generators/ReportSection.java:90 - [LombokGetterMayBeUsed] Field 'withFailureDetail' may have Lombok @Getter
+src/main/java/org/testin/report/generators/TestRunHtmlGenerator.java:28 - [unused] Field is never used.
+src/main/java/org/testin/report/generators/TestRunSummary.java:59 - [ConstantValue] Condition name != null is always true
+src/main/java/org/testin/statusbar/ShortcutItem.java:8 - [unused] Constructor is never used.
+src/main/java/org/testin/statusbar/ShortcutItem.java:11 - [unused] Method owner class is never instantiated ORAll instantiations are not reachable from the entry points.
+src/main/java/org/testin/statusbar/ShortcutItem.java:16 - [unused] Method owner class is never instantiated ORAll instantiations are not reachable from the entry points.
+src/main/java/org/testin/ui/framework/ComponentDialogBase.java:30 - [GrazieInspection] Two consecutive dots
+src/main/java/org/testin/ui/framework/ComponentDialogBase.java:64 - [DanglingJavadoc] Dangling Javadoc comment
+src/main/java/org/testin/ui/framework/DialogDetails.java:37 - [GrazieInspection] Use a comma before 'and' if it connects two independent clauses (unless they are closely connected and short).
+src/main/java/org/testin/ui/framework/DialogSplitButton.java:17 - [GrazieInspection] In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.
+src/main/java/org/testin/ui/framework/DialogSplitButton.java:20 - [GrazieInspection] In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.
+src/main/java/org/testin/util/EditorUtil.java:122 - [GrazieStyle] Long sentences (49 words here) are harder to read, according to the research; consider splitting
+src/main/java/org/testin/util/TestDataParser.java:48 - [DanglingJavadoc] Dangling Javadoc comment
+src/main/java/org/testin/util/TestDataParser.java:109 - [unused] Method is never used.
+src/main/java/org/testin/view/details/DetailsTab.java:17 - [UNUSED_IMPORT] Unused import import org.testin.model.Config;
+src/main/java/org/testin/view/marker/MarkerDetailsViewDialog.java:6 - [UNUSED_IMPORT] Unused import import org.testin.model.Config;
+src/main/java/org/testin/view/ViewTab.java:15 - [unused] Enum constant is never used.
+src/main/java/org/testin/view/ViewTab.java:16 - [unused] Enum constant is never used.
+src/main/resources/META-INF/plugin.xml:45 - [SpellCheckingInspection] Typo: In word 'AlZamil'
+src/main/resources/META-INF/plugin.xml:57 - [SpellCheckingInspection] Typo: In word 'AlZamil'

@@ -1,0 +1,15 @@
+<problems is_local_tool="true">
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/report/generators/ReportSection.java</file>
+  <line>90</line>
+  <module>Testin.main</module>
+  <package>org.testin.report.generators</package>
+  <entry_point TYPE="method" FQNAME="org.testin.report.generators.ReportSection boolean isWithFailureDetail()" />
+  <problem_class id="LombokGetterMayBeUsed" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Lombok @Getter may be used</problem_class>
+  <description>Field 'withFailureDetail' may have Lombok @Getter</description>
+  <highlighted_element>/** * True for the tables that carry priority, severity and the actual result: * the colum...</highlighted_element>
+  <language>JAVA</language>
+  <offset>4</offset>
+  <length>237</length>
+</problem>
+</problems>

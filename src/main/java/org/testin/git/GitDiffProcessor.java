@@ -24,12 +24,16 @@ import java.util.function.Function;
  * two sides of each change.
  * <p>
  * It used to ask the IDE instead - {@code ChangeListManager.getAllChanges()} -
- * and that was wrong twice over. The IDE only tracks repositories registered as
- * VCS roots in the open project, and the Testin root is deliberately a separate
- * repository from the automation project, so the change list was empty for it and
- * the review reported "No changes" however much had changed. And a brand-new test
- * case is untracked, which that list never reports at all, so the first commit of
- * a new test set could not be made from the plugin under any layout.
+ * and that was wrong twice over.
+ * <p>
+ * The IDE tracks only repositories registered as VCS roots in the open project.
+ * A Testin root is deliberately a separate repository from the automation
+ * project, so the change list was empty for it, and the review reported "No
+ * changes" however much had changed.
+ * <p>
+ * And a brand-new test case is untracked, which that list never reports at all.
+ * So the first commit of a new test set could not be made from the plugin under
+ * any layout.
  * <p>
  * Asking Git directly also makes the read match the writes: init, add, commit,
  * remote, config, pull and push already run as Git commands.

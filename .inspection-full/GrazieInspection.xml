@@ -1,0 +1,350 @@
+<problems is_local_tool="true">
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/listeners/ModelChangeNotifier.java</file>
+  <line>22</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor.listeners</package>
+  <entry_point TYPE="class" FQNAME="org.testin.editor.listeners.ModelChangeNotifier" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Two consecutive dots</description>
+  <highlighted_element>..</highlighted_element>
+  <language>JAVA</language>
+  <offset>14</offset>
+  <length>2</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommandRunner.java</file>
+  <line>34</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommandRunner java.lang.String executeRemote(com.intellij.openapi.project.Project project, java.nio.file.Path workingDirectory, java.lang.String remoteUrl, java.lang.String... command)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Possible typo detected.</description>
+  <highlighted_element>git4idea</highlighted_element>
+  <language>JAVA</language>
+  <offset>19</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/model/dto/TestCaseDto.java</file>
+  <line>118</line>
+  <module>Testin.main</module>
+  <package>org.testin.model.dto</package>
+  <entry_point TYPE="method" FQNAME="org.testin.model.dto.TestCaseDto org.testin.model.dto.TestCaseDto deleted(java.util.UUID id)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>65</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>24</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="field" FQNAME="org.testin.git.GitCommitService repositories" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Possible typo detected.</description>
+  <highlighted_element>git4idea</highlighted_element>
+  <language>JAVA</language>
+  <offset>64</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/run/RunEditorContextMenu.java</file>
+  <line>63</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor.run</package>
+  <entry_point TYPE="method" FQNAME="org.testin.editor.run.RunEditorContextMenu void registerShortcuts(com.intellij.ui.components.JBList&lt;org.testin.model.dto.TestCaseDto&gt; list, org.testin.editor.AbstractEditorContextMenu menu)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>42</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitRepositoryService.java</file>
+  <line>182</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitRepositoryService java.lang.String runRemote(java.nio.file.Path path, java.lang.String remoteUrl, java.lang.String... command)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Possible typo detected.</description>
+  <highlighted_element>git4idea</highlighted_element>
+  <language>JAVA</language>
+  <offset>7</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/model/ToolBarDefault.java</file>
+  <line>27</line>
+  <module>Testin.main</module>
+  <package>org.testin.model</package>
+  <entry_point TYPE="field" FQNAME="org.testin.model.ToolBarDefault ON" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>16</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/TestinEditor.java</file>
+  <line>68</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor</package>
+  <entry_point TYPE="method" FQNAME="org.testin.editor.TestinEditor java.lang.String cardTitle(int globalIndex, org.testin.model.dto.TestCaseDto tc)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Use a comma before 'and' if it connects two independent clauses (unless they are closely connected and short).</description>
+  <highlighted_element>and</highlighted_element>
+  <language>JAVA</language>
+  <offset>72</offset>
+  <length>4</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/ui/framework/DialogDetails.java</file>
+  <line>37</line>
+  <module>Testin.main</module>
+  <package>org.testin.ui.framework</package>
+  <entry_point TYPE="method" FQNAME="org.testin.ui.framework.DialogDetails DialogDetails(java.util.List&lt;org.testin.ui.framework.DialogDetails.Row&gt; rows)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Use a comma before 'and' if it connects two independent clauses (unless they are closely connected and short).</description>
+  <highlighted_element>and</highlighted_element>
+  <language>JAVA</language>
+  <offset>68</offset>
+  <length>4</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/remove/RemoveAction.java</file>
+  <line>58</line>
+  <module>Testin.main</module>
+  <package>org.testin.remove</package>
+  <entry_point TYPE="method" FQNAME="org.testin.remove.RemoveAction void actionPerformed(com.intellij.openapi.actionSystem.AnActionEvent e)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Did you mean 'form'?</description>
+  <highlighted_element>From</highlighted_element>
+  <language>JAVA</language>
+  <offset>70</offset>
+  <length>4</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/ui/framework/ComponentDialogBase.java</file>
+  <line>30</line>
+  <module>Testin.main</module>
+  <package>org.testin.ui.framework</package>
+  <entry_point TYPE="method" FQNAME="org.testin.ui.framework.ComponentDialogBase org.testin.ui.framework.ComponentDialogBase.TextFieldBuilder&lt;T&gt; textFieldWithSelections()" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Two consecutive dots</description>
+  <highlighted_element>..</highlighted_element>
+  <language>JAVA</language>
+  <offset>37</offset>
+  <length>2</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/test/TestEditorContextMenu.java</file>
+  <line>67</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor.test</package>
+  <entry_point TYPE="method" FQNAME="org.testin.editor.test.TestEditorContextMenu void registerShortcuts(com.intellij.ui.components.JBList&lt;org.testin.model.dto.TestCaseDto&gt; list, org.testin.editor.AbstractEditorContextMenu menu)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>42</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/ui/framework/DialogSplitButton.java</file>
+  <line>17</line>
+  <module>Testin.main</module>
+  <package>org.testin.ui.framework</package>
+  <entry_point TYPE="class" FQNAME="org.testin.ui.framework.DialogSplitButton" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>27</offset>
+  <length>10</length>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/ui/framework/DialogSplitButton.java</file>
+  <line>20</line>
+  <module>Testin.main</module>
+  <package>org.testin.ui.framework</package>
+  <entry_point TYPE="class" FQNAME="org.testin.ui.framework.DialogSplitButton" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>15</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/TestCaseSequenceStore.java</file>
+  <line>75</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.TestCaseSequenceStore void put(java.nio.file.Path testSetPath, org.testin.model.dto.TestCaseDto testCase)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>The word 'create' is a verb. Did you mean the noun 'creation'?</description>
+  <highlighted_element>create</highlighted_element>
+  <language>JAVA</language>
+  <offset>51</offset>
+  <length>6</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/Shared.java</file>
+  <line>24</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor</package>
+  <entry_point TYPE="file" FQNAME="file://$PROJECT_DIR$/src/main/java/org/testin/editor/Shared.java" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Use a comma before 'and' if it connects two independent clauses (unless they are closely connected and short).</description>
+  <highlighted_element>and</highlighted_element>
+  <language>JAVA</language>
+  <offset>56</offset>
+  <length>4</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/run/RunEditor.java</file>
+  <line>688</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor.run</package>
+  <entry_point TYPE="method" FQNAME="org.testin.editor.run.RunEditor void showExecutionTotal()" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>This French-borrowed phrase usually has diacritics</description>
+  <highlighted_element>resume</highlighted_element>
+  <language>JAVA</language>
+  <offset>7</offset>
+  <length>6</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/editor/run/RunEditor.java</file>
+  <line>747</line>
+  <module>Testin.main</module>
+  <package>org.testin.editor.run</package>
+  <entry_point TYPE="method" FQNAME="org.testin.editor.run.RunEditor void stopExecution()" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>7</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/VfsExecutor.java</file>
+  <line>96</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.VfsExecutor void removeVf(com.intellij.openapi.project.Project p, java.lang.Object requester, java.nio.file.Path path, java.util.function.Consumer&lt;java.lang.Boolean&gt; onDeleted)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>The verb 'delete' does not usually follow articles like 'a'. Check that 'delete' is spelled correctly; using 'delete' as a noun may be non-standard.</description>
+  <highlighted_element>a delete</highlighted_element>
+  <language>JAVA</language>
+  <offset>71</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/model/markers/TestRunsMainDirectoryMarker.java</file>
+  <line>8</line>
+  <module>Testin.main</module>
+  <package>org.testin.model.markers</package>
+  <entry_point TYPE="class" FQNAME="org.testin.model.markers.TestRunsMainDirectoryMarker" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>An apostrophe may be missing.</description>
+  <highlighted_element>runs</highlighted_element>
+  <language>JAVA</language>
+  <offset>61</offset>
+  <length>4</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/ProjectIndexer.java</file>
+  <line>460</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.ProjectIndexer void moveNode(java.nio.file.Path oldPath, java.nio.file.Path newPath, java.util.function.Consumer&lt;java.lang.Boolean&gt; onFinished)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>61</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/ProjectIndexer.java</file>
+  <line>249</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.ProjectIndexer org.testin.indexer.ProjectIndexer.NodeContents contentsUnder(java.nio.file.Path path)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>The verb 'delete' does not usually follow articles like 'a'. Check that 'delete' is spelled correctly; using 'delete' as a noun may be non-standard.</description>
+  <highlighted_element>a</highlighted_element>
+  <language>JAVA</language>
+  <offset>79</offset>
+  <length>2</length>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/ProjectIndexer.java</file>
+  <line>250</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.ProjectIndexer org.testin.indexer.ProjectIndexer.NodeContents contentsUnder(java.nio.file.Path path)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>The verb 'delete' does not usually follow articles like 'a'. Check that 'delete' is spelled correctly; using 'delete' as a noun may be non-standard.</description>
+  <highlighted_element>delete</highlighted_element>
+  <language>JAVA</language>
+  <offset>7</offset>
+  <length>6</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/ProjectIndexer.java</file>
+  <line>444</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.ProjectIndexer void removeVf(java.nio.file.Path path, java.lang.Runnable cacheUpdate, java.util.function.Consumer&lt;java.lang.Boolean&gt; onRemoved)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>The verb 'delete' does not usually follow articles like 'the'. Check that 'delete' is spelled correctly; using 'delete' as a noun may be non-standard.</description>
+  <highlighted_element>the delete</highlighted_element>
+  <language>JAVA</language>
+  <offset>39</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/ProjectIndexer.java</file>
+  <line>573</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.ProjectIndexer void persistMarker(org.testin.model.dto.dirs.DirectoryDto dto)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>The verb 'write' does not usually follow articles like 'the'. Check that 'write' is spelled correctly; using 'write' as a noun may be non-standard.</description>
+  <highlighted_element>the</highlighted_element>
+  <language>JAVA</language>
+  <offset>75</offset>
+  <length>4</length>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/indexer/ProjectIndexer.java</file>
+  <line>574</line>
+  <module>Testin.main</module>
+  <package>org.testin.indexer</package>
+  <entry_point TYPE="method" FQNAME="org.testin.indexer.ProjectIndexer void persistMarker(org.testin.model.dto.dirs.DirectoryDto dto)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>The verb 'write' does not usually follow articles like 'the'. Check that 'write' is spelled correctly; using 'write' as a noun may be non-standard.</description>
+  <highlighted_element>write</highlighted_element>
+  <language>JAVA</language>
+  <offset>7</offset>
+  <length>5</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitBackgroundTask.java</file>
+  <line>22</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="class" FQNAME="org.testin.git.GitBackgroundTask" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Possible typo detected.</description>
+  <highlighted_element>git4idea</highlighted_element>
+  <language>JAVA</language>
+  <offset>3</offset>
+  <length>8</length>
+</problem>
+</problems>

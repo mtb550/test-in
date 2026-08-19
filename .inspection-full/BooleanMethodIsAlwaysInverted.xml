@@ -1,0 +1,28 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitRepositoryService.java</file>
+  <line>157</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitRepositoryService boolean abortRebase(java.nio.file.Path path)" />
+  <problem_class id="BooleanMethodIsAlwaysInverted" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Boolean method is always inverted</problem_class>
+  <hints />
+  <description>Calls to boolean method 'abortRebase()' are always inverted</description>
+  <highlighted_element>abortRebase</highlighted_element>
+  <language>JAVA</language>
+  <offset>19</offset>
+  <length>11</length>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitRepositoryService.java</file>
+  <line>164</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitRepositoryService boolean continueRebase(java.nio.file.Path path)" />
+  <problem_class id="BooleanMethodIsAlwaysInverted" severity="WARNING" attribute_key="WARNING_ATTRIBUTES">Boolean method is always inverted</problem_class>
+  <hints />
+  <description>Calls to boolean method 'continueRebase()' are always inverted</description>
+  <highlighted_element>continueRebase</highlighted_element>
+  <language>JAVA</language>
+  <offset>19</offset>
+  <length>14</length>
+</problem></problems>
