@@ -104,13 +104,32 @@ public final class ExplorerPanel implements Disposable {
      * box and the empty state can then never disagree about which project is open.
      */
     public void refresh() {
+        // Gathered off the EDT, drawn on it. What the panel decides on is a
+        // directory walk that reads a marker per project, and the threading rule
+        // in CLAUDE.md keeps disk work off the thread that paints (#66).
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            final PanelState state = state();
+
+            ApplicationManager.getApplication().invokeLater(() -> {
+                if (p.isDisposed()) return;
+                draw(state);
+            });
+        });
+    }
+
+    /**
+     * Draws the panel from an answer it was given. On the EDT, and reading
+     * nothing: every question it could ask was answered by {@link #state()}
+     * before it was called.
+     */
+    private void draw(final @NotNull PanelState state) {
         final @Nullable TestProjectDirectoryDto tp = bound();
 
         panel.removeAll();
         panel.getEmptyText().clear();
 
         if (tp == null) {
-            showWelcome(state());
+            showWelcome(state);
         } else {
             showTree(tp);
         }

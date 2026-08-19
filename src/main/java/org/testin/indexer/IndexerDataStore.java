@@ -237,16 +237,24 @@ final class IndexerDataStore {
      * Makes a single file the plugin just wrote with {@code java.nio} visible in
      * the IDE, creating its VFS entry when there is not one yet.
      * <p>
-     * The directory form above cannot do this job: refreshing a path the VFS has
-     * never seen leaves it unseen, and refreshing the parent recursively to find
-     * one new file would walk a whole project to deliver two lines of YAML.
+     * The directory it sits in is refreshed first, and that is the part that
+     * matters: a file the VFS has never seen is discovered by re-reading its
+     * parent's children, not by resolving the file itself. One level only -
+     * recursion here would walk a whole project to deliver two lines of YAML,
+     * which is what the directory form above is for.
      * <p>
      * Synchronous, and therefore on a pooled thread: a refresh that resolves a
      * path reads the VFS persistence, which the EDT is not allowed to do.
      */
     void refreshFile(final @NotNull Path file) {
-        ApplicationManager.getApplication().executeOnPooledThread(() ->
-                LocalFileSystem.getInstance().refreshAndFindFileByNioFile(file));
+        final @Nullable Path parent = file.getParent();
+
+        ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            if (parent != null) {
+                LocalFileSystem.getInstance().refreshNioFiles(List.of(parent), false, false, null);
+            }
+            LocalFileSystem.getInstance().refreshAndFindFileByNioFile(file);
+        });
     }
 
     /**
