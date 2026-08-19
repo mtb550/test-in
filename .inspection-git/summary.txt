@@ -1,0 +1,12 @@
+48 findings
+
+By inspection:
+
+    32  unused
+     8  GrazieInspection
+     7  GrazieStyle
+     1  DataFlowIssue
+
+By package:
+
+    48  org/testin/git

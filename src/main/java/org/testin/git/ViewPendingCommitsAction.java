@@ -119,7 +119,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                             return;
                         }
 
-                        Services.getInstance(p, Notifier.class).softShow(p, "Committed", commitId);
+                        Services.getInstance(p, Notifier.class).softShow(p, "Committed", commitLabel(commitId));
                     });
                 },
                 ex -> {
@@ -204,7 +204,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     // remote without going back to look it up.
                     ApplicationManager.getApplication().invokeLater(() ->
                             Services.getInstance(p, Notifier.class).info(p, "Pushed",
-                                    "Commit " + commitId + " is on " + remote + "/" + branch));
+                                    commitLabel(commitId) + " is on " + remote + "/" + branch));
                 },
                 ex -> {
                     if (git.hasConflicts(repoPath)) {
@@ -280,6 +280,15 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                         ex -> Services.getInstance(p, Notifier.class).error(p, "Config Failed",
                                 "Failed to set Git identity:" + System.lineSeparator() + ex.getMessage()))
         ).show());
+    }
+
+    /**
+     * How a commit is named to the tester. The id when Git could give one - it is
+     * what they search for on the remote - and a plain phrase when it could not,
+     * so a successful push is never reported as "Commit  is on origin/main".
+     */
+    private static @NotNull String commitLabel(final @NotNull String commitId) {
+        return commitId.isBlank() ? "The commit" : "Commit " + commitId;
     }
 
     private boolean isIdentityError(final @Nullable String message) {

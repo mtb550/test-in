@@ -1,0 +1,93 @@
+<problems is_local_tool="true">
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ChangeSubject.java</file>
+  <line>37</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="field" FQNAME="org.testin.git.ChangeSubject MARKER" />
+  <problem_class id="GrazieStyle" severity="STYLE_SUGGESTION" attribute_key="TEXT_STYLE_SUGGESTION">Style</problem_class>
+  <description>Long sentences (53 words here) are harder to read, according to the research; consider splitting</description>
+  <highlighted_element>own.</highlighted_element>
+  <language>JAVA</language>
+  <offset>25</offset>
+  <length>4</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/PendingChange.java</file>
+  <line>36</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.PendingChange org.testin.model.dto.TestCaseDto testCase()" />
+  <problem_class id="GrazieStyle" severity="STYLE_SUGGESTION" attribute_key="TEXT_STYLE_SUGGESTION">Style</problem_class>
+  <description>Long sentences (54 words here) are harder to read, according to the research; consider splitting</description>
+  <highlighted_element>row.</highlighted_element>
+  <language>JAVA</language>
+  <offset>51</offset>
+  <length>4</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/PendingChange.java</file>
+  <line>17</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="class" FQNAME="org.testin.git.PendingChange" />
+  <problem_class id="GrazieStyle" severity="STYLE_SUGGESTION" attribute_key="TEXT_STYLE_SUGGESTION">Style</problem_class>
+  <description>Long sentences (49 words here) are harder to read, according to the research; consider splitting</description>
+  <highlighted_element>to.</highlighted_element>
+  <language>JAVA</language>
+  <offset>72</offset>
+  <length>3</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitDiffProcessor.java</file>
+  <line>30</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="class" FQNAME="org.testin.git.GitDiffProcessor" />
+  <problem_class id="GrazieStyle" severity="STYLE_SUGGESTION" attribute_key="TEXT_STYLE_SUGGESTION">Style</problem_class>
+  <description>Long sentences (44 words here) are harder to read, according to the research; consider splitting</description>
+  <highlighted_element>changed.</highlighted_element>
+  <language>JAVA</language>
+  <offset>53</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/TestRunChangeComparator.java</file>
+  <line>24</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="class" FQNAME="org.testin.git.TestRunChangeComparator" />
+  <problem_class id="GrazieStyle" severity="STYLE_SUGGESTION" attribute_key="TEXT_STYLE_SUGGESTION">Style</problem_class>
+  <description>Long sentences (45 words here) are harder to read, according to the research; consider splitting</description>
+  <highlighted_element>individually.</highlighted_element>
+  <language>JAVA</language>
+  <offset>35</offset>
+  <length>13</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/PendingChangeFactory.java</file>
+  <line>159</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.PendingChangeFactory org.testin.git.PendingChange marker(org.testin.git.DiffType type, java.lang.String beforeJson, java.lang.String afterJson, java.nio.file.Path relativePath, org.testin.util.Mapper mapper)" />
+  <problem_class id="GrazieStyle" severity="STYLE_SUGGESTION" attribute_key="TEXT_STYLE_SUGGESTION">Style</problem_class>
+  <description>American English uses '-iz-' in suffixes</description>
+  <highlighted_element>recognises</highlighted_element>
+  <language>JAVA</language>
+  <offset>66</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>143</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService boolean remoteHasBranch(java.nio.file.Path repositoryPath, java.lang.String remote, java.lang.String branch)" />
+  <problem_class id="GrazieStyle" severity="STYLE_SUGGESTION" attribute_key="TEXT_STYLE_SUGGESTION">Style</problem_class>
+  <description>Long sentences (44 words here) are harder to read, according to the research; consider splitting</description>
+  <highlighted_element>branch.</highlighted_element>
+  <language>JAVA</language>
+  <offset>15</offset>
+  <length>7</length>
+</problem>
+</problems>

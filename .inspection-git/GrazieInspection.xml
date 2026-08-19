@@ -1,0 +1,105 @@
+<problems is_local_tool="true">
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/PendingCommitsDialog.java</file>
+  <line>95</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.PendingCommitsDialog PendingCommitsDialog(com.intellij.openapi.project.Project p, java.util.List&lt;org.testin.git.PendingChange&gt; differences, java.nio.file.Path repoRoot, java.util.function.Consumer&lt;org.testin.git.PendingCommitsDialog.Request&gt; onCommit)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>This phrase contains a double negative.</description>
+  <highlighted_element>nothing</highlighted_element>
+  <language>JAVA</language>
+  <offset>31</offset>
+  <length>7</length>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/PendingCommitsDialog.java</file>
+  <line>97</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.PendingCommitsDialog PendingCommitsDialog(com.intellij.openapi.project.Project p, java.util.List&lt;org.testin.git.PendingChange&gt; differences, java.nio.file.Path repoRoot, java.util.function.Consumer&lt;org.testin.git.PendingCommitsDialog.Request&gt; onCommit)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>37</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>95</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void reviewChanges(com.intellij.openapi.project.Project p, java.nio.file.Path path, java.util.List&lt;org.testin.git.PendingChange&gt; changes)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>11</offset>
+  <length>10</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitRepositoryService.java</file>
+  <line>182</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitRepositoryService java.lang.String runRemote(java.nio.file.Path path, java.lang.String remoteUrl, java.lang.String... command)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Possible typo detected.</description>
+  <highlighted_element>git4idea</highlighted_element>
+  <language>JAVA</language>
+  <offset>7</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitBackgroundTask.java</file>
+  <line>22</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="class" FQNAME="org.testin.git.GitBackgroundTask" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Possible typo detected.</description>
+  <highlighted_element>git4idea</highlighted_element>
+  <language>JAVA</language>
+  <offset>3</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommandRunner.java</file>
+  <line>34</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommandRunner java.lang.String executeRemote(com.intellij.openapi.project.Project project, java.nio.file.Path workingDirectory, java.lang.String remoteUrl, java.lang.String... command)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Possible typo detected.</description>
+  <highlighted_element>git4idea</highlighted_element>
+  <language>JAVA</language>
+  <offset>19</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>24</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="field" FQNAME="org.testin.git.GitCommitService repositories" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>Possible typo detected.</description>
+  <highlighted_element>git4idea</highlighted_element>
+  <language>JAVA</language>
+  <offset>64</offset>
+  <length>8</length>
+</problem>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>87</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService java.lang.String headCommitId(java.nio.file.Path repositoryPath)" />
+  <problem_class id="GrazieInspection" severity="GRAMMAR_ERROR" attribute_key="GRAMMAR_ERROR">Grammar</problem_class>
+  <description>In American English, 'afterward' is the preferred variant. 'Afterwards' is more commonly used in British English and other dialects.</description>
+  <highlighted_element>afterwards</highlighted_element>
+  <language>JAVA</language>
+  <offset>68</offset>
+  <length>10</length>
+</problem>
+</problems>

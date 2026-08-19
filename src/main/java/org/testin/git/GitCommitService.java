@@ -86,11 +86,17 @@ public final class GitCommitService {
      * The short id of the commit at HEAD - what a tester quotes when they say
      * which commit their work went into, and what the push reports afterwards.
      * <p>
-     * Blank when the repository has no commit yet, which is a real state: a
-     * repository initialized a moment ago and nothing committed into it.
+     * Blank rather than a failure when Git cannot answer: a repository with no
+     * commit in it yet has no HEAD, and the commit that just succeeded must not
+     * be reported as failed because the label for it could not be read.
      */
     public @NotNull String headCommitId(final @NotNull Path repositoryPath) {
-        return GitCommandRunner.execute(project, repositoryPath, "git", "rev-parse", "--short", "HEAD").trim();
+        try {
+            return GitCommandRunner.execute(project, repositoryPath, "git", "rev-parse", "--short", "HEAD").trim();
+        } catch (final RuntimeException ex) {
+            Logger.warn("Could not read the commit id: " + ex.getMessage());
+            return "";
+        }
     }
 
     public void configureRemote(final @NotNull Path repositoryPath, final @NotNull String remoteName, final @NotNull String remoteUrl) {

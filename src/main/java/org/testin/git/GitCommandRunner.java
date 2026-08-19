@@ -85,6 +85,7 @@ final class GitCommandRunner {
             case "rebase" -> GitCommand.REBASE;
             case "push" -> GitCommand.PUSH;
             case "remote" -> GitCommand.REMOTE;
+            case "rev-parse" -> GitCommand.REV_PARSE;
             case "show" -> GitCommand.SHOW;
             case "status" -> GitCommand.STATUS;
             default -> throw new IllegalArgumentException("Unsupported Git command: " + command);

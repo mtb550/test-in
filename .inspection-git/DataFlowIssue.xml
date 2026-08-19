@@ -1,0 +1,15 @@
+<problems is_local_tool="true">
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/PendingChangeFactory.java</file>
+  <line>34</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.PendingChangeFactory org.testin.git.PendingChange fromFile(org.testin.git.DiffType type, java.lang.String beforeJson, java.lang.String afterJson, java.nio.file.Path relativePath, org.testin.util.Mapper mapper)" />
+  <problem_class id="DataFlowIssue" severity="ERROR" attribute_key="ERRORS_ATTRIBUTES">Nullability and data flow problems</problem_class>
+  <description>@Nullable method 'fromFile' always returns a non-null value</description>
+  <highlighted_element>Nullable</highlighted_element>
+  <language>JAVA</language>
+  <offset>12</offset>
+  <length>8</length>
+</problem>
+</problems>

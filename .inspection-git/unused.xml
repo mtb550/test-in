@@ -1,0 +1,514 @@
+<problems>
+<problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/FieldChange.java</file>
+  <line>15</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.FieldChange FieldChange(java.lang.String fieldName, java.lang.String oldValue, java.lang.String newValue, org.testin.git.ChangeType changeType)" />
+  <language>JAVA</language>
+  <offset>25</offset>
+  <length>79</length>
+  <highlighted_element>(@NotNull String fieldName, @NotNull String oldValue, @NotNull String newValue,</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>All constructor usages are not reachable from the entry points.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitBackgroundTask.java</file>
+  <line>30</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitBackgroundTask GitBackgroundTask(com.intellij.openapi.project.Project p, java.lang.String title, boolean cancellable, org.testin.git.GitTaskWork work, java.util.function.Consumer&lt;java.lang.Exception&gt; onError)" />
+  <language>JAVA</language>
+  <offset>11</offset>
+  <length>17</length>
+  <highlighted_element>GitBackgroundTask</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>All constructor usages are not reachable from the entry points.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitBackgroundTask.java</file>
+  <line>37</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitBackgroundTask void run(com.intellij.openapi.project.Project p, java.lang.String title, boolean cancellable, org.testin.git.GitTaskWork work, java.util.function.Consumer&lt;java.lang.Exception&gt; onError)" />
+  <language>JAVA</language>
+  <offset>23</offset>
+  <length>3</length>
+  <highlighted_element>run</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Method is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>31</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService GitCommitService(com.intellij.openapi.project.Project project)" />
+  <language>JAVA</language>
+  <offset>11</offset>
+  <length>16</length>
+  <highlighted_element>GitCommitService</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Constructor is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>57</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService void initialize(java.nio.file.Path repositoryPath)" />
+  <language>JAVA</language>
+  <offset>16</offset>
+  <length>10</length>
+  <highlighted_element>initialize</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>72</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService void stageAndCommit(java.nio.file.Path repositoryPath, java.lang.String message, java.util.Collection&lt;org.testin.git.PendingChange&gt; selectedChanges)" />
+  <language>JAVA</language>
+  <offset>16</offset>
+  <length>14</length>
+  <highlighted_element>stageAndCommit</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>93</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService java.lang.String headCommitId(java.nio.file.Path repositoryPath)" />
+  <language>JAVA</language>
+  <offset>27</offset>
+  <length>12</length>
+  <highlighted_element>headCommitId</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>102</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService void configureRemote(java.nio.file.Path repositoryPath, java.lang.String remoteName, java.lang.String remoteUrl)" />
+  <language>JAVA</language>
+  <offset>16</offset>
+  <length>15</length>
+  <highlighted_element>configureRemote</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>106</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService void configureIdentity(java.nio.file.Path repositoryPath, java.lang.String name, java.lang.String email, boolean global)" />
+  <language>JAVA</language>
+  <offset>16</offset>
+  <length>17</length>
+  <highlighted_element>configureIdentity</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitCommitService.java</file>
+  <line>127</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitCommitService void pullAndPush(java.nio.file.Path repositoryPath, java.lang.String remote, java.lang.String branch)" />
+  <language>JAVA</language>
+  <offset>16</offset>
+  <length>11</length>
+  <highlighted_element>pullAndPush</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitDiffProcessor.java</file>
+  <line>40</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitDiffProcessor java.util.List&lt;org.testin.git.PendingChange&gt; getPendingChanges(com.intellij.openapi.project.Project project, java.nio.file.Path repositoryRoot)" />
+  <language>JAVA</language>
+  <offset>47</offset>
+  <length>17</length>
+  <highlighted_element>getPendingChanges</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Method is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitIdentityDialog.java</file>
+  <line>35</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitIdentityDialog GitIdentityDialog(com.intellij.openapi.project.Project p, java.util.function.Consumer&lt;org.testin.git.GitIdentityDialog.Identity&gt; onSet)" />
+  <language>JAVA</language>
+  <offset>4</offset>
+  <length>17</length>
+  <highlighted_element>GitIdentityDialog</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Constructor is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/GitIdentityDialog.java</file>
+  <line>90</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.GitIdentityDialog.Identity Identity(java.lang.String name, java.lang.String email, boolean global)" />
+  <language>JAVA</language>
+  <offset>19</offset>
+  <length>61</length>
+  <highlighted_element>(@NotNull String name, @NotNull String email, boolean global)</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>All constructor usages are not reachable from the entry points.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/PendingCommitsDialog.java</file>
+  <line>50</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.PendingCommitsDialog PendingCommitsDialog(com.intellij.openapi.project.Project p, java.util.List&lt;org.testin.git.PendingChange&gt; differences, java.nio.file.Path repoRoot, java.util.function.Consumer&lt;org.testin.git.PendingCommitsDialog.Request&gt; onCommit)" />
+  <language>JAVA</language>
+  <offset>11</offset>
+  <length>20</length>
+  <highlighted_element>PendingCommitsDialog</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Constructor is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>30</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="class" FQNAME="org.testin.git.ViewPendingCommitsAction" />
+  <language>JAVA</language>
+  <offset>13</offset>
+  <length>24</length>
+  <highlighted_element>ViewPendingCommitsAction</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Class is not instantiated.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>31</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="field" FQNAME="org.testin.git.ViewPendingCommitsAction git" />
+  <language>JAVA</language>
+  <offset>48</offset>
+  <length>3</length>
+  <highlighted_element>git</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Field is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>32</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="field" FQNAME="org.testin.git.ViewPendingCommitsAction commits" />
+  <language>JAVA</language>
+  <offset>44</offset>
+  <length>7</length>
+  <highlighted_element>commits</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Field is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>37</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction ViewPendingCommitsAction(com.intellij.openapi.project.Project p, com.intellij.ui.treeStructure.SimpleTree tree)" />
+  <language>JAVA</language>
+  <offset>11</offset>
+  <length>24</length>
+  <highlighted_element>ViewPendingCommitsAction</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Constructor is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>77</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void scanForChanges(com.intellij.openapi.project.Project p, java.nio.file.Path path)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>14</length>
+  <highlighted_element>scanForChanges</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>86</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void reviewChanges(com.intellij.openapi.project.Project p, java.nio.file.Path path, java.util.List&lt;org.testin.git.PendingChange&gt; changes)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>13</length>
+  <highlighted_element>reviewChanges</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>100</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void performCommitWorkflow(com.intellij.openapi.project.Project p, java.nio.file.Path repoPath, java.lang.String commitMessage, java.util.Collection&lt;org.testin.git.PendingChange&gt; selectedChanges, boolean push)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>21</length>
+  <highlighted_element>performCommitWorkflow</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>134</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void initializeGitRepository(com.intellij.openapi.project.Project p, java.nio.file.Path repoPath)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>23</length>
+  <highlighted_element>initializeGitRepository</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>150</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void pushToRemote(com.intellij.openapi.project.Project p, java.nio.file.Path repoPath, java.lang.String commitId)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>12</length>
+  <highlighted_element>pushToRemote</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>172</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void configureRemoteAndPush(com.intellij.openapi.project.Project p, java.nio.file.Path repoPath, java.lang.String remoteName, java.lang.String branch, java.lang.String commitId)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>22</length>
+  <highlighted_element>configureRemoteAndPush</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>194</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void executeGitPush(com.intellij.openapi.project.Project p, java.nio.file.Path repoPath, java.lang.String remote, java.lang.String branch, java.lang.String commitId)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>14</length>
+  <highlighted_element>executeGitPush</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>224</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void showConflictActions(java.nio.file.Path repoPath, java.lang.String remote, java.lang.String branch)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>19</length>
+  <highlighted_element>showConflictActions</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>235</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void finishRebase(java.nio.file.Path repoPath, java.lang.String remote, java.lang.String branch, boolean abort)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>12</length>
+  <highlighted_element>finishRebase</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>261</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction void promptAndSetGitIdentity(com.intellij.openapi.project.Project p, java.nio.file.Path repoPath, java.lang.String pendingCommitMessage, java.util.Collection&lt;org.testin.git.PendingChange&gt; selectedChanges, boolean push)" />
+  <language>JAVA</language>
+  <offset>17</offset>
+  <length>23</length>
+  <highlighted_element>promptAndSetGitIdentity</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>290</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction java.lang.String commitLabel(java.lang.String commitId)" />
+  <language>JAVA</language>
+  <offset>35</offset>
+  <length>11</length>
+  <highlighted_element>commitLabel</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Method is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ViewPendingCommitsAction.java</file>
+  <line>294</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="method" FQNAME="org.testin.git.ViewPendingCommitsAction boolean isIdentityError(java.lang.String message)" />
+  <language>JAVA</language>
+  <offset>20</offset>
+  <length>15</length>
+  <highlighted_element>isIdentityError</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>&lt;ul&gt;&lt;li&gt;Method owner class is never instantiated OR&lt;/li&gt;&lt;li&gt;All instantiations are not reachable from the entry points.&lt;/li&gt;&lt;/ul&gt;</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/ChangeType.java</file>
+  <line>10</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="class" FQNAME="org.testin.git.ChangeType" />
+  <language>JAVA</language>
+  <offset>12</offset>
+  <length>10</length>
+  <highlighted_element>ChangeType</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Enum is never used.</description>
+</problem><problem>
+  <file>file://$PROJECT_DIR$/src/main/java/org/testin/git/TestRunChangeComparator.java</file>
+  <line>30</line>
+  <module>Testin.main</module>
+  <package>org.testin.git</package>
+  <entry_point TYPE="class" FQNAME="org.testin.git.TestRunChangeComparator" />
+  <language>JAVA</language>
+  <offset>12</offset>
+  <length>23</length>
+  <highlighted_element>TestRunChangeComparator</highlighted_element>
+  <problem_class id="unused" severity="WARNING" attribute_key="NOT_USED_ELEMENT_ATTRIBUTES">unused declaration</problem_class>
+  <hints>
+    <hint value="comment" />
+    <hint value="delete" />
+  </hints>
+  <description>Class is never used.</description>
+</problem></problems>
