@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
+import org.testin.config.TestinConfigService;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -32,17 +33,30 @@ public class RefreshAction extends AbstractProjectAction {
 
         Logger.info("Refresh: re-indexing started");
 
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        indexer.resetForReindex();
-
-        indexer.indexWithProgress();
-
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            // The repository's testin.yml is on disk too, and Refresh is the
+            // tester saying "read the disk again". It was read once when the
+            // service was created and never after, so a file that was deleted,
+            // hand-edited, or brought in by a branch switch left the plugin
+            // acting on what it said at startup (#6).
+            //
+            // Before the index, exactly as at startup: the file names the test
+            // project, and indexing is scoped to it.
+            Services.getInstance(p, TestinConfigService.class).reload();
+
+            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+            indexer.resetForReindex();
+            indexer.indexWithProgress();
             indexer.awaitIndexing();
 
             Logger.info("Refresh: re-indexing complete, rebuilding tree");
 
             ApplicationManager.getApplication().invokeLater(() -> {
+                if (p.isDisposed()) {
+                    refreshGuard.set(false);
+                    return;
+                }
+
                 pp.refresh();
 
                 refreshGuard.set(false);
