@@ -47,13 +47,21 @@
 ]]></description>
 
     <change-notes><![CDATA[
-    <b>2.8-beta</b>
+    <b>2.8.0-alpha</b>
     <ul>
+        <li><b>Every change is reviewable, and the review commits and pushes:</b> the pending-changes dialog now understands test runs and markers as well as test cases, so an executed run no longer shows as a nameless row and a run edited after its first commit no longer disappears from the list entirely. A Test Set column says where each change lives, and the button is <b>Commit &amp; Push</b> with Commit alone behind it &mdash; the push is chosen with the changes still on screen, and the notification names the commit it sent.</li>
+        <li><b>Removed:</b> a run keeps the row for a test case deleted under it, marked Removed, carrying the verdict and timings it recorded. The row takes no new verdict &mdash; a case that is gone cannot be run &mdash; execution steps over it, and the reports count it in a table of its own.</li>
+        <li><b>Removing a test project works again</b> from the tree, behind a confirmation that says how much goes with it: "Holds 3 test sets, 42 test cases and 5 test runs".</li>
+        <li><b>Dates read the way they are written:</b> exporting a sheet and importing it back kept every date, instead of turning each one into today. An imported case now keeps the author and dates its file carried rather than being stamped with whoever ran the import.</li>
+        <li><b>Audit that tells the truth:</b> all seven node markers share one audit block, every one of them reads a file written before the fields were renamed, and a node nobody has modified reports when it was made instead of the moment it was read.</li>
+        <li><b>Lighter lists:</b> a card reuses its badges instead of rebuilding them for every row, so sorting, filtering and paging a full page of test cases costs a fraction of what it did.</li>
+        <li><b>Quieter, clearer messages:</b> import, export, report and sync outcomes appear as status-bar balloons instead of entries in the notification log, which is left for the failures worth finding again. Syncing a project that is not under Git says so plainly and points at where a repository is created.</li>
+        <li><b>Absent, not broken:</b> in IDEs without the Java or TestNG plugin, Run Test Case, Automate Test Case and Navigate To Code are no longer offered at all rather than appearing and refusing.</li>
+        <li>The Git identity and group-selection dialogs moved onto the shared dialog framework, so every key they bind is shown; an empty list says why it is empty; and a marker that has not been written yet is no longer logged as an error.</li>
         <li><b>Git on a repository of its own:</b> test cases no longer have to live inside the automation project. The pending review reads Git directly, so a newly written test case shows up straight away, the markers that make a test set a test set travel with the commit, and a first push to an empty repository succeeds.</li>
-        <li><b>A real review dialog:</b> pending changes open in a table with a commit message field and a Commit button, a status bar showing the keys, and right-click to revert a single changed field.</li>
+        <li><b>A real review dialog:</b> pending changes open in a table with a commit message field, a status bar showing the keys, and right-click to revert a single changed field.</li>
         <li><b>Execution timing:</b> a run records when it started and ended, per-case durations survive stopping and resuming, and all three report formats show a real execution date instead of the day the run was created.</li>
         <li><b>Bug severity and priority as badges</b> on the run card, each captioned so it cannot be mistaken for the test case's own priority, and readable in both light and dark themes.</li>
-        <li><b>Clearer confirmations:</b> every action says what it did in a few words. Work that finishes on its own time, like a sync or a push, stays in the notification log instead of fading away unseen.</li>
         <li>Tested by <b>Mohammed AlZamil</b>.</li>
     </ul>
     <br/>
