@@ -34,7 +34,7 @@ public class ActionIcons extends BaseDetails {
         // passed case used to show a green tick here, which reads as a verdict
         // and is one - the verdict is a badge now, below.
         final CardHoverAction navigate = CardHoverAction.NAVIGATE_TO_TEST_METHOD;
-        final CardHoverAction run = CardHoverAction.runSlot(dto.getTempStatus());
+        final CardHoverAction run = CardHoverAction.runSlot(dto);
 
         // Neither icon is drawn in an IDE that cannot act on it, and a row with
         // no icons in it is no row at all.

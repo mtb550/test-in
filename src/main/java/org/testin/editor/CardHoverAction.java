@@ -28,7 +28,7 @@ public enum CardHoverAction {
             Shortcuts.NavigateToCode,
             OptionalPlugin.JAVA,
             AllIcons.Nodes.Class,
-            NavigateToCodeAction::execute
+            (p, cases) -> NavigateToCodeAction.execute(p, cases.getFirst())
     ),
 
     RUN_TEST_CASE(
@@ -36,7 +36,7 @@ public enum CardHoverAction {
             Shortcuts.RunTestCase,
             OptionalPlugin.TESTNG,
             AllIcons.RunConfigurations.TestState.Run,
-            (p, tc) -> RunTestCases.run(p, List.of(tc))
+            RunTestCases::run
     ),
 
     /**
@@ -52,7 +52,7 @@ public enum CardHoverAction {
             Shortcuts.EMPTY,
             OptionalPlugin.TESTNG,
             AllIcons.Actions.Suspend,
-            (p, tc) -> stopRun(p)
+            (p, cases) -> stopRun(p)
     );
 
     private final @NotNull String tooltip;
@@ -72,17 +72,32 @@ public enum CardHoverAction {
     private final @NotNull Icon icon;
 
     /**
-     * What clicking the button does. Here rather than at each place that draws
-     * one, so the card, the view panel and any later caller act the same.
+     * What pressing the button does. Here rather than at each place that offers
+     * one, so the card, the view panel, the context menu and the key all act the
+     * same.
+     * <p>
+     * A selection rather than a case, because that is the widest a caller has:
+     * the keyboard hands over what is selected, and a card hands over the one it
+     * sits on. Running twelve cases as one call is also what keeps the plugin to
+     * a single notification with a count.
      */
     @Getter(AccessLevel.NONE)
-    private final @NotNull BiConsumer<Project, TestCaseDto> onClick;
+    private final @NotNull BiConsumer<Project, List<TestCaseDto>> onClick;
 
     /**
-     * Does this button's work on that test case.
+     * Does this button's work on the one case it was pressed from.
      */
     public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
-        onClick.accept(p, tc);
+        execute(p, List.of(tc));
+    }
+
+    /**
+     * Does this button's work on a whole selection.
+     */
+    public void execute(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+        if (cases.isEmpty()) return;
+
+        onClick.accept(p, cases);
     }
 
     /**
@@ -96,14 +111,28 @@ public enum CardHoverAction {
     }
 
     /**
-     * Which of the two the card offers where a single run icon used to sit: the
-     * stop while the case is running, the run every other time.
-     * <p>
-     * One owner, because three places have to name the same button - the painter
-     * drawing it, the hit-test deciding what the pointer is over, and the click.
+     * Which of the two a case offers where a single run icon used to sit: the
+     * stop while it is running, the run every other time.
      */
-    public static @NotNull CardHoverAction runSlot(final @NotNull RunStatus status) {
-        return status == RunStatus.RUNNING ? STOP_TEST_CASE : RUN_TEST_CASE;
+    public static @NotNull CardHoverAction runSlot(final @NotNull TestCaseDto tc) {
+        return runSlot(List.of(tc));
+    }
+
+    /**
+     * Which of the two a whole selection offers: the stop as soon as one of them
+     * is running, because a stop stops the run and not the case it was asked
+     * from.
+     * <p>
+     * One owner, because everything that offers this gesture has to name the
+     * same button - the painter drawing it, the hit-test deciding what the
+     * pointer is over, the click, the context menu entry, and F5. The card and
+     * the key disagreed for exactly as long as they answered this separately
+     * (#66, finding 18).
+     */
+    public static @NotNull CardHoverAction runSlot(final @NotNull List<TestCaseDto> cases) {
+        return cases.stream().anyMatch(tc -> tc.getTempStatus() == RunStatus.RUNNING)
+                ? STOP_TEST_CASE
+                : RUN_TEST_CASE;
     }
 
     /**

@@ -157,7 +157,7 @@ public class CardMouseListener extends MouseAdapter {
 
         // The card draws the run button or the stop button by the same rule, so
         // the pointer is over whichever one this case is offering.
-        return Shared.descriptionActionIcons(titleWidth).at(xInCell, yInCell, CardHoverAction.runSlot(tc.getTempStatus()));
+        return Shared.descriptionActionIcons(titleWidth).at(xInCell, yInCell, CardHoverAction.runSlot(tc));
     }
 
 }
