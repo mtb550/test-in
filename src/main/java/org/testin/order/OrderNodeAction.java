@@ -49,13 +49,19 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * The selected node, when there is one and it is a kind that can be ordered.
+     * The selected node, when it is a kind that can be ordered.
      * <p>
-     * Two things can be absent here and both are ordinary: a tree with nothing
-     * selected, and a row that is not a directory at all. Answering with an
-     * empty Optional rather than a null puts both behind one word, so the menu
-     * state and the action are each a single line and neither tests for
-     * anything.
+     * Empty means the node is one with no arrangement to have - a project, or
+     * one of its two containers. It cannot mean "nothing is selected": the
+     * popup that carries this entry only opens over a row that resolves to a
+     * node, and selects it on the way. What makes the answer an Optional is the
+     * lookup itself, which is declared to return null for a tree that has no
+     * selection - a contract this action shares with every other one on the
+     * tree, and one that starts mattering here the day this gets a keyboard
+     * shortcut.
+     * <p>
+     * Either way nothing downstream asks: the menu state and the action are each
+     * a single line, and neither tests for anything.
      */
     private @NotNull Optional<DirectoryDto> selected() {
         return Optional.ofNullable(TreeValueUtil.selectedDirectory(tree)).filter(DirectoryDto::isOrderable);
