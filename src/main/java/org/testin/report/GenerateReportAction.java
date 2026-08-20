@@ -11,7 +11,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
@@ -25,7 +24,6 @@ import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.util.Display;
 import org.testin.util.Shortcuts;
 
 import java.awt.datatransfer.StringSelection;
@@ -108,7 +106,7 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     private void processAndSave(final @NotNull Project p, final @NotNull TestRunDirectoryDto tr,
-                                final @NotNull FileTypes format, final @Nullable File outputFile) {
+                                final @NotNull FileTypes format, final @NotNull File outputFile) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 final Path dirPath = tr.getPath();
@@ -120,23 +118,13 @@ public class GenerateReportAction extends AbstractProjectAction {
 
                 final byte[] fileBytes = format.generateReport(p, tr, runData, detailsMap);
 
-                final File reportFile;
-                if (outputFile != null) {
-                    reportFile = outputFile;
-                } else {
-                    final String cleanName = runData.getChangeLog().replace(".json", "");
-                    final String rawTimestamp = Display.formatDate(java.time.ZonedDateTime.now());
-                    final String safeTimestamp = rawTimestamp.replace(":", "-").replace("/", "-");
-                    reportFile = dirPath.resolve(cleanName + "_Report_" + safeTimestamp + format.getExtension()).toFile();
-                }
-
-                Files.write(reportFile.toPath(), fileBytes);
+                Files.write(outputFile.toPath(), fileBytes);
 
                 final Notifier notifier = Services.getInstance(p, Notifier.class);
                 final NotificationAction openAction = notifier.action("Open report", () -> {
 
                     try {
-                        java.awt.Desktop.getDesktop().open(reportFile);
+                        java.awt.Desktop.getDesktop().open(outputFile);
                     } catch (final Exception openEx) {
                         Logger.error("Failed to open report: " + openEx.getMessage());
                     }
@@ -145,14 +133,14 @@ public class GenerateReportAction extends AbstractProjectAction {
                 final NotificationAction copyAction = new NotificationAction("Copy path") {
                     @Override
                     public void actionPerformed(final @NotNull AnActionEvent e, final @NotNull Notification notification) {
-                        CopyPasteManager.getInstance().setContents(new StringSelection(reportFile.getAbsolutePath()));
+                        CopyPasteManager.getInstance().setContents(new StringSelection(outputFile.getAbsolutePath()));
                     }
                 };
                 copyAction.getTemplatePresentation().setIcon(AllIcons.Actions.Copy);
 
                 Services.getInstance(p, Notifier.class).infoWithActions(p,
                         format.name() + " Report Generated",
-                        "Saved successfully: " + reportFile.getName(),
+                        "Saved successfully: " + outputFile.getName(),
                         openAction,
                         copyAction
                 );

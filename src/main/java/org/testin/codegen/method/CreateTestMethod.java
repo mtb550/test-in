@@ -9,7 +9,6 @@ import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
@@ -58,7 +57,7 @@ public class CreateTestMethod implements GenAction {
         }, () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
     }
 
-    public void executeSync(final @NotNull Project p, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
+    public void executeSync(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull List<String> fqcn) {
         final Optional<Target> parsed = parse(fqcn);
         if (parsed.isEmpty()) {
             Logger.error("FQCN list is too short to generate a method: " + fqcn);
@@ -77,7 +76,7 @@ public class CreateTestMethod implements GenAction {
         }
     }
 
-    private void createMethod(final @NotNull Project p, final @NotNull Target target, final @Nullable TestCaseDto tc) {
+    private void createMethod(final @NotNull Project p, final @NotNull Target target, final @NotNull TestCaseDto tc) {
         final List<String> packageList = target.packageList();
         final String className = target.className();
         final String methodName = target.methodName();
@@ -144,7 +143,7 @@ public class CreateTestMethod implements GenAction {
 
     private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList,
                                        final @NotNull String className, final @NotNull String methodName,
-                                       final @Nullable TestCaseDto tc) {
+                                       final @NotNull TestCaseDto tc) {
         JavaSourceRoot.find(p).ifPresentOrElse(
                 sourceRoot -> injectIntoFile(p, sourceRoot, packageList, className, methodName, tc),
                 () -> Logger.error("retryInjectPhysically: no Java test source root, cannot inject method '"
@@ -157,7 +156,7 @@ public class CreateTestMethod implements GenAction {
      */
     private void injectIntoFile(final @NotNull Project p, final @NotNull VirtualFile sourceRoot,
                                 final @NotNull List<String> packageList, final @NotNull String className,
-                                final @NotNull String methodName, final @Nullable TestCaseDto tc) {
+                                final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final String relativePath = String.join("/", packageList) + "/" + className + ".java";
             final VirtualFile javaFile = sourceRoot.findFileByRelativePath(relativePath);
@@ -186,12 +185,7 @@ public class CreateTestMethod implements GenAction {
     }
 
     private void injectMethod(final @NotNull Project p, final @NotNull PsiClass targetClass,
-                              final @NotNull String methodName, final @Nullable TestCaseDto tc) {
-        if (tc == null) {
-            Logger.error("injectMethod: no test case data for method '" + methodName + "'");
-            return;
-        }
-
+                              final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final PsiElementFactory factory = JavaPsiFacade.getElementFactory(p);
             final PsiFile file = targetClass.getContainingFile();

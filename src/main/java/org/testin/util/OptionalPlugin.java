@@ -5,7 +5,6 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -38,7 +37,12 @@ public enum OptionalPlugin {
     private final @NotNull String label;
     private final @NotNull String requirement;
     private final @NotNull Key<Boolean> warned;
-    private volatile @Nullable Boolean available;
+    /**
+     * Whether the IDE has this plugin, once asked. Three states rather than a
+     * nullable Boolean: "not looked yet" is a state of its own, and saying so
+     * with a constant means nothing has to test for a missing answer (#71).
+     */
+    private volatile @NotNull Availability availability = Availability.UNKNOWN;
 
     OptionalPlugin(final @NotNull String pluginId, final @NotNull String label, final @NotNull String requirement) {
         this.pluginId = pluginId;
@@ -48,14 +52,23 @@ public enum OptionalPlugin {
     }
 
     public boolean isAvailable() {
-        Boolean value = available;
-        if (value == null) {
+        Availability known = availability;
+        if (known == Availability.UNKNOWN) {
             // Enabled = installed and not disabled; a disabled plugin's classes
             // are just as absent as an uninstalled one's.
-            value = PluginManager.getInstance().findEnabledPlugin(PluginId.getId(pluginId)) != null;
-            available = value;
+            known = PluginManager.getInstance().findEnabledPlugin(PluginId.getId(pluginId)) != null
+                    ? Availability.PRESENT
+                    : Availability.ABSENT;
+            availability = known;
         }
-        return value;
+        return known == Availability.PRESENT;
+    }
+
+    /**
+     * What is known about a plugin: nothing yet, or the answer.
+     */
+    private enum Availability {
+        UNKNOWN, PRESENT, ABSENT
     }
 
     /**
