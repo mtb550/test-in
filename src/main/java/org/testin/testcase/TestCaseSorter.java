@@ -59,36 +59,41 @@ public final class TestCaseSorter {
     public static @NotNull List<TestCaseDto> place(final @NotNull List<TestCaseDto> arranged) {
         final List<TestCaseDto> moved = new ArrayList<>();
         String previous = "";
+        int i = 0;
 
-        for (int i = 0; i < arranged.size(); i++) {
+        while (i < arranged.size()) {
             final TestCaseDto testCase = arranged.get(i);
 
             if (!testCase.getOrder().isEmpty() && testCase.getOrder().compareTo(previous) > 0) {
                 previous = testCase.getOrder();
+                i++;
                 continue;
             }
 
-            testCase.setOrder(Rank.between(previous, nextRankAfter(arranged, i, previous)));
-            previous = testCase.getOrder();
-            moved.add(testCase);
+            // The next case that already sorts after everything placed so far.
+            // Found once for the whole run of cases that need ranks, and the
+            // loop then resumes at it - so the search walks the list once
+            // however much of it moved, rather than once per case.
+            int anchor = i + 1;
+            while (anchor < arranged.size()) {
+                final String rank = arranged.get(anchor).getOrder();
+                if (!rank.isEmpty() && rank.compareTo(previous) > 0) break;
+                anchor++;
+            }
+
+            final String upperBound = anchor < arranged.size() ? arranged.get(anchor).getOrder() : "";
+
+            for (int j = i; j < anchor; j++) {
+                final TestCaseDto placed = arranged.get(j);
+                placed.setOrder(Rank.between(previous, upperBound));
+                previous = placed.getOrder();
+                moved.add(placed);
+            }
+
+            i = anchor;
         }
 
         return List.copyOf(moved);
-    }
-
-    /**
-     * The rank of the first case further down the list that still sorts after
-     * {@code previous}, or empty when there is none - the case being placed is
-     * going to the end.
-     */
-    private static @NotNull String nextRankAfter(final @NotNull List<TestCaseDto> arranged, final int from,
-                                                 final @NotNull String previous) {
-        for (int i = from + 1; i < arranged.size(); i++) {
-            final String rank = arranged.get(i).getOrder();
-            if (!rank.isEmpty() && rank.compareTo(previous) > 0) return rank;
-        }
-
-        return "";
     }
 
     /**
