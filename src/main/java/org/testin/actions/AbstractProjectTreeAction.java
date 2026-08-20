@@ -12,9 +12,10 @@ import javax.swing.*;
  * of them declared both for themselves.
  * <p>
  * Only for actions whose tree is always there. {@code EscapeAction} and
- * {@code GenerateReportAction} declare theirs {@code @Nullable} because they
- * have constructors that take a list or a table instead, so they keep their own
- * field and extend {@link AbstractProjectAction}.
+ * {@code GenerateReportAction} have constructors that take a list or a table
+ * instead, and each of those says what the action does rather than which
+ * surface it was given, so neither keeps a tree at all - both extend
+ * {@link AbstractProjectAction} directly.
  * <p>
  * Like its parent, this holds constructor arguments and nothing else.
  */
