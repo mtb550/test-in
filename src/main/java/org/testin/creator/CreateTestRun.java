@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.CheckedTreeNode;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -31,6 +30,7 @@ import org.testin.util.EditorUtil;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,7 +44,7 @@ public class CreateTestRun implements NodeCreator {
      * including its own tree refresh and editor opening. Always returns null.
      */
     @Override
-    public @Nullable DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
+    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
         // The tree this was started from only exists when a project is bound, so
         // nobody can click their way into the miss. It is checked because a run
         // written against no project would be a directory nothing owns.
@@ -52,7 +52,7 @@ public class CreateTestRun implements NodeCreator {
                 tp -> configureRun(tp.getTestCasesDirectory(), name, parentDir, newDirPath),
                 () -> Logger.warn("Create test run: no test project is bound to " + p.getName()));
 
-        return null;
+        return Optional.empty();
     }
 
     /**

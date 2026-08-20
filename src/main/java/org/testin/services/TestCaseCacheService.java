@@ -4,7 +4,6 @@ import com.intellij.openapi.Disposable;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.Collections;
@@ -87,7 +86,7 @@ public final class TestCaseCacheService implements Disposable {
      * completion for cases that still exist. Rebuilding from what remains is the
      * only answer that is right in both directions.
      */
-    public void reload(final @NotNull Supplier<@Nullable List<TestCaseDto>> source) {
+    public void reload(final @NotNull Supplier<@NotNull List<TestCaseDto>> source) {
         // Bursts collapse into one rebuild: deleting fifty cases asks fifty times
         // and the answer is the same each time. The flag is cleared before the
         // source is read, so a removal landing after that still gets a pass of
@@ -99,7 +98,6 @@ public final class TestCaseCacheService implements Disposable {
             reloadScheduled.set(false);
 
             final List<TestCaseDto> testCases = source.get();
-            if (testCases == null) return;
 
             // Built beside the live sets and swapped in, not cleared and refilled.
             // A dialog reading them while a deletion rebuilds would otherwise see

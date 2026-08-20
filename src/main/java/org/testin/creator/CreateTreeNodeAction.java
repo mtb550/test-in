@@ -20,6 +20,7 @@ import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;
 
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public class CreateTreeNodeAction extends AbstractProjectTreeAction {
@@ -55,20 +56,20 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
                 return;
             }
 
-            DirectoryDto dir = dt.getAction().apply(p).execute(s, pDir, newDirPath);
+            final Optional<DirectoryDto> created = dt.getAction().apply(p).execute(s, pDir, newDirPath);
             Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
-            // Asynchronous creators (test runs) return null and run their own
-            // follow-up once their dialog completes - including their own
-            // confirmation, which is why this one sits after the null check.
-            if (dir == null) return;
+            // Asynchronous creators (test runs) answer with nothing and run their
+            // own follow-up once their dialog completes - including their own
+            // confirmation, which is why this one is inside the ifPresent.
+            created.ifPresent(dir -> {
+                Services.getInstance(p, Notifier.class).softShow(p, "Created");
 
-            Services.getInstance(p, Notifier.class).softShow(p, "Created");
+                if (dt == DirectoryType.TS)
+                    Services.getInstance(p, EditorUtil.class).open(p, dir);
 
-            if (dt == DirectoryType.TS)
-                Services.getInstance(p, EditorUtil.class).open(p, dir);
-
-            dt.getCodegen().execute(p, dir);
+                dt.getCodegen().execute(p, dir);
+            });
 
         };
 

@@ -101,11 +101,12 @@ public class ImportAction extends AbstractProjectTreeAction {
 
                     final String cName = NameSanitizer.removeSpecialChars(entry.getKey());
                     final Path newDirPath = targetPath.resolve(cName);
-                    final DirectoryDto dir = new CreateTestSet(p).execute(cName, selectedDirDto, newDirPath);
+                    // A test set creator always answers with the set it made.
+                    final TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) new CreateTestSet(p)
+                            .execute(cName, selectedDirDto, newDirPath)
+                            .orElseThrow();
 
                     linkAndSaveTestCases(p, newDirPath, sheetCases, rankOfTail(p, newDirPath));
-
-                    final TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
 
                     for (final TestCaseDto tc : sheetCases) tc.setParent(sheetDto);
 

@@ -2,11 +2,11 @@ package org.testin.creator;
 
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * The creator of the node types the tree cannot create under a selection.
@@ -23,10 +23,10 @@ public final class NotCreatableFromTree implements NodeCreator {
     private final @NotNull String nodeType;
 
     @Override
-    public @Nullable DirectoryDto execute(final @NotNull String name, final DirectoryDto parentDir,
-                                          final @NotNull Path newDirPath) {
+    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final DirectoryDto parentDir,
+                                                   final @NotNull Path newDirPath) {
         Logger.info(nodeType + " is not created from the tree");
-        return null;
+        return Optional.empty();
     }
 }
 
