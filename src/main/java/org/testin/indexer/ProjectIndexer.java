@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.util.concurrency.AppExecutorUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.DirectoryMapper;
 import org.testin.model.DirectoryType;
@@ -553,9 +552,7 @@ public final class ProjectIndexer {
             if (pending.decrementAndGet() != 0) return;
             ApplicationManager.getApplication().executeOnPooledThread(() -> {
                 refreshIndexedProject(targetPath);
-                if (onComplete != null) {
-                    ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
-                }
+                ApplicationManager.getApplication().invokeLater(() -> onComplete.accept(copied.get()));
             });
         };
         final Runnable operationSucceeded = () -> {

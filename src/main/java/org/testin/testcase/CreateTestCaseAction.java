@@ -22,8 +22,6 @@ import org.testin.testcase.create.CreateTestCaseDialog;
 import org.testin.util.Shortcuts;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 
 public class CreateTestCaseAction extends AbstractProjectAction {
     private final @NotNull TestinEditor editor;

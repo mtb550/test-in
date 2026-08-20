@@ -12,7 +12,6 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditorContextMenu;
-import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;

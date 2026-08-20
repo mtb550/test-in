@@ -6,10 +6,8 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.testin.model.dto.TestCaseDto;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
-import org.testin.testcase.TestCaseOrder;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
@@ -18,12 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
 import java.util.function.Consumer;
 
 /**

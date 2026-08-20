@@ -131,9 +131,7 @@ public class ExportAction extends AbstractProjectTreeAction {
         // The same order the editor shows, from the same rule - a sheet whose
         // rows are in a different order from the screen they were exported from
         // is a sheet nobody trusts.
-        final List<TestCaseDto> orderedList = new ArrayList<>(TestCaseOrder.ordered(loaded));
-
-        return orderedList;
+        return new ArrayList<>(TestCaseOrder.ordered(loaded));
     }
 
     @Override

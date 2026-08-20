@@ -35,7 +35,6 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseAction;
-import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.FontSync;
 import org.testin.view.GridViewDetailsAction;

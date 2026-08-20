@@ -14,7 +14,6 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 public interface TestinEditor extends Disposable {
     @NotNull DirectoryDto getParent();
