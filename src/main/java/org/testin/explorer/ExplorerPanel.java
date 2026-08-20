@@ -137,8 +137,8 @@ public final class ExplorerPanel implements Disposable {
 
     /**
      * Draws the panel from an answer it was given. On the EDT, and reading
-     * nothing: every question it could ask was answered by {@link #state()}
-     * before it was called.
+     * nothing: every question it could ask was answered by
+     * {@link #state(Map)} before it was called.
      */
     private void draw(final @NotNull PanelState state) {
         final @Nullable TestProjectDirectoryDto tp = bound();

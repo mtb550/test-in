@@ -147,10 +147,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
-     * Only nodes that declare themselves transferable can be cut, copied or dragged.
-     */
-    /**
-     * Whether copying or cutting would put anything on the clipboard.
+     * Whether copying or cutting would put anything on the clipboard - which is
+     * true of the nodes that declare themselves transferable, and no others.
      * <p>
      * The menu entries ask this rather than deciding for themselves, so what a
      * greyed Copy means and what Copy would do are the same rule read twice.

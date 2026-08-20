@@ -631,12 +631,9 @@ public final class ProjectIndexer {
     }
 
     /**
-     * The node at a path, whatever kind it is, or null when nothing is indexed
+     * The node at a path, whatever kind it is, empty when nothing is indexed
      * there. Saves a caller that only has a path from having to know which kind
      * of node to ask for.
-     */
-    /**
-     * The node at a path, empty when nothing is indexed there.
      * <p>
      * The one path lookup that answers rather than promises: its callers ask
      * about a path they remembered - editors to reopen from a previous session,

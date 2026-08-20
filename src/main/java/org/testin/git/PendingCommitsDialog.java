@@ -123,17 +123,6 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     }
 
     /**
-     * One row per changed field, not per changed file: a case with three edited
-     * fields is three rows, so each can be reverted on its own. A run and a
-     * marker contribute rows the same way - what changed inside them, one line
-     * each - though neither offers a revert.
-     * <p>
-     * The name column is whatever the row is about: a test case's description, a
-     * run's name, the node a marker belongs to. The test set beside it is filled
-     * for a test case and blank for the rest, because a run belongs to no test
-     * set and saying otherwise would be a guess.
-     */
-    /**
      * The branches to offer, with the current one always among them: it is the
      * selected value, and a list that did not contain its own selection would
      * read as a branch about to be created. A repository with no commit yet has
@@ -149,6 +138,17 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         return withCurrent;
     }
 
+    /**
+     * One row per changed field, not per changed file: a case with three edited
+     * fields is three rows, so each can be reverted on its own. A run and a
+     * marker contribute rows the same way - what changed inside them, one line
+     * each - though neither offers a revert.
+     * <p>
+     * The name column is whatever the row is about: a test case's description, a
+     * run's name, the node a marker belongs to. The test set beside it is filled
+     * for a test case and blank for the rest, because a run belongs to no test
+     * set and saying otherwise would be a guess.
+     */
     private void fillRows(final @NotNull List<PendingChange> differences) {
         for (final PendingChange diff : differences) {
             for (final FieldChange change : diff.fieldChanges()) {
