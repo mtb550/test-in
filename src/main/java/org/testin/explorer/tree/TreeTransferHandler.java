@@ -10,6 +10,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Moved;
+import org.testin.codegen.SubtreeCode;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
@@ -315,6 +316,7 @@ public class TreeTransferHandler extends TransferHandler {
         } else {
             final List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
             Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
+                generateForCopies(sources, target);
                 refresh.run();
                 confirmLanded("Pasted", copied);
             });
@@ -417,6 +419,24 @@ public class TreeTransferHandler extends TransferHandler {
                 refresh.run();
                 onDone.accept(moved.get());
             });
+        }
+    }
+
+    /**
+     * Generates the Java for what was just copied.
+     * <p>
+     * A copy has none of its own: the files were duplicated, and nothing in them
+     * is Java. Unlike a move there is nothing to carry over, so each copied node
+     * and everything under it is generated from scratch - which is also why this
+     * runs after the copy rather than before it, the opposite of a move (#51).
+     */
+    private void generateForCopies(final @NotNull List<DirectoryDto> sources, final @NotNull DirectoryDto target) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+
+        for (final DirectoryDto source : sources) {
+            indexer.find(target.getPath().resolve(source.getName())).ifPresent(copy -> SubtreeCode.generate(p, copy));
         }
     }
 

@@ -584,6 +584,13 @@ public final class ProjectIndexer {
         };
 
         for (final Path sourcePath : sourcePaths) {
+            final Path copiedRoot = targetPath.resolve(sourcePath.getFileName());
+
+            final Runnable copySucceeded = () -> {
+                reidentifyCopiedCases(copiedRoot);
+                operationSucceeded.run();
+            };
+
             Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, sourcePath, targetPath, "Copy Failed", (sourceVf, targetVf) -> {
                 try {
                     sourceVf.copy(this, targetVf, sourceVf.getName());
@@ -591,7 +598,72 @@ public final class ProjectIndexer {
                     Logger.error(ex.getMessage());
                     throw new RuntimeException(ex);
                 }
-            }, operationSucceeded, operationFinished);
+            }, copySucceeded, operationFinished);
+        }
+    }
+
+    /**
+     * Gives every test case in a freshly copied subtree an id of its own.
+     * <p>
+     * A copy is a copy of the files, so the cases in it arrive carrying the ids
+     * of the cases they came from - and a case's id is its identity here: the
+     * index holds one case per id, so the copy and the original would resolve to
+     * the same case, and editing either would edit both. Pasting a single case
+     * has always taken a fresh id; copying a whole set never went through that
+     * code (#51).
+     * <p>
+     * Before the index reads them, and by the file name, because the file name
+     * is what the scanner takes the identity from - the id inside is rewritten
+     * to match so the two never disagree.
+     * <p>
+     * Test runs are left alone. Their file is named for their folder rather than
+     * for an id, so they are not touched by this, and a copied run still refers
+     * to the cases it actually executed.
+     */
+    private void reidentifyCopiedCases(final @NotNull Path copiedRoot) {
+        final List<Path> caseFiles;
+
+        try (Stream<Path> files = Files.walk(copiedRoot)) {
+            // Collected before rewriting: the walk is lazy, and creating and
+            // deleting files under it while it runs is not its contract.
+            caseFiles = files.filter(Files::isRegularFile).filter(ProjectIndexer::isCaseFile).toList();
+
+        } catch (final IOException ex) {
+            Logger.error("Could not read the copied nodes at " + copiedRoot + ": " + ex.getMessage());
+            return;
+        }
+
+        caseFiles.forEach(this::reidentify);
+        Logger.info("Gave " + caseFiles.size() + " copied test case(s) new ids under " + copiedRoot.getFileName());
+    }
+
+    /**
+     * A test case is the file whose name is an id. A marker is named for its
+     * kind and a run for its folder, so neither answers true.
+     */
+    private static boolean isCaseFile(final @NotNull Path file) {
+        final String name = file.getFileName().toString();
+        if (!name.endsWith(".json")) return false;
+
+        try {
+            UUID.fromString(name.substring(0, name.length() - ".json".length()));
+            return true;
+        } catch (final IllegalArgumentException notACase) {
+            return false;
+        }
+    }
+
+    private void reidentify(final @NotNull Path caseFile) {
+        try {
+            final TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(caseFile.toFile(), TestCaseDto.class);
+            final UUID fresh = UUID.randomUUID();
+
+            tc.setId(fresh);
+            Services.getInstance(p, FilesUtil.class).write(p, caseFile.resolveSibling(fresh + ".json"), tc);
+            Files.delete(caseFile);
+
+        } catch (final Exception ex) {
+            Logger.error("Could not give the copied case " + caseFile.getFileName() + " a new id: " + ex.getMessage());
         }
     }
 
