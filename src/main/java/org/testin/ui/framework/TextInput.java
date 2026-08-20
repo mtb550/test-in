@@ -35,10 +35,6 @@ public final class TextInput implements DialogComponent {
     private final @Nullable String placeHolderText;
     private boolean emptyWarningShown;
 
-    TextInput(final @Nullable Icon icon, final @Nullable String placeHolderText, final @Nullable String initialValue) {
-        this(icon, placeHolderText, initialValue, ANYTHING);
-    }
-
     /**
      * @param accepts what the field is allowed to hold, as a regular expression
      *                the whole text must match. Checked as the text arrives, so
