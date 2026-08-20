@@ -5,6 +5,7 @@ import com.intellij.openapi.fileEditor.FileEditorState;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolderBase;
 import com.intellij.openapi.vfs.VirtualFile;
+import lombok.Getter;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,6 +22,13 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
 
     private final @NotNull Project p;
     private final @NotNull UnifiedVirtualFile vf;
+
+    /**
+     * The Testin editor inside this tab. Exposed so a re-index can tell it to
+     * read the node again - the tab is what the platform hands back, and the
+     * editor is what holds the data.
+     */
+    @Getter
     private final @NotNull TestinEditor editor;
 
     @Override

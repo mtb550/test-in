@@ -77,10 +77,10 @@ public class RefreshAction extends AbstractProjectAction {
                     return;
                 }
 
-                // Before the tree is rebuilt: an editor on a node the new
-                // index does not have is showing data that is gone, and saving
-                // it would write it back.
-                Services.getInstance(p, EditorUtil.class).closeOrphaned(p);
+                // Before the tree is rebuilt: an editor is holding the node
+                // it was opened on and the cases it read from it, and after a
+                // re-index either can be data that is gone.
+                Services.getInstance(p, EditorUtil.class).refreshOpen(p);
 
                 pp.refresh();
 

@@ -359,8 +359,16 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
 
-        // Before anything is cleared: the timer holds the item it is counting,
-        // and everything it is counted into is about to be thrown away.
+        reload();
+    }
+
+    /**
+     * Re-read and redrawn. The execution stops first: the timer holds the item
+     * it is counting and everything it is counted into is about to be thrown
+     * away.
+     */
+    @Override
+    public void reload() {
         haltExecution();
 
         toolBar.clearFiltersAndSearch();

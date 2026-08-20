@@ -408,6 +408,11 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void onToolBarRefreshButtonClicked() {
         Logger.debug("[refresh] clicked, currentView=" + toolBar.getCurrentView());
+        reload();
+    }
+
+    @Override
+    public void reload() {
         toolBar.clearFiltersAndSearch();
 
         rememberSelection();

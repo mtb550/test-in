@@ -50,6 +50,20 @@ public interface TestinEditor extends Disposable {
 
     void refreshView();
 
+    /**
+     * Throws away what this editor holds and reads the index again.
+     * <p>
+     * {@link #refreshView()} redraws from the lists the editor is holding, which
+     * is what a page change or a filter needs. This is for when those lists are
+     * the wrong data altogether - a branch was checked out, a sync brought a
+     * colleague's edits - and the editor has to go back to the indexer for what
+     * the node holds now.
+     * <p>
+     * The refresh button in the editor's own toolbar is the same thing, so it
+     * calls this rather than keeping a second copy of it.
+     */
+    void reload();
+
     @NotNull List<TestCaseDto> getSelectedTestCases();
 
     void appendNewTestCase(final @NotNull TestCaseDto tc);
