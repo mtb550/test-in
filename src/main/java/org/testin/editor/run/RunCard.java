@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.BaseCard;
+import org.testin.editor.CardHoverAction;
 import org.testin.editor.Shared;
 import org.testin.model.RunEditorAttributes;
 import org.testin.model.TestRunItems;
@@ -29,6 +30,8 @@ public class RunCard extends BaseCard {
         Arrays.stream(RunEditorAttributes.values())
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(runItem, badges, details, p));
+
+        this.runSlot = CardHoverAction.runSlot(runItem.requireTc().getTempStatus());
 
         updateUI(index, title, badges, details);
 

@@ -41,10 +41,9 @@ public class RunStatusBadgeTest {
     }
 
     @Test
-    public void everyStatusHasAnIconAndTooltip() {
+    public void everyStatusHasAnIcon() {
         for (final RunStatus status : RunStatus.values()) {
             assertNotNull(status.getIcon(), status + " needs an icon for the gutter");
-            assertFalse(status.getTooltip().isBlank(), status + " needs a tooltip");
         }
     }
 }

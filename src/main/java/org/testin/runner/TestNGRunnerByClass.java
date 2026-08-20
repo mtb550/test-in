@@ -1,9 +1,7 @@
 package org.testin.runner;
 
-import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.module.Module;
@@ -21,6 +19,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.services.Services;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
@@ -36,6 +35,9 @@ public class TestNGRunnerByClass {
         }
 
         Logger.info("Running test class: " + fqcn);
+
+        // Read here, where the tester's gesture is - see TestNGRunnerByMethod.
+        final int generation = Services.getInstance(p, TestNGExecution.class).generation();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
@@ -81,7 +83,7 @@ public class TestNGRunnerByClass {
 
                         Logger.info("Setting TEST_OBJECT=" + TestType.CLASS.getType() + ", MAIN_CLASS=" + finalFqcn + ", simpleClass=" + simpleClassName);
 
-                        ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
+                        Services.getInstance(p, TestNGExecution.class).launch(generation, settings);
                     });
                 });
             } catch (final IndexNotReadyException ex) {

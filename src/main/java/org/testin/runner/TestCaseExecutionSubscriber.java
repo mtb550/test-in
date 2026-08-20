@@ -11,7 +11,6 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -61,7 +60,7 @@ public final class TestCaseExecutionSubscriber {
                         // below writes fields a renderer reads - so it happens on
                         // the EDT, and the redraw needs no hop of its own.
                         ApplicationManager.getApplication().invokeLater(
-                                () -> record(testName, status, Objects.toString(error, ""))));
+                                () -> record(testName, status, error)));
     }
 
     private void record(final @NotNull String testName, final @NotNull RunStatus status, final @NotNull String error) {

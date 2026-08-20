@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.clipboard.CutState;
 import org.testin.editor.BaseCard;
+import org.testin.editor.CardHoverAction;
 import org.testin.editor.Shared;
 import org.testin.model.RunStatus;
 import org.testin.model.TestEditorAttributes;
@@ -36,7 +37,7 @@ public class TestCard extends BaseCard {
                 .forEach(attr -> attr.applyToUI(tc, badges, details, p));
 
         final RunStatus runStatus = tc.getTempStatus();
-        this.isRunning = runStatus == RunStatus.RUNNING;
+        this.runSlot = CardHoverAction.runSlot(runStatus);
 
         runStatus.getBadge().ifPresent(badge -> badges.add(Shared.createRunStatusBadge(badge)));
 

@@ -1,9 +1,7 @@
 package org.testin.runner;
 
-import com.intellij.execution.ProgramRunnerUtil;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
-import com.intellij.execution.executors.DefaultRunExecutor;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.module.Module;
@@ -20,6 +18,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
+import org.testin.services.Services;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.ArrayList;
@@ -30,6 +29,11 @@ public final class TestNGRunnerByMethod {
 
     public void runTestMethod(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         ArrayList<String> fqcn = Fqcn.ofMethod(tc);
+
+        // Read here, where the tester's gesture is: everything below hops to a
+        // pooled thread and back, and a launch prepared before a stop must not
+        // start after it (#34).
+        final int generation = Services.getInstance(p, TestNGExecution.class).generation();
 
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
@@ -87,7 +91,8 @@ public final class TestNGRunnerByMethod {
 
                         runManager.setTemporaryConfiguration(settings);
                         runManager.setSelectedConfiguration(settings);
-                        ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
+
+                        Services.getInstance(p, TestNGExecution.class).launch(generation, settings);
                     });
                 }));
     }

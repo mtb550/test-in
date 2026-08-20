@@ -3,11 +3,13 @@ package org.testin.runner;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsAdapter;
 import com.intellij.execution.testframework.sm.runner.SMTRunnerEventsListener;
 import com.intellij.execution.testframework.sm.runner.SMTestProxy;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunStatus;
+import org.testin.services.Services;
+
+import java.util.Objects;
 
 public class TestCaseExecutionTracker {
 
@@ -26,29 +28,30 @@ public class TestCaseExecutionTracker {
         p.getMessageBus().connect(p).subscribe(SMTRunnerEventsListener.TEST_STATUS, new SMTRunnerEventsAdapter() {
             @Override
             public void onTestStarted(final @NotNull SMTestProxy test) {
-                broadcastStatusChange(p, test.getPresentableName().toLowerCase(), RunStatus.RUNNING, null);
+                TestCaseExecutionListener.broadcast(p, test.getPresentableName().toLowerCase(), RunStatus.RUNNING, "");
             }
 
             @Override
             public void onTestFinished(final @NotNull SMTestProxy test) {
-                String testName = test.getPresentableName().toLowerCase();
+                final String testName = test.getPresentableName().toLowerCase();
 
-                if (test.isPassed())
-                    broadcastStatusChange(p, testName, RunStatus.PASSED, null);
+                if (test.isPassed()) {
+                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.PASSED, "");
 
-                else if (test.isDefect())
-                    broadcastStatusChange(p, testName, RunStatus.FAILED, test.getErrorMessage());
+                } else if (test.isDefect()) {
+                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED,
+                            Objects.toString(test.getErrorMessage(), ""));
 
-                else
-                    broadcastStatusChange(p, testName, RunStatus.FAILED, test.getErrorMessage() != null ? test.getErrorMessage() : "Skipped/Terminated");
-            }
-        });
-    }
+                } else if (Services.getInstance(p, TestNGExecution.class).isStopped()) {
+                    // The tester stopped this run. The case neither passed nor
+                    // failed - it did not finish - and badging it red would report
+                    // a defect nobody found (#34).
+                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.IDLE, "");
 
-    private static void broadcastStatusChange(final @NotNull Project p, final @NotNull String testName, final @NotNull RunStatus status, final String error) {
-        ApplicationManager.getApplication().invokeLater(() -> {
-            if (!p.isDisposed()) {
-                p.getMessageBus().syncPublisher(TestCaseExecutionListener.TOPIC).onStatusChanged(testName, status, error);
+                } else {
+                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED,
+                            Objects.toString(test.getErrorMessage(), "Skipped/Terminated"));
+                }
             }
         });
     }

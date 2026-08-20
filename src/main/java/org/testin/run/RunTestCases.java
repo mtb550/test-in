@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
-import org.testin.runner.TestCaseExecutionListener;
+import org.testin.runner.TestNGExecution;
 import org.testin.runner.TestNGRunnerByMethod;
 import org.testin.services.Services;
 import org.testin.util.OptionalPlugin;
@@ -35,9 +35,7 @@ public final class RunTestCases {
         for (final TestCaseDto tc : testCases) {
             if (tc.getTempStatus() == RunStatus.RUNNING) continue;
 
-            p.getMessageBus().syncPublisher(TestCaseExecutionListener.TOPIC)
-                    .onStatusChanged(tc.getId().toString().toLowerCase(), RunStatus.RUNNING, null);
-
+            Services.getInstance(p, TestNGExecution.class).starting(tc);
             Services.getInstance(p, TestNGRunnerByMethod.class).runTestMethod(p, tc);
             started++;
         }

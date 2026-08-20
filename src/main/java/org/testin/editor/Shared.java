@@ -159,19 +159,27 @@ public class Shared {
                 new Rectangle(x + icon.getIconWidth() + JBUI.scale(8), y, icon.getIconWidth(), icon.getIconHeight()));
     }
 
-    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final boolean isRunning) {
+    /**
+     * Draws the card's action icons: the navigate button, and whichever of the
+     * run and stop buttons this card's state offers.
+     */
+    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth,
+                                                  final @NotNull String hoveredAction, final @NotNull CardHoverAction runSlot) {
         final ActionIcons icons = descriptionActionIcons(titleWidth);
 
-        if (CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered()) {
-            drawHoverableIcon(c, g, AllIcons.Nodes.Class, icons.navigate().x, icons.navigate().y,
-                    CardHoverAction.NAVIGATE_TO_TEST_METHOD.name().equals(hoveredAction));
-        }
+        drawIfOffered(c, g, CardHoverAction.NAVIGATE_TO_TEST_METHOD, icons.navigate(), hoveredAction);
+        drawIfOffered(c, g, runSlot, icons.run(), hoveredAction);
+    }
 
-        if (CardHoverAction.RUN_TEST_CASE.isOffered()) {
-            drawHoverableIcon(c, g, isRunning ? AllIcons.Actions.Suspend : AllIcons.RunConfigurations.TestState.Run,
-                    icons.run().x, icons.run().y,
-                    CardHoverAction.RUN_TEST_CASE.name().equals(hoveredAction));
-        }
+    /**
+     * One button, drawn where it sits, and left out entirely in an IDE that
+     * cannot act on it.
+     */
+    private static void drawIfOffered(final @NotNull Component c, final @NotNull Graphics g, final @NotNull CardHoverAction action,
+                                      final @NotNull Rectangle at, final @NotNull String hoveredAction) {
+        if (!action.isOffered()) return;
+
+        drawHoverableIcon(c, g, action.getIcon(), at.x, at.y, action.name().equals(hoveredAction));
     }
 
     /**
@@ -231,14 +239,14 @@ public class Shared {
          * being generous here is safe while nothing else on the title line is
          * clickable.
          */
-        public @NotNull Optional<CardHoverAction> at(final int x, final int y) {
+        public @NotNull Optional<CardHoverAction> at(final int x, final int y, final @NotNull CardHoverAction runSlot) {
             // An action this IDE does not offer is not drawn, so nothing is over
             // it either - the band belongs to the icon, and there is no icon.
             if (CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered() && grown(navigate).contains(x, y))
                 return Optional.of(CardHoverAction.NAVIGATE_TO_TEST_METHOD);
 
-            if (CardHoverAction.RUN_TEST_CASE.isOffered() && grown(run).contains(x, y))
-                return Optional.of(CardHoverAction.RUN_TEST_CASE);
+            if (runSlot.isOffered() && grown(run).contains(x, y))
+                return Optional.of(runSlot);
 
             return Optional.empty();
         }

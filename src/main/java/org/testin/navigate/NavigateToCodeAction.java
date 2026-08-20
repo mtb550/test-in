@@ -23,7 +23,12 @@ public class NavigateToCodeAction extends AbstractProjectAction {
         this.registerCustomShortcutSet(Shortcuts.NavigateToCode.getCustomShortcut(), list);
     }
 
-    public void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
+    /**
+     * Static because it reads nothing of the action it sits on. The two hover
+     * icons used to build one of these just to reach it, which registered this
+     * action's shortcut set on the list again on every single click.
+     */
+    public static void execute(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         if (!OptionalPlugin.JAVA.isAvailableOrWarn(p)) return;
 
         ArrayList<String> generatedFqcn = Fqcn.ofMethod(tc);

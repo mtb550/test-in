@@ -10,8 +10,6 @@ import org.testin.editor.*;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.navigate.NavigateToCodeAction;
-import org.testin.run.RunTestCases;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -79,14 +77,8 @@ public class CardMouseListener extends MouseAdapter {
         getActionAtPoint(index, e.getX() - bounds.x, e.getY() - bounds.y).ifPresent(action -> {
             final TestCaseDto tc = list.getModel().getElementAt(index);
 
-            if (action == CardHoverAction.NAVIGATE_TO_TEST_METHOD) {
-                Logger.trace("org.testin.navigate action, tc: " + tc.getDescription());
-                new NavigateToCodeAction(p, list).execute(p, tc);
-
-            } else if (action == CardHoverAction.RUN_TEST_CASE) {
-                Logger.trace("run action, tc: " + tc.getDescription());
-                RunTestCases.run(p, List.of(tc));
-            }
+            Logger.trace(action.getTooltip() + ", tc: " + tc.getDescription());
+            action.execute(p, tc);
 
             e.consume();
         });
@@ -159,10 +151,13 @@ public class CardMouseListener extends MouseAdapter {
         // The title is asked of the editor, which owns what it reads, and where
         // the icons sit is asked of Shared, which paints them. Neither is worked
         // out here: both used to be, and both drifted.
-        final String title = editor.cardTitle(editor.globalIndex(index), list.getModel().getElementAt(index));
+        final TestCaseDto tc = list.getModel().getElementAt(index);
+        final String title = editor.cardTitle(editor.globalIndex(index), tc);
         final int titleWidth = list.getFontMetrics(titleFont).stringWidth(title);
 
-        return Shared.descriptionActionIcons(titleWidth).at(xInCell, yInCell);
+        // The card draws the run button or the stop button by the same rule, so
+        // the pointer is over whichever one this case is offering.
+        return Shared.descriptionActionIcons(titleWidth).at(xInCell, yInCell, CardHoverAction.runSlot(tc.getTempStatus()));
     }
 
 }
