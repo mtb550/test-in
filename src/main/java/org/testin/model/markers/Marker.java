@@ -21,6 +21,26 @@ import java.time.temporal.ChronoUnit;
 @SuppressWarnings("UnusedReturnValue")
 public interface Marker {
 
+    /**
+     * What a node's order is when nobody has given it one: the largest number
+     * there is, so it sorts after everything a tester did number without any
+     * reader having to notice that it means "none".
+     * <p>
+     * The alternative was zero, which is what an {@code int} defaults to - and
+     * zero sorts first in an ascending sort, which is the opposite of what it
+     * means. Every reader would then carry the correction. This way the value
+     * carries it, once.
+     */
+    int NOT_ORDERED = Integer.MAX_VALUE;
+
+    /**
+     * Where the node sits among its siblings, {@link #NOT_ORDERED} when nobody
+     * has said - see {@link org.testin.model.dto.dirs.DirectoryDto#getOrder}.
+     */
+    int getOrder();
+
+    Marker setOrder(int order);
+
     @NotNull String getCreatedBy();
 
     Marker setCreatedBy(@NotNull String createdBy);

@@ -20,6 +20,7 @@ import org.testin.model.PackageStatus;
 import org.testin.model.ProjectStatus;
 import org.testin.model.TestSetStatus;
 import org.testin.open.OpenAction;
+import org.testin.order.OrderNodeAction;
 import org.testin.open.OpenContextMenuAction;
 import org.testin.remove.RemoveAction;
 import org.testin.rename.RenameAction;
@@ -56,6 +57,7 @@ public class TreeContextMenu extends DefaultActionGroup {
                         new RedoNodeAction(p, tree),
                         new RemoveAction(p, tree, pp),
                         new RenameAction(p, pp, tree),
+                        new OrderNodeAction(p, pp, tree),
                         new CopyNodeAction(tree),
                         new CutNodeAction(tree),
                         new PasteNodeAction(p, tree))

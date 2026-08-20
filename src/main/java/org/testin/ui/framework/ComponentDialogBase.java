@@ -264,6 +264,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         private @Nullable Icon icon;
         private @Nullable String placeholder;
         private @Nullable String value;
+        private @NotNull String accepts = TextInput.ANYTHING;
 
         private TextInputBuilder() {
         }
@@ -286,8 +287,22 @@ public final class ComponentDialogBase<C extends DialogComponent> {
             return this;
         }
 
+        /**
+         * What the field may hold, as a regular expression the whole value must
+         * match - {@code [0-9]*} for a number, {@code [A-Z]{2,4}} for a code.
+         * <p>
+         * Enforced as the text arrives rather than checked on submit, so the
+         * field cannot be made to hold anything else in the first place.
+         * Emptying it is always allowed; whether empty is acceptable is the
+         * dialog's decision.
+         */
+        public @NotNull TextInputBuilder accepting(final @NotNull String regex) {
+            this.accepts = regex;
+            return this;
+        }
+
         public @NotNull ComponentDialogBase<TextInput> build() {
-            return new ComponentDialogBase<>(new TextInput(icon, placeholder, value));
+            return new ComponentDialogBase<>(new TextInput(icon, placeholder, value, accepts));
         }
     }
 

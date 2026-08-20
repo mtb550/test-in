@@ -62,6 +62,28 @@ public abstract class DirectoryDto {
     public abstract Marker getMarker();
 
     /**
+     * The number the tester gave this node, or {@link Marker#NOT_ORDERED} when
+     * they have not - which sorts after every number anyone did give.
+     */
+    public int getOrder() {
+        return getMarker().getOrder();
+    }
+
+    /**
+     * Whether a tester can put this node in a deliberate order among its
+     * siblings.
+     * <p>
+     * False here, because most kinds of node already have an order that means
+     * something: a test run is read by when it happened, and the two containers
+     * of a project are exactly two and always the same way round. Arranging by
+     * hand is for the test-set side, where the order is the tester's plan for
+     * working through a suite - so those two say so.
+     */
+    public boolean isOrderable() {
+        return false;
+    }
+
+    /**
      * File name of this node's marker JSON inside the directory.
      */
     @NonNull

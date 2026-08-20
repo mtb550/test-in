@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.testin.model.markers.TestCasesMainDirectoryMarker;
 import org.testin.model.markers.TestProjectMarker;
+import org.testin.model.markers.Marker;
 import org.testin.model.markers.TestSetMarker;
 import org.testng.annotations.Test;
 
@@ -47,6 +48,34 @@ public class MarkerJsonTest {
         assertTrue(json.contains("\"modifiedBy\""), json);
         assertTrue(json.contains("\"status\":\"ACTIVE\""), json);
         assertFalse(json.contains("statusLabel"), json);
+    }
+
+    /**
+     * A node nobody ordered says nothing about order.
+     * <p>
+     * "No number" is the largest number there is, so that an unordered node
+     * sorts after every ordered one without anything having to test for it - but
+     * these files are committed and read by people, and a marker carrying
+     * 2147483647 would be a number no human wrote and none can explain. It is
+     * left out instead, and a file without the key reads back as unordered.
+     */
+    @Test
+    public void anUnorderedMarkerCarriesNoOrderAtAll() throws Exception {
+        assertFalse(mapper.writeValueAsString(new TestSetMarker()).contains("order"),
+                mapper.writeValueAsString(new TestSetMarker()));
+
+        assertEquals(mapper.readValue("{}", TestSetMarker.class).getOrder(), Marker.NOT_ORDERED);
+    }
+
+    /**
+     * A node the tester did order carries the number they typed, and only that.
+     */
+    @Test
+    public void anOrderedMarkerCarriesTheNumberTyped() throws Exception {
+        final String json = mapper.writeValueAsString(new TestSetMarker().setOrder(3));
+
+        assertTrue(json.contains("\"order\":3"), json);
+        assertEquals(mapper.readValue(json, TestSetMarker.class).getOrder(), 3);
     }
 
     /**
