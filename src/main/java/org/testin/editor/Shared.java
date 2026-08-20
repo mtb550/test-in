@@ -240,7 +240,7 @@ public class Shared {
             if (CardHoverAction.RUN_TEST_CASE.isOffered() && grown(run).contains(x, y))
                 return Optional.of(CardHoverAction.RUN_TEST_CASE);
 
-            return null;
+            return Optional.empty();
         }
 
         private @NotNull Rectangle grown(final @NotNull Rectangle icon) {
