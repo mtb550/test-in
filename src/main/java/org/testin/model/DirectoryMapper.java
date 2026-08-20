@@ -13,6 +13,7 @@ import org.testin.model.markers.*;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
+import java.util.List;
 import java.nio.file.Path;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -26,7 +27,7 @@ public final class DirectoryMapper {
                 .name(fileName)
                 .path(path)
                 .pathName(fileName)
-                .path2(DirectoryDto.pathOf(null, fileName))
+                .path2(DirectoryDto.pathOf(List.of(), fileName))
                 .build();
 
         tp.setTestCasesDirectory(getTestCasesRootNode(p, path, tp));
@@ -45,7 +46,7 @@ public final class DirectoryMapper {
                     .name(fileName)
                     .path(path)
                     .pathName(fileName)
-                    .path2(DirectoryDto.pathOf(null, fileName))
+                    .path2(DirectoryDto.pathOf(List.of(), fileName))
                     .marker(marker)
                     .build();
 

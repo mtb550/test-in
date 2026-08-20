@@ -55,9 +55,10 @@ public class TestDataParserDateTest {
 
     @Test
     public void aBlankCellIsNoTimeAtAll() {
+        // An absent column arrives here as "": both importers default it, and
+        // the setter that hands it over declares it @NotNull (#71).
         assertTrue(Config.isNotExecuted(TestDataParser.date("")), "the file did not say when");
         assertTrue(Config.isNotExecuted(TestDataParser.date("   ")), "nor here");
-        assertTrue(Config.isNotExecuted(TestDataParser.date(null)), "nor when the column is absent");
     }
 
     @Test

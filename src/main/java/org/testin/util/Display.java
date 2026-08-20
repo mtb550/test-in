@@ -4,7 +4,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.Config;
 
 import java.time.Duration;
@@ -28,8 +27,8 @@ public final class Display {
      * A value as the details panel shows it: capitalized, and ended with a full
      * stop unless it already ends in something that closes it (#22).
      */
-    public static @NotNull String format(final @Nullable String text) {
-        if (StringUtil.isEmptyOrSpaces(text)) return "";
+    public static @NotNull String format(final @NotNull String text) {
+        if (text.isBlank()) return "";
 
         final String s = text.trim();
         return StringUtil.capitalize(s) + (endsClosed(s) ? "" : ".");

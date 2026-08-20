@@ -25,8 +25,8 @@ public final class TestCaseCacheService implements Disposable {
     private final @NotNull Set<String> steps = ConcurrentHashMap.newKeySet();
     private final @NotNull AtomicBoolean reloadScheduled = new AtomicBoolean();
 
-    private static void addTo(final @NotNull Set<String> target, final @Nullable String value) {
-        if (value != null && !value.isBlank()) target.add(value.trim());
+    private static void addTo(final @NotNull Set<String> target, final @NotNull String value) {
+        if (!value.isBlank()) target.add(value.trim());
     }
 
     /**
@@ -54,27 +54,27 @@ public final class TestCaseCacheService implements Disposable {
         return Collections.unmodifiableSet(steps);
     }
 
-    public void addDescription(final @Nullable String t) {
-        if (t != null && !t.trim().isEmpty()) descriptions.add(t.trim());
+    public void addDescription(final @NotNull String t) {
+        addTo(descriptions, t);
     }
 
-    public void addExpectedResult(final @Nullable String e) {
-        if (e != null && !e.trim().isEmpty()) expectedResults.add(e.trim());
+    public void addExpectedResult(final @NotNull String e) {
+        addTo(expectedResults, e);
     }
 
-    public void addModule(final @Nullable String e) {
-        if (e != null && !e.trim().isEmpty()) modules.add(e.trim());
+    public void addModule(final @NotNull String e) {
+        addTo(modules, e);
     }
 
-    public void addStep(final @Nullable String s) {
-        if (s != null && !s.trim().isEmpty()) steps.add(s.trim());
+    public void addStep(final @NotNull String s) {
+        addTo(steps, s);
     }
 
-    public void load(final @Nullable List<TestCaseDto> testCases) {
+    public void load(final @NotNull List<TestCaseDto> testCases) {
         cacheAsync(testCases);
     }
 
-    public void addNewItems(final @Nullable List<TestCaseDto> tcs) {
+    public void addNewItems(final @NotNull List<TestCaseDto> tcs) {
         cacheAsync(tcs);
     }
 
@@ -124,8 +124,8 @@ public final class TestCaseCacheService implements Disposable {
         });
     }
 
-    private void cacheAsync(final @Nullable List<TestCaseDto> testCases) {
-        if (testCases == null || testCases.isEmpty()) return;
+    private void cacheAsync(final @NotNull List<TestCaseDto> testCases) {
+        if (testCases.isEmpty()) return;
         ApplicationManager.getApplication().executeOnPooledThread(() -> testCases.forEach(this::cache));
     }
 
@@ -133,8 +133,7 @@ public final class TestCaseCacheService implements Disposable {
         addDescription(tc.getDescription());
         addExpectedResult(tc.getExpectedResult());
         addModule(tc.getModule());
-        // Jackson can leave steps null on hand-edited JSON despite the field default.
-        Optional.of(tc.getSteps()).ifPresent(stepList -> stepList.forEach(this::addStep));
+        tc.getSteps().forEach(this::addStep);
     }
 
     @Override

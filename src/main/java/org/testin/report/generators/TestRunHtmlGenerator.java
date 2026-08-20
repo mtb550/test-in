@@ -2,7 +2,6 @@ package org.testin.report.generators;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.TestRunItems;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
@@ -197,7 +196,7 @@ public final class TestRunHtmlGenerator {
     }
 
     private void overviewRow(final @NotNull StringBuilder html, final @NotNull String label,
-                             final @Nullable String value) {
+                             final @NotNull String value) {
         html.append("<tr>")
                 .append("<td class='label'>").append(label).append("</td>")
                 .append("<td class='value'>").append(escapedHtml(value)).append("</td>")
@@ -212,8 +211,7 @@ public final class TestRunHtmlGenerator {
                 .append("</div>");
     }
 
-    private @NotNull String escapedHtml(final @Nullable String text) {
-        if (text == null || text.isEmpty()) return "";
+    private @NotNull String escapedHtml(final @NotNull String text) {
         return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 }

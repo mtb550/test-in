@@ -3,7 +3,6 @@ package org.testin.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
 
@@ -48,14 +47,14 @@ public final class NameSanitizer {
         return result.append("Test").toString();
     }
 
-    public static @NotNull String description(final @Nullable String rawDescription) {
-        if (rawDescription == null || rawDescription.isBlank()) return "EMPTY_DESCRIPTION";
+    public static @NotNull String description(final @NotNull String rawDescription) {
+        if (rawDescription.isBlank()) return "EMPTY_DESCRIPTION";
         final String cleaned = INVALID_NAME.matcher(rawDescription).replaceAll("").trim();
         return cleaned.isEmpty() ? "EMPTY_DESCRIPTION" : cleaned;
     }
 
-    public static @NotNull String methodName(final @Nullable String description) {
-        if (description == null || description.isEmpty()) return "testMethod";
+    public static @NotNull String methodName(final @NotNull String description) {
+        if (description.isEmpty()) return "testMethod";
         final StringBuilder result = new StringBuilder();
         for (final String word : description.split("[^a-zA-Z0-9]+")) {
             if (word.isEmpty()) continue;

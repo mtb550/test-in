@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.testin.logger.Logger;
 import org.testin.model.BugPriority;
@@ -34,6 +33,12 @@ public final class TestRunWordGenerator {
             3, new int[]{3, 87, 10},
             4, new int[]{3, 77, 10, 10}
     );
+    /**
+     * No rule under the paragraph, said as a color of no color rather than as a
+     * null the border writer would have to check (#71).
+     */
+    final String NO_BORDER = "";
+
     final String DARK_NAVY = "1F3864";
     final String MEDIUM_BLUE = "2E5496";
     final String DARK_GRAY = "595959";
@@ -61,12 +66,12 @@ public final class TestRunWordGenerator {
 
                 final String projectName = Services.getInstance(p, BoundTestProject.class).name();
 
-                addText(doc, "TEST SUMMARY REPORT", 18, true, DARK_NAVY, null, 2);
+                addText(doc, "TEST SUMMARY REPORT", 18, true, DARK_NAVY, NO_BORDER, 2);
 
                 String subtitleText = projectName + "  |  " + tr.getPlatform() + ", " + tr.getComponent();
                 addText(doc, subtitleText, 10, false, MEDIUM_BLUE, DARK_NAVY, 5);
 
-                XWPFParagraph conf = addText(doc, "Confidential — QA Test Execution Summary", 8, false, DARK_GRAY, null, 20);
+                XWPFParagraph conf = addText(doc, "Confidential — QA Test Execution Summary", 8, false, DARK_GRAY, NO_BORDER, 20);
                 setItalic(conf);
 
                 addHeading(doc, "1. Report Overview", 0, 15);
@@ -166,7 +171,7 @@ public final class TestRunWordGenerator {
 
     private @NotNull XWPFParagraph addText(final @NotNull XWPFDocument doc, final @NotNull String text, final int size,
                                            final boolean bold, final @NotNull String color,
-                                           final @Nullable String bottomBorder, final int spacingAfterPt) {
+                                           final @NotNull String bottomBorder, final int spacingAfterPt) {
         final XWPFParagraph p = doc.createParagraph();
         p.setSpacingAfter(spacingAfterPt * 20);
         final XWPFRun run = p.createRun();
@@ -175,7 +180,7 @@ public final class TestRunWordGenerator {
         run.setFontFamily("Calibri");
         run.setBold(bold);
         run.setColor(color);
-        if (bottomBorder != null) {
+        if (!bottomBorder.isEmpty()) {
             final CTBorder bottom = p.getCTPPr().addNewPBdr().addNewBottom();
             bottom.setVal(STBorder.Enum.forString("single"));
             bottom.setSz(BigInteger.valueOf(16));
@@ -277,7 +282,7 @@ public final class TestRunWordGenerator {
                                 final @NotNull Map<UUID, TestCaseDto> detailsMap, final @NotNull String headerBg,
                                 final boolean withFailureDetail, final @NotNull Predicate<TestRunItems> filter) {
         addHeading(doc, sectionNumber + ". " + sectionTitle, 20, 12);
-        addText(doc, description, 11, false, BLACK, null, 12);
+        addText(doc, description, 11, false, BLACK, NO_BORDER, 12);
 
         int cols = withFailureDetail ? 4 : 2;
         XWPFTable table = doc.createTable(1, cols);

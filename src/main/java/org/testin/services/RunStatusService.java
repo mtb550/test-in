@@ -7,7 +7,6 @@ import com.intellij.ui.components.JBList;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
 import org.testin.editor.toolbar.Toolbar;
@@ -78,7 +77,7 @@ public final class RunStatusService {
         Logger.trace("[RunStatusService]: Status updated -> " + tc.getDescription() + " = " + status);
 
         persistRun(p, editor);
-        triggerFilterRefresh(ui, null);
+        triggerFilterRefresh(ui);
 
         confirmVerdict(p, status, 1);
     }
@@ -226,16 +225,28 @@ public final class RunStatusService {
             Logger.info("Run finished with " + closed + " case(s) not executed; marked untested: " + runPath);
     }
 
-    private void triggerFilterRefresh(final @NotNull TestinEditor editor, final @Nullable JBList<TestCaseDto> list) {
+    /**
+     * The same refresh, for a caller with no list of its own to repaint.
+     */
+    private void triggerFilterRefresh(final @NotNull TestinEditor editor) {
+        ApplicationManager.getApplication().invokeLater(() -> refreshEditor(editor));
+    }
+
+    private void triggerFilterRefresh(final @NotNull TestinEditor editor, final @NotNull JBList<TestCaseDto> list) {
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (list != null) {
-                list.repaint();
-            }
-            if (editor instanceof RunEditor runEditor) {
-                runEditor.refreshAfterStatusChange();
-            } else if (editor instanceof Toolbar) {
-                ((Toolbar) editor).onToolBarFilterSelectionChanged();
-            }
+            list.repaint();
+            refreshEditor(editor);
         });
+    }
+
+    /**
+     * What both refreshes do to the editor itself, on the EDT.
+     */
+    private void refreshEditor(final @NotNull TestinEditor editor) {
+        if (editor instanceof RunEditor runEditor) {
+            runEditor.refreshAfterStatusChange();
+        } else if (editor instanceof Toolbar toolbar) {
+            toolbar.onToolBarFilterSelectionChanged();
+        }
     }
 }

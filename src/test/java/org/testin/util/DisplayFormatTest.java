@@ -40,6 +40,6 @@ public class DisplayFormatTest {
     @Test
     public void blankIsEmpty() {
         assertEquals(Display.format("   "), "");
-        assertEquals(Display.format(null), "");
+        assertEquals(Display.format(""), "");
     }
 }

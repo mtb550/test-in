@@ -3,7 +3,6 @@ package org.testin.util;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.Config;
 import org.testin.model.Group;
 import org.testin.model.Priority;
@@ -32,8 +31,8 @@ public final class TestDataParser {
     private static final @NotNull DateTimeFormatter WITHOUT_WEEKDAY =
             DateTimeFormatter.ofPattern("dd-MM-yyyy 'At' HH:mm:ss '['VV']'", Locale.US);
 
-    public static @NotNull List<String> steps(final @Nullable String rawSteps) {
-        if (rawSteps == null || rawSteps.isBlank()) return new ArrayList<>();
+    public static @NotNull List<String> steps(final @NotNull String rawSteps) {
+        if (rawSteps.isBlank()) return new ArrayList<>();
         String text = rawSteps;
         if (!text.contains("\n") && MULTI_STEP_LINE.matcher(text).matches()) {
             text = STEP_SEPARATOR.matcher(text).replaceAll("\n");
@@ -44,8 +43,8 @@ public final class TestDataParser {
                 .collect(Collectors.toList());
     }
 
-    public static @NotNull Priority priority(final @Nullable String value) {
-        if (value == null || value.isBlank()) return Priority.LOW;
+    public static @NotNull Priority priority(final @NotNull String value) {
+        if (value.isBlank()) return Priority.LOW;
         try {
             return Priority.valueOf(value.trim().toUpperCase(Locale.ROOT));
         } catch (final IllegalArgumentException ignored) {
@@ -67,8 +66,8 @@ public final class TestDataParser {
      * than now: the file did not say when, and inventing a moment is what this
      * was doing wrong in the first place.
      */
-    public static @NotNull ZonedDateTime date(final @Nullable String value) {
-        if (value == null || value.isBlank()) return Config.NOT_EXECUTED;
+    public static @NotNull ZonedDateTime date(final @NotNull String value) {
+        if (value.isBlank()) return Config.NOT_EXECUTED;
 
         final String text = value.trim();
         try {
@@ -91,8 +90,8 @@ public final class TestDataParser {
         }
     }
 
-    public static @NotNull List<Group> groups(final @Nullable String rawGroups) {
-        if (rawGroups == null || rawGroups.isBlank()) return new ArrayList<>();
+    public static @NotNull List<Group> groups(final @NotNull String rawGroups) {
+        if (rawGroups.isBlank()) return new ArrayList<>();
         return Arrays.stream(rawGroups.split(","))
                 .map(String::trim)
                 .filter(group -> !group.isEmpty())
