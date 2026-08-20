@@ -1,4 +1,4 @@
-package org.testin.explorer.version;
+package org.testin.explorer.toolbar;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.progress.ProgressIndicator;
@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.git.GitRepositoryService;
+import org.testin.git.ViewPendingCommitsAction;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -120,6 +122,22 @@ public class BranchSelector {
         checkoutBranchAndRefreshTree(selectedBranch);
     }
 
+    /**
+     * Checks the branch out and re-reads everything that came with it.
+     * <p>
+     * Rebuilding the tree is not enough and never was. The tree is drawn from
+     * the indexer's cache, and a checkout replaces every file under the project
+     * - so a tree redrawn from the old cache shows the test cases of the branch
+     * that was left, misses the ones only the new branch has, and reads stale
+     * descriptions for the ones on both. Everything downstream of the cache -
+     * the editors, the details panel, the reports - was reading the old branch
+     * too (#88).
+     * <p>
+     * So the switch does what Refresh does, through the same action rather than
+     * a copy of it: the VFS is told the files changed, the index is thrown away
+     * and rebuilt with a progress bar, editors on nodes the new branch does not
+     * have are closed, and the tree is rebuilt from what was actually read.
+     */
     private void checkoutBranchAndRefreshTree(final @NotNull String targetBranch) {
         // Captured before the task starts: the field can be reassigned by a
         // project switch while the checkout is still running.
@@ -136,19 +154,40 @@ public class BranchSelector {
                 // one below rather than the command's output (#63).
                 final @Nullable String checkedOut = git.checkout(repositoryPath, targetBranch);
                 if (checkedOut == null) {
-                    ApplicationManager.getApplication().invokeLater(() -> {
-                        restoreSelectedBranch();
-                        Services.getInstance(p, Notifier.class).error(p, "Git Checkout Failed",
-                                "Could not checkout " + targetBranch + ". Do you have uncommitted changes?");
-                    });
+                    ApplicationManager.getApplication().invokeLater(() -> refuseSwitch(repositoryPath, targetBranch));
                     return;
                 }
 
                 currentBranch = checkedOut;
 
-                ApplicationManager.getApplication().invokeLater(() -> pp.getProjectTree().refresh());
+                // The files changed underneath the IDE, which knows nothing about
+                // a checkout the plugin ran as a command. Through the indexer,
+                // which owns file access, and before the re-index reads them.
+                Services.getInstance(p, ProjectIndexer.class).refreshDirectory(repositoryPath);
+
+                ApplicationManager.getApplication().invokeLater(() -> pp.reindex("Switched to " + checkedOut));
             }
         });
+    }
+
+    /**
+     * What a refused checkout says. Git refuses when the switch would overwrite
+     * uncommitted work, which here means edited test cases - so the message
+     * names that as the cause and carries the review that clears it, instead of
+     * asking the tester a question about their own repository.
+     */
+    private void refuseSwitch(final @NotNull Path repositoryPath, final @NotNull String targetBranch) {
+        restoreSelectedBranch();
+
+        final Notifier notifier = Services.getInstance(p, Notifier.class);
+        notifier.warnWithAction(p, "Branch Not Switched",
+                targetBranch + " was not checked out. There are uncommitted changes in this test project "
+                        + "that switching would overwrite - commit them first.",
+                "Review Changes",
+                // Built on the panel's own tree: the review belongs to the
+                // project the tree is showing, which is the one whose branch
+                // would not switch.
+                () -> new ViewPendingCommitsAction(p, pp.getProjectTree().getMainTree()).openFor(repositoryPath));
     }
 
     /**

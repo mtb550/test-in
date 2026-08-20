@@ -55,6 +55,31 @@ public final class EditorUtil {
 
     }
 
+    /**
+     * Closes every Testin editor whose node the indexer no longer holds.
+     * <p>
+     * An editor carries a snapshot of the node it was opened on, so a test set
+     * that a re-index did not find again keeps its tab open showing test cases
+     * that are not there any more - and saving it would write them back. That is
+     * an ordinary consequence of re-indexing: a branch switch replaces every
+     * file under the root, and a sync can take a test set away.
+     * <p>
+     * On the EDT, after indexing has finished. Asking the cache before it has
+     * been rebuilt would close every editor in the project.
+     */
+    public void closeOrphaned(final @NotNull Project p) {
+        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
+        final FileEditorManager fed = FileEditorManager.getInstance(p);
+
+        for (final VirtualFile open : fed.getOpenFiles()) {
+            if (!(open instanceof UnifiedVirtualFile testinFile)) continue;
+            if (indexer.nodeExists(Path.of(testinFile.getPath()))) continue;
+
+            Logger.info("Closing the editor for a node that is no longer indexed: " + testinFile.getName());
+            fed.closeFile(testinFile);
+        }
+    }
+
     public void closeThenOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final FileEditorManager fed = FileEditorManager.getInstance(p);
 

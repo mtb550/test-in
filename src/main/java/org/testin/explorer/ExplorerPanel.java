@@ -18,7 +18,7 @@ import org.testin.config.TestinConfigService;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.RefreshAction;
 import org.testin.explorer.tree.ExplorerTree;
-import org.testin.explorer.version.BranchSelector;
+import org.testin.explorer.toolbar.BranchSelector;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.ProjectStatus;
@@ -332,6 +332,14 @@ public final class ExplorerPanel implements Disposable {
      */
     public void reindex() {
         new RefreshAction(p, this).execute();
+    }
+
+    /**
+     * Re-indexes and rebuilds, reporting what caused it rather than the generic
+     * refresh - a branch switch says which branch.
+     */
+    public void reindex(final @NotNull String outcome) {
+        new RefreshAction(p, this).execute(outcome);
     }
 
     @Override

@@ -80,10 +80,22 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-
         final Path path = TreeValueUtil.projectPath(tree);
         if (path == null) return;
 
+        openFor(path);
+    }
+
+    /**
+     * The review for a repository the caller already knows, rather than for
+     * whatever the tree has selected.
+     * <p>
+     * A branch that would not switch has the path and a reason to offer the
+     * review, and nothing selected to read one from. The menu entry goes through
+     * here too, once it has resolved its selection to a repository - the review
+     * is about a repository either way.
+     */
+    public void openFor(final @NotNull Path path) {
         if (!git.isRepository(path)) {
             Services.getInstance(p, Notifier.class).warnWithAction(p,
                     "Git repository not found",
