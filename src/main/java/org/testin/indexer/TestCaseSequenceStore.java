@@ -3,6 +3,7 @@ package org.testin.indexer;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
+import org.testin.testcase.TestCaseSorter;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
@@ -129,10 +130,9 @@ final class TestCaseSequenceStore {
         final List<UUID> ids = new ArrayList<>(sortedList.size());
         final Set<UUID> newIds = new HashSet<>();
 
-        for (int i = 0; i < sortedList.size(); i++) {
-            final TestCaseDto testCase = sortedList.get(i);
-            testCase.setIsHead(i == 0);
-            testCase.setNext(i < sortedList.size() - 1 ? sortedList.get(i + 1).getId() : null);
+        TestCaseSorter.relink(sortedList);
+
+        for (final TestCaseDto testCase : sortedList) {
             ids.add(testCase.getId());
             newIds.add(testCase.getId());
             testCasesById.put(testCase.getId(), testCase);

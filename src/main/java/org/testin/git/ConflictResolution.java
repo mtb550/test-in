@@ -6,8 +6,10 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
+import org.testin.testcase.TestCaseSorter;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 
@@ -16,8 +18,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import java.util.function.Consumer;
 
 /**
@@ -77,6 +83,10 @@ public final class ConflictResolution {
         final List<String> leftOver = new ArrayList<>();
         final List<Pending> pending = new ArrayList<>();
 
+        // Which test sets a conflict landed in. The chain is a property of the
+        // set, so the repair happens once per set and not once per file.
+        final Set<String> resolvedSets = new LinkedHashSet<>();
+
         for (final String relativePath : conflicting) {
             if (!isTestCase(relativePath)) {
                 leftOver.add(relativePath);
@@ -97,6 +107,8 @@ public final class ConflictResolution {
 
             final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper, base, mine, theirs);
 
+            resolvedSets.add(testSetOf(relativePath));
+
             if (!merge.isSettled()) {
                 pending.add(new Pending(relativePath, name(mapper, mine, relativePath), merge.merged(),
                         merge.questions(), theirs));
@@ -107,7 +119,7 @@ public final class ConflictResolution {
         }
 
         ApplicationManager.getApplication().invokeLater(() ->
-                ask(p, git, mapper, repositoryPath, pending, leftOver, onResolved, onLeftOver));
+                ask(p, git, mapper, repositoryPath, pending, leftOver, resolvedSets, onResolved, onLeftOver));
     }
 
     /**
@@ -118,10 +130,19 @@ public final class ConflictResolution {
     private static void ask(final @NotNull Project p, final @NotNull GitRepositoryService git,
                             final @NotNull Mapper mapper, final @NotNull Path repositoryPath,
                             final @NotNull List<Pending> pending, final @NotNull List<String> leftOver,
-                            final @NotNull Runnable onResolved, final @NotNull Consumer<List<String>> onLeftOver) {
+                            final @NotNull Set<String> resolvedSets, final @NotNull Runnable onResolved,
+                            final @NotNull Consumer<List<String>> onLeftOver) {
         if (pending.isEmpty()) {
-            if (leftOver.isEmpty()) onResolved.run();
-            else onLeftOver.accept(List.copyOf(leftOver));
+            // Every conflict in these sets is settled now, so the chain can be
+            // read as a whole - which is the only level it means anything at.
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                repairChains(git, mapper, repositoryPath, resolvedSets);
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (leftOver.isEmpty()) onResolved.run();
+                    else onLeftOver.accept(List.copyOf(leftOver));
+                });
+            });
             return;
         }
 
@@ -140,9 +161,99 @@ public final class ConflictResolution {
                 if (!written) stillLeft.add(next.relativePath());
 
                 ApplicationManager.getApplication().invokeLater(() ->
-                        ask(p, git, mapper, repositoryPath, new ArrayList<>(rest), stillLeft, onResolved, onLeftOver));
+                        ask(p, git, mapper, repositoryPath, new ArrayList<>(rest), stillLeft, resolvedSets,
+                                onResolved, onLeftOver));
             });
         }).show();
+    }
+
+    /**
+     * Puts the order of every test set a conflict landed in back together.
+     * <p>
+     * A merge decides one file at a time and the order is not in one file: it is
+     * a chain across the set, held in {@code isHead} and {@code next}. Two
+     * testers who each add a case to the same set both rewrite the tail's
+     * pointer, so whichever the merge keeps leaves the other case pointed at by
+     * nothing - present, committed, and nowhere in the order.
+     * <p>
+     * So the set is read as a whole once its conflicts are settled, sorted the
+     * way the editor sorts it - the chain first, then everything nothing points
+     * at - and relinked along that order. Both testers' cases end up in the
+     * list, the one that lost the pointer last.
+     * <p>
+     * Only the files that actually changed are written and staged, so the repair
+     * is part of the commit that caused it rather than a modification left
+     * behind after the rebase.
+     */
+    private static void repairChains(final @NotNull GitRepositoryService git, final @NotNull Mapper mapper,
+                                     final @NotNull Path repositoryPath, final @NotNull Set<String> testSets) {
+        for (final String testSet : testSets) {
+            if (testSet.isEmpty()) continue;
+
+            final Path directory = repositoryPath.resolve(testSet);
+            final Map<Path, TestCaseDto> cases = read(mapper, directory);
+            if (cases.size() < 2) continue;
+
+            final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(new ArrayList<>(cases.values())).sortedList();
+            TestCaseSorter.relink(sorted);
+
+            cases.forEach((file, testCase) -> rewriteIfChanged(git, mapper, repositoryPath, file, testCase));
+        }
+    }
+
+    /**
+     * Every test case in a test set directory, as it stands on disk after the
+     * merge. Read here rather than from the indexer's cache: the files were just
+     * rewritten underneath it, and the cache is rebuilt after the rebase.
+     */
+    private static @NotNull Map<Path, TestCaseDto> read(final @NotNull Mapper mapper, final @NotNull Path directory) {
+        final Map<Path, TestCaseDto> cases = new LinkedHashMap<>();
+
+        try (Stream<Path> files = Files.list(directory)) {
+            files.filter(file -> file.getFileName().toString().endsWith(".json")).sorted().forEach(file -> {
+                try {
+                    cases.put(file, mapper.readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
+                } catch (final Exception ex) {
+                    Logger.warn("Skipping " + file.getFileName() + " while repairing the order: " + ex.getMessage());
+                }
+            });
+
+        } catch (final IOException ex) {
+            Logger.error("Could not read " + directory + " to repair the order: " + ex.getMessage());
+        }
+
+        return cases;
+    }
+
+    /**
+     * Writes a case whose place in the chain moved, and stages it. A case the
+     * repair did not move is left exactly as it is - rewriting it would put an
+     * untouched file in the commit and the diff of a rebase would stop being
+     * readable.
+     */
+    private static void rewriteIfChanged(final @NotNull GitRepositoryService git, final @NotNull Mapper mapper,
+                                         final @NotNull Path repositoryPath, final @NotNull Path file,
+                                         final @NotNull TestCaseDto testCase) {
+        try {
+            final String relinked = mapper.writeValueAsString(testCase);
+            if (relinked.equals(Files.readString(file, StandardCharsets.UTF_8))) return;
+
+            Files.writeString(file, relinked, StandardCharsets.UTF_8);
+            git.stageResolved(repositoryPath, repositoryPath.relativize(file).toString().replace('\\', '/'));
+
+            Logger.info("Repaired the order of " + file.getFileName());
+
+        } catch (final IOException ex) {
+            Logger.error("Could not repair the order in " + file + ": " + ex.getMessage());
+        }
+    }
+
+    /**
+     * The test set a conflicted file sits in, as a repository-relative path.
+     */
+    private static @NotNull String testSetOf(final @NotNull String relativePath) {
+        final int lastSlash = relativePath.lastIndexOf('/');
+        return lastSlash < 0 ? "" : relativePath.substring(0, lastSlash);
     }
 
     /**

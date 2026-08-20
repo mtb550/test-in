@@ -2,6 +2,8 @@ package org.testin.git;
 
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.SortResult;
 import org.testin.util.Mapper;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -428,6 +430,109 @@ public class GitWorkflowTest {
         assertEquals(merged.getExpectedResult(), "the dashboard opens within two seconds");
         assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
         assertEquals(review(), List.of(), "a resolved rebase leaves nothing pending");
+    }
+
+    /**
+     * Two testers adding a test case to the same test set at the same time -
+     * the conflict this product gets more than any other, and the one a field
+     * merge alone does not finish (#90).
+     * <p>
+     * Neither new file conflicts: they are new files with different names. What
+     * conflicts is the case that was last in the set, because both testers
+     * pointed it at their own new case. A merge decides one file at a time and
+     * can only keep one of those pointers, which leaves the other tester's case
+     * committed and pointed at by nothing.
+     * <p>
+     * So after merging, the set is read as a whole and relinked. Both cases end
+     * up in the chain, and the one that lost the pointer is last.
+     */
+    @Test
+    public void twoTestersAddingCasesToOneSetBothKeepTheirsInTheChain() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+        mustGit(work, "push", "-u", "origin", "main");
+
+        final TestCaseDto tail = cases.get(1);
+        final String tailPath = "Test Cases/login flow/" + tail.getId() + ".json";
+
+        // The colleague appends a case: their new file, and the tail now points
+        // at it.
+        final Path colleague = cloneAsColleague();
+        mustGit(colleague, "config", "user.name", "Colleague");
+        mustGit(colleague, "config", "user.email", "colleague@example.invalid");
+
+        final TestCaseDto theirNewCase = testCase("a locked account cannot sign in");
+        write(colleague, "Test Cases/login flow/" + theirNewCase.getId() + ".json", theirNewCase);
+
+        final TestCaseDto theirTail = mapper().readValue(
+                Files.readString(colleague.resolve(tailPath), StandardCharsets.UTF_8), TestCaseDto.class);
+        write(colleague, tailPath, theirTail.setNext(theirNewCase.getId()));
+
+        mustGit(colleague, "add", "-A");
+        mustGit(colleague, "commit", "-m", "added the locked account case");
+        mustGit(colleague, "push", "origin", "main");
+
+        // This tester appends one too, pointing the same tail at their own.
+        final TestCaseDto myNewCase = testCase("a signed-in user signs out");
+        write(work, "Test Cases/login flow/" + myNewCase.getId() + ".json", myNewCase);
+
+        final TestCaseDto myTail = mapper().readValue(
+                Files.readString(work.resolve(tailPath), StandardCharsets.UTF_8), TestCaseDto.class);
+        write(work, tailPath, myTail.setNext(myNewCase.getId()));
+
+        commit(stagedFor(review()), "added the sign out case");
+
+        assertNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+                "the tail's next pointer is expected to conflict");
+
+        // The merge: the pointer is settled without asking, because no answer to
+        // "which pointer" means anything to a tester.
+        final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(),
+                mustGit(work, "show", ":1:" + tailPath),
+                mustGit(work, "show", ":3:" + tailPath),
+                mustGit(work, "show", ":2:" + tailPath));
+
+        assertTrue(merge.isSettled(), "an order pointer is not a question");
+
+        Files.writeString(work.resolve(tailPath), merge.merged().toPrettyString(), StandardCharsets.UTF_8);
+        mustGit(work, "add", "--", tailPath);
+
+        // The repair: read the set, sort it, relink it, write what moved.
+        final Path testSet = work.resolve("Test Cases/login flow");
+        final List<TestCaseDto> all = new ArrayList<>();
+        try (Stream<Path> files = Files.list(testSet)) {
+            for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
+                all.add(mapper().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
+            }
+        }
+
+        final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(all).sortedList();
+        TestCaseSorter.relink(sorted);
+
+        for (final TestCaseDto testCase : sorted) {
+            write(work, "Test Cases/login flow/" + testCase.getId() + ".json", testCase);
+        }
+        mustGit(work, "add", "--", "Test Cases/login flow");
+        mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
+
+        // Four cases, one chain, and both new ones are in it.
+        final List<TestCaseDto> after = new ArrayList<>();
+        try (Stream<Path> files = Files.list(testSet)) {
+            for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
+                after.add(mapper().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
+            }
+        }
+
+        final SortResult order = TestCaseSorter.sortTestCases(after);
+
+        assertEquals(after.size(), 4);
+        assertEquals(order.unsortedIds(), Set.of(), "every case is reachable from the head");
+        assertEquals(order.sortedList().size(), 4);
+        assertTrue(order.sortedList().stream().anyMatch(tc -> tc.getId().equals(theirNewCase.getId())),
+                "the colleague's case is in the chain");
+        assertTrue(order.sortedList().stream().anyMatch(tc -> tc.getId().equals(myNewCase.getId())),
+                "my case is in the chain");
+        assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
     }
 
     /**
