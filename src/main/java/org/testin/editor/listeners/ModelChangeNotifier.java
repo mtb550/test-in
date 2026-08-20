@@ -2,12 +2,11 @@ package org.testin.editor.listeners;
 
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.Setter;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import org.testin.editor.UpdateCallback;
 
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
-import java.util.Optional;
 
 /**
  * Tells the editor that its list model changed, so it can re-sort and redraw.
@@ -33,8 +32,13 @@ public class ModelChangeNotifier implements ListDataListener {
 
     private boolean active = true;
 
+    /**
+     * What a change tells: nothing, until an editor says otherwise. A notifier
+     * nobody listens to still runs, and runs a callback that does nothing (#71).
+     */
     @Setter
-    private @Nullable UpdateCallback onUpdateCallback;
+    private @NotNull UpdateCallback onUpdateCallback = () -> {
+    };
 
     public void pause() {
         this.active = false;
@@ -61,7 +65,6 @@ public class ModelChangeNotifier implements ListDataListener {
     private void notifyChanged() {
         if (!active) return;
 
-        Optional.ofNullable(onUpdateCallback)
-                .ifPresent(cb -> ApplicationManager.getApplication().invokeLater(cb::onUpdate));
+        ApplicationManager.getApplication().invokeLater(onUpdateCallback::onUpdate);
     }
 }

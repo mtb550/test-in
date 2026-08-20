@@ -112,7 +112,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
     @Getter
     @Setter
-    private @Nullable String hoveredIconAction = null;
+    private @NotNull String hoveredIconAction = "";
 
     @Getter
     @Setter

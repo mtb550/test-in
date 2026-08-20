@@ -17,6 +17,7 @@ import org.testin.model.dto.TestCaseDto;
 import org.testin.util.FontSync;
 
 import javax.swing.*;
+import java.util.Optional;
 import java.awt.*;
 import java.awt.event.MouseWheelEvent;
 import java.util.List;
@@ -158,7 +159,7 @@ public class Shared {
                 new Rectangle(x + icon.getIconWidth() + JBUI.scale(8), y, icon.getIconWidth(), icon.getIconHeight()));
     }
 
-    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @Nullable String hoveredAction, final boolean isRunning) {
+    public static void drawDescriptionActionIcons(final @NotNull Component c, final @NotNull Graphics g, final int titleWidth, final @NotNull String hoveredAction, final boolean isRunning) {
         final ActionIcons icons = descriptionActionIcons(titleWidth);
 
         if (CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered()) {
@@ -182,25 +183,29 @@ public class Shared {
         if (e.isControlDown() || e.isMetaDown())
             return;
 
-        final JBScrollPane scrollPane = findScrollPane(e.getComponent());
-
-        if (scrollPane != null && e.getComponent() != scrollPane) {
-            final MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
-            scrollPane.dispatchEvent(clonedEvent);
-            e.consume();
-        }
+        findScrollPane(e.getComponent())
+                .filter(scrollPane -> e.getComponent() != scrollPane)
+                .ifPresent(scrollPane -> {
+                    final MouseWheelEvent clonedEvent = (MouseWheelEvent) SwingUtilities.convertMouseEvent(e.getComponent(), e, scrollPane);
+                    scrollPane.dispatchEvent(clonedEvent);
+                    e.consume();
+                });
     }
 
-    private static @Nullable JBScrollPane findScrollPane(final @Nullable Component component) {
+    /**
+     * The scroll pane this component sits in, walking up until Swing runs out
+     * of parents - which is where the null comes from and where it stops.
+     */
+    private static @NotNull Optional<JBScrollPane> findScrollPane(final @Nullable Component component) {
         Component current = component;
         while (current != null) {
-            if (current instanceof JBScrollPane)
-                return (JBScrollPane) current;
+            if (current instanceof JBScrollPane scrollPane)
+                return Optional.of(scrollPane);
 
             current = current.getParent();
         }
 
-        return null;
+        return Optional.empty();
     }
 
     private static void drawHoverableIcon(final @NotNull Component c, final @NotNull Graphics g, final @NotNull Icon baseIcon, final int x, final int y, final boolean isHovered) {
@@ -221,18 +226,19 @@ public class Shared {
     public record ActionIcons(@NotNull Rectangle navigate, @NotNull Rectangle run) {
 
         /**
-         * Which action the pointer is over, or none. The bands are grown a little
-         * past the icons: a 16-pixel target is hard to hold, and being generous
-         * here is safe while nothing else on the title line is clickable.
+         * Which action the pointer is over, or nothing at all. The bands are
+         * grown a little past the icons: a 16-pixel target is hard to hold, and
+         * being generous here is safe while nothing else on the title line is
+         * clickable.
          */
-        public @Nullable CardHoverAction at(final int x, final int y) {
+        public @NotNull Optional<CardHoverAction> at(final int x, final int y) {
             // An action this IDE does not offer is not drawn, so nothing is over
             // it either - the band belongs to the icon, and there is no icon.
             if (CardHoverAction.NAVIGATE_TO_TEST_METHOD.isOffered() && grown(navigate).contains(x, y))
-                return CardHoverAction.NAVIGATE_TO_TEST_METHOD;
+                return Optional.of(CardHoverAction.NAVIGATE_TO_TEST_METHOD);
 
             if (CardHoverAction.RUN_TEST_CASE.isOffered() && grown(run).contains(x, y))
-                return CardHoverAction.RUN_TEST_CASE;
+                return Optional.of(CardHoverAction.RUN_TEST_CASE);
 
             return null;
         }

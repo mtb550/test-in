@@ -3,7 +3,6 @@ package org.testin.editor;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.Group;
 import org.testin.model.Priority;
 import org.testin.model.TestRunItems;
@@ -15,14 +14,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Shared, null-safe filtering for test and test-run editors.
+ * Shared filtering for the test and test-run editors.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TestCaseFilter {
 
     public static @NotNull List<TestCaseDto> filter(
             final @NotNull Collection<TestCaseDto> source,
-            final @Nullable String query,
+            final @NotNull String query,
             final @NotNull Set<Group> groups,
             final @NotNull Set<Priority> priorities,
             final @NotNull Set<String> modules) {
@@ -34,7 +33,7 @@ public final class TestCaseFilter {
 
     public static @NotNull List<TestCaseDto> filter(
             final @NotNull Collection<TestCaseDto> source,
-            final @Nullable String query,
+            final @NotNull String query,
             final @NotNull Set<Group> groups,
             final @NotNull Set<Priority> priorities,
             final @NotNull Set<String> modules,
@@ -44,7 +43,7 @@ public final class TestCaseFilter {
             return Collections.emptyList();
         }
 
-        final String normalizedQuery = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
+        final String normalizedQuery = query.trim().toLowerCase(Locale.ROOT);
         return source.stream()
                 .filter(testCase -> matches(testCase, normalizedQuery, groups, priorities, modules, statuses, runItemProvider))
                 .collect(Collectors.toList());
@@ -82,7 +81,7 @@ public final class TestCaseFilter {
         return runItem != null && statuses.contains(runItem.getStatus());
     }
 
-    private static boolean containsIgnoreCase(final @Nullable String value, final @NotNull String query) {
-        return value != null && value.toLowerCase(Locale.ROOT).contains(query);
+    private static boolean containsIgnoreCase(final @NotNull String value, final @NotNull String query) {
+        return value.toLowerCase(Locale.ROOT).contains(query);
     }
 }

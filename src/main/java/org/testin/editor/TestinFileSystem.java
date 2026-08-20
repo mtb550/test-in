@@ -16,6 +16,8 @@ public final class TestinFileSystem extends DeprecatedVirtualFileSystem implemen
         return PROTOCOL;
     }
 
+    // The platform's own signature: a file system answers null for a path it
+    // does not have, and the platform reads that before we do (#71).
     @Override
     public @Nullable VirtualFile findFileByPath(final @NotNull String path) {
         return null;

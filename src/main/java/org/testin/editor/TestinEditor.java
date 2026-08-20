@@ -91,9 +91,12 @@ public interface TestinEditor extends Disposable {
 
     void selectTestCase(final @Nullable TestCaseDto tc);
 
-    @Nullable String getHoveredIconAction();
+    /**
+     * Which action icon the pointer is over, by name, and empty for none.
+     */
+    @NotNull String getHoveredIconAction();
 
-    void setHoveredIconAction(final @Nullable String action);
+    void setHoveredIconAction(final @NotNull String action);
 
     int getHoveredIndex();
 
