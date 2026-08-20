@@ -61,9 +61,17 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
         return Optional.ofNullable(TreeValueUtil.selectedDirectory(tree)).filter(DirectoryDto::isOrderable);
     }
 
+    /**
+     * Always on the menu, and greyed out on a node that has no order to set.
+     * <p>
+     * Hiding it would answer a question the tester did not ask: an entry that
+     * appears on some nodes and not others reads as a menu that changes shape,
+     * and they have to find out by right-clicking around which nodes have it.
+     * Greyed out says the same thing in place - this exists, not for this one.
+     */
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(selected().isPresent());
+        e.getPresentation().setEnabled(selected().isPresent());
     }
 
     @Override
