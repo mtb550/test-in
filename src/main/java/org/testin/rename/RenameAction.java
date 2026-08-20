@@ -7,8 +7,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.codegen.clazz.RenameJavaClass;
-import org.testin.codegen.pkg.RenameJavaPackage;
+import org.testin.codegen.Renamed;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeUndoService;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -16,8 +15,6 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
-import org.testin.model.dto.dirs.TestSetDirectoryDto;
-import org.testin.model.dto.dirs.TestSetPackageDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.util.EditorUtil;
@@ -94,7 +91,11 @@ public class RenameAction extends AbstractProjectTreeAction {
                              final @NotNull Runnable onDone) {
         Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 
-        dispatchRenameCodegen(dir, newName);
+        // Before the data rename, while the old name is still what finds the
+        // generated code. Which generator that is belongs to the node, not here.
+        if (OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) {
+            dir.getType().getRenameCodegen().execute(p, new Renamed(dir, newName));
+        }
 
         final Path oldPath = dir.getPath();
         final Path newPath = oldPath.getParent().resolve(newName);
@@ -114,17 +115,6 @@ public class RenameAction extends AbstractProjectTreeAction {
         });
     }
 
-
-    // todo, to be moved to the codegen package and enhanced, later (#51)
-    private void dispatchRenameCodegen(final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
-
-        if (dir instanceof TestProjectDirectoryDto || dir instanceof TestSetPackageDirectoryDto) {
-            new RenameJavaPackage().execute(p, dir, newName);
-        } else if (dir instanceof TestSetDirectoryDto tsDir) {
-            new RenameJavaClass().execute(p, tsDir, newName);
-        }
-    }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {

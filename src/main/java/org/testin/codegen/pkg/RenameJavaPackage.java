@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
+import org.testin.codegen.Renamed;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.util.NameSanitizer;
@@ -22,13 +23,10 @@ public class RenameJavaPackage implements GenAction {
 
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
-        if (!(obj instanceof DirectoryDto dir)) return;
-        execute(p, dir, dir.getName());
-    }
+        if (!(obj instanceof Renamed renamed)) return;
 
-    public void execute(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
-
-        final List<String> fqcn = Fqcn.ofPackage(dir);
+        final List<String> fqcn = Fqcn.ofPackage(renamed.dir());
+        final String newName = renamed.newName();
 
         JavaSourceRoot.find(p).ifPresentOrElse(
                 testSourceRoot -> renameUnder(p, testSourceRoot, fqcn, newName),
