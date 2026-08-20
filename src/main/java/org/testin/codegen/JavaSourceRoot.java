@@ -1,6 +1,7 @@
 package org.testin.codegen;
 
 import com.intellij.openapi.application.WriteAction;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
@@ -110,6 +111,26 @@ public final class JavaSourceRoot {
     public static void writeInRoot(final @NotNull Project p, final @NotNull String whatFailed,
                                    final @NotNull RootWork work) {
         WriteAction.run(() -> {
+            try {
+                inRoot(p, work);
+            } catch (final IOException ex) {
+                Logger.info("Error " + whatFailed + ": " + ex.getMessage());
+            }
+        });
+    }
+
+    /**
+     * For work that edits PSI, which the platform refuses outside a command -
+     * "Must not change PSI outside command or undo-transparent action". A write
+     * action is not enough, and the difference does not show until the edit is
+     * attempted: moving a class threw here on the first drag (#51).
+     *
+     * @param title      names the command, as the platform shows it
+     * @param whatFailed named in the log if the work raises, e.g. "moving class"
+     */
+    public static void commandInRoot(final @NotNull Project p, final @NotNull String title,
+                                     final @NotNull String whatFailed, final @NotNull RootWork work) {
+        WriteCommandAction.runWriteCommandAction(p, title, null, () -> {
             try {
                 inRoot(p, work);
             } catch (final IOException ex) {

@@ -34,7 +34,7 @@ public class MoveJavaClass implements GenAction {
         final List<String> destination = moved.destinationPackage(p);
         final String fileName = fqcn.getLast() + ".java";
 
-        JavaSourceRoot.writeInRoot(p, "moving class", sourceRoot -> {
+        JavaSourceRoot.commandInRoot(p, "Move Test Class", "moving class", sourceRoot -> {
             final VirtualFile file = sourceRoot.findFileByRelativePath(String.join("/", fqcn) + ".java");
 
             if (file == null) {

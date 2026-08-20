@@ -30,7 +30,7 @@ public class MoveJavaPackage implements GenAction {
         final List<String> fqcn = Fqcn.ofPackage(moved.dir());
         final List<String> destination = moved.destinationPackage(p);
 
-        JavaSourceRoot.writeInRoot(p, "moving package", sourceRoot -> {
+        JavaSourceRoot.commandInRoot(p, "Move Test Package", "moving package", sourceRoot -> {
             final VirtualFile folder = sourceRoot.findFileByRelativePath(String.join("/", fqcn));
 
             if (folder == null || !folder.isDirectory()) {

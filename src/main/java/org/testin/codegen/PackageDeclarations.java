@@ -26,7 +26,9 @@ import org.testin.logger.Logger;
  * the old parent package instead, which is the same answer arrived at the long
  * way round.
  * <p>
- * Runs inside the caller's write command action, because it edits PSI.
+ * Runs inside the caller's write <em>command</em> action. A plain write action
+ * is not enough for a PSI edit and the platform says so by throwing, which is
+ * how this was found.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PackageDeclarations {
