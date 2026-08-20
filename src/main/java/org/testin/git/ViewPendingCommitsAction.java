@@ -116,13 +116,24 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         GitBackgroundTask.run(p, "Scanning for changes", true,
                 indicator -> {
                     final List<PendingChange> changes = GitDiffProcessor.getPendingChanges(p, path);
-                    ApplicationManager.getApplication().invokeLater(() -> reviewChanges(p, path, changes));
+
+                    // Read here and carried in, because the dialog cannot ask:
+                    // every Git command goes through git4idea's authentication
+                    // setup, which asserts it is not running on the EDT, and a
+                    // dialog is built on the EDT.
+                    final List<String> branches = git.getLocalBranches(path);
+                    final String current = git.getCurrentBranch(path);
+
+                    ApplicationManager.getApplication().invokeLater(() ->
+                            reviewChanges(p, path, changes, branches, current == null ? "" : current));
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
     }
 
     private void reviewChanges(final @NotNull Project p, final @NotNull Path path,
-                               final @NotNull List<PendingChange> changes) {
+                               final @NotNull List<PendingChange> changes,
+                               final @NotNull List<String> branches,
+                               final @NotNull String currentBranch) {
         if (changes.isEmpty()) {
             Services.getInstance(p, Notifier.class).softShow(p, "No changes");
             return;
@@ -131,7 +142,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         // The dialog owns the whole review - which changes, the message, and
         // whether it goes to the remote - so there is nothing left to ask
         // afterward.
-        new PendingCommitsDialog(p, changes, path,
+        new PendingCommitsDialog(p, changes, path, branches, currentBranch,
                 request -> commitOnBranch(p, path, request)).show();
     }
 

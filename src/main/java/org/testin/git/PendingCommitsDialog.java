@@ -48,9 +48,22 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     private final @NotNull DialogSplitButton commit;
     private final @NotNull Consumer<Request> onCommit;
 
+    /**
+     * @param branches      the branches to offer, read by the caller. Every Git
+     *                      command in this plugin goes through git4idea's
+     *                      authentication setup, which asserts it is not on the
+     *                      EDT - and a dialog constructor is on the EDT. So the
+     *                      background pass that collected the changes collects
+     *                      these too
+     * @param currentBranch the branch the repository is on, empty when Git could
+     *                      not say - a repository with no commit yet has a
+     *                      branch name and no branch
+     */
     public PendingCommitsDialog(final @NotNull Project p,
                                 final @NotNull List<PendingChange> differences,
                                 final @NotNull Path repoRoot,
+                                final @NotNull List<String> branches,
+                                final @NotNull String currentBranch,
                                 final @NotNull Consumer<Request> onCommit) {
         super(p);
         this.repoRoot = repoRoot;
@@ -71,7 +84,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         // to start - which is how a tester keeps a cycle's results off main
         // without leaving the dialog.
         final ComponentDialogBase<ChoiceInput> branchRow =
-                ComponentDialogBase.choice("Branch", localBranches(p, repoRoot), currentBranch(p, repoRoot));
+                ComponentDialogBase.choice("Branch", offered(branches, currentBranch), currentBranch);
 
         // Deliberately empty. Pre-filling it produced five commits called
         // "Updated test cases" in one afternoon of testing - a default that gets
@@ -121,27 +134,19 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      * set and saying otherwise would be a guess.
      */
     /**
-     * The branch that is checked out, or empty when Git cannot say - a
-     * repository with no commit in it yet has a branch name and no branch, and
-     * the row is still worth showing because committing is what creates it.
-     */
-    private static @NotNull String currentBranch(final @NotNull Project p, final @NotNull Path repoRoot) {
-        final String current = new GitRepositoryService(p).getCurrentBranch(repoRoot);
-        return current == null ? "" : current;
-    }
-
-    /**
      * The branches to offer, with the current one always among them: it is the
-     * default, and a list that did not contain its own selection would read as a
-     * branch about to be created.
+     * selected value, and a list that did not contain its own selection would
+     * read as a branch about to be created. A repository with no commit yet has
+     * exactly that shape - Git names the branch and lists none.
      */
-    private static @NotNull List<String> localBranches(final @NotNull Project p, final @NotNull Path repoRoot) {
-        final List<String> branches = new ArrayList<>(new GitRepositoryService(p).getLocalBranches(repoRoot));
-        final String current = currentBranch(p, repoRoot);
+    private static @NotNull List<String> offered(final @NotNull List<String> branches,
+                                                 final @NotNull String current) {
+        if (current.isEmpty() || branches.contains(current)) return branches;
 
-        if (!current.isEmpty() && !branches.contains(current)) branches.addFirst(current);
+        final List<String> withCurrent = new ArrayList<>(branches);
+        withCurrent.addFirst(current);
 
-        return branches;
+        return withCurrent;
     }
 
     private void fillRows(final @NotNull List<PendingChange> differences) {
