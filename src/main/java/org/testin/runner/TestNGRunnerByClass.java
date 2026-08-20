@@ -23,7 +23,7 @@ import org.testin.services.Services;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Service(Service.Level.PROJECT)
-public class TestNGRunnerByClass {
+public final class TestNGRunnerByClass {
 
     public void runTestClass(final @NotNull Project p, final @NotNull String fqcn) {
 
