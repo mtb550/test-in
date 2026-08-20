@@ -12,6 +12,7 @@ import org.testin.model.TestRunStatus;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 
+import java.util.Objects;
 import javax.swing.*;
 import java.util.Set;
 
@@ -31,9 +32,8 @@ public class TreeCellRenderer extends ColoredTreeCellRenderer {
                 append(message, SimpleTextAttributes.ERROR_ATTRIBUTES);
                 return;
             }
-            final DirectoryDto dir = TreeValueUtil.directoryOf(value);
-            if (dir == null) {
-                append(value != null ? value.toString() : "", SimpleTextAttributes.REGULAR_ATTRIBUTES);
+            if (!(TreeValueUtil.valueOf(value) instanceof DirectoryDto dir)) {
+                append(Objects.toString(value, ""), SimpleTextAttributes.REGULAR_ATTRIBUTES);
                 return;
             }
             final DirectoryType type = dir.getType();

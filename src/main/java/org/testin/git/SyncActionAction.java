@@ -14,7 +14,6 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import git4idea.GitUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -25,6 +24,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import javax.swing.tree.TreePath;
+import java.util.Optional;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -42,13 +42,15 @@ public class SyncActionAction extends AbstractProjectTreeAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        getActiveProjectPath().ifPresentOrElse(this::syncRepository, () ->
+                Services.getInstance(p, Notifier.class).error(p, "Sync Error",
+                        "Could not determine the active project. Please select a project in the tree."));
+    }
 
-        final Path repoPath = getActiveProjectPath();
-
-        if (repoPath == null) {
-            Services.getInstance(p, Notifier.class).error(p, "Sync Error", "Could not determine the active project. Please select a project in the tree.");
-            return;
-        }
+    /**
+     * Everything the action does once it knows which repository it is syncing.
+     */
+    private void syncRepository(final @NotNull Path repoPath) {
 
         // Soft, and not an error: nothing failed. The tester pressed Sync on a
         // test project that was never put under Git, and the sentence says which
@@ -206,24 +208,26 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
     }
 
-    private @Nullable Path getActiveProjectPath() {
+    /**
+     * The test project the selection sits under - the nearest one walking up the
+     * selected path, and the tree's own root when nothing is selected.
+     */
+    private @NotNull Optional<Path> getActiveProjectPath() {
         final TreePath selectionPath = tree.getSelectionPath();
         if (selectionPath != null) {
             for (final Object component : selectionPath.getPath()) {
-                final TestProjectDirectoryDto project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class);
-                if (project != null) return project.getPath();
+                final Optional<Path> project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class)
+                        .map(TestProjectDirectoryDto::getPath);
+                if (project.isPresent()) return project;
             }
         }
 
-        final TestProjectDirectoryDto root = TreeValueUtil.valueOf(tree.getModel().getRoot(), TestProjectDirectoryDto.class);
-        return root == null ? null : root.getPath();
+        return TreeValueUtil.projectPath(tree);
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-        e.getPresentation().setEnabled(TreeValueUtil.valueOf(path.getLastPathComponent(), TestProjectDirectoryDto.class) != null);
+        e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestProjectDirectoryDto.class).isPresent());
     }
 
     @Override

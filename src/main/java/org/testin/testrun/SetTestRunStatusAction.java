@@ -15,7 +15,6 @@ import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 
-import javax.swing.tree.TreePath;
 
 public class SetTestRunStatusAction extends AbstractProjectAction {
     final @NotNull SimpleTree tree;
@@ -27,38 +26,31 @@ public class SetTestRunStatusAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
+        TreeValueUtil.selected(tree, TestRunDirectoryDto.class).ifPresent(this::askForStatus);
+    }
 
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+    private void askForStatus(final @NotNull TestRunDirectoryDto testRunDto) {
+        new TestRunStatusMenuDialog(p, selectedStatus -> {
+            Logger.trace("Status changed -> " + testRunDto.getName() + " = " + selectedStatus.getLabel());
 
-        final TestRunDirectoryDto testRunDto = TreeValueUtil.valueOf(path.getLastPathComponent(), TestRunDirectoryDto.class);
-        if (testRunDto != null) {
-            new TestRunStatusMenuDialog(p, selectedStatus -> {
-                Logger.trace("Status changed -> " + testRunDto.getName() + " = " + selectedStatus.getLabel());
+            // Updates the indexer-owned marker (single source of truth) and
+            // persists it through the sequential run-status writer.
+            Services.getInstance(p, RunStatusService.class).persistMarker(
+                    p, testRunDto.getPath(), selectedStatus);
 
-                // Updates the indexer-owned marker (single source of truth) and
-                // persists it through the sequential run-status writer.
-                Services.getInstance(p, RunStatusService.class).persistMarker(
-                        p, testRunDto.getPath(), selectedStatus);
+            Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
 
-                Services.getInstance(p, ExplorerPanel.class).getProjectTree().refresh();
-
-                // The status names itself, as verdicts do: "Completed", "Closed".
-                // Inside the menu callback, so a dismissed menu says nothing (#62).
-                Services.getInstance(p, Notifier.class).softShow(p, selectedStatus.getLabel());
-            }).show();
-        }
+            // The status names itself, as verdicts do: "Completed", "Closed".
+            // Inside the menu callback, so a dismissed menu says nothing (#62).
+            Services.getInstance(p, Notifier.class).softShow(p, selectedStatus.getLabel());
+        }).show();
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-        final TestRunDirectoryDto dir = TreeValueUtil.valueOf(path.getLastPathComponent(), TestRunDirectoryDto.class);
-        e.getPresentation().setEnabled(dir != null && !dir.getMarker().getStatus().isTerminal());
+        e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestRunDirectoryDto.class)
+                .filter(dir -> !dir.getMarker().getStatus().isTerminal())
+                .isPresent());
     }
 
     @Override

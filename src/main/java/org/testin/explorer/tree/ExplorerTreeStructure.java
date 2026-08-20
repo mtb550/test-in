@@ -38,6 +38,10 @@ public final class ExplorerTreeStructure extends AbstractTreeStructure {
         return node.getChildren().toArray();
     }
 
+    /**
+     * The platform's contract: null is how a tree structure says "this is the
+     * root", and AbstractTreeStructure reads it before we do (#71).
+     */
     @Override
     public @Nullable Object getParentElement(final @NotNull Object element) {
         return element instanceof ExplorerTreeNode node ? node.getParent() : null;

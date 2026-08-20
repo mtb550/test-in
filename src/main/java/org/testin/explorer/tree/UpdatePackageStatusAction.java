@@ -5,8 +5,8 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.indexer.ProjectIndexer;
@@ -33,16 +33,26 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
         this.status = status;
     }
 
-    private static @Nullable PackageMarker markerOf(final @Nullable DirectoryDto dir) {
-        return dir != null && dir.getMarker() instanceof PackageMarker marker ? marker : null;
+    /**
+     * The package marker of the node selected on its own - empty on anything
+     * that is not a package, which is what greys the entry out.
+     */
+    private @NotNull Optional<PackageMarker> selectedMarker() {
+        return TreeValueUtil.singleSelectedDirectory(tree)
+                .map(DirectoryDto::getMarker)
+                .filter(PackageMarker.class::isInstance)
+                .map(PackageMarker.class::cast);
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final DirectoryDto dir = TreeValueUtil.singleSelectedDirectory(tree);
-        final PackageMarker marker = markerOf(dir);
-        if (dir == null || marker == null) return;
+        TreeValueUtil.singleSelectedDirectory(tree)
+                .filter(dir -> dir.getMarker() instanceof PackageMarker)
+                .ifPresent(this::mark);
+    }
 
+    private void mark(final @NotNull DirectoryDto dir) {
+        final PackageMarker marker = (PackageMarker) dir.getMarker();
         try {
             marker.setStatus(status);
             marker.touch(Services.getInstance(p, AppSettingsState.class).testerName);
@@ -61,10 +71,10 @@ public class UpdatePackageStatusAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final PackageMarker marker = markerOf(TreeValueUtil.singleSelectedDirectory(tree));
+        final Optional<PackageMarker> marker = selectedMarker();
 
-        e.getPresentation().setVisible(marker != null);
-        e.getPresentation().setEnabled(marker != null && marker.getStatus() != status);
+        e.getPresentation().setVisible(marker.isPresent());
+        e.getPresentation().setEnabled(marker.filter(m -> m.getStatus() != status).isPresent());
     }
 
     @Override

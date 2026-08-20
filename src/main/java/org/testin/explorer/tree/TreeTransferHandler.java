@@ -26,6 +26,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,22 +61,22 @@ public class TreeTransferHandler extends TransferHandler {
      * paste into project B. Unresolvable ownership rejects.
      */
     static boolean sameTestProject(final @NotNull DirectoryDto source, final @NotNull DirectoryDto target) {
-        final DirectoryDto sourceProject = owningProject(source);
-        final DirectoryDto targetProject = owningProject(target);
+        final Optional<Path> sourceProject = owningProject(source).map(DirectoryDto::getPath);
 
-        return sourceProject != null && targetProject != null
-                && sourceProject.getPath().equals(targetProject.getPath());
+        return sourceProject.isPresent()
+                && sourceProject.equals(owningProject(target).map(DirectoryDto::getPath));
     }
 
     /**
-     * Null when the node hangs outside any test project - ownership unresolvable.
+     * Empty when the node hangs outside any test project - ownership
+     * unresolvable.
      */
-    private static @Nullable DirectoryDto owningProject(final @NotNull DirectoryDto node) {
+    private static @NotNull Optional<DirectoryDto> owningProject(final @NotNull DirectoryDto node) {
         DirectoryDto current = node;
         while (current != null && !(current instanceof TestProjectDirectoryDto)) {
             current = current.getParent();
         }
-        return current;
+        return Optional.ofNullable(current);
     }
 
     private static @NotNull String describe(final @NotNull List<DirectoryDto> sources) {
@@ -104,6 +105,10 @@ public class TreeTransferHandler extends TransferHandler {
         return COPY_OR_MOVE;
     }
 
+    /**
+     * Swing's contract: null is how a TransferHandler says there is nothing to
+     * drag, and the platform reads it before anything of ours does (#71).
+     */
     @Override
     protected @Nullable Transferable createTransferable(final @NotNull JComponent c) {
         final List<DirectoryDto> directories = transferableSelection();
@@ -179,8 +184,10 @@ public class TreeTransferHandler extends TransferHandler {
     @Override
     public boolean canImport(final @NotNull TransferSupport support) {
         if (!support.isDataFlavorSupported(NODE_FLAVOR)) return false;
-        final DirectoryDto target = targetDirectory(support);
-        final boolean valid = target != null && target.isTransferTarget() && anySourceLands(support, target);
+        final boolean valid = targetDirectory(support)
+                .filter(DirectoryDto::isTransferTarget)
+                .filter(target -> anySourceLands(support, target))
+                .isPresent();
 
         // No drop highlight over places nothing can land on - the highlight
         // otherwise lingers as a stray selection band.
@@ -217,8 +224,9 @@ public class TreeTransferHandler extends TransferHandler {
 
         try {
             final TreeTransferPayload payload = (TreeTransferPayload) support.getTransferable().getTransferData(NODE_FLAVOR);
-            final DirectoryDto target = targetDirectory(support);
-            if (target == null) return false;
+            final Optional<DirectoryDto> landing = targetDirectory(support);
+            if (landing.isEmpty()) return false;
+            final DirectoryDto target = landing.get();
 
             final int action = resolveAction(support, payload);
             final List<DirectoryDto> sources = transferableSources(payload.nodes(), target, action);
@@ -324,22 +332,28 @@ public class TreeTransferHandler extends TransferHandler {
         Services.getInstance(p, Notifier.class).softShowCounted(p, outcome, landed);
     }
 
-    private @Nullable DirectoryDto targetDirectory(final @NotNull TransferSupport support) {
-        if (support.isDrop()) {
-            final TreePath path = dropPath(support);
-            return path == null ? null : TreeValueUtil.directoryOf(path.getLastPathComponent());
-        }
-        return TreeValueUtil.selectedDirectory(tree.getSelectionPath());
+    /**
+     * Where the transfer would land: the row under a drop, or whatever the tree
+     * has selected for a clipboard paste.
+     */
+    private @NotNull Optional<DirectoryDto> targetDirectory(final @NotNull TransferSupport support) {
+        return support.isDrop()
+                ? dropPath(support).flatMap(TreeValueUtil::directoryAt)
+                : TreeValueUtil.selectedDirectory(tree);
     }
 
-    private @Nullable TreePath dropPath(final @NotNull TransferSupport support) {
+    /**
+     * SimpleTree has a drop location type of its own, and reporting the drop by
+     * the wrong one is how ordering silently refused every drop it was given.
+     */
+    private @NotNull Optional<TreePath> dropPath(final @NotNull TransferSupport support) {
         if (support.getDropLocation() instanceof SimpleTree.DropLocation dropLocation) {
-            return dropLocation.getPath();
+            return Optional.ofNullable(dropLocation.getPath());
         }
         if (support.getDropLocation() instanceof JTree.DropLocation dropLocation) {
-            return dropLocation.getPath();
+            return Optional.ofNullable(dropLocation.getPath());
         }
-        return null;
+        return Optional.empty();
     }
 
     private int resolveAction(final @NotNull TransferSupport support, final @NotNull TreeTransferPayload payload) {
@@ -398,6 +412,8 @@ public class TreeTransferHandler extends TransferHandler {
         }
     }
 
+    // Both parameters are Swing's, and Swing passes null for either when the
+    // drag ended without one (#71).
     @Override
     protected void exportDone(final @Nullable JComponent source, final @Nullable Transferable data, final int action) {
         if (action != MOVE) resetLastAction();

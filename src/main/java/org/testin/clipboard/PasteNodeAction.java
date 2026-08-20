@@ -40,9 +40,11 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
         final Transferable contents = CopyPasteManager.getInstance().getContents();
         if (contents == null || !contents.isDataFlavorSupported(TreeTransferHandler.NODE_FLAVOR)) return;
 
-        final DirectoryDto target = TreeValueUtil.selectedDirectory(tree.getSelectionPath());
-        if (target == null) return;
+        TreeValueUtil.selectedDirectory(tree).ifPresent(target -> paste(transferHandler, contents, target));
+    }
 
+    private void paste(final @NotNull TreeTransferHandler transferHandler, final @NotNull Transferable contents,
+                       final @NotNull DirectoryDto target) {
         try {
             final TreeTransferPayload payload = (TreeTransferPayload) contents.getTransferData(TreeTransferHandler.NODE_FLAVOR);
 

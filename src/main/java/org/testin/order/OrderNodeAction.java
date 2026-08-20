@@ -64,7 +64,7 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
      * a single line, and neither tests for anything.
      */
     private @NotNull Optional<DirectoryDto> selected() {
-        return Optional.ofNullable(TreeValueUtil.selectedDirectory(tree)).filter(DirectoryDto::isOrderable);
+        return TreeValueUtil.selectedDirectory(tree).filter(DirectoryDto::isOrderable);
     }
 
     /**

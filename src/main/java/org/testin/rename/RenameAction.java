@@ -25,7 +25,6 @@ import org.testin.util.OptionalPlugin;
 import org.testin.util.Shortcuts;
 
 import javax.swing.*;
-import javax.swing.tree.TreePath;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.nio.file.Path;
@@ -44,13 +43,9 @@ public class RenameAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-
-        final DirectoryDto dir = TreeValueUtil.directoryOf(path.getLastPathComponent());
-        if (dir == null || !dir.isRenamable()) return;
-
-        new RenameDialog(p, dir.getName(), newName -> renameNode(dir, newName)).show();
+        TreeValueUtil.selectedDirectory(tree)
+                .filter(DirectoryDto::isRenamable)
+                .ifPresent(dir -> new RenameDialog(p, dir.getName(), newName -> renameNode(dir, newName)).show());
     }
 
     private void renameNode(final @NotNull DirectoryDto dir, final @NotNull String newName) {
@@ -133,12 +128,9 @@ public class RenameAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        TreePath path = tree.getSelectionPath();
-
-        e.getPresentation().setEnabled(path != null &&
-                TreeValueUtil.directoryOf(path.getLastPathComponent()) instanceof DirectoryDto dir &&
-                dir.isRenamable()
-        );
+        e.getPresentation().setEnabled(TreeValueUtil.selectedDirectory(tree)
+                .filter(DirectoryDto::isRenamable)
+                .isPresent());
     }
 
     @Override

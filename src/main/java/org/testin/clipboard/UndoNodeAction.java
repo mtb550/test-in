@@ -42,7 +42,7 @@ public class UndoNodeAction extends AbstractProjectAction {
     public void update(final @NotNull AnActionEvent e) {
         final TreeUndoService undo = Services.getInstance(p, TreeUndoService.class);
         e.getPresentation().setEnabled(undo.canUndo());
-        e.getPresentation().setText(undo.canUndo() ? "Undo " + undo.undoDescription() : "Undo");
+        e.getPresentation().setText(("Undo " + undo.undoDescription()).trim());
     }
 
     @Override

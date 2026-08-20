@@ -31,6 +31,7 @@ import org.testin.util.Shortcuts;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
@@ -85,28 +86,25 @@ public class GenerateReportAction extends AbstractProjectAction {
      * editor is showing. Asked by both {@link #isAvailable()} and
      * {@link #execute()}, so the two can never disagree about which run is meant.
      */
-    private @Nullable TestRunDirectoryDto selectedRun() {
+    private @NotNull Optional<TestRunDirectoryDto> selectedRun() {
         if (tree != null) return TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
-        return editor instanceof RunEditor re ? re.getParent() : null;
+        return editor instanceof RunEditor re ? Optional.of(re.getParent()) : Optional.empty();
     }
 
     /**
      * True when the current selection resolves to a test run.
      */
     public boolean isAvailable() {
-        return selectedRun() != null;
+        return selectedRun().isPresent();
     }
 
     /**
      * Direct entry point for toolbar buttons — no AnActionEvent required.
      */
     public void execute() {
-        final TestRunDirectoryDto tr = selectedRun();
-        if (tr == null) return;
-
-        final String suggestedName = tr.getPath().getFileName().toString() + "_Report";
-
-        new GenerateReportDialog(p, suggestedName, (format, file) -> processAndSave(p, tr, format, file)).show();
+        selectedRun().ifPresent(tr -> new GenerateReportDialog(p,
+                tr.getPath().getFileName().toString() + "_Report",
+                (format, file) -> processAndSave(p, tr, format, file)).show());
     }
 
     @Override

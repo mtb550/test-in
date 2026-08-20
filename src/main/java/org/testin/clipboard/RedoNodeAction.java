@@ -42,7 +42,7 @@ public class RedoNodeAction extends AbstractProjectAction {
     public void update(final @NotNull AnActionEvent e) {
         final TreeUndoService redo = Services.getInstance(p, TreeUndoService.class);
         e.getPresentation().setEnabled(redo.canRedo());
-        e.getPresentation().setText(redo.canRedo() ? "Redo " + redo.redoDescription() : "Redo");
+        e.getPresentation().setText(("Redo " + redo.redoDescription()).trim());
     }
 
     @Override

@@ -25,24 +25,21 @@ public class TreeMouseListener extends PopupHandler {
     @Override
     public void invokePopup(final @NotNull Component comp, final int x, final int y) {
         final TreePath selPath = rowPathAt(x, y);
+        if (selPath == null || TreeValueUtil.directoryAt(selPath).isEmpty()) return;
 
-        if (selPath != null && TreeValueUtil.directoryOf(selPath.getLastPathComponent()) != null) {
-
-            if (!tree.getSelectionModel().isPathSelected(selPath)) {
-                tree.setSelectionPath(selPath);
-            }
-
-            final ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
-            popupMenu.getComponent().show(comp, x, y);
+        if (!tree.getSelectionModel().isPathSelected(selPath)) {
+            tree.setSelectionPath(selPath);
         }
+
+        final ActionPopupMenu popupMenu = ActionManager.getInstance().createActionPopupMenu(ActionPlaces.TOOLWINDOW_POPUP, treeContextMenu);
+        popupMenu.getComponent().show(comp, x, y);
     }
 
     @Override
     public void mouseClicked(final @NotNull MouseEvent e) {
         final TreePath selPath = rowPathAt(e.getX(), e.getY());
 
-        if (selPath == null || TreeValueUtil.directoryOf(selPath.getLastPathComponent()) == null)
-            return;
+        if (selPath == null || TreeValueUtil.directoryAt(selPath).isEmpty()) return;
 
         if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
             new OpenAction(p, tree).execute(p);

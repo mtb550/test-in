@@ -26,7 +26,6 @@ import org.testin.services.Services;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Mapper;
 
-import javax.swing.tree.TreePath;
 import java.io.InputStream;
 import java.util.*;
 
@@ -43,12 +42,13 @@ public class ExportAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
+        TreeValueUtil.selectedDirectory(tree).ifPresent(this::exportFrom);
+    }
 
-        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
-        if (!(userObject instanceof DirectoryDto dirDto)) return;
-
+    /**
+     * Everything the action does once it knows which node it is exporting from.
+     */
+    private void exportFrom(final @NotNull DirectoryDto dirDto) {
         final VirtualFile targetDir = resolveTargetDir(dirDto);
         if (targetDir == null) return;
 
@@ -136,9 +136,9 @@ public class ExportAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final DirectoryDto selected = TreeValueUtil.singleSelectedDirectory(tree);
-
-        e.getPresentation().setEnabled(selected != null && selected.isTestCaseContainer());
+        e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree)
+                .filter(DirectoryDto::isTestCaseContainer)
+                .isPresent());
     }
 
     @Override

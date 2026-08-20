@@ -18,7 +18,6 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
-import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -73,19 +72,12 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-        if (path == null) return;
-        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
-
-        e.getPresentation().setEnabled(userObject instanceof TestProjectDirectoryDto);
+        e.getPresentation().setEnabled(TreeValueUtil.selected(tree, TestProjectDirectoryDto.class).isPresent());
     }
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final Path path = TreeValueUtil.projectPath(tree);
-        if (path == null) return;
-
-        openFor(path);
+        TreeValueUtil.projectPath(tree).ifPresent(this::openFor);
     }
 
     /**

@@ -19,7 +19,6 @@ import org.testin.services.Services;
 import org.testin.util.EditorUtil;
 import org.testin.util.Shortcuts;
 
-import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.function.BiConsumer;
 
@@ -33,11 +32,13 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final DirectoryDto pDir = TreeValueUtil.selectedDirectory(tree);
-        final TreePath path = tree.getSelectionPath();
+        TreeValueUtil.selectedDirectory(tree).ifPresent(this::createUnder);
+    }
 
-        if (path == null || pDir == null) return;
-
+    /**
+     * Everything the action does once it knows which node it is creating under.
+     */
+    private void createUnder(final @NotNull DirectoryDto pDir) {
         final BiConsumer<String, DirectoryType> onCreate = (s, dt) -> {
 
             if (s.isEmpty()) return;
@@ -85,14 +86,12 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
     @Override
     public void update(final @NotNull AnActionEvent e) {
 
-        DirectoryDto parentDir = TreeValueUtil.selectedDirectory(tree);
-
-        if (parentDir == null || parentDir instanceof TestProjectDirectoryDto) {
-            e.getPresentation().setEnabled(false);
-            return;
-        }
-
-        e.getPresentation().setEnabled(parentDir.canCreateChildren());
+        // A test project holds its two fixed containers and nothing else, so
+        // there is nothing to create directly under it.
+        e.getPresentation().setEnabled(TreeValueUtil.selectedDirectory(tree)
+                .filter(parent -> !(parent instanceof TestProjectDirectoryDto))
+                .filter(DirectoryDto::canCreateChildren)
+                .isPresent());
     }
 
     @Override

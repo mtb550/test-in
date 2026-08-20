@@ -55,13 +55,14 @@ public class ImportAction extends AbstractProjectTreeAction {
             return;
         }
 
-        final Object userObject = TreeValueUtil.valueOf(path.getLastPathComponent());
+        TreeValueUtil.directoryAt(path)
+                .filter(DirectoryDto::isTestCaseContainer)
+                .ifPresentOrElse(this::openImportDialog, () ->
+                        Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Import Into",
+                                "Select a Test Set, a Test Set Package, or the Test Cases directory."));
+    }
 
-        if (!(userObject instanceof DirectoryDto dirDto) || !dirDto.isTestCaseContainer()) {
-            Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Import Into", "Select a Test Set, a Test Set Package, or the Test Cases directory.");
-            return;
-        }
-
+    private void openImportDialog(final @NotNull DirectoryDto dirDto) {
         // The framework dialog reports through this callback rather than a
         // return code, and only ever with a non-empty selection.
         new ImportDialog(p, importAttributes,
@@ -181,9 +182,9 @@ public class ImportAction extends AbstractProjectTreeAction {
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        final DirectoryDto selected = TreeValueUtil.singleSelectedDirectory(tree);
-
-        e.getPresentation().setEnabled(selected != null && selected.isTestCaseContainer());
+        e.getPresentation().setEnabled(TreeValueUtil.singleSelectedDirectory(tree)
+                .filter(DirectoryDto::isTestCaseContainer)
+                .isPresent());
     }
 
     @Override
