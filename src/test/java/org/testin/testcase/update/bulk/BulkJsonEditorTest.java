@@ -70,8 +70,10 @@ public class BulkJsonEditorTest {
     }
 
     @Test
-    public void nullIsEmptyRatherThanACrash() {
-        assertEquals(BulkJsonEditor.escapeJson(null), "");
-        assertEquals(BulkJsonEditor.unescapeJson(null), "");
+    public void anEmptyValueEscapesToNothing() {
+        // A field the tester left blank is "" on the DTO, which is what the
+        // escapes now take. This used to pin a null they no longer accept (#71).
+        assertEquals(BulkJsonEditor.escapeJson(""), "");
+        assertEquals(BulkJsonEditor.unescapeJson(""), "");
     }
 }

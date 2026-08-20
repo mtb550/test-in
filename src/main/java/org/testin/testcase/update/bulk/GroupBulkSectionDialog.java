@@ -2,7 +2,6 @@ package org.testin.testcase.update.bulk;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
@@ -14,7 +13,7 @@ import java.util.function.Consumer;
 public class GroupBulkSectionDialog extends JsonArraySplitBulkSectionDialog {
 
     public GroupBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                  final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
+                                  final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p, selectedItems, updatedItems);
     }
 

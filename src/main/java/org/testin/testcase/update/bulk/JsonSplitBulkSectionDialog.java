@@ -5,7 +5,6 @@ import com.intellij.openapi.ui.popup.JBPopupListener;
 import com.intellij.openapi.ui.popup.LightweightWindowEvent;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.ui.framework.AbstractFrameworkDialog;
 import org.testin.ui.framework.ComponentDialogBase;
@@ -27,7 +26,7 @@ import java.util.function.Consumer;
 public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog<BulkJsonEditors> {
 
     private final @NotNull List<TestCaseDto> selectedItems;
-    private final @Nullable Consumer<List<TestCaseDto>> updatedItems;
+    private final @NotNull Consumer<List<TestCaseDto>> updatedItems;
     private final @NotNull BulkJsonEditors editors;
 
     /**
@@ -38,7 +37,7 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
     private final @NotNull List<String> originalEscaped = new ArrayList<>();
 
     protected JsonSplitBulkSectionDialog(final @NotNull Project p, final @NotNull List<TestCaseDto> selectedItems,
-                                         final @Nullable Consumer<List<TestCaseDto>> updatedItems) {
+                                         final @NotNull Consumer<List<TestCaseDto>> updatedItems) {
         super(p);
         this.selectedItems = selectedItems;
         this.updatedItems = updatedItems;
@@ -135,18 +134,20 @@ public abstract class JsonSplitBulkSectionDialog extends AbstractFrameworkDialog
         final List<String> newValues = new ArrayList<>();
 
         for (int i = 0; i < selectedItems.size(); i++) {
-            final String current = editors.valueAt(i);
             // The editor shows newlines flattened to spaces, so writing an
             // untouched row back would permanently flatten a stored multi-line
-            // value. null = "unchanged, skip".
-            newValues.add(current == null || current.equals(originalEscaped.get(i))
-                    ? null
-                    : BulkJsonEditor.unescapeJson(current).trim());
+            // value. A null entry is "unchanged, skip", which is what applyValues
+            // reads - and an unreadable value is unchanged by definition.
+            final int index = i;
+            newValues.add(editors.valueAt(index)
+                    .filter(current -> !current.equals(originalEscaped.get(index)))
+                    .map(current -> BulkJsonEditor.unescapeJson(current).trim())
+                    .orElse(null));
         }
 
         applyValues(selectedItems, newValues);
-        // todo, apply update automation edit bulk test cases. set to null for now
-        if (updatedItems != null) updatedItems.accept(selectedItems);
+        // todo, apply update automation edit bulk test cases.
+        updatedItems.accept(selectedItems);
 
         closeOk();
     }
