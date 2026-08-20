@@ -4,7 +4,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.importexport.FileTypes;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -13,6 +12,8 @@ import org.testin.services.Services;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.util.Arrays;
+import java.util.Optional;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
@@ -35,14 +36,14 @@ public class FileDocumentListener implements DocumentListener {
     }
 
     /**
-     * The format that can read this file name, or null when nothing can. Only
-     * formats with an import handler count; matching an .html file would NPE downstream.
+     * The format that can read this file name, empty when nothing can. Only
+     * formats with an import handler count; matching an .html file would NPE
+     * downstream.
      */
-    private static @Nullable FileTypes importableFormatOf(final @NotNull String fileName) {
-        for (final FileTypes type : FileTypes.values()) {
-            if (type.isImportable() && fileName.endsWith(type.getExtension())) return type;
-        }
-        return null;
+    private static @NotNull Optional<FileTypes> importableFormatOf(final @NotNull String fileName) {
+        return Arrays.stream(FileTypes.values())
+                .filter(type -> type.isImportable() && fileName.endsWith(type.getExtension()))
+                .findFirst();
     }
 
     @Override
@@ -71,8 +72,11 @@ public class FileDocumentListener implements DocumentListener {
     }
 
     private void loadFile(final @NotNull File importFile) {
-        final FileTypes format = importableFormatOf(importFile.getName().toLowerCase());
-        if (format == null) return;
+        importableFormatOf(importFile.getName().toLowerCase())
+                .ifPresent(format -> loadFile(importFile, format));
+    }
+
+    private void loadFile(final @NotNull File importFile, final @NotNull FileTypes format) {
 
         // Parsing a workbook is heavy I/O; keep it off the EDT — this fires per keystroke.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {

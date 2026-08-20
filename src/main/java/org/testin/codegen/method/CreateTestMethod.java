@@ -18,6 +18,7 @@ import org.testin.model.Group;
 import org.testin.model.dto.TestCaseDto;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.List;
 
 public class CreateTestMethod implements GenAction {
@@ -31,14 +32,14 @@ public class CreateTestMethod implements GenAction {
      * IndexOutOfBoundsException out of the async path. Splitting in one place is
      * what stops the two drifting apart again.
      */
-    static @Nullable Target parse(final @NotNull List<String> fqcn) {
-        if (fqcn.size() < 2) return null;
+    static @NotNull Optional<Target> parse(final @NotNull List<String> fqcn) {
+        if (fqcn.size() < 2) return Optional.empty();
 
-        return new Target(
+        return Optional.of(new Target(
                 String.join(".", fqcn.subList(0, fqcn.size() - 1)),
                 fqcn.subList(0, fqcn.size() - 2),
                 fqcn.get(fqcn.size() - 2),
-                fqcn.getLast());
+                fqcn.getLast()));
     }
 
     @Override
@@ -46,26 +47,24 @@ public class CreateTestMethod implements GenAction {
         if (!(obj instanceof TestCaseDto tc)) return;
 
         final List<String> fqcn = Fqcn.ofMethod(tc);
-        final Target target = parse(fqcn);
-        if (target == null) {
-            Logger.error("FQCN list is too short to generate a method: " + fqcn);
-            return;
-        }
 
-        Logger.info("Creating Test Case for: " + fqcn);
+        parse(fqcn).ifPresentOrElse(target -> {
+            Logger.info("Creating Test Case for: " + fqcn);
 
-        ApplicationManager.getApplication().invokeLater(() ->
-                WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
-                        createMethod(p, target, tc)
-                ));
+            ApplicationManager.getApplication().invokeLater(() ->
+                    WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
+                            createMethod(p, target, tc)
+                    ));
+        }, () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
     }
 
     public void executeSync(final @NotNull Project p, final @Nullable TestCaseDto tc, final @NotNull List<String> fqcn) {
-        final Target target = parse(fqcn);
-        if (target == null) {
+        final Optional<Target> parsed = parse(fqcn);
+        if (parsed.isEmpty()) {
             Logger.error("FQCN list is too short to generate a method: " + fqcn);
             return;
         }
+        final Target target = parsed.get();
 
         Logger.info("Creating Test Case (sync) for: " + fqcn);
 

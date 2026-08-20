@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertFalse;
 
 /**
  * Splitting an FQCN list into the parts the generator writes a method from (#48).
@@ -20,18 +20,19 @@ public class CreateTestMethodTargetTest {
 
     @Test
     public void anEmptyListHasNoClassOrMethod() {
-        assertNull(CreateTestMethod.parse(List.of()));
+        assertFalse(CreateTestMethod.parse(List.of()).isPresent());
     }
 
     @Test
     public void aSingleSegmentIsAMethodWithNoClass() {
         // The case that threw: getLast() succeeds, get(size - 2) is index -1.
-        assertNull(CreateTestMethod.parse(List.of("shouldDoSomething")));
+        assertFalse(CreateTestMethod.parse(List.of("shouldDoSomething")).isPresent());
     }
 
     @Test
     public void aClassAndMethodAreTheSmallestUsableList() {
-        final CreateTestMethod.Target target = CreateTestMethod.parse(List.of("LoginTest", "shouldLogIn"));
+        final CreateTestMethod.Target target =
+                CreateTestMethod.parse(List.of("LoginTest", "shouldLogIn")).orElseThrow();
 
         assertEquals(target.className(), "LoginTest");
         assertEquals(target.methodName(), "shouldLogIn");
@@ -42,7 +43,7 @@ public class CreateTestMethodTargetTest {
     @Test
     public void packageSegmentsAreEverythingBeforeTheClass() {
         final CreateTestMethod.Target target =
-                CreateTestMethod.parse(List.of("org", "example", "tests", "LoginTest", "shouldLogIn"));
+                CreateTestMethod.parse(List.of("org", "example", "tests", "LoginTest", "shouldLogIn")).orElseThrow();
 
         assertEquals(target.className(), "LoginTest");
         assertEquals(target.methodName(), "shouldLogIn");

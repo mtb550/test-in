@@ -7,7 +7,6 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.method.CreateTestMethod;
@@ -33,6 +32,7 @@ import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.List;
 import java.util.Map;
 
@@ -82,11 +82,10 @@ public class ImportAction extends AbstractProjectTreeAction {
 
         ApplicationManager.getApplication().runWriteAction(() -> {
             if (selectedDirDto instanceof TestSetDirectoryDto ts) {
-                final TestCaseDto tail = findExistingTail(p, targetPath);
                 final List<TestCaseDto> flatList = new ArrayList<>();
                 selectedCasesBySheet.values().forEach(flatList::addAll);
 
-                linkAndSaveTestCases(p, targetPath, flatList, tail);
+                linkAndSaveTestCases(p, targetPath, flatList, rankOfTail(p, targetPath));
 
                 for (final TestCaseDto tc : flatList) tc.setParent(ts);
 
@@ -104,8 +103,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                     final Path newDirPath = targetPath.resolve(cName);
                     final DirectoryDto dir = new CreateTestSet(p).execute(cName, selectedDirDto, newDirPath);
 
-                    final TestCaseDto tail = findExistingTail(p, newDirPath);
-                    linkAndSaveTestCases(p, newDirPath, sheetCases, tail);
+                    linkAndSaveTestCases(p, newDirPath, sheetCases, rankOfTail(p, newDirPath));
 
                     final TestSetDirectoryDto sheetDto = (TestSetDirectoryDto) dir;
 
@@ -148,13 +146,13 @@ public class ImportAction extends AbstractProjectTreeAction {
 
     private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath,
                                       final @NotNull List<TestCaseDto> testCases,
-                                      final @Nullable TestCaseDto existingTail) {
+                                      final @NotNull String tailRank) {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         // After what is already in the set, in the order the sheet listed them.
         // Nothing that was there is touched: an import used to rewrite the case
         // that happened to be last.
-        String rank = existingTail == null ? "" : existingTail.getOrder();
+        String rank = tailRank;
 
         for (final TestCaseDto currentTestCase : testCases) {
             rank = Rank.after(rank);
@@ -173,11 +171,15 @@ public class ImportAction extends AbstractProjectTreeAction {
      * The last case in the set, which is what an import lands after. From the
      * indexer, which is the source of truth for what is already there.
      */
-    private @Nullable TestCaseDto findExistingTail(final @NotNull Project p, final @NotNull Path directory) {
+    private @NotNull String rankOfTail(final @NotNull Project p, final @NotNull Path directory) {
+        return findExistingTail(p, directory).map(TestCaseDto::getOrder).orElse("");
+    }
+
+    private @NotNull Optional<TestCaseDto> findExistingTail(final @NotNull Project p, final @NotNull Path directory) {
         final List<TestCaseDto> existing =
                 TestCaseOrder.ordered(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory));
 
-        return existing.isEmpty() ? null : existing.getLast();
+        return existing.isEmpty() ? Optional.empty() : Optional.of(existing.getLast());
     }
 
     @Override

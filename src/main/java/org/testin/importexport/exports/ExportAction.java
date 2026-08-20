@@ -12,7 +12,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
@@ -49,8 +48,9 @@ public class ExportAction extends AbstractProjectTreeAction {
      * Everything the action does once it knows which node it is exporting from.
      */
     private void exportFrom(final @NotNull DirectoryDto dirDto) {
-        final VirtualFile targetDir = resolveTargetDir(dirDto);
-        if (targetDir == null) return;
+        final Optional<VirtualFile> resolved = resolveTargetDir(dirDto);
+        if (resolved.isEmpty()) return;
+        final VirtualFile targetDir = resolved.get();
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Exporting test cases", true) {
             @Override
@@ -103,13 +103,12 @@ public class ExportAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * Null when the path is not in the VFS; a file resolves to its parent directory.
+     * Empty when the path is not in the VFS; a file resolves to its parent
+     * directory.
      */
-    public @Nullable VirtualFile resolveTargetDir(final @NotNull DirectoryDto dirDto) {
-        final VirtualFile target = LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString());
-        if (target == null) return null;
-
-        return target.isDirectory() ? target : target.getParent();
+    public @NotNull Optional<VirtualFile> resolveTargetDir(final @NotNull DirectoryDto dirDto) {
+        return Optional.ofNullable(LocalFileSystem.getInstance().findFileByPath(dirDto.getPath().toString()))
+                .map(target -> target.isDirectory() ? target : target.getParent());
     }
 
     public @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final @NotNull VirtualFile dir) {

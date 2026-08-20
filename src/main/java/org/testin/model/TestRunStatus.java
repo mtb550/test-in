@@ -69,10 +69,10 @@ public enum TestRunStatus {
     private final @NotNull Icon icon;
 
     /**
-     * The status the advance action moves this run to, or null when terminal.
+     * The status the advance action moves this run to, empty when terminal.
      */
-    public @Nullable TestRunStatus nextStatus() {
-        return TRANSITIONS.get(this);
+    public @NotNull Optional<TestRunStatus> nextStatus() {
+        return Optional.ofNullable(TRANSITIONS.get(this));
     }
 
     /**

@@ -33,10 +33,8 @@ public class UpdateTestRunStatusAction extends AbstractProjectAction {
         if (!(editor instanceof RunEditor runEditor)) return;
 
         // The enum owns the lifecycle: ask it where this run goes next.
-        final TestRunStatus newStatus = runEditor.getParent().getMarker().getStatus().nextStatus();
-        if (newStatus == null) return;
-
-        applyStatusChange(runEditor, newStatus);
+        runEditor.getParent().getMarker().getStatus().nextStatus()
+                .ifPresent(newStatus -> applyStatusChange(runEditor, newStatus));
     }
 
     public void applyStatusChange(final @NotNull RunEditor editor, final @NotNull TestRunStatus newStatus) {
