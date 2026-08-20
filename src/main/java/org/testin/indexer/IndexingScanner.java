@@ -147,6 +147,7 @@ final class IndexingScanner {
                             try {
                                 final TestCaseDto tc = mapper.readValue(filePath.toFile(), TestCaseDto.class);
                                 tc.setParent(ts);
+                                tc.setId(identityOf(filePath, tc));
                                 store.getTestCasesById().put(tc.getId(), tc);
                                 caseIds.add(tc.getId());
                             } catch (final Exception ex) {
@@ -234,6 +235,43 @@ final class IndexingScanner {
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run '" +
                     path.getFileName().toString() + "': " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Which test case a file is: its name, when the name is a UUID.
+     * <p>
+     * The plugin writes a case to {@code <id>.json} and reads it back keyed by
+     * the id inside, so the two always agree - until a file is copied outside
+     * the plugin, which is a thing people do on GitHub. Then two files claim one
+     * id, the cache keeps whichever the parallel scan reached last, and the other
+     * case is gone. Worse than gone: when the file that lost was the one holding
+     * {@code isHead}, the set has no starting point at all and every case in it
+     * shows as unsorted.
+     * <p>
+     * The name is the identity because it cannot collide - one directory cannot
+     * hold two files with the same name - so a copied file becomes a second case
+     * rather than a coin toss. It arrives pointed at by nothing, which is what
+     * the Unsorted badge is for.
+     * <p>
+     * A name that is not a UUID keeps the id inside the file: that is a file the
+     * plugin did not write, and inventing an identity for it would be worse than
+     * believing what it says.
+     */
+    private static @NotNull UUID identityOf(final @NotNull Path filePath, final @NotNull TestCaseDto tc) {
+        final String name = filePath.getFileName().toString().replace(".json", "");
+
+        try {
+            final UUID fromName = UUID.fromString(name);
+
+            if (!fromName.equals(tc.getId())) {
+                Logger.warn("Test case " + filePath.getFileName() + " says its id is " + tc.getId()
+                        + "; the file name is the identity, so it is read as " + fromName);
+            }
+            return fromName;
+
+        } catch (final IllegalArgumentException ex) {
+            return tc.getId();
         }
     }
 }
