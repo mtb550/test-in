@@ -96,12 +96,13 @@ public abstract class AbstractButton extends JButton {
      * toolbar button does, so the key is discoverable without opening the menu
      * that also carries it.
      * <p>
-     * The Swing tooltip is deliberately left unset: HelpTooltip replaces it, and
-     * a button carrying both shows the plain one on some paths and the rich one
-     * on others.
+     * The Swing tooltip is deliberately left unset - no tooltip, which is what an
+     * empty one means to the constructor above: HelpTooltip replaces it, and a
+     * button carrying both shows the plain one on some paths and the rich one on
+     * others.
      */
     public AbstractButton(final @NotNull String tooltip, final @NotNull Icon icon, final @NotNull Shortcuts shortcut) {
-        this(null, icon);
+        this("", icon);
 
         new HelpTooltip()
                 .setDescription(HtmlChunk.text(tooltip))
