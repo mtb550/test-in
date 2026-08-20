@@ -28,6 +28,14 @@ import java.awt.event.KeyEvent;
 @AllArgsConstructor
 public enum Shortcuts {
 
+    /**
+     * No key at all. A status bar hint renders a keystroke its component binds
+     * itself and binds nothing of its own, and this is what it carries instead
+     * of a null every reader would have to check (#71). The keystroke is one
+     * the keyboard cannot produce, so nothing can match it by accident.
+     */
+    EMPTY(KeyStroke.getKeyStroke(KeyEvent.VK_UNDEFINED, 0)),
+
     // Dialog confirm / dismiss
     Enter(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0)),
     Escape(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0)),

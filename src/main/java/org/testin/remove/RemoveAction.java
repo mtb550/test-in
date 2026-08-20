@@ -70,7 +70,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
 
         // Single node: its path shows exactly what is being deleted.
         final String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : null;
-        new ConfirmDialog(p, "Confirm Removing", msg, from, null, "Remove", () -> removeNodes(nodesToRemove)).show();
+        new ConfirmDialog(p, "Confirm Removing", msg, from, "", "Remove", () -> removeNodes(nodesToRemove)).show();
     }
 
     private void removeNodes(final @NotNull List<DirectoryDto> nodesToRemove) {

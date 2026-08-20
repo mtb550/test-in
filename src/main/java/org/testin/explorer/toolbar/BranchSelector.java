@@ -188,7 +188,7 @@ public class BranchSelector {
         new ConfirmDialog(p, "Uncommitted Changes",
                 changes + " in this test project are not committed. Switching does not leave them behind - "
                         + "they come with you, and can be committed onto " + targetBranch + " by mistake.",
-                currentBranch.isEmpty() ? null : currentBranch, targetBranch,
+                currentBranch, targetBranch,
                 "Switch Anyway", () -> checkout(repositoryPath, targetBranch),
                 List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, "Review Changes",
                         () -> new ViewPendingCommitsAction(p, pp.getProjectTree().getMainTree()).openFor(repositoryPath))))

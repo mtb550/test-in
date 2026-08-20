@@ -4,6 +4,7 @@ import com.intellij.util.IconUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.testin.ui.dialogs.DialogStyle;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -44,12 +45,19 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     }
 
     /**
-     * A plain message — the confirmation-dialog component. The muted From/To
-     * rows show where a transfer goes; pass null to omit either.
+     * A plain message on its own — the ordinary confirmation.
+     */
+    public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text) {
+        return message(text, "", "");
+    }
+
+    /**
+     * A message with the muted From/To rows that show where a transfer goes.
+     * An empty side is a side the message does not mention.
      */
     public static @NotNull ComponentDialogBase<DialogMessage> message(final @NotNull String text,
-                                                                      final @Nullable String from,
-                                                                      final @Nullable String to) {
+                                                                      final @NotNull String from,
+                                                                      final @NotNull String to) {
         return new ComponentDialogBase<>(new DialogMessage(text, from, to));
     }
 
@@ -129,8 +137,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      * color accents of tree icons (e.g. badge dots) never distract inside
      * a dialog. Dialogs pass their icons plain.
      */
-    private static @Nullable Icon desaturate(final @Nullable Icon icon) {
-        return icon == null ? null : IconUtil.desaturate(icon);
+    private static @NotNull Icon desaturate(final @NotNull Icon icon) {
+        return icon == DialogStyle.NO_ICON ? icon : IconUtil.desaturate(icon);
     }
 
     public @NotNull C getComponent() {
@@ -170,10 +178,10 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         }
 
         /**
-         * One caption/value row; a null or blank value skips the row.
+         * One caption/value row; a blank value skips the row.
          */
-        public @NotNull DetailsBuilder row(final @NotNull String caption, final @Nullable String value) {
-            if (value != null && !value.isBlank()) {
+        public @NotNull DetailsBuilder row(final @NotNull String caption, final @NotNull String value) {
+            if (!value.isBlank()) {
                 rows.add(new DialogDetails.Row(caption, value));
             }
             return this;
@@ -226,19 +234,19 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      */
     public static final class TextAreaBuilder {
 
-        private @Nullable String placeholder;
-        private @Nullable String value;
+        private @NotNull String placeholder = "";
+        private @NotNull String value = "";
         private int rows = 5;
 
         private TextAreaBuilder() {
         }
 
-        public @NotNull TextAreaBuilder placeholder(final @Nullable String placeholder) {
+        public @NotNull TextAreaBuilder placeholder(final @NotNull String placeholder) {
             this.placeholder = placeholder;
             return this;
         }
 
-        public @NotNull TextAreaBuilder value(final @Nullable String value) {
+        public @NotNull TextAreaBuilder value(final @NotNull String value) {
             this.value = value;
             return this;
         }
@@ -261,20 +269,20 @@ public final class ComponentDialogBase<C extends DialogComponent> {
      */
     public static final class TextInputBuilder {
 
-        private @Nullable Icon icon;
-        private @Nullable String placeholder;
-        private @Nullable String value;
+        private @NotNull Icon icon = DialogStyle.NO_ICON;
+        private @NotNull String placeholder = "";
+        private @NotNull String value = "";
         private @NotNull String accepts = TextInput.ANYTHING;
 
         private TextInputBuilder() {
         }
 
-        public @NotNull TextInputBuilder icon(final @Nullable Icon icon) {
+        public @NotNull TextInputBuilder icon(final @NotNull Icon icon) {
             this.icon = desaturate(icon);
             return this;
         }
 
-        public @NotNull TextInputBuilder placeholder(final @Nullable String placeholder) {
+        public @NotNull TextInputBuilder placeholder(final @NotNull String placeholder) {
             this.placeholder = placeholder;
             return this;
         }
@@ -282,7 +290,7 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         /**
          * The value the field opens with (e.g. the current name on rename).
          */
-        public @NotNull TextInputBuilder value(final @Nullable String value) {
+        public @NotNull TextInputBuilder value(final @NotNull String value) {
             this.value = value;
             return this;
         }
@@ -312,8 +320,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     public static final class TextFieldBuilder<T> {
 
         private final @NotNull List<SelectionList<T>> selections = new ArrayList<>();
-        private @Nullable Icon icon;
-        private @Nullable String placeholder;
+        private @NotNull Icon icon = DialogStyle.NO_ICON;
+        private @NotNull String placeholder = "";
 
         private TextFieldBuilder() {
         }
@@ -321,12 +329,12 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         /**
          * The field's leading icon before a selection takes over.
          */
-        public @NotNull TextFieldBuilder<T> icon(final @Nullable Icon icon) {
+        public @NotNull TextFieldBuilder<T> icon(final @NotNull Icon icon) {
             this.icon = desaturate(icon);
             return this;
         }
 
-        public @NotNull TextFieldBuilder<T> placeholder(final @Nullable String placeholder) {
+        public @NotNull TextFieldBuilder<T> placeholder(final @NotNull String placeholder) {
             this.placeholder = placeholder;
             return this;
         }
@@ -334,8 +342,8 @@ public final class ComponentDialogBase<C extends DialogComponent> {
         /**
          * One selectable row: icon, name, muted hint, and the submitted value.
          */
-        public @NotNull TextFieldBuilder<T> selection(final @Nullable Icon icon, final @NotNull String name,
-                                                      final @Nullable String hint, final @NotNull T value) {
+        public @NotNull TextFieldBuilder<T> selection(final @NotNull Icon icon, final @NotNull String name,
+                                                      final @NotNull String hint, final @NotNull T value) {
             selections.add(SelectionList.add(desaturate(icon), name, hint, value));
             return this;
         }

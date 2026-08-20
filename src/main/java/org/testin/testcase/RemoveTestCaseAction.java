@@ -59,7 +59,7 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
                 ? "Remove '" + selectedItems.getFirst().getDescription() + "'?"
                 : "Remove these " + selectedItems.size() + " test cases?";
 
-        new ConfirmDialog(p, "Confirm Removing", msg, dir.getPath().toString(), null, "Remove", () -> {
+        new ConfirmDialog(p, "Confirm Removing", msg, dir.getPath().toString(), "", "Remove", () -> {
             delete.run();
 
             // Inside the confirmation callback, not around actionPerformed: a

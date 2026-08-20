@@ -47,10 +47,9 @@ public final class GenerateReportDialog extends AbstractFrameworkDialog<Destinat
 
     @Override
     protected void submit() {
-        final DestinationForm.Destination destination = component().resolve();
-        if (destination == null) return;
-
-        onGenerate.accept(destination.format(), destination.file());
-        closeOk();
+        component().resolve().ifPresent(destination -> {
+            onGenerate.accept(destination.format(), destination.file());
+            closeOk();
+        });
     }
 }

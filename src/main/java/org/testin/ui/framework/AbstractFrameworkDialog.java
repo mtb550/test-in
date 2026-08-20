@@ -114,7 +114,7 @@ public abstract class AbstractFrameworkDialog<C extends DialogComponent> {
             bindShortcutKeys(contentPanel);
             bindSubmitGesture();
 
-            final ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title(), null);
+            final ComponentPopupBuilder builder = DialogStyle.createPopupBuilder(contentPanel, focusComponent(), dto().title());
             if (preferredSize != null) {
                 contentPanel.setPreferredSize(preferredSize);
                 builder.setResizable(true).setMovable(true);

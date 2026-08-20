@@ -234,7 +234,7 @@ public class TreeTransferHandler extends TransferHandler {
                 final Path fromPath = sources.getFirst().getPath().getParent();
                 new ConfirmDialog(p, verb,
                         verb + " " + describe(sources) + " into '" + target.getName() + "'?",
-                        fromPath == null ? null : fromPath.toString(),
+                        fromPath == null ? "" : fromPath.toString(),
                         target.getPath().toString(),
                         verb,
                         () -> transfer(action, sources, target)

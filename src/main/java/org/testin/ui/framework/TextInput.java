@@ -32,7 +32,7 @@ public final class TextInput implements DialogComponent {
     static final @NotNull String ANYTHING = ".*";
 
     private final @NotNull ExtendableTextField textField;
-    private final @Nullable String placeHolderText;
+    private final @NotNull String placeHolderText;
     private boolean emptyWarningShown;
 
     /**
@@ -42,16 +42,16 @@ public final class TextInput implements DialogComponent {
      *                made to hold anything else - there is nothing to validate
      *                on submit and nothing to explain afterward
      */
-    TextInput(final @Nullable Icon icon, final @Nullable String placeHolderText, final @Nullable String initialValue,
+    TextInput(final @NotNull Icon icon, final @NotNull String placeHolderText, final @NotNull String initialValue,
               final @NotNull String accepts) {
         this.placeHolderText = placeHolderText;
-        textField = new ExtendableTextField(initialValue == null ? "" : initialValue);
+        textField = new ExtendableTextField(initialValue);
         // Derived from the label font at construction, so every dialog open
         // picks up the current IDE font-size setting.
         textField.setFont(JBFont.label().biggerOn(6f));
         textField.setBorder(JBUI.Borders.empty(10, 12));
 
-        if (placeHolderText != null && !placeHolderText.isBlank()) {
+        if (!placeHolderText.isBlank()) {
             textField.getEmptyText().setText(placeHolderText);
             TextComponentEmptyText.setupPlaceholderVisibility(textField);
             // Typing clears a red empty-submit warning back to the normal look.
@@ -124,7 +124,7 @@ public final class TextInput implements DialogComponent {
     }
 
     private void showPlaceholder(final @NotNull SimpleTextAttributes attributes) {
-        if (placeHolderText == null || placeHolderText.isBlank()) return;
+        if (placeHolderText.isBlank()) return;
 
         textField.getEmptyText().clear();
         textField.getEmptyText().appendText(placeHolderText, attributes);

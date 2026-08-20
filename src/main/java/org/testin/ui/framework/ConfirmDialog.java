@@ -2,7 +2,6 @@ package org.testin.ui.framework;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.util.Shortcuts;
 
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> 
     private final @NotNull Runnable onConfirm;
 
     public ConfirmDialog(final @NotNull Project p, final @NotNull String dialogTitle, final @NotNull String message,
-                         final @Nullable String from, final @Nullable String to,
+                         final @NotNull String from, final @NotNull String to,
                          final @NotNull String confirmName, final @NotNull Runnable onConfirm) {
         this(p, dialogTitle, message, from, to, confirmName, onConfirm, List.of());
     }
@@ -35,7 +34,7 @@ public final class ConfirmDialog extends AbstractFrameworkDialog<DialogMessage> 
      *                     Empty for the ordinary yes-or-no
      */
     public ConfirmDialog(final @NotNull Project p, final @NotNull String dialogTitle, final @NotNull String message,
-                         final @Nullable String from, final @Nullable String to,
+                         final @NotNull String from, final @NotNull String to,
                          final @NotNull String confirmName, final @NotNull Runnable onConfirm,
                          final @NotNull List<Alternative> alternatives) {
         super(p);

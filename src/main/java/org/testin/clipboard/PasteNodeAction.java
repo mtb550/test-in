@@ -63,7 +63,7 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
 
             new ConfirmDialog(p, "Paste",
                     verb + " " + what + " into '" + target.getName() + "'?",
-                    fromPath == null ? null : fromPath.toString(),
+                    fromPath == null ? "" : fromPath.toString(),
                     target.getPath().toString(),
                     verb,
                     transferHandler::pasteFromClipboard

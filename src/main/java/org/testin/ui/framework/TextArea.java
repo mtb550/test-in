@@ -6,7 +6,6 @@ import com.intellij.ui.components.JBTextArea;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 
 import javax.imageio.ImageIO;
@@ -33,8 +32,8 @@ public final class TextArea implements DialogComponent {
     private final @NotNull JBTextArea area;
     private final @NotNull JBScrollPane panel;
 
-    TextArea(final @Nullable String placeholder, final @Nullable String value, final int rows) {
-        area = new JBTextArea(value == null ? "" : value);
+    TextArea(final @NotNull String placeholder, final @NotNull String value, final int rows) {
+        area = new JBTextArea(value);
         area.setFont(JBFont.label().biggerOn(2f));
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
@@ -42,7 +41,7 @@ public final class TextArea implements DialogComponent {
         area.setColumns(50);
         area.setBorder(JBUI.Borders.empty(8, 12));
 
-        if (placeholder != null && !placeholder.isBlank()) {
+        if (!placeholder.isBlank()) {
             area.getEmptyText().setText(placeholder);
         }
 
@@ -57,12 +56,12 @@ public final class TextArea implements DialogComponent {
     }
 
     /**
-     * Null when the image cannot be encoded, which the caller reads as "paste it
+     * Empty when the image cannot be encoded, which the caller reads as "paste it
      * as text instead". It used to signal that by throwing, so a genuine encoding
      * failure and an image the clipboard had not finished loading arrived at the
      * same catch and neither was logged.
      */
-    private static @Nullable String toDataUri(final @NotNull Image image) {
+    private static @NotNull String toDataUri(final @NotNull Image image) {
         final BufferedImage buffered;
         if (image instanceof BufferedImage alreadyBuffered) {
             buffered = alreadyBuffered;
@@ -71,7 +70,7 @@ public final class TextArea implements DialogComponent {
             final int height = image.getHeight(null);
             // A not-yet-loaded async image reports -1; the caller falls back
             // to the normal text paste.
-            if (width <= 0 || height <= 0) return null;
+            if (width <= 0 || height <= 0) return "";
 
             buffered = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             final Graphics2D g = buffered.createGraphics();
@@ -88,7 +87,7 @@ public final class TextArea implements DialogComponent {
             return "data:image/png;base64," + Base64.getEncoder().encodeToString(out.toByteArray());
         } catch (final IOException ex) {
             Logger.error("Could not encode a pasted image as PNG: " + ex.getMessage());
-            return null;
+            return "";
         }
     }
 
@@ -106,8 +105,8 @@ public final class TextArea implements DialogComponent {
                 if (contents != null && contents.isDataFlavorSupported(DataFlavor.imageFlavor)) {
                     try {
                         final Image image = (Image) contents.getTransferData(DataFlavor.imageFlavor);
-                        final @Nullable String dataUri = toDataUri(image);
-                        if (dataUri != null) {
+                        final String dataUri = toDataUri(image);
+                        if (!dataUri.isEmpty()) {
                             area.insert(dataUri, area.getCaretPosition());
                             return;
                         }
