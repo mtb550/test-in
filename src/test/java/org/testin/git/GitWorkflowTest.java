@@ -361,6 +361,76 @@ public class GitWorkflowTest {
     }
 
     /**
+     * The conflict this product actually gets: a colleague edited one field of a
+     * test case and the tester edited another, so Git stops on a file where
+     * nobody disagreed about anything (#90).
+     * <p>
+     * Everything here is real - a remote, a colleague's clone, a rebase that
+     * genuinely stops - because the merge rules being right is not the same as
+     * the merge working. The three stages have to be readable while the rebase
+     * is stopped, the merged file has to be one Git accepts as a resolution, and
+     * the rebase has to finish afterward.
+     */
+    @Test
+    public void aConflictedTestCaseIsMergedFieldByFieldAndTheRebaseFinishes() throws IOException {
+        final List<TestCaseDto> cases = writeTestProject();
+        commit(stagedFor(review()), "the first commit");
+        mustGit(work, "push", "-u", "origin", "main");
+
+        final String relativePath = "Test Cases/login flow/" + cases.getFirst().getId() + ".json";
+
+        // The colleague sharpens the expected result.
+        final Path colleague = cloneAsColleague();
+        mustGit(colleague, "config", "user.name", "Colleague");
+        mustGit(colleague, "config", "user.email", "colleague@example.invalid");
+
+        final Path theirCopy = colleague.resolve(relativePath);
+        final TestCaseDto theirs = mapper().readValue(Files.readString(theirCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+        Files.writeString(theirCopy, mapper().writeValueAsString(
+                theirs.setExpectedResult("the dashboard opens within two seconds").setUpdatedBy("colleague")),
+                StandardCharsets.UTF_8);
+        mustGit(colleague, "commit", "-am", "tightened the expected result");
+        mustGit(colleague, "push", "origin", "main");
+
+        // The tester rewords the description of the same case, and commits.
+        final Path myCopy = work.resolve(relativePath);
+        final TestCaseDto mine = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+        Files.writeString(myCopy, mapper().writeValueAsString(
+                mine.setDescription("a registered user signs in with a valid password").setUpdatedBy("muteb")),
+                StandardCharsets.UTF_8);
+        commit(stagedFor(review()), "reworded the description");
+
+        // Git stops: one file, two commits, no way for it to know the two edits
+        // are in different fields.
+        assertNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+                "the pull is expected to stop on the conflict");
+
+        final List<String> conflicting = GitRefs.unmergedPaths(
+                mustGit(work, "status", "--porcelain", "-uall").lines().filter(line -> !line.isBlank()).toList());
+        assertEquals(conflicting, List.of(relativePath));
+
+        // What the plugin does with it: read the three sides Git is holding and
+        // merge them field by field.
+        final String base = mustGit(work, "show", ":1:" + relativePath);
+        final String remote = mustGit(work, "show", ":2:" + relativePath);
+        final String replayed = mustGit(work, "show", ":3:" + relativePath);
+
+        final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, replayed, remote);
+        assertTrue(merge.isSettled(), "different fields are not a disagreement");
+
+        Files.writeString(myCopy, merge.merged().toPrettyString(), StandardCharsets.UTF_8);
+        mustGit(work, "add", "--", relativePath);
+        mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
+
+        // Both edits survived, and the repository is not mid-rebase any more.
+        final TestCaseDto merged = mapper().readValue(Files.readString(myCopy, StandardCharsets.UTF_8), TestCaseDto.class);
+        assertEquals(merged.getDescription(), "a registered user signs in with a valid password");
+        assertEquals(merged.getExpectedResult(), "the dashboard opens within two seconds");
+        assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
+        assertEquals(review(), List.of(), "a resolved rebase leaves nothing pending");
+    }
+
+    /**
      * The colleague half of the round trip: they change a case and push, and the
      * change arrives here on a pull.
      */

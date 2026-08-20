@@ -393,14 +393,32 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      */
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote,
                                      final @NotNull String branch) {
-        final String message = GitRefs.conflictMessage(git.conflictingPaths(repoPath));
+        final List<String> conflicting = git.conflictingPaths(repoPath);
         final Notifier notifier = Services.getInstance(p, Notifier.class);
+
         notifier.warnWithActions(
                 p,
                 "Git Conflicts",
-                message,
+                GitRefs.conflictMessage(conflicting),
+                notifier.action("Resolve", () -> resolveConflicts(repoPath, remote, branch, conflicting)),
                 notifier.action("Continue rebase", () -> finishRebase(repoPath, remote, branch, false)),
                 notifier.action("Abort rebase", () -> finishRebase(repoPath, remote, branch, true)));
+    }
+
+    /**
+     * Merges the conflicted test cases and continues the rebase when nothing is
+     * left conflicting.
+     * <p>
+     * Off the EDT because it reads Git and writes files; the questions it cannot
+     * answer open on the EDT from inside.
+     */
+    private void resolveConflicts(final @NotNull Path repoPath, final @NotNull String remote,
+                                  final @NotNull String branch, final @NotNull List<String> conflicting) {
+        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                ConflictResolution.resolve(p, repoPath, conflicting,
+                        () -> finishRebase(repoPath, remote, branch, false),
+                        leftOver -> Services.getInstance(p, Notifier.class).warn(p, "Still Conflicting",
+                                GitRefs.conflictMessage(leftOver))));
     }
 
     private void finishRebase(final @NotNull Path repoPath, final @NotNull String remote,

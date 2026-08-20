@@ -114,16 +114,33 @@ public class SyncActionAction extends AbstractProjectTreeAction {
 
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
         final Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        final NotificationAction resolveAction = notifier.action(
+                "Resolve", () -> resolveConflicts(repoPath, conflicting));
         final NotificationAction continueAction = notifier.action(
                 "Continue rebase", () -> finishRebase(repoPath, false));
         final NotificationAction abortAction = notifier.action(
                 "Abort rebase", () -> finishRebase(repoPath, true));
+
         notifier.warnWithActions(
                 p,
                 "Git Conflicts",
                 GitRefs.conflictMessage(conflicting),
+                resolveAction,
                 continueAction,
                 abortAction);
+    }
+
+    /**
+     * Merges the conflicted test cases and continues the pull when nothing is
+     * left conflicting. Off the EDT: it reads Git and writes files.
+     */
+    private void resolveConflicts(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
+        ApplicationManager.getApplication().executeOnPooledThread(() ->
+                ConflictResolution.resolve(p, repoPath, conflicting,
+                        () -> finishRebase(repoPath, false),
+                        leftOver -> Services.getInstance(p, Notifier.class).warn(p, "Still Conflicting",
+                                GitRefs.conflictMessage(leftOver))));
     }
 
     /**

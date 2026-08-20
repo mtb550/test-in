@@ -167,6 +167,31 @@ public final class GitRepositoryService {
     }
 
     /**
+     * One side of a conflicted file as Git holds it in the index.
+     * <p>
+     * The three sides of a conflict never touch the working tree, which holds
+     * the marked-up mixture instead - so a merge that means to read them reads
+     * them from here. Empty when that stage does not exist, which is what two
+     * testers creating the same file leaves behind: no common ancestor (#90).
+     *
+     * @param stage 1 for the common ancestor, 2 for the branch being replayed
+     *              onto, 3 for the commits being replayed
+     */
+    public @NotNull String stageContent(final @NotNull Path path, final @NotNull String relativePath, final int stage) {
+        final String content = run(path, "git", "show", ":" + stage + ":" + relativePath);
+        return content == null ? "" : content;
+    }
+
+    /**
+     * Stages a file whose conflict has been resolved, which is how Git is told
+     * it is over. Answers whether it worked - a resolution Git did not accept
+     * would stop the rebase again with nothing left on screen to explain it.
+     */
+    public boolean stageResolved(final @NotNull Path path, final @NotNull String relativePath) {
+        return run(path, "git", "add", "--", relativePath) != null;
+    }
+
+    /**
      * The files a stopped pull left conflicting, in the order Git lists them.
      */
     public @NotNull List<String> conflictingPaths(final @NotNull Path path) {
