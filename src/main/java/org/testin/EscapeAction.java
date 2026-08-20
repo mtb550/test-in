@@ -11,8 +11,9 @@ import com.intellij.ui.table.JBTable;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.clipboard.CutState;
+import org.testin.services.Services;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.explorer.tree.TreeTransferHandler;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -97,8 +98,8 @@ public class EscapeAction extends AbstractProjectAction {
     }
 
     private void clearClipboardState() {
-        if (TestEditorContextMenu.isGlobalCutAction()) {
-            TestEditorContextMenu.clearCutState();
+        if (Services.getInstance(p, CutState.class).isCutting()) {
+            Services.getInstance(p, CutState.class).clear();
         }
         CopyPasteManager.getInstance().setContents(new StringSelection(""));
     }

@@ -9,7 +9,6 @@ import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -42,11 +41,7 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
 
         if (!selectedTestCases.isEmpty()) {
             try {
-                TestEditorContextMenu.setGlobalCutAction(true);
-
-                TestEditorContextMenu.getGlobalPendingCutIds().clear();
-                selectedTestCases.forEach(tc -> TestEditorContextMenu.getGlobalPendingCutIds().add(tc.getId()));
-                TestEditorContextMenu.setGlobalSourceEditorUI(editor);
+                Services.getInstance(p, CutState.class).cut(editor, selectedTestCases);
 
                 String json = Services.getInstance(p, Mapper.class).writeValueAsString(selectedTestCases);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));

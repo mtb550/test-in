@@ -11,10 +11,10 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
-import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.clipboard.CutState;
 import org.testin.services.Services;
 import org.testin.ui.framework.ConfirmDialog;
 import org.testin.util.Shortcuts;
@@ -47,8 +47,8 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
 
         // A pending cut removes its source as the second half of a move the
         // tester already asked for, so it is not confirmed again.
-        final boolean isCutAndSelected = TestEditorContextMenu.isGlobalCutAction() &&
-                selectedItems.stream().allMatch(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()));
+        final boolean isCutAndSelected = Services.getInstance(p, CutState.class).isCutting() &&
+                selectedItems.stream().allMatch(tc -> Services.getInstance(p, CutState.class).isPending(tc.getId()));
 
         if (isCutAndSelected) {
             delete.run();

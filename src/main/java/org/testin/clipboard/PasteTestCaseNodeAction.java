@@ -12,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
-import org.testin.editor.test.TestEditorContextMenu;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -52,13 +51,12 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
             TestEditor destUI = (editor instanceof TestEditor) ? (TestEditor) editor : null;
             if (destUI == null) return;
 
-            boolean isCut = TestEditorContextMenu.isGlobalCutAction();
-            TestinEditor sourceUI = TestEditorContextMenu.getGlobalSourceEditorUI();
+            final CutState cutState = Services.getInstance(p, CutState.class);
+            final boolean isCut = cutState.isCutting();
 
-            if (isCut && sourceUI != null) {
-
-                List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
-                        .filter(tc -> TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId()))
+            cutState.source().ifPresent(sourceUI -> {
+                final List<TestCaseDto> cutItems = sourceUI.getAllTestCases().stream()
+                        .filter(tc -> cutState.isPending(tc.getId()))
                         .toList();
 
                 ApplicationManager.getApplication().runWriteAction(() -> {
@@ -72,7 +70,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
                 if (sourceUI != destUI && sourceUI instanceof TestEditor sourceEditor) {
                     sourceEditor.reorderAndPersist();
                 }
-            }
+            });
 
             int pasted = 0;
 
@@ -88,9 +86,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
             destUI.reorderAndPersist();
 
-            if (isCut) {
-                TestEditorContextMenu.clearCutState();
-            }
+            if (isCut) cutState.clear();
 
             // Inside the invokeLater and after the sequence is persisted: the
             // action itself returns long before the cases exist (#62).

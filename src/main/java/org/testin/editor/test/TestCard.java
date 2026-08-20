@@ -2,11 +2,13 @@ package org.testin.editor.test;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
+import org.testin.clipboard.CutState;
 import org.testin.editor.BaseCard;
 import org.testin.editor.Shared;
 import org.testin.model.RunStatus;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.services.Services;
 
 import java.awt.*;
 import java.util.*;
@@ -27,7 +29,7 @@ public class TestCard extends BaseCard {
         badges.clear();
         details.clear();
 
-        this.isPendingCut = TestEditorContextMenu.isGlobalCutAction() && TestEditorContextMenu.getGlobalPendingCutIds().contains(tc.getId());
+        this.isPendingCut = Services.getInstance(p, CutState.class).isPending(tc.getId());
 
         Arrays.stream(TestEditorAttributes.values())
                 .filter(activeDetails::contains)
