@@ -70,8 +70,11 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
     }
 
     private void performDeletion(final @NotNull List<TestCaseDto> selectedItems) {
-        relinkAroundRemoved(selectedItems);
-
+        // Nothing is relinked. A case carries its own position, so removing one
+        // leaves a gap in the ranks and no case anywhere pointing at it - which
+        // used to be a walk over the whole set rewriting the survivors on either
+        // side of every removed run.
+        //
         // Off the editor's master list first. The list model holds only the
         // current page, while the next sequence write persists every entry of
         // the master list.
@@ -88,58 +91,6 @@ public class RemoveTestCaseAction extends AbstractProjectAction {
         for (int i = selectedItems.size() - 1; i >= 0; i--) {
             model.remove(model.getElementIndex(selectedItems.get(i)));
         }
-    }
-
-    /**
-     * Stitches the linked list past every removed node. Handles non-contiguous
-     * selections: each removed run is bridged by its surrounding survivors —
-     * relinking only around first/last selected would leave middle survivors
-     * unreachable and silently break the ordering.
-     * <p>
-     * Walks the editor's master list rather than the page model. The model holds
-     * one page, so deleting the first case on page two would look like deleting
-     * the head - page one's last case would keep pointing at a removed id.
-     */
-    private void relinkAroundRemoved(final @NotNull List<TestCaseDto> selectedItems) {
-        final Set<UUID> removedIds = new HashSet<>();
-        for (final TestCaseDto tc : selectedItems) removedIds.add(tc.getId());
-
-        final List<TestCaseDto> source = editor.getAllTestCases();
-        final List<TestCaseDto> all;
-        synchronized (source) {
-            all = new ArrayList<>(source);
-        }
-
-        TestCaseDto prevSurvivor = null;
-        int i = 0;
-        while (i < all.size()) {
-            final TestCaseDto tc = all.get(i);
-            if (!removedIds.contains(tc.getId())) {
-                prevSurvivor = tc;
-                i++;
-                continue;
-            }
-
-            // A run of removed rows: find the survivor after it.
-            int j = i;
-            while (j < all.size() && removedIds.contains(all.get(j).getId())) j++;
-            final TestCaseDto nextSurvivor = j < all.size() ? all.get(j) : null;
-
-            if (prevSurvivor == null) {
-                if (Boolean.TRUE.equals(tc.getIsHead()) && nextSurvivor != null) {
-                    nextSurvivor.setIsHead(true);
-                    saveToFile(nextSurvivor);
-                }
-            } else {
-                prevSurvivor.setNext(nextSurvivor != null ? nextSurvivor.getId() : null);
-                saveToFile(prevSurvivor);
-            }
-            i = j;
-        }
-    }
-
-    private void saveToFile(final @NotNull TestCaseDto item) {
-        Services.getInstance(p, ProjectIndexer.class).putTestCase(dir.getPath(), item);
     }
 
     @Override

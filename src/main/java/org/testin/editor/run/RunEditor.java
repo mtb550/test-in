@@ -234,7 +234,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     }
                 }
 
-                final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(p, loadedItems).sortedList();
+                final List<TestCaseDto> sorted = TestCaseSorter.sorted(loadedItems);
                 Services.getInstance(p, TestCaseCacheService.class).load(sorted);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
@@ -627,11 +627,6 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         list.setSelectedIndex(index);
         list.ensureIndexIsVisible(index);
         list.requestFocusInWindow();
-    }
-
-    @Override
-    public @NotNull Set<UUID> getUnsortedIds() {
-        return Collections.emptySet();
     }
 
     @Override

@@ -20,6 +20,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -137,6 +139,7 @@ final class IndexingScanner {
             store.getTestSetsDirByPath().put(path.toString(), ts);
 
             final List<UUID> caseIds = Collections.synchronizedList(new ArrayList<>());
+            final Map<Path, TestCaseDto> loaded = Collections.synchronizedMap(new LinkedHashMap<>());
             final Mapper mapper = Services.getInstance(p, Mapper.class);
 
             try (Stream<Path> files = Files.list(path)) {
@@ -150,6 +153,7 @@ final class IndexingScanner {
                                 tc.setId(identityOf(filePath, tc));
                                 store.getTestCasesById().put(tc.getId(), tc);
                                 caseIds.add(tc.getId());
+                                loaded.put(filePath, tc);
                             } catch (final Exception ex) {
                                 Logger.error("Failed to read test case '" + filePath.toAbsolutePath() +
                                         "': " + ex.getMessage());
@@ -158,6 +162,14 @@ final class IndexingScanner {
             }
 
             store.getTestSetCaseIds().put(path.toString(), caseIds);
+
+            // A set written before cases carried their own rank has its order in
+            // the old chain, and only here can it still be read - the model has
+            // dropped those keys. Converted once and written back, so the tester
+            // finds their set in the order they arranged it.
+            for (final TestCaseDto converted : LegacyChainOrder.apply(p, loaded)) {
+                store.putTestCase(path, converted);
+            }
             if (indicator != null) {
                 indicator.setText("Test set: " + ts.getName() + " (" + caseIds.size() + " cases)");
             }

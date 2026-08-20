@@ -3,7 +3,6 @@ package org.testin.git;
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.testcase.TestCaseSorter;
-import org.testin.testcase.SortResult;
 import org.testin.util.Mapper;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -151,7 +150,8 @@ public class GitWorkflowTest {
                 testCase("a registered user signs in"),
                 testCase("a wrong password is refused"));
 
-        cases.getFirst().setIsHead(true).setNext(cases.get(1).getId());
+        // Ranked in the order the editor would show them.
+        TestCaseSorter.rankAll(cases);
 
         for (final TestCaseDto testCase : cases) {
             write(work, "Test Cases/login flow/" + testCase.getId() + ".json", testCase);
@@ -434,104 +434,58 @@ public class GitWorkflowTest {
 
     /**
      * Two testers adding a test case to the same test set at the same time -
-     * the conflict this product gets more than any other, and the one a field
-     * merge alone does not finish (#90).
+     * the thing this product does more than anything else, and the thing that
+     * used to conflict (#90).
      * <p>
-     * Neither new file conflicts: they are new files with different names. What
-     * conflicts is the case that was last in the set, because both testers
-     * pointed it at their own new case. A merge decides one file at a time and
-     * can only keep one of those pointers, which leaves the other tester's case
-     * committed and pointed at by nothing.
-     * <p>
-     * So after merging, the set is read as a whole and relinked. Both cases end
-     * up in the chain, and the one that lost the pointer is last.
+     * Neither new file conflicts: they are new files with new names. Nothing
+     * else conflicts either, now that a case carries its own position - the case
+     * that happened to be last used to be rewritten by both testers to point at
+     * their own new one, and that third file was the conflict. Git merges this
+     * on its own, with nothing for the plugin to resolve.
      */
     @Test
-    public void twoTestersAddingCasesToOneSetBothKeepTheirsInTheChain() throws IOException {
-        final List<TestCaseDto> cases = writeTestProject();
+    public void twoTestersAddingCasesToOneSetDoNotConflictAtAll() throws IOException {
+        writeTestProject();
         commit(stagedFor(review()), "the first commit");
         mustGit(work, "push", "-u", "origin", "main");
 
-        final TestCaseDto tail = cases.get(1);
-        final String tailPath = "Test Cases/login flow/" + tail.getId() + ".json";
-
-        // The colleague appends a case: their new file, and the tail now points
-        // at it.
+        // The colleague appends a case and pushes it.
         final Path colleague = cloneAsColleague();
         mustGit(colleague, "config", "user.name", "Colleague");
         mustGit(colleague, "config", "user.email", "colleague@example.invalid");
 
-        final TestCaseDto theirNewCase = testCase("a locked account cannot sign in");
+        final TestCaseDto theirNewCase = testCase("a locked account cannot sign in").setOrder("s");
         write(colleague, "Test Cases/login flow/" + theirNewCase.getId() + ".json", theirNewCase);
-
-        final TestCaseDto theirTail = mapper().readValue(
-                Files.readString(colleague.resolve(tailPath), StandardCharsets.UTF_8), TestCaseDto.class);
-        write(colleague, tailPath, theirTail.setNext(theirNewCase.getId()));
 
         mustGit(colleague, "add", "-A");
         mustGit(colleague, "commit", "-m", "added the locked account case");
         mustGit(colleague, "push", "origin", "main");
 
-        // This tester appends one too, pointing the same tail at their own.
-        final TestCaseDto myNewCase = testCase("a signed-in user signs out");
+        // This tester appends one too, at the same moment.
+        final TestCaseDto myNewCase = testCase("a signed-in user signs out").setOrder("s");
         write(work, "Test Cases/login flow/" + myNewCase.getId() + ".json", myNewCase);
-
-        final TestCaseDto myTail = mapper().readValue(
-                Files.readString(work.resolve(tailPath), StandardCharsets.UTF_8), TestCaseDto.class);
-        write(work, tailPath, myTail.setNext(myNewCase.getId()));
-
         commit(stagedFor(review()), "added the sign out case");
 
-        assertNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
-                "the tail's next pointer is expected to conflict");
+        // No conflict to resolve: the pull rebases straight through.
+        assertNotNull(git(work, "pull", "--rebase", "--autostash", "origin", "main"),
+                "two appended cases touch two files and merge on their own");
 
-        // The merge: the pointer is settled without asking, because no answer to
-        // "which pointer" means anything to a tester.
-        final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(),
-                mustGit(work, "show", ":1:" + tailPath),
-                mustGit(work, "show", ":3:" + tailPath),
-                mustGit(work, "show", ":2:" + tailPath));
-
-        assertTrue(merge.isSettled(), "an order pointer is not a question");
-
-        Files.writeString(work.resolve(tailPath), merge.merged().toPrettyString(), StandardCharsets.UTF_8);
-        mustGit(work, "add", "--", tailPath);
-
-        // The repair: read the set, sort it, relink it, write what moved.
-        final Path testSet = work.resolve("Test Cases/login flow");
-        final List<TestCaseDto> all = new ArrayList<>();
-        try (Stream<Path> files = Files.list(testSet)) {
-            for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
-                all.add(mapper().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
-            }
-        }
-
-        final List<TestCaseDto> sorted = TestCaseSorter.sortTestCases(all).sortedList();
-        TestCaseSorter.relink(sorted);
-
-        for (final TestCaseDto testCase : sorted) {
-            write(work, "Test Cases/login flow/" + testCase.getId() + ".json", testCase);
-        }
-        mustGit(work, "add", "--", "Test Cases/login flow");
-        mustGit(work, "-c", "core.editor=true", "rebase", "--continue");
-
-        // Four cases, one chain, and both new ones are in it.
         final List<TestCaseDto> after = new ArrayList<>();
-        try (Stream<Path> files = Files.list(testSet)) {
+        try (Stream<Path> files = Files.list(work.resolve("Test Cases/login flow"))) {
             for (final Path file : files.filter(f -> f.getFileName().toString().endsWith(".json")).sorted().toList()) {
                 after.add(mapper().readValue(Files.readString(file, StandardCharsets.UTF_8), TestCaseDto.class));
             }
         }
 
-        final SortResult order = TestCaseSorter.sortTestCases(after);
+        assertEquals(after.size(), 4, "both testers keep their case");
 
-        assertEquals(after.size(), 4);
-        assertEquals(order.unsortedIds(), Set.of(), "every case is reachable from the head");
-        assertEquals(order.sortedList().size(), 4);
-        assertTrue(order.sortedList().stream().anyMatch(tc -> tc.getId().equals(theirNewCase.getId())),
-                "the colleague's case is in the chain");
-        assertTrue(order.sortedList().stream().anyMatch(tc -> tc.getId().equals(myNewCase.getId())),
-                "my case is in the chain");
+        // Same rank on both, which is allowed: the order is settled the same way
+        // on every machine, so two testers never see two different lists.
+        final List<TestCaseDto> ordered = TestCaseSorter.sorted(after);
+        assertEquals(ordered, TestCaseSorter.sorted(new ArrayList<>(after.reversed())),
+                "the order does not depend on what order the files were read in");
+        assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(theirNewCase.getId())));
+        assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(myNewCase.getId())));
         assertEquals(mustGit(work, "status", "--porcelain", "-uall").strip(), "");
     }
 

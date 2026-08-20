@@ -23,6 +23,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.testcase.TestCaseSorter;
 import org.testin.util.Mapper;
 
 import javax.swing.tree.TreePath;
@@ -112,8 +113,7 @@ public class ExportAction extends AbstractProjectTreeAction {
     }
 
     public @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final @NotNull VirtualFile dir) {
-        final Map<UUID, TestCaseDto> tcMap = new HashMap<>();
-        TestCaseDto head = null;
+        final List<TestCaseDto> loaded = new ArrayList<>();
 
         final VirtualFile[] files = dir.getChildren();
         if (files == null) return Collections.emptyList();
@@ -121,32 +121,17 @@ public class ExportAction extends AbstractProjectTreeAction {
         for (final VirtualFile file : files) {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
-                    final TestCaseDto tc = Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class);
-                    tcMap.put(tc.getId(), tc);
-                    if (Boolean.TRUE.equals(tc.getIsHead())) {
-                        head = tc;
-                    }
+                    loaded.add(Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class));
                 } catch (final Exception ex) {
                     Logger.error("Loading test cases failed: " + ex.getMessage());
                 }
             }
         }
 
-        if (head == null && !tcMap.isEmpty()) {
-            return new ArrayList<>(tcMap.values());
-        }
-
-        final List<TestCaseDto> orderedList = new ArrayList<>();
-        TestCaseDto current = head;
-
-        while (current != null) {
-            orderedList.add(current);
-            if (current.getNext() != null) {
-                current = tcMap.get(current.getNext());
-            } else {
-                current = null;
-            }
-        }
+        // The same order the editor shows, from the same rule - a sheet whose
+        // rows are in a different order from the screen they were exported from
+        // is a sheet nobody trusts.
+        final List<TestCaseDto> orderedList = new ArrayList<>(TestCaseSorter.sorted(loaded));
 
         return orderedList;
     }

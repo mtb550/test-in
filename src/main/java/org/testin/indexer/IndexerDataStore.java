@@ -115,8 +115,9 @@ final class IndexerDataStore {
         testCaseStore.remove(testSetPath, tcId);
     }
 
-    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList) {
-        testCaseStore.updateSequence(testSetPath, sortedList);
+    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList,
+                        final @NotNull List<TestCaseDto> moved) {
+        testCaseStore.updateSequence(testSetPath, sortedList, moved);
     }
 
     void putTestRun(final @NotNull Path testRunPath, final @NotNull TestRunDto tr) {

@@ -23,7 +23,7 @@ public class TestCard extends BaseCard {
         this.p = p;
     }
 
-    public void updateData(final int index, final @NotNull TestCaseDto tc, final @NotNull Set<?> activeDetails, final boolean isUnsorted, final @NotNull String title) {
+    public void updateData(final int index, final @NotNull TestCaseDto tc, final @NotNull Set<?> activeDetails, final @NotNull String title) {
         badges.clear();
         details.clear();
 
@@ -32,10 +32,6 @@ public class TestCard extends BaseCard {
         Arrays.stream(TestEditorAttributes.values())
                 .filter(activeDetails::contains)
                 .forEach(attr -> attr.applyToUI(tc, badges, details, p));
-
-        if (isUnsorted) {
-            badges.add(Shared.createUnsortedBadge());
-        }
 
         final RunStatus runStatus = tc.getTempStatus();
         this.isRunning = runStatus == RunStatus.RUNNING;

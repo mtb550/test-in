@@ -18,6 +18,8 @@ import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
+import org.testin.testcase.Rank;
+import org.testin.testcase.TestCaseSorter;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -148,22 +150,14 @@ public class ImportAction extends AbstractProjectTreeAction {
                                       final @Nullable TestCaseDto existingTail) {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
-        TestCaseDto previousNode = existingTail;
+        // After what is already in the set, in the order the sheet listed them.
+        // Nothing that was there is touched: an import used to rewrite the case
+        // that happened to be last.
+        String rank = existingTail == null ? "" : existingTail.getOrder();
 
         for (final TestCaseDto currentTestCase : testCases) {
-            if (previousNode == null) {
-                currentTestCase.setIsHead(true);
-
-            } else {
-                currentTestCase.setIsHead(null);
-                previousNode.setNext(currentTestCase.getId());
-            }
-            currentTestCase.setNext(null);
-            previousNode = currentTestCase;
-        }
-
-        if (existingTail != null) {
-            indexer.putTestCase(dirPath, existingTail);
+            rank = Rank.after(rank);
+            currentTestCase.setOrder(rank);
         }
 
         // The imported cases keep the audit their file carried; the tail is an
@@ -175,14 +169,14 @@ public class ImportAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * The indexer is the source of truth for existing test cases — no need to
-     * re-read JSON files from disk to find the linked-list tail.
+     * The last case in the set, which is what an import lands after. From the
+     * indexer, which is the source of truth for what is already there.
      */
     private @Nullable TestCaseDto findExistingTail(final @NotNull Project p, final @NotNull Path directory) {
-        return Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory).stream()
-                .filter(tc -> tc.getNext() == null)
-                .findFirst()
-                .orElse(null);
+        final List<TestCaseDto> existing =
+                TestCaseSorter.sorted(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory));
+
+        return existing.isEmpty() ? null : existing.getLast();
     }
 
     @Override

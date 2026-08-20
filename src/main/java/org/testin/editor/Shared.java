@@ -69,13 +69,6 @@ public class Shared {
     }
 
     /**
-     * The test case is not under a test set, so it is not in a run yet.
-     */
-    public static @NotNull Badge createUnsortedBadge() {
-        return new Badge("Unsorted", UNSORTED_COLOR);
-    }
-
-    /**
      * The live state of a case while a run is executing - the label and color
      * are the status's own.
      */

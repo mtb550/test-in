@@ -35,7 +35,7 @@ import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseAction;
-import org.testin.testcase.SortResult;
+import org.testin.testcase.Rank;
 import org.testin.testcase.TestCaseSorter;
 import org.testin.util.FontSync;
 import org.testin.view.GridViewDetailsAction;
@@ -83,8 +83,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     private final @NotNull StatusBar statusBar;
     @Getter
     private final @NotNull List<TestCaseDto> allTestCases;
-    @Getter
-    private final @NotNull Set<UUID> unsortedIds;
     @Getter
     private final @NotNull List<TestCaseDto> currentTestCases;
     /**
@@ -138,7 +136,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         this.allTestCases = Collections.synchronizedList(new ArrayList<>());
         this.currentTestCases = Collections.synchronizedList(new ArrayList<>());
 
-        this.unsortedIds = Collections.synchronizedSet(new HashSet<>());
 
         this.mainPanel = new JBPanel<>(new BorderLayout());
         this.center = new EditorCenter(this.mainPanel);
@@ -199,7 +196,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
                     if (generation != modelGeneration.get()) return;
                     allTestCases.clear();
                     currentTestCases.clear();
-                    unsortedIds.clear();
                     list.setPaintBusy(false);
                     loading = false;
                     // The message comes from refreshView, which is the one place
@@ -211,19 +207,16 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
             Services.getInstance(p, TestCaseCacheService.class).load(items);
 
-            final SortResult result = TestCaseSorter.sortTestCases(p, items);
+            final List<TestCaseDto> sorted = TestCaseSorter.sorted(items);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
                 allTestCases.clear();
-                allTestCases.addAll(result.sortedList());
+                allTestCases.addAll(sorted);
                 currentTestCases.clear();
-                currentTestCases.addAll(result.sortedList());
+                currentTestCases.addAll(sorted);
 
-                unsortedIds.clear();
-                unsortedIds.addAll(result.unsortedIds());
-
-                result.sortedList().forEach(tc -> tc.setParent(parent));
+                sorted.forEach(tc -> tc.setParent(parent));
 
                 // The item may now sit on a different page than before the reload.
                 jumpToPageOfPendingSelection();
@@ -247,17 +240,16 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             snapshot = new ArrayList<>(this.allTestCases);
         }
 
-        this.unsortedIds.clear();
         final Path dirPath = parent.getPath();
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
-            for (int i = 0; i < snapshot.size(); i++) {
-                final TestCaseDto current = snapshot.get(i);
-                current.setIsHead(i == 0);
-                current.setNext(i < snapshot.size() - 1 ? snapshot.get(i + 1).getId() : null);
-            }
+            // Ranked along the order on screen, which is the order the tester
+            // just arranged. A case already sitting in the right place keeps the
+            // rank it had, so a drag writes the case that moved and leaves the
+            // rest of the set alone.
+            final List<TestCaseDto> moved = TestCaseSorter.place(snapshot);
 
-            Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot);
+            Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
 
             ApplicationManager.getApplication().invokeLater(this::refreshView);
         });
@@ -419,7 +411,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         this.allTestCases.clear();
         this.currentTestCases.clear();
-        this.unsortedIds.clear();
         this.model.removeAll();
         this.list.setPaintBusy(true);
         this.list.getEmptyText().setText("Refreshing...");
@@ -605,17 +596,15 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         final int generation = modelGeneration.incrementAndGet();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             if (generation != modelGeneration.get()) return;
-            final SortResult result = TestCaseSorter.sortTestCases(p, snapshot);
+            final List<TestCaseDto> sorted = TestCaseSorter.sorted(snapshot);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
 
                 synchronized (allTestCases) {
                     this.allTestCases.clear();
-                    this.allTestCases.addAll(result.sortedList());
+                    this.allTestCases.addAll(sorted);
                 }
-                this.unsortedIds.clear();
-                this.unsortedIds.addAll(result.unsortedIds());
 
                 onDone.run();
             });
@@ -668,7 +657,6 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         allTestCases.clear();
         currentTestCases.clear();
-        unsortedIds.clear();
 
         model.removeListDataListener(modelChangeNotifier);
         model.removeAll();

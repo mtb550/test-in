@@ -68,8 +68,6 @@ public class ImportCsv {
             if (isRowEmpty) continue;
 
             final TestCaseDto currentTestCase = new TestCaseDto().setId(UUID.randomUUID());
-            currentTestCase.setNext(null);
-            currentTestCase.setIsHead(null);
 
             for (final TestEditorAttributes attr : TestEditorAttributes.values()) {
                 if (attr.can(Can.IMPORT)) {

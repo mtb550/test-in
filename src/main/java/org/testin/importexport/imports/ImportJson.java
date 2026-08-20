@@ -34,8 +34,6 @@ public class ImportJson {
 
             for (final TestCaseDto tc : entry.getValue()) {
                 tc.setId(UUID.randomUUID());
-                tc.setIsHead(null);
-                tc.setNext(null);
                 sanitized.add(tc);
             }
 

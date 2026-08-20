@@ -25,9 +25,24 @@ import java.util.UUID;
 @ToString
 public final class TestCaseDto {
 
-    private volatile UUID next;
-
-    private volatile Boolean isHead;
+    /**
+     * Where this case sits in its test set, as a value it owns (see
+     * {@link org.testin.testcase.Rank}).
+     * <p>
+     * It used to be two fields naming other cases - {@code isHead} and
+     * {@code next} - so a case knew its neighbors instead of its position.
+     * Every insertion, deletion and reorder then rewrote a case the tester had
+     * not touched, which is what made two people working in parallel conflict on
+     * a third person's file, and what let one lost pointer leave a whole test
+     * set with no order at all.
+     * <p>
+     * Empty on a case that has not been placed yet - imported, copied in,
+     * arrived from a merge. Those sort after the placed ones, oldest first, and
+     * are given a rank the next time anything writes them.
+     */
+    @NonNull
+    @Builder.Default
+    private volatile String order = "";
 
     @NonNull
     @Builder.Default

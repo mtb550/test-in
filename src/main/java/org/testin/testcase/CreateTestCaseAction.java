@@ -11,6 +11,7 @@ import org.testin.actions.AbstractProjectAction;
 import org.testin.codegen.GenType;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.test.TestEditor;
+import org.testin.testcase.Rank;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
@@ -44,16 +45,16 @@ public class CreateTestCaseAction extends AbstractProjectAction {
         new CreateTestCaseDialog(p, tc -> {
             final List<TestCaseDto> tcs = editor.getAllTestCases();
 
-            final boolean isEmpty = tcs.isEmpty();
-            tc.setIsHead(isEmpty);
-
-            final TestCaseDto lastTc = isEmpty ? null : tcs.getLast();
-            if (lastTc != null) lastTc.setNext(tc.getId());
+            // After the last one, and nothing else moves. The case that was last
+            // used to be rewritten to point at this one, which is what made a
+            // second tester adding a case at the same time conflict on a file
+            // neither of them had opened.
+            tc.setOrder(Rank.after(tcs.isEmpty() ? "" : tcs.getLast().getOrder()));
 
             tc.setParent(dir);
             editor.appendNewTestCase(tc);
 
-            final List<TestCaseDto> affectedNodes = Stream.of(tc, lastTc).filter(Objects::nonNull).toList();
+            final List<TestCaseDto> affectedNodes = List.of(tc);
             Services.getInstance(p, TestCaseCacheService.class).addNewItems(affectedNodes);
 
             Services.getInstance(p, TestCasePersistService.class).persist(dir.getPath(), affectedNodes);

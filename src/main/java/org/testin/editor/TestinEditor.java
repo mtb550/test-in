@@ -92,8 +92,6 @@ public interface TestinEditor extends Disposable {
 
     void selectTestCase(final @Nullable TestCaseDto tc);
 
-    @NotNull Set<UUID> getUnsortedIds();
-
     @Nullable String getHoveredIconAction();
 
     void setHoveredIconAction(final @Nullable String action);
