@@ -17,6 +17,7 @@ import org.testin.EscapeAction;
 import org.testin.editor.*;
 import org.testin.editor.grid.GridPanelBuilder;
 import org.testin.editor.list.ListPanelBuilder;
+import org.testin.editor.grid.GridView;
 import org.testin.editor.list.ListView;
 import org.testin.editor.listeners.GridContextMenuListener;
 import org.testin.editor.listeners.GridSelectionListener;
@@ -54,6 +55,7 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.time.Duration;
 import java.util.*;
+import java.util.Optional;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -83,18 +85,17 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      */
     private final @NotNull AtomicInteger loadGeneration = new AtomicInteger();
     /**
-     * Child disposable for the current grid table's font-sync subscription;
-     * replaced on every grid rebuild so old subscriptions do not accumulate.
+     * The grid, from the moment the tester first switches to it - table, scroll
+     * pane and the font-sync subscription that goes with them. Empty until then,
+     * and after a rebuild that failed (#66, finding 18).
      */
-    private @Nullable Disposable gridFontSyncDisposable;
+    private @NotNull Optional<GridView> grid = Optional.empty();
     private @NotNull JBPanel<?> mainPanel;
     private @NotNull EditorCenter center;
-    private @Nullable JBList<TestCaseDto> list;
-    private @Nullable CollectionListModel<TestCaseDto> model;
-    private @Nullable JBTable gridTable;
+    private final @NotNull JBList<TestCaseDto> list;
+    private final @NotNull CollectionListModel<TestCaseDto> model;
+    private final @NotNull JBScrollPane listScrollPane;
     private @NotNull RunEditorContextMenu contextMenu;
-    private @Nullable JBScrollPane gridScrollPane;
-    private @NotNull JBScrollPane listScrollPane;
     @Getter
     @Setter
     private int currentPage = 1;
@@ -148,27 +149,29 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         this.resultsMap = new ConcurrentHashMap<>();
 
-        buildOpeningPanel();
+        // Shared list-view construction (see ListPanelBuilder, the counterpart of
+        // GridPanelBuilder). Built here rather than in buildOpeningPanel so the
+        // three parts of it are final: the editor never exists without a list.
+        final ListView listView = ListPanelBuilder.build(p, projectDisposable);
+        this.model = listView.model();
+        this.list = listView.list();
+        this.listScrollPane = listView.scrollPane();
+
+        buildOpeningPanel(listView);
         loadDataAsync();
     }
 
-    private void buildOpeningPanel() {
+    private void buildOpeningPanel(final @NotNull ListView listView) {
         toolBar = new RunToolbar(p, this);
         statusBar = new StatusBar();
         StatusBarListener.attach(this);
-
-        // Shared list-view construction (see ListPanelBuilder, the counterpart of GridPanelBuilder).
-        final ListView listView = ListPanelBuilder.build(p, projectDisposable);
-        model = listView.model();
-        list = listView.list();
-        listScrollPane = listView.scrollPane();
 
         // Run editor specifics: the run card renderer.
         list.setCellRenderer(new RunListRenderer(p, this));
 
         this.contextMenu = new RunEditorContextMenu(p, this, parent, list);
         ListPanelBuilder.wireCommonListeners(p, this, listView, parent, contextMenu,
-                () -> gridTable,
+                () -> grid.map(GridView::table),
                 () -> toolBar.getCurrentView() == ViewMode.GRID_VIEW);
 
         mainPanel = new JBPanel<>(new BorderLayout());
@@ -185,10 +188,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     private void loadDataAsync() {
         final int generation = loadGeneration.incrementAndGet();
-        if (list != null) {
-            list.setPaintBusy(true);
-            list.getEmptyText().setText("Loading...");
-        }
+        list.setPaintBusy(true);
+        list.getEmptyText().setText("Loading...");
 
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
@@ -322,12 +323,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void refreshCards() {
-        if (list != null && model != null) model.allContentsChanged();
+        model.allContentsChanged();
     }
 
     private void updateGridColumns() {
-        if (gridTable == null) return;
-        gridPanelBuilder.applyColumnVisibility(gridTable, RunEditorAttributes.class, getSelectedDetails());
+        grid.ifPresent(view ->
+                gridPanelBuilder.applyColumnVisibility(view.table(), RunEditorAttributes.class, getSelectedDetails()));
     }
 
     @Override
@@ -344,10 +345,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     public void onToolBarSwitchedToGridView() {
         Logger.debug("[switch] -> GRID view, currentView=" + toolBar.getCurrentView());
         rebuildGrid();
-        // rebuildGrid() swallows failures; the grid parts are then still null
-        // and the previous center stays visible instead of an NPE.
-        if (gridScrollPane != null) center.set(gridScrollPane);
-        if (gridTable != null) SwingUtilities.invokeLater(gridTable::requestFocusInWindow);
+        // rebuildGrid() swallows failures; the grid is then still empty and the
+        // previous center stays visible instead of an NPE.
+        grid.ifPresent(view -> {
+            center.set(view.scrollPane());
+            SwingUtilities.invokeLater(view.table()::requestFocusInWindow);
+        });
     }
 
     @Override
@@ -453,7 +456,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         if (toolBar.getCurrentView() == ViewMode.GRID_VIEW) {
             Logger.debug("[refreshView] grid active -> rebuilding grid");
             rebuildGrid();
-            if (gridScrollPane != null) center.set(gridScrollPane);
+            grid.ifPresent(view -> center.set(view.scrollPane()));
         }
     }
 
@@ -461,9 +464,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
      * Records the selected test case (and grid column) before the data is reloaded.
      */
     private void rememberSelection() {
-        final TestCaseDto selected = list != null ? list.getSelectedValue() : null;
+        // Swing answers null when nothing is selected, which is the one thing
+        // there is nothing to remember about.
+        final TestCaseDto selected = list.getSelectedValue();
         selectionToRestore = selected != null ? selected.getId() : null;
-        gridColumnToRestore = gridTable != null ? gridTable.getSelectedColumn() : -1;
+        gridColumnToRestore = grid.map(view -> view.table().getSelectedColumn()).orElse(-1);
     }
 
     /**
@@ -490,31 +495,29 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         final Set<RunEditorAttributes> attributes = getSelectedDetails();
         Logger.debug("[grid] rebuildGrid start, pageItems=" + pageItems.size() + ", details=" + attributes);
         try {
-            gridTable = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, (currentPage - 1) * pageSize);
+            final JBTable table = gridPanelBuilder.buildRunTable(p, pageItems, attributes, resultsMap, (currentPage - 1) * pageSize);
 
-            if (gridFontSyncDisposable != null) Disposer.dispose(gridFontSyncDisposable);
-            gridFontSyncDisposable = Disposer.newDisposable(projectDisposable, "testin.runEditor.gridFontSync");
-            FontSync.syncWithNativeEditor(p, gridTable, gridFontSyncDisposable);
+            // The previous grid's subscription goes with the previous grid, so
+            // they do not accumulate one per rebuild.
+            grid.ifPresent(previous -> Disposer.dispose(previous.fontSync()));
+            final Disposable fontSync = Disposer.newDisposable(projectDisposable, "testin.runEditor.gridFontSync");
+            FontSync.syncWithNativeEditor(p, table, fontSync);
 
-            gridTable.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, gridTable, pageItems));
+            table.getSelectionModel().addListSelectionListener(new GridSelectionListener(this, table, pageItems));
             // ESC in grid view behaves like ESC in the list: hide the view panel, then clear the selection.
-            new EscapeAction(p, gridTable);
+            new EscapeAction(p, table);
             // ENTER on the non-editable sequence column opens the details view.
-            new GridViewDetailsAction(p, gridTable, pageItems, parent.getPath2()).installDoubleClick();
-            // Read the nullable field once: the context menu listener needs a real
-            // list, and the selection carried over from list view comes from it.
-            final JBList<TestCaseDto> currentList = list;
-            if (currentList != null) {
-                gridTable.addMouseListener(new GridContextMenuListener(gridTable, currentList, contextMenu, pageItems));
+            new GridViewDetailsAction(p, table, pageItems, parent.getPath2()).installDoubleClick();
 
-                GridPanelBuilder.restoreSelection(gridTable, currentList, pageItems, gridColumnToRestore);
-            }
+            table.addMouseListener(new GridContextMenuListener(table, list, contextMenu, pageItems));
+            GridPanelBuilder.restoreSelection(table, list, pageItems, gridColumnToRestore);
+
             // Cleared regardless of whether the row was found, so a stale column can never
             // be applied to an unrelated rebuild.
             gridColumnToRestore = -1;
 
-            gridScrollPane = new JBScrollPane(gridTable);
-            Logger.debug("[grid] rebuildGrid done, rows=" + gridTable.getRowCount() + ", cols=" + gridTable.getColumnCount());
+            grid = Optional.of(new GridView(table, new JBScrollPane(table), fontSync));
+            Logger.debug("[grid] rebuildGrid done, rows=" + table.getRowCount() + ", cols=" + table.getColumnCount());
         } catch (final Exception ex) {
             Logger.error("[grid] rebuildGrid FAILED: " + ex);
         }

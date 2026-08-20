@@ -5,6 +5,8 @@ import com.intellij.ui.table.JBTable;
 import org.testin.editor.listeners.GridListSelectionSynchronizer;
 import org.testng.annotations.Test;
 
+import java.util.Optional;
+
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.DefaultTableModel;
 
@@ -22,7 +24,7 @@ public class GridListSelectionSynchronizerTest {
 
         final GridListSelectionSynchronizer synchronizer = new GridListSelectionSynchronizer(
                 list,
-                () -> table,
+                () -> Optional.of(table),
                 () -> true
         );
         synchronizer.valueChanged(new ListSelectionEvent(list, 2, 2, false));
