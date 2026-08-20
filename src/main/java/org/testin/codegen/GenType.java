@@ -16,11 +16,6 @@ import org.testin.util.OptionalPlugin;
  */
 @Getter
 public enum GenType {
-    CREATE_TEST_PROJECT(
-            "Create Test Project",
-            "Create Automation Test Project"
-    ),
-
     REMOVE_TEST_PROJECT(
             "Remove Test Project",
             "Remove Automation Test Project"
@@ -29,11 +24,6 @@ public enum GenType {
     RENAME_TEST_PROJECT(
             "Rename Test Project",
             "Rename Automation Test Project"
-    ),
-
-    CREATE_TEST_SET_PACKAGE(
-            "Create Test Set Package",
-            "Create Automation Test Package"
     ),
 
     REMOVE_TEST_SET_PACKAGE(

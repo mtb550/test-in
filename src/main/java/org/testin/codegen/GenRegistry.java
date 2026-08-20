@@ -13,7 +13,6 @@ import org.testin.codegen.method.RenameTestMethod;
 import org.testin.codegen.method.update.UpdateTestDescription;
 import org.testin.codegen.method.update.UpdateTestGroup;
 import org.testin.codegen.method.update.UpdateTestPriority;
-import org.testin.codegen.pkg.CreateJavaPackage;
 import org.testin.codegen.pkg.MoveJavaPackage;
 import org.testin.codegen.pkg.RemoveJavaPackage;
 import org.testin.codegen.pkg.RenameJavaPackage;
@@ -34,9 +33,7 @@ final class GenRegistry {
     private static final @NotNull Map<GenType, GenAction> ACTIONS = new EnumMap<>(GenType.class);
 
     static {
-        ACTIONS.put(GenType.CREATE_TEST_PROJECT, new CreateJavaPackage());
         ACTIONS.put(GenType.RENAME_TEST_PROJECT, new RenameJavaPackage());
-        ACTIONS.put(GenType.CREATE_TEST_SET_PACKAGE, new CreateJavaPackage());
         ACTIONS.put(GenType.REMOVE_TEST_PROJECT, new RemoveJavaPackage());
         ACTIONS.put(GenType.REMOVE_TEST_SET_PACKAGE, new RemoveJavaPackage());
         ACTIONS.put(GenType.RENAME_TEST_SET_PACKAGE, new RenameJavaPackage());

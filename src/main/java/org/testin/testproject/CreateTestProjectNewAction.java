@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectAction;
-import org.testin.codegen.GenType;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.DirectoryMapper;
@@ -55,8 +54,6 @@ public class CreateTestProjectNewAction extends AbstractProjectAction {
 
         pp.refresh();
         Services.getInstance(p, Notifier.class).softShow(p, "Project created");
-
-        GenType.CREATE_TEST_PROJECT.getAction().execute(p, tp);
     }
 
 

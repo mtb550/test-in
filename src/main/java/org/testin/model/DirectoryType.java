@@ -27,7 +27,7 @@ public enum DirectoryType {
             AllIcons.Nodes.Project,
             ".tp",
             p -> new NotCreatableFromTree("Test Project"),
-            (p, dir) -> GenType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
+            new NoJavaCode("a test project on its own"),
             (p, renamed) -> GenType.RENAME_TEST_PROJECT.getAction().execute(p, renamed),
             new NoJavaCode("A test project never moves; it"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath(), removed -> {
@@ -69,7 +69,7 @@ public enum DirectoryType {
             AllIcons.Nodes.WebFolder,
             ".tsp",
             CreateTestSetPackage::new,
-            (p, dir) -> GenType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
+            new NoJavaCode("a test set package on its own"),
             (p, renamed) -> GenType.RENAME_TEST_SET_PACKAGE.getAction().execute(p, renamed),
             (p, moved) -> GenType.MOVE_TEST_SET_PACKAGE.getAction().execute(p, moved),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath(), removed -> {
