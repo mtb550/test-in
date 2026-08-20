@@ -524,9 +524,7 @@ public final class ProjectIndexer {
             store.renameNode(oldPath, newPath);
             Logger.info("Moved successfully to: " + newPath);
             onFinished.accept(true);
-        }, () -> {
-            onFinished.accept(false);
-        });
+        }, () -> onFinished.accept(false));
     }
 
     /**

@@ -437,7 +437,7 @@ public final class TestRunWordGenerator {
      * leftmost columns carry the remainder, which is what the handwritten
      * widths did when there were always six of them.
      */
-    private @NotNull int[] evenWidths(final int columns) {
+    private int @NotNull [] evenWidths(final int columns) {
         final int[] widths = new int[columns];
         Arrays.fill(widths, 100 / columns);
 

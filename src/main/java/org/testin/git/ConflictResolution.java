@@ -187,8 +187,8 @@ public final class ConflictResolution {
 
     /**
      * Whether the conflict is in a test case at all. A run's results and a
-     * marker are different shapes with different rules, and a file the plugin
-     * never wrote is nobody's business here.
+     * marker are different shapes with different rules, and a file from outside
+     * the plugin is somebody else's business.
      */
     private static boolean isTestCase(final @NotNull String relativePath) {
         return relativePath.endsWith(".json") && relativePath.contains("Test Cases/");
