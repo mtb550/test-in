@@ -16,7 +16,6 @@ import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.model.dto.dirs.DirectoryDto;
-import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.model.dto.dirs.TestRunDirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.model.markers.TestRunMarker;
@@ -49,14 +48,19 @@ public class CreateTestRun implements NodeCreator {
         // The tree this was started from only exists when a project is bound, so
         // nobody can click their way into the miss. It is checked because a run
         // written against no project would be a directory nothing owns.
-        final @Nullable TestProjectDirectoryDto tp = Services.getInstance(p, BoundTestProject.class).get();
-        if (tp == null) {
-            Logger.warn("Create test run: no test project is bound to " + p.getName());
-            return null;
-        }
+        Services.getInstance(p, BoundTestProject.class).get().ifPresentOrElse(
+                tp -> configureRun(tp.getTestCasesDirectory(), name, parentDir, newDirPath),
+                () -> Logger.warn("Create test run: no test project is bound to " + p.getName()));
 
-        final DirectoryDto testCasesRoot = tp.getTestCasesDirectory();
+        return null;
+    }
 
+    /**
+     * The dialog the creator is: which test cases the run covers, chosen from
+     * the bound project's own tree.
+     */
+    private void configureRun(final @NotNull DirectoryDto testCasesRoot, final @NotNull String name,
+                              final DirectoryDto parentDir, final @NotNull Path newDirPath) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
 
             final Path testCasesPath = testCasesRoot.getPath();
@@ -82,8 +86,6 @@ public class CreateTestRun implements NodeCreator {
                 }).show();
             });
         });
-
-        return null;
     }
 
     /**

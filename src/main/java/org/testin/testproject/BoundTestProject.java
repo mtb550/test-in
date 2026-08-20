@@ -4,7 +4,6 @@ import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.config.TestinConfigService;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
@@ -12,6 +11,7 @@ import org.testin.model.ProjectStatus;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.services.Services;
 
+import java.util.Optional;
 import java.util.Map;
 
 /**
@@ -52,7 +52,7 @@ public final class BoundTestProject {
     }
 
     /**
-     * The named project as the indexer holds it, or null when the name matches
+     * The named project as the indexer holds it, empty when the name matches
      * nothing there - no file, a name nobody uses, or a project that is archived
      * and therefore never indexed.
      * <p>
@@ -60,14 +60,13 @@ public final class BoundTestProject {
      * everywhere else. Renaming the folder breaks the binding, and the tester is
      * sent back to the picker rather than shown a wrong project.
      */
-    public @Nullable TestProjectDirectoryDto get() {
+    public @NotNull Optional<TestProjectDirectoryDto> get() {
         final String name = name();
-        if (name.isEmpty()) return null;
+        if (name.isEmpty()) return Optional.empty();
 
         return Services.getInstance(p, ProjectIndexer.class).getTestProjectsByPath().values().stream()
                 .filter(tp -> name.equals(tp.getName()))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
     /**
@@ -92,7 +91,7 @@ public final class BoundTestProject {
      * because it is the one cause with an obvious fix.
      */
     public @NotNull String problem(final @NotNull Map<String, ProjectStatus> underRoot) {
-        if (!isNamed() || get() != null) return "";
+        if (!isNamed() || get().isPresent()) return "";
 
         final String name = name();
         final ProjectStatus status = underRoot.get(name);

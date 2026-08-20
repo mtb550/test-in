@@ -13,7 +13,6 @@ import com.intellij.ui.components.JBPanelWithEmptyText;
 import com.intellij.util.ui.StatusText;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.config.TestinConfigService;
 import org.testin.creator.CreateTestProjectAction;
 import org.testin.explorer.toolbar.RefreshAction;
@@ -32,6 +31,7 @@ import org.testin.testproject.CreateTestProjectCloneAction;
 import org.testin.util.Bundle;
 
 import java.awt.*;
+import java.util.Optional;
 import java.util.Map;
 
 @Service(Service.Level.PROJECT)
@@ -141,16 +141,10 @@ public final class ExplorerPanel implements Disposable {
      * {@link #state(Map)} before it was called.
      */
     private void draw(final @NotNull PanelState state) {
-        final @Nullable TestProjectDirectoryDto tp = bound();
-
         panel.removeAll();
         panel.getEmptyText().clear();
 
-        if (tp == null) {
-            showWelcome(state);
-        } else {
-            showTree(tp);
-        }
+        bound().ifPresentOrElse(this::showTree, () -> showWelcome(state));
 
         panel.revalidate();
         panel.repaint();
@@ -178,7 +172,7 @@ public final class ExplorerPanel implements Disposable {
         });
     }
 
-    private @Nullable TestProjectDirectoryDto bound() {
+    private @NotNull Optional<TestProjectDirectoryDto> bound() {
         return Services.getInstance(p, BoundTestProject.class).get();
     }
 
@@ -223,7 +217,7 @@ public final class ExplorerPanel implements Disposable {
 
         return PanelState.of(
                 !Services.getInstance(p, TestinRoot.class).getPath().toString().isEmpty(),
-                bound() != null,
+                bound().isPresent(),
                 Services.getInstance(p, BoundTestProject.class).isMissing(underRoot),
                 Services.getInstance(p, TestinConfigService.class).get().hasRepoUrl(),
                 !underRoot.isEmpty());
@@ -241,7 +235,7 @@ public final class ExplorerPanel implements Disposable {
         panel.add(projectTree.getComponent(), BorderLayout.CENTER);
 
         projectTree.refresh();
-        branchSelector.updateProject(tp);
+        branchSelector.updateProject(Optional.of(tp));
     }
 
     /**

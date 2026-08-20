@@ -20,6 +20,8 @@ import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.Optional;
+import java.util.Objects;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -33,7 +35,12 @@ public class BranchSelector {
     /**
      * Null while no project is selected, or the selected one has no path.
      */
-    private @Nullable Path projectPath;
+    /**
+     * The repository this box is showing branches of, and the empty path while
+     * there is none - the same "nothing configured" the Testin root uses, so
+     * there is one shape of absence rather than two (#71).
+     */
+    private @NotNull Path projectPath = Path.of("");
 
     // Written from background git tasks and read on the EDT. Empty, never null,
     // when no branch is known yet.
@@ -55,7 +62,7 @@ public class BranchSelector {
     private boolean showingPlaceholder = false;
 
     public BranchSelector(final @NotNull Project p, final @NotNull ExplorerPanel pp,
-                          final @Nullable TestProjectDirectoryDto testProjectDirectory) {
+                          final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
         this.p = p;
         this.pp = pp;
         this.git = new GitRepositoryService(p);
@@ -70,8 +77,8 @@ public class BranchSelector {
         updateProject(testProjectDirectory);
     }
 
-    public void updateProject(final @Nullable TestProjectDirectoryDto testProjectDirectory) {
-        final Path path = testProjectDirectory != null ? testProjectDirectory.getPath() : null;
+    public void updateProject(final @NotNull Optional<TestProjectDirectoryDto> testProjectDirectory) {
+        final Path path = testProjectDirectory.map(TestProjectDirectoryDto::getPath).orElse(Path.of(""));
         this.projectPath = path;
 
         isUpdating = true;
@@ -83,7 +90,7 @@ public class BranchSelector {
             isUpdating = false;
         }
 
-        if (path == null) {
+        if (path.toString().isEmpty()) {
             showPlaceholder("No project path found");
         } else if (git.isRepository(path)) {
             showPlaceholder("Loading branches...");
@@ -117,7 +124,7 @@ public class BranchSelector {
 
         final String selectedBranch = getSelectedBranch();
 
-        if (selectedBranch == null || showingPlaceholder || selectedBranch.equals(currentBranch)) {
+        if (selectedBranch.isEmpty() || showingPlaceholder || selectedBranch.equals(currentBranch)) {
             return;
         }
 
@@ -144,7 +151,7 @@ public class BranchSelector {
         // Captured before the task starts: the field can be reassigned by a
         // project switch while the checkout is still running.
         final Path repositoryPath = projectPath;
-        if (repositoryPath == null) return;
+        if (repositoryPath.toString().isEmpty()) return;
 
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking branch " + targetBranch, false) {
             @Override
@@ -288,8 +295,7 @@ public class BranchSelector {
                                     comboBox.setSelectedItem(currentBranch);
                                 } else {
                                     comboBox.setSelectedIndex(0);
-                                    final String selected = getSelectedBranch();
-                                    currentBranch = selected == null ? "" : selected;
+                                    currentBranch = getSelectedBranch();
                                 }
 
                                 comboBox.setEnabled(true);
@@ -324,7 +330,10 @@ public class BranchSelector {
         return comboBox;
     }
 
-    public @Nullable String getSelectedBranch() {
-        return (String) comboBox.getSelectedItem();
+    /**
+     * What the box is showing, and the empty string when it is showing nothing.
+     */
+    public @NotNull String getSelectedBranch() {
+        return Objects.toString(comboBox.getSelectedItem(), "");
     }
 }
