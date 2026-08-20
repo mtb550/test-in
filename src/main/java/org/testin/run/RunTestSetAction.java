@@ -7,14 +7,17 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.codegen.Fqcn;
 import org.testin.explorer.tree.TreeValueUtil;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
+import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
-import org.testin.runner.TestNGRunnerByClass;
+import org.testin.runner.TestNGRunner;
 import org.testin.services.Services;
 import org.testin.util.OptionalPlugin;
+
+import java.util.List;
 
 
 public class RunTestSetAction extends AbstractProjectTreeAction {
@@ -33,27 +36,31 @@ public class RunTestSetAction extends AbstractProjectTreeAction {
         TreeValueUtil.selected(tree, TestSetDirectoryDto.class).ifPresent(this::runTestSet);
     }
 
+    /**
+     * Runs the set's cases, as one run.
+     * <p>
+     * The cases are asked for by name rather than the class they generate into.
+     * Handing the runner a class name was what left a test set run unable to
+     * mark a card, refuse a case with no generated method, or be stopped at all
+     * - none of which is about running one process, and all of which is about
+     * not knowing what is in it (#36).
+     */
     private void runTestSet(final @NotNull TestSetDirectoryDto ts) {
         if (!OptionalPlugin.TESTNG.isAvailableOrWarn(p)) return;
 
-        Logger.info(this.getClass() + "directory file: " + ts.getPath().toFile());
-        // Build the FQCN the same way the code generator does: strip the
-        // "Test Cases" display node and sanitize each segment. The raw path2
-        // join produced a class name findClass could never resolve.
-        final String fqcn = String.join(".", Fqcn.ofClass(p, ts));
-        Logger.info(this.getClass() + "fqcn path: " + fqcn);
+        final List<TestCaseDto> cases = Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(ts.getPath());
 
-        if (fqcn.trim().isEmpty()) {
-            Services.getInstance(p, Notifier.class).error(p, "Run Failed", "Could not parse class name from file path: " + ts.getPath().toFile().getName());
+        if (cases.isEmpty()) {
+            Services.getInstance(p, Notifier.class).softShow(p, ts.getName() + " has no test cases");
             return;
         }
 
-        Logger.info("fqcn: " + fqcn);
-        Services.getInstance(p, TestNGRunnerByClass.class).runTestClass(p, fqcn);
+        Logger.info("Running test set " + ts.getName() + " with " + cases.size() + " test case(s)");
+        Services.getInstance(p, TestNGRunner.class).run(p, cases);
 
-        // The same word Run Test Case uses, for the same reason: the run
-        // starts elsewhere and the tree gives no sign it was heard (#62).
-        Services.getInstance(p, Notifier.class).softShow(p, "Running");
+        // The same word Run Test Case uses, for the same reason: the run starts
+        // elsewhere and the tree gives no sign it was heard (#62).
+        Services.getInstance(p, Notifier.class).softShowCounted(p, "Running", cases.size());
     }
 
     @Override

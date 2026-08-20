@@ -10,7 +10,6 @@ import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.components.Service;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
@@ -18,29 +17,33 @@ import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * The TestNG runs this plugin started: which case runs under which
+ * The TestNG runs this plugin started: which cases are running under which
  * configuration, and how to stop the ones the tester asked to stop.
  * <p>
- * Both runners used to call {@code ProgramRunnerUtil.executeConfiguration}
+ * The runner used to call {@code ProgramRunnerUtil.executeConfiguration}
  * directly, which is fire-and-forget - nothing was kept, so nothing could be
  * stopped, and no button had anything to call (#34).
  * <p>
- * <b>A stop reaches the cases it was asked about and no others.</b> Each case
- * runs under its own configuration, named for the case, so the process behind
- * one is findable by name. Stopping one case while eleven others run leaves the
- * eleven running.
+ * <b>A stop reaches the run a case belongs to, and no other.</b> A run holds one
+ * case when it was started from a card and all of them when it was started from
+ * a test set, because one configuration is one process either way. Stopping a
+ * case in a run of twelve therefore stops all twelve - there is one process
+ * behind them - and every one of them is put back. Stopping a case that is a run
+ * of its own leaves the others alone.
  * <p>
  * Two things have to stop, and killing one of them is not a stop. The
  * <b>process</b> is killed rather than asked to end - see {@link #kill}. The
- * <b>launch that has not happened yet</b> is dropped: running a page of twelve
- * schedules twelve launches, each hopping to a pooled thread and back to the
- * EDT, so most are still queued when the tester presses Stop.
+ * <b>launch that has not happened yet</b> is dropped: a run hops to a pooled
+ * thread and back to the EDT before its process exists, and a tester who presses
+ * Stop in that second means it.
  */
 @Service(Service.Level.PROJECT)
 public final class TestNGExecution {
@@ -55,11 +58,17 @@ public final class TestNGExecution {
 
     /**
      * Cases asked for whose launch has not reached the platform yet. A stop takes
-     * a case out, and the launch finds it gone when its turn comes and does not
-     * start. An entry lives for the two thread hops between the click and the
-     * process, and is taken out by whichever of the two arrives first.
+     * one out, and the launch finds it gone when its turn comes. An entry lives
+     * for the two thread hops between the click and the process.
      */
     private final @NotNull Set<TestCaseDto> pending = ConcurrentHashMap.newKeySet();
+
+    /**
+     * Which run each case is running under, by the configuration's name. This is
+     * what lets a stop reach one run without touching another, and what tells it
+     * which other cases go down with the process it kills.
+     */
+    private final @NotNull Map<TestCaseDto, String> configOf = new ConcurrentHashMap<>();
 
     /**
      * Cases the tester stopped, so a report arriving afterward is not read as a
@@ -78,23 +87,6 @@ public final class TestNGExecution {
     }
 
     /**
-     * The run configuration a case runs under: {@code SimpleClass.method}.
-     * <p>
-     * One owner, because two things have to agree on it - the runner naming the
-     * configuration it creates, and a stop looking for the process that
-     * configuration started. Worked out from the case alone, so neither has to
-     * remember what the other did.
-     */
-    public static @NotNull String configName(final @NotNull TestCaseDto tc) {
-        final List<String> fqcn = Fqcn.ofMethod(tc);
-        final String method = fqcn.getLast();
-        final String classFqcn = String.join(".", fqcn.subList(0, fqcn.size() - 1));
-        final int lastDot = classFqcn.lastIndexOf('.');
-
-        return (lastDot >= 0 ? classFqcn.substring(lastDot + 1) : classFqcn) + "." + method;
-    }
-
-    /**
      * A case is on its way to the runner: remembered, and shown as running.
      * <p>
      * Remembering it and marking it are one fact, so they happen together. The
@@ -110,43 +102,51 @@ public final class TestNGExecution {
     }
 
     /**
-     * Starts the configuration for a case, unless the tester stopped that case
-     * while this launch was still on its way here.
+     * Which of these cases the tester still wants run, taking them out of the
+     * queue as it answers.
+     * <p>
+     * Asked immediately before the configuration is built, so a case stopped
+     * while the run was being prepared is left out of it rather than started and
+     * then killed.
      */
-    public void launch(final @NotNull TestCaseDto tc, final @NotNull RunnerAndConfigurationSettings settings) {
-        if (!pending.remove(tc)) {
-            Logger.info("Not starting " + settings.getName() + ": it was stopped before it began");
-            return;
-        }
-
-        launch(settings);
+    public @NotNull List<TestCaseDto> stillWanted(final @NotNull List<TestCaseDto> cases) {
+        return cases.stream().filter(pending::remove).toList();
     }
 
     /**
-     * Starts a configuration that belongs to no one case - a whole test set run
-     * as a class.
+     * Starts the configuration, and remembers which cases are running under it.
      */
-    public void launch(final @NotNull RunnerAndConfigurationSettings settings) {
+    public void launch(final @NotNull List<TestCaseDto> cases, final @NotNull RunnerAndConfigurationSettings settings) {
+        cases.forEach(tc -> configOf.put(tc, settings.getName()));
         launchedNames.add(settings.getName());
 
-        Logger.info("Starting " + settings.getName());
+        Logger.info("Starting " + settings.getName() + " with " + cases.size() + " test case(s)");
         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
+    }
+
+    /**
+     * A case that was asked for is not going to run. Drops it from the queue and
+     * puts the card back, saying nothing - for the paths that have already told
+     * the tester why in their own words.
+     */
+    public void notStarting(final @NotNull TestCaseDto tc) {
+        pending.remove(tc);
+        configOf.remove(tc);
+
+        TestCaseExecutionListener.broadcast(p, key(tc), RunStatus.IDLE, "");
     }
 
     /**
      * A case that was asked for has no generated method to run.
      * <p>
-     * Both paths that discover this come through here rather than logging and
-     * returning. The card is already showing Running by the time either is
-     * reached - it is marked at the click, a second before the launch - so one
-     * that quietly returned left the case looking like it was running for the
-     * rest of the session.
+     * The card is already showing Running by the time this is reached - it is
+     * marked at the click, a second before the launch - so a path that returned
+     * quietly left the case looking like it was running for the rest of the
+     * session.
      */
     public void noGeneratedCode(final @NotNull TestCaseDto tc) {
-        pending.remove(tc);
-
         Logger.warn("Not running '" + tc.getDescription() + "': it has no generated code");
-        TestCaseExecutionListener.broadcast(p, key(tc), RunStatus.IDLE, "");
+        notStarting(tc);
 
         Services.getInstance(p, Notifier.class).softShowNoGeneratedCode(p, tc.getDescription());
     }
@@ -164,30 +164,46 @@ public final class TestNGExecution {
     }
 
     /**
-     * Kills the processes running these cases and drops their launches that have
-     * not started yet.
+     * Kills the runs these cases belong to and drops their launches that have not
+     * started yet.
      * <p>
-     * Only the cases that are running, and only those: a selection can hold cases
-     * that passed an hour ago, and a stop is no reason to forget their verdicts.
+     * Only the cases that are running: a selection can hold cases that passed an
+     * hour ago, and a stop is no reason to forget their verdicts.
      *
-     * @return how many were stopped, for the one notification the gesture makes
+     * @return how many cases were stopped, which is more than were asked for when
+     *         they share a run - the count the one notification reports
      */
     public int stop(final @NotNull List<TestCaseDto> cases) {
-        final List<TestCaseDto> stopping = cases.stream()
+        final List<TestCaseDto> asked = cases.stream()
+                .filter(tc -> tc.getTempStatus() == RunStatus.RUNNING)
+                .toList();
+
+        if (asked.isEmpty()) return 0;
+
+        // One configuration is one process, however many cases it holds, so a
+        // case cannot be stopped without stopping the ones beside it. Leaving
+        // those showing Running would be the older bug in a smaller place.
+        final Set<String> runs = asked.stream()
+                .map(tc -> configOf.getOrDefault(tc, ""))
+                .filter(name -> !name.isEmpty())
+                .collect(Collectors.toSet());
+
+        final List<TestCaseDto> stopping = Stream.concat(
+                        asked.stream(),
+                        configOf.entrySet().stream().filter(e -> runs.contains(e.getValue())).map(Map.Entry::getKey))
+                .distinct()
                 .filter(tc -> tc.getTempStatus() == RunStatus.RUNNING)
                 .toList();
 
         stopping.forEach(tc -> {
             pending.remove(tc);
+            configOf.remove(tc);
             stopped.add(tc.getId());
         });
 
-        final Set<String> names = stopping.stream()
-                .map(TestNGExecution::configName)
-                .collect(Collectors.toSet());
-
-        final List<RunContentDescriptor> theirs = running(names);
-        Logger.info("Stopping " + stopping.size() + " test case(s): " + theirs.size() + " had reached a process");
+        final List<RunContentDescriptor> theirs = running(runs);
+        Logger.info("Stopping " + stopping.size() + " test case(s) in " + runs.size()
+                + " run(s): " + theirs.size() + " had reached a process");
 
         theirs.forEach(this::kill);
         stopping.forEach(tc -> TestCaseExecutionListener.broadcast(p, key(tc), RunStatus.IDLE, ""));

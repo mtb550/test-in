@@ -7,8 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
-import org.testin.runner.TestNGExecution;
-import org.testin.runner.TestNGRunnerByMethod;
+import org.testin.runner.TestNGRunner;
 import org.testin.services.Services;
 import org.testin.util.OptionalPlugin;
 
@@ -35,8 +34,10 @@ public final class RunTestCases {
         for (final TestCaseDto tc : testCases) {
             if (tc.getTempStatus() == RunStatus.RUNNING) continue;
 
-            Services.getInstance(p, TestNGExecution.class).starting(tc);
-            Services.getInstance(p, TestNGRunnerByMethod.class).runTestMethod(p, tc);
+            // One run per case rather than one run for the selection: a case the
+            // tester started from its own card is one they expect to be able to
+            // stop on its own, and a run is what a stop reaches.
+            Services.getInstance(p, TestNGRunner.class).run(p, List.of(tc));
             started++;
         }
 
