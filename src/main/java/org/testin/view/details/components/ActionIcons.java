@@ -60,7 +60,7 @@ public class ActionIcons extends BaseDetails {
             actionsPanel.add(hoverIcon(currentStatus.getIcon(),
                     currentStatus.getTooltip(),
                     Shortcuts.RunTestCase.getShortcutText(),
-                    () -> currentStatus.executeAction(p, dto, null)));
+                    () -> currentStatus.executeAction(p, dto)));
         }
 
         return addFullWidthRow(panel, gbc, actionsPanel,

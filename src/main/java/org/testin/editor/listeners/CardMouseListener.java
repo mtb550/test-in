@@ -11,7 +11,7 @@ import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.navigate.NavigateToCodeAction;
-import org.testin.run.RunTestCaseAction;
+import org.testin.run.RunTestCases;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -85,7 +85,7 @@ public class CardMouseListener extends MouseAdapter {
 
             } else if (action == CardHoverAction.RUN_TEST_CASE) {
                 Logger.trace("run action, tc: " + tc.getDescription());
-                new RunTestCaseAction(p, list).execute(tc);
+                RunTestCases.run(p, List.of(tc));
             }
 
             e.consume();

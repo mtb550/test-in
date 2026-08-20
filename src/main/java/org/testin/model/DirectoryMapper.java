@@ -5,7 +5,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.*;
@@ -163,7 +162,9 @@ public final class DirectoryMapper {
      * Builds a run node without reading the marker file (used when creating a new run).
      */
     public @NotNull TestRunDirectoryDto setTestRunNode(final @NotNull Project p, final @NotNull Path path, final @NotNull DirectoryDto parent) {
-        return buildTestRunNode(p, path, parent, null);
+        // The marker a new run starts with, rather than none at all: what the
+        // builder would have defaulted to, said out loud.
+        return buildTestRunNode(p, path, parent, new TestRunMarker());
     }
 
     /**
@@ -176,7 +177,7 @@ public final class DirectoryMapper {
     }
 
     private @NotNull TestRunDirectoryDto buildTestRunNode(final @NotNull Project p, final @NotNull Path path,
-                                                          final @NotNull DirectoryDto parent, final @Nullable TestRunMarker marker) {
+                                                          final @NotNull DirectoryDto parent, final @NotNull TestRunMarker marker) {
         final String fileName = path.getFileName().toString();
         try {
             final var builder = TestRunDirectoryDto
@@ -186,7 +187,7 @@ public final class DirectoryMapper {
                     .parent(parent)
                     .path2(DirectoryDto.pathOf(parent.getPath2(), fileName));
 
-            if (marker != null) builder.marker(marker);
+            builder.marker(marker);
 
             final TestRunDirectoryDto testRunDirectoryDto = builder.build();
             Logger.info("retrieve the test run directory: " + testRunDirectoryDto);

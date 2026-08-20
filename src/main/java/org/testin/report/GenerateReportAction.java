@@ -32,6 +32,7 @@ import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
@@ -39,8 +40,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class GenerateReportAction extends AbstractProjectAction {
 
-    private final @Nullable SimpleTree tree;
-    private final @Nullable TestinEditor editor;
+    /**
+     * Which run this action reports on, decided by the surface it was built for:
+     * the tree's selected node, or the run an editor is showing.
+     * <p>
+     * It used to be two nullable fields, and every reader worked out again which
+     * constructor had been called (#71).
+     */
+    private final @NotNull Supplier<Optional<TestRunDirectoryDto>> selectedRun;
 
     /**
      * The tree entry, which registers the shortcut itself: the context menu
@@ -49,15 +56,13 @@ public class GenerateReportAction extends AbstractProjectAction {
      */
     public GenerateReportAction(final @NotNull Project p, final @NotNull SimpleTree tree) {
         super(p, "Generate Report", "Generate test run report", AllIcons.ToolbarDecorator.Export);
-        this.tree = tree;
-        this.editor = null;
+        this.selectedRun = () -> TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
         registerCustomShortcutSet(Shortcuts.GenerateReport.getCustomShortcut(), tree);
     }
 
     public GenerateReportAction(final @NotNull Project p, final @NotNull TestinEditor editor) {
         super(p, "Generate Report", "Generate test run report", null);
-        this.tree = null;
-        this.editor = editor;
+        this.selectedRun = () -> editor instanceof RunEditor re ? Optional.of(re.getParent()) : Optional.empty();
     }
 
     /**
@@ -82,27 +87,17 @@ public class GenerateReportAction extends AbstractProjectAction {
     }
 
     /**
-     * The run this action reports on: the tree's selected node, or the run the
-     * editor is showing. Asked by both {@link #isAvailable()} and
-     * {@link #execute()}, so the two can never disagree about which run is meant.
-     */
-    private @NotNull Optional<TestRunDirectoryDto> selectedRun() {
-        if (tree != null) return TreeValueUtil.valueOf(tree.getLastSelectedPathComponent(), TestRunDirectoryDto.class);
-        return editor instanceof RunEditor re ? Optional.of(re.getParent()) : Optional.empty();
-    }
-
-    /**
      * True when the current selection resolves to a test run.
      */
     public boolean isAvailable() {
-        return selectedRun().isPresent();
+        return selectedRun.get().isPresent();
     }
 
     /**
      * Direct entry point for toolbar buttons — no AnActionEvent required.
      */
     public void execute() {
-        selectedRun().ifPresent(tr -> new GenerateReportDialog(p,
+        selectedRun.get().ifPresent(tr -> new GenerateReportDialog(p,
                 tr.getPath().getFileName().toString() + "_Report",
                 (format, file) -> processAndSave(p, tr, format, file)).show());
     }

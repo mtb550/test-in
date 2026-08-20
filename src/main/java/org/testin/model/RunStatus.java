@@ -3,16 +3,16 @@ package org.testin.model;
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
-import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.run.RunTestCaseAction;
+import org.testin.run.RunTestCases;
 
 import java.util.Optional;
+import java.util.List;
 import javax.swing.*;
 import java.awt.*;
 
@@ -56,13 +56,11 @@ public enum RunStatus {
     private final @Nullable Badge badge;
 
     /**
-     * Runs the test case. The list is the component the run action binds its
-     * shortcut to and is null when there is none — the details panel runs a
-     * single case it already holds, with no list behind it.
+     * Runs the test case. No list is involved: this is the icon on a card or in
+     * the details panel, and it already knows which case it is about.
      */
-    public void executeAction(final @NotNull Project p, final @NotNull TestCaseDto dto,
-                              final @Nullable JBList<TestCaseDto> list) {
-        new RunTestCaseAction(p, list).execute(dto);
+    public void executeAction(final @NotNull Project p, final @NotNull TestCaseDto dto) {
+        RunTestCases.run(p, List.of(dto));
     }
 
     /**
