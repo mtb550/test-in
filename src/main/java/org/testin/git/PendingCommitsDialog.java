@@ -43,6 +43,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
     private final @NotNull List<PendingChange> rowDifferences = new ArrayList<>();
     private final @NotNull Path repoRoot;
     private final @NotNull SelectionTable changes;
+    private final @NotNull ChoiceInput branch;
     private final @NotNull TextInput message;
     private final @NotNull DialogSplitButton commit;
     private final @NotNull Consumer<Request> onCommit;
@@ -64,6 +65,14 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                 .column("Before", 180)
                 .column("After", 180)
                 .build();
+        // The branch is part of the review, not a thing to remember to do
+        // first. It offers the branches this machine has, on the one that is
+        // checked out, and takes a name that is not on the list as a new branch
+        // to start - which is how a tester keeps a cycle's results off main
+        // without leaving the dialog.
+        final ComponentDialogBase<ChoiceInput> branchRow =
+                ComponentDialogBase.choice("Branch", localBranches(p, repoRoot), currentBranch(p, repoRoot));
+
         // Deliberately empty. Pre-filling it produced five commits called
         // "Updated test cases" in one afternoon of testing - a default that gets
         // accepted rather than read, and a history that tells a reviewer nothing.
@@ -77,8 +86,9 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         final ComponentDialogBase<DialogSplitButton> commitButton =
                 ComponentDialogBase.splitButton(PUSH, COMMIT);
 
-        components = List.of(table, messageField, commitButton);
+        components = List.of(table, branchRow, messageField, commitButton);
         changes = table.getComponent();
+        branch = branchRow.getComponent();
         message = messageField.getComponent();
         commit = commitButton.getComponent();
 
@@ -110,6 +120,30 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
      * for a test case and blank for the rest, because a run belongs to no test
      * set and saying otherwise would be a guess.
      */
+    /**
+     * The branch that is checked out, or empty when Git cannot say - a
+     * repository with no commit in it yet has a branch name and no branch, and
+     * the row is still worth showing because committing is what creates it.
+     */
+    private static @NotNull String currentBranch(final @NotNull Project p, final @NotNull Path repoRoot) {
+        final String current = new GitRepositoryService(p).getCurrentBranch(repoRoot);
+        return current == null ? "" : current;
+    }
+
+    /**
+     * The branches to offer, with the current one always among them: it is the
+     * default, and a list that did not contain its own selection would read as a
+     * branch about to be created.
+     */
+    private static @NotNull List<String> localBranches(final @NotNull Project p, final @NotNull Path repoRoot) {
+        final List<String> branches = new ArrayList<>(new GitRepositoryService(p).getLocalBranches(repoRoot));
+        final String current = currentBranch(p, repoRoot);
+
+        if (!current.isEmpty() && !branches.contains(current)) branches.addFirst(current);
+
+        return branches;
+    }
+
     private void fillRows(final @NotNull List<PendingChange> differences) {
         for (final PendingChange diff : differences) {
             for (final FieldChange change : diff.fieldChanges()) {
@@ -209,14 +243,25 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             return;
         }
 
-        onCommit.accept(new Request(selected, message.getText().trim(), PUSH.equals(commit.getChosen())));
+        onCommit.accept(new Request(selected, message.getText().trim(),
+                PUSH.equals(commit.getChosen()), branch.getValue(), branch.isNew()));
         closeOk();
     }
 
     /**
-     * What the tester asked for: these changes, under this message, and whether
-     * it goes to the remote as well as into the local history.
+     * What the tester asked for: these changes, under this message, onto this
+     * branch, and whether it goes to the remote as well as into the local
+     * history.
+     *
+     * @param branch    where the commit goes. The branch that is checked out
+     *                  unless the tester picked or typed another
+     * @param newBranch true when the name is not one of the branches offered, so
+     *                  the commit starts it rather than switching to it. Decided
+     *                  here, where the list that was offered is known, rather
+     *                  than by asking Git again later and racing whoever else
+     *                  touched the repository in between
      */
-    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push) {
+    public record Request(@NotNull List<PendingChange> changes, @NotNull String message, boolean push,
+                          @NotNull String branch, boolean newBranch) {
     }
 }

@@ -108,6 +108,33 @@ public final class GitRepositoryService {
     }
 
     /**
+     * Starts a branch at the current commit and moves onto it, answering whether
+     * it worked.
+     * <p>
+     * Uncommitted work comes along, which is the point: the tester is in the
+     * review because they have changes, and naming a new branch there means they
+     * want those changes on it. That is also why this never refuses the way a
+     * plain checkout does - there is nothing to overwrite on a branch that did
+     * not exist a moment ago.
+     */
+    public boolean startBranch(final @NotNull Path path, final @NotNull String branch) {
+        return run(path, "git", "checkout", "-b", branch) != null;
+    }
+
+    /**
+     * The branches on this machine, current one first. What the review offers to
+     * commit onto - remote-only branches are left out, because committing onto
+     * one means creating the local branch anyway, and the tester can type the
+     * name to do exactly that.
+     */
+    public @NotNull List<String> getLocalBranches(final @NotNull Path path) {
+        final String output = run(path, "git", "branch");
+        if (output == null) return List.of();
+
+        return GitRefs.parseBranches(output.lines().toList());
+    }
+
+    /**
      * What Git itself reports as changed, one porcelain line per file.
      * <p>
      * {@code -uall} rather than the default: without it Git collapses an

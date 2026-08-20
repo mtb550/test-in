@@ -93,6 +93,17 @@ public final class ComponentDialogBase<C extends DialogComponent> {
     }
 
     /**
+     * A captioned row offering existing values and accepting a new one — the
+     * open-set counterpart of {@link #radios}. The selected value must be one
+     * of the options; what the tester types over it need not be.
+     */
+    public static @NotNull ComponentDialogBase<ChoiceInput> choice(final @NotNull String caption,
+                                                                   final @NotNull List<String> options,
+                                                                   final @NotNull String selected) {
+        return new ComponentDialogBase<>(new ChoiceInput(caption, List.copyOf(options), selected));
+    }
+
+    /**
      * A captioned radio row — one radio per option, one always selected.
      */
     public static <T> @NotNull RadioBuilder<T> radios(final @NotNull String caption) {

@@ -13,6 +13,8 @@ import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.config.TestinConfigService;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
+import org.testin.explorer.ExplorerPanel;
+import org.testin.indexer.ProjectIndexer;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 
@@ -130,15 +132,81 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         // whether it goes to the remote - so there is nothing left to ask
         // afterward.
         new PendingCommitsDialog(p, changes, path,
-                request -> performCommitWorkflow(p, path, request.message(), request.changes(), request.push())).show();
+                request -> commitOnBranch(p, path, request)).show();
+    }
+
+    /**
+     * Puts the review's changes on the branch the review named.
+     * <p>
+     * Three cases and one of them is the ordinary one. The branch that is
+     * already checked out commits as it always did. A name that was not on the
+     * list starts a branch here and takes the uncommitted work along, which is
+     * how a cycle's results stay off main without leaving the dialog. An
+     * existing branch is checked out first - and Git can refuse that, when the
+     * switch would overwrite the very changes being committed, so the refusal is
+     * reported and nothing is committed anywhere.
+     * <p>
+     * Off the EDT, because all three ask Git.
+     */
+    private void commitOnBranch(final @NotNull Project p, final @NotNull Path repoPath,
+                                final @NotNull PendingCommitsDialog.Request request) {
+        final String target = request.branch();
+
+        GitBackgroundTask.run(p, "Preparing the branch", false,
+                indicator -> {
+                    final String current = git.getCurrentBranch(repoPath);
+
+                    if (target.isEmpty() || target.equals(current)) {
+                        performCommitWorkflow(p, repoPath, request, target.isEmpty() ? current : target);
+                        return;
+                    }
+
+                    indicator.setText((request.newBranch() ? "Starting " : "Checking out ") + target);
+
+                    final boolean moved = request.newBranch()
+                            ? git.startBranch(repoPath, target)
+                            : git.checkout(repoPath, target) != null;
+
+                    if (!moved) {
+                        ApplicationManager.getApplication().invokeLater(() ->
+                                Services.getInstance(p, Notifier.class).error(p, "Branch Not Switched",
+                                        target + " could not be checked out, so nothing was committed. "
+                                                + "The changes are still here and still yours."));
+                        return;
+                    }
+
+                    // A branch started here begins at the commit that is already
+                    // checked out, so not one file changed and there is nothing
+                    // to read again - the panel is only redrawn so its branch box
+                    // stops naming the branch that was left. Moving to a branch
+                    // that already existed is the other thing entirely: every
+                    // file under the project was just replaced.
+                    if (!request.newBranch()) {
+                        Services.getInstance(p, ProjectIndexer.class).refreshDirectory(repoPath);
+                    }
+
+                    ApplicationManager.getApplication().invokeLater(() -> {
+                        final ExplorerPanel panel = Services.getInstance(p, ExplorerPanel.class);
+
+                        if (request.newBranch()) panel.refresh();
+                        else panel.reindex("Switched to " + target);
+
+                        performCommitWorkflow(p, repoPath, request, target);
+                    });
+                },
+                ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error",
+                        "Could not prepare " + target + ": " + ex.getMessage()));
     }
 
     private void performCommitWorkflow(
             final @NotNull Project p,
             final @NotNull Path repoPath,
-            final @NotNull String commitMessage,
-            final @NotNull Collection<PendingChange> selectedChanges,
-            final boolean push) {
+            final @NotNull PendingCommitsDialog.Request request,
+            final @Nullable String branch) {
+        final String commitMessage = request.message();
+        final Collection<PendingChange> selectedChanges = request.changes();
+        final boolean push = request.push();
+
         GitBackgroundTask.run(p, push ? "Committing and pushing" : "Committing to local Git", false,
                 indicator -> {
                     indicator.setText("Staging and committing files");
@@ -151,7 +219,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (push) {
-                            pushToRemote(p, repoPath, commitId);
+                            pushToRemote(p, repoPath, commitId, branch);
                             return;
                         }
 
@@ -160,7 +228,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 },
                 ex -> {
                     if (isIdentityError(ex.getMessage())) {
-                        promptAndSetGitIdentity(p, repoPath, commitMessage, selectedChanges, push);
+                        promptAndSetGitIdentity(p, repoPath, request, branch);
                     } else {
                         Services.getInstance(p, Notifier.class).error(p, "Commit Failed", "Failed to commit changes:" + System.lineSeparator() + ex.getMessage());
                     }
@@ -183,14 +251,26 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Init Failed", "Failed to initialize repository: " + ex.getMessage()));
     }
 
-    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath, final @NotNull String commitId) {
+    /**
+     * @param committedOn the branch the commit went onto, or null when Git could
+     *                    not say which one that was. A push follows the commit
+     *                    rather than the remote's default: they are the same
+     *                    branch on almost every push, and on the one that
+     *                    matters - a cycle committed onto its own branch - the
+     *                    default would send the work somewhere the tester did
+     *                    not choose
+     */
+    private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath,
+                              final @NotNull String commitId, final @Nullable String committedOn) {
         GitBackgroundTask.run(p, "Checking Git remote", false,
                 indicator -> {
                     final String remoteName = git.getRemoteName(repoPath);
                     final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
-                    final String branch = git.getDefaultBranch(repoPath);
+                    final String branch = committedOn == null || committedOn.isBlank()
+                            ? git.getDefaultBranch(repoPath)
+                            : committedOn;
                     if (branch == null || branch.isBlank()) {
-                        throw new IllegalStateException("Could not determine the repository default branch.");
+                        throw new IllegalStateException("Could not determine which branch to push.");
                     }
                     ApplicationManager.getApplication().invokeLater(() -> {
                         // A null remote name always yields an empty URL above; naming it here
@@ -260,7 +340,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     // with the failure that needs it.
                     final Notifier notifier = Services.getInstance(p, Notifier.class);
                     notifier.errorWithActions(p, "Push Failed", ex.getMessage(),
-                            notifier.action("Try Again", () -> pushToRemote(p, repoPath, commitId)));
+                            notifier.action("Try Again", () -> pushToRemote(p, repoPath, commitId, branch)));
                 });
     }
 
@@ -305,9 +385,8 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private void promptAndSetGitIdentity(
             final @NotNull Project p,
             final @NotNull Path repoPath,
-            final @NotNull String pendingCommitMessage,
-            final @NotNull Collection<PendingChange> selectedChanges,
-            final boolean push) {
+            final @NotNull PendingCommitsDialog.Request request,
+            final @Nullable String branch) {
         // The dialog validates what it collected - a blank name or email never
         // leaves it - so this is the workflow resuming, not a second check.
         ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->
@@ -318,7 +397,9 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                                 // The tester is watching: they just filled the dialog
                                 // in and the commit resumes on the next line.
                                 Services.getInstance(p, Notifier.class).softShow(p, "Identity set");
-                                performCommitWorkflow(p, repoPath, pendingCommitMessage, selectedChanges, push);
+                                // The branch is settled by now - this is the
+                                // same commit resuming, not a second decision.
+                                performCommitWorkflow(p, repoPath, request, branch);
                             });
                         },
                         ex -> Services.getInstance(p, Notifier.class).error(p, "Config Failed",
