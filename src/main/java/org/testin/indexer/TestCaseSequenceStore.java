@@ -119,8 +119,8 @@ final class TestCaseSequenceStore {
      *
      * @param moved the cases whose rank actually changed. Only these are
      *              written: the order is a value each case carries now, so a
-     *              case that did not move has nothing new to say, and rewriting
-     *              it would put a file nobody edited in the tester's next commit
+     *              case that stayed put has nothing new to say, and rewriting it
+     *              would put an untouched file in the tester's next commit
      */
     void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
                         final @NotNull List<TestCaseDto> moved) {

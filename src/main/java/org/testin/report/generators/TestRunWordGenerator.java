@@ -434,7 +434,7 @@ public final class TestRunWordGenerator {
 
     /**
      * Percentages that fill the row exactly, whatever the tile count. The
-     * leftmost columns carry the remainder, which is what the hand-written
+     * leftmost columns carry the remainder, which is what the handwritten
      * widths did when there were always six of them.
      */
     private @NotNull int[] evenWidths(final int columns) {

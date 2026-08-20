@@ -117,7 +117,7 @@ public final class Mapper {
      * field by field, where a side that will not parse into a DTO still has
      * fields worth keeping (#90).
      * <p>
-     * An empty object for anything unreadable. Every caller of this treats an
+     * An empty object for anything unreadable. Every caller here treats an
      * unknown side as one that says nothing, which is what an empty object is.
      */
     public @NotNull ObjectNode readTree(final @NotNull String content) {

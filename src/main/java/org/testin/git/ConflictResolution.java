@@ -41,7 +41,7 @@ public final class ConflictResolution {
      * Git's three sides of a conflicted file, in the index: the common ancestor,
      * ours, theirs. During a rebase "ours" is the branch being replayed onto and
      * "theirs" is the tester's own commits, which is why nothing downstream is
-     * labelled by stage number.
+     * labeled by stage number.
      */
     private static final int BASE = 1;
     private static final int REMOTE = 2;
@@ -65,7 +65,7 @@ public final class ConflictResolution {
      * @param conflicting the paths Git reports as conflicting
      * @param onResolved  run when nothing conflicting is left
      * @param onLeftOver  given whatever could not be resolved here - a run, a
-     *                    marker, a file that is not Testin's at all
+     *                    marker, or a file the plugin never wrote
      */
     public static void resolve(final @NotNull Project p, final @NotNull Path repositoryPath,
                                final @NotNull List<String> conflicting, final @NotNull Runnable onResolved,
@@ -187,8 +187,8 @@ public final class ConflictResolution {
 
     /**
      * Whether the conflict is in a test case at all. A run's results and a
-     * marker are different shapes with different rules, and a file that is not
-     * Testin's is nobody's business here.
+     * marker are different shapes with different rules, and a file the plugin
+     * never wrote is nobody's business here.
      */
     private static boolean isTestCase(final @NotNull String relativePath) {
         return relativePath.endsWith(".json") && relativePath.contains("Test Cases/");

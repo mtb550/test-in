@@ -48,8 +48,9 @@ public abstract class AbstractMarker implements Marker {
      * really a number. A marker file written before this existed has no such key
      * and arrives here the same way.
      * <p>
-     * Left out of the JSON when it is that value, so a file nobody ordered says
-     * nothing about order rather than carrying a number no human would write.
+     * Left out of the JSON when it is that value: a file nobody ordered stays
+     * silent about order rather than carrying a number a human would never
+     * write.
      * <p>
      * Here rather than on each kind of node: a test set, a package and a project
      * all sit among siblings, and one field they inherit is one place to change

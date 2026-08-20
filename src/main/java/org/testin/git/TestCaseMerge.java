@@ -91,9 +91,9 @@ public final class TestCaseMerge {
      *
      * @param mapper the project's mapper - handed in rather than reached for, so
      *               the merge rules can be asserted without an IDE
-     * @param base   the common ancestor, or empty text when there is none - two
-     *               testers who created a case with the same name have no shared
-     *               past, and every field then reads as set by both, which is the
+     * @param base   the common ancestor, or empty text when there is none. Two
+     *               testers who created a case under the same name share no
+     *               past, so every field reads as set by both - which is the
      *               honest answer
      * @param mine   this machine's version
      * @param theirs the version the pull brought
