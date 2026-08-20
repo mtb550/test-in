@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.clazz.CreateJavaClass;
 import org.testin.codegen.clazz.RemoveJavaClass;
+import org.testin.codegen.clazz.MoveJavaClass;
 import org.testin.codegen.clazz.RenameJavaClass;
 import org.testin.codegen.method.CreateTestMethod;
 import org.testin.codegen.method.RemoveTestMethod;
@@ -13,6 +14,7 @@ import org.testin.codegen.method.update.UpdateTestDescription;
 import org.testin.codegen.method.update.UpdateTestGroup;
 import org.testin.codegen.method.update.UpdateTestPriority;
 import org.testin.codegen.pkg.CreateJavaPackage;
+import org.testin.codegen.pkg.MoveJavaPackage;
 import org.testin.codegen.pkg.RemoveJavaPackage;
 import org.testin.codegen.pkg.RenameJavaPackage;
 
@@ -38,9 +40,11 @@ final class GenRegistry {
         ACTIONS.put(GenType.REMOVE_TEST_PROJECT, new RemoveJavaPackage());
         ACTIONS.put(GenType.REMOVE_TEST_SET_PACKAGE, new RemoveJavaPackage());
         ACTIONS.put(GenType.RENAME_TEST_SET_PACKAGE, new RenameJavaPackage());
+        ACTIONS.put(GenType.MOVE_TEST_SET_PACKAGE, new MoveJavaPackage());
         ACTIONS.put(GenType.CREATE_TEST_SET, new CreateJavaClass());
         ACTIONS.put(GenType.REMOVE_TEST_SET, new RemoveJavaClass());
         ACTIONS.put(GenType.RENAME_TEST_SET, new RenameJavaClass());
+        ACTIONS.put(GenType.MOVE_TEST_SET, new MoveJavaClass());
         ACTIONS.put(GenType.CREATE_TEST_CASE, new CreateTestMethod());
         ACTIONS.put(GenType.REMOVE_TEST_CASE, new RemoveTestMethod());
         ACTIONS.put(GenType.RENAME_TEST_CASE, new RenameTestMethod());

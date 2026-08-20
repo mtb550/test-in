@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.GenType;
+import org.testin.codegen.Moved;
 import org.testin.codegen.NoJavaCode;
 import org.testin.codegen.Renamed;
 import org.testin.creator.*;
@@ -28,6 +29,7 @@ public enum DirectoryType {
             p -> new NotCreatableFromTree("Test Project"),
             (p, dir) -> GenType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
             (p, renamed) -> GenType.RENAME_TEST_PROJECT.getAction().execute(p, renamed),
+            new NoJavaCode("A test project never moves; it"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestProject(dir.getPath(), removed -> {
                 if (removed) GenType.REMOVE_TEST_PROJECT.getAction().execute(p, dir);
                 onRemoved.accept(removed);
@@ -43,6 +45,7 @@ public enum DirectoryType {
             p -> new NotCreatableFromTree("Test Cases directory"),
             new NoJavaCode("Test Cases directory"),
             new NoJavaCode("Test Cases directory"),
+            new NoJavaCode("Test Cases directory"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved),
             SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES
     ),
@@ -53,6 +56,7 @@ public enum DirectoryType {
             AllIcons.Nodes.Bookmark,
             ".trd",
             p -> new NotCreatableFromTree("Test Runs directory"),
+            new NoJavaCode("Test Runs directory"),
             new NoJavaCode("Test Runs directory"),
             new NoJavaCode("Test Runs directory"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).refuseRemove(dir.getPath(), onRemoved),
@@ -67,6 +71,7 @@ public enum DirectoryType {
             CreateTestSetPackage::new,
             (p, dir) -> GenType.CREATE_TEST_SET_PACKAGE.getAction().execute(p, dir),
             (p, renamed) -> GenType.RENAME_TEST_SET_PACKAGE.getAction().execute(p, renamed),
+            (p, moved) -> GenType.MOVE_TEST_SET_PACKAGE.getAction().execute(p, moved),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSetPackage(dir.getPath(), removed -> {
                 if (removed) GenType.REMOVE_TEST_SET_PACKAGE.getAction().execute(p, dir);
                 onRemoved.accept(removed);
@@ -82,6 +87,7 @@ public enum DirectoryType {
             CreateTestRunPackage::new,
             new NoJavaCode("test run package"),
             new NoJavaCode("test run package"),
+            new NoJavaCode("test run package"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRunPackage(dir.getPath(), onRemoved),
             SimpleTextAttributes.REGULAR_ATTRIBUTES
     ),
@@ -94,6 +100,7 @@ public enum DirectoryType {
             CreateTestSet::new,
             (p, dir) -> GenType.CREATE_TEST_SET.getAction().execute(p, dir),
             (p, renamed) -> GenType.RENAME_TEST_SET.getAction().execute(p, renamed),
+            (p, moved) -> GenType.MOVE_TEST_SET.getAction().execute(p, moved),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestSet(dir.getPath(), removed -> {
                 if (removed) GenType.REMOVE_TEST_SET.getAction().execute(p, dir);
                 onRemoved.accept(removed);
@@ -107,6 +114,7 @@ public enum DirectoryType {
             AllIcons.Toolwindows.ToolWindowRunWithCoverage,
             ".tr",
             CreateTestRun::new,
+            new NoJavaCode("test run"),
             new NoJavaCode("test run"),
             new NoJavaCode("test run"),
             (p, dir, onRemoved) -> Services.getInstance(p, ProjectIndexer.class).removeTestRun(dir.getPath(), onRemoved),
@@ -144,6 +152,16 @@ public enum DirectoryType {
      * third place to answer a question this enum exists to answer once (#51).
      */
     private final @NotNull GenAction renameCodegen;
+
+    /**
+     * What a move does to this kind of node's code, given a {@link Moved}.
+     * <p>
+     * A move changes which package a file declares, so it is its own operation
+     * and not a rename with a different argument. Nothing did it at all before:
+     * a dragged test set left its class behind, and the cases under it stopped
+     * being runnable (#51).
+     */
+    private final @NotNull GenAction moveCodegen;
 
     private final @NotNull RemoveHandler removeHandler;
     private final @NotNull SimpleTextAttributes attributes;

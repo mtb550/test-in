@@ -9,12 +9,14 @@ import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.testin.codegen.Moved;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
+import org.testin.util.OptionalPlugin;
 import org.testin.ui.framework.ConfirmDialog;
 
 import javax.swing.*;
@@ -399,6 +401,12 @@ public class TreeTransferHandler extends TransferHandler {
         final AtomicInteger moved = new AtomicInteger();
 
         for (int i = 0; i < from.size(); i++) {
+            // Before the data move, while the old path is still what finds the
+            // generated code - and here rather than at the gesture, because undo
+            // and redo are this same routine with the two lists swapped, so they
+            // carry the code back and forth without knowing they do (#51).
+            syncCode(from.get(i), to.get(i));
+
             Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), wasMoved -> {
                 // The move is asynchronous, so this can land after the project
                 // closed; refreshing a disposed tree throws.
@@ -410,6 +418,20 @@ public class TreeTransferHandler extends TransferHandler {
                 onDone.accept(moved.get());
             });
         }
+    }
+
+    /**
+     * Moves the generated Java that belongs to the node at this path, if the
+     * node has any. Which generator that is belongs to the node itself.
+     */
+    private void syncCode(final @NotNull Path from, final @NotNull Path to) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+        final Path target = to.getParent();
+        if (target == null) return;
+
+        Services.getInstance(p, ProjectIndexer.class).find(from)
+                .ifPresent(dir -> dir.getType().getMoveCodegen().execute(p, new Moved(dir, target)));
     }
 
     // Both parameters are Swing's, and Swing passes null for either when the

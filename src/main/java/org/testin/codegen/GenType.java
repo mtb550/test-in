@@ -46,6 +46,11 @@ public enum GenType {
             "Rename Automation Test Package"
     ),
 
+    MOVE_TEST_SET_PACKAGE(
+            "Move Test Set Package",
+            "Move Automation Test Package"
+    ),
+
     CREATE_TEST_SET(
             "Create Test Set",
             "Create Automation Test Class"
@@ -59,6 +64,11 @@ public enum GenType {
     RENAME_TEST_SET(
             "Rename Test Set",
             "Rename Automation Test Class"
+    ),
+
+    MOVE_TEST_SET(
+            "Move Test Set",
+            "Move Automation Test Class"
     ),
 
     CREATE_TEST_CASE(
