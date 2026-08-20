@@ -24,6 +24,7 @@ import org.testin.setting.AppSettingsState;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -37,11 +38,9 @@ public final class RunStatusService {
         if (executingIndex == -1) return;
 
         final TestCaseDto currentTc = editor.getCurrentTestCases().get(executingIndex);
-        final TestRunItems item = editor.getResultsMap().get(currentTc.getId());
-
-        if (item != null) {
-            item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
-        }
+        final Optional<TestRunItems> item = editor.runItem(currentTc.getId());
+        item.ifPresent(runItem ->
+                runItem.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName));
 
         Logger.trace("[RunStatusService]: Execution status updated -> " + currentTc.getDescription() + " = " + status);
 
@@ -64,8 +63,9 @@ public final class RunStatusService {
     public void executeManual(final @NotNull Project p, final @NotNull TestinEditor ui, final @NotNull TestCaseDto tc, final @NotNull TestStatus status) {
         if (!(ui instanceof RunEditor editor)) return;
 
-        final TestRunItems item = editor.getResultsMap().get(tc.getId());
-        if (item == null) return;
+        final Optional<TestRunItems> found = editor.runItem(tc.getId());
+        if (found.isEmpty()) return;
+        final TestRunItems item = found.get();
 
         final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
         if (tcIndex != -1 && tcIndex == editor.getCurrentlyExecutingIndex()) {
@@ -100,8 +100,7 @@ public final class RunStatusService {
 
         if (selectedItems.size() == 1) {
             final TestCaseDto tc = selectedItems.getFirst();
-            final TestRunItems only = editor.getResultsMap().get(tc.getId());
-            if (only != null && only.isRemoved()) {
+            if (editor.runItem(tc.getId()).filter(TestRunItems::isRemoved).isPresent()) {
                 refuseRemoved(p);
                 return;
             }
@@ -116,11 +115,11 @@ public final class RunStatusService {
             int recorded = 0;
 
             for (final TestCaseDto tc : selectedItems) {
-                final TestRunItems item = editor.getResultsMap().get(tc.getId());
-                if (item != null && item.isRemoved()) continue;
+                final Optional<TestRunItems> found = editor.runItem(tc.getId())
+                        .filter(item -> !item.isRemoved());
 
-                if (item != null) {
-                    item.recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
+                if (found.isPresent()) {
+                    found.get().recordVerdict(status, Services.getInstance(p, AppSettingsState.class).testerName);
                     recorded++;
 
                     final int tcIndex = editor.getCurrentTestCases().indexOf(tc);
@@ -156,10 +155,8 @@ public final class RunStatusService {
      * its sequential run writer.
      */
     public void persistRun(final @NotNull Project p, final @NotNull RunEditor editor) {
-        final TestRunDto tr = editor.getTr();
-        if (tr == null) return;
-
-        Services.getInstance(p, ProjectIndexer.class).persistRun(editor.getParent().getPath(), tr);
+        editor.run().ifPresent(tr ->
+                Services.getInstance(p, ProjectIndexer.class).persistRun(editor.getParent().getPath(), tr));
     }
 
     /**

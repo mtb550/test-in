@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBList;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectAction;
 import org.testin.editor.TestinEditor;
 import org.testin.editor.run.RunEditor;
@@ -15,11 +14,12 @@ import org.testin.logger.Logger;
 import org.testin.model.TestRunItems;
 import org.testin.model.TestStatus;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.model.dto.TestRunDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.testrun.create.FailedResultDialog;
+
+import java.util.Optional;
 import org.testin.util.Shortcuts;
 
 
@@ -37,13 +37,15 @@ public class UpdateRunItemAction extends AbstractProjectAction {
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
 
-        final @Nullable TestCaseDto selected = list.getSelectedValue();
+        // Swing answers null when nothing is selected, which is nothing to edit.
+        final TestCaseDto selected = list.getSelectedValue();
         if (selected == null) return;
 
         if (!(editor instanceof RunEditor runEditor)) return;
 
-        final @Nullable TestRunItems runItem = runEditor.getResultsMap().get(selected.getId());
-        if (runItem == null) return;
+        final Optional<TestRunItems> found = runEditor.runItem(selected.getId());
+        if (found.isEmpty()) return;
+        final TestRunItems runItem = found.get();
 
         // The test case is gone: what the run recorded against it stands as it is.
         if (runItem.isRemoved()) {
@@ -55,23 +57,18 @@ public class UpdateRunItemAction extends AbstractProjectAction {
 
         // The same details dialog that opens automatically on a Failed status;
         // F2 edits without touching the status.
-        new FailedResultDialog(p, runItem, () -> {
-            final TestRunDto tr = runEditor.getTr();
-
-            // The editor nulls the run while it reloads. Persisting is the whole point
-            // of the callback, so say the edit was dropped rather than lose it quietly.
-            if (tr == null) {
-                Logger.warn("Run item edited while the run was reloading; not persisted");
-                return;
-            }
-
+        new FailedResultDialog(p, runItem, () -> runEditor.run().ifPresentOrElse(tr -> {
             Services.getInstance(p, ProjectIndexer.class).persistRun(runEditor.getParent().getPath(), tr);
             list.repaint();
 
-            // After the persist and past the reload guard above: an edit that was
-            // dropped rather than saved must not report itself as saved (#62).
+            // After the persist: an edit that was dropped rather than saved must
+            // not report itself as saved (#62).
             Services.getInstance(p, Notifier.class).softShow(p, "Details updated");
-        }).show();
+
+            // The editor empties the run while it reloads. Persisting is the whole
+            // point of the callback, so say the edit was dropped rather than lose it
+            // quietly.
+        }, () -> Logger.warn("Run item edited while the run was reloading; not persisted"))).show();
     }
 
     @Override
@@ -79,10 +76,11 @@ public class UpdateRunItemAction extends AbstractProjectAction {
         // Details belong to failed test cases only - the dialog's title stays
         // truthful and the action reads as what it is.
         boolean enabled = false;
-        final @Nullable TestCaseDto selected = list.getSelectedValue();
+        final TestCaseDto selected = list.getSelectedValue();
         if (selected != null && list.getSelectedValuesList().size() == 1 && editor instanceof RunEditor runEditor) {
-            final @Nullable TestRunItems item = runEditor.getResultsMap().get(selected.getId());
-            enabled = item != null && item.getStatus() == TestStatus.FAILED;
+            enabled = runEditor.runItem(selected.getId())
+                    .filter(item -> item.getStatus() == TestStatus.FAILED)
+                    .isPresent();
         }
         e.getPresentation().setEnabled(enabled);
     }

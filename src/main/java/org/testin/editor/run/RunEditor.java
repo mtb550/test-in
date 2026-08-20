@@ -74,7 +74,11 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     @Getter
     private final @NotNull List<TestCaseDto> currentTestCases;
 
-    @Getter
+    /**
+     * What the run recorded for each case, by case id. Not handed out: callers
+     * ask {@link #runItem(UUID)}, so "this case has no run item" is one answer
+     * rather than eight map lookups each checked for null (#71).
+     */
     private final @NotNull Map<UUID, TestRunItems> resultsMap;
 
     private final @NotNull GridPanelBuilder gridPanelBuilder = new GridPanelBuilder();
@@ -118,8 +122,27 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     @Getter
     @Setter
     private int hoveredIndex = -1;
-    @Getter
+    /**
+     * The run being edited, and empty while a reload is replacing it. Volatile:
+     * loaded off the EDT and read on it.
+     */
     private volatile @Nullable TestRunDto tr;
+
+    /**
+     * What the run recorded for this case, empty when it recorded nothing - a
+     * case added to the test set after the run was created, or a map still being
+     * refilled by a reload.
+     */
+    public @NotNull Optional<TestRunItems> runItem(final @NotNull UUID id) {
+        return Optional.ofNullable(resultsMap.get(id));
+    }
+
+    /**
+     * The run being edited, empty while a reload is replacing it.
+     */
+    public @NotNull Optional<TestRunDto> run() {
+        return Optional.ofNullable(tr);
+    }
 
     @Getter
     private int currentlyExecutingIndex = -1;

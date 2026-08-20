@@ -23,8 +23,8 @@ public class TestRunItemsTest {
 
     @Test
     public void aFreshItemHasNoTestCaseUntilTheEditorWiresOne() {
-        assertNull(TestRunItems.builder().id(UUID.randomUUID()).build().getTc(),
-                "tc is @JsonIgnore - deserializing a run never fills it");
+        assertTrue(TestRunItems.builder().id(UUID.randomUUID()).build().testCase().isEmpty(),
+                "the case is @JsonIgnore - deserializing a run never fills it");
     }
 
     @Test
@@ -47,11 +47,11 @@ public class TestRunItemsTest {
     }
 
     @Test
-    public void getTcStaysAvailableForTheCallersThatMustHandleNull() {
+    public void testCaseStaysAvailableForTheCallersThatMustHandleItsAbsence() {
         final TestRunItems item = TestRunItems.builder().id(UUID.randomUUID()).build();
 
         // FailedResultDialog renders "No longer in the test set" from exactly this.
-        assertNull(item.getTc());
+        assertTrue(item.testCase().isEmpty());
         assertEquals(item.getStatus(), org.testin.model.TestStatus.PENDING, "an unrun item defaults to PENDING");
     }
 }

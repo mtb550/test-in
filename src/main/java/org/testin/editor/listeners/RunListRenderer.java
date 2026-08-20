@@ -19,13 +19,11 @@ public class RunListRenderer extends AbstractListRenderer<RunEditor> {
 
     @Override
     protected @NotNull RunCard bindDataAndGetCard(final @NotNull JList<? extends TestCaseDto> list, final @NotNull TestCaseDto tc, final int globalIndex, final boolean isSelected, final boolean isRowHovered, final @NotNull String hover) {
-        TestRunItems runItem = editor.getResultsMap().get(tc.getId());
-
-        // The results map can be transiently empty during a refresh while the list still repaints;
-        // render a pending placeholder instead of crashing inside the cell renderer.
-        if (runItem == null) {
-            runItem = TestRunItems.builder().id(tc.getId()).tc(tc).build();
-        }
+        // The results map can be transiently empty during a refresh while the list
+        // still repaints; render a pending placeholder rather than crashing inside
+        // the cell renderer.
+        final TestRunItems runItem = editor.runItem(tc.getId())
+                .orElseGet(() -> TestRunItems.builder().id(tc.getId()).tc(tc).build());
 
         card.updateData(globalIndex, editor.getSelectedDetails(), runItem, editor.cardTitle(globalIndex, tc));
         card.setActionsState(isSelected, isRowHovered, hover);

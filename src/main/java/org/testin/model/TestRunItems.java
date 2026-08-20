@@ -13,6 +13,7 @@ import org.testin.model.dto.TestCaseDto;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.UUID;
 
 @Setter
@@ -35,6 +36,7 @@ public class TestRunItems {
      * raw run item read straight from the file.
      */
     @JsonIgnore
+    @Getter(AccessLevel.NONE)
     @Nullable
     private TestCaseDto tc;
 
@@ -126,6 +128,15 @@ public class TestRunItems {
      *
      * @throws IllegalStateException if called on an item the editor filtered out
      */
+    /**
+     * The test case, for the paths where it may not be there: a dialog opened on
+     * a run item whose case is no longer in the test set. The rendering paths
+     * ask {@link #requireTc()} instead, which states the invariant they rely on.
+     */
+    public @NotNull Optional<TestCaseDto> testCase() {
+        return Optional.ofNullable(tc);
+    }
+
     public @NotNull TestCaseDto requireTc() {
         if (tc == null)
             throw new IllegalStateException("Run item " + id + " has no test case; it should not have reached the editor");
