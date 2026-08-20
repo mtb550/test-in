@@ -100,7 +100,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * Test case selected before a reload. Held as an id, not as a dto: a refresh
      * replaces the objects, so identity would not survive it.
      */
-    private @Nullable UUID selectionToRestore;
+    private @NotNull Optional<UUID> selectionToRestore = Optional.empty();
     /**
      * Grid column selected before a reload, so the cell comes back, not just the row.
      */
@@ -255,9 +255,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     @Override
-    public void selectTestCase(final @Nullable TestCaseDto tc) {
-        if (tc == null) return;
-
+    public void selectTestCase(final @NotNull TestCaseDto tc) {
         if (!currentTestCases.contains(tc)) {
             toolBar.getToolbarItem(FilterPopupBtn.class).resetToolBarFilter();
 
@@ -447,9 +445,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         currentPage = page.page();
         final List<TestCaseDto> pageItems = new ArrayList<>(currentTestCases.subList(page.fromIndex(), page.toIndex()));
 
-        final UUID selectedId = selectionToRestore != null
-                ? selectionToRestore
-                : (list.getSelectedValue() != null ? list.getSelectedValue().getId() : null);
+        // What was selected before the reload, or what is selected right now.
+        // Swing answers null for an empty selection, which is converted here.
+        final Optional<UUID> selectedId = selectionToRestore
+                .or(() -> Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId));
 
         modelChangeNotifier.pause();
         model.replaceAll(pageItems);
@@ -457,17 +456,17 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
         // Matched by id: a reload hands back different dto instances for the
         // same test cases, so comparing objects would drop the selection.
-        if (selectedId != null) {
+        selectedId.ifPresent(id -> {
             for (final TestCaseDto item : pageItems) {
-                if (selectedId.equals(item.getId())) {
+                if (id.equals(item.getId())) {
                     // Selected by value, not by index: the list model owns its own
                     // ordering, so an index into pageItems is not safe to reuse.
                     list.setSelectedValue(item, true);
                     break;
                 }
             }
-        }
-        selectionToRestore = null;
+        });
+        selectionToRestore = Optional.empty();
 
         showEmptyStateIfNothingToDraw(totalItems);
 
@@ -510,8 +509,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * Records the selected test case (and grid column) before the data is reloaded.
      */
     private void rememberSelection() {
-        final TestCaseDto selected = list.getSelectedValue();
-        selectionToRestore = selected != null ? selected.getId() : null;
+        selectionToRestore = Optional.ofNullable(list.getSelectedValue()).map(TestCaseDto::getId);
         gridColumnToRestore = grid.map(view -> view.table().getSelectedColumn()).orElse(-1);
     }
 
@@ -519,11 +517,13 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * Moves to whichever page now holds the remembered test case.
      */
     private void jumpToPageOfPendingSelection() {
-        final int page = PageWindow.pageContaining(selectionToRestore, currentTestCases, pageSize);
+        final int page = selectionToRestore
+                .map(id -> PageWindow.pageContaining(id, currentTestCases, pageSize))
+                .orElse(0);
 
         // Not on any page anymore - the case was deleted or filtered out, so
         // there is nothing left to restore.
-        if (page == 0) selectionToRestore = null;
+        if (page == 0) selectionToRestore = Optional.empty();
         else currentPage = page;
     }
 

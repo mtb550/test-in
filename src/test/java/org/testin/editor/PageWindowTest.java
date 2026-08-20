@@ -68,16 +68,14 @@ public class PageWindowTest {
      * Zero, not one: the callers tell "it is on the first page" from "it is not
      * here any more" by this, and restoring a selection that has gone would put
      * the editor on a page the tester did not ask for.
+     * <p>
+     * Nothing remembered at all is no longer a case here - the editors hold the
+     * remembered id as an Optional and do not ask when it is empty (#71).
      */
     @Test
     public void answersZeroWhenTheCaseIsNotInTheList() {
         assertEquals(PageWindow.pageContaining(UUID.randomUUID(), casesOf(10), 50), 0);
         assertEquals(PageWindow.pageContaining(UUID.randomUUID(), List.of(), 50), 0);
-    }
-
-    @Test
-    public void answersZeroWhenNothingWasRemembered() {
-        assertEquals(PageWindow.pageContaining(null, casesOf(10), 50), 0);
     }
 
     @Test

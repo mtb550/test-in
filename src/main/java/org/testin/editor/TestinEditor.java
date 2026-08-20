@@ -88,7 +88,7 @@ public interface TestinEditor extends Disposable {
 
     void updateSequenceAndSaveAll();
 
-    void selectTestCase(final @Nullable TestCaseDto tc);
+    void selectTestCase(final @NotNull TestCaseDto tc);
 
     /**
      * Which action icon the pointer is over, by name, and empty for none.

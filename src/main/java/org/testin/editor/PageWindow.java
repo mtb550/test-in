@@ -1,7 +1,6 @@
 package org.testin.editor;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 
 import java.util.List;
@@ -30,10 +29,8 @@ public record PageWindow(int page, int totalPages, int fromIndex, int toIndex) {
      * for the same reason {@link #of} guards it: it comes from settings, and
      * dividing by a stored 0 would throw.
      */
-    public static int pageContaining(final @Nullable UUID testCaseId,
+    public static int pageContaining(final @NotNull UUID testCaseId,
                                      final @NotNull List<TestCaseDto> items, final int pageSize) {
-        if (testCaseId == null) return 0;
-
         final int safePageSize = Math.max(1, pageSize);
         for (int i = 0; i < items.size(); i++) {
             if (testCaseId.equals(items.get(i).getId())) return (i / safePageSize) + 1;
