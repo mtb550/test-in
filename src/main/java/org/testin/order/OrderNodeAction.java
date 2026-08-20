@@ -6,7 +6,6 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.indexer.ProjectIndexer;
@@ -14,6 +13,8 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
 import org.testin.explorer.tree.TreeValueUtil;
+
+import java.util.Optional;
 
 /**
  * Gives a node its place among its siblings: a number the tester types.
@@ -34,10 +35,7 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final DirectoryDto node = selected();
-        if (node == null) return;
-
-        new OrderDialog(p, node.getOrder(), order -> apply(node, order)).show();
+        selected().ifPresent(node -> new OrderDialog(p, node.getOrder(), order -> apply(node, order)).show());
     }
 
     private void apply(final @NotNull DirectoryDto node, final int order) {
@@ -51,18 +49,21 @@ public class OrderNodeAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * The selected node when it is one that can be ordered, and null otherwise.
-     * Read by both the menu state and the action, so the two can never disagree
-     * about what is offered.
+     * The selected node, when there is one and it is a kind that can be ordered.
+     * <p>
+     * Two things can be absent here and both are ordinary: a tree with nothing
+     * selected, and a row that is not a directory at all. Answering with an
+     * empty Optional rather than a null puts both behind one word, so the menu
+     * state and the action are each a single line and neither tests for
+     * anything.
      */
-    private @Nullable DirectoryDto selected() {
-        final DirectoryDto node = TreeValueUtil.selectedDirectory(tree);
-        return node != null && node.isOrderable() ? node : null;
+    private @NotNull Optional<DirectoryDto> selected() {
+        return Optional.ofNullable(TreeValueUtil.selectedDirectory(tree)).filter(DirectoryDto::isOrderable);
     }
 
     @Override
     public void update(final @NotNull AnActionEvent e) {
-        e.getPresentation().setEnabledAndVisible(selected() != null);
+        e.getPresentation().setEnabledAndVisible(selected().isPresent());
     }
 
     @Override
