@@ -124,8 +124,12 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     final List<String> branches = git.getLocalBranches(path);
                     final String current = git.getCurrentBranch(path);
 
+                    // A commit that succeeded and a push that failed leave
+                    // nothing pending and work that never left the machine.
+                    final int unpushed = git.unpushedCount(path);
+
                     ApplicationManager.getApplication().invokeLater(() ->
-                            reviewChanges(p, path, changes, branches, current == null ? "" : current));
+                            reviewChanges(p, path, changes, branches, current == null ? "" : current, unpushed));
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
     }
@@ -133,9 +137,10 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
     private void reviewChanges(final @NotNull Project p, final @NotNull Path path,
                                final @NotNull List<PendingChange> changes,
                                final @NotNull List<String> branches,
-                               final @NotNull String currentBranch) {
+                               final @NotNull String currentBranch,
+                               final int unpushed) {
         if (changes.isEmpty()) {
-            Services.getInstance(p, Notifier.class).softShow(p, "No changes");
+            offerThePush(p, path, currentBranch, unpushed);
             return;
         }
 
@@ -207,6 +212,33 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error",
                         "Could not prepare " + target + ": " + ex.getMessage()));
+    }
+
+    /**
+     * What to say when there is nothing to commit.
+     * <p>
+     * Usually nothing happened and "No changes" is the whole truth. But a commit
+     * that succeeded and a push that failed - a conflict, a rejected pull, a
+     * dropped connection - leaves exactly this state with work that has not left
+     * the machine, and the review saying "No changes" was the last thing the
+     * plugin had to offer: the commit existed, nothing was pending, and no
+     * action anywhere pushed it (#66).
+     */
+    private void offerThePush(final @NotNull Project p, final @NotNull Path path,
+                              final @NotNull String currentBranch, final int unpushed) {
+        final Notifier notifier = Services.getInstance(p, Notifier.class);
+
+        if (unpushed == 0) {
+            notifier.softShow(p, "No changes");
+            return;
+        }
+
+        final String waiting = unpushed == 1 ? "1 commit is" : unpushed + " commits are";
+
+        notifier.warnWithAction(p, "Not Pushed",
+                waiting + " committed here and not on the remote.",
+                "Push",
+                () -> pushToRemote(p, path, commits.headCommitId(path), currentBranch));
     }
 
     private void performCommitWorkflow(
@@ -355,13 +387,18 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                 });
     }
 
+    /**
+     * On the background thread that failed, because naming the conflicting files
+     * means asking Git for them.
+     */
     private void showConflictActions(final @NotNull Path repoPath, final @NotNull String remote,
                                      final @NotNull String branch) {
+        final String message = GitRefs.conflictMessage(git.conflictingPaths(repoPath));
         final Notifier notifier = Services.getInstance(p, Notifier.class);
         notifier.warnWithActions(
                 p,
                 "Git Conflicts",
-                "Pull stopped because conflicts must be resolved in the IDE before continuing.",
+                message,
                 notifier.action("Continue rebase", () -> finishRebase(repoPath, remote, branch, false)),
                 notifier.action("Abort rebase", () -> finishRebase(repoPath, remote, branch, true)));
     }

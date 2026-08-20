@@ -26,6 +26,7 @@ import org.testin.services.Services;
 
 import javax.swing.tree.TreePath;
 import java.nio.file.Path;
+import java.util.List;
 
 public class SyncActionAction extends AbstractProjectTreeAction {
     private final @NotNull ExplorerPanel pp;
@@ -95,9 +96,13 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     // platform's own assertion.
                     final boolean conflicts = git.hasConflicts(repoPath);
 
+                    // Asked here too, for the same reason: naming the files
+                    // that conflict is another git status.
+                    final List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
+
                     ApplicationManager.getApplication().invokeLater(() -> {
                         if (conflicts) {
-                            showConflictActions(repoPath);
+                            showConflictActions(repoPath, conflicting);
                         } else {
                             Services.getInstance(p, Notifier.class).error(p, "Sync Failed", "Could not pull changes:\n" + ex.getMessage());
                         }
@@ -107,7 +112,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         });
     }
 
-    private void showConflictActions(final @NotNull Path repoPath) {
+    private void showConflictActions(final @NotNull Path repoPath, final @NotNull List<String> conflicting) {
         final Notifier notifier = Services.getInstance(p, Notifier.class);
         final NotificationAction continueAction = notifier.action(
                 "Continue rebase", () -> finishRebase(repoPath, false));
@@ -116,7 +121,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         notifier.warnWithActions(
                 p,
                 "Git Conflicts",
-                "Pull stopped because conflicts must be resolved in the IDE before continuing.",
+                GitRefs.conflictMessage(conflicting),
                 continueAction,
                 abortAction);
     }
@@ -130,9 +135,10 @@ public class SyncActionAction extends AbstractProjectTreeAction {
         // Called from a background task's body and from its error handler, both
         // off the EDT - which is where the git question has to be asked.
         final boolean conflicts = git.hasConflicts(repoPath);
+        final List<String> conflicting = conflicts ? git.conflictingPaths(repoPath) : List.of();
 
         ApplicationManager.getApplication().invokeLater(() -> {
-            if (conflicts) showConflictActions(repoPath);
+            if (conflicts) showConflictActions(repoPath, conflicting);
             else Services.getInstance(p, Notifier.class).error(p, "Git Conflict Operation Failed", message);
         });
     }

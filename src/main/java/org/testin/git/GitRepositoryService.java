@@ -167,6 +167,35 @@ public final class GitRepositoryService {
     }
 
     /**
+     * The files a stopped pull left conflicting, in the order Git lists them.
+     */
+    public @NotNull List<String> conflictingPaths(final @NotNull Path path) {
+        return GitRefs.unmergedPaths(status(path));
+    }
+
+    /**
+     * How many commits are on this branch and not on its remote.
+     * <p>
+     * The number nobody could see: a commit that succeeded and a push that
+     * failed leave a repository with nothing pending and work that has not left
+     * the machine, which read as "nothing to commit" and no way forward.
+     * <p>
+     * Zero when Git cannot answer - a branch with no upstream that the remote
+     * has never heard of has nothing to be ahead of.
+     */
+    public int unpushedCount(final @NotNull Path path) {
+        final String counted = run(path, "git", "rev-list", "--count", "@{upstream}..HEAD");
+        if (counted == null) return 0;
+
+        try {
+            return Integer.parseInt(counted.trim());
+        } catch (final NumberFormatException ex) {
+            Logger.debug("Could not read the unpushed count in " + path + ": " + counted);
+            return 0;
+        }
+    }
+
+    /**
      * Git leaves one of these directories behind for the duration of a rebase -
      * which is how Git itself knows, and the only way to ask without a
      * repository object.

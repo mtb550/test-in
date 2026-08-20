@@ -119,6 +119,42 @@ public final class GitRefs {
         return path.replace('\\', '/');
     }
 
+    /**
+     * The paths Git reports as conflicting, from the same porcelain output
+     * {@link #hasUnmergedPaths} answers yes or no about.
+     */
+    public static @NotNull List<String> unmergedPaths(final @NotNull List<String> porcelainLines) {
+        return porcelainLines.stream()
+                .filter(line -> line.length() >= 4)
+                .filter(line -> UNMERGED.contains(line.substring(0, 2)))
+                .map(line -> unquote(line.substring(3)))
+                .filter(path -> !path.isEmpty())
+                .map(GitRefs::slashed)
+                .toList();
+    }
+
+    /**
+     * What a tester is told when a pull stops on conflicts.
+     * <p>
+     * Naming the files is the whole point: "resolve them in the IDE" without
+     * saying which ones sends a tester looking through a tree for something the
+     * plugin already knows (#66). Both the sync and the push say this, from
+     * here, because two copies of a sentence drift the way two copies of a rule
+     * do.
+     */
+    public static @NotNull String conflictMessage(final @NotNull List<String> unmergedPaths) {
+        if (unmergedPaths.isEmpty()) {
+            return "The pull stopped on a conflict. Continue once it is resolved, or abort to roll the pull back.";
+        }
+
+        final int shown = Math.min(unmergedPaths.size(), 3);
+        final String names = String.join(", ", unmergedPaths.subList(0, shown));
+        final String more = unmergedPaths.size() > shown ? " and " + (unmergedPaths.size() - shown) + " more" : "";
+
+        return "Both sides changed " + names + more + ". Resolve the conflict, then continue - or abort to roll "
+                + "the pull back and keep what is here.";
+    }
+
     private static @NotNull DiffType typeOf(final @NotNull String code) {
         if (code.equals("??") || code.indexOf('A') >= 0) return DiffType.ADDED;
         if (code.indexOf('D') >= 0) return DiffType.DELETED;
