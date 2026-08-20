@@ -30,11 +30,6 @@ public final class TestNGRunnerByMethod {
     public void runTestMethod(final @NotNull Project p, final @NotNull TestCaseDto tc) {
         ArrayList<String> fqcn = Fqcn.ofMethod(tc);
 
-        // Read here, where the tester's gesture is: everything below hops to a
-        // pooled thread and back, and a launch prepared before a stop must not
-        // start after it (#34).
-        final int generation = Services.getInstance(p, TestNGExecution.class).generation();
-
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
 
@@ -57,7 +52,10 @@ public final class TestNGRunnerByMethod {
                     final String finalFqcn = targetClass.getQualifiedName();
                     final int dotIndex = classFqcn.lastIndexOf('.');
                     final String simpleClassName = (dotIndex >= 0) ? classFqcn.substring(dotIndex + 1) : classFqcn;
-                    final String configLabel = simpleClassName + "." + methodName;
+
+                    // Asked for rather than spelled out again: a stop finds the
+                    // process by this name, so the two have to agree (#34).
+                    final String configLabel = TestNGExecution.configName(tc);
 
                     Logger.info("finalFqcn: " + finalFqcn + ", simpleClass: " + simpleClassName);
                     Logger.info("Config label: " + configLabel);
@@ -92,7 +90,7 @@ public final class TestNGRunnerByMethod {
                         runManager.setTemporaryConfiguration(settings);
                         runManager.setSelectedConfiguration(settings);
 
-                        Services.getInstance(p, TestNGExecution.class).launch(generation, settings);
+                        Services.getInstance(p, TestNGExecution.class).launch(tc, settings);
                     });
                 }));
     }

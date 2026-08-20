@@ -52,7 +52,7 @@ public enum CardHoverAction {
             Shortcuts.EMPTY,
             OptionalPlugin.TESTNG,
             AllIcons.Actions.Suspend,
-            (p, cases) -> stopRun(p)
+            CardHoverAction::stopRun
     );
 
     private final @NotNull String tooltip;
@@ -101,13 +101,15 @@ public enum CardHoverAction {
     }
 
     /**
-     * Stops the run rather than the one case the button sits on: the plugin
-     * holds no handle to a single case's process, and stopping one of a page of
-     * twelve would leave the other eleven going with nothing to reach them by.
+     * Stops these cases and no others: a card stops the one it sits on, and the
+     * key stops what is selected. Said once with a count, the way starting them
+     * is - a page of twelve raises one notification, not twelve.
      */
-    private static void stopRun(final @NotNull Project p) {
-        Services.getInstance(p, TestNGExecution.class).stop();
-        Services.getInstance(p, Notifier.class).softShow(p, "Stopped");
+    private static void stopRun(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
+        final int stopped = Services.getInstance(p, TestNGExecution.class).stop(cases);
+
+        if (stopped == 1) Services.getInstance(p, Notifier.class).softShow(p, "Stopped");
+        else if (stopped > 1) Services.getInstance(p, Notifier.class).softShow(p, "Stopped " + stopped);
     }
 
     /**

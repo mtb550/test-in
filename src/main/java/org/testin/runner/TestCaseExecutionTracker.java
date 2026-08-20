@@ -7,7 +7,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Key;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.RunStatus;
-import org.testin.services.Services;
 
 import java.util.Objects;
 
@@ -41,12 +40,6 @@ public class TestCaseExecutionTracker {
                 } else if (test.isDefect()) {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED,
                             Objects.toString(test.getErrorMessage(), ""));
-
-                } else if (Services.getInstance(p, TestNGExecution.class).isStopped()) {
-                    // The tester stopped this run. The case neither passed nor
-                    // failed - it did not finish - and badging it red would report
-                    // a defect nobody found (#34).
-                    TestCaseExecutionListener.broadcast(p, testName, RunStatus.IDLE, "");
 
                 } else {
                     TestCaseExecutionListener.broadcast(p, testName, RunStatus.FAILED,

@@ -36,9 +36,6 @@ public class TestNGRunnerByClass {
 
         Logger.info("Running test class: " + fqcn);
 
-        // Read here, where the tester's gesture is - see TestNGRunnerByMethod.
-        final int generation = Services.getInstance(p, TestNGExecution.class).generation();
-
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             try {
                 ApplicationManager.getApplication().runReadAction(() -> {
@@ -83,7 +80,7 @@ public class TestNGRunnerByClass {
 
                         Logger.info("Setting TEST_OBJECT=" + TestType.CLASS.getType() + ", MAIN_CLASS=" + finalFqcn + ", simpleClass=" + simpleClassName);
 
-                        Services.getInstance(p, TestNGExecution.class).launch(generation, settings);
+                        Services.getInstance(p, TestNGExecution.class).launch(settings);
                     });
                 });
             } catch (final IndexNotReadyException ex) {

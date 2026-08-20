@@ -36,6 +36,8 @@ public final class TestCaseExecutionSubscriber {
      */
     private final @NotNull Map<String, UUID> uuidToDtoId = new ConcurrentHashMap<>();
 
+    private final @NotNull Project p;
+
     private final @NotNull ProjectIndexer indexer;
 
     /**
@@ -51,6 +53,7 @@ public final class TestCaseExecutionSubscriber {
 
     public TestCaseExecutionSubscriber(final @NotNull Project p, final @NotNull Disposable parentDisposable,
                                        final @NotNull Runnable onUpdated) {
+        this.p = p;
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
         this.onUpdated = onUpdated;
 
@@ -74,8 +77,10 @@ public final class TestCaseExecutionSubscriber {
                 : Optional.ofNullable(uuidToDtoId.get(testName)).flatMap(indexer::findTestCase);
 
         reported.ifPresent(tc -> {
-            Logger.debug("  reporting on '" + tc.getDescription() + "', tempStatus='" + status + "'");
-            tc.setTempStatus(status);
+            final RunStatus reportedStatus = verdictFor(tc, status);
+
+            Logger.debug("  reporting on '" + tc.getDescription() + "', tempStatus='" + reportedStatus + "'");
+            tc.setTempStatus(reportedStatus);
             tc.setTempError(error);
         });
 
@@ -89,6 +94,22 @@ public final class TestCaseExecutionSubscriber {
         }
 
         if (reported.isPresent()) onUpdated.run();
+    }
+
+    /**
+     * What the report means for this case.
+     * <p>
+     * A case the tester stopped reports itself finished without having passed,
+     * which reads exactly like a failure. It is not one: nobody found a defect,
+     * the case simply did not finish (#34). Decided here because this is the one
+     * place that knows which case a report is about - the runner sees only the
+     * name TestNG chose for the method.
+     */
+    private @NotNull RunStatus verdictFor(final @NotNull TestCaseDto tc, final @NotNull RunStatus status) {
+        final boolean stopped = status == RunStatus.FAILED
+                && Services.getInstance(p, TestNGExecution.class).isStopped(tc);
+
+        return stopped ? RunStatus.IDLE : status;
     }
 
     /**
