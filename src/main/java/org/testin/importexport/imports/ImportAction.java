@@ -19,7 +19,7 @@ import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.TestEditorAttributes.Can;
 import org.testin.testcase.Rank;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -92,7 +92,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                 if (generateCode) generateTestMethods(p, flatList, ts.getName());
 
                 Services.getInstance(p, EditorUtil.class).closeThenOpen(p, ts);
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "imported", flatList.size());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", flatList.size());
 
             } else {
                 int totalImported = 0;
@@ -116,7 +116,7 @@ public class ImportAction extends AbstractProjectTreeAction {
                 }
                 // Same wording as the single-test-set branch above: the tester
                 // chose which shape to import into, so the count is the news (#62).
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "imported", totalImported);
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Imported", totalImported);
             }
 
             // Asynchronous refresh: a synchronous recursive VFS refresh inside a
@@ -174,7 +174,7 @@ public class ImportAction extends AbstractProjectTreeAction {
      */
     private @Nullable TestCaseDto findExistingTail(final @NotNull Project p, final @NotNull Path directory) {
         final List<TestCaseDto> existing =
-                TestCaseSorter.sorted(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory));
+                TestCaseOrder.ordered(Services.getInstance(p, ProjectIndexer.class).getTestCasesForTestSet(directory));
 
         return existing.isEmpty() ? null : existing.getLast();
     }

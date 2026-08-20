@@ -43,7 +43,7 @@ import org.testin.notifications.Notifier;
 import org.testin.services.RunStatusService;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.testrun.UpdateTestRunStatusAction;
 import org.testin.util.Display;
 import org.testin.util.FontSync;
@@ -234,15 +234,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     }
                 }
 
-                final List<TestCaseDto> sorted = TestCaseSorter.sorted(loadedItems);
-                Services.getInstance(p, TestCaseCacheService.class).load(sorted);
+                final List<TestCaseDto> ordered = TestCaseOrder.ordered(loadedItems);
+                Services.getInstance(p, TestCaseCacheService.class).load(ordered);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
                     if (generation != loadGeneration.get()) return;
                     allTestCases.clear();
-                    allTestCases.addAll(sorted);
+                    allTestCases.addAll(ordered);
                     currentTestCases.clear();
-                    currentTestCases.addAll(sorted);
+                    currentTestCases.addAll(ordered);
 
                     // Before refreshView reads currentPage: the reload may have moved
                     // the remembered test case onto a different page.

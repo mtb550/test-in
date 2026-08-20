@@ -2,7 +2,7 @@ package org.testin.git;
 
 import org.testin.model.Priority;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Mapper;
 import org.testng.SkipException;
 import org.testng.annotations.AfterMethod;
@@ -151,7 +151,7 @@ public class GitWorkflowTest {
                 testCase("a wrong password is refused"));
 
         // Ranked in the order the editor would show them.
-        TestCaseSorter.rankAll(cases);
+        TestCaseOrder.rankAll(cases);
 
         for (final TestCaseDto testCase : cases) {
             write(work, "Test Cases/login flow/" + testCase.getId() + ".json", testCase);
@@ -481,8 +481,8 @@ public class GitWorkflowTest {
 
         // Same rank on both, which is allowed: the order is settled the same way
         // on every machine, so two testers never see two different lists.
-        final List<TestCaseDto> ordered = TestCaseSorter.sorted(after);
-        assertEquals(ordered, TestCaseSorter.sorted(new ArrayList<>(after.reversed())),
+        final List<TestCaseDto> ordered = TestCaseOrder.ordered(after);
+        assertEquals(ordered, TestCaseOrder.ordered(new ArrayList<>(after.reversed())),
                 "the order does not depend on what order the files were read in");
         assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(theirNewCase.getId())));
         assertTrue(ordered.stream().anyMatch(tc -> tc.getId().equals(myNewCase.getId())));

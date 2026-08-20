@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * and test run package markers, which share the meaning and so share the enum.
  * <p>
  * Archived keeps everything inside it and changes only how it is treated: the
- * package is retired ({@code DirectoryDto.isRetired()}) — drawn gray, sorted
+ * package is retired ({@code DirectoryDto.isRetired()}) — drawn gray, ordered
  * after the active ones, left collapsed by expand-all, and its contents not
  * offered for a new run — so last quarter's runs stop being the first thing in
  * the tree (#68).

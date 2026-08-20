@@ -12,7 +12,7 @@ import static org.testng.Assert.assertTrue;
  * The one promise ranks make: between any two of them there is another, so
  * moving a test case writes that case and nothing else.
  * <p>
- * Everything the ordering rests on is here. A rank that sorted wrong would put
+ * Everything the ordering rests on is here. A rank that ordered wrong would put
  * a tester's cases in an order they did not choose, and a rank that could not be
  * squeezed between two others would send the plugin back to rewriting a whole
  * test set to move one row.
@@ -91,10 +91,10 @@ public class RankTest {
     @Test
     public void aLargeSpreadStaysDistinctAndOrdered() {
         final List<String> ranks = Rank.spread(300);
-        final List<String> sorted = new ArrayList<>(ranks);
-        sorted.sort(String::compareTo);
+        final List<String> ordered = new ArrayList<>(ranks);
+        ordered.sort(String::compareTo);
 
-        assertEquals(ranks, sorted, "a spread is already in sort order");
+        assertEquals(ranks, ordered, "a spread is already in sort order");
         assertEquals(ranks.stream().distinct().count(), 300L, "and holds no duplicates");
     }
 

@@ -93,7 +93,7 @@ public class RemoveAction extends AbstractProjectTreeAction {
             Logger.info("Removed " + removed.get() + " of " + nodesToRemove.size() + " node(s).");
 
             if (removed.get() > 0) {
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Node", "removed", removed.get());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Removed", removed.get());
             }
         };
 

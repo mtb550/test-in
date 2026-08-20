@@ -23,7 +23,7 @@ import org.testin.model.dto.dirs.DirectoryDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Mapper;
 
 import javax.swing.tree.TreePath;
@@ -131,7 +131,7 @@ public class ExportAction extends AbstractProjectTreeAction {
         // The same order the editor shows, from the same rule - a sheet whose
         // rows are in a different order from the screen they were exported from
         // is a sheet nobody trusts.
-        final List<TestCaseDto> orderedList = new ArrayList<>(TestCaseSorter.sorted(loaded));
+        final List<TestCaseDto> orderedList = new ArrayList<>(TestCaseOrder.ordered(loaded));
 
         return orderedList;
     }

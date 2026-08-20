@@ -46,13 +46,12 @@ public final class TestCaseMerge {
     private static final @NotNull String UPDATED_BY = "updatedBy";
 
     /**
-     * Where the case sits in its test set. Both sides rewrite these when they
-     * each add a case to the same set, and no answer to "which pointer" means
-     * anything to a tester - so the remote's chain is taken and a case left out
-     * of it shows up under Unsorted, which is where the tree already puts a case
-     * that nothing points at.
+     * Where the case sits in its test set. Both testers can have moved it, and
+     * "which position" is not a question either of them can usefully answer
+     * about a merge - so the remote's rank is taken, and the case is one place
+     * from where the other tester left it rather than missing.
      */
-    private static final @NotNull Set<String> ORDER = Set.of("isHead", "next");
+    private static final @NotNull Set<String> ORDER = Set.of("order");
 
     /**
      * Never a real conflict, and never worth a question: the file is the case,

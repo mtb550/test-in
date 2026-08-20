@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.services.Services;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.Mapper;
 
 import java.nio.charset.StandardCharsets;
@@ -89,11 +89,11 @@ final class LegacyChainOrder {
         // Whatever the chain never reached goes on the end, in the order the
         // comparator would have put it - the same answer the editor used to give
         // by badging them Unsorted and showing them last.
-        for (final TestCaseDto testCase : TestCaseSorter.sorted(new ArrayList<>(files.values()))) {
+        for (final TestCaseDto testCase : TestCaseOrder.ordered(new ArrayList<>(files.values()))) {
             if (!walked.contains(testCase.getId())) ordered.add(testCase);
         }
 
-        TestCaseSorter.rankAll(ordered);
+        TestCaseOrder.rankAll(ordered);
         Logger.info("Converted the order of " + ordered.size() + " test cases from a chain to ranks");
 
         return List.copyOf(ordered);

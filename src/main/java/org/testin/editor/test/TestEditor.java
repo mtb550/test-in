@@ -36,7 +36,7 @@ import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.Rank;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.util.FontSync;
 import org.testin.view.GridViewDetailsAction;
 import org.testin.view.ViewPanel;
@@ -207,16 +207,16 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
 
             Services.getInstance(p, TestCaseCacheService.class).load(items);
 
-            final List<TestCaseDto> sorted = TestCaseSorter.sorted(items);
+            final List<TestCaseDto> ordered = TestCaseOrder.ordered(items);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
                 allTestCases.clear();
-                allTestCases.addAll(sorted);
+                allTestCases.addAll(ordered);
                 currentTestCases.clear();
-                currentTestCases.addAll(sorted);
+                currentTestCases.addAll(ordered);
 
-                sorted.forEach(tc -> tc.setParent(parent));
+                ordered.forEach(tc -> tc.setParent(parent));
 
                 // The item may now sit on a different page than before the reload.
                 jumpToPageOfPendingSelection();
@@ -230,7 +230,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void onDataSynced() {
-        sortAndIdentifyUnsorted(this::refreshView);
+        orderThen(this::refreshView);
     }
 
     @Override
@@ -247,7 +247,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
             // just arranged. A case already sitting in the right place keeps the
             // rank it had, so a drag writes the case that moved and leaves the
             // rest of the set alone.
-            final List<TestCaseDto> moved = TestCaseSorter.place(snapshot);
+            final List<TestCaseDto> moved = TestCaseOrder.place(snapshot);
 
             Services.getInstance(p, ProjectIndexer.class).updateSequence(dirPath, snapshot, moved);
 
@@ -293,7 +293,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
     @Override
     public void appendNewTestCase(final @NotNull TestCaseDto tc) {
         this.allTestCases.add(tc);
-        sortAndIdentifyUnsorted(() -> {
+        orderThen(() -> {
             updateSequenceAndSaveAll();
 
             // VFS refresh goes through the indexer - file access is the
@@ -573,8 +573,8 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * the indexer. Persisting must wait for the sort to land - callers use
      * this instead of running the two steps sequentially themselves.
      */
-    public void resortAndPersistSequence() {
-        sortAndIdentifyUnsorted(this::updateSequenceAndSaveAll);
+    public void reorderAndPersist() {
+        orderThen(this::updateSequenceAndSaveAll);
     }
 
     /**
@@ -583,7 +583,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
      * where onDone continues (persisting, refreshing). Any newer sort or load
      * bumps the generation, so a stale result never overwrites a newer one.
      */
-    private void sortAndIdentifyUnsorted(final @NotNull Runnable onDone) {
+    private void orderThen(final @NotNull Runnable onDone) {
         final List<TestCaseDto> snapshot;
         synchronized (allTestCases) {
             snapshot = new ArrayList<>(allTestCases);
@@ -596,14 +596,14 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         final int generation = modelGeneration.incrementAndGet();
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
             if (generation != modelGeneration.get()) return;
-            final List<TestCaseDto> sorted = TestCaseSorter.sorted(snapshot);
+            final List<TestCaseDto> ordered = TestCaseOrder.ordered(snapshot);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (generation != modelGeneration.get()) return;
 
                 synchronized (allTestCases) {
                     this.allTestCases.clear();
-                    this.allTestCases.addAll(sorted);
+                    this.allTestCases.addAll(ordered);
                 }
 
                 onDone.run();

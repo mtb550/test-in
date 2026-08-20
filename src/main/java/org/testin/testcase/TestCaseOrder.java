@@ -21,9 +21,9 @@ import java.util.List;
  * Nothing can be unreachable, so nothing can be unsorted: what is in the folder
  * is on the screen, in the order the ranks give.
  */
-public final class TestCaseSorter {
+public final class TestCaseOrder {
 
-    private TestCaseSorter() {
+    private TestCaseOrder() {
     }
 
     /**
@@ -38,7 +38,7 @@ public final class TestCaseSorter {
             .thenComparing(TestCaseDto::getCreatedAt)
             .thenComparing(TestCaseDto::getId);
 
-    public static @NotNull List<TestCaseDto> sorted(final @NotNull List<TestCaseDto> cases) {
+    public static @NotNull List<TestCaseDto> ordered(final @NotNull List<TestCaseDto> cases) {
         return cases.stream().sorted(BY_RANK).toList();
     }
 

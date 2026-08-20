@@ -69,9 +69,9 @@ public class RetiredNodesTest {
                 testSetPackage("beta", PackageStatus.ACTIVE));
         children.forEach(child -> child.setParent(parent));
 
-        final List<DirectoryDto> sorted = new DirectoryChildrenIndex().get(PARENT,
+        final List<DirectoryDto> ordered = new DirectoryChildrenIndex().get(PARENT,
                 () -> Stream.concat(Stream.of(parent), children.stream()).toList());
 
-        assertEquals(sorted.stream().map(DirectoryDto::getName).toList(), List.of("beta", "zeta", "alpha", "old"));
+        assertEquals(ordered.stream().map(DirectoryDto::getName).toList(), List.of("beta", "zeta", "alpha", "old"));
     }
 }

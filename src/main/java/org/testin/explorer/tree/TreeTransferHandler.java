@@ -285,7 +285,7 @@ public class TreeTransferHandler extends TransferHandler {
             final List<Path> sourcePaths = sources.stream().map(DirectoryDto::getPath).toList();
             Services.getInstance(p, ProjectIndexer.class).copyNodes(sourcePaths, target.getPath(), copied -> {
                 refresh.run();
-                confirmLanded("pasted", copied);
+                confirmLanded("Pasted", copied);
             });
         }
 
@@ -300,7 +300,7 @@ public class TreeTransferHandler extends TransferHandler {
     private void confirmLanded(final @NotNull String outcome, final int landed) {
         if (landed == 0) return;
 
-        Services.getInstance(p, Notifier.class).softShowCounted(p, "Node", outcome, landed);
+        Services.getInstance(p, Notifier.class).softShowCounted(p, outcome, landed);
     }
 
     private @Nullable DirectoryDto targetDirectory(final @NotNull TransferSupport support) {
@@ -340,7 +340,7 @@ public class TreeTransferHandler extends TransferHandler {
                 .map(source -> target.getPath().resolve(source.getName()))
                 .toList();
 
-        moveBatch(oldPaths, newPaths, moved -> confirmLanded("moved", moved));
+        moveBatch(oldPaths, newPaths, moved -> confirmLanded("Moved", moved));
 
         Services.getInstance(p, TreeUndoService.class).push(new TreeUndoService.TreeOperation(
                 "Move " + describe(sources),
@@ -411,7 +411,7 @@ public class TreeTransferHandler extends TransferHandler {
         // it, and which of the two it was. A copy changes nothing on screen, so
         // without this the tester has no way to tell it happened.
         Services.getInstance(p, Notifier.class)
-                .softShowCounted(p, "Node", cut ? "cut" : "copied", directories.size());
+                .softShowCounted(p, cut ? "Cut" : "Copied", directories.size());
     }
 
     public void pasteFromClipboard() {

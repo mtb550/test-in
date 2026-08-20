@@ -62,8 +62,6 @@ public class Shared {
      * the value being shown, which is where a color belongs; this one describes
      * a position in the tree rather than a value, so it has no enum to live in.
      */
-    private static final @NotNull JBColor UNSORTED_COLOR = new JBColor(new Color(255, 100, 100), new Color(130, 50, 50));
-
     public static @NotNull Badge createPriorityBadge(final @NotNull TestCaseDto tc) {
         return captioned("Priority", tc.getPriority().getName(), tc.getPriority().getColor());
     }

@@ -4,7 +4,7 @@ import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.services.Services;
 import org.testin.setting.AppSettingsState;
 
@@ -51,7 +51,7 @@ final class TestCaseSequenceStore {
             if (testCase != null && seen.add(id)) cases.add(testCase);
         }
 
-        return TestCaseSorter.sorted(cases);
+        return TestCaseOrder.ordered(cases);
     }
 
     void put(final @NotNull Path testSetPath, final @NotNull TestCaseDto testCase) {
@@ -122,16 +122,16 @@ final class TestCaseSequenceStore {
      *              case that did not move has nothing new to say, and rewriting
      *              it would put a file nobody edited in the tester's next commit
      */
-    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList,
+    void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
                         final @NotNull List<TestCaseDto> moved) {
         final String path = testSetPath.toString();
-        final List<UUID> ids = new ArrayList<>(sortedList.size());
+        final List<UUID> ids = new ArrayList<>(orderedList.size());
         final Set<UUID> newIds = new HashSet<>();
 
         final Set<UUID> movedIds = new HashSet<>();
         for (final TestCaseDto testCase : moved) movedIds.add(testCase.getId());
 
-        for (final TestCaseDto testCase : sortedList) {
+        for (final TestCaseDto testCase : orderedList) {
             ids.add(testCase.getId());
             newIds.add(testCase.getId());
             testCasesById.put(testCase.getId(), testCase);

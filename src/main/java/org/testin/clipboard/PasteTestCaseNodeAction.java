@@ -70,7 +70,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
                 sourceUI.getAllTestCases().removeAll(cutItems);
                 if (sourceUI != destUI && sourceUI instanceof TestEditor sourceEditor) {
-                    sourceEditor.resortAndPersistSequence();
+                    sourceEditor.reorderAndPersist();
                 }
             }
 
@@ -86,7 +86,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
                 pasted++;
             }
 
-            destUI.resortAndPersistSequence();
+            destUI.reorderAndPersist();
 
             if (isCut) {
                 TestEditorContextMenu.clearCutState();
@@ -94,7 +94,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
             // Inside the invokeLater and after the sequence is persisted: the
             // action itself returns long before the cases exist (#62).
-            if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "pasted", pasted);
+            if (pasted > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Pasted", pasted);
         });
     }
 

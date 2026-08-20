@@ -367,9 +367,9 @@ public final class ProjectIndexer {
         return List.copyOf(store.getTestCasesById().values());
     }
 
-    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> sortedList,
+    public void updateSequence(final @NotNull Path testSetPath, final @NotNull List<TestCaseDto> orderedList,
                                final @NotNull List<TestCaseDto> moved) {
-        store.updateSequence(testSetPath, sortedList, moved);
+        store.updateSequence(testSetPath, orderedList, moved);
     }
 
     /**

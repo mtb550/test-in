@@ -51,9 +51,8 @@ public final class Notifier {
      * "Nodes copied 3" for several. Here rather than at the call sites so that
      * every bulk action pluralizes and counts the same way (#62).
      */
-    public void softShowCounted(final @NotNull Project p, final @NotNull String noun,
-                                final @NotNull String outcome, final int count) {
-        softShow(p, count == 1 ? noun + " " + outcome : noun + "s " + outcome + " " + count);
+    public void softShowCounted(final @NotNull Project p, final @NotNull String outcome, final int count) {
+        softShow(p, count == 1 ? outcome : outcome + " " + count);
     }
 
     /**

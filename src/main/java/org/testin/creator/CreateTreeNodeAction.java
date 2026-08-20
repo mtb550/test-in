@@ -62,7 +62,7 @@ public class CreateTreeNodeAction extends AbstractProjectTreeAction {
             // confirmation, which is why this one sits after the null check.
             if (dir == null) return;
 
-            Services.getInstance(p, Notifier.class).softShow(p, "Node created");
+            Services.getInstance(p, Notifier.class).softShow(p, "Created");
 
             if (dt == DirectoryType.TS)
                 Services.getInstance(p, EditorUtil.class).open(p, dir);

@@ -21,7 +21,7 @@ import static org.testng.Assert.assertEquals;
  * Cases carry their own rank now, so neither is possible: there is no chain to
  * lose and nothing to be unreachable from.
  */
-public class TestCaseSorterTest {
+public class TestCaseOrderTest {
 
     private static TestCaseDto testCase(final String description, final String rank) {
         return TestCaseDto.builder()
@@ -38,8 +38,8 @@ public class TestCaseSorterTest {
         final TestCaseDto second = testCase("sign out", "m");
         final TestCaseDto third = testCase("a wrong password is refused", "s");
 
-        assertEquals(TestCaseSorter.sorted(List.of(third, first, second)), List.of(first, second, third));
-        assertEquals(TestCaseSorter.sorted(List.of(second, third, first)), List.of(first, second, third));
+        assertEquals(TestCaseOrder.ordered(List.of(third, first, second)), List.of(first, second, third));
+        assertEquals(TestCaseOrder.ordered(List.of(second, third, first)), List.of(first, second, third));
     }
 
     /**
@@ -53,10 +53,10 @@ public class TestCaseSorterTest {
         final TestCaseDto ranked = testCase("sign in", "c");
         final TestCaseDto arrived = testCase("copied in from somewhere", "");
 
-        final List<TestCaseDto> sorted = TestCaseSorter.sorted(List.of(arrived, ranked));
+        final List<TestCaseDto> ordered = TestCaseOrder.ordered(List.of(arrived, ranked));
 
-        assertEquals(sorted.size(), 2);
-        assertEquals(sorted, List.of(ranked, arrived));
+        assertEquals(ordered.size(), 2);
+        assertEquals(ordered, List.of(ranked, arrived));
     }
 
     /**
@@ -69,7 +69,7 @@ public class TestCaseSorterTest {
         final TestCaseDto mine = testCase("a signed-in user signs out", "s");
         final TestCaseDto theirs = testCase("a locked account cannot sign in", "s");
 
-        assertEquals(TestCaseSorter.sorted(List.of(mine, theirs)), TestCaseSorter.sorted(List.of(theirs, mine)));
+        assertEquals(TestCaseOrder.ordered(List.of(mine, theirs)), TestCaseOrder.ordered(List.of(theirs, mine)));
     }
 
     /**
@@ -83,13 +83,13 @@ public class TestCaseSorterTest {
         final TestCaseDto third = testCase("a wrong password is refused", "s");
 
         final List<TestCaseDto> arranged = new ArrayList<>(List.of(first, third, second));
-        final List<TestCaseDto> moved = TestCaseSorter.place(arranged);
+        final List<TestCaseDto> moved = TestCaseOrder.place(arranged);
 
         // One case is written, and which one is not knowable from the list: a
         // case dragged up and the case it passed swapping down arrange the same
         // way. What matters is that the set is not rewritten to say so.
         assertEquals(moved.size(), 1, "one drag, one file");
-        assertEquals(TestCaseSorter.sorted(new ArrayList<>(arranged)), arranged, "and the list now sorts as arranged");
+        assertEquals(TestCaseOrder.ordered(new ArrayList<>(arranged)), arranged, "and the list now sorts as arranged");
         assertEquals(first.getOrder(), "c", "the case at the top never moved, so its rank is untouched");
     }
 
@@ -98,16 +98,16 @@ public class TestCaseSorterTest {
         final TestCaseDto ranked = testCase("sign in", "c");
         final TestCaseDto arrived = testCase("copied in from somewhere", "");
 
-        final List<TestCaseDto> moved = TestCaseSorter.place(new ArrayList<>(List.of(ranked, arrived)));
+        final List<TestCaseDto> moved = TestCaseOrder.place(new ArrayList<>(List.of(ranked, arrived)));
 
         assertEquals(moved, List.of(arrived));
         assertEquals(ranked.getOrder(), "c");
-        assertEquals(TestCaseSorter.sorted(List.of(arrived, ranked)), List.of(ranked, arrived));
+        assertEquals(TestCaseOrder.ordered(List.of(arrived, ranked)), List.of(ranked, arrived));
     }
 
     @Test
     public void anEmptySetSortsToNothingRatherThanFailing() {
-        assertEquals(TestCaseSorter.sorted(List.of()), List.of());
-        assertEquals(TestCaseSorter.place(new ArrayList<>()), List.of());
+        assertEquals(TestCaseOrder.ordered(List.of()), List.of());
+        assertEquals(TestCaseOrder.place(new ArrayList<>()), List.of());
     }
 }

@@ -33,11 +33,10 @@ public class TestCaseMergeTest {
      * about.
      */
     private static String testCase(final String description, final String expected, final String priority,
-                                   final String updatedBy, final String updatedAt, final String next) {
+                                   final String updatedBy, final String updatedAt, final String rank) {
         return """
                 {
-                  "next" : %s,
-                  "isHead" : false,
+                  "order" : "%s",
                   "id" : "929b97e9-48c1-47c1-9256-2d54080cb2cb",
                   "description" : "%s",
                   "expectedResult" : "%s",
@@ -49,7 +48,7 @@ public class TestCaseMergeTest {
                   "createdAt" : "Thursday 20-08-2026 At 03:33:24 [Asia/Riyadh]",
                   "updatedAt" : "%s"
                 }
-                """.formatted(next, description, expected, priority, updatedBy, updatedAt);
+                """.formatted(rank, description, expected, priority, updatedBy, updatedAt);
     }
 
     private static String at(final String time) {
@@ -62,9 +61,9 @@ public class TestCaseMergeTest {
      */
     @Test
     public void differentFieldsMergeWithoutAsking() {
-        final String base = testCase("sign in", "dashboard opens", "LOW", "", at("09:00:00"), "null");
-        final String mine = testCase("a registered user signs in", "dashboard opens", "LOW", "muteb", at("10:00:00"), "null");
-        final String theirs = testCase("sign in", "the account dashboard opens", "LOW", "sara", at("11:00:00"), "null");
+        final String base = testCase("sign in", "dashboard opens", "LOW", "", at("09:00:00"), "m");
+        final String mine = testCase("a registered user signs in", "dashboard opens", "LOW", "muteb", at("10:00:00"), "m");
+        final String theirs = testCase("sign in", "the account dashboard opens", "LOW", "sara", at("11:00:00"), "m");
 
         final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, mine, theirs);
 
@@ -80,9 +79,9 @@ public class TestCaseMergeTest {
      */
     @Test
     public void theAuditStampsAreNeverAQuestion() {
-        final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "null");
-        final String mine = testCase("signs in with a valid password", "", "LOW", "muteb", at("10:00:00"), "null");
-        final String theirs = testCase("sign in", "the dashboard opens", "LOW", "sara", at("11:30:00"), "null");
+        final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
+        final String mine = testCase("signs in with a valid password", "", "LOW", "muteb", at("10:00:00"), "m");
+        final String theirs = testCase("sign in", "the dashboard opens", "LOW", "sara", at("11:30:00"), "m");
 
         final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, mine, theirs);
 
@@ -96,9 +95,9 @@ public class TestCaseMergeTest {
      */
     @Test
     public void theSameFieldChangedBothWaysIsAskedAbout() {
-        final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "null");
-        final String mine = testCase("a registered user signs in", "", "LOW", "muteb", at("10:00:00"), "null");
-        final String theirs = testCase("a known user signs in", "", "LOW", "sara", at("11:00:00"), "null");
+        final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
+        final String mine = testCase("a registered user signs in", "", "LOW", "muteb", at("10:00:00"), "m");
+        final String theirs = testCase("a known user signs in", "", "LOW", "sara", at("11:00:00"), "m");
 
         final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, mine, theirs);
 
@@ -116,9 +115,9 @@ public class TestCaseMergeTest {
      */
     @Test
     public void answeringTakesTheOtherSideForThatFieldOnly() {
-        final String base = testCase("sign in", "opens", "LOW", "", at("09:00:00"), "null");
-        final String mine = testCase("mine", "opens", "HIGH", "muteb", at("10:00:00"), "null");
-        final String theirs = testCase("theirs", "opens", "LOW", "sara", at("11:00:00"), "null");
+        final String base = testCase("sign in", "opens", "LOW", "", at("09:00:00"), "m");
+        final String mine = testCase("mine", "opens", "HIGH", "muteb", at("10:00:00"), "m");
+        final String theirs = testCase("theirs", "opens", "LOW", "sara", at("11:00:00"), "m");
 
         final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, mine, theirs);
         TestCaseMerge.answer(mapper(), merge.merged(), merge.questions().getFirst(), true, theirs);
@@ -129,9 +128,9 @@ public class TestCaseMergeTest {
 
     @Test
     public void keepingMyAnswerChangesNothing() {
-        final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "null");
-        final String mine = testCase("mine", "", "LOW", "muteb", at("10:00:00"), "null");
-        final String theirs = testCase("theirs", "", "LOW", "sara", at("11:00:00"), "null");
+        final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
+        final String mine = testCase("mine", "", "LOW", "muteb", at("10:00:00"), "m");
+        final String theirs = testCase("theirs", "", "LOW", "sara", at("11:00:00"), "m");
 
         final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, mine, theirs);
         TestCaseMerge.answer(mapper(), merge.merged(), merge.questions().getFirst(), false, theirs);
@@ -140,20 +139,20 @@ public class TestCaseMergeTest {
     }
 
     /**
-     * Two testers adding a case to the same test set both rewrite the tail's
-     * next pointer. Neither answer means anything to a tester, so neither is
-     * asked for.
+     * Both testers moved the same case, to different places. Neither answer
+     * means much to the other - the case is one row from where they left it
+     * either way - so it is settled rather than asked about.
      */
     @Test
-    public void theOrderPointersAreSettledWithoutAsking() {
-        final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "null");
-        final String mine = testCase("sign in", "", "LOW", "muteb", at("10:00:00"), "\"11111111-1111-1111-1111-111111111111\"");
-        final String theirs = testCase("sign in", "", "LOW", "sara", at("11:00:00"), "\"22222222-2222-2222-2222-222222222222\"");
+    public void aPositionIsSettledWithoutAsking() {
+        final String base = testCase("sign in", "", "LOW", "", at("09:00:00"), "m");
+        final String mine = testCase("sign in", "", "LOW", "muteb", at("10:00:00"), "c");
+        final String theirs = testCase("sign in", "", "LOW", "sara", at("11:00:00"), "s");
 
         final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), base, mine, theirs);
 
-        assertTrue(merge.isSettled(), "a pointer is not a question a tester can answer");
-        assertEquals(merge.merged().get("next").asText(), "22222222-2222-2222-2222-222222222222");
+        assertTrue(merge.isSettled(), "where a case sits is not a question a tester can answer about a merge");
+        assertEquals(merge.merged().get("order").asText(), "s");
     }
 
     /**
@@ -162,8 +161,8 @@ public class TestCaseMergeTest {
      */
     @Test
     public void aMissingAncestorAsksAboutWhatDiffers() {
-        final String mine = testCase("mine", "opens", "LOW", "muteb", at("10:00:00"), "null");
-        final String theirs = testCase("theirs", "opens", "LOW", "sara", at("11:00:00"), "null");
+        final String mine = testCase("mine", "opens", "LOW", "muteb", at("10:00:00"), "m");
+        final String theirs = testCase("theirs", "opens", "LOW", "sara", at("11:00:00"), "m");
 
         final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), "", mine, theirs);
 
@@ -178,7 +177,7 @@ public class TestCaseMergeTest {
      */
     @Test
     public void anUnreadableSideIsNotAFailure() {
-        final String mine = testCase("mine", "", "LOW", "muteb", at("10:00:00"), "null");
+        final String mine = testCase("mine", "", "LOW", "muteb", at("10:00:00"), "m");
 
         final TestCaseMerge.Merge merge = TestCaseMerge.of(mapper(), "", mine, "<<<<<<< HEAD not json at all");
 

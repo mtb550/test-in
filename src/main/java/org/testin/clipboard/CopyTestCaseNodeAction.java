@@ -44,7 +44,7 @@ public class CopyTestCaseNodeAction extends AbstractProjectAction {
                 String json = Services.getInstance(p, Mapper.class).writeValueAsString(tcs);
                 CopyPasteManager.getInstance().setContents(new StringSelection(json));
 
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "copied", tcs.size());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Copied", tcs.size());
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());

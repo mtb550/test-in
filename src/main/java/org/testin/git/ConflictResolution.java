@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
-import org.testin.testcase.TestCaseSorter;
+import org.testin.testcase.TestCaseOrder;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
 

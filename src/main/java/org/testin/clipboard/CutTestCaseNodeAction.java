@@ -53,7 +53,7 @@ public class CutTestCaseNodeAction extends AbstractProjectAction {
 
                 list.repaint();
 
-                Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "cut", selectedTestCases.size());
+                Services.getInstance(p, Notifier.class).softShowCounted(p, "Cut", selectedTestCases.size());
 
             } catch (final Exception ex) {
                 Logger.error("Exception: " + ex.getMessage());
