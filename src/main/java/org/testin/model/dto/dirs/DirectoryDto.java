@@ -73,11 +73,11 @@ public abstract class DirectoryDto {
      * Whether a tester can put this node in a deliberate order among its
      * siblings.
      * <p>
-     * False here, because most kinds of node already have an order that means
-     * something: a test run is read by when it happened, and the two containers
-     * of a project are exactly two and always the same way round. Arranging by
-     * hand is for the test-set side, where the order is the tester's plan for
-     * working through a suite - so those two say so.
+     * False here, for the nodes that have no siblings worth arranging: the two
+     * containers of a project are exactly two and always the same way round, and
+     * a project is what the tree is rooted at. Everything a tester puts in a
+     * folder says otherwise - unnumbered, those still read by the date they were
+     * made, which is the order they have always had.
      */
     public boolean isOrderable() {
         return false;

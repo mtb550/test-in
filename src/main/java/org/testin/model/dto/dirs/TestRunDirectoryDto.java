@@ -52,4 +52,14 @@ public class TestRunDirectoryDto extends DirectoryDto {
     public @NotNull DirectoryType getType() {
         return DirectoryType.TR;
     }
+
+    /**
+     * A test run is arranged by the tester when they say so. Unnumbered it reads by
+     * the date it was created, which is the order runs have always had - the
+     * number is for the cycle somebody wants at the top.
+     */
+    @Override
+    public boolean isOrderable() {
+        return true;
+    }
 }

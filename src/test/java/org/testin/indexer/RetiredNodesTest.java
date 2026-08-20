@@ -155,16 +155,20 @@ public class RetiredNodesTest {
     }
 
     /**
-     * Only the nodes a tester arranges offer it: a run is read by when it
-     * happened, and a project's two containers are always the same way round.
+     * Everything a tester puts in a folder can be numbered. What cannot is what
+     * has no arrangement to have: a project's two containers are exactly two and
+     * always the same way round, and the project is what the tree is rooted at.
      */
     @Test
-    public void onlyTheTestSetSideIsOrderable() {
-        assertTrue(testSet("a", TestSetStatus.ACTIVE).isOrderable());
-        assertTrue(testSetPackage("p", PackageStatus.ACTIVE).isOrderable());
+    public void everythingATesterFilesCanBeOrdered() {
+        for (final DirectoryDto node : List.of(testSet("a", TestSetStatus.ACTIVE),
+                testSetPackage("p", PackageStatus.ACTIVE), new TestRunDirectoryDto(),
+                new TestRunPackageDirectoryDto())) {
+            assertTrue(node.isOrderable(), node.getClass().getSimpleName());
+        }
 
         for (final DirectoryDto fixed : List.of(new TestProjectDirectoryDto(), new TestCasesMainDirectoryDto(),
-                new TestRunsMainDirectoryDto(), new TestRunDirectoryDto(), new TestRunPackageDirectoryDto())) {
+                new TestRunsMainDirectoryDto())) {
             assertFalse(fixed.isOrderable(), fixed.getClass().getSimpleName());
         }
     }
