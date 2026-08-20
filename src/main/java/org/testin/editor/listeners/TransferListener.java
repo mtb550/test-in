@@ -115,7 +115,7 @@ public class TransferListener extends TransferHandler {
 
             // After the save, inside the try: a drop that threw on the way here
             // is logged, not confirmed (#62).
-            Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "reordered", itemsToMove.size());
+            Services.getInstance(p, Notifier.class).softShowCounted(p, "Test case", "re-sorted", itemsToMove.size());
 
             itemsToMove.stream().findFirst().ifPresentOrElse(
                     editor::selectTestCase,
