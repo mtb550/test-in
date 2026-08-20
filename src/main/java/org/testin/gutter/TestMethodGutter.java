@@ -11,7 +11,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
@@ -23,18 +22,19 @@ import org.testin.view.ViewToolWindowFactory;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class TestMethodGutter extends RelatedItemLineMarkerProvider implements DumbAware {
 
     /**
-     * Null when the annotation's testName is not a UUID at all.
+     * Empty when the annotation's testName is not a UUID at all.
      */
-    private static @Nullable UUID parseUuid(final @NotNull String value) {
+    private static @NotNull Optional<UUID> parseUuid(final @NotNull String value) {
         try {
-            return UUID.fromString(value);
-        } catch (final IllegalArgumentException ex) {
-            return null;
+            return Optional.of(UUID.fromString(value));
+        } catch (final IllegalArgumentException notAnId) {
+            return Optional.empty();
         }
     }
 
@@ -60,10 +60,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
 
         // Only mark testin-managed methods: a handwritten testName like "smoke"
         // is not a UUID and clicking its marker would throw.
-        final UUID testCaseId = parseUuid(extractedValue);
-        if (testCaseId == null) return;
-
-        RelatedItemLineMarkerInfo<PsiElement> marker = new RelatedItemLineMarkerInfo<>(
+        parseUuid(extractedValue).ifPresent(testCaseId -> result.add(new RelatedItemLineMarkerInfo<>(
                 element,
                 element.getTextRange(),
                 AllIcons.Nodes.Related,
@@ -71,9 +68,7 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 (mouseEvent, psiElement) -> openViewPanel(p, testCaseId),
                 GutterIconRenderer.Alignment.RIGHT,
                 Collections::emptyList
-        );
-
-        result.add(marker);
+        )));
     }
 
     private void openViewPanel(final @NotNull Project p, final @NotNull UUID uuid) {

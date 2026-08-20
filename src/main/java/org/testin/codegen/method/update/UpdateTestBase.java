@@ -6,38 +6,39 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class UpdateTestBase {
 
-    protected @Nullable PsiMethod findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
-        final String targetId = tc.getId().toString();
-        for (final PsiMethod m : pc.getMethods()) {
-            final PsiAnnotation annotation = m.getModifierList().findAnnotation("org.testng.annotations.Test");
-            if (annotation != null) {
+    private static final @NotNull String TEST_ANNOTATION = "org.testng.annotations.Test";
 
-                final String annText = annotation.getText();
-                if (annText != null && annText.contains("testName") && annText.contains(targetId)) {
-                    return m;
-                }
-            }
-        }
-        return null;
+    /**
+     * The generated method for this test case, found by the id in its @Test
+     * annotation - empty when the class holds no such method.
+     */
+    protected @NotNull Optional<PsiMethod> findMethodByTestName(final @NotNull PsiClass pc, final @NotNull TestCaseDto tc) {
+        final String targetId = tc.getId().toString();
+
+        return Arrays.stream(pc.getMethods())
+                .filter(method -> getTestAnnotation(method)
+                        .map(PsiAnnotation::getText)
+                        .filter(text -> text.contains("testName") && text.contains(targetId))
+                        .isPresent())
+                .findFirst();
     }
 
-    protected @Nullable PsiAnnotation getTestAnnotation(final @NotNull PsiMethod pm) {
-        final PsiModifierList modifierList = pm.getModifierList();
-        final PsiAnnotation annotation = modifierList.findAnnotation("org.testng.annotations.Test");
-        if (annotation == null) {
-            Logger.warn("Update: method has no @Test annotation");
-        }
-        return annotation;
+    /**
+     * The method's @Test annotation, empty on a method that has none.
+     */
+    protected @NotNull Optional<PsiAnnotation> getTestAnnotation(final @NotNull PsiMethod pm) {
+        return Optional.ofNullable(pm.getModifierList().findAnnotation(TEST_ANNOTATION));
     }
 
     protected void updateAnnotationAttribute(final @NotNull PsiElementFactory pf, final @NotNull PsiAnnotation pa,
@@ -98,11 +99,10 @@ public class UpdateTestBase {
      */
     protected void updateTestAnnotationAttribute(final @NotNull Project p, final @NotNull PsiMethod pm,
                                                  final @NotNull String attrName, final @NotNull String newValue) {
-        final PsiAnnotation testAnnotation = getTestAnnotation(pm);
-        if (testAnnotation == null) return;
-
-        updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue);
-        com.intellij.psi.codeStyle.CodeStyleManager.getInstance(p).reformat(pm);
+        getTestAnnotation(pm).ifPresentOrElse(testAnnotation -> {
+            updateAnnotationAttribute(JavaPsiFacade.getElementFactory(p), testAnnotation, attrName, newValue);
+            com.intellij.psi.codeStyle.CodeStyleManager.getInstance(p).reformat(pm);
+        }, () -> Logger.warn("Update: method has no @Test annotation"));
     }
 
     // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
@@ -120,12 +120,8 @@ public class UpdateTestBase {
                         Logger.warn("Update: class not found: " + path);
                         return;
                     }
-                    final PsiMethod targetMethod = findMethodByTestName(targetClass, tc);
-                    if (targetMethod == null) {
-                        Logger.warn("Update: no method found with testName=" + tc.getId());
-                        return;
-                    }
-                    updater.accept(targetMethod);
+                    findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
+                            () -> Logger.warn("Update: no method found with testName=" + tc.getId()));
                 }));
     }
 }

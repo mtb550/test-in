@@ -3,8 +3,8 @@ package org.testin.logger;
 import com.intellij.openapi.application.ApplicationManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Logger {
@@ -14,8 +14,7 @@ public final class Logger {
     private static volatile LoggerService backendService;
 
     public static void setLogLevel(final @NotNull Level level) {
-        LoggerService service = getService();
-        if (service != null) service.setLogLevel(level);
+        getService().ifPresent(service -> service.setLogLevel(level));
     }
 
     public static void trace(final @NotNull String message) {
@@ -54,23 +53,20 @@ public final class Logger {
     }
 
     private static void log(final Level level, final String callerClass, final String message) {
-        LoggerService service = getService();
-
-        if (service != null)
-            service.log(level, callerClass, message);
-        else
-            System.out.println("[" + level.paddedName + "] [" + callerClass + "] " + message);
+        getService().ifPresentOrElse(
+                service -> service.log(level, callerClass, message),
+                () -> System.out.println("[" + level.paddedName + "] [" + callerClass + "] " + message));
     }
 
     /**
-     * Null before the application is up: callers fall back to stdout.
+     * Empty before the application is up: the two callers fall back to stdout.
      */
-    private static @Nullable LoggerService getService() {
+    private static @NotNull Optional<LoggerService> getService() {
         if (backendService == null) {
             if (ApplicationManager.getApplication() != null) {
                 backendService = ApplicationManager.getApplication().getService(LoggerService.class);
             }
         }
-        return backendService;
+        return Optional.ofNullable(backendService);
     }
 }

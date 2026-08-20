@@ -83,25 +83,28 @@ public class CreateTestMethod implements GenAction {
         final String methodName = target.methodName();
 
         try {
-            final PsiClass targetClass = findOrCreateClass(p, target.path(), packageList, className);
-            if (targetClass != null) {
-                injectMethod(p, targetClass, methodName, tc);
-            } else
-                retryInjectPhysically(p, packageList, className, methodName, tc);
+            findOrCreateClass(p, target.path(), packageList, className).ifPresentOrElse(
+                    targetClass -> injectMethod(p, targetClass, methodName, tc),
+                    () -> retryInjectPhysically(p, packageList, className, methodName, tc));
 
         } catch (final Exception ex) {
             Logger.error("Failed to inject Java method: " + ex.getMessage());
         }
     }
 
-    private @Nullable PsiClass findOrCreateClass(final @NotNull Project p, final @NotNull String path,
-                                                 final @NotNull List<String> packageList,
-                                                 final @NotNull String className) {
+    /**
+     * The class the method goes in, written out first if it is not there yet.
+     * Empty when it could not be found or created, which is what sends the
+     * caller down the physical-injection path.
+     */
+    private @NotNull Optional<PsiClass> findOrCreateClass(final @NotNull Project p, final @NotNull String path,
+                                                          final @NotNull List<String> packageList,
+                                                          final @NotNull String className) {
         final JavaPsiFacade psiFacade = JavaPsiFacade.getInstance(p);
         final GlobalSearchScope scope = GlobalSearchScope.projectScope(p);
 
-        final PsiClass targetClass = psiFacade.findClass(path, scope);
-        if (targetClass != null) return targetClass;
+        final PsiClass existing = psiFacade.findClass(path, scope);
+        if (existing != null) return Optional.of(existing);
 
         try {
             final VirtualFile sourceRoot = JavaSourceRoot.findOrWarn(p);
@@ -129,7 +132,7 @@ public class CreateTestMethod implements GenAction {
         }
 
         PsiDocumentManager.getInstance(p).commitAllDocuments();
-        return psiFacade.findClass(path, scope);
+        return Optional.ofNullable(psiFacade.findClass(path, scope));
     }
 
     private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList,
