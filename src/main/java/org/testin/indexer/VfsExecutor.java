@@ -41,6 +41,8 @@ final class VfsExecutor {
         // not allowed to do, while the operation itself mutates the VFS and so
         // needs the write action.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            // Boundary: the VFS answers null for a path it cannot resolve -
+            // deleted underneath us, or never refreshed into it (#71).
             final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
 
             ApplicationManager.getApplication().invokeLater(() -> {
@@ -64,26 +66,27 @@ final class VfsExecutor {
 
     void executeVfsAction(final @NotNull Project p, final @NotNull Path sourcePath, final @NotNull Path targetPath,
                           final @NotNull String errorTitle, final @NotNull VfsBiOperation operation,
-                          final @Nullable Runnable onSuccess, final @Nullable Runnable onFailure) {
+                          final @NotNull Runnable onSuccess, final @NotNull Runnable onFailure) {
         // Both lookups off the EDT, the operation on it - see the single-path form.
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            // Boundary: the VFS answers null for a path it cannot resolve (#71).
             final @Nullable VirtualFile sourceVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(sourcePath);
             final @Nullable VirtualFile targetVf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(targetPath);
 
             ApplicationManager.getApplication().invokeLater(() -> {
                 if (sourceVf == null || targetVf == null) {
                     Services.getInstance(p, Notifier.class).error(p, "Could not find source or target path on disk.", errorTitle);
-                    if (onFailure != null) onFailure.run();
+                    onFailure.run();
                     return;
                 }
 
                 WriteAction.run(() -> {
                     try {
                         operation.execute(sourceVf, targetVf);
-                        if (onSuccess != null) onSuccess.run();
+                        onSuccess.run();
                     } catch (final Exception ex) {
                         Services.getInstance(p, Notifier.class).error(p, "Operation failed: " + ex.getMessage(), errorTitle);
-                        if (onFailure != null) onFailure.run();
+                        onFailure.run();
                     }
                 });
             });
@@ -108,6 +111,8 @@ final class VfsExecutor {
     void removeVf(final @NotNull Project p, final @NotNull Object requester, final @NotNull Path path,
                   final @NotNull Consumer<@NotNull Boolean> onDeleted) {
         ApplicationManager.getApplication().executeOnPooledThread(() -> {
+            // Boundary: the VFS answers null for a path it cannot resolve -
+            // deleted underneath us, or never refreshed into it (#71).
             final @Nullable VirtualFile vf = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(path);
 
             ApplicationManager.getApplication().invokeLater(() -> {

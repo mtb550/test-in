@@ -50,6 +50,8 @@ final class FilesUtil {
         }
 
         try {
+            // Boundary: java.nio answers null for a path with no parent, which is
+            // a filesystem root. Kept here and never carried further (#71).
             final @Nullable Path parent = path.getParent();
             if (parent != null) {
                 Files.createDirectories(parent);

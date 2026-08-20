@@ -202,10 +202,7 @@ public class DetailsTab {
                 resolved = resolved.resolve(segment);
             }
 
-            final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            final TestSetDirectoryDto ts = indexer.getTestSetByPath(resolved);
-            if (ts != null)
-                return ts.getPath();
+            return Services.getInstance(p, ProjectIndexer.class).getTestSetByPath(resolved).getPath();
         }
 
         return null;

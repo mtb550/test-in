@@ -180,10 +180,6 @@ public final class RunStatusService {
     public void persistMarker(final @NotNull Project p, final @NotNull Path runPath,
                               final @NotNull TestRunStatus status) {
         final TestRunDirectoryDto trd = Services.getInstance(p, ProjectIndexer.class).getTestRunDirByPath(runPath);
-        if (trd == null) {
-            Logger.warn("persistMarker: run not indexed: " + runPath);
-            return;
-        }
 
         final TestRunMarker marker = trd.getMarker();
         marker.setStatus(status);
@@ -214,7 +210,6 @@ public final class RunStatusService {
      */
     private void finishRun(final @NotNull Project p, final @NotNull Path runPath) {
         final TestRunDto tr = Services.getInstance(p, ProjectIndexer.class).getTestRunByPath(runPath);
-        if (tr == null) return;
 
         int closed = 0;
         for (final TestRunItems item : tr.getResults()) {

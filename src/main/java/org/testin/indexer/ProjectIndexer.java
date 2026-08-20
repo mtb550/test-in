@@ -291,19 +291,23 @@ public final class ProjectIndexer {
         return store.getTestCasesForTestSet(testSetPath);
     }
 
-    public @Nullable TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
+    public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
         return store.getTestRunByPath(testRunPath);
     }
 
-    public @Nullable TestCaseDto getTestCaseById(final @NotNull UUID id) {
-        return store.getTestCaseById(id);
+    /**
+     * A test case by id, empty when it is not indexed - a case deleted after a
+     * run recorded it, or after the code that names it was generated.
+     */
+    public @NotNull Optional<TestCaseDto> findTestCase(final @NotNull UUID id) {
+        return store.findTestCase(id);
     }
 
-    public @Nullable TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
+    public @NotNull TestSetDirectoryDto getTestSetByPath(final @NotNull Path path) {
         return store.getTestSetDirByPath(path);
     }
 
-    public @Nullable TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
+    public @NotNull TestRunDirectoryDto getTestRunDirByPath(final @NotNull Path path) {
         return store.getTestRunDirByPath(path);
     }
 
@@ -502,11 +506,11 @@ public final class ProjectIndexer {
      */
     public void moveNode(final @NotNull Path oldPath,
                          final @NotNull Path newPath,
-                         final @Nullable Consumer<@NotNull Boolean> onFinished) {
+                         final @NotNull Consumer<@NotNull Boolean> onFinished) {
         final Path targetParent = newPath.getParent();
         if (targetParent == null) {
             Logger.warn("Move refused, target has no parent directory: " + newPath);
-            if (onFinished != null) onFinished.accept(false);
+            onFinished.accept(false);
             return;
         }
 
@@ -520,9 +524,9 @@ public final class ProjectIndexer {
         }, () -> {
             store.renameNode(oldPath, newPath);
             Logger.info("Moved successfully to: " + newPath);
-            if (onFinished != null) onFinished.accept(true);
+            onFinished.accept(true);
         }, () -> {
-            if (onFinished != null) onFinished.accept(false);
+            onFinished.accept(false);
         });
     }
 
@@ -534,9 +538,9 @@ public final class ProjectIndexer {
      * finished copy from a failed one (#66, F2).
      */
     public void copyNodes(final @NotNull List<Path> sourcePaths, final @NotNull Path targetPath,
-                          final @Nullable IntConsumer onComplete) {
+                          final @NotNull IntConsumer onComplete) {
         if (sourcePaths.isEmpty()) {
-            if (onComplete != null) onComplete.accept(0);
+            onComplete.accept(0);
             return;
         }
 
@@ -634,7 +638,16 @@ public final class ProjectIndexer {
      * there. Saves a caller that only has a path from having to know which kind
      * of node to ask for.
      */
-    public @Nullable DirectoryDto findByPath(final @NotNull Path path) {
+    /**
+     * The node at a path, empty when nothing is indexed there.
+     * <p>
+     * The one path lookup that answers rather than promises: its callers ask
+     * about a path they remembered - editors to reopen from a previous session,
+     * a path typed into settings - and what was there last time may not be there
+     * now. Every other lookup is keyed by something on the screen and returns
+     * the node (#71).
+     */
+    public @NotNull Optional<DirectoryDto> find(final @NotNull Path path) {
         return store.findByPath(path);
     }
 
@@ -646,7 +659,7 @@ public final class ProjectIndexer {
      * Cache lookup, no disk access: true when a tree node exists at the path.
      */
     public boolean nodeExists(final @NotNull Path path) {
-        return store.findByPath(path) != null;
+        return store.findByPath(path).isPresent();
     }
 
     /**
@@ -671,7 +684,7 @@ public final class ProjectIndexer {
      * {@code executeVfsAction} reports and swallows a failure before the cache
      * update and the callback are reached.
      */
-    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @Nullable Runnable onFinished) {
+    public void renameNode(final @NotNull Path oldPath, final @NotNull Path newPath, final @NotNull Runnable onFinished) {
         Services.getInstance(p, VfsExecutor.class).executeVfsAction(p, oldPath, vf -> {
             try {
                 vf.rename(this, newPath.getFileName().toString());
@@ -685,7 +698,7 @@ public final class ProjectIndexer {
             // rename succeeded: otherwise the target directory already exists
             // and the rename fails with "already exists in VFS".
             store.renameNode(oldPath, newPath);
-            if (onFinished != null) onFinished.run();
+            onFinished.run();
         });
     }
 

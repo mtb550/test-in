@@ -212,7 +212,7 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
                     indexer.putTestCase(testSetPath, oldState);
                 }
                 case MODIFIED -> {
-                    final TestCaseDto current = indexer.getTestCaseById(testCaseId);
+                    final TestCaseDto current = indexer.findTestCase(testCaseId).orElse(null);
                     final TestCaseDto oldState = diff.oldState();
                     final RevertAction revert = changeType == null ? null : changeType.getRevertAction();
                     if (current == null || oldState == null || revert == null) return;

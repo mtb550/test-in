@@ -15,6 +15,7 @@ import org.testin.services.Services;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class TestCaseExecutionSubscriber {
@@ -41,35 +42,36 @@ public class TestCaseExecutionSubscriber {
 
                 final UUID testUuid = parseUuid(testName);
                 if (testUuid != null) {
-                    final TestCaseDto tc = indexer.getTestCaseById(testUuid);
-                    if (tc != null) {
+                    final Optional<TestCaseDto> found = indexer.findTestCase(testUuid);
+
+                    found.ifPresent(tc -> {
                         Logger.debug("ID match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
                         tc.setTempStatus(status);
-                        tc.setTempError(error != null ? error : "");
+                        tc.setTempError(error == null ? "" : error);
                         runningDtoId = tc.getId();
-                        updated = true;
-                    }
+                    });
+                    updated = found.isPresent();
                 }
 
                 if (!updated) {
                     final UUID dtoId = uuidToDtoId.get(testName);
                     if (dtoId != null) {
-                        final TestCaseDto tc = indexer.getTestCaseById(dtoId);
-                        if (tc != null) {
+                        final Optional<TestCaseDto> found = indexer.findTestCase(dtoId);
+
+                        found.ifPresent(tc -> {
                             Logger.debug("  UUID map match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
                             tc.setTempStatus(status);
-                            tc.setTempError(error != null ? error : "");
-                            updated = true;
-                        }
+                            tc.setTempError(error == null ? "" : error);
+                        });
+                        updated = found.isPresent();
                     }
                 }
 
                 if (!updated && status == RunStatus.RUNNING && runningDtoId != null && !uuidToDtoId.containsKey(testName)) {
-                    final TestCaseDto tc = indexer.getTestCaseById(runningDtoId);
-                    if (tc != null) {
+                    indexer.findTestCase(runningDtoId).ifPresent(tc -> {
                         Logger.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");
                         uuidToDtoId.put(testName, tc.getId());
-                    }
+                    });
                 }
 
                 if (updated)

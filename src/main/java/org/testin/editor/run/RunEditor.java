@@ -202,36 +202,31 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     tr = run;
                 }
 
-                if (run != null) {
-                    final Map<UUID, TestRunItems> newResults = run.getResults().stream()
-                            .collect(Collectors.toMap(TestRunItems::getId, item -> item,
-                                    (existingItem, duplicateItem) -> existingItem));
-                    resultsMap.putAll(newResults);
-                }
+                resultsMap.putAll(run.getResults().stream()
+                        .collect(Collectors.toMap(TestRunItems::getId, item -> item,
+                                (existingItem, duplicateItem) -> existingItem)));
 
                 final List<TestCaseDto> loadedItems = new ArrayList<>();
-                if (run != null) {
-                    for (final TestRunItems item : run.getResults()) {
-                        final TestCaseDto indexed = indexer.getTestCaseById(item.getId());
+                for (final TestRunItems item : run.getResults()) {
+                    final TestCaseDto indexed = indexer.findTestCase(item.getId()).orElse(null);
 
-                        // A case deleted since the run leaves its result behind, and
-                        // the result is what the run is a record of. The row stays,
-                        // says so, and takes the one status a tester cannot give.
-                        //
-                        // In memory only. The file heals the next time the run is
-                        // written, the way the missing-stamp repair already does -
-                        // opening a run rewrites nothing.
-                        if (indexed == null) {
-                            Logger.warn("Test run references a deleted test case id=" + item.getId());
-                            item.setStatus(TestStatus.REMOVED);
-                        }
-
-                        final TestCaseDto testCase = indexed != null ? indexed : TestCaseDto.deleted(item.getId());
-
-                        loadedItems.add(testCase);
-                        final TestRunItems runItem = resultsMap.get(item.getId());
-                        if (runItem != null) runItem.setTc(testCase);
+                    // A case deleted since the run leaves its result behind, and
+                    // the result is what the run is a record of. The row stays,
+                    // says so, and takes the one status a tester cannot give.
+                    //
+                    // In memory only. The file heals the next time the run is
+                    // written, the way the missing-stamp repair already does -
+                    // opening a run rewrites nothing.
+                    if (indexed == null) {
+                        Logger.warn("Test run references a deleted test case id=" + item.getId());
+                        item.setStatus(TestStatus.REMOVED);
                     }
+
+                    final TestCaseDto testCase = indexed != null ? indexed : TestCaseDto.deleted(item.getId());
+
+                    loadedItems.add(testCase);
+                    final TestRunItems runItem = resultsMap.get(item.getId());
+                    if (runItem != null) runItem.setTc(testCase);
                 }
 
                 final List<TestCaseDto> ordered = TestCaseOrder.ordered(loadedItems);

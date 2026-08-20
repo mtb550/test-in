@@ -122,11 +122,6 @@ public class GenerateReportAction extends AbstractProjectAction {
 
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 final TestRunDto runData = indexer.getTestRunByPath(dirPath);
-                if (runData == null) {
-                    Services.getInstance(p, Notifier.class).softShow(p, "Report Empty",
-                            "No test run data found at: " + dirPath);
-                    return;
-                }
 
                 final Map<UUID, TestCaseDto> detailsMap = fetchTestCaseDetails(p, runData);
 
@@ -186,10 +181,7 @@ public class GenerateReportAction extends AbstractProjectAction {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         for (final TestRunItems item : tr.getResults()) {
-            final TestCaseDto tc = indexer.getTestCaseById(item.getId());
-            if (tc != null) {
-                detailsMap.put(item.getId(), tc);
-            }
+            indexer.findTestCase(item.getId()).ifPresent(tc -> detailsMap.put(item.getId(), tc));
         }
 
         return detailsMap;

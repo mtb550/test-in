@@ -84,8 +84,10 @@ public class TestMethodGutter extends RelatedItemLineMarkerProvider implements D
                 final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
                 indexer.awaitIndexing();
 
-                final TestCaseDto dto = indexer.getTestCaseById(uuid);
+                final TestCaseDto dto = indexer.findTestCase(uuid).orElse(null);
 
+                // Generated code outlives the case it was generated from: the
+                // annotation still names an id nobody can open.
                 if (dto == null) {
                     Logger.error("Unable to find test case with UUID: " + uuid);
                     return;

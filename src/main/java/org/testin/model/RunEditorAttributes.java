@@ -137,10 +137,9 @@ public enum RunEditorAttributes implements ToolBarAttribute {
             "Path",
             ToolBarDefault.LOCKED_UNCHECKED,
             (item, p) -> {
-                final TestCaseDto tc = Services.getInstance(p, ProjectIndexer.class).getTestCaseById(item.getId());
-                if (tc != null)
-                    return String.join(" > ", tc.getParent().getPath2());
-                return "";
+                return Services.getInstance(p, ProjectIndexer.class).findTestCase(item.getId())
+                        .map(tc -> String.join(" > ", tc.getParent().getPath2()))
+                        .orElse("");
             }
     ),
 

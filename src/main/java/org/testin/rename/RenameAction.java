@@ -87,7 +87,8 @@ public class RenameAction extends AbstractProjectTreeAction {
     }
 
     private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName) {
-        applyRename(dir, newName, null);
+        applyRename(dir, newName, () -> {
+        });
     }
 
     /**
@@ -96,7 +97,7 @@ public class RenameAction extends AbstractProjectTreeAction {
      * was renamed would double-report one keystroke (#62).
      */
     private void applyRename(final @NotNull DirectoryDto dir, final @NotNull String newName,
-                             final @Nullable Runnable onDone) {
+                             final @NotNull Runnable onDone) {
         Services.getInstance(p, EditorUtil.class).close(p, dir.getName());
 
         dispatchRenameCodegen(dir, newName);
@@ -115,7 +116,7 @@ public class RenameAction extends AbstractProjectTreeAction {
 
             Logger.info("Success! Renamed to: " + newName);
 
-            if (onDone != null) onDone.run();
+            onDone.run();
         });
     }
 

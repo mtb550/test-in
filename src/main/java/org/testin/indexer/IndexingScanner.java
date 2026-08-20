@@ -1,5 +1,6 @@
 package org.testin.indexer;
 
+import com.intellij.openapi.progress.EmptyProgressIndicator;
 import com.intellij.openapi.progress.ProgressIndicator;
 import com.intellij.openapi.project.Project;
 import lombok.AllArgsConstructor;
@@ -41,13 +42,13 @@ final class IndexingScanner {
 
     void scanProject(final @NotNull Path projectPath) {
         try {
-            scanProjectContents(projectPath, null);
+            scanProjectContents(projectPath, new EmptyProgressIndicator());
         } finally {
             store.invalidateChildrenIndex();
         }
     }
 
-    private void scanProjectContents(final @NotNull Path projectPath, final @Nullable ProgressIndicator indicator) {
+    private void scanProjectContents(final @NotNull Path projectPath, final @NotNull ProgressIndicator indicator) {
         try {
             final TestProjectDirectoryDto tp = Services.getInstance(p, DirectoryMapper.class).getTestProjectNode(p, projectPath);
 
@@ -58,36 +59,30 @@ final class IndexingScanner {
 
             store.getTestProjectsByPath().put(projectPath.toString(), tp);
 
-            if (indicator != null) {
                 indicator.setFraction(0.1);
                 indicator.setText(tp.getName() + " - test sets...");
-            }
 
             final TestCasesMainDirectoryDto tcd = tp.getTestCasesDirectory();
             store.getTestCasesMainDirsByPath().put(tcd.getPath().toString(), tcd);
             scanTestSets(tcd.getPath(), tcd, indicator);
 
 
-            if (indicator != null) {
                 indicator.setFraction(0.5);
                 indicator.setText(tp.getName() + " - test runs...");
-            }
 
             final TestRunsMainDirectoryDto trd = tp.getTestRunsDirectory();
             store.getTestRunsMainDirsByPath().put(trd.getPath().toString(), trd);
             scanTestRunDirs(trd.getPath(), trd, indicator);
 
-            if (indicator != null) {
                 indicator.setFraction(1.0);
                 indicator.setText(tp.getName() + " - done.");
-            }
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan project: " + projectPath.getFileName() + " - " + ex.getMessage());
         }
     }
 
-    private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @Nullable ProgressIndicator indicator) {
+    private void scanTestSets(final @NotNull Path tcDir, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(tcDir)) {
             final List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -107,7 +102,7 @@ final class IndexingScanner {
         }
     }
 
-    private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @Nullable ProgressIndicator indicator) {
+    private void scanTestSetPackage(final @NotNull Path path, final @NotNull DirectoryDto parent, final @NotNull ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final TestSetPackageDirectoryDto tsp = dirMapper.getTestSetPackageNode(p, path, parent);
@@ -131,7 +126,7 @@ final class IndexingScanner {
     }
 
     private void scanTestSet(final @NotNull Path path, final @NotNull DirectoryDto parent,
-                             final @Nullable ProgressIndicator indicator) {
+                             final @NotNull ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final TestSetDirectoryDto ts = dirMapper.getTestSetNode(p, path, parent);
@@ -170,9 +165,7 @@ final class IndexingScanner {
             for (final TestCaseDto converted : LegacyChainOrder.apply(p, loaded)) {
                 store.putTestCase(path, converted);
             }
-            if (indicator != null) {
                 indicator.setText("Test set: " + ts.getName() + " (" + caseIds.size() + " cases)");
-            }
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test set '" +
@@ -181,7 +174,7 @@ final class IndexingScanner {
     }
 
     private void scanTestRunDirs(final @NotNull Path trDir, final @NotNull DirectoryDto parent,
-                                 final @Nullable ProgressIndicator indicator) {
+                                 final @NotNull ProgressIndicator indicator) {
         try (Stream<Path> paths = Files.list(trDir)) {
             final List<Path> dirs = paths.filter(Files::isDirectory).toList();
 
@@ -200,7 +193,7 @@ final class IndexingScanner {
     }
 
     private void scanTestRunPackageDir(final @NotNull Path path, final @NotNull DirectoryDto parent,
-                                       final @Nullable ProgressIndicator indicator) {
+                                       final @NotNull ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final TestRunPackageDirectoryDto trp = dirMapper.getTestRunPackageNode(p, path, parent);
@@ -224,7 +217,7 @@ final class IndexingScanner {
     }
 
     private void scanTestRun(final @NotNull Path path, final @NotNull DirectoryDto parent,
-                             final @Nullable ProgressIndicator indicator) {
+                             final @NotNull ProgressIndicator indicator) {
         try {
             final DirectoryMapper dirMapper = Services.getInstance(p, DirectoryMapper.class);
             final TestRunDirectoryDto tr = dirMapper.getTestRunNode(p, path, parent);
@@ -240,9 +233,7 @@ final class IndexingScanner {
                 store.getTestRunsByPath().put(path.toString(), trr);
             }
 
-            if (indicator != null) {
                 indicator.setText("Test run: " + fileName);
-            }
 
         } catch (final Exception ex) {
             Logger.error("Failed to scan test run '" +

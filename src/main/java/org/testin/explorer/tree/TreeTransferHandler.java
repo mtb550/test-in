@@ -372,7 +372,8 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to) {
-        moveBatch(from, to, null);
+        moveBatch(from, to, moved -> {
+        });
     }
 
     /**
@@ -381,7 +382,7 @@ public class TreeTransferHandler extends TransferHandler {
      * the nodes moved would double-report one keystroke.
      */
     private void moveBatch(final @NotNull List<Path> from, final @NotNull List<Path> to,
-                           final @Nullable IntConsumer onDone) {
+                           final @NotNull IntConsumer onDone) {
         final AtomicInteger remaining = new AtomicInteger(from.size());
         final AtomicInteger moved = new AtomicInteger();
 
@@ -394,7 +395,7 @@ public class TreeTransferHandler extends TransferHandler {
                 if (remaining.decrementAndGet() != 0) return;
 
                 refresh.run();
-                if (onDone != null) onDone.accept(moved.get());
+                onDone.accept(moved.get());
             });
         }
     }

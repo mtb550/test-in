@@ -97,12 +97,10 @@ public final class EditorUtil {
      * the editor type when it was opened.
      */
     private boolean isIndexed(final @NotNull Project p, final @NotNull UnifiedVirtualFile file) {
-        final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-        final Path path = file.getDir().getPath();
-
-        return file.getDir() instanceof TestRunDirectoryDto
-                ? indexer.getTestRunDirByPath(path) != null
-                : indexer.getTestSetByPath(path) != null;
+        // Asked as a question rather than by fetching and comparing to null: the
+        // lookups promise a node now, so calling one to find out whether there
+        // is one would fail rather than answer (#71).
+        return Services.getInstance(p, ProjectIndexer.class).nodeExists(file.getDir().getPath());
     }
 
     public void closeThenOpen(final @NotNull Project p, final @NotNull DirectoryDto dir) {
@@ -202,7 +200,7 @@ public final class EditorUtil {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             for (final String entry : entries) {
-                final DirectoryDto dir = indexer.findByPath(Path.of(entry));
+                final DirectoryDto dir = indexer.find(Path.of(entry)).orElse(null);
                 Logger.debug("restoring editor for '" + entry + "' -> " + (dir != null ? "found" : "not indexed"));
 
                 openIfNotOpen(p, dir);
