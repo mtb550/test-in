@@ -12,7 +12,6 @@ import com.intellij.openapi.util.Disposer;
 import com.intellij.util.ui.UIUtil;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.testcase.CreateTestCaseFields;
@@ -47,18 +46,31 @@ public abstract class TestCaseBaseDialog {
     protected final @NotNull Disposable dialogDisposable;
     protected final @NotNull Map<CreateTestCaseSection, StatusBarItem[]> statusBarMapping;
     private final @NotNull List<CreateTestCaseSection> cachedSections;
-    private @Nullable PropertyChangeListener focusListener;
+    /**
+     * A focus change nothing listens for, before the dynamic status bar is
+     * installed.
+     */
+    private static final @NotNull PropertyChangeListener NOTHING_ON_FOCUS = evt -> {
+    };
+
+    /**
+     * What a focus change updates the status bar with, and one that updates
+     * nothing before the dynamic bar is installed. Removing a listener that was
+     * never added is what the focus manager does with it: nothing.
+     */
+    private @NotNull PropertyChangeListener focusListener = NOTHING_ON_FOCUS;
 
     public TestCaseBaseDialog(final @NotNull Project p) {
         this.p = p;
         this.dialogDisposable = Disposer.newDisposable("testin.testCaseDialog");
         Disposer.register(p, dialogDisposable);
+
         this.DescriptionSection = new DescriptionSection(p);
         this.expectedResultSection = new ExpectedResultSection(p);
         this.moduleSection = new ModuleSection(p);
         this.testDataSection = new TestDataSection();
         this.preConditionsSection = new PreConditionsSection(p);
-        this.stepsSection = new StepsSection(p);
+        this.stepsSection = new StepsSection(p, dialogDisposable);
         this.prioritySection = new PrioritySection();
         this.groupSection = new GroupSection();
         this.statusBarSection = new StatusBarSection();
@@ -73,7 +85,6 @@ public abstract class TestCaseBaseDialog {
                         CreateTestCaseFields::getStatusBarItems
                 ));
 
-        stepsSection.setParentDisposable(dialogDisposable);
     }
 
     protected void initDynamicStatusBar(final @NotNull JComponent parentPanel) {
@@ -96,10 +107,8 @@ public abstract class TestCaseBaseDialog {
     }
 
     private void removeFocusListener() {
-        if (focusListener != null) {
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener);
-            focusListener = null;
-        }
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener("focusOwner", focusListener);
+        focusListener = NOTHING_ON_FOCUS;
     }
 
     public void dispose() {

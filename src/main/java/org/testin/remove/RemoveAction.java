@@ -36,13 +36,13 @@ public class RemoveAction extends AbstractProjectTreeAction {
         this.registerCustomShortcutSet(DeletePackage.getCustomShortcut(), tree);
     }
 
-    private boolean isRemovable(final @Nullable Object dir) {
-        return dir instanceof DirectoryDto dto && dto.isRemovable();
-    }
-
+    /**
+     * @param paths Swing's own answer, which is null rather than empty when
+     *              nothing is selected - see TreeValueUtil.selectedDirectories
+     */
     private @NotNull List<DirectoryDto> getRemovableNodes(final TreePath @Nullable [] paths) {
         return TreeValueUtil.selectedDirectories(paths).stream()
-                .filter(this::isRemovable)
+                .filter(DirectoryDto::isRemovable)
                 .toList();
     }
 
