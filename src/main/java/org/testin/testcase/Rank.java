@@ -86,44 +86,57 @@ public final class Rank {
     }
 
     /**
-     * Ranks for a whole list at once, evenly spread - a set being written from
-     * nothing by an import, or by the one-time conversion of a set that still
-     * carried a chain.
+     * How many digits a rank is written with. {@code a} is left out: it is the
+     * zero digit, and a rank must never end in one - so the digits are
+     * {@code b}-{@code z}, and a rank of any width sorts correctly against any
+     * other of the same width.
+     */
+    private static final char SPREAD_FIRST = 'b';
+    private static final int SPREAD_DIGITS = LAST - SPREAD_FIRST + 1;
+
+    /**
+     * Ranks for a whole list at once, evenly spread - an import, a paste, or the
+     * one-time conversion of a set that still carried a chain.
      * <p>
-     * Spread rather than consecutive so that later insertions stay short:
-     * {@code c, f, i} leaves whole letters free between them, where {@code a, b,
-     * c} would force a second character at the first drop.
+     * Written with as many digits as the list needs and no more: twenty-five
+     * cases fit in one character, six hundred in two, fifteen thousand in three.
+     * Spread across the whole range rather than packed at the start, so a case
+     * dropped between two of them later stays short.
      */
     public static @NotNull List<String> spread(final int count) {
         if (count <= 0) return List.of();
 
-        final List<String> ranks = new ArrayList<>(count);
-        String last = "";
+        int width = 1;
+        long slots = SPREAD_DIGITS;
+        while (slots < count + 1L) {
+            width++;
+            slots *= SPREAD_DIGITS;
+        }
 
-        final int room = LAST - FIRST;
-        final int step = Math.max(1, room / (count + 1));
+        final long step = slots / (count + 1L);
+        final List<String> ranks = new ArrayList<>(count);
 
         for (int i = 0; i < count; i++) {
-            last = last.isEmpty() ? String.valueOf((char) (FIRST + step)) : step(last, step);
-            ranks.add(last);
+            ranks.add(digits((i + 1) * step, width));
         }
 
         return List.copyOf(ranks);
     }
 
     /**
-     * The next rank a whole step further on, falling back to the smallest step
-     * there is once the alphabet runs out - which keeps a set of any size in
-     * order, however many cases it holds.
+     * A number as a rank of the given width, most significant digit first - so
+     * the order the numbers are in is the order the strings sort in.
      */
-    private static @NotNull String step(final @NotNull String from, final int step) {
-        final char lastChar = from.charAt(from.length() - 1);
+    private static @NotNull String digits(final long value, final int width) {
+        final char[] rank = new char[width];
+        long left = value;
 
-        if (lastChar + step <= LAST) {
-            return from.substring(0, from.length() - 1) + (char) (lastChar + step);
+        for (int i = width - 1; i >= 0; i--) {
+            rank[i] = (char) (SPREAD_FIRST + (left % SPREAD_DIGITS));
+            left /= SPREAD_DIGITS;
         }
 
-        return after(from);
+        return new String(rank);
     }
 
     /**

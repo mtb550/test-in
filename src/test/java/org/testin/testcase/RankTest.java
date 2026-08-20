@@ -98,6 +98,34 @@ public class RankTest {
         assertEquals(ranks.stream().distinct().count(), 300L, "and holds no duplicates");
     }
 
+    /**
+     * Past the alphabet, appending grows the rank by a character rather than
+     * running out: z is followed by zm, which sorts after it because a longer
+     * string with the same prefix does. Not za - a is the zero digit, so za
+     * would be the same position as z written twice, with no room between them.
+     */
+    @Test
+    public void appendingPastTheAlphabetGrowsTheRank() {
+        assertEquals(Rank.after("y"), "z");
+        assertEquals(Rank.after("z"), "zm");
+        assertEquals(Rank.after("zz"), "zzm");
+
+        assertTrue("z".compareTo(Rank.after("z")) < 0, "and the longer rank still sorts after");
+    }
+
+    /**
+     * A set of any size is written with as many characters as it needs and no
+     * more. A thousand cases used to produce a rank seventy-one characters long,
+     * because the spread stepped one letter at a time and then piled zs on the
+     * end once the alphabet ran out.
+     */
+    @Test
+    public void aSpreadStaysShortHoweverManyCasesThereAre() {
+        assertEquals(Rank.spread(20).stream().mapToInt(String::length).max().orElse(0), 1);
+        assertEquals(Rank.spread(500).stream().mapToInt(String::length).max().orElse(0), 2);
+        assertEquals(Rank.spread(1000).stream().mapToInt(String::length).max().orElse(0), 3);
+    }
+
     @Test
     public void anEmptySpreadIsEmptyRatherThanAFailure() {
         assertEquals(Rank.spread(0), List.of());
