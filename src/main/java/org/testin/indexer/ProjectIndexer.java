@@ -290,6 +290,31 @@ public final class ProjectIndexer {
         return store.getTestCasesForTestSet(testSetPath);
     }
 
+    /**
+     * Every test case under this node, in tree order: a test set's own cases, and
+     * those of every test set beneath a package.
+     * <p>
+     * No instanceof and no special case for a package: a node that holds no cases
+     * of its own answers with an empty list, so one walk serves a test set, a
+     * package of them, and the Test Cases root alike.
+     * <p>
+     * Retired branches are left out. A deprecated test set, or anything under an
+     * archived package, is not current work - the same rule that keeps it out of
+     * the case selection when a run is configured (#68). A retired node the
+     * tester picked out themselves is still walked: they asked for it by name.
+     */
+    public @NotNull List<TestCaseDto> getTestCasesUnder(final @NotNull DirectoryDto dir) {
+        final List<TestCaseDto> cases = new ArrayList<>(getTestCasesForTestSet(dir.getPath()));
+
+        for (final DirectoryDto child : getChildren(dir.getPath())) {
+            if (child.isRetired()) continue;
+
+            cases.addAll(getTestCasesUnder(child));
+        }
+
+        return cases;
+    }
+
     public @NotNull TestRunDto getTestRunByPath(final @NotNull Path testRunPath) {
         return store.getTestRunByPath(testRunPath);
     }
