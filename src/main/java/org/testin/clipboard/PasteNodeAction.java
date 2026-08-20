@@ -74,10 +74,24 @@ public class PasteNodeAction extends AbstractProjectTreeAction {
         }
     }
 
+    /**
+     * Greyed out where nothing can land: a test project holds its two
+     * containers and nothing else, so pasting into one has no meaning.
+     * <p>
+     * Asked of the transfer handler, which is what the paste itself asks: the
+     * clipboard's flavor, the target, the family rules and the own-subtree
+     * check. Deciding any of it here would be a second rule to keep in step.
+     */
+    @Override
+    public void update(final @NotNull AnActionEvent e) {
+        e.getPresentation().setEnabled(tree.getTransferHandler() instanceof TreeTransferHandler handler
+                && handler.canPasteFromClipboard());
+    }
+
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
-        // BGT on purpose - no update() here reads Swing state; do not switch to EDT (#52).
-        return ActionUpdateThread.BGT;
+        // update() reads the tree's selection, which is Swing state (#52).
+        return ActionUpdateThread.EDT;
     }
 
 }

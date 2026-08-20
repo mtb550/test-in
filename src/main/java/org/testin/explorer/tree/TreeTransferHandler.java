@@ -149,6 +149,29 @@ public class TreeTransferHandler extends TransferHandler {
     /**
      * Only nodes that declare themselves transferable can be cut, copied or dragged.
      */
+    /**
+     * Whether copying or cutting would put anything on the clipboard.
+     * <p>
+     * The menu entries ask this rather than deciding for themselves, so what a
+     * greyed Copy means and what Copy would do are the same rule read twice.
+     */
+    public boolean hasTransferableSelection() {
+        return !transferableSelection().isEmpty();
+    }
+
+    /**
+     * Whether what is on the clipboard could land on what is selected.
+     * <p>
+     * The same question the paste itself asks, through the same method - the
+     * flavor, the target, the family rules and the own-subtree check all
+     * together. A menu entry deciding any part of that for itself would be a
+     * second rule that agrees with this one until the day it does not.
+     */
+    public boolean canPasteFromClipboard() {
+        final Transferable contents = CopyPasteManager.getInstance().getContents();
+        return contents != null && canImport(new TransferSupport(tree, contents));
+    }
+
     private @NotNull List<DirectoryDto> transferableSelection() {
         return TreeValueUtil.selectedDirectories(tree.getSelectionPaths()).stream()
                 .filter(DirectoryDto::isTransferable)
