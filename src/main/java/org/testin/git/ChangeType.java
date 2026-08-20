@@ -1,9 +1,13 @@
 package org.testin.git;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
@@ -119,14 +123,24 @@ public enum ChangeType {
     private final @NotNull String label;
 
     /**
-     * Null for add/remove: creating or deleting a whole test case has no field to revert.
+     * Absent for add/remove: creating or deleting a whole test case has no field
+     * to revert.
      */
+    @Getter(AccessLevel.NONE)
     private final @Nullable RevertAction revertAction;
 
-    public static @Nullable ChangeType fromLabel(final @Nullable String label) {
-        for (final ChangeType type : values())
-            if (type.label.equals(label)) return type;
+    /**
+     * How a row of this kind is put back, and empty for the kinds that cannot
+     * be - which is what greys the revert out.
+     */
+    public @NotNull Optional<RevertAction> getRevertAction() {
+        return Optional.ofNullable(revertAction);
+    }
 
-        return null;
+    /**
+     * The kind of change this label names, empty when nothing names it.
+     */
+    public static @NotNull Optional<ChangeType> fromLabel(final @NotNull String label) {
+        return Arrays.stream(values()).filter(type -> type.label.equals(label)).findFirst();
     }
 }

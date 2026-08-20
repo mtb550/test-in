@@ -55,6 +55,23 @@ public record PendingChange(@NotNull ChangeSubject subject, @NotNull String name
     }
 
     /**
+     * The case as it was committed - the side a revert puts back.
+     * <p>
+     * A deletion and a modification both carry it; the factory populates it for
+     * exactly those. Asked here so the revert does not read the nullable field
+     * and check it, which is the same reason {@link #testCase()} exists.
+     *
+     * @throws IllegalStateException if asked of a change that never had a
+     *                               committed side
+     */
+    public @NotNull TestCaseDto committedState() {
+        if (oldState == null) {
+            throw new IllegalStateException("A " + type + " change carries no committed state: " + relativeFilePath);
+        }
+        return oldState;
+    }
+
+    /**
      * Whether a row of this change can be put back. Only a test case can: the
      * revert writes a test case through the indexer, and a run or a marker has
      * no field-level revert to apply.

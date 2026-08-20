@@ -112,6 +112,11 @@ public enum Shortcuts {
     private final @NotNull KeyStroke key;
 
     /**
+     * No key, as a key: what a status or a field carries when nothing binds it.
+     */
+    public static final @NotNull KeyStroke NO_KEY = EMPTY.key;
+
+    /**
      * The platform menu modifier (Cmd on macOS, Ctrl elsewhere), same source
      * as the other cross-platform shortcuts; plain Ctrl in headless test runs.
      */
@@ -152,8 +157,19 @@ public enum Shortcuts {
         return new KeyboardShortcut(key, null);
     }
 
+    /**
+     * A keystroke as a tester reads it, and nothing at all for the key that
+     * never arrives - what is bound to no key has no name to show (#71).
+     */
     public static @NotNull String shortcutText(final @NotNull KeyStroke key) {
-        return KeymapUtil.getKeystrokeText(key);
+        return isNoKey(key) ? "" : KeymapUtil.getKeystrokeText(key);
+    }
+
+    /**
+     * True when this is the keystroke nothing produces - see {@link #EMPTY}.
+     */
+    public static boolean isNoKey(final @NotNull KeyStroke key) {
+        return NO_KEY.equals(key);
     }
 
     /**

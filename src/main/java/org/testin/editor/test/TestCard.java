@@ -36,8 +36,7 @@ public class TestCard extends BaseCard {
         final RunStatus runStatus = tc.getTempStatus();
         this.isRunning = runStatus == RunStatus.RUNNING;
 
-        final RunStatus.Badge badge = runStatus.getBadge();
-        if (badge != null) badges.add(Shared.createRunStatusBadge(badge));
+        runStatus.getBadge().ifPresent(badge -> badges.add(Shared.createRunStatusBadge(badge)));
 
         updateUI(index, title, badges, details);
     }

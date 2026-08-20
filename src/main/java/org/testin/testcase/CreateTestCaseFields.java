@@ -3,7 +3,6 @@ package org.testin.testcase;
 import com.intellij.icons.AllIcons;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.statusbar.StatusBarItem;
 import org.testin.testcase.create.CreateTestCaseSection;
 import org.testin.testcase.create.TestCaseBaseDialog;
@@ -56,7 +55,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     TEST_DATA(
             "Test Data",
-            null,
+            Shortcuts.EMPTY,
             AllIcons.Nodes.DataTables,
             TestCaseBaseDialog::getTestDataSection,
             "set test data",
@@ -65,7 +64,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     PRE_CONDITIONS(
             "Pre Conditions",
-            null,
+            Shortcuts.EMPTY,
             AllIcons.Actions.StepOut,
             TestCaseBaseDialog::getPreConditionsSection,
             "set pre conditions",
@@ -115,7 +114,11 @@ public enum CreateTestCaseFields implements StatusBarItem {
      * {@link #JUMP_KEYS} have their key advertised in the status bar, so a
      * binding outside that list was one nobody could discover.
      */
-    private final @Nullable Shortcuts shortcut;
+    /**
+     * The key that jumps to this field, and {@link Shortcuts#EMPTY} for the
+     * fields no key reaches.
+     */
+    private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;
     private final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor;
 
@@ -129,7 +132,7 @@ public enum CreateTestCaseFields implements StatusBarItem {
      */
     private final TestCaseDialogKey @NotNull [] ownKeys;
 
-    CreateTestCaseFields(final @NotNull String name, final @Nullable Shortcuts shortcut, final @NotNull Icon icon,
+    CreateTestCaseFields(final @NotNull String name, final @NotNull Shortcuts shortcut, final @NotNull Icon icon,
                          final @NotNull Function<TestCaseBaseDialog, CreateTestCaseSection> sectionExtractor,
                          final @NotNull String placeholder, final TestCaseDialogKey @NotNull ... ownKeys) {
         this.name = name;
@@ -159,6 +162,6 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     @Override
     public @NotNull String getShortcutText() {
-        return shortcut != null ? shortcut.getShortcutText() : "";
+        return shortcut.getShortcutText();
     }
 }

@@ -17,7 +17,7 @@ public class RunStatusBadgeTest {
 
     @Test
     public void idleDrawsNoBadge() {
-        assertNull(RunStatus.IDLE.getBadge(), "a case nobody has run carries no badge");
+        assertTrue(RunStatus.IDLE.getBadge().isEmpty(), "a case nobody has run carries no badge");
     }
 
     @Test
@@ -25,8 +25,9 @@ public class RunStatusBadgeTest {
         for (final RunStatus status : RunStatus.values()) {
             if (status == RunStatus.IDLE) continue;
 
-            final RunStatus.Badge badge = status.getBadge();
-            assertNotNull(badge, status + " should draw a badge");
+            final RunStatus.Badge badge = status.getBadge()
+                    .orElseThrow(() -> new AssertionError(status + " should draw a badge"));
+
             assertNotNull(badge.color(), status + " has a label, so it has a color to draw it in");
             assertFalse(badge.label().isBlank(), status + " has a visible label");
         }
@@ -34,9 +35,9 @@ public class RunStatusBadgeTest {
 
     @Test
     public void theLabelsAreTheOnesTheCardShows() {
-        assertEquals(RunStatus.PASSED.getBadge().label(), "Passed");
-        assertEquals(RunStatus.FAILED.getBadge().label(), "Failed");
-        assertEquals(RunStatus.RUNNING.getBadge().label(), "Running");
+        assertEquals(RunStatus.PASSED.getBadge().orElseThrow().label(), "Passed");
+        assertEquals(RunStatus.FAILED.getBadge().orElseThrow().label(), "Failed");
+        assertEquals(RunStatus.RUNNING.getBadge().orElseThrow().label(), "Running");
     }
 
     @Test

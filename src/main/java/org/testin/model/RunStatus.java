@@ -5,12 +5,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBList;
 import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.run.RunTestCaseAction;
 
+import java.util.Optional;
 import javax.swing.*;
 import java.awt.*;
 
@@ -50,6 +52,7 @@ public enum RunStatus {
      * Label and color are one fact, so they are one field: a status cannot end
      * up with a label and no color to draw it in.
      */
+    @Getter(AccessLevel.NONE)
     private final @Nullable Badge badge;
 
     /**
@@ -60,6 +63,14 @@ public enum RunStatus {
     public void executeAction(final @NotNull Project p, final @NotNull TestCaseDto dto,
                               final @Nullable JBList<TestCaseDto> list) {
         new RunTestCaseAction(p, list).execute(dto);
+    }
+
+    /**
+     * The badge this status draws on a card, and empty for IDLE - a case nobody
+     * has run carries none.
+     */
+    public @NotNull Optional<Badge> getBadge() {
+        return Optional.ofNullable(badge);
     }
 
     public record Badge(@NotNull String label, @NotNull JBColor color) {

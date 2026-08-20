@@ -4,7 +4,6 @@ import com.intellij.icons.AllIcons;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -21,13 +20,13 @@ public enum TestRunConfiguration {
     CHANGE_LOG(
             "Change Log",
             AllIcons.Nodes.Type,
-            null
+            Free.OPTIONS
     ),
 
     COMMIT_ID(
             "Commit ID",
             AllIcons.Nodes.Type,
-            null
+            Free.OPTIONS
     ),
 
     PLATFORM(
@@ -66,5 +65,26 @@ public enum TestRunConfiguration {
     /**
      * Null for free-text fields; set only by those offering a fixed choice.
      */
-    private final @Nullable String[] options;
+    /**
+     * A field with nothing to pick from: a line to type in.
+     * <p>
+     * In a holder because an enum constant cannot name a static field of its own
+     * enum, and the constants are declared first.
+     */
+    private static final class Free {
+        private static final String[] OPTIONS = new String[0];
+    }
+
+    /**
+     * What the field offers to pick from, and nothing at all for a field that is
+     * free text - which is what {@link #isChoice()} answers.
+     */
+    private final @NotNull String[] options;
+
+    /**
+     * True when this field is a dropdown rather than a line to type in.
+     */
+    public boolean isChoice() {
+        return options.length > 0;
+    }
 }

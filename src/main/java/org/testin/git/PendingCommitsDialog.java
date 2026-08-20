@@ -195,8 +195,6 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
             return;
         }
 
-        final ChangeType changeType = ChangeType.fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE));
-
         try {
             final Path testSetPath = repoRoot.resolve(diff.relativeFilePath()).getParent();
             if (testSetPath == null) return;
@@ -206,19 +204,19 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
 
             switch (diff.type()) {
                 case ADDED -> indexer.removeTestCase(testSetPath, testCaseId);
-                case DELETED -> {
-                    final TestCaseDto oldState = diff.oldState();
-                    if (oldState == null) return;
-                    indexer.putTestCase(testSetPath, oldState);
-                }
+                case DELETED -> indexer.putTestCase(testSetPath, diff.committedState());
                 case MODIFIED -> {
-                    final TestCaseDto current = indexer.findTestCase(testCaseId).orElse(null);
-                    final TestCaseDto oldState = diff.oldState();
-                    final RevertAction revert = changeType == null ? null : changeType.getRevertAction();
-                    if (current == null || oldState == null || revert == null) return;
+                    // The row's own label says which field it reverts; a label
+                    // that names no revertable field leaves the row alone.
+                    final Optional<RevertAction> revert = ChangeType
+                            .fromLabel(changes.getValueAt(row, COLUMN_CHANGE_TYPE))
+                            .flatMap(ChangeType::getRevertAction);
+                    final Optional<TestCaseDto> current = indexer.findTestCase(testCaseId);
 
-                    revert.apply(current, oldState);
-                    indexer.putTestCase(testSetPath, current);
+                    if (revert.isEmpty() || current.isEmpty()) return;
+
+                    revert.get().apply(current.get(), diff.committedState());
+                    indexer.putTestCase(testSetPath, current.get());
                 }
             }
 

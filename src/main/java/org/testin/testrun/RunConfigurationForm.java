@@ -67,7 +67,7 @@ public class RunConfigurationForm implements DialogComponent {
 
         int row = 3;
         for (final TestRunConfiguration field : TestRunConfiguration.values()) {
-            if (field.getOptions() != null) {
+            if (field.isChoice()) {
                 final ComboBox<String> comboBox = new ComboBox<>(field.getOptions());
                 comboBox.setEditable(true);
                 fieldMap.put(field, comboBox);
