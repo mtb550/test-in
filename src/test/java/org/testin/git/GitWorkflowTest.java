@@ -530,7 +530,7 @@ public class GitWorkflowTest {
         final String remoteInfo = mustGit(work, "remote", "show", "origin");
 
         assertTrue(remoteInfo.contains("HEAD branch:"), "git reports a HEAD branch line: " + remoteInfo);
-        assertNull(GitRefs.parseHeadBranch(remoteInfo), "an empty remote names no branch, so the push falls back to the local one");
+        assertEquals(GitRefs.parseHeadBranch(remoteInfo), "", "an empty remote names no branch, so the push falls back to the local one");
     }
 
     /**

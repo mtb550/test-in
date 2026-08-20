@@ -7,7 +7,6 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.git.GitRepositoryService;
 import org.testin.git.ViewPendingCommitsAction;
@@ -208,11 +207,11 @@ public class BranchSelector {
             public void run(final @NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
 
-                // Null means the checkout did not happen; the git reason is
+                // Empty means the checkout did not happen; the git reason is
                 // already in testin.log, and the sentence worth showing is the
                 // one below rather than the command's output (#63).
-                final @Nullable String checkedOut = git.checkout(repositoryPath, targetBranch);
-                if (checkedOut == null) {
+                final String checkedOut = git.checkout(repositoryPath, targetBranch);
+                if (checkedOut.isEmpty()) {
                     ApplicationManager.getApplication().invokeLater(() -> refuseSwitch(repositoryPath, targetBranch));
                     return;
                 }
@@ -278,7 +277,7 @@ public class BranchSelector {
                     }
                     final List<String> branches = git.getAvailableBranches(repositoryPath);
                     final String loadedCurrentBranch = git.getCurrentBranch(repositoryPath);
-                    if (loadedCurrentBranch != null) currentBranch = loadedCurrentBranch;
+                    if (!loadedCurrentBranch.isEmpty()) currentBranch = loadedCurrentBranch;
 
                     ApplicationManager.getApplication().invokeLater(() -> {
                         isUpdating = true;

@@ -4,7 +4,6 @@ import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 import org.testin.services.Services;
 import org.testin.util.Mapper;
@@ -60,8 +59,8 @@ public final class GitDiffProcessor {
      * repository: which lines are ours, which side of each change is read from
      * where, and which changes are not worth showing.
      *
-     * @param committedContent the file's content as committed, or null when
-     *                         there is none - a new file, or no commits yet
+     * @param committedContent the file's content as committed, empty when there
+     *                         is none - a new file, or no commits yet
      */
     static @NotNull List<PendingChange> toDiffs(
             final @NotNull List<String> statusLines,
@@ -86,7 +85,7 @@ public final class GitDiffProcessor {
             try {
                 result.add(PendingChangeFactory.fromFile(
                         entry.type(),
-                        entry.type() == DiffType.ADDED ? null : committedContent.apply(entry.path()),
+                        entry.type() == DiffType.ADDED ? "" : committedContent.apply(entry.path()),
                         workingContent(root, relativePath, entry),
                         relativePath,
                         mapper));
@@ -106,18 +105,18 @@ public final class GitDiffProcessor {
     }
 
     /**
-     * Null for a deletion, which by definition has no file left on disk.
+     * Empty for a deletion, which by definition has no file left on disk.
      * <p>
      * Read with plain file access rather than through the VFS: this is the
      * working tree as Git just described it, and a VFS copy that has not caught
      * up would disagree with the status line that named the file. {@code git} is
      * an exempt package for exactly this kind of read.
      */
-    private static @Nullable String workingContent(
+    private static @NotNull String workingContent(
             final @NotNull Path root,
             final @NotNull Path relativePath,
             final @NotNull GitRefs.StatusEntry entry) {
-        if (entry.type() == DiffType.DELETED) return null;
+        if (entry.type() == DiffType.DELETED) return "";
 
         final Path file = root.resolve(relativePath);
         try {

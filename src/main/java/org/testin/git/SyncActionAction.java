@@ -70,9 +70,9 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                 try {
                     indicator.setText("Checking remote configuration...");
                     final String remoteName = git.getRemoteName(repoPath);
-                    final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
+                    final String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
 
-                    if (remoteName == null || remoteUrl.isEmpty()) {
+                    if (remoteUrl.isEmpty()) {
                         ApplicationManager.getApplication().invokeLater(() ->
                                 Services.getInstance(p, Notifier.class).warn(p, "Sync Aborted", "No remote URL is configured for this project. Push a commit first to configure the remote.")
                         );
@@ -80,7 +80,7 @@ public class SyncActionAction extends AbstractProjectTreeAction {
                     }
 
                     final String branch = git.getDefaultBranch(repoPath);
-                    if (branch == null || branch.isBlank()) {
+                    if (branch.isBlank()) {
                         throw new IllegalStateException("Could not determine the repository default branch.");
                     }
 

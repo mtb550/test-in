@@ -3,7 +3,6 @@ package org.testin.git;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -211,28 +210,28 @@ public final class GitRefs {
      * A remote with no commits reports {@code HEAD branch: (unknown)} - it has no
      * branches yet, so there is nothing to name. Read literally that is a branch
      * called {@code (unknown)}, which is what a first push tried to pull from:
-     * "couldn't find remote ref (unknown)". Null instead, so the caller falls
+     * "couldn't find remote ref (unknown)". Empty instead, so the caller falls
      * back to the branch checked out here, which is the one being pushed.
      */
-    public static @Nullable String parseHeadBranch(final @NotNull String remoteShowOutput) {
+    public static @NotNull String parseHeadBranch(final @NotNull String remoteShowOutput) {
         final Matcher matcher = HEAD_BRANCH.matcher(remoteShowOutput);
-        if (!matcher.find()) return null;
+        if (!matcher.find()) return "";
 
         final String branch = matcher.group(1);
-        return NO_HEAD_BRANCH.equals(branch) ? null : branch;
+        return NO_HEAD_BRANCH.equals(branch) ? "" : branch;
     }
 
     /**
      * The remote to sync with: {@code origin} when present, otherwise the
-     * first remote, otherwise {@code null}.
+     * first remote, otherwise nothing at all.
      */
-    public static @Nullable String chooseRemote(final @NotNull List<String> remotes) {
+    public static @NotNull String chooseRemote(final @NotNull List<String> remotes) {
         final List<String> names = remotes.stream()
                 .map(String::trim)
                 .filter(name -> !name.isEmpty())
                 .toList();
         if (names.contains("origin")) return "origin";
-        return names.isEmpty() ? null : names.getFirst();
+        return names.isEmpty() ? "" : names.getFirst();
     }
 
     /**

@@ -4,11 +4,11 @@ import com.intellij.openapi.project.Project;
 import git4idea.GitUtil;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.List;
 
 /**
@@ -37,38 +37,38 @@ public final class GitRepositoryService {
     }
 
     /**
-     * The checked-out branch, or null when Git cannot name one - an empty
-     * repository before its first commit, or a detached HEAD.
+     * The checked-out branch, and nothing at all when Git cannot name one - an
+     * empty repository before its first commit, or a detached HEAD.
      */
-    public @Nullable String getCurrentBranch(final @NotNull Path path) {
-        final String branch = run(path, "git", "branch", "--show-current");
-        return branch == null || branch.isBlank() ? null : branch.trim();
+    public @NotNull String getCurrentBranch(final @NotNull Path path) {
+        return run(path, "git", "branch", "--show-current").orElse("").trim();
     }
 
     /**
      * The branch a push should go to: what the remote calls its HEAD, falling
      * back to the branch checked out here.
      */
-    public @Nullable String getDefaultBranch(final @NotNull Path path) {
+    public @NotNull String getDefaultBranch(final @NotNull Path path) {
         final String currentBranch = getCurrentBranch(path);
         final String remoteName = getRemoteName(path);
-        if (remoteName == null) return currentBranch;
+        if (remoteName.isEmpty()) return currentBranch;
 
-        final String remoteInfo = runRemote(path, getRemoteUrl(path, remoteName), "git", "remote", "show", remoteName);
-        final String headBranch = remoteInfo == null ? null : GitRefs.parseHeadBranch(remoteInfo);
-        return headBranch != null ? headBranch : currentBranch;
+        final String headBranch = runRemote(path, getRemoteUrl(path, remoteName), "git", "remote", "show", remoteName)
+                .map(GitRefs::parseHeadBranch)
+                .orElse("");
+
+        return headBranch.isEmpty() ? currentBranch : headBranch;
     }
 
     public void fetchRemoteBranches(final @NotNull Path path) {
         final String remoteName = getRemoteName(path);
-        if (remoteName == null) return;
+        if (remoteName.isEmpty()) return;
 
         runRemote(path, getRemoteUrl(path, remoteName), "git", "fetch", "--all", "--prune");
     }
 
     public @NotNull List<String> getAvailableBranches(final @NotNull Path path) {
-        final String output = run(path, "git", "branch", "-a");
-        return output == null ? List.of() : GitRefs.parseBranches(output.lines().toList());
+        return GitRefs.parseBranches(run(path, "git", "branch", "-a").orElse("").lines().toList());
     }
 
     /**
@@ -77,34 +77,35 @@ public final class GitRepositoryService {
      * configured", which is what an unreadable config amounts to.
      */
     public @NotNull String getRemoteUrl(final @NotNull Path path, final @NotNull String remoteName) {
-        final String url = run(path, "git", "remote", "get-url", remoteName);
-        return url == null ? "" : url.trim();
-    }
-
-    public @Nullable String getRemoteName(final @NotNull Path path) {
-        final String output = run(path, "git", "remote");
-        return output == null ? null : GitRefs.chooseRemote(output.lines().toList());
+        return run(path, "git", "remote", "get-url", remoteName).orElse("").trim();
     }
 
     /**
-     * The branch that is now checked out, or null when the checkout failed —
-     * which the caller reads as "put the branch box back where it was". The git
-     * reason goes to the log rather than into the caller's balloon: it is
-     * command output, and the sentence the tester needs (uncommitted changes)
-     * is the caller's to write.
+     * The remote to work with, and nothing at all when the repository has none.
      */
-    public @Nullable String checkout(final @NotNull Path path, final @NotNull String branch) {
+    public @NotNull String getRemoteName(final @NotNull Path path) {
+        return GitRefs.chooseRemote(run(path, "git", "remote").orElse("").lines().toList());
+    }
+
+    /**
+     * The branch that is now checked out, and nothing at all when the checkout
+     * did not happen — which the caller reads as "put the branch box back where
+     * it was". The git reason goes to the log rather than into the caller's
+     * balloon: it is command output, and the sentence the tester needs
+     * (uncommitted changes) is the caller's to write.
+     */
+    public @NotNull String checkout(final @NotNull Path path, final @NotNull String branch) {
         final String localName = GitRefs.localNameOf(branch);
         final boolean remoteBranch = !localName.equals(branch);
 
         // A remote branch checked out by its remote name detaches HEAD. Tracking
         // it under its local name is what the tester meant by picking it.
         if (remoteBranch && !getAvailableBranches(path).contains(localName)) {
-            return run(path, "git", "checkout", "-b", localName, "--track", branch) == null ? null : localName;
+            return run(path, "git", "checkout", "-b", localName, "--track", branch).isPresent() ? localName : "";
         }
 
         final String target = remoteBranch ? localName : branch;
-        return run(path, "git", "checkout", target) == null ? null : target;
+        return run(path, "git", "checkout", target).isPresent() ? target : "";
     }
 
     /**
@@ -118,7 +119,7 @@ public final class GitRepositoryService {
      * not exist a moment ago.
      */
     public boolean startBranch(final @NotNull Path path, final @NotNull String branch) {
-        return run(path, "git", "checkout", "-b", branch) != null;
+        return run(path, "git", "checkout", "-b", branch).isPresent();
     }
 
     /**
@@ -128,10 +129,7 @@ public final class GitRepositoryService {
      * name to do exactly that.
      */
     public @NotNull List<String> getLocalBranches(final @NotNull Path path) {
-        final String output = run(path, "git", "branch");
-        if (output == null) return List.of();
-
-        return GitRefs.parseBranches(output.lines().toList());
+        return GitRefs.parseBranches(run(path, "git", "branch").orElse("").lines().toList());
     }
 
     /**
@@ -142,17 +140,17 @@ public final class GitRepositoryService {
      * "Test Cases/login/" and not one line per test case in it.
      */
     public @NotNull List<String> status(final @NotNull Path path) {
-        final String output = run(path, "git", "status", "--porcelain", "-uall");
-        return output == null ? List.of() : output.lines().filter(line -> !line.isBlank()).toList();
+        return run(path, "git", "status", "--porcelain", "-uall").orElse("")
+                .lines().filter(line -> !line.isBlank()).toList();
     }
 
     /**
-     * A file's content as committed, or null when there is no committed version
-     * to read - the file is new, or the repository has no commits at all, which
-     * is every repository on the day it is initialized.
+     * A file's content as committed, and empty when there is no committed
+     * version to read - the file is new, or the repository has no commits at
+     * all, which is every repository on the day it is initialized.
      */
-    public @Nullable String showAtHead(final @NotNull Path path, final @NotNull String relativePath) {
-        return run(path, "git", "show", "HEAD:" + relativePath);
+    public @NotNull String showAtHead(final @NotNull Path path, final @NotNull String relativePath) {
+        return run(path, "git", "show", "HEAD:" + relativePath).orElse("");
     }
 
     /**
@@ -162,8 +160,7 @@ public final class GitRepositoryService {
     public boolean hasConflicts(final @NotNull Path path) {
         if (isRebaseInProgress(path)) return true;
 
-        final String output = run(path, "git", "status", "--porcelain");
-        return output != null && GitRefs.hasUnmergedPaths(output.lines().toList());
+        return GitRefs.hasUnmergedPaths(run(path, "git", "status", "--porcelain").orElse("").lines().toList());
     }
 
     /**
@@ -178,8 +175,7 @@ public final class GitRepositoryService {
      *              onto, 3 for the commits being replayed
      */
     public @NotNull String stageContent(final @NotNull Path path, final @NotNull String relativePath, final int stage) {
-        final String content = run(path, "git", "show", ":" + stage + ":" + relativePath);
-        return content == null ? "" : content;
+        return run(path, "git", "show", ":" + stage + ":" + relativePath).orElse("");
     }
 
     /**
@@ -188,7 +184,7 @@ public final class GitRepositoryService {
      * would stop the rebase again with nothing left on screen to explain it.
      */
     public boolean stageResolved(final @NotNull Path path, final @NotNull String relativePath) {
-        return run(path, "git", "add", "--", relativePath) != null;
+        return run(path, "git", "add", "--", relativePath).isPresent();
     }
 
     /**
@@ -209,11 +205,11 @@ public final class GitRepositoryService {
      * has never heard of has nothing to be ahead of.
      */
     public int unpushedCount(final @NotNull Path path) {
-        final String counted = run(path, "git", "rev-list", "--count", "@{upstream}..HEAD");
-        if (counted == null) return 0;
+        final String counted = run(path, "git", "rev-list", "--count", "@{upstream}..HEAD").orElse("").trim();
+        if (counted.isEmpty()) return 0;
 
         try {
-            return Integer.parseInt(counted.trim());
+            return Integer.parseInt(counted);
         } catch (final NumberFormatException ex) {
             Logger.debug("Could not read the unpushed count in " + path + ": " + counted);
             return 0;
@@ -240,25 +236,31 @@ public final class GitRepositoryService {
      * knows that.
      */
     public boolean couldNotAbortRebase(final @NotNull Path path) {
-        return run(path, "git", "rebase", "--abort") == null;
+        return run(path, "git", "rebase", "--abort").isEmpty();
     }
 
     /**
      * True when the rebase did not continue — see {@link #couldNotAbortRebase}.
      */
     public boolean couldNotContinueRebase(final @NotNull Path path) {
-        return run(path, "git", "rebase", "--continue") == null;
+        return run(path, "git", "rebase", "--continue").isEmpty();
     }
 
     /**
-     * Runs a local command and answers null when it failed, rather than raising.
+     * Runs a local command and answers nothing when it failed, rather than
+     * raising.
      * <p>
      * Every caller here treats a failure as "no answer" - there is no branch, no
-     * remote, the rebase did not continue - and each of them already returns
-     * null or false for it. The reason goes to the log, where a git message
+     * remote, the rebase did not continue - and each of them already answers
+     * empty or false for it. The reason goes to the log, where a git message
      * belongs; the sentence the tester reads is written by whoever called.
+     * <p>
+     * An Optional rather than an empty string, because a command that succeeds
+     * with no output is not a command that failed: {@code git checkout} prints
+     * nothing on success, and reading that as a failure would leave the branch
+     * box showing a branch nobody is on (#71).
      */
-    private @Nullable String run(final @NotNull Path path, final @NotNull String... command) {
+    private @NotNull Optional<String> run(final @NotNull Path path, final @NotNull String... command) {
         return execute(path, "", command);
     }
 
@@ -267,19 +269,19 @@ public final class GitRepositoryService {
      * {@code git4idea} set up authentication for it, so a fetch or a push can
      * ask for credentials. See {@code GitCommandRunner.executeRemote}.
      */
-    private @Nullable String runRemote(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
+    private @NotNull Optional<String> runRemote(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
         return execute(path, remoteUrl, command);
     }
 
     /**
      * The one body both entry points share: a blank URL is a local command.
      */
-    private @Nullable String execute(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
+    private @NotNull Optional<String> execute(final @NotNull Path path, final @NotNull String remoteUrl, final @NotNull String... command) {
         try {
-            return GitCommandRunner.executeRemote(project, path, remoteUrl, command);
+            return Optional.of(GitCommandRunner.executeRemote(project, path, remoteUrl, command));
         } catch (final RuntimeException ex) {
             Logger.debug("git " + String.join(" ", command) + " failed in " + path + ": " + ex.getMessage());
-            return null;
+            return Optional.empty();
         }
     }
 }

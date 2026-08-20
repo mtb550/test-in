@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.TestRunDto;
 import org.testin.util.Mapper;
@@ -35,11 +34,11 @@ final class PendingChangeFactory {
      */
     static @NotNull PendingChange fromFile(
             final @NotNull DiffType type,
-            final @Nullable String beforeJson,
-            final @Nullable String afterJson,
+            final @NotNull String beforeJson,
+            final @NotNull String afterJson,
             final @NotNull Path relativePath,
             final @NotNull Mapper mapper) {
-        return switch (subjectOf(relativePath, afterJson == null ? beforeJson : afterJson, mapper)) {
+        return switch (subjectOf(relativePath, afterJson.isEmpty() ? beforeJson : afterJson, mapper)) {
             case TEST_CASE -> testCase(type, beforeJson, afterJson, relativePath, mapper);
             case TEST_RUN -> testRun(type, beforeJson, afterJson, relativePath, mapper);
             case MARKER -> marker(type, beforeJson, afterJson, relativePath, mapper);
@@ -63,7 +62,7 @@ final class PendingChangeFactory {
      * nobody planned for, and it is still listed - what the review does not show
      * cannot be committed.
      */
-    private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath, final @Nullable String json,
+    private static @NotNull ChangeSubject subjectOf(final @NotNull Path relativePath, final @NotNull String json,
                                                     final @NotNull Mapper mapper) {
         final String fileName = relativePath.getFileName().toString();
 
@@ -85,8 +84,8 @@ final class PendingChangeFactory {
      * The JSON as a plain map, or empty when there is nothing readable there.
      * Used to ask what a file is before committing to a type for it.
      */
-    private static @NotNull Map<String, Object> fieldsIn(final @NotNull Mapper mapper, final @Nullable String json) {
-        if (json == null || json.isBlank()) return Map.of();
+    private static @NotNull Map<String, Object> fieldsIn(final @NotNull Mapper mapper, final @NotNull String json) {
+        if (json.isBlank()) return Map.of();
 
         try {
             return mapper.readValue(json, new TypeReference<>() {
@@ -106,7 +105,7 @@ final class PendingChangeFactory {
     }
 
     private static @NotNull PendingChange testCase(
-            final @NotNull DiffType type, final @Nullable String beforeJson, final @Nullable String afterJson,
+            final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
             final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final String testSet = parentName(relativePath);
 
@@ -141,7 +140,7 @@ final class PendingChangeFactory {
     }
 
     private static @NotNull PendingChange testRun(
-            final @NotNull DiffType type, final @Nullable String beforeJson, final @Nullable String afterJson,
+            final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
             final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final String runName = parentName(relativePath);
 
@@ -162,7 +161,7 @@ final class PendingChangeFactory {
      * its status. Everything else it holds is the audit the plugin fills in.
      */
     private static @NotNull PendingChange marker(
-            final @NotNull DiffType type, final @Nullable String beforeJson, final @Nullable String afterJson,
+            final @NotNull DiffType type, final @NotNull String beforeJson, final @NotNull String afterJson,
             final @NotNull Path relativePath, final @NotNull Mapper mapper) {
         final String node = parentName(relativePath);
         final String before = statusIn(mapper, beforeJson);
@@ -211,7 +210,7 @@ final class PendingChangeFactory {
      * not carry one. Read as a map because seven marker classes hold different
      * statuses and this needs the word, not the type.
      */
-    private static @NotNull String statusIn(final @NotNull Mapper mapper, final @Nullable String json) {
+    private static @NotNull String statusIn(final @NotNull Mapper mapper, final @NotNull String json) {
         final Object status = fieldsIn(mapper, json).get("status");
         return status == null ? "" : status.toString();
     }
@@ -221,9 +220,9 @@ final class PendingChangeFactory {
         return parent == null ? "" : parent.getFileName().toString();
     }
 
-    private static <T> @NotNull T read(final @NotNull Mapper mapper, final @Nullable String json,
+    private static <T> @NotNull T read(final @NotNull Mapper mapper, final @NotNull String json,
                                        final @NotNull Class<T> type) {
-        if (json == null) throw new IllegalStateException("Missing Git file revision");
+        if (json.isEmpty()) throw new IllegalStateException("Missing Git file revision");
         return mapper.readValue(json, type);
     }
 }

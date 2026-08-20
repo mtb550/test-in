@@ -60,7 +60,7 @@ public class PendingChangeFactoryTest {
         final TestCaseDto added = testCase("a brand new case");
 
         final PendingChange diff = PendingChangeFactory.fromFile(
-                DiffType.ADDED, null, json(added), PATH, mapper());
+                DiffType.ADDED, "", json(added), PATH, mapper());
 
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.ADDED);
@@ -81,7 +81,7 @@ public class PendingChangeFactoryTest {
         final TestCaseDto removed = testCase("a case that is going away");
 
         final PendingChange diff = PendingChangeFactory.fromFile(
-                DiffType.DELETED, json(removed), null, PATH, mapper());
+                DiffType.DELETED, json(removed), "", PATH, mapper());
 
         assertNotNull(diff);
         assertEquals(diff.type(), DiffType.DELETED);
@@ -147,7 +147,7 @@ public class PendingChangeFactoryTest {
                 """.formatted(UUID.randomUUID(), UUID.randomUUID());
 
         final PendingChange added = PendingChangeFactory.fromFile(
-                DiffType.ADDED, null, runJson, Path.of("Test Runs", "cycle 4", "cycle 4.json"), mapper());
+                DiffType.ADDED, "", runJson, Path.of("Test Runs", "cycle 4", "cycle 4.json"), mapper());
 
         assertNotNull(added);
         assertEquals(added.subject(), ChangeSubject.TEST_RUN);
@@ -212,16 +212,16 @@ public class PendingChangeFactoryTest {
         final TestCaseDto present = testCase("only one side survived");
 
         assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, null, json(present), PATH, mapper()));
+                DiffType.MODIFIED, "", json(present), PATH, mapper()));
 
         assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
-                DiffType.MODIFIED, json(present), null, PATH, mapper()));
+                DiffType.MODIFIED, json(present), "", PATH, mapper()));
 
         assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
-                DiffType.ADDED, json(present), null, PATH, mapper()));
+                DiffType.ADDED, json(present), "", PATH, mapper()));
 
         assertThrows(IllegalStateException.class, () -> PendingChangeFactory.fromFile(
-                DiffType.DELETED, null, json(present), PATH, mapper()));
+                DiffType.DELETED, "", json(present), PATH, mapper()));
     }
 
     /**
@@ -235,10 +235,10 @@ public class PendingChangeFactoryTest {
         final TestCaseDto before = testCase("before");
         final TestCaseDto after = testCase("after").setId(before.getId());
 
-        assertEquals(PendingChangeFactory.fromFile(DiffType.ADDED, null, json(added), PATH, mapper())
+        assertEquals(PendingChangeFactory.fromFile(DiffType.ADDED, "", json(added), PATH, mapper())
                 .testCase().getDescription(), "added");
 
-        assertEquals(PendingChangeFactory.fromFile(DiffType.DELETED, json(before), null, PATH, mapper())
+        assertEquals(PendingChangeFactory.fromFile(DiffType.DELETED, json(before), "", PATH, mapper())
                 .testCase().getDescription(), "before", "a deletion is about the case that was there");
 
         assertEquals(PendingChangeFactory.fromFile(DiffType.MODIFIED, json(before), json(after), PATH, mapper())
@@ -254,7 +254,7 @@ public class PendingChangeFactoryTest {
         final TestCaseDto original = testCase("survives the round trip");
 
         final PendingChange diff = PendingChangeFactory.fromFile(
-                DiffType.ADDED, null, json(original), PATH, mapper());
+                DiffType.ADDED, "", json(original), PATH, mapper());
 
         assertNotNull(diff);
         final TestCaseDto readBack = diff.newState();

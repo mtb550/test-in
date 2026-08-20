@@ -8,7 +8,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.config.TestinConfigService;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -21,6 +20,7 @@ import org.testin.services.Services;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Locale;
 
 /**
@@ -121,7 +121,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     final int unpushed = git.unpushedCount(path);
 
                     ApplicationManager.getApplication().invokeLater(() ->
-                            reviewChanges(p, path, changes, branches, current == null ? "" : current, unpushed));
+                            reviewChanges(p, path, changes, branches, current, unpushed));
                 },
                 ex -> Services.getInstance(p, Notifier.class).error(p, "Git Error", "Failed to calculate diffs: " + ex.getMessage()));
     }
@@ -173,7 +173,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
 
                     final boolean moved = request.newBranch()
                             ? git.startBranch(repoPath, target)
-                            : git.checkout(repoPath, target) != null;
+                            : !git.checkout(repoPath, target).isEmpty();
 
                     if (!moved) {
                         ApplicationManager.getApplication().invokeLater(() ->
@@ -237,7 +237,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
             final @NotNull Project p,
             final @NotNull Path repoPath,
             final @NotNull PendingCommitsDialog.Request request,
-            final @Nullable String branch) {
+            final @NotNull String branch) {
         final String commitMessage = request.message();
         final Collection<PendingChange> selectedChanges = request.changes();
         final boolean push = request.push();
@@ -262,7 +262,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
                     });
                 },
                 ex -> {
-                    if (isIdentityError(ex.getMessage())) {
+                    if (isIdentityError(Objects.toString(ex.getMessage(), ""))) {
                         promptAndSetGitIdentity(p, repoPath, request, branch);
                     } else {
                         Services.getInstance(p, Notifier.class).error(p, "Commit Failed", "Failed to commit changes:" + System.lineSeparator() + ex.getMessage());
@@ -296,22 +296,20 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
      *                    not choose
      */
     private void pushToRemote(final @NotNull Project p, final @NotNull Path repoPath,
-                              final @NotNull String commitId, final @Nullable String committedOn) {
+                              final @NotNull String commitId, final @NotNull String committedOn) {
         GitBackgroundTask.run(p, "Checking Git remote", false,
                 indicator -> {
                     final String remoteName = git.getRemoteName(repoPath);
-                    final String remoteUrl = remoteName == null ? "" : git.getRemoteUrl(repoPath, remoteName);
-                    final String branch = committedOn == null || committedOn.isBlank()
-                            ? git.getDefaultBranch(repoPath)
-                            : committedOn;
-                    if (branch == null || branch.isBlank()) {
+                    final String remoteUrl = remoteName.isEmpty() ? "" : git.getRemoteUrl(repoPath, remoteName);
+                    final String branch = committedOn.isBlank() ? git.getDefaultBranch(repoPath) : committedOn;
+                    if (branch.isBlank()) {
                         throw new IllegalStateException("Could not determine which branch to push.");
                     }
                     ApplicationManager.getApplication().invokeLater(() -> {
-                        // A null remote name always yields an empty URL above; naming it here
-                        // keeps the "already configured" branch provably non-null.
-                        if (remoteName == null || remoteUrl.isEmpty()) {
-                            configureRemoteAndPush(p, repoPath, remoteName == null ? "origin" : remoteName, branch, commitId);
+                        // A repository with no remote yields an empty URL above, and
+                        // origin is the name the configure step would create.
+                        if (remoteUrl.isEmpty()) {
+                            configureRemoteAndPush(p, repoPath, remoteName.isEmpty() ? "origin" : remoteName, branch, commitId);
                         } else {
                             executeGitPush(p, repoPath, remoteName, branch, commitId);
                         }
@@ -444,7 +442,7 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
             final @NotNull Project p,
             final @NotNull Path repoPath,
             final @NotNull PendingCommitsDialog.Request request,
-            final @Nullable String branch) {
+            final @NotNull String branch) {
         // The dialog validates what it collected - a blank name or email never
         // leaves it - so this is the workflow resuming, not a second check.
         ApplicationManager.getApplication().invokeLater(() -> new GitIdentityDialog(p, identity ->
@@ -465,9 +463,11 @@ public class ViewPendingCommitsAction extends AbstractProjectTreeAction {
         ).show());
     }
 
-    private boolean isIdentityError(final @Nullable String message) {
-        if (message == null) return false;
-
+    /**
+     * An exception with no message of its own arrives here as the empty string,
+     * converted where it comes out of the JDK rather than checked here (#71).
+     */
+    private boolean isIdentityError(final @NotNull String message) {
         final String normalized = message.toLowerCase(Locale.ROOT);
         return normalized.contains("author identity unknown")
                 || normalized.contains("please tell me who you are");

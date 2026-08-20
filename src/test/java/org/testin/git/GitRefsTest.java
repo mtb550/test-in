@@ -38,13 +38,13 @@ public class GitRefsTest {
     }
 
     @Test
-    public void headBranchIsNullWhenTheRemoteDoesNotReportOne() {
+    public void headBranchIsEmptyWhenTheRemoteDoesNotReportOne() {
         final String remoteShow = """
                 * remote origin
                   Fetch URL: https://github.com/mtb550/test-in.git
                 """;
 
-        assertNull(GitRefs.parseHeadBranch(remoteShow));
+        assertEquals(GitRefs.parseHeadBranch(remoteShow), "");
     }
 
     @Test
@@ -64,8 +64,8 @@ public class GitRefsTest {
 
     @Test
     public void noRemotesMeansNoRemoteToSyncWith() {
-        assertNull(GitRefs.chooseRemote(List.of()));
-        assertNull(GitRefs.chooseRemote(List.of("", "   ")));
+        assertEquals(GitRefs.chooseRemote(List.of()), "");
+        assertEquals(GitRefs.chooseRemote(List.of("", "   ")), "");
     }
 
     @Test
@@ -254,7 +254,7 @@ public class GitRefsTest {
                   HEAD branch: (unknown)
                 """;
 
-        assertNull(GitRefs.parseHeadBranch(output), "an empty remote has no branch to name");
+        assertEquals(GitRefs.parseHeadBranch(output), "", "an empty remote has no branch to name");
     }
 
     // ------------------------------------------------------------ branches
