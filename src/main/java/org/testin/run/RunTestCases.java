@@ -43,7 +43,6 @@ public final class RunTestCases {
         // Once for the click, not once per case: running a page of twelve used
         // to raise twelve balloons. Nothing is said when every case was already
         // running, because nothing was started.
-        if (started == 1) Services.getInstance(p, Notifier.class).softShow(p, "Running");
-        else if (started > 1) Services.getInstance(p, Notifier.class).softShow(p, "Running " + started);
+        if (started > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Running", started);
     }
 }

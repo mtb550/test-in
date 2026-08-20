@@ -108,8 +108,7 @@ public enum CardHoverAction {
     private static void stopRun(final @NotNull Project p, final @NotNull List<TestCaseDto> cases) {
         final int stopped = Services.getInstance(p, TestNGExecution.class).stop(cases);
 
-        if (stopped == 1) Services.getInstance(p, Notifier.class).softShow(p, "Stopped");
-        else if (stopped > 1) Services.getInstance(p, Notifier.class).softShow(p, "Stopped " + stopped);
+        if (stopped > 0) Services.getInstance(p, Notifier.class).softShowCounted(p, "Stopped", stopped);
     }
 
     /**

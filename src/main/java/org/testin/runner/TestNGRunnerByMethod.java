@@ -44,7 +44,19 @@ public final class TestNGRunnerByMethod {
                     PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(classFqcn, GlobalSearchScope.projectScope(p));
 
                     if (targetClass == null) {
-                        Logger.warn("Target class not found for FQCN: " + classFqcn);
+                        Services.getInstance(p, TestNGExecution.class)
+                                .notStarting(tc, tc.getDescription() + " has no generated class yet");
+                        return;
+                    }
+
+                    // The configuration names a method, and TestNG runs the class
+                    // when that method is not in it - so a case with no generated
+                    // code ran whatever else the class held and reported on that,
+                    // while the case itself never reported at all and kept its
+                    // Running badge for good (#34).
+                    if (targetClass.findMethodsByName(methodName, false).length == 0) {
+                        Services.getInstance(p, TestNGExecution.class)
+                                .notStarting(tc, tc.getDescription() + " has no generated test method yet");
                         return;
                     }
 

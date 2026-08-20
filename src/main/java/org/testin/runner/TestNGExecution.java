@@ -14,6 +14,8 @@ import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
 import org.testin.model.RunStatus;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 
 import java.util.List;
 import java.util.Set;
@@ -129,6 +131,26 @@ public final class TestNGExecution {
 
         Logger.info("Starting " + settings.getName());
         ProgramRunnerUtil.executeConfiguration(settings, DefaultRunExecutor.getRunExecutorInstance());
+    }
+
+    /**
+     * A case that was asked for is not going to run, and why.
+     * <p>
+     * Every path that gives up between the click and the launch comes through
+     * here rather than logging and returning. The card is already showing
+     * Running by the time any of them is reached - it is marked at the click, a
+     * second before the launch - so one that quietly returned left the case
+     * looking like it was running for the rest of the session.
+     *
+     * @param reason a sentence for the tester, not a diagnostic
+     */
+    public void notStarting(final @NotNull TestCaseDto tc, final @NotNull String reason) {
+        pending.remove(tc);
+
+        Logger.warn("Not running '" + tc.getDescription() + "': " + reason);
+        TestCaseExecutionListener.broadcast(p, key(tc), RunStatus.IDLE, "");
+
+        Services.getInstance(p, Notifier.class).softShow(p, reason);
     }
 
     /**
