@@ -2,10 +2,10 @@ package org.testin.editor;
 
 import com.intellij.ui.components.JBPanel;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.logger.Logger;
 
 import javax.swing.*;
+import java.util.Optional;
 import java.awt.*;
 
 /**
@@ -21,7 +21,10 @@ public final class EditorCenter {
 
     private final @NotNull JBPanel<?> panel;
 
-    private @Nullable JComponent current;
+    /**
+     * Whatever is in the center, and nothing before the first {@link #set}.
+     */
+    private @NotNull Optional<JComponent> current = Optional.empty();
 
     public EditorCenter(final @NotNull JBPanel<?> panel) {
         this.panel = panel;
@@ -32,12 +35,12 @@ public final class EditorCenter {
      */
     public void set(final @NotNull JComponent component) {
         Logger.debug("[center] setCenter -> " + component.getClass().getSimpleName()
-                + " (had center=" + (current != null) + ")");
+                + " (had center=" + current.isPresent() + ")");
 
-        if (current != null) panel.remove(current);
+        current.ifPresent(panel::remove);
 
         panel.add(component, BorderLayout.CENTER);
-        current = component;
+        current = Optional.of(component);
 
         panel.revalidate();
         panel.repaint();

@@ -3,7 +3,6 @@ package org.testin.editor.grid;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.components.JBTextArea;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
@@ -13,11 +12,15 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
+import java.util.Optional;
 
 public class GridCellEditor extends AbstractCellEditor implements TableCellEditor {
 
     private final @NotNull JBTextArea textArea = new JBTextArea();
-    private @Nullable JTable editingTable;
+    /**
+     * The table being edited in, empty between edits.
+     */
+    private @NotNull Optional<JTable> editingTable = Optional.empty();
     private int editingRow = -1;
 
     public GridCellEditor() {
@@ -50,7 +53,7 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
 
     @Override
     public @NotNull Component getTableCellEditorComponent(final JTable table, final Object value, final boolean isSelected, final int row, final int column) {
-        editingTable = table;
+        editingTable = Optional.of(table);
         editingRow = row;
         textArea.setText(value == null ? "" : value.toString());
         textArea.setFont(table.getFont());
@@ -74,11 +77,14 @@ public class GridCellEditor extends AbstractCellEditor implements TableCellEdito
      * clipped area. The row is re-measured for real when the edit is committed.
      */
     private void growRowToFitEditor() {
-        if (editingTable == null || editingRow < 0 || editingRow >= editingTable.getRowCount()) return;
+        editingTable.filter(table -> editingRow >= 0 && editingRow < table.getRowCount())
+                .ifPresent(this::growRowIn);
+    }
 
+    private void growRowIn(final @NotNull JTable table) {
         final int needed = textArea.getPreferredSize().height;
-        if (needed > editingTable.getRowHeight(editingRow)) {
-            editingTable.setRowHeight(editingRow, needed);
+        if (needed > table.getRowHeight(editingRow)) {
+            table.setRowHeight(editingRow, needed);
         }
     }
 

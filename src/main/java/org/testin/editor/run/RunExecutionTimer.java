@@ -2,7 +2,6 @@ package org.testin.editor.run;
 
 import com.intellij.openapi.Disposable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.model.TestRunItems;
 
 import javax.swing.*;
@@ -13,8 +12,18 @@ import java.time.Duration;
  */
 final class RunExecutionTimer implements Disposable {
 
-    private @Nullable Timer timer;
+    /**
+     * The ticker, and one that ticks nothing before a case is started and after
+     * one is stopped - so stopping is always something that can be done, and the
+     * item a finished timer was counting is let go of with it.
+     */
+    private @NotNull Timer timer = notTicking();
     private long startedAt;
+
+    private static @NotNull Timer notTicking() {
+        return new Timer(1000, ignored -> {
+        });
+    }
 
     /**
      * Counts on from what the case already carries rather than resetting it.
@@ -38,10 +47,8 @@ final class RunExecutionTimer implements Disposable {
     }
 
     void stop() {
-        if (timer != null) {
-            timer.stop();
-            timer = null;
-        }
+        timer.stop();
+        timer = notTicking();
     }
 
     @Override
