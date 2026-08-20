@@ -53,6 +53,10 @@ public enum Shortcuts {
     CopyItem(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.CTRL_DOWN_MASK)),
     DeletePackage(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0)),
 
+    // A confirmation's second answer - the one that is neither doing it nor
+    // walking away, e.g. reviewing the changes a branch switch would carry.
+    ConfirmAlternative(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.SHIFT_DOWN_MASK)),
+
     // Run editor: export the run's results (context menu + toolbar button)
     GenerateReport(KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.CTRL_DOWN_MASK)),
 

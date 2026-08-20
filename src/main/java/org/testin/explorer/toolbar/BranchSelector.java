@@ -14,7 +14,9 @@ import org.testin.git.ViewPendingCommitsAction;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.dirs.TestProjectDirectoryDto;
 import org.testin.notifications.Notifier;
+import org.testin.ui.framework.ConfirmDialog;
 import org.testin.services.Services;
+import org.testin.util.Shortcuts;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -144,6 +146,56 @@ public class BranchSelector {
         final Path repositoryPath = projectPath;
         if (repositoryPath == null) return;
 
+        ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking branch " + targetBranch, false) {
+            @Override
+            public void run(final @NotNull ProgressIndicator indicator) {
+                indicator.setIndeterminate(true);
+
+                final int pending = (int) git.status(repositoryPath).stream().filter(line -> !line.isBlank()).count();
+
+                ApplicationManager.getApplication().invokeLater(() -> {
+                    if (pending == 0) {
+                        checkout(repositoryPath, targetBranch);
+                        return;
+                    }
+                    askBeforeCarryingWorkAcross(repositoryPath, targetBranch, pending);
+                });
+            }
+        });
+    }
+
+    /**
+     * Asks before a switch takes uncommitted work with it.
+     * <p>
+     * Git hardly ever refuses. A new test case is an untracked file and comes
+     * along without a word; an edited one comes along too unless the file
+     * differs on the branch being entered, which is the one case Git stops. So
+     * the common outcome is a tester landing on another branch with work that
+     * belongs to the one they left - and here that work looks like it belongs
+     * where it landed, because the tree shows it and the review offers it for
+     * commit.
+     * <p>
+     * The box goes back to the current branch first, so a question left
+     * unanswered leaves the panel saying where the repository actually is. A
+     * switch that goes ahead puts it right again when the tree is rebuilt.
+     */
+    private void askBeforeCarryingWorkAcross(final @NotNull Path repositoryPath, final @NotNull String targetBranch,
+                                             final int pending) {
+        restoreSelectedBranch();
+
+        final String changes = pending == 1 ? "1 change" : pending + " changes";
+
+        new ConfirmDialog(p, "Uncommitted Changes",
+                changes + " in this test project are not committed. Switching does not leave them behind - "
+                        + "they come with you, and can be committed onto " + targetBranch + " by mistake.",
+                currentBranch.isEmpty() ? null : currentBranch, targetBranch,
+                "Switch Anyway", () -> checkout(repositoryPath, targetBranch),
+                List.of(new ConfirmDialog.Alternative(Shortcuts.ConfirmAlternative, "Review Changes",
+                        () -> new ViewPendingCommitsAction(p, pp.getProjectTree().getMainTree()).openFor(repositoryPath))))
+                .show();
+    }
+
+    private void checkout(final @NotNull Path repositoryPath, final @NotNull String targetBranch) {
         ProgressManager.getInstance().run(new Task.Backgroundable(p, "Checking out branch: " + targetBranch, false) {
             @Override
             public void run(final @NotNull ProgressIndicator indicator) {
