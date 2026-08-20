@@ -85,7 +85,7 @@ public final class StartupActivity implements ProjectActivity {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
                     if (p.isDisposed()) return;
-                    if (JavaSourceRoot.find(p) == null) {
+                    if (JavaSourceRoot.find(p).isEmpty()) {
                         Services.getInstance(p, Notifier.class).softShow(p,
                                 "Java Test Source Not Found",
                                 "Unable to find a Java test source package in this project - "

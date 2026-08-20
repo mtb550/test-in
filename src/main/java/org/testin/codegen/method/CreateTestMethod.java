@@ -107,25 +107,7 @@ public class CreateTestMethod implements GenAction {
         if (existing != null) return Optional.of(existing);
 
         try {
-            final VirtualFile sourceRoot = JavaSourceRoot.findOrWarn(p);
-            if (sourceRoot != null) {
-                // Package segments are camelCase (see NameSanitizer.packageName); lowercasing
-                // the directory here would disagree with the emitted package declaration
-                // and with CreateJavaClass, so findClass could never resolve the class.
-                final VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", packageList));
-                if (packageDir != null) {
-                    final String fileName = className + ".java";
-                    if (packageDir.findChild(fileName) == null) {
-                        final VirtualFile javaFile = packageDir.createChildData(this, fileName);
-                        final String packageName = String.join(".", packageList);
-                        final String fileContent = packageName.isEmpty()
-                                ? "public class " + className + " {\n\n}\n"
-                                : "package " + packageName + ";\n\npublic class " + className + " {\n\n}\n";
-                        VfsUtil.saveText(javaFile, fileContent);
-                        javaFile.refresh(false, false);
-                    }
-                }
-            }
+            JavaSourceRoot.inRootOrWarn(p, sourceRoot -> writeEmptyClass(sourceRoot, packageList, className));
 
         } catch (final IOException ex) {
             Logger.error("Failed to create class file for '" + className + "': " + ex.getMessage());
@@ -135,16 +117,48 @@ public class CreateTestMethod implements GenAction {
         return Optional.ofNullable(psiFacade.findClass(path, scope));
     }
 
+    /**
+     * Writes the class file a generated method needs, when it is not there yet.
+     * <p>
+     * Package segments are camelCase (see NameSanitizer.packageName); lowercasing
+     * the directory here would disagree with the emitted package declaration and
+     * with CreateJavaClass, so findClass could never resolve the class.
+     */
+    private void writeEmptyClass(final @NotNull VirtualFile sourceRoot, final @NotNull List<String> packageList,
+                                 final @NotNull String className) throws IOException {
+        final VirtualFile packageDir = VfsUtil.createDirectoryIfMissing(sourceRoot, String.join("/", packageList));
+        if (packageDir == null) return;
+
+        final String fileName = className + ".java";
+        if (packageDir.findChild(fileName) != null) return;
+
+        final VirtualFile javaFile = packageDir.createChildData(this, fileName);
+        final String packageName = String.join(".", packageList);
+        final String fileContent = packageName.isEmpty()
+                ? "public class " + className + " {\n\n}\n"
+                : "package " + packageName + ";\n\npublic class " + className + " {\n\n}\n";
+
+        VfsUtil.saveText(javaFile, fileContent);
+        javaFile.refresh(false, false);
+    }
+
     private void retryInjectPhysically(final @NotNull Project p, final @NotNull List<String> packageList,
                                        final @NotNull String className, final @NotNull String methodName,
                                        final @Nullable TestCaseDto tc) {
-        try {
-            final VirtualFile sourceRoot = JavaSourceRoot.find(p);
-            if (sourceRoot == null) {
-                Logger.error("retryInjectPhysically: sourceRoot is null, cannot inject method '" + methodName + "'");
-                return;
-            }
+        JavaSourceRoot.find(p).ifPresentOrElse(
+                sourceRoot -> injectIntoFile(p, sourceRoot, packageList, className, methodName, tc),
+                () -> Logger.error("retryInjectPhysically: no Java test source root, cannot inject method '"
+                        + methodName + "'"));
+    }
 
+    /**
+     * The fallback path: the class file is on disk but the PSI did not give us
+     * the class, so it is read back and the method injected into it.
+     */
+    private void injectIntoFile(final @NotNull Project p, final @NotNull VirtualFile sourceRoot,
+                                final @NotNull List<String> packageList, final @NotNull String className,
+                                final @NotNull String methodName, final @Nullable TestCaseDto tc) {
+        try {
             final String relativePath = String.join("/", packageList) + "/" + className + ".java";
             final VirtualFile javaFile = sourceRoot.findFileByRelativePath(relativePath);
             if (javaFile == null) {

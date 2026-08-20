@@ -1,6 +1,5 @@
 package org.testin.codegen.clazz;
 
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +9,6 @@ import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 
-import java.io.IOException;
 import java.util.List;
 
 public class RemoveJavaClass implements GenAction {
@@ -26,20 +24,13 @@ public class RemoveJavaClass implements GenAction {
         final String className = fqcn.getLast();
         final String fileName = className + ".java";
 
-        WriteAction.run(() -> {
-            try {
-                final VirtualFile testSourceRoot = JavaSourceRoot.find(p);
-                if (testSourceRoot == null) return;
+        JavaSourceRoot.writeInRoot(p, "removing class", testSourceRoot -> {
+            final VirtualFile pkgDir = testSourceRoot.findFileByRelativePath(packagePath);
+            final VirtualFile classFile = pkgDir != null ? pkgDir.findChild(fileName) : null;
 
-                final VirtualFile pkgDir = testSourceRoot.findFileByRelativePath(packagePath);
-                final VirtualFile classFile = pkgDir != null ? pkgDir.findChild(fileName) : null;
-
-                if (classFile != null && classFile.exists()) {
-                    classFile.delete(this);
-                    Logger.info("Class removed physically at: " + classFile.getPath());
-                }
-            } catch (final IOException ex) {
-                Logger.info("Error removing class: " + ex.getMessage());
+            if (classFile != null && classFile.exists()) {
+                classFile.delete(this);
+                Logger.info("Class removed physically at: " + classFile.getPath());
             }
         });
     }

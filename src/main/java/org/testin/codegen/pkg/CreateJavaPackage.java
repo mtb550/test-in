@@ -1,6 +1,5 @@
 package org.testin.codegen.pkg;
 
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -11,7 +10,6 @@ import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 
-import java.io.IOException;
 import java.util.List;
 
 public class CreateJavaPackage implements GenAction {
@@ -21,23 +19,13 @@ public class CreateJavaPackage implements GenAction {
         if (!(obj instanceof DirectoryDto dir)) return;
         final List<String> fqcn = Fqcn.ofPackage(dir);
 
-        WriteAction.run(() -> {
-            try {
-                final VirtualFile testSourceRoot = JavaSourceRoot.findOrWarn(p);
-                if (testSourceRoot == null) {
-                    return;
-                }
-
-                final VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));
-                if (vf == null) {
-                    Logger.error("Could not create package directory: " + String.join("/", fqcn));
-                    return;
-                }
-                Logger.info("Package created physically at: " + vf.getPath());
-
-            } catch (final IOException ex) {
-                Logger.info("Error creating package: " + ex.getMessage());
+        JavaSourceRoot.writeInRootOrWarn(p, "creating package", testSourceRoot -> {
+            final VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, String.join("/", fqcn));
+            if (vf == null) {
+                Logger.error("Could not create package directory: " + String.join("/", fqcn));
+                return;
             }
+            Logger.info("Package created physically at: " + vf.getPath());
         });
     }
 }

@@ -1,6 +1,5 @@
 package org.testin.codegen.clazz;
 
-import com.intellij.openapi.application.WriteAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -11,7 +10,6 @@ import org.testin.codegen.JavaSourceRoot;
 import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
 
-import java.io.IOException;
 import java.util.List;
 
 public class CreateJavaClass implements GenAction {
@@ -28,38 +26,27 @@ public class CreateJavaClass implements GenAction {
 
         Logger.info("Ready to generate Test Class: " + className + " in package: " + fqcn);
 
-        WriteAction.run(() -> {
-            try {
-                final VirtualFile testSourceRoot = JavaSourceRoot.findOrWarn(p);
-                if (testSourceRoot == null) {
-                    Logger.info("Could not find Main Source Root in the project modules.");
-                    return;
-                }
-
-                final VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, path.replace(".", "/"));
-                if (vf == null) {
-                    Logger.error("Could not create package directory: " + path.replace(".", "/"));
-                    return;
-                }
-
-                final VirtualFile existingFile = vf.findChild(fileName);
-                if (existingFile != null) {
-                    Logger.info("File already exists: " + existingFile.getPath());
-                    return;
-                }
-
-                final VirtualFile javaFile = vf.createChildData(this, fileName);
-                final String fileContent = "package " + path + ";\n\n" +
-                        "public class " + className + " {\n" +
-                        "    \n" +
-                        "}\n";
-
-                VfsUtil.saveText(javaFile, fileContent);
-                Logger.info("Test Class created physically at: " + javaFile.getPath());
-
-            } catch (final IOException ex) {
-                Logger.info("Error creating test class: " + ex.getMessage());
+        JavaSourceRoot.writeInRootOrWarn(p, "creating test class", testSourceRoot -> {
+            final VirtualFile vf = VfsUtil.createDirectoryIfMissing(testSourceRoot, path.replace(".", "/"));
+            if (vf == null) {
+                Logger.error("Could not create package directory: " + path.replace(".", "/"));
+                return;
             }
+
+            final VirtualFile existingFile = vf.findChild(fileName);
+            if (existingFile != null) {
+                Logger.info("File already exists: " + existingFile.getPath());
+                return;
+            }
+
+            final VirtualFile javaFile = vf.createChildData(this, fileName);
+            final String fileContent = "package " + path + ";\n\n" +
+                    "public class " + className + " {\n" +
+                    "    \n" +
+                    "}\n";
+
+            VfsUtil.saveText(javaFile, fileContent);
+            Logger.info("Test Class created physically at: " + javaFile.getPath());
         });
     }
 }

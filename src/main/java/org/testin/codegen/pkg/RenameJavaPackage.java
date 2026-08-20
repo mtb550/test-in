@@ -29,12 +29,17 @@ public class RenameJavaPackage implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull DirectoryDto dir, final @NotNull String newName) {
 
         final List<String> fqcn = Fqcn.ofPackage(dir);
-        final VirtualFile testSourceRoot = JavaSourceRoot.find(p);
-        if (testSourceRoot == null) {
-            Logger.info("Could not find Test Source Root in the project modules.");
-            return;
-        }
 
+        JavaSourceRoot.find(p).ifPresentOrElse(
+                testSourceRoot -> renameUnder(p, testSourceRoot, fqcn, newName),
+                () -> Logger.info("Could not find Test Source Root in the project modules."));
+    }
+
+    /**
+     * The rename itself, once the source root is known.
+     */
+    private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot,
+                             final @NotNull List<String> fqcn, final @NotNull String newName) {
         final VirtualFile pkgDir = testSourceRoot.findFileByRelativePath(String.join("/", fqcn));
         if (pkgDir == null || !pkgDir.isDirectory()) {
             Logger.info("Package not found for rename: " + String.join(".", fqcn));
