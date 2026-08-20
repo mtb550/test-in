@@ -32,6 +32,7 @@ import org.testin.logger.Logger;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
+import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.services.Services;
 import org.testin.services.TestCaseCacheService;
 import org.testin.testcase.CreateTestCaseAction;
@@ -172,7 +173,7 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         mainPanel.add(statusBar, BorderLayout.SOUTH);
         StatusBarListener.attach(this);
 
-        new TestCaseExecutionSubscriber(p, list, projectDisposable);
+        new TestCaseExecutionSubscriber(p, projectDisposable, list::repaint);
 
         // List view is the default mode when the editor opens.
         onToolBarSwitchedToListView();

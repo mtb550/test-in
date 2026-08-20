@@ -10,6 +10,7 @@ import com.intellij.ui.content.Content;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.runner.TestCaseExecutionSubscriber;
 import org.testin.util.FontSync;
 import org.testin.view.bugs.OpenBugsTab;
 import org.testin.view.details.DetailsTab;
@@ -57,7 +58,7 @@ public class ViewPanel implements Disposable {
 
         refreshCurrentView();
 
-        new ViewPanelExecutionSubscriber(p, this);
+        new TestCaseExecutionSubscriber(p, this, this::refreshCurrentView);
     }
 
     private @NotNull JBScrollPane createScrollPane(final @NotNull Component view) {
