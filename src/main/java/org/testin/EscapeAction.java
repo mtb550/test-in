@@ -107,12 +107,13 @@ public class EscapeAction extends AbstractProjectAction {
      * True when the view panel was open and has been hidden by this ESC.
      */
     private boolean hideViewPanelIfVisible() {
-        final ToolWindow toolWindow = ViewToolWindowFactory.getToolWindow(p);
-        if (toolWindow != null && toolWindow.isVisible()) {
-            toolWindow.hide(null);
-            return true;
-        }
-        return false;
+        return ViewToolWindowFactory.toolWindow(p)
+                .filter(ToolWindow::isVisible)
+                .map(toolWindow -> {
+                    toolWindow.hide(null);
+                    return true;
+                })
+                .orElse(false);
     }
 
     @Override

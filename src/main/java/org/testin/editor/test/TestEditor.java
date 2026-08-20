@@ -38,7 +38,6 @@ import org.testin.testcase.CreateTestCaseAction;
 import org.testin.testcase.TestCaseOrder;
 import org.testin.util.FontSync;
 import org.testin.view.GridViewDetailsAction;
-import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
@@ -648,11 +647,10 @@ public class TestEditor implements Disposable, Toolbar, TestinEditor {
         toolBar.dispose();
         statusBar.dispose();
 
-        final TestCaseDto selectedInThisFile = list.getSelectedValue();
-
-        final ViewPanel viewer = ViewToolWindowFactory.getViewPanel();
-        if (viewer != null)
-            viewer.hide(selectedInThisFile);
+        // Swing answers null when the editor is closing with nothing selected,
+        // and then there is no case whose view panel needs closing.
+        Optional.ofNullable(list.getSelectedValue()).ifPresent(selectedInThisFile ->
+                ViewToolWindowFactory.panel().ifPresent(viewer -> viewer.hide(selectedInThisFile)));
 
         allTestCases.clear();
         currentTestCases.clear();

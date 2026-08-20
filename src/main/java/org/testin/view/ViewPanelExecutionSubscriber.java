@@ -3,7 +3,6 @@ package org.testin.view;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.logger.Logger;
 import org.testin.model.RunStatus;
@@ -12,6 +11,7 @@ import org.testin.runner.TestCaseExecutionListener;
 import org.testin.services.Services;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +20,11 @@ public class ViewPanelExecutionSubscriber {
     // Written from the TestNG runner thread and read from the EDT.
     private final @NotNull Map<String, UUID> uuidToDtoId = new ConcurrentHashMap<>();
     private final @NotNull ProjectIndexer indexer;
-    private volatile @Nullable UUID runningDtoId = null;
+    /**
+     * The case the runner is on, empty until one reports itself. Volatile: it is
+     * written from the TestNG thread and read from the EDT.
+     */
+    private volatile @NotNull Optional<UUID> runningDtoId = Optional.empty();
 
     public ViewPanelExecutionSubscriber(final @NotNull Project p, final @NotNull ViewPanel viewPanel) {
         this.indexer = Services.getInstance(p, ProjectIndexer.class);
@@ -30,40 +34,36 @@ public class ViewPanelExecutionSubscriber {
             public void onStatusChanged(final @NotNull String testName, final @NotNull RunStatus status, final String error) {
                 Logger.debug("ViewPanel subscription fired: testName='" + testName + "', status='" + status + "'");
 
-                boolean updated = false;
+                final String reported = Objects.toString(error, "");
 
-                final UUID testUuid = parseUuid(testName);
-                if (testUuid != null) {
-                    final Optional<TestCaseDto> found = indexer.findTestCase(testUuid);
+                final Optional<TestCaseDto> byId = parseUuid(testName).flatMap(indexer::findTestCase);
 
+                byId.ifPresent(tc -> {
+                    Logger.debug("  ID match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
+                    tc.setTempStatus(status);
+                    tc.setTempError(reported);
+                    runningDtoId = Optional.of(tc.getId());
+                });
+
+                final Optional<TestCaseDto> found = byId.isPresent()
+                        ? byId
+                        : Optional.ofNullable(uuidToDtoId.get(testName)).flatMap(indexer::findTestCase);
+
+                if (byId.isEmpty()) {
                     found.ifPresent(tc -> {
-                        Logger.debug("  ID match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
+                        Logger.debug("  UUID map match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
                         tc.setTempStatus(status);
-                        tc.setTempError(error == null ? "" : error);
-                        runningDtoId = tc.getId();
+                        tc.setTempError(reported);
                     });
-                    updated = found.isPresent();
                 }
 
-                if (!updated) {
-                    final UUID dtoId = uuidToDtoId.get(testName);
-                    if (dtoId != null) {
-                        final Optional<TestCaseDto> found = indexer.findTestCase(dtoId);
-
-                        found.ifPresent(tc -> {
-                            Logger.debug("  UUID map match! desc='" + tc.getDescription() + "', setting tempStatus='" + status + "'");
-                            tc.setTempStatus(status);
-                            tc.setTempError(error == null ? "" : error);
-                        });
-                        updated = found.isPresent();
-                    }
-                }
+                final boolean updated = found.isPresent();
 
                 // Snapshotted: the field is volatile, so re-reading it after the
                 // check could see a different value.
-                final UUID runningId = runningDtoId;
-                if (!updated && status == RunStatus.RUNNING && runningId != null && !uuidToDtoId.containsKey(testName)) {
-                    indexer.findTestCase(runningId).ifPresent(tc -> {
+                final Optional<UUID> runningId = runningDtoId;
+                if (!updated && status == RunStatus.RUNNING && !uuidToDtoId.containsKey(testName)) {
+                    runningId.flatMap(indexer::findTestCase).ifPresent(tc -> {
                         Logger.debug("  Mapping UUID='" + testName + "' -> DTO id='" + tc.getId() + "' desc='" + tc.getDescription() + "'");
                         uuidToDtoId.put(testName, tc.getId());
                     });
@@ -75,11 +75,14 @@ public class ViewPanelExecutionSubscriber {
                     ApplicationManager.getApplication().invokeLater(viewPanel::refreshCurrentView);
             }
 
-            private @Nullable UUID parseUuid(final @NotNull String s) {
+            /**
+             * The test name as an id, when that is what it is.
+             */
+            private @NotNull Optional<UUID> parseUuid(final @NotNull String s) {
                 try {
-                    return UUID.fromString(s);
-                } catch (final IllegalArgumentException ex) {
-                    return null;
+                    return Optional.of(UUID.fromString(s));
+                } catch (final IllegalArgumentException notAnId) {
+                    return Optional.empty();
                 }
             }
         });

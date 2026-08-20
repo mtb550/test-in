@@ -15,7 +15,6 @@ import org.testin.view.ViewToolWindowFactory;
 import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.Optional;
 
 @AllArgsConstructor
 public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor {
@@ -82,8 +81,8 @@ public class UnifiedFileEditor extends UserDataHolderBase implements FileEditor 
     public void selectNotify() {
         final List<TestCaseDto> selected = editor.getSelectedTestCases();
 
-        Optional.ofNullable(ViewToolWindowFactory.getToolWindow(p))
-                .map(tw -> ViewToolWindowFactory.getViewPanel())
+        ViewToolWindowFactory.toolWindow(p)
+                .flatMap(tw -> ViewToolWindowFactory.panel())
                 .ifPresent(viewer -> {
 
                     if (!selected.isEmpty())

@@ -12,7 +12,6 @@ import com.intellij.ui.components.JBScrollPane;
 import com.intellij.util.ui.JBFont;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.TestEditorAttributes;
 import org.testin.model.dto.TestCaseDto;
@@ -24,15 +23,15 @@ import org.testin.testcase.create.TestCaseUpdateMenuDialog;
 import org.testin.util.Display;
 import org.testin.util.FontSync;
 import org.testin.util.Shortcuts;
-import org.testin.view.ViewPanel;
 import org.testin.view.ViewToolWindowFactory;
 import org.testin.view.details.components.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Optional;
 import java.util.List;
+import java.util.Objects;
 
 public class DetailsTab {
 
@@ -44,32 +43,36 @@ public class DetailsTab {
     final double WEIGHT_X = 1.0;
     final double SPACER_WEIGHT_Y = 1.0;
 
-    public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab, final @Nullable TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    public void load(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab,
+                     final @NotNull Optional<TestCaseDto> dto, final @NotNull List<String> currentPath) {
         detailsTab.removeAll();
         detailsTab.setLayout(new BorderLayout());
         detailsTab.setBorder(BorderFactory.createEmptyBorder());
 
-        if (dto == null) {
-            renderPlaceholder(detailsTab);
-        } else {
-            final JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
-            contentPanel.setOpaque(false);
-
-            renderStoneLayout(p, contentPanel, dto, currentPath);
-
-            final JBScrollPane scrollPane = new JBScrollPane(contentPanel);
-            scrollPane.setBorder(null);
-            scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
-
-            FontSync.attachWheelZoom(p, contentPanel);
-
-            detailsTab.add(scrollPane, BorderLayout.CENTER);
-
-            registerEditShortcutOnce(p, detailsTab);
-        }
+        dto.ifPresentOrElse(
+                testCase -> renderCase(p, detailsTab, testCase, currentPath),
+                () -> renderPlaceholder(detailsTab));
 
         detailsTab.revalidate();
         detailsTab.repaint();
+    }
+
+    private void renderCase(final @NotNull Project p, final @NotNull JBPanel<?> detailsTab,
+                            final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
+        final JBPanel<?> contentPanel = new JBPanel<>(new GridBagLayout());
+        contentPanel.setOpaque(false);
+
+        renderStoneLayout(p, contentPanel, dto, currentPath);
+
+        final JBScrollPane scrollPane = new JBScrollPane(contentPanel);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_UNIT_INCREMENT);
+
+        FontSync.attachWheelZoom(p, contentPanel);
+
+        detailsTab.add(scrollPane, BorderLayout.CENTER);
+
+        registerEditShortcutOnce(p, detailsTab);
     }
 
     private void renderPlaceholder(final @NotNull JBPanel<?> panel) {
@@ -81,7 +84,7 @@ public class DetailsTab {
         panel.add(placeholder, BorderLayout.NORTH);
     }
 
-    private void renderStoneLayout(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    private void renderStoneLayout(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         final GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = JBUI.insets(INSETS_DEFAULT);
         gbc.anchor = GridBagConstraints.NORTHWEST;
@@ -96,7 +99,7 @@ public class DetailsTab {
      * Rows shown in the details panel, in display order. Rows with custom rendering
      * are dedicated components; plain label/value rows are table-driven.
      */
-    private @NotNull List<BaseDetails> detailRows(final @Nullable ArrayList<String> currentPath) {
+    private @NotNull List<BaseDetails> detailRows(final @NotNull List<String> currentPath) {
         return List.of(
                 new NavigationBar(currentPath),
                 new Id(),
@@ -122,7 +125,7 @@ public class DetailsTab {
         );
     }
 
-    private int setupFixedRows(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    private int setupFixedRows(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         int row = 0;
         for (final BaseDetails component : detailRows(currentPath)) {
             row = component.render(p, panel, (GridBagConstraints) gbc.clone(), dto, row);
@@ -146,14 +149,8 @@ public class DetailsTab {
         new DumbAwareAction() {
             @Override
             public void actionPerformed(final @NotNull AnActionEvent e) {
-                final ViewPanel viewPanel = ViewToolWindowFactory.getViewPanel();
-                if (viewPanel == null) return;
-
-                final TestCaseDto currentDto = viewPanel.getCurrentTestCaseDto();
-                if (currentDto == null) return;
-
-                final ArrayList<String> path = viewPanel.getPage().getCurrentPath();
-                openUpdateMenu(p, currentDto, path);
+                ViewToolWindowFactory.panel().ifPresent(viewPanel -> viewPanel.getCurrentTestCase()
+                        .ifPresent(currentDto -> openUpdateMenu(p, currentDto, viewPanel.getPage().getCurrentPath())));
             }
 
             @Override
@@ -164,18 +161,14 @@ public class DetailsTab {
         }.registerCustomShortcutSet(Shortcuts.UpdateItem.getCustomShortcut(), detailsTab);
     }
 
-    private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    private void openUpdateMenu(final @NotNull Project p, final @NotNull TestCaseDto dto, final @NotNull List<String> currentPath) {
         final List<TestCaseDto> items = List.of(dto);
 
         new TestCaseUpdateMenuDialog(p, items, (tcs, gt) -> {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
-            final Path editPath = resolveEditPath(p, dto, currentPath);
 
-            if (editPath != null) {
-                for (final TestCaseDto tc : tcs) {
-                    indexer.putTestCase(editPath, tc);
-                }
-            }
+            resolveEditPath(p, dto, currentPath).ifPresent(editPath ->
+                    tcs.forEach(tc -> indexer.putTestCase(editPath, tc)));
 
             Services.getInstance(p, Notifier.class).softShow(p, "Updated");
 
@@ -183,27 +176,31 @@ public class DetailsTab {
         }).show();
     }
 
-    @Nullable
-    private Path resolveEditPath(final @NotNull Project p, final @NotNull TestCaseDto dto, final @Nullable ArrayList<String> currentPath) {
+    /**
+     * Where an update writes: the case's own parent when it has one, otherwise
+     * the test set the navigation path names. Empty when neither says - a case
+     * shown from a search result, with no path and no parent read yet.
+     */
+    private @NotNull Optional<Path> resolveEditPath(final @NotNull Project p, final @NotNull TestCaseDto dto,
+                                                    final @NotNull List<String> currentPath) {
         final DirectoryDto parent = dto.getParent();
         if (!parent.getPath().toString().isEmpty()) {
-            return parent.getPath();
+            return Optional.of(parent.getPath());
         }
 
-        if (currentPath != null && !currentPath.isEmpty()) {
-            Path root = Services.getInstance(p, TestinRoot.class).getPath();
-            if (root.toString().isEmpty()) {
-                root = Path.of(p.getBasePath() != null ? p.getBasePath() : "");
-            }
+        if (currentPath.isEmpty()) return Optional.empty();
 
-            Path resolved = root.isAbsolute() ? root : Path.of(p.getBasePath() != null ? p.getBasePath() : "").resolve(root);
-            for (final String segment : currentPath) {
-                resolved = resolved.resolve(segment);
-            }
+        // The platform answers null for a project with no directory of its own.
+        final Path basePath = Path.of(Objects.toString(p.getBasePath(), ""));
 
-            return Services.getInstance(p, ProjectIndexer.class).getTestSetByPath(resolved).getPath();
+        Path root = Services.getInstance(p, TestinRoot.class).getPath();
+        if (root.toString().isEmpty()) root = basePath;
+
+        Path resolved = root.isAbsolute() ? root : basePath.resolve(root);
+        for (final String segment : currentPath) {
+            resolved = resolved.resolve(segment);
         }
 
-        return null;
+        return Optional.of(Services.getInstance(p, ProjectIndexer.class).getTestSetByPath(resolved).getPath());
     }
 }

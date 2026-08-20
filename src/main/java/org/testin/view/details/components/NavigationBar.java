@@ -8,7 +8,6 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.model.dto.dirs.TestSetDirectoryDto;
@@ -22,7 +21,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,7 +40,11 @@ public class NavigationBar extends BaseDetails {
     final int GBC_INSETS_BOTTOM = 0;
     final int GBC_INSETS_RIGHT = 16;
 
-    private final @Nullable ArrayList<String> currentPath;
+    /**
+     * The folders above the case, and empty when the caller had none to give -
+     * the bar then draws the test set alone.
+     */
+    private final @NotNull List<String> currentPath;
 
     @Override
     public int render(final @NotNull Project p, final @NotNull JBPanel<?> panel, final @NotNull GridBagConstraints gbc, final @NotNull TestCaseDto dto, final int currentRow) {
@@ -50,7 +53,7 @@ public class NavigationBar extends BaseDetails {
 
         final float navFontSize = Math.max(8.0f, FontSync.getBaseFontSize() - 1.0f);
 
-        if (currentPath != null) {
+        {
             for (int i = 0; i < currentPath.size(); i++) {
 
                 final String labelText = currentPath.get(i);

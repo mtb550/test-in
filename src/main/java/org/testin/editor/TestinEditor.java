@@ -12,7 +12,6 @@ import org.testin.view.ViewToolWindowFactory;
 
 import javax.swing.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 public interface TestinEditor extends Disposable {
@@ -103,6 +102,6 @@ public interface TestinEditor extends Disposable {
     void setHoveredIndex(final int index);
 
     default void dispose() {
-        Optional.ofNullable(ViewToolWindowFactory.getViewPanel()).ifPresent(ViewPanel::reset);
+        ViewToolWindowFactory.panel().ifPresent(ViewPanel::reset);
     }
 }
