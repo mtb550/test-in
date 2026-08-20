@@ -110,7 +110,7 @@ public final class TestRunWordGenerator {
 
                 addText(doc, String.format(
                         "This run holds %d test cases, of which %d were executed. Of those, %d%% passed. The results below summarize the outcome.",
-                        summary.total(), summary.executed(), summary.passRate()), 11, false, BLACK, null, 12);
+                        summary.total(), summary.executed(), summary.passRate()), 11, false, BLACK, NO_BORDER, 12);
 
                 // Seven tiles when the run has removed cases, six otherwise:
                 // the total counts them, so without a tile of their own the

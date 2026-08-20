@@ -68,8 +68,9 @@ public class RemoveAction extends AbstractProjectTreeAction {
                 : "Remove these " + nodesToRemove.size() + " items?")
                 + (holds.isEmpty() ? "" : System.lineSeparator() + holds);
 
-        // Single node: its path shows exactly what is being deleted.
-        final String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : null;
+        // Single node: its path shows exactly what is being deleted. Several, and
+        // there is no one path to show, which the dialog reads as no From row.
+        final String from = nodesToRemove.size() == 1 ? nodesToRemove.getFirst().getPath().toString() : "";
         new ConfirmDialog(p, "Confirm Removing", msg, from, "", "Remove", () -> removeNodes(nodesToRemove)).show();
     }
 

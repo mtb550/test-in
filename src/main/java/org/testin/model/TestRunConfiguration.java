@@ -63,9 +63,6 @@ public enum TestRunConfiguration {
     private final @NotNull Icon icon;
 
     /**
-     * Null for free-text fields; set only by those offering a fixed choice.
-     */
-    /**
      * A field with nothing to pick from: a line to type in.
      * <p>
      * In a holder because an enum constant cannot name a static field of its own

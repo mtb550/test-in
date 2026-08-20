@@ -62,9 +62,6 @@ public enum TestRunStatus {
     private final @NotNull String label;
 
     /**
-     * Null for the statuses the tester cannot set directly from the keyboard.
-     */
-    /**
      * The key that moves a run to this status, and {@link Shortcuts#NO_KEY} for
      * the statuses no key reaches.
      */

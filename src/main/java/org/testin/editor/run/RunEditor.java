@@ -267,11 +267,9 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
                     // the remembered test case onto a different page.
                     jumpToPageOfPendingSelection();
 
-                    if (list != null) {
-                        list.setPaintBusy(false);
-                        if (allTestCases.isEmpty()) {
-                            list.getEmptyText().setText("No test cases found in this run.");
-                        }
+                    list.setPaintBusy(false);
+                    if (allTestCases.isEmpty()) {
+                        list.getEmptyText().setText("No test cases found in this run.");
                     }
                     // Also the first paint's answer: Stop starts hidden because a run
                     // that has just loaded is not executing.
@@ -281,10 +279,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             } catch (final Exception ex) {
                 Logger.error("Failed to load Test Run data from disk: " + ex.getMessage());
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    if (list != null) {
-                        list.setPaintBusy(false);
-                        list.getEmptyText().setText("Unable to load this test run.");
-                    }
+                    list.setPaintBusy(false);
+                    list.getEmptyText().setText("Unable to load this test run.");
                 });
             }
         });
@@ -300,7 +296,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void onToolBarSearchFocusReleased() {
-        if (list != null) list.requestFocusInWindow();
+        list.requestFocusInWindow();
     }
 
     @Override
@@ -402,13 +398,10 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         this.tr = null;
 
-        if (this.model != null)
-            this.model.removeAll();
+        this.model.removeAll();
 
-        if (this.list != null) {
-            this.list.setPaintBusy(true);
-            this.list.getEmptyText().setText("Refreshing...");
-        }
+        this.list.setPaintBusy(true);
+        this.list.getEmptyText().setText("Refreshing...");
 
         loadDataAsync();
     }
@@ -595,16 +588,15 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
         Disposer.dispose(projectDisposable);
 
         executionTimer.dispose();
-        if (list != null)
-            for (final MouseListener listener : list.getMouseListeners())
-                list.removeMouseListener(listener);
+        for (final MouseListener listener : list.getMouseListeners())
+            list.removeMouseListener(listener);
 
         toolBar.dispose();
         statusBar.dispose();
 
         allTestCases.clear();
         resultsMap.clear();
-        if (model != null) model.removeAll();
+        model.removeAll();
         mainPanel.removeAll();
         TestinEditor.super.dispose();
 
@@ -614,7 +606,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public @Nullable JComponent getPreferredFocusedComponent() {
-        return list != null ? list : mainPanel;
+        return list;
     }
 
     public @NotNull JComponent getComponent() {
@@ -627,10 +619,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void selectTestCase(final @NotNull TestCaseDto tc) {
-        if (tc == null) return;
-
         final int index = currentTestCases.indexOf(tc);
-        if (index < 0 || list == null) return;
+        if (index < 0) return;
 
         final int targetPage = (index / Math.max(1, pageSize)) + 1;
         final int localIndex = index % Math.max(1, pageSize);
@@ -644,7 +634,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     private void selectVisibleIndex(final int index) {
-        if (list == null || index < 0 || index >= list.getModel().getSize()) return;
+        if (index < 0 || index >= list.getModel().getSize()) return;
         list.setSelectedIndex(index);
         list.ensureIndexIsVisible(index);
         list.requestFocusInWindow();
@@ -652,15 +642,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public @NotNull List<TestCaseDto> getSelectedTestCases() {
-        return list != null ? list.getSelectedValuesList() : Collections.emptyList();
+        return list.getSelectedValuesList();
     }
 
     public void startTimerForIndex(final int globalIndex) {
         if (globalIndex >= currentTestCases.size()) {
-            final JBList<TestCaseDto> currentList = list;
-            if (currentList == null) return;
-
-            new UpdateTestRunStatusAction(p, this, currentList).onExecutionFinished(this);
+            new UpdateTestRunStatusAction(p, this, list).onExecutionFinished(this);
             return;
         }
 
@@ -674,10 +661,8 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
         final int localIndex = globalIndex - ((currentPage - 1) * pageSize);
 
-        if (list != null) {
-            list.setSelectedIndex(localIndex);
-            list.ensureIndexIsVisible(localIndex);
-        }
+        list.setSelectedIndex(localIndex);
+        list.ensureIndexIsVisible(localIndex);
 
         final TestCaseDto currentTc = currentTestCases.get(globalIndex);
         final TestRunItems runItem = resultsMap.get(currentTc.getId());
@@ -701,7 +686,7 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
             // Only when the case is on the page being viewed: contentsChanged
             // fires with index -1 for one that is not, which invalidates the
             // layout of the whole list once a second for a row nobody can see.
-            if (model != null && model.contains(currentTc)) model.contentsChanged(currentTc);
+            if (model.contains(currentTc)) model.contentsChanged(currentTc);
             showExecutionTotal();
         });
     }
@@ -797,13 +782,12 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
 
     @Override
     public void onStartExecutionClicked() {
-        final JBList<TestCaseDto> currentList = list;
-        final TestRunDto run = tr;
-        if (currentList == null || run == null) return;
+        final Optional<TestRunDto> run = run();
+        if (run.isEmpty()) return;
 
         // Before the status change, which is what persists the run.
-        run.markExecutionStarted();
-        new UpdateTestRunStatusAction(p, this, currentList).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
+        run.get().markExecutionStarted();
+        new UpdateTestRunStatusAction(p, this, list).applyStatusChange(this, TestRunStatus.IN_PROGRESS);
         startTimerForIndex(firstPendingIndex());
         refreshExecutionButtons();
     }
@@ -835,13 +819,17 @@ public class RunEditor implements Disposable, Toolbar, TestinEditor {
     }
 
     /**
-     * The tester's own stop. The confirmation lives here rather than in
-     * {@link #stopExecution()} because that runs on four internal paths - the last
-     * verdict, a bulk apply, the run completing - where nobody pressed anything.
+     * The tester's own stop, and the only one that reaches the test runner.
+     * <p>
+     * {@link #stopExecution()} runs on four internal paths - the last verdict, a
+     * bulk apply, the run completing - where nobody pressed anything and a test
+     * that is running is running legitimately. Killing it there would end a run
+     * the tester never asked to end.
      */
     @Override
     public void onStopExecutionClicked() {
         stopExecution();
+
         // The other stop paths persist as part of the verdict or status change they
         // belong to; this one is the tester's alone, so it writes the run itself -
         // the case duration ticked so far and the end stamp would otherwise live only

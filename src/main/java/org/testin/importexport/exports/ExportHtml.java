@@ -133,8 +133,6 @@ public class ExportHtml {
     }
 
     private @NotNull String htmlEscape(final @NotNull String value) {
-        if (value == null) return "";
-
         final StringBuilder sb = new StringBuilder(value.length());
         for (int i = 0; i < value.length(); i++) {
             final char c = value.charAt(i);

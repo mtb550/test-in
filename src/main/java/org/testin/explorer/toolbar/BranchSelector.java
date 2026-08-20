@@ -32,9 +32,6 @@ public class BranchSelector {
     private final @NotNull DefaultComboBoxModel<String> model;
 
     /**
-     * Null while no project is selected, or the selected one has no path.
-     */
-    /**
      * The repository this box is showing branches of, and the empty path while
      * there is none - the same "nothing configured" the Testin root uses, so
      * there is one shape of absence rather than two (#71).

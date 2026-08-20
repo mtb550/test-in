@@ -197,10 +197,15 @@ public final class EditorUtil {
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
             for (final String entry : entries) {
-                final DirectoryDto dir = indexer.find(Path.of(entry)).orElse(null);
-                Logger.debug("restoring editor for '" + entry + "' -> " + (dir != null ? "found" : "not indexed"));
-
-                openIfNotOpen(p, dir);
+                // A remembered editor whose node is not there any more is not
+                // reopened: the path was written last time the project closed and
+                // the node may have been removed since.
+                indexer.find(Path.of(entry)).ifPresentOrElse(
+                        dir -> {
+                            Logger.debug("restoring editor for '" + entry + "' -> found");
+                            openIfNotOpen(p, dir);
+                        },
+                        () -> Logger.debug("restoring editor for '" + entry + "' -> not indexed"));
             }
 
             PropertiesComponent.getInstance(p).setValue(OPEN_EDITORS_KEY, null);

@@ -110,13 +110,11 @@ public enum CreateTestCaseFields implements StatusBarItem {
 
     private final @NotNull String name;
     /**
-     * Null for a section with no key of its own. Only the sections in
-     * {@link #JUMP_KEYS} have their key advertised in the status bar, so a
-     * binding outside that list was one nobody could discover.
-     */
-    /**
      * The key that jumps to this field, and {@link Shortcuts#EMPTY} for the
      * fields no key reaches.
+     * <p>
+     * Only the fields in {@link #JUMP_KEYS} have their key advertised in the
+     * status bar, so a binding outside that list is one nobody could discover.
      */
     private final @NotNull Shortcuts shortcut;
     private final @NotNull Icon icon;

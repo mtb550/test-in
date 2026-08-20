@@ -49,7 +49,7 @@ public final class RunStatusService {
 
         // Only when a verdict was actually recorded: a missing run item leaves
         // the status exactly as it was.
-        if (item != null) confirmVerdict(p, status, 1);
+        item.ifPresent(recorded -> confirmVerdict(p, status, 1));
 
         ApplicationManager.getApplication().invokeLater(() -> {
             final UUID currentId = currentTc.getId();
