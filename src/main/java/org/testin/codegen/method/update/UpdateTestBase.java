@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
+import org.testin.notifications.Notifier;
+import org.testin.services.Services;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -105,10 +107,44 @@ public class UpdateTestBase {
         }, () -> Logger.warn("Update: method has no @Test annotation"));
     }
 
-    // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
-    // its @Test method by testName, then apply the specific update inside a write command action.
+    /**
+     * The edit was saved and no code changed, because there is no generated
+     * method to change.
+     * <p>
+     * Said out loud rather than written to the log and forgotten. The tester
+     * watched the case change in the editor and has no other way to learn that
+     * the code did not follow - it happened five times in one log before anybody
+     * noticed (#66, finding 19).
+     */
+    private void noCodeToUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String detail) {
+        Logger.warn("Update: " + detail);
+
+        Services.getInstance(p, Notifier.class).softShowNoGeneratedCode(p, tc.getDescription());
+    }
+
+    /**
+     * Applies a change to the case's generated method, and says so when there is
+     * none to change.
+     */
     protected void applyUpdate(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
                                final @NotNull Consumer<PsiMethod> updater) {
+        applyToMethod(p, tc, title, updater, detail -> noCodeToUpdate(p, tc, detail));
+    }
+
+    /**
+     * The same, for removing the method: one that is not there needs no
+     * removing, so nothing is said. A balloon reading "has no generated code
+     * yet" while the tester deletes a case is a balloon about nothing.
+     */
+    protected void applyRemoval(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
+                                final @NotNull Consumer<PsiMethod> updater) {
+        applyToMethod(p, tc, title, updater, detail -> Logger.debug("Remove: " + detail + ", so nothing to remove"));
+    }
+
+    // Shared boilerplate for all update actions: resolve the FQCN, locate the target class and
+    // its @Test method by testName, then apply the specific update inside a write command action.
+    private void applyToMethod(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull String title,
+                               final @NotNull Consumer<PsiMethod> updater, final @NotNull Consumer<String> onMissing) {
         final List<String> fqcn = Fqcn.ofMethod(tc);
         if (fqcn.size() < 2) return;
         final String path = String.join(".", fqcn.subList(0, fqcn.size() - 1));
@@ -117,11 +153,12 @@ public class UpdateTestBase {
                 WriteCommandAction.runWriteCommandAction(p, title, null, () -> {
                     final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p));
                     if (targetClass == null) {
-                        Logger.warn("Update: class not found: " + path);
+                        onMissing.accept("class not found: " + path);
                         return;
                     }
+
                     findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
-                            () -> Logger.warn("Update: no method found with testName=" + tc.getId()));
+                            () -> onMissing.accept("no method with testName=" + tc.getId()));
                 }));
     }
 }

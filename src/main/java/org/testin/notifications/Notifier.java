@@ -47,6 +47,22 @@ public final class Notifier {
     }
 
     /**
+     * The tester acted on a test case that has no generated method.
+     * <p>
+     * One sentence for one situation, whichever action they reached it through -
+     * running the case, or editing it and expecting the code to follow. Both used
+     * to give up in silence, each in its own way: the runner ran whatever else
+     * the class held, and an edit changed the case and left the code alone (#34,
+     * #66 finding 19).
+     * <p>
+     * It fades rather than going in the log: it is feedback on what they just
+     * did, and the remedy - generate the code - is a keystroke away.
+     */
+    public void softShowNoGeneratedCode(final @NotNull Project p, final @NotNull String testCase) {
+        softShow(p, testCase + " has no generated code yet");
+    }
+
+    /**
      * Confirms an operation that ran over a selection: "Node copied" for one,
      * "Nodes copied 3" for several. Here rather than at the call sites so that
      * every bulk action pluralizes and counts the same way (#62).

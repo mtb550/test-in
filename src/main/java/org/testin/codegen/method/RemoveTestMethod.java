@@ -13,7 +13,7 @@ public class RemoveTestMethod extends UpdateTestBase implements GenAction {
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
-        applyUpdate(p, tc, "Remove Test Method", pm -> {
+        applyRemoval(p, tc, "Remove Test Method", pm -> {
             final String name = pm.getName();
             pm.delete();
             Logger.info("Removed test method: " + name);

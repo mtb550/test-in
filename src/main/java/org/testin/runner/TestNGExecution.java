@@ -134,23 +134,21 @@ public final class TestNGExecution {
     }
 
     /**
-     * A case that was asked for is not going to run, and why.
+     * A case that was asked for has no generated method to run.
      * <p>
-     * Every path that gives up between the click and the launch comes through
-     * here rather than logging and returning. The card is already showing
-     * Running by the time any of them is reached - it is marked at the click, a
-     * second before the launch - so one that quietly returned left the case
-     * looking like it was running for the rest of the session.
-     *
-     * @param reason a sentence for the tester, not a diagnostic
+     * Both paths that discover this come through here rather than logging and
+     * returning. The card is already showing Running by the time either is
+     * reached - it is marked at the click, a second before the launch - so one
+     * that quietly returned left the case looking like it was running for the
+     * rest of the session.
      */
-    public void notStarting(final @NotNull TestCaseDto tc, final @NotNull String reason) {
+    public void noGeneratedCode(final @NotNull TestCaseDto tc) {
         pending.remove(tc);
 
-        Logger.warn("Not running '" + tc.getDescription() + "': " + reason);
+        Logger.warn("Not running '" + tc.getDescription() + "': it has no generated code");
         TestCaseExecutionListener.broadcast(p, key(tc), RunStatus.IDLE, "");
 
-        Services.getInstance(p, Notifier.class).softShow(p, reason);
+        Services.getInstance(p, Notifier.class).softShowNoGeneratedCode(p, tc.getDescription());
     }
 
     /**
