@@ -159,3 +159,19 @@ be committed back into storage.
   `compileOnly` + `annotationProcessor`, never `implementation`).
 - Verify with `./gradlew compileJava test` before presenting changes; do not
   commit until Muteb has sandbox-tested (`./gradlew runIde`) and approved.
+- **A green build is not evidence of a working plugin.** `@NotNull` is not a
+  compile-time contract: javac ignores it, and the IDE's instrumenter rewrites
+  it into a throw that exists only inside a running IDE. `return null` from a
+  method declared to return `Optional` compiles. A null literal passed to a
+  `@NotNull` parameter compiles. Both throw in front of the tester.
+- **So run `pwsh tools/inspect.ps1` before offering a change for a sandbox
+  test**, whenever it touched nullability, annotations, or many files at once.
+  It costs one indexing pass, 10-20 minutes, which makes it a sweep gate and
+  not a per-commit one. Drive `DataFlowIssue` and `ReturnNull` to zero; every
+  other survivor needs a reason written beside it. Run after the last edit, on
+  a still tree: editing a file while the inspector is reading it produces
+  findings about a version that no longer exists, which reads exactly like a
+  real defect.
+- The report lands in `.inspection/`, deliberately outside `build/` so
+  `./gradlew clean` does not delete the list you are working from. Start with
+  `summary.txt` for the counts and `findings.txt` for the lines.
