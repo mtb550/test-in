@@ -11,7 +11,6 @@ import org.testin.model.TestRunItems;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.Optional;
 
 public class RunCard extends BaseCard {
     private final @NotNull Project p;

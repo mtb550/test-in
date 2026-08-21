@@ -14,7 +14,6 @@ import java.awt.*;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 
 /**

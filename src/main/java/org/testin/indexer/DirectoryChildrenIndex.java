@@ -3,9 +3,10 @@ package org.testin.indexer;
 import org.jetbrains.annotations.NotNull;
 import org.testin.model.dto.dirs.DirectoryDto;
 
+import org.testin.model.markers.Marker;
+
 import java.nio.file.Path;
 import java.util.*;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 

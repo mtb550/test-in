@@ -15,7 +15,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.util.*;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * The dialog framework shell (issue #11). A concrete dialog assigns the

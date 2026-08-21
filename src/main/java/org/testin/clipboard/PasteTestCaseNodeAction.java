@@ -44,7 +44,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        List<TestCaseDto> pastedCases = getFromClipboard(p);
+        final @NotNull List<TestCaseDto> pastedCases = getFromClipboard();
         if (pastedCases.isEmpty()) return;
 
         ApplicationManager.getApplication().invokeLater(() -> {
@@ -113,7 +113,7 @@ public class PasteTestCaseNodeAction extends AbstractProjectAction {
         return !readTestCases(contents).isEmpty();
     }
 
-    private @NotNull List<TestCaseDto> getFromClipboard(final @NotNull Project p) {
+    private @NotNull List<TestCaseDto> getFromClipboard() {
         return ClipboardContents.withFlavor(DataFlavor.stringFlavor)
                 .map(this::readTestCases)
                 .orElseGet(List::of);
