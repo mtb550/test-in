@@ -93,7 +93,16 @@ be committed back into storage.
 - `final` on parameters and locals wherever possible.
 - Nullability: org.jetbrains `@NotNull`/`@Nullable` everywhere; Lombok
   `@NonNull` only on DTO/marker fields (it generates runtime checks there).
-  Never jspecify.
+  Never jspecify. Locals carry `final @NotNull` too, wherever the value they
+  are assigned is one.
+- **`Optional` is how a field says "not set yet", and a parameter says
+  "possibly nothing".** A popup built on first show, a service the application
+  has not started, a run an editor has not loaded: each holds an empty Optional
+  rather than a null, so no reader has to test for one. The
+  `OptionalUsedAsFieldOrParameterType` inspection is switched off in
+  `.idea/inspectionProfiles/Testin.xml` for exactly this reason — what it argues
+  for instead is a nullable field, which is the thing the codebase spent a sweep
+  removing. Turning it back on means reversing that decision, not tidying up.
 - Node behavior is declared on the node: capability flags on `DirectoryDto`
   (`isRenamable`, `isTransferable`, `acceptsTransferred`, ...) instead of
   instanceof chains at call sites. Enums carry their own presentation and
