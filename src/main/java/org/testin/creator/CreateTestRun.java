@@ -177,7 +177,7 @@ public class CreateTestRun implements NodeCreator {
         });
     }
 
-    private @NotNull CheckedTreeNode convertToCheckedNodes(final DefaultMutableTreeNode node) {
+    private @NotNull CheckedTreeNode convertToCheckedNodes(final @NotNull DefaultMutableTreeNode node) {
         final Object userObj = node.getUserObject();
         final CheckedTreeNode newNode = new CheckedTreeNode(userObj);
         for (int i = 0; i < node.getChildCount(); i++) {

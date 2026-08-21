@@ -1,5 +1,6 @@
 package org.testin.explorer.tree;
 
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
@@ -402,13 +403,13 @@ public class TreeTransferHandler extends TransferHandler {
         final AtomicInteger remaining = new AtomicInteger(from.size());
         final AtomicInteger moved = new AtomicInteger();
 
-        for (int i = 0; i < from.size(); i++) {
-            // Before the data move, while the old path is still what finds the
-            // generated code - and here rather than at the gesture, because undo
-            // and redo are this same routine with the two lists swapped, so they
-            // carry the code back and forth without knowing they do (#51).
-            syncCode(from.get(i), to.get(i));
+        // Before the data moves, while the old paths are still what find the
+        // generated code - and here rather than at the gesture, because undo and
+        // redo are this same routine with the two lists swapped, so they carry
+        // the code back and forth without knowing they do (#51).
+        syncCode(from, to);
 
+        for (int i = 0; i < from.size(); i++) {
             Services.getInstance(p, ProjectIndexer.class).moveNode(from.get(i), to.get(i), wasMoved -> {
                 // The move is asynchronous, so this can land after the project
                 // closed; refreshing a disposed tree throws.
@@ -441,12 +442,28 @@ public class TreeTransferHandler extends TransferHandler {
     }
 
     /**
+     * Moves the generated Java of every node in the batch, as one command.
+     * <p>
+     * One command for the gesture rather than one per node: every mover opens a
+     * command of its own, and a command inside a command is the outer one, so
+     * dragging twenty test sets takes the write lock once, reparses once and
+     * leaves the tester one undo entry beside the tree's own - not twenty to
+     * press through, each undoing a class move while the tree stays where it is.
+     * Whether this IDE has Java is asked once here for the same reason (#51).
+     */
+    private void syncCode(final @NotNull List<Path> from, final @NotNull List<Path> to) {
+        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
+
+        WriteCommandAction.runWriteCommandAction(p, "Move Test Code", null, () -> {
+            for (int i = 0; i < from.size(); i++) moveCodeOf(from.get(i), to.get(i));
+        });
+    }
+
+    /**
      * Moves the generated Java that belongs to the node at this path, if the
      * node has any. Which generator that is belongs to the node itself.
      */
-    private void syncCode(final @NotNull Path from, final @NotNull Path to) {
-        if (!OptionalPlugin.JAVA.isAvailableOrWarnOnce(p)) return;
-
+    private void moveCodeOf(final @NotNull Path from, final @NotNull Path to) {
         final Path target = to.getParent();
         if (target == null) return;
 

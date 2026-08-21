@@ -1,5 +1,6 @@
 package org.testin.codegen;
 
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -26,9 +27,21 @@ import org.testin.services.Services;
 public final class SubtreeCode {
 
     /**
-     * Generates for this node, its test cases, and every node under it.
+     * Generates for this node, its test cases, and every node under it, as one
+     * command.
+     * <p>
+     * One command for the whole subtree rather than one per file written: each
+     * generator opens a command of its own, and a command inside a command is
+     * the outer one, so the walk takes the write lock once, reparses each class
+     * once and leaves the tester a single undo for the copy they made. A copied
+     * set of fifty cases used to be fifty commands, each with its own freeze
+     * (#51).
      */
     public static void generate(final @NotNull Project p, final @NotNull DirectoryDto dir) {
+        WriteCommandAction.runWriteCommandAction(p, "Generate Test Code", null, () -> walk(p, dir));
+    }
+
+    private static void walk(final @NotNull Project p, final @NotNull DirectoryDto dir) {
         final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
 
         Logger.info("Generating code for " + dir.getName());
@@ -41,7 +54,7 @@ public final class SubtreeCode {
         }
 
         for (final DirectoryDto child : indexer.getChildren(dir.getPath())) {
-            generate(p, child);
+            walk(p, child);
         }
     }
 }

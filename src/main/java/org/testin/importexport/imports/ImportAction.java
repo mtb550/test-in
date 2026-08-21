@@ -4,12 +4,12 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
 import org.testin.actions.AbstractProjectTreeAction;
-import org.testin.codegen.Fqcn;
-import org.testin.codegen.method.CreateTestMethod;
+import org.testin.codegen.GenType;
 import org.testin.creator.CreateTestSet;
 import org.testin.explorer.ExplorerPanel;
 import org.testin.explorer.tree.TreeValueUtil;
@@ -131,18 +131,24 @@ public class ImportAction extends AbstractProjectTreeAction {
     }
 
     /**
-     * Generates the automation test method for each imported case. The target
-     * name only labels the log line.
+     * Generates the automation test method for each imported case, as one
+     * command. The target name only labels the log line.
+     * <p>
+     * Through the registry like every other caller: naming the generator class
+     * made this the one place that could keep working its own way while the
+     * rest of the plugin changed how a method is made. One command around the
+     * loop, so a sheet of two hundred cases is one write lock and one undo
+     * rather than two hundred of each (#51).
      */
     private void generateTestMethods(final @NotNull Project p, final @NotNull List<TestCaseDto> testCases,
                                      final @NotNull String targetName) {
         Logger.info("Import: generating test methods for '" + targetName + "' with " + testCases.size() + " cases");
 
-        final CreateTestMethod syncInjector = new CreateTestMethod();
-        for (final TestCaseDto tc : testCases) {
-            final List<String> fqcn = Fqcn.ofMethod(tc);
-            syncInjector.executeSync(p, tc, fqcn);
-        }
+        WriteCommandAction.runWriteCommandAction(p, "Create Test Methods", null, () -> {
+            for (final TestCaseDto tc : testCases) {
+                GenType.CREATE_TEST_CASE.getAction().execute(p, tc);
+            }
+        });
     }
 
     private void linkAndSaveTestCases(final @NotNull Project p, final @NotNull Path dirPath,

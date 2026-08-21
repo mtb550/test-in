@@ -17,7 +17,7 @@ public class CreateTestSetPackage implements NodeCreator {
     private final @NotNull Project p;
 
     @Override
-    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
+    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         TestSetPackageDirectoryDto tsp = Services.getInstance(p, DirectoryMapper.class).getTestSetPackageNode(p, newDirPath, parentDir);
 
         Services.getInstance(p, ProjectIndexer.class).addTestSetPackage(tsp);

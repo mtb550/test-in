@@ -1,6 +1,5 @@
 package org.testin.codegen.method;
 
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -41,39 +40,33 @@ public class CreateTestMethod implements GenAction {
                 fqcn.getLast()));
     }
 
+    /**
+     * Writes the method here and now, in the caller's command when there is one.
+     * <p>
+     * A command inside a command is the outer one, so a caller generating for a
+     * whole set - an import, a copied test set - opens one command around its
+     * loop and gets one write lock, one reparse of the class and one undo entry
+     * instead of one of each per case. This used to hand every case to
+     * {@code invokeLater}, which put each one in an event of its own and so
+     * outside any command the caller had opened: fifty cases meant fifty
+     * separate freezes and fifty entries in the IDE's undo (#51).
+     * <p>
+     * On the EDT, because a write command action is. Both callers are: a dialog
+     * that just closed, and the copy's completion.
+     */
     @Override
     public void execute(final @NotNull Project p, final @NotNull Object obj) {
         if (!(obj instanceof TestCaseDto tc)) return;
 
         final List<String> fqcn = Fqcn.ofMethod(tc);
 
-        parse(fqcn).ifPresentOrElse(target -> {
-            Logger.info("Creating Test Case for: " + fqcn);
-
-            ApplicationManager.getApplication().invokeLater(() ->
-                    WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
-                            createMethod(p, target, tc)
-                    ));
-        }, () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
-    }
-
-    public void executeSync(final @NotNull Project p, final @NotNull TestCaseDto tc, final @NotNull List<String> fqcn) {
-        final Optional<Target> parsed = parse(fqcn);
-        if (parsed.isEmpty()) {
-            Logger.error("FQCN list is too short to generate a method: " + fqcn);
-            return;
-        }
-        final Target target = parsed.get();
-
-        Logger.info("Creating Test Case (sync) for: " + fqcn);
-
-        try {
-            WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null, () ->
-                    createMethod(p, target, tc)
-            );
-        } catch (final Exception ex) {
-            Logger.error("Failed to inject Java method '" + target.methodName() + "': " + ex.getMessage());
-        }
+        parse(fqcn).ifPresentOrElse(
+                target -> {
+                    Logger.info("Creating Test Case for: " + fqcn);
+                    WriteCommandAction.runWriteCommandAction(p, "Create Test Method", null,
+                            () -> createMethod(p, target, tc));
+                },
+                () -> Logger.error("FQCN list is too short to generate a method: " + fqcn));
     }
 
     private void createMethod(final @NotNull Project p, final @NotNull Target target, final @NotNull TestCaseDto tc) {
