@@ -6,6 +6,7 @@ import com.intellij.ui.components.JBPanel;
 import com.intellij.util.ui.JBUI;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.testin.editor.ViewMode;
 import org.testin.editor.toolbar.components.*;
 
@@ -47,11 +48,10 @@ public abstract class AbstractToolbarPanel extends JBPanel<AbstractToolbarPanel>
      * instrumentation throw here — this only says which class was missing.
      */
     public <T extends ToolbarItem> @NotNull T getToolbarItem(final @NotNull Class<T> itemClass) {
-        final ToolbarItem item = toolbarItems.get(itemClass);
-        if (item == null) {
-            throw new IllegalStateException(itemClass.getSimpleName() + " is not registered on " + getClass().getSimpleName());
-        }
-        return itemClass.cast(item);
+        return Optional.ofNullable(toolbarItems.get(itemClass))
+                .map(itemClass::cast)
+                .orElseThrow(() -> new IllegalStateException(
+                        itemClass.getSimpleName() + " is not registered on " + getClass().getSimpleName()));
     }
 
     /**

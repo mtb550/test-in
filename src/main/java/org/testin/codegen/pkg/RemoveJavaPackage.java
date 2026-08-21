@@ -1,12 +1,10 @@
 package org.testin.codegen.pkg;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
-import org.testin.logger.Logger;
 import org.testin.model.dto.dirs.DirectoryDto;
 
 import java.util.List;
@@ -21,13 +19,8 @@ public class RemoveJavaPackage implements GenAction {
         if (fqcn.isEmpty()) return;
         final String packagePath = String.join("/", fqcn);
 
-        JavaSourceRoot.writeInRoot(p, "removing package", testSourceRoot -> {
-            final VirtualFile pkgDir = testSourceRoot.findFileByRelativePath(packagePath);
-            if (pkgDir != null && pkgDir.exists()) {
-                pkgDir.delete(this);
-                Logger.info("Package removed physically at: " + pkgDir.getPath());
-            }
-        });
+        JavaSourceRoot.writeInRoot(p, "removing package", testSourceRoot ->
+                JavaSourceRoot.deleteUnder(testSourceRoot, packagePath, this));
     }
 
 }

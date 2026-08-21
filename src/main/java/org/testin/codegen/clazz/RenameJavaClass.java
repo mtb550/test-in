@@ -6,6 +6,7 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.Renamed;
@@ -26,12 +27,14 @@ public class RenameJavaClass implements GenAction {
         final String path = String.join(".", fqcn);
 
         WriteCommandAction.runWriteCommandAction(p, "Rename Test Class", null, () -> {
-            final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p));
-            if (targetClass == null) {
+            final Optional<PsiClass> found = Optional.ofNullable(
+                    JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)));
+            if (found.isEmpty()) {
                 Logger.warn("RenameJavaClass: class not found: " + path);
                 return;
             }
 
+            final PsiClass targetClass = found.orElseThrow();
             final String newClassName = NameSanitizer.className(newName);
             // Receiver is the non-null side: PsiClass#getName is null for anonymous classes.
             if (!newClassName.equals(targetClass.getName())) {

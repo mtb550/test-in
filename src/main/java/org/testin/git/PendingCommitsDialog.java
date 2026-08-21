@@ -3,6 +3,7 @@ package org.testin.git;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.JBUI;
 import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.testin.indexer.ProjectIndexer;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -196,9 +197,10 @@ public final class PendingCommitsDialog extends AbstractFrameworkDialog<Selectio
         }
 
         try {
-            final Path testSetPath = repoRoot.resolve(diff.relativeFilePath()).getParent();
-            if (testSetPath == null) return;
+            final Optional<Path> found = Optional.ofNullable(repoRoot.resolve(diff.relativeFilePath()).getParent());
+            if (found.isEmpty()) return;
 
+            final Path testSetPath = found.orElseThrow();
             final ProjectIndexer indexer = Services.getInstance(p, ProjectIndexer.class);
             final UUID testCaseId = UUID.fromString(diff.testCaseId());
 

@@ -151,14 +151,11 @@ public class UpdateTestBase {
 
         ApplicationManager.getApplication().invokeLater(() ->
                 WriteCommandAction.runWriteCommandAction(p, title, null, () -> {
-                    final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p));
-                    if (targetClass == null) {
-                        onMissing.accept("class not found: " + path);
-                        return;
-                    }
-
-                    findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
-                            () -> onMissing.accept("no method with testName=" + tc.getId()));
+                    Optional.ofNullable(JavaPsiFacade.getInstance(p).findClass(path, GlobalSearchScope.projectScope(p)))
+                            .ifPresentOrElse(
+                                    targetClass -> findMethodByTestName(targetClass, tc).ifPresentOrElse(updater,
+                                            () -> onMissing.accept("no method with testName=" + tc.getId())),
+                                    () -> onMissing.accept("class not found: " + path));
                 }));
     }
 }

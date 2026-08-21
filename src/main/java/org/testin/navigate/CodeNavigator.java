@@ -10,6 +10,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.search.GlobalSearchScope;
 import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.notifications.Notifier;
 import org.testin.services.Services;
@@ -33,9 +34,11 @@ public class CodeNavigator {
         ApplicationManager.getApplication().executeOnPooledThread(() ->
                 ApplicationManager.getApplication().runReadAction(() -> {
                     try {
-                        final PsiClass targetClass = JavaPsiFacade.getInstance(p).findClass(className, GlobalSearchScope.projectScope(p));
+                        final Optional<PsiClass> found = Optional.ofNullable(
+                                JavaPsiFacade.getInstance(p).findClass(className, GlobalSearchScope.projectScope(p)));
 
-                        if (targetClass != null) {
+                        if (found.isPresent()) {
+                            final PsiClass targetClass = found.orElseThrow();
                             Navigatable targetElement = targetClass;
 
                             final PsiMethod[] exactMethods = targetClass.findMethodsByName(methodName, false);

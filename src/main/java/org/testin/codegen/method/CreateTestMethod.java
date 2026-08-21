@@ -128,13 +128,13 @@ public class CreateTestMethod implements GenAction {
                                 final @NotNull String methodName, final @NotNull TestCaseDto tc) {
         try {
             final String relativePath = String.join("/", packageList) + "/" + className + ".java";
-            final VirtualFile javaFile = sourceRoot.findFileByRelativePath(relativePath);
-            if (javaFile == null) {
+            final Optional<VirtualFile> found = JavaSourceRoot.under(sourceRoot, relativePath);
+            if (found.isEmpty()) {
                 Logger.error("retryInjectPhysically: file not found at " + relativePath + " for method '" + methodName + "'");
                 return;
             }
 
-            final PsiFile psiFile = PsiManager.getInstance(p).findFile(javaFile);
+            final PsiFile psiFile = PsiManager.getInstance(p).findFile(found.orElseThrow());
             if (!(psiFile instanceof PsiJavaFile javaPsiFile)) {
                 Logger.error("retryInjectPhysically: file " + className + ".java is not a valid Java file for method '" + methodName + "'");
                 return;
@@ -160,10 +160,19 @@ public class CreateTestMethod implements GenAction {
      * with no import list of its own, and a TestNG that is not on the classpath
      * - so neither is asked about separately.
      */
+    /**
+     * Whether the file already imports TestNG's @Test. The platform answers "it
+     * does not" with no import statement, and this is the one place that reads
+     * that.
+     */
+    private static boolean alreadyImportsTest(final @NotNull PsiImportList imports) {
+        return imports.findSingleClassImportStatement(TESTNG_TEST) != null;
+    }
+
     private void addTestImport(final @NotNull Project p, final @NotNull PsiJavaFile javaFile,
                                final @NotNull PsiElementFactory factory) {
         Optional.ofNullable(javaFile.getImportList())
-                .filter(imports -> imports.findSingleClassImportStatement(TESTNG_TEST) == null)
+                .filter(imports -> !alreadyImportsTest(imports))
                 .ifPresent(imports -> Optional
                         .ofNullable(JavaPsiFacade.getInstance(p).findClass(TESTNG_TEST, GlobalSearchScope.allScope(p)))
                         .ifPresent(testClass -> imports.add(factory.createImportStatement(testClass))));

@@ -93,6 +93,32 @@ public final class JavaSourceRoot {
      * nothing at all, so the same missing folder explained itself differently
      * depending on which generator noticed (#71).
      */
+    /**
+     * Whatever sits at a path under the source root: nothing when the code was
+     * never generated for that node, or when someone deleted it by hand. Both
+     * are ordinary states, which is why every caller gets an answer rather than
+     * a null to interpret.
+     */
+    public static @NotNull Optional<VirtualFile> under(final @NotNull VirtualFile root,
+                                                       final @NotNull String relativePath) {
+        return Optional.ofNullable(root.findFileByRelativePath(relativePath));
+    }
+
+    /**
+     * Deletes what sits at a path under the source root, when anything does.
+     * Removing a class and removing a package were the same five lines, and
+     * neither of them was ever a failure when there was nothing to remove.
+     */
+    public static void deleteUnder(final @NotNull VirtualFile root, final @NotNull String relativePath,
+                                   final @NotNull Object requestor) throws IOException {
+        final Optional<VirtualFile> found = under(root, relativePath).filter(VirtualFile::exists);
+        if (found.isEmpty()) return;
+
+        final VirtualFile target = found.orElseThrow();
+        target.delete(requestor);
+        Logger.info("Removed generated code at: " + target.getPath());
+    }
+
     public static @NotNull Optional<VirtualFile> packageFolder(final @NotNull VirtualFile root,
                                                                final @NotNull List<String> packageSegments) throws IOException {
         final String relative = String.join("/", packageSegments);

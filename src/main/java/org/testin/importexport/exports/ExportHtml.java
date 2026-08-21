@@ -136,9 +136,7 @@ public class ExportHtml {
         final StringBuilder sb = new StringBuilder(value.length());
         for (int i = 0; i < value.length(); i++) {
             final char c = value.charAt(i);
-            final String rep = HTML_ESCAPES.get(c);
-            if (rep != null) sb.append(rep);
-            else sb.append(c);
+            sb.append(HTML_ESCAPES.getOrDefault(c, String.valueOf(c)));
         }
         return sb.toString();
     }

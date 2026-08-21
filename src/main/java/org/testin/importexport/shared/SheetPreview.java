@@ -25,6 +25,13 @@ import java.util.Map;
  */
 public final class SheetPreview implements DialogComponent {
 
+    /**
+     * The table of a sheet the preview never built one for: no rows, so nothing
+     * of that sheet is selected.
+     */
+    private static final @NotNull DefaultTableModel NO_MODEL = new DefaultTableModel();
+
+
     private final @NotNull Project p;
     private final @NotNull List<TestEditorAttributes> attributes;
 
@@ -80,8 +87,9 @@ public final class SheetPreview implements DialogComponent {
         final Map<String, List<TestCaseDto>> selectedBySheet = new LinkedHashMap<>();
 
         for (final Map.Entry<String, List<TestCaseDto>> entry : sheets.entrySet()) {
-            final DefaultTableModel model = models.get(entry.getKey());
-            if (model == null) continue;
+            // A sheet the preview never built a table for shows nothing, so
+            // nothing of it is selected.
+            final DefaultTableModel model = models.getOrDefault(entry.getKey(), NO_MODEL);
 
             final List<TestCaseDto> casesInSheet = entry.getValue();
             final List<TestCaseDto> selected = new ArrayList<>();

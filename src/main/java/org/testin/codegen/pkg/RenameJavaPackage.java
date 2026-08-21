@@ -8,6 +8,8 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import org.jetbrains.annotations.NotNull;
+import java.util.Objects;
+import java.util.Optional;
 import org.testin.codegen.Fqcn;
 import org.testin.codegen.GenAction;
 import org.testin.codegen.JavaSourceRoot;
@@ -37,12 +39,14 @@ public class RenameJavaPackage implements GenAction {
      */
     private void renameUnder(final @NotNull Project p, final @NotNull VirtualFile testSourceRoot,
                              final @NotNull List<String> fqcn, final @NotNull String newName) {
-        final VirtualFile pkgDir = testSourceRoot.findFileByRelativePath(String.join("/", fqcn));
-        if (pkgDir == null || !pkgDir.isDirectory()) {
+        final Optional<VirtualFile> found = JavaSourceRoot.under(testSourceRoot, String.join("/", fqcn))
+                .filter(VirtualFile::isDirectory);
+        if (found.isEmpty()) {
             Logger.info("Package not found for rename: " + String.join(".", fqcn));
             return;
         }
 
+        final VirtualFile pkgDir = found.orElseThrow();
         final String newTop = NameSanitizer.packageName(newName);
         // The package path of the directory that CONTAINS the renamed package, e.g. "muath"
         // for a package at "muath.pkgtu" -> "muath.pkg". Needed so the new package
@@ -85,10 +89,12 @@ public class RenameJavaPackage implements GenAction {
 
     private @NotNull String buildNewPackage(final @NotNull VirtualFile root, final @NotNull VirtualFile parentDir,
                                             final @NotNull String newTop, final @NotNull String parentPackage) {
-        final String rel = VfsUtil.getRelativePath(parentDir, root, '/');
+        // The root itself is no path below the root, which VfsUtil says with a
+        // null and which means the same as saying it with an empty string.
+        final String rel = Objects.requireNonNullElse(VfsUtil.getRelativePath(parentDir, root, '/'), "");
         final String base = parentPackage.isEmpty() ? newTop : parentPackage + "." + newTop;
 
-        if (rel == null || rel.isEmpty()) return base;
+        if (rel.isEmpty()) return base;
         return base + "." + rel.replace('/', '.');
     }
 }

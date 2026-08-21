@@ -3,6 +3,7 @@ package org.testin.codegen;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.testin.codegen.clazz.CreateJavaClass;
 import org.testin.codegen.clazz.RemoveJavaClass;
 import org.testin.codegen.clazz.MoveJavaClass;
@@ -51,8 +52,7 @@ final class GenRegistry {
     }
 
     static @NotNull GenAction actionFor(final @NotNull GenType type) {
-        final GenAction action = ACTIONS.get(type);
-        if (action == null) throw new IllegalStateException("No generator registered for " + type);
-        return action;
+        return Optional.ofNullable(ACTIONS.get(type))
+                .orElseThrow(() -> new IllegalStateException("No generator registered for " + type));
     }
 }

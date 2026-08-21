@@ -10,7 +10,6 @@ import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.LocalFileSystem;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import git4idea.GitUtil;
 import org.jetbrains.annotations.NotNull;
@@ -203,8 +202,8 @@ public class SyncActionAction extends AbstractProjectTreeAction {
     }
 
     private void refreshRepository(final @NotNull Path repoPath) {
-        final VirtualFile vFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile());
-        if (vFile != null) GitUtil.refreshVfsInRoot(vFile);
+        Optional.ofNullable(LocalFileSystem.getInstance().refreshAndFindFileByIoFile(repoPath.toFile()))
+                .ifPresent(GitUtil::refreshVfsInRoot);
         Services.getInstance(p, ProjectIndexer.class).scanSingleProject(repoPath);
     }
 
@@ -213,16 +212,22 @@ public class SyncActionAction extends AbstractProjectTreeAction {
      * selected path, and the tree's own root when nothing is selected.
      */
     private @NotNull Optional<Path> getActiveProjectPath() {
-        final TreePath selectionPath = tree.getSelectionPath();
-        if (selectionPath != null) {
-            for (final Object component : selectionPath.getPath()) {
-                final Optional<Path> project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class)
-                        .map(TestProjectDirectoryDto::getPath);
-                if (project.isPresent()) return project;
-            }
+        return Optional.ofNullable(tree.getSelectionPath())
+                .flatMap(SyncActionAction::projectOn)
+                .or(() -> TreeValueUtil.projectPath(tree));
+    }
+
+    /**
+     * The nearest test project on a selected path, walking down from the root.
+     */
+    private static @NotNull Optional<Path> projectOn(final @NotNull TreePath selectionPath) {
+        for (final Object component : selectionPath.getPath()) {
+            final Optional<Path> project = TreeValueUtil.valueOf(component, TestProjectDirectoryDto.class)
+                    .map(TestProjectDirectoryDto::getPath);
+            if (project.isPresent()) return project;
         }
 
-        return TreeValueUtil.projectPath(tree);
+        return Optional.empty();
     }
 
     @Override

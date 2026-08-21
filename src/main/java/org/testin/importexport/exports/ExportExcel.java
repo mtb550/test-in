@@ -16,6 +16,16 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class ExportExcel {
+
+    /**
+     * Whether the workbook already carries a sheet of this name. POI says it
+     * does not by handing back no sheet, and this is the one place that reads
+     * that.
+     */
+    private static boolean hasSheet(final @NotNull Workbook workbook, final @NotNull String name) {
+        return workbook.getSheet(name) != null;
+    }
+
     private final @NotNull ExportAction exportAction;
 
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
@@ -31,7 +41,7 @@ public class ExportExcel {
                 if (safeSheetName.length() > 31) {
                     safeSheetName = safeSheetName.substring(0, 31);
                 }
-                while (workbook.getSheet(safeSheetName) != null) {
+                while (hasSheet(workbook, safeSheetName)) {
                     safeSheetName = safeSheetName.substring(0, 28) + "...";
                 }
 

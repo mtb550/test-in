@@ -2,7 +2,7 @@ package org.testin.importexport.exports;
 
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import com.intellij.openapi.util.io.FileUtil;
 import org.testin.logger.Logger;
 import org.testin.model.dto.TestCaseDto;
 import org.testin.notifications.Notifier;
@@ -12,7 +12,6 @@ import org.testin.util.Mapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +26,9 @@ public class ExportJson {
     public void exportToFile(final @NotNull Project p, final @NotNull File destFile,
                              final @NotNull Map<String, List<TestCaseDto>> sheetsData) {
         try {
-            final @Nullable Path parent = destFile.toPath().getParent();
-            if (parent != null) Files.createDirectories(parent);
+            // The platform's own helper: it knows that a bare file name has no
+            // parent directory to create, so nothing here has to.
+            FileUtil.createParentDirs(destFile);
 
             Files.write(destFile.toPath(), Services.getInstance(p, Mapper.class).writeValueAsBytes(sheetsData));
         } catch (final IOException ex) {

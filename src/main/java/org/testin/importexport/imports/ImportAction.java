@@ -28,7 +28,6 @@ import org.testin.util.EditorUtil;
 import org.testin.util.NameSanitizer;
 import org.testin.util.OptionalPlugin;
 
-import javax.swing.tree.TreePath;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,14 +47,7 @@ public class ImportAction extends AbstractProjectTreeAction {
 
     @Override
     public void actionPerformed(final @NotNull AnActionEvent e) {
-        final TreePath path = tree.getSelectionPath();
-
-        if (path == null) {
-            Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Import Into", "Select a directory in the Project Panel tree.");
-            return;
-        }
-
-        TreeValueUtil.directoryAt(path)
+        TreeValueUtil.directoryAt(tree.getSelectionPath())
                 .filter(DirectoryDto::isTestCaseContainer)
                 .ifPresentOrElse(this::openImportDialog, () ->
                         Services.getInstance(p, Notifier.class).softShow(p, "Nothing to Import Into",

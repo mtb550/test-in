@@ -1,8 +1,8 @@
 package org.testin.editor.run;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.ui.components.JBLabel;
 import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.testin.editor.BaseCard;
 import org.testin.editor.CardHoverAction;
 import org.testin.editor.Shared;
@@ -35,12 +35,11 @@ public class RunCard extends BaseCard {
 
         updateUI(index, title, badges, details);
 
-        final JBLabel statusLabel = attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName());
-
-        if (statusLabel != null) {
+        // The status label is there only when the tester is showing that column.
+        Optional.ofNullable(attributeLabels.get(RunEditorAttributes.RUN_STATUS.getName())).ifPresent(statusLabel -> {
             statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
             statusLabel.setForeground(runItem.getStatus().getRowColor());
-        }
+        });
 
     }
 }

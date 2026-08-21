@@ -5,6 +5,7 @@ import com.intellij.openapi.ui.ComboBox;
 import com.intellij.ui.components.JBCheckBox;
 import com.intellij.ui.table.JBTable;
 import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.model.Priority;
 import org.testin.model.TestEditorAttributes;
@@ -103,10 +104,8 @@ public class TablePanelBuilder {
         for (int i = 0; i < table.getColumnCount(); i++) {
             final TableColumn col = table.getColumnModel().getColumn(i);
 
-            TableCellRenderer headerRenderer = col.getHeaderRenderer();
-            if (headerRenderer == null) {
-                headerRenderer = table.getTableHeader().getDefaultRenderer();
-            }
+            final TableCellRenderer headerRenderer = Optional.ofNullable(col.getHeaderRenderer())
+                    .orElseGet(() -> table.getTableHeader().getDefaultRenderer());
             final Component headerComp = headerRenderer.getTableCellRendererComponent(
                     table, col.getHeaderValue(), false, false, 0, i);
             int maxWidth = headerComp.getPreferredSize().width;

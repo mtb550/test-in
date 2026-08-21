@@ -121,9 +121,8 @@ public final class SourceForm implements DialogComponent {
         final File source = new File(filePath);
 
         if (offersDefaultFolder && setDefaultCheckBox.isSelected()) {
-            final File folder = source.getParentFile();
-            if (folder != null)
-                Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder.getAbsolutePath();
+            Optional.ofNullable(source.getParentFile()).ifPresent(folder ->
+                    Services.getInstance(p, AppSettingsState.class).defaultDownloadFolder = folder.getAbsolutePath());
         }
 
         return Optional.of(source);

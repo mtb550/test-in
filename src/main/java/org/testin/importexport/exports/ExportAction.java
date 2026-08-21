@@ -12,6 +12,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.treeStructure.SimpleTree;
 import org.jetbrains.annotations.NotNull;
+import java.util.Objects;
 import org.testin.actions.AbstractProjectTreeAction;
 import org.testin.explorer.tree.TreeValueUtil;
 import org.testin.logger.Logger;
@@ -87,14 +88,11 @@ public class ExportAction extends AbstractProjectTreeAction {
         if (dirDto instanceof TestSetDirectoryDto) {
             allSheets.put(targetDirectory.getName(), loadTestCasesInOrder(p, targetDirectory));
         } else {
-            final VirtualFile[] children = targetDirectory.getChildren();
-            if (children != null) {
-                for (final VirtualFile child : children) {
-                    if (child.isDirectory()) {
-                        final List<TestCaseDto> tcs = loadTestCasesInOrder(p, child);
-                        if (!tcs.isEmpty()) {
-                            allSheets.put(child.getName(), tcs);
-                        }
+            for (final VirtualFile child : childrenOf(targetDirectory)) {
+                if (child.isDirectory()) {
+                    final List<TestCaseDto> tcs = loadTestCasesInOrder(p, child);
+                    if (!tcs.isEmpty()) {
+                        allSheets.put(child.getName(), tcs);
                     }
                 }
             }
@@ -111,13 +109,18 @@ public class ExportAction extends AbstractProjectTreeAction {
                 .map(target -> target.isDirectory() ? target : target.getParent());
     }
 
+    /**
+     * What a VFS directory holds. The platform answers "nothing readable here"
+     * with a null array, which is the same as holding nothing.
+     */
+    private static VirtualFile @NotNull [] childrenOf(final @NotNull VirtualFile dir) {
+        return Objects.requireNonNullElse(dir.getChildren(), VirtualFile.EMPTY_ARRAY);
+    }
+
     public @NotNull List<TestCaseDto> loadTestCasesInOrder(final @NotNull Project p, final @NotNull VirtualFile dir) {
         final List<TestCaseDto> loaded = new ArrayList<>();
 
-        final VirtualFile[] files = dir.getChildren();
-        if (files == null) return Collections.emptyList();
-
-        for (final VirtualFile file : files) {
+        for (final VirtualFile file : childrenOf(dir)) {
             if (!file.isDirectory() && file.getName().endsWith(".json")) {
                 try (InputStream is = file.getInputStream()) {
                     loaded.add(Services.getInstance(p, Mapper.class).readValue(is, TestCaseDto.class));

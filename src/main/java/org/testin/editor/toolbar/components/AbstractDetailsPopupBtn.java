@@ -6,6 +6,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.ui.CheckBoxList;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import java.util.Optional;
 import org.testin.logger.Logger;
 import org.testin.model.ToolBarAttribute;
 import org.testin.ui.dialogs.DialogStyle;
@@ -84,8 +85,10 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
              */
             @Override
             protected boolean isEnabled(final int index) {
-                final E item = getItemAt(index);
-                return item == null || item.getToolBarDefault().isSwitchable();
+                // A row the list has not filled in yet locks nothing.
+                return Optional.ofNullable(getItemAt(index))
+                        .map(item -> item.getToolBarDefault().isSwitchable())
+                        .orElse(true);
             }
         };
         DialogStyle.styleContent(detailsList);
@@ -93,11 +96,10 @@ public abstract class AbstractDetailsPopupBtn<E extends Enum<E> & ToolBarAttribu
         options.forEach(attr -> detailsList.addItem(attr, attr.getName(), selectedDetails.contains(attr)));
 
         detailsList.setCheckBoxListListener((index, state) -> {
-            final E item = detailsList.getItemAt(index);
-            if (item != null) {
+            Optional.ofNullable(detailsList.getItemAt(index)).ifPresent(item -> {
                 if (state) selectedDetails.add(item);
                 else selectedDetails.remove(item);
-            }
+            });
 
             saveProps();
 

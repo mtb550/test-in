@@ -84,7 +84,7 @@ public class FileDocumentListener implements DocumentListener {
                 final Map<String, List<TestCaseDto>> parsedData = importLoader.apply(importFile, format);
 
                 ApplicationManager.getApplication().invokeLater(() -> {
-                    if (parsedData == null || parsedData.isEmpty()) {
+                    if (parsedData.isEmpty()) {
                         Services.getInstance(p, Notifier.class).softShow(p, "No Data", "No test cases found in the selected file.");
                         return;
                     }
