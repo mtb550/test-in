@@ -16,13 +16,13 @@ import java.util.function.Consumer;
 /**
  * Work that runs off the EDT under the IDE's own progress bar.
  * <p>
- * The four long operations a tester starts from a dialog - importing a sheet,
- * exporting one, generating a report, creating a test run - used to run with the
- * dialog still on screen and, where the work was on the EDT, frozen with it. The
- * dialog closes on the button now and the work reports itself here instead
- * (#87).
+ * A tester starts four long operations from a dialog: importing a sheet,
+ * exporting one, generating a report, creating a test run. Each used to run with
+ * the dialog still on screen, and where the work was on the EDT, frozen with it.
  * <p>
- * None of them can be cancelled. An import writes one file per test case and an
+ * The dialog closes on the button now, and the work reports itself here (#87).
+ * <p>
+ * None of them can be canceled. An import writes one file per test case and an
  * export or a report writes one file whole, so a stop part-way through leaves
  * something half-made that nobody asked for; the bar moves and nothing
  * interrupts it.
@@ -41,8 +41,8 @@ public final class BackgroundWork {
      * @param whatFailed the heading of the message if it throws - "Import Failed"
      * @param work       the work itself. It is handed the indicator, so anything
      *                   that knows how much it has to do can say so with
-     *                   {@link ProgressIndicator#setFraction}; anything that does
-     *                   not leaves the bar as it finds it.
+     *                   {@link ProgressIndicator#setFraction}. Anything that
+     *                   cannot leaves the bar as it found it.
      */
     public static void run(final @NotNull Project p, final @NotNull String title,
                            final @NotNull String whatFailed,

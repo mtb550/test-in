@@ -64,8 +64,7 @@ public class ExportAction extends AbstractProjectTreeAction {
                 // than a return code, so the destination is never read back
                 // out of a dialog that was canceled. It hands back the cases
                 // the tester left ticked, not the ones gathered above.
-                new ExportDialog(p, exportAttributes, sheets, targetDir, (destination, selected) ->
-                        writeExport(destination, selected)).show();
+                new ExportDialog(p, exportAttributes, sheets, targetDir, this::writeExport).show();
             });
         });
     }
