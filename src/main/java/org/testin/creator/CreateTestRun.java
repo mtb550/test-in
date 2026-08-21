@@ -44,7 +44,7 @@ public class CreateTestRun implements NodeCreator {
      * including its own tree refresh and editor opening. Always returns null.
      */
     @Override
-    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final DirectoryDto parentDir, final @NotNull Path newDirPath) {
+    public @NotNull Optional<DirectoryDto> execute(final @NotNull String name, final @NotNull DirectoryDto parentDir, final @NotNull Path newDirPath) {
         // The tree this was started from only exists when a project is bound, so
         // nobody can click their way into the miss. It is checked because a run
         // written against no project would be a directory nothing owns.

@@ -93,8 +93,14 @@ public final class Notifier {
         });
     }
 
+    /**
+     * An error with nothing written above the message: the message is the whole
+     * of it.
+     */
+    private static final @NotNull String NO_TITLE = "";
+
     public void error(final @NotNull Project p, final @NotNull String message) {
-        notify(p, null, message, NotificationType.ERROR);
+        notify(p, NO_TITLE, message, NotificationType.ERROR);
     }
 
     public void info(final @NotNull Project p, final @NotNull String title, final @NotNull String message) {
@@ -149,7 +155,11 @@ public final class Notifier {
 
     private void notify(final @NotNull Project p, final @NotNull String title, final @NotNull String message,
                         final @NotNull NotificationType type, final @NotNull NotificationAction... actions) {
-        final Notification notification = title == null
+        // The platform has one overload with a title and one without, and picks
+        // by which is called - so "no title" needs a value to be chosen by. It
+        // used to be a null, which the annotation sweep then declared impossible
+        // while the one caller that passes it went on passing it (#93).
+        final Notification notification = title.isEmpty()
                 ? NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(message, type)
                 : NotificationGroupManager.getInstance().getNotificationGroup(GROUP_ID).createNotification(title, message, type);
 

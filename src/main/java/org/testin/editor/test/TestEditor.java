@@ -46,7 +46,6 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.Optional;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
