@@ -14,9 +14,11 @@
     intellij.version in gradle.properties, so the result does not depend on which
     IDE happens to be installed on a given machine.
 
-    Config and system directories are isolated under build/, because a running IDE
-    holds a lock on its own - without this the run fails while IntelliJ is open on
-    the same project, and it must never write to the developer's real settings.
+    Everything it writes - the XML, the two reports, and the throwaway config and
+    system directories the inspector needs - goes under .inspection/, one folder
+    to delete. Those last are isolated because a running IDE holds a lock on its
+    own: without them the run fails while IntelliJ is open on the same project,
+    and it must never touch the developer's real settings.
 
     Costs one full indexing pass, so expect 10-20 minutes. A deliberate sweep, not
     a per-commit gate.
@@ -26,9 +28,10 @@
 #>
 
 param(
-    # Where the XML output and the two reports are written. Deliberately not
-    # under build/: ./gradlew clean deletes that, and the findings list is what
-    # you work from for the next hour. Gitignored instead.
+    # The one folder this script writes: the XML, the two reports, and the
+    # inspector's throwaway IDE directories. Deliberately not under build/:
+    # ./gradlew clean deletes that, and the findings list is what you work from
+    # for the next hour. Gitignored instead.
     [string] $OutputDir = '.inspection',
 
     # Restrict the run to a subdirectory. Defaults to the production sources,
@@ -64,18 +67,14 @@ function Resolve-Inspector {
 }
 
 function Invoke-Inspector([string] $inspect, [string] $outPath) {
-    # Beside the output and for the same reason: an inspector still running holds
-    # this directory open, and a ./gradlew clean in another terminal then fails
-    # to delete build/ rather than merely losing the report.
-    $scratch = Join-Path $repo '.inspection-ide'
-
-    # Started from empty every time. Reusing the caches is tempting - they hold
-    # the indexes and make a second run far quicker - but the VFS snapshot in
-    # there can survive a source edit and be analysed instead of the file on
-    # disk, which reports findings that were already fixed. A slow run beats a
-    # stale one.
-    if (Test-Path $scratch) { Get-ChildItem -Path $scratch -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue }
-    New-Item -ItemType Directory -Force -Path $scratch, $outPath | Out-Null
+    # Inside the output folder, so the caller that empties it for a fresh run
+    # empties these caches with it. Starting them from empty every time is the
+    # point: reusing them is tempting - they hold the indexes and make a second
+    # run far quicker - but the VFS snapshot in there can survive a source edit
+    # and be analysed instead of the file on disk, which reports findings that
+    # were already fixed. A slow run beats a stale one.
+    $scratch = Join-Path $outPath 'ide'
+    New-Item -ItemType Directory -Force -Path $scratch | Out-Null
 
     # Forward slashes: idea.properties is read as a Java properties file, where a
     # backslash escapes the next character.
@@ -158,10 +157,16 @@ function Write-Reports([object[]] $problems, [string] $outPath) {
 $outPath = Join-Path $repo $OutputDir
 
 if (-not $ReportOnly) {
-    # A stale XML file from an earlier run would be counted as part of this one.
+    # The single cleanup: a stale XML file would be counted as part of this run,
+    # and a stale index would be analysed in place of the source. Both live here.
     # The contents, not the directory: gradle.properties sets org.gradle.vfs.watch,
     # so the daemon holds a handle on it and removing the directory itself fails.
-    if (Test-Path $outPath) { Get-ChildItem -Path $outPath -Recurse -Force | Remove-Item -Recurse -Force }
+    # A cache file an earlier inspector still holds open is allowed to survive -
+    # it costs a slower run - but a surviving report is counted twice, so say so.
+    if (Test-Path $outPath) { Get-ChildItem -Path $outPath -Recurse -Force | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue }
+    if (Get-ChildItem -Path (Join-Path $outPath '*.xml') -ErrorAction SilentlyContinue) {
+        throw "XML from an earlier run is still in $outPath and could not be deleted. Close whatever holds it open and run again."
+    }
     Invoke-Inspector (Resolve-Inspector) $outPath
 }
 
