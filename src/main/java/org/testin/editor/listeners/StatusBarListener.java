@@ -3,7 +3,6 @@ package org.testin.editor.listeners;
 import org.jetbrains.annotations.NotNull;
 import org.testin.editor.TestinEditor;
 
-import javax.swing.*;
 
 public class StatusBarListener {
 
